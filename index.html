@@ -115,6 +115,26 @@ h1, h2, h3, h4 { margin: 0; line-height: 1.15; }
 .foot { margin-left: var(--side); padding: 20px 24px 28px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); }
 .foot a { color: var(--text); text-decoration: underline; }
 .bottom-nav { display: none; }
+/* ============ Leaderboard ============ */
+.lb-head h1 { margin: 0 0 4px; }
+.lb-head p { margin: 0 0 16px; }
+.lb-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; margin-bottom: 14px; border-radius: 14px; background: #0c0a0b; border: 1px solid var(--line); }
+.lb-tabs button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 4px; border-radius: 10px; color: var(--muted); font: 700 12px Inter, sans-serif; transition: background .2s, color .2s; }
+.lb-tabs button span { font-size: 18px; }
+.lb-tabs button.on { background: var(--panel-3); color: var(--text); }
+.lb-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.lb-row { display: grid; grid-template-columns: 40px 34px 1fr auto; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 12px; background: var(--panel-2); border: 1px solid transparent; }
+.lb-row.podium { background: linear-gradient(90deg, rgba(251, 191, 36, .12), var(--panel-2) 60%); }
+.lb-row.me { border-color: var(--green); box-shadow: 0 0 0 3px rgba(255, 35, 64, .12); }
+.lb-pos { text-align: center; font: 800 16px Inter, sans-serif; color: var(--muted); }
+.lb-row.podium .lb-pos { font-size: 22px; }
+.lb-badge svg { display: block; }
+.lb-name { min-width: 0; display: flex; flex-direction: column; }
+.lb-name b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-name small { color: var(--muted); font-size: 12px; }
+.lb-val { font: 800 15px Inter, sans-serif; color: var(--gold); white-space: nowrap; }
+.lb-msg { padding: 24px 12px; text-align: center; color: var(--muted); }
+@media (max-width: 480px) { .lb-tabs button { font-size: 11px; } .lb-row { grid-template-columns: 30px 30px 1fr auto; gap: 8px; padding: 8px; } }
 section { margin-bottom: 28px; }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
 .sec-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
@@ -1746,6 +1766,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
       <a href="#lobby-table"><span>🎡</span>Roues & tables</a>
       <a href="#lobby-quick"><span>⚡</span>Jeux rapides</a>
       <a href="#profil" data-nav="vip"><span>👑</span>Profil & rangs</a>
+      <a href="#classement" data-nav="top"><span>🏆</span>Classement</a>
       <a href="#recharger" data-nav="refill"><span>💰</span>Recharger</a>
     </nav>
     <div class="side-label">Jeux</div>
@@ -1775,6 +1796,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
     <a href="#accueil" data-nav="home"><span>🏠</span>Accueil</a>
     <a href="#lobby-slot" data-nav="slots"><span>🎰</span>Jeux</a>
     <a href="#profil" data-nav="vip"><span>👑</span>Profil</a>
+    <a href="#classement" data-nav="top"><span>🏆</span>Top</a>
     <a href="#recharger" data-nav="refill"><span>💰</span>Recharger</a>
   </nav>
 
@@ -1807,7 +1829,7 @@ function readStats() {
     return readStats.blank();
   }
 }
-readStats.blank = () => ({ wagered: 0, won: 0, spins: 0, biggest: 0, history: [] });
+readStats.blank = () => ({ wagered: 0, won: 0, spins: 0, biggest: 0, bestBonus: 0, history: [] });
 
 class Wallet extends EventTarget {
   constructor() {
@@ -1871,6 +1893,14 @@ class Wallet extends EventTarget {
     }
     this.save();
     this.dispatchEvent(new CustomEvent('payout', { detail: { amount: n, meta } }));
+  }
+
+  // Total paid by one bonus round (free spins, hold & spin…), for the "best bonus" record.
+  bonusWin(n) {
+    this.fresh();
+    if (n <= (this.state.bestBonus || 0)) return;
+    this.state.bestBonus = round(n);
+    this.save();
   }
 
   // Free credits (daily bonus, level rewards, ads): not counted as winnings, earn no XP.
@@ -1974,6 +2004,12 @@ const cloud = {
   async load(uid) { const d = await (await users()).doc(uid).get(); return d.exists ? d.data() : null; },
   // JSON round trip: Firestore refuses undefined values.
   async save(uid, data) { await (await users()).doc(uid).set(JSON.parse(JSON.stringify(data))); },
+  // Public leaderboard: one small entry per account (leaderboard/{uid}), readable by everyone.
+  async saveBoard(uid, entry) { await (await init()).db.collection('leaderboard').doc(uid).set(entry); },
+  async top(field, n) {
+    const q = await (await init()).db.collection('leaderboard').orderBy(field, 'desc').limit(n).get();
+    return q.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  },
 };
 
 return { cloud };
@@ -2077,6 +2113,7 @@ class Profiles extends EventTarget {
     this.mode = 'cloud';
     this.store = { current: user.uid, users: { [user.uid]: data } };
     this.bind();
+    this.publish();
     this.dispatchEvent(new CustomEvent('change', { detail: { isNew } }));
     return { profile: data, isNew };
   }
@@ -2107,7 +2144,28 @@ class Profiles extends EventTarget {
     if (!this.saveT) return;
     clearTimeout(this.saveT);
     this.saveT = null;
-    if (this.mode === 'cloud' && this.current) cloud.save(this.store.current, this.current).catch((e) => console.error(e));
+    if (this.mode === 'cloud' && this.current) {
+      cloud.save(this.store.current, this.current).catch((e) => console.error(e));
+      this.publish();
+    }
+  }
+
+  // The account's public leaderboard entry: level, balance and best wins (in KE).
+  publish() {
+    const me = this.current;
+    if (this.mode !== 'cloud' || !me) return;
+    const { xpToNext } = __mods['progress.js'];
+    const level = me.prog?.level || 1, xp = me.prog?.xp || 0, need = xpToNext(level);
+    const entry = {
+      name: me.name,
+      level,
+      levelScore: level + (Number.isFinite(need) ? Math.min(0.999, xp / need) : 0),
+      bal: Math.round(me.bal ?? START) / 100,
+      best: me.stats?.biggest || 0,
+      bestBonus: me.stats?.bestBonus || 0,
+      updated: Date.now(),
+    };
+    cloud.saveBoard(this.store.current, entry).catch((e) => console.error(e));
   }
 
   // Returns an error message, or null when the pseudo is valid.
@@ -5083,6 +5141,7 @@ class SlotMachine {
       const won = await runHoldSpin(this, res.grid);
       if (won > 0) {
         wallet.credit(won, { game: `${g.name} · Hold & Spin`, x: won / bet });
+        wallet.bonusWin(won);
         this.root.querySelector('.last-win').textContent = fmt(won);
         await this.celebrate(won, { summary: 'HOLD & SPIN' });
       }
@@ -5140,7 +5199,7 @@ class SlotMachine {
     this.layer.innerHTML = '';
     this.updateBanner();
     this.slotEl.classList.remove('in-free');
-    if (won > 0) wallet.credit(won, { game: `${g.name} · Free Spins`, x: won / this.bet });
+    if (won > 0) { wallet.credit(won, { game: `${g.name} · Free Spins`, x: won / this.bet }); wallet.bonusWin(won); }
     await this.celebrate(won, { summary: cfg.title.toUpperCase() });
     this.restoreAfterFeature();
   }
@@ -5380,6 +5439,7 @@ class BaseGame {
     this.auto = 0;
     this.busy = false;
     this.dead = false;
+    this.featWin = 0; // cents paid by bonus features during the current round
     this.music = new Music(this.cfg.music);
     this.mountArt();
     this.render();
@@ -5404,6 +5464,7 @@ class BaseGame {
   }
   win(c, label) {
     if (c <= 0) return;
+    if (label) this.featWin += c;
     wallet.credit(c / 100, { game: label ? `${this.game.name} · ${label}` : this.game.name, x: c / Math.max(1, this.lastStake || this.bet) });
   }
 
@@ -5554,7 +5615,9 @@ class BaseGame {
   async round(fn) {
     if (this.busy || this.dead) return;
     this.setBusy(true);
+    this.featWin = 0;
     try { await fn(); } catch (e) { console.error(e); }
+    if (this.featWin > 0) wallet.bonusWin(this.featWin / 100);
     if (this.dead) return;
     this.setBusy(false);
     if (this.auto > 0) {
@@ -10686,6 +10749,67 @@ function renderResponsible(root) {
 return { renderRefill, renderResponsible };
 })();
 
+// ---- pages/leaderboard.js ----
+__mods['pages/leaderboard.js'] = (() => {
+// Leaderboard: top accounts by level, balance, biggest single win and biggest bonus round (Firestore 'leaderboard').
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { rankBadge, rankOf } = __mods['progress.js'];
+const { fmt } = __mods['wallet.js'];
+
+const BOARDS = [
+  { id: 'level', field: 'levelScore', icon: '👑', label: 'Niveau', value: (e) => `Niv. ${e.level}` },
+  { id: 'bal', field: 'bal', icon: '💰', label: 'Solde', value: (e) => fmt(e.bal) },
+  { id: 'best', field: 'best', icon: '💥', label: 'Plus gros gain', value: (e) => fmt(e.best) },
+  { id: 'bonus', field: 'bestBonus', icon: '🎁', label: 'Plus gros bonus', value: (e) => fmt(e.bestBonus) },
+];
+const TOP = 50;
+const MEDAL = ['🥇', '🥈', '🥉'];
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+let tab = 'level';
+try { tab = localStorage.getItem('lb_tab') || tab; } catch { /* ignore */ }
+
+function renderLeaderboard(root) {
+  const me = profiles.online ? profiles.store.current : null;
+  root.innerHTML = `
+    <section class="panel lb">
+      <div class="lb-head"><h1>🏆 Classement</h1><p class="muted">Les ${TOP} meilleurs joueurs inscrits. ${profiles.online ? 'Ta ligne est mise en avant.' : 'Crée un compte pour apparaître dans le classement.'}</p></div>
+      <div class="lb-tabs" role="tablist">${BOARDS.map((b) => `<button type="button" data-lb="${b.id}" class="${b.id === tab ? 'on' : ''}"><span>${b.icon}</span>${b.label}</button>`).join('')}</div>
+      <ol class="lb-list"><li class="lb-msg">Chargement…</li></ol>
+    </section>`;
+  const list = root.querySelector('.lb-list');
+  let token = 0;
+  const load = async () => {
+    const b = BOARDS.find((x) => x.id === tab) || BOARDS[0], my = ++token;
+    root.querySelectorAll('[data-lb]').forEach((n) => n.classList.toggle('on', n.dataset.lb === b.id));
+    list.innerHTML = '<li class="lb-msg">Chargement…</li>';
+    if (!cloud.enabled) { list.innerHTML = '<li class="lb-msg">Le classement s’active avec les comptes en ligne.</li>'; return; }
+    try {
+      const rows = (await cloud.top(b.field, TOP)).filter((e) => (e[b.field] || 0) > 0);
+      if (my !== token || !root.isConnected) return;
+      list.innerHTML = rows.length ? rows.map((e, i) => `
+        <li class="lb-row${e.uid === me ? ' me' : ''}${i < 3 ? ' podium' : ''}">
+          <span class="lb-pos">${MEDAL[i] || i + 1}</span>
+          <span class="lb-badge">${rankBadge(rankOf(e.level || 1), 30)}</span>
+          <span class="lb-name"><b>${esc(e.name || 'Joueur')}</b><small>${rankOf(e.level || 1).name}${b.id === 'level' ? '' : ` · Niv. ${e.level || 1}`}</small></span>
+          <span class="lb-val">${b.value(e)}</span>
+        </li>`).join('') : '<li class="lb-msg">Personne pour l’instant : à toi de jouer !</li>';
+    } catch (e) {
+      console.error(e);
+      if (my === token) list.innerHTML = '<li class="lb-msg">Classement indisponible pour le moment.</li>';
+    }
+  };
+  root.querySelectorAll('[data-lb]').forEach((n) => {
+    n.onclick = () => { tab = n.dataset.lb; try { localStorage.setItem('lb_tab', tab); } catch { /* ignore */ } load(); };
+  });
+  profiles.flush(); // show the player's latest numbers
+  load();
+}
+
+return { renderLeaderboard };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -10698,6 +10822,7 @@ const { mountAllArt } = __mods['art/index.js'];
 const { renderLobby } = __mods['pages/lobby.js'];
 const { renderGame, leaveGame } = __mods['pages/game.js'];
 const { renderRefill, renderResponsible } = __mods['pages/account.js'];
+const { renderLeaderboard } = __mods['pages/leaderboard.js'];
 const { ALL_GAMES } = __mods['games/index.js'];
 
 const view = document.getElementById('view');
@@ -10707,6 +10832,7 @@ const routes = [
   { re: /^lobby-(\w+)$/, page: (r, m) => renderLobby(r, { filter: m[1] }), nav: 'slots' },
   { re: /^game-([\w-]+)$/, page: (r, m) => renderGame(r, { id: m[1] }), nav: 'slots' },
   { re: /^(profil|vip)$/, page: (r) => renderProfile(r), nav: 'vip' },
+  { re: /^classement$/, page: (r) => renderLeaderboard(r), nav: 'top' },
   { re: /^(recharger|daily)$/, page: (r) => renderRefill(r), nav: 'refill' },
   { re: /^responsable$/, page: (r) => renderResponsible(r), nav: 'resp' },
 ];
