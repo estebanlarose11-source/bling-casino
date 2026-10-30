@@ -3722,7 +3722,7 @@ const ORIGINALS = [
   {"id": "mines", "name": "Mines", "cat": "quick", "tag": "Instantané", "sub": "Évite les bombes", "colors": ["#ffa51f", "#8a2a0c"], "description": "Retourne des cases sans toucher une bombe. Choisis de 1 à 24 bombes : plus il y en a, plus le multiplicateur grimpe vite. Encaisse quand tu veux.", "features": ["1 à 24 bombes", "Encaisse quand tu veux", "Multiplicateur croissant"], "rtp": "≈ 96 %", "vol": 3, "max": "Selon les bombes"},
   {"id": "avion", "name": "Avion", "cat": "quick", "tag": "Crash", "sub": "Encaisse avant l’explosion", "colors": ["#f0284f", "#4a0a1f"], "description": "L’avion décolle et le multiplicateur grimpe : encaisse avant qu’il explose. Tu peux régler un encaissement automatique.", "features": ["Courbe en direct", "Encaissement auto", "Historique des explosions"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
   {"id": "plinko", "name": "Plinko", "cat": "quick", "tag": "Instantané", "sub": "Billes, clous et multiplicateurs", "colors": ["#38bdf8", "#4c1d95"], "description": "Lâche tes billes en haut de la pyramide : elles rebondissent de clou en clou et tombent dans une case multiplicateur. Choisis le risque, de 8 à 16 rangées, et lance jusqu’à 20 billes d’un coup.", "features": ["8 à 16 rangées", "3 niveaux de risque", "Jusqu’à 20 billes par lancer", "Multiplicateurs jusqu’à ×1 000"], "rtp": "≈ 94 %", "vol": 4, "max": "×1 000"},
-  {"id": "vortex", "name": "Vortex", "cat": "quick", "tag": "Instantané", "sub": "La bulle tombe au fond du trou", "colors": ["#ef4444", "#1f0a0a"], "description": "Lâche ta mise dans une bulle au-dessus d’un vortex d’anneaux rouges et noirs. Case rouge : la bulle tombe dans le trou et le multiplicateur monte. Case noire : elle s’arrête et tu encaisses. Au fond du vortex : ×1 000.", "features": ["9 anneaux qui tournent", "×1,2 à ×60 par anneau", "×1 000 au fond du vortex", "Chances visibles sur chaque anneau"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
+  {"id": "vortex", "name": "Roue Rouge Noire", "cat": "quick", "tag": "Instantané", "sub": "Rouge, la bille tombe · noir, elle bloque", "colors": ["#ef4444", "#1f0a0a"], "description": "Une grande roue de 9 anneaux rouges et noirs qui tournent. Ta mise tombe du haut de la roue vers le centre : sur une case rouge elle passe à l’anneau suivant et le multiplicateur monte, sur une case noire elle est bloquée et tu encaisses. Au centre : ×1 000.", "features": ["9 anneaux qui tournent", "×1,2 à ×60 par anneau", "×1 000 au centre", "Chances visibles sur chaque anneau"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -3991,20 +3991,21 @@ const SPECS = {
     },
   },
   vortex: {
-    bg: ['#3a0a10', '#050203'], light: '#ff6b6b', title: ['VORTEX'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'JUSQU’À ×1 000',
+    bg: ['#3a0a10', '#050203'], light: '#ff6b6b', title: ['ROUGE NOIRE'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'JUSQU’À ×1 000',
     art: (u) => {
       let rings = '';
-      for (let i = 0; i < 7; i++) {
-        const rx = 140 - i * 18, ry = rx * 0.4, cy = 150 + i * 9;
+      for (let i = 0; i < 6; i++) {
+        const r0 = 118 - i * 17, r1 = r0 - 17;
         for (let k = 0; k < 16; k++) {
-          const a0 = (k / 16) * Math.PI * 2 + i * 0.5, a1 = a0 + Math.PI / 8;
-          const p = (r1, r2, a) => `${(150 + r1 * Math.cos(a)).toFixed(1)} ${(cy + r2 * Math.sin(a)).toFixed(1)}`;
-          rings += `<path d="M${p(rx, ry, a0)} A${rx} ${ry} 0 0 1 ${p(rx, ry, a1)} L${p(rx - 18, (rx - 18) * 0.4, a1)} A${rx - 18} ${(rx - 18) * 0.4} 0 0 0 ${p(rx - 18, (rx - 18) * 0.4, a0)} Z" fill="${(k + i) % 3 ? '#111' : '#dc2626'}" stroke="#fbbf24" stroke-opacity=".35" stroke-width=".8"/>`;
+          const a0 = (k / 16) * Math.PI * 2 + i * 0.4, a1 = a0 + Math.PI / 8;
+          const p = (r, a) => `${(150 + r * Math.cos(a)).toFixed(1)} ${(150 + r * Math.sin(a)).toFixed(1)}`;
+          rings += `<path d="M${p(r0, a0)} A${r0} ${r0} 0 0 1 ${p(r0, a1)} L${p(r1, a1)} A${r1} ${r1} 0 0 0 ${p(r1, a0)} Z" fill="${(k + i) % 2 ? '#111' : '#dc2626'}" stroke="#fbbf24" stroke-opacity=".5" stroke-width=".8"/>`;
         }
       }
-      return `${rings}<ellipse cx="150" cy="213" rx="16" ry="7" fill="#fde047" filter="url(#glow${u})"/>
-        <g filter="url(#glow${u})"><circle cx="150" cy="96" r="24" fill="#ffd6dd" fill-opacity=".75" stroke="#fff" stroke-width="2"/><circle cx="142" cy="88" r="7" fill="#fff" opacity=".85"/></g>
-        <text x="150" y="101" text-anchor="middle" font-family="Inter,sans-serif" font-weight="900" font-size="13" fill="#7f1d1d">×1000</text>`;
+      return `<circle cx="150" cy="150" r="126" fill="url(#gold${u})" filter="url(#sh${u})"/>${rings}
+        <circle cx="150" cy="150" r="17" fill="#f59e0b" stroke="#fde68a" stroke-width="2" filter="url(#glow${u})"/>
+        <path d="M138 16 H162 L150 32 Z" fill="#fde047"/>
+        <g filter="url(#glow${u})"><circle cx="150" cy="47" r="15" fill="#ffd6dd" fill-opacity=".85" stroke="#fff" stroke-width="2"/><circle cx="145" cy="42" r="4.5" fill="#fff"/></g>`;
     },
   },
 };
@@ -4128,7 +4129,7 @@ const { getGame } = __mods['games/index.js'];
 const UPDATES = [
   {
     game: 'vortex', date: '2026-10-30', title: 'Nouveau jeu', isNew: true,
-    items: ['Ta mise tombe dans une bulle au-dessus d’un vortex', 'Case rouge : la bulle descend et le multiplicateur monte', '×1,2 à ×60 sur les anneaux, ×1 000 au fond', 'Les chances sont visibles sur chaque anneau'],
+    items: ['Une grande roue d’anneaux rouges et noirs qui tournent', 'Rouge : la bille tombe vers le centre et le multiplicateur monte', 'Noir : la bille est bloquée, tu encaisses', '×1,2 à ×60 sur les anneaux, ×1 000 au centre'],
   },
   {
     game: 'madwheel', date: '2026-10-30', title: 'Zoom immersif',
@@ -11167,9 +11168,10 @@ return { PlinkoGame };
 
 // ---- games/impl/vortex.js ----
 __mods['games/impl/vortex.js'] = (() => {
-// Vortex: a giant funnel of spinning red and black rings. The bet bubble lands on the outer ring: a red slot is a
-// hole and the bubble drops one ring deeper (bigger multiplier), a black slot stops it and pays that ring.
-// The share of red slots on each ring is exactly the chance to go deeper (RTP ≈ 95 %).
+// Roue Rouge Noire: a big wheel of concentric spinning rings cut into red and black slots, seen face on. The bet
+// ball drops from the top of the wheel straight down towards the centre: each ring stops under it, a red slot lets
+// it fall to the next ring (bigger multiplier), a black slot blocks it and pays that ring. The share of red slots
+// on each ring is exactly the chance to fall further (RTP ≈ 95 %).
 
 const { BaseGame, fmtC, shortC } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
@@ -11193,7 +11195,7 @@ function rtp() { let r = 1, ev = 0; RINGS.forEach((g) => { const q = g.red / SEG
 const isRed = (n, k) => Math.floor(((k + 1) * n) / SEG) > Math.floor((k * n) / SEG); // red slots spread evenly
 const xs = (m) => (m >= 100 ? m.toLocaleString('fr-FR') : String(m).replace('.', ','));
 const ease = (t) => 1 - Math.pow(1 - t, 3);
-const SLOT = (Math.PI * 2) / SEG, FRONT = Math.PI / 2;
+const SLOT = (Math.PI * 2) / SEG, FRONT = -Math.PI / 2; // the ball sits at 12 o'clock on each ring
 
 class VortexGame extends BaseGame {
   constructor(root, game) {
@@ -11203,7 +11205,7 @@ class VortexGame extends BaseGame {
       head: '<div class="vx-hist" aria-label="Derniers résultats"></div>',
       stage: '<div class="vx-board"><canvas class="vx-canvas"></canvas></div>',
       below: `<div class="vx-ladder">${RINGS.map((g, i) => `<span data-lv="${i}">${i ? `×${xs(g.m)}` : 'Perdu'}</span>`).join('')}<span data-lv="${RINGS.length}" class="vx-top">×${xs(CENTER)}</span></div>`,
-      hello: 'Choisis ta mise et lance la bulle dans le vortex.',
+      hello: 'Choisis ta mise et lâche la bille sur la roue.',
     });
     this.rot = RINGS.map((_, i) => i * 0.7);
     this.spin = RINGS.map((_, i) => (i % 2 ? -1 : 1) * (0.32 + i * 0.07));
@@ -11222,24 +11224,22 @@ class VortexGame extends BaseGame {
   }
 
   layout() {
-    // Seen from above: each deeper ring sits a little lower, but less than its own width, so the near wall of
-    // every ring stays visible and the whole thing reads as a hole rather than a cone.
-    const w = Math.max(260, this.q('.vx-board').clientWidth), R = Math.min(w * 0.47, 330), ky = 0.42;
-    const top = R * ky + Math.max(46, R * 0.2), h = Math.round(top + R * ky + Math.max(18, R * 0.13) + 8); // room for the bubble on the outer ring
+    // Face-on wheel with room above it for the falling ball.
+    const w = Math.max(260, this.q('.vx-board').clientWidth), R = Math.min(w * 0.46, 290);
+    const cy = R + Math.max(40, R * 0.22), h = Math.round(cy + R + 14);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);
     this.canvas.style.height = `${h}px`;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.geo = { w, h, cx: w / 2, top, R, ky, dy: R * 0.024 };
+    this.geo = { w, h, cx: w / 2, cy, R };
   }
 
-  // Ring i: outer radius, the ellipse centre (deeper rings sit lower) and the point where the bubble rests.
-  ringR(i) { return this.geo.R * (1 - i * 0.094); }
-  ringY(i) { return this.geo.top + i * this.geo.dy; }
+  // Ring i: outer radius (the rim takes the first 6 %), and where the ball rests on it: 12 o'clock.
+  ringR(i) { return this.geo.R * (0.94 - i * 0.084); }
   restPoint(i) {
-    if (i >= RINGS.length) return { x: this.geo.cx, y: this.ringY(RINGS.length) + this.ringR(RINGS.length) * this.geo.ky * 0.2, s: 1 - RINGS.length * 0.07 };
+    if (i >= RINGS.length) return { x: this.geo.cx, y: this.geo.cy, s: 0.9 };
     const mid = (this.ringR(i) + this.ringR(i + 1)) / 2;
-    return { x: this.geo.cx, y: this.ringY(i) + mid * this.geo.ky, s: 1 - i * 0.07 };
+    return { x: this.geo.cx, y: this.geo.cy - mid, s: 0.9 };
   }
 
   frame(now) {
@@ -11295,8 +11295,8 @@ class VortexGame extends BaseGame {
       this.mark = null;
       this.hold = RINGS.map(() => null);
       const stop = play();
-      this.msg('La bulle tombe dans le vortex…');
-      this.bubble = { x: this.geo.cx, y: -40, s: 1.15, bet, lv: 0 };
+      this.msg('La bille tombe sur la roue…');
+      this.bubble = { x: this.geo.cx, y: -30, s: 0.9, bet, lv: 0 };
       sfx.spin();
       await this.moveBubble(this.restPoint(0), 650, true);
       for (let i = 0; i <= Math.min(stop, RINGS.length - 1) && !this.dead; i++) {
@@ -11312,7 +11312,7 @@ class VortexGame extends BaseGame {
         this.bubble.lv = i + 1;
         this.hold[i] = null;
         await this.moveBubble(this.restPoint(i + 1), 420, true);
-        if (i + 1 < RINGS.length) this.msg(`Trou rouge ! ×${xs(multAt(i + 1))}`);
+        if (i + 1 < RINGS.length) this.msg(`Rouge ! La bille tombe · ×${xs(multAt(i + 1))}`);
       }
       if (this.dead) return;
       this.land(stop, bet);
@@ -11329,11 +11329,11 @@ class VortexGame extends BaseGame {
     if (win > 0) {
       this.win(win);
       this.setLast(win);
-      this.msg(`${stop >= RINGS.length ? 'CENTRE DU VORTEX ! ' : ''}×${xs(m)} · +${fmtC(win)}`);
+      this.msg(`${stop >= RINGS.length ? 'CENTRE DE LA ROUE ! ' : ''}×${xs(m)} · +${fmtC(win)}`);
       fx.burst(r.left + p.x, r.top + p.y, m >= 8 ? 50 : 20, ['#fde047', '#ef4444', '#fff'], m >= 8 ? 9 : 5);
-      if (m >= 12) { this.flash('rgba(239,68,68,.45)'); this.celebrate(win, { summary: stop >= RINGS.length ? 'CENTRE DU VORTEX' : null }); } else if (m >= 2) sfx.win(); else sfx.coin();
+      if (m >= 12) { this.flash('rgba(239,68,68,.45)'); this.celebrate(win, { summary: stop >= RINGS.length ? 'CENTRE DE LA ROUE' : null }); } else if (m >= 2) sfx.win(); else sfx.coin();
     } else {
-      this.msg(`Case noire : la bulle s’arrête. Tu perds ${fmtC(bet)}.`);
+      this.msg(`Case noire : la bille est bloquée. Tu perds ${fmtC(bet)}.`);
       this.shake();
       sfx.puff();
     }
@@ -11341,51 +11341,69 @@ class VortexGame extends BaseGame {
 
   /* ---------- drawing ---------- */
   draw(now) {
-    const c = this.ctx, { w, h, cx, ky } = this.geo;
+    const c = this.ctx, { w, h, cx, cy, R } = this.geo, pulse = 0.6 + 0.4 * Math.sin(now / 300);
     c.clearRect(0, 0, w, h);
-    // funnel walls, outer ring first
-    for (let i = 0; i < RINGS.length; i++) {
-      const R0 = this.ringR(i), R1 = this.ringR(i + 1), y = this.ringY(i), rot = this.rot[i], n = RINGS[i].red;
-      for (let k = 0; k < SEG; k++) {
-        const a0 = rot + k * SLOT, a1 = a0 + SLOT, mid = a0 + SLOT / 2, light = 0.55 + 0.45 * Math.max(0, Math.sin(mid));
-        c.beginPath();
-        c.ellipse(cx, y, R0, R0 * ky, 0, a0, a1);
-        c.ellipse(cx, y, R1, R1 * ky, 0, a1, a0, true);
-        c.closePath();
-        c.fillStyle = isRed(n, k) ? `hsl(354, 82%, ${Math.round(22 + 26 * light)}%)` : `hsl(240, 8%, ${Math.round(5 + 10 * light)}%)`;
-        c.fill();
-        c.strokeStyle = 'rgba(251, 191, 36, .35)'; c.lineWidth = 1; c.stroke();
-      }
-      // multiplier painted on the far side of the ring
-      const lr = (R0 + R1) / 2;
-      c.font = `800 ${Math.max(9, (R0 - R1) * 0.42)}px Orbitron, Inter, sans-serif`;
-      c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.fillStyle = this.bubble && this.bubble.lv === i ? '#fde047' : 'rgba(255, 255, 255, .8)';
-      c.fillText(i ? `×${xs(RINGS[i].m)}` : '✕', cx, y - lr * ky);
+    // gold rim with lights
+    c.save(); c.shadowColor = 'rgba(239, 68, 68, .45)'; c.shadowBlur = 30;
+    const rim = c.createLinearGradient(0, cy - R, 0, cy + R);
+    rim.addColorStop(0, '#fde68a'); rim.addColorStop(0.5, '#b45309'); rim.addColorStop(1, '#fbbf24');
+    c.fillStyle = rim; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill(); c.restore();
+    for (let k = 0; k < 36; k++) {
+      const a = (k / 36) * Math.PI * 2, on = (Math.floor(now / 160) + k) % 3 === 0;
+      c.fillStyle = on ? '#fff7d6' : 'rgba(120, 53, 15, .9)';
+      c.beginPath(); c.arc(cx + Math.cos(a) * R * 0.97, cy + Math.sin(a) * R * 0.97, Math.max(2, R * 0.012), 0, 7); c.fill();
     }
-    // the bottom of the funnel
-    const Rc = this.ringR(RINGS.length), yc = this.ringY(RINGS.length), pulse = 0.6 + 0.4 * Math.sin(now / 300);
-    const gr = c.createRadialGradient(cx, yc, 2, cx, yc, Rc);
-    gr.addColorStop(0, `rgba(253, 224, 71, ${0.85 * pulse})`); gr.addColorStop(0.45, 'rgba(234, 88, 12, .55)'); gr.addColorStop(1, 'rgba(10, 4, 6, 1)');
-    c.fillStyle = gr; c.beginPath(); c.ellipse(cx, yc, Rc, Rc * ky, 0, 0, 7); c.fill();
-    c.font = `900 ${Math.max(11, Rc * 0.3)}px Orbitron, Inter, sans-serif`; c.fillStyle = '#fff7d6';
-    c.fillText(`×${xs(CENTER)}`, cx, yc + 1);
+    // the ball's path from the top down to the centre
+    c.fillStyle = 'rgba(255, 255, 255, .06)';
+    c.fillRect(cx - R * 0.05, cy - this.ringR(0), R * 0.1, this.ringR(0));
+    // spinning rings, outer first
+    for (let i = 0; i < RINGS.length; i++) {
+      const R0 = this.ringR(i), R1 = this.ringR(i + 1), rot = this.rot[i], n = RINGS[i].red;
+      for (let k = 0; k < SEG; k++) {
+        const a0 = rot + k * SLOT, a1 = a0 + SLOT, red = isRed(n, k);
+        const g = c.createRadialGradient(cx, cy, R1, cx, cy, R0);
+        if (red) { g.addColorStop(0, '#7f1d1d'); g.addColorStop(0.5, '#dc2626'); g.addColorStop(1, '#991b1b'); } else { g.addColorStop(0, '#030304'); g.addColorStop(0.5, '#1f2026'); g.addColorStop(1, '#0b0b0e'); }
+        c.beginPath(); c.arc(cx, cy, R0, a0, a1); c.arc(cx, cy, R1, a1, a0, true); c.closePath();
+        c.fillStyle = g; c.fill();
+        c.strokeStyle = 'rgba(251, 191, 36, .45)'; c.lineWidth = 1; c.stroke();
+      }
+      // multiplier painted at 6 o'clock, fixed while the ring turns
+      const lr = (R0 + R1) / 2, lit = this.bubble && this.bubble.lv === i;
+      c.font = `800 ${Math.max(9, (R0 - R1) * 0.44)}px Orbitron, Inter, sans-serif`;
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillStyle = 'rgba(0, 0, 0, .55)'; c.fillRect(cx - (R0 - R1) * 0.95, cy + lr - (R0 - R1) * 0.32, (R0 - R1) * 1.9, (R0 - R1) * 0.64);
+      c.fillStyle = lit ? '#fde047' : 'rgba(255, 255, 255, .9)';
+      c.fillText(i ? `×${xs(RINGS[i].m)}` : '✕', cx, cy + lr + 1);
+    }
+    // gloss over the wheel
+    const gl = c.createLinearGradient(0, cy - R, 0, cy + R * 0.2);
+    gl.addColorStop(0, 'rgba(255,255,255,.12)'); gl.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = gl; c.beginPath(); c.arc(cx, cy, this.ringR(0), Math.PI, 0); c.fill();
+    // centre: the ×1000 hub
+    const Rc = this.ringR(RINGS.length), hub = c.createRadialGradient(cx, cy, 2, cx, cy, Rc);
+    hub.addColorStop(0, `rgba(253, 224, 71, ${0.7 + 0.3 * pulse})`); hub.addColorStop(0.55, '#ea580c'); hub.addColorStop(1, '#431407');
+    c.fillStyle = hub; c.beginPath(); c.arc(cx, cy, Rc, 0, 7); c.fill();
+    c.strokeStyle = '#fbbf24'; c.lineWidth = 2; c.stroke();
+    c.font = `900 ${Math.max(11, Rc * 0.42)}px Orbitron, Inter, sans-serif`; c.fillStyle = '#fff7d6';
+    c.fillText(`×${xs(CENTER)}`, cx, cy + 1);
+    // gold marker above the wheel: where the ball drops in
+    c.fillStyle = '#fbbf24'; c.beginPath(); c.moveTo(cx - 12, cy - R - 4); c.lineTo(cx + 12, cy - R - 4); c.lineTo(cx, cy - R + 14); c.closePath(); c.fill();
     // the bet bubble
     const b = this.bubble;
     if (b) {
-      const r = Math.max(14, this.geo.R * 0.12) * b.s;
-      c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.ellipse(b.x, b.y + r * 0.85, r * 0.85, r * 0.28, 0, 0, 7); c.fill();
+      const r = Math.max(15, (this.ringR(0) - this.ringR(1)) * 0.95) * b.s; // a bit wider than a ring so the bet stays readable
+      c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.arc(b.x + r * 0.15, b.y + r * 0.2, r, 0, 7); c.fill();
       const bg = c.createRadialGradient(b.x - r * 0.35, b.y - r * 0.45, r * 0.1, b.x, b.y, r);
       bg.addColorStop(0, 'rgba(255,255,255,.95)'); bg.addColorStop(0.35, 'rgba(255, 220, 230, .55)'); bg.addColorStop(1, 'rgba(255, 35, 64, .55)');
       c.fillStyle = bg; c.beginPath(); c.arc(b.x, b.y, r, 0, 7); c.fill();
       c.strokeStyle = 'rgba(255,255,255,.8)'; c.lineWidth = 1.5; c.stroke();
-      c.fillStyle = '#1a0408'; c.font = `900 ${r * 0.42}px Inter, sans-serif`;
+      c.fillStyle = '#1a0408'; c.font = `900 ${r * 0.4}px Inter, sans-serif`;
       c.fillText(shortC(b.bet), b.x, b.y - r * 0.12);
       c.font = `800 ${r * 0.34}px Orbitron, Inter, sans-serif`; c.fillStyle = '#b3001b';
       c.fillText(b.lv ? `×${xs(multAt(b.lv))}` : 'MISE', b.x, b.y + r * 0.36);
       // red square framing the bubble where it stopped
       if (this.mark != null) {
-        const s = r * 2.5;
+        const s = r * 2.3;
         c.save(); c.strokeStyle = '#ff2340'; c.lineWidth = 3; c.shadowColor = '#ff2340'; c.shadowBlur = 16 * pulse;
         c.strokeRect(b.x - s / 2, b.y - s / 2, s, s); c.restore();
       }
@@ -11400,9 +11418,9 @@ class VortexGame extends BaseGame {
 
   info() {
     const rows = RINGS.map((g, i) => `<li>Anneau ${i + 1} : ${i ? `arrêt = <b>×${xs(g.m)}</b>` : 'arrêt = <b>perdu</b>'} · ${g.red} trous rouges sur ${SEG}</li>`).join('');
-    return this.rules(`<h4>Règles</h4><p>Ta mise tombe dans une bulle sur l’anneau extérieur du vortex. L’anneau tourne puis s’arrête sous la bulle : sur une <b>case rouge</b>, c’est un trou et la bulle descend à l’anneau suivant ; sur une <b>case noire</b>, elle s’arrête et tu gagnes le multiplicateur de cet anneau.</p>
-      <p>Plus on descend, plus le multiplicateur monte et moins il y a de trous. Au fond du vortex : <b>×${xs(CENTER)}</b>.</p>
-      <h4>Les anneaux, de l’extérieur vers le centre</h4><ul class="rules">${rows}<li>Fond du vortex : <b>×${xs(CENTER)}</b></li></ul>
+    return this.rules(`<h4>Règles</h4><p>Ta mise tombe dans une bille en haut de la roue. Chaque anneau tourne puis s’arrête sous la bille : sur une <b>case rouge</b>, elle tombe vers l’anneau suivant ; sur une <b>case noire</b>, elle est bloquée et tu gagnes le multiplicateur de cet anneau.</p>
+      <p>Plus la bille se rapproche du centre, plus le multiplicateur monte et moins il y a de rouge. Au centre : <b>×${xs(CENTER)}</b>.</p>
+      <h4>Les anneaux, de l’extérieur vers le centre</h4><ul class="rules">${rows}<li>Centre de la roue : <b>×${xs(CENTER)}</b></li></ul>
       <p class="muted small">La proportion de cases rouges sur chaque anneau est exactement la chance de descendre. Retour théorique ${(rtp() * 100).toFixed(1).replace('.', ',')} %.</p>`);
   }
 }
