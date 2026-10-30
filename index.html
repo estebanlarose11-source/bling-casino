@@ -166,6 +166,19 @@ section { margin-bottom: 28px; }
 @keyframes wolfLean { 50% { transform: rotate(-6deg) translateX(-8px) scale(1.04); } }
 
 .hero-side { display: grid; gap: 12px; }
+/* update poster on the category pages */
+.upd-hero { background: radial-gradient(520px 320px at 78% 35%, color-mix(in srgb, var(--ua) 40%, transparent), transparent 70%), linear-gradient(135deg, color-mix(in srgb, var(--ub) 70%, #000) 0%, #0b0a0b 75%);
+  border-color: color-mix(in srgb, var(--ua) 55%, transparent); box-shadow: var(--shadow), inset 0 0 80px color-mix(in srgb, var(--ua) 18%, transparent); }
+.upd-hero .upd-eye { color: #fff; background: var(--ua); padding: 5px 10px; border-radius: 999px; letter-spacing: 1px; box-shadow: 0 0 18px color-mix(in srgb, var(--ua) 60%, transparent); }
+.upd-hero h1 em { background: linear-gradient(90deg, #fff, var(--ua)); -webkit-background-clip: text; background-clip: text; }
+.upd-list { list-style: none; margin: 14px 0 22px; padding: 0; display: grid; gap: 7px; color: #d6dbe6; font-size: 14px; }
+.upd-list li { position: relative; padding-left: 22px; }
+.upd-list li::before { content: '✦'; position: absolute; left: 0; color: var(--ua); }
+.upd-ribbon { position: absolute; top: 14px; left: -34px; width: 150px; padding: 5px 0; transform: rotate(-35deg); background: linear-gradient(90deg, #ff2340, #ff7a45); color: #fff; font: 900 11px Inter, sans-serif; letter-spacing: 1px; text-align: center; box-shadow: 0 4px 12px rgba(0, 0, 0, .4); z-index: 2; }
+.promo-tile .upd-sub { color: #e5e7eb; font-weight: 700; }
+.upd-tag { position: absolute; left: 8px; top: 8px; z-index: 4; padding: 3px 8px; border-radius: 8px; background: linear-gradient(90deg, #ff2340, #ff7a45); color: #fff; font: 900 10px Inter, sans-serif; letter-spacing: .8px; box-shadow: 0 3px 10px rgba(0, 0, 0, .45); }
+.upd-tag.new { background: linear-gradient(90deg, #22c55e, #14b8a6); }
+@media (max-width: 760px) { .upd-hero .hero-copy { max-width: none; } .upd-hero h1 { font-size: 26px; } .upd-list { font-size: 13px; } }
 .promo-tile {
   display: flex; align-items: center; gap: 14px; padding: 18px; border-radius: 16px;
   border: 1px solid var(--line); background: var(--panel); transition: transform .2s, border-color .2s, box-shadow .2s;
@@ -4072,6 +4085,36 @@ function heroArtSVG(game) { return coverSVG(game, { cls: 'cover hero-cover', bad
 return { coverSVG, heroArtSVG };
 })();
 
+// ---- updates.js ----
+__mods['updates.js'] = (() => {
+// Game updates, newest first. Each lobby page (machines à sous, roues & tables, jeux rapides) shows its latest
+// update as the big poster, and the game card wears a "MISE À JOUR" / "NOUVEAU" tag for RECENT_DAYS.
+// Add an entry at the top every time a game is updated.
+const { getGame } = __mods['games/index.js'];
+
+const UPDATES = [
+  {
+    game: 'huff', date: '2026-10-30', title: 'MEGA BONUS et roue du loup',
+    items: ['5 scatters : le MEGA BONUS et sa roue du loup', 'JACKPOT ×5 000, MAJOR, bonus maisons en or ou bonus 5 tours', 'Les cases vides tournent pendant le bonus', 'Nouveau jackpot MINI et pièces jackpot dans les maisons en or'],
+  },
+  {
+    game: 'madwheel', date: '2026-10-30', title: 'Zoom sur la roue',
+    items: ['La caméra plonge sur la flèche pendant le ralenti final', 'Suspense sur les dernières cases', 'Nouvelle roue : 22 × 1, 15 × 2, 7 × 5 et 4 × 10'],
+  },
+  {
+    game: 'plinko', date: '2026-10-30', title: 'Nouveau jeu', isNew: true,
+    items: ['8 à 16 rangées de clous', '3 niveaux de risque', 'Jusqu’à 20 billes par lancer', 'Multiplicateurs jusqu’à ×1 000'],
+  },
+];
+const RECENT_DAYS = 14;
+
+const fmtDate = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+const latestFor = (test) => UPDATES.filter((u) => { const g = getGame(u.game); return g && test(g); });
+const recent = (id) => UPDATES.find((u) => u.game === id && (Date.now() - Date.parse(`${u.date}T12:00:00`)) / 864e5 <= RECENT_DAYS);
+
+return { UPDATES, latestFor, recent, fmtDate };
+})();
+
 // ---- pages/lobby.js ----
 __mods['pages/lobby.js'] = (() => {
 const { GAMES, ORIGINALS, ALL_GAMES, getGame } = __mods['games/index.js'];
@@ -4079,6 +4122,7 @@ const { wallet, fmt } = __mods['wallet.js'];
 const { coverSVG } = __mods['covers.js'];
 const { BRAND } = __mods['brand.js'];
 const { likeButton, isLiked } = __mods['likes.js'];
+const { UPDATES, latestFor, recent, fmtDate } = __mods['updates.js'];
 
 const VOL = ['', 'Très basse', 'Basse', 'Moyenne', 'Haute', 'Très haute'];
 const volLabel = (g) => (g.original ? VOL[g.vol] : g.volatility);
@@ -4086,9 +4130,11 @@ const volLabel = (g) => (g.original ? VOL[g.vol] : g.volatility);
 const thumbArt = (g, opts) => coverSVG(g, opts);
 
 function gameCard(g) {
+  const u = recent(g.id);
   return `<a class="game-card" href="#game-${g.id}" aria-label="${g.name} · ${BRAND.provider}" style="--accent:${g.original ? g.colors[0] : '#f59e0b'}">
     <div class="thumb">
       ${thumbArt(g, { square: true })}
+      ${u ? `<span class="upd-tag${u.isNew ? ' new' : ''}">${u.isNew ? 'NOUVEAU' : 'MISE À JOUR'}</span>` : ''}
       <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></div>
       ${likeButton(g.id)}
     </div>
@@ -4132,8 +4178,33 @@ function renderLobby(root, params = {}) {
         ${ALL_GAMES.some(f.test) ? `<div class="game-grid">${ALL_GAMES.filter(f.test).map(gameCard).join('')}</div>` : '<p class="muted">Aucun favori pour l’instant : touche le cœur en haut à droite d’une affiche pour l’ajouter ici.</p>'}
       </section>`;
 
-  root.innerHTML = `
+  // Category pages lead with their latest game update; the home page keeps the Big Bad Wolf hero.
+  const ups = ['slot', 'table', 'quick'].includes(filter) ? latestFor(f.test) : [];
+  const upd = ups[0], ug = upd && getGame(upd.game);
+  const updTile = (u, k) => {
+    const g = getGame(u.game);
+    return `<a class="promo-tile p${k + 1}" href="#game-${g.id}" style="--accent:${g.colors[0]}">
+      <span class="tile-art">${thumbArt(g, { square: true })}</span>
+      <div><b>${g.name}</b><small>${u.isNew ? 'Nouveau' : 'Mise à jour'} · ${fmtDate(u.date)}</small><small class="upd-sub">${u.title}</small></div></a>`;
+  };
+  const hero = upd ? `
     <section class="hero">
+      <div class="hero-main upd-hero" style="--ua:${ug.colors[0]};--ub:${ug.colors[1]}">
+        <div class="hero-copy">
+          <span class="eyebrow upd-eye">${upd.isNew ? '✨ Nouveau jeu' : '🆕 Mise à jour'} · ${fmtDate(upd.date)}</span>
+          <h1>${ug.name}<br><em>${upd.title}</em></h1>
+          <ul class="upd-list">${upd.items.map((x) => `<li>${x}</li>`).join('')}</ul>
+          <div class="hero-cta"><a class="btn primary lg" href="#game-${ug.id}">${upd.isNew ? 'Découvrir' : 'Essayer la nouveauté'}</a></div>
+        </div>
+        <div class="hero-art"><div class="hero-poster">${coverSVG(ug, { square: true })}<span class="upd-ribbon">${upd.isNew ? 'NOUVEAU' : 'MISE À JOUR'}</span></div></div>
+      </div>
+      <div class="hero-side">
+        ${[...ups.slice(1), ...UPDATES.filter((u) => !ups.includes(u))].slice(0, 3).map(updTile).join('')}
+      </div>
+    </section>` : '';
+
+  root.innerHTML = `
+    ${hero || `<section class="hero">
       <div class="hero-main theme-wolf">
         <div class="hero-copy">
           <span class="eyebrow">Nouveau · ${BRAND.provider}</span>
@@ -4148,7 +4219,7 @@ function renderLobby(root, params = {}) {
         ${tile('candy', 'p2')}
         ${tile('madwheel', 'p3')}
       </div>
-    </section>
+    </section>`}
 
     <div class="chips">${FILTERS.map((x) => `<a class="chip${x.id === filter ? ' on' : ''}" href="#${x.id === 'all' ? 'accueil' : `lobby-${x.id}`}">${x.icon} ${x.label}</a>`).join('')}</div>
 
