@@ -1759,7 +1759,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
     <button class="icon-btn burger" data-toggle-side aria-label="Menu">☰</button>
     <a class="logo mobile" href="#accueil"><span class="logo-mark">S</span></a>
     <div class="top-wallet">
-      <div class="balance"><b data-balance>0,00 K</b></div>
+      <div class="balance"><b data-balance>0,00 KE</b></div>
       <a class="btn primary top-refill" href="#recharger" aria-label="Recharger"><span>Recharger</span><b>+</b></a>
     </div>
     <div class="top-right"><span class="demo-tag">MODE DÉMO</span></div>
@@ -1814,7 +1814,7 @@ class Wallet extends EventTarget {
     super();
     this.cents = readBal() ?? START;
     this.state = readStats();
-    // One fresh start at the new 1 000 K balance for players from earlier versions.
+    // One fresh start at the new 1 000 KE balance for players from earlier versions.
     try {
       if (!localStorage.getItem('bling.start.v4')) {
         localStorage.setItem('bling.start.v4', '1');
@@ -1901,8 +1901,8 @@ class Wallet extends EventTarget {
 }
 
 const round = (n) => Math.round(n * 100) / 100;
-// The app's play-money currency: the K (short for kéro).
-const fmt = (n) => `${n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\u00a0K`;
+// The app's play-money currency: the KE (short for kéro).
+const fmt = (n) => `${n.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\u00a0KE`;
 const wallet = new Wallet();
 
 return { START, REFILL_BELOW, round, fmt, wallet };
@@ -2025,7 +2025,7 @@ class Profiles extends EventTarget {
     this.mode = cloud.enabled ? null : 'local';
     this.store = cloud.enabled ? { current: null, users: {} } : read();
     if (this.store.current && !this.store.users[this.store.current]) this.store.current = null;
-    // One-time reset after the RTP rework: every profile on this device goes back to 1 000 K.
+    // One-time reset after the RTP rework: every profile on this device goes back to 1 000 KE.
     try {
       if (this.mode === 'local' && !localStorage.getItem('bling.start.v5')) {
         localStorage.setItem('bling.start.v5', '1');
@@ -2084,7 +2084,7 @@ class Profiles extends EventTarget {
   async signUp(email, password, pseudo) { return this.openAccount(await cloud.signUp(email, password), pseudo); }
   async signIn(email, password) { return this.openAccount(await cloud.signIn(email, password)); }
 
-  // A fresh 1 000 K profile that is never saved.
+  // A fresh 1 000 KE profile that is never saved.
   playAsGuest() {
     this.mode = 'guest';
     this.store = { current: 'guest', users: { guest: blank('Invité', false) } };
@@ -2194,7 +2194,7 @@ const RANKS = [
   { id: 'platine', name: 'Platine', from: 31, to: 40, color: '#67e8f9', dark: '#0e5f74', perLevel: 120, rankUp: 2000 },
   { id: 'diamant', name: 'Diamant', from: 41, to: MAX_LEVEL, color: '#d8b4fe', dark: '#5b21b6', perLevel: 250, rankUp: 5000 },
 ];
-const MAX_LEVEL_BONUS = 10000; // K on reaching level 50
+const MAX_LEVEL_BONUS = 10000; // KE on reaching level 50
 
 const XP = {
   round: { min: 2, max: 10, refStake: 5 }, // per paid round: min + (max - min) × √(stake / refStake), capped
@@ -2210,7 +2210,7 @@ const xpToNext = (L) => (L >= MAX_LEVEL ? Infinity : Math.round((150 + 55 * L **
 const rankOf = (L) => RANKS.find((r) => L >= r.from && L <= r.to) || RANKS[RANKS.length - 1];
 const rankIndex = (L) => RANKS.indexOf(rankOf(L));
 
-// Credits (K) won on reaching level L: the rank's per-level reward, plus the rank-up and max-level bonuses.
+// Credits (KE) won on reaching level L: the rank's per-level reward, plus the rank-up and max-level bonuses.
 function levelReward(L) {
   const r = rankOf(L);
   let amt = r.perLevel;
@@ -2331,7 +2331,7 @@ const { progress, rankIndex } = __mods['progress.js'];
 const DAILY = {
   cooldownMs: 24 * 3600e3,
   streakMs: 48 * 3600e3,
-  amounts: [50, 60, 70, 85, 100, 120, 150], // K for streak day 1..7 (day 7+ stays at the cap)
+  amounts: [50, 60, 70, 85, 100, 120, 150], // KE for streak day 1..7 (day 7+ stays at the cap)
   perRank: 0.1, // +10 % per rank above Bronze (Diamant: +40 %)
   xp: 40,
 };
@@ -2960,7 +2960,7 @@ const { doubleDaily, dailyStatus } = __mods['daily.js'];
 
 const PLACEMENTS = {
   credits: { label: '+100 jetons', dailyCap: 20, cooldownMin: 0, reward: () => { wallet.grant(100); return '+100 jetons ajoutés'; } },
-  daily_x2: { label: 'Doubler mon bonus du jour', dailyCap: 1, cooldownMin: 0, when: () => dailyStatus().canDouble, reward: () => `Bonus du jour doublé : +${doubleDaily()} K` },
+  daily_x2: { label: 'Doubler mon bonus du jour', dailyCap: 1, cooldownMin: 0, when: () => dailyStatus().canDouble, reward: () => `Bonus du jour doublé : +${doubleDaily()} KE` },
   xp_boost: { label: 'XP ×2 pendant 15 min', dailyCap: 3, cooldownMin: 60, reward: () => { progress.boost(15); return 'XP ×2 activé pendant 15 minutes'; } },
 };
 
@@ -3088,7 +3088,7 @@ function renderProfile(root) {
         <p class="muted">Une fois toutes les 24 h. Reviens chaque jour pour faire monter ta série (max au jour 7).</p></div></div>
       <div class="streak">${DAILY.amounts.map((_, k) => {
         const day = k + 1, cur = d.ready ? d.next : d.streak, done = day < cur || (!d.ready && day === cur), now = d.ready && day === Math.min(cur, 7);
-        return `<div class="sd${done ? ' done' : ''}${now ? ' now' : ''}"><small>Jour ${day}${day === 7 ? '+' : ''}</small><b>${amountFor(day, p.level)} K</b></div>`;
+        return `<div class="sd${done ? ' done' : ''}${now ? ' now' : ''}"><small>Jour ${day}${day === 7 ? '+' : ''}</small><b>${amountFor(day, p.level)} KE</b></div>`;
       }).join('')}</div>
       <div class="dc-act">${d.ready
         ? `<button class="btn primary lg" data-claim>Récupérer ${fmt(d.amount)}</button><small class="muted">Série : jour ${d.next}${d.next > 1 ? ' 🔥' : ''} · +${DAILY.xp} XP</small>`
@@ -3101,7 +3101,7 @@ function renderProfile(root) {
         const on = p.rank === r, done = p.level > r.to;
         return `<div class="rank-card${on ? ' on' : ''}${done ? ' done' : ''}${p.level < r.from ? ' locked' : ''}" style="--rk:${r.color};--rkd:${r.dark}">
           ${rankBadge(r, 56)}<b>${r.name}</b><small>Niveaux ${r.from} à ${r.to}</small>
-          <ul><li>+${r.perLevel} K par niveau</li>${r.rankUp ? `<li>+${fmt(r.rankUp)} en entrant</li>` : '<li>Rang de départ</li>'}${r.to === MAX_LEVEL ? `<li>+${fmt(MAX_LEVEL_BONUS)} au niveau ${MAX_LEVEL}</li>` : ''}</ul>
+          <ul><li>+${r.perLevel} KE par niveau</li>${r.rankUp ? `<li>+${fmt(r.rankUp)} en entrant</li>` : '<li>Rang de départ</li>'}${r.to === MAX_LEVEL ? `<li>+${fmt(MAX_LEVEL_BONUS)} au niveau ${MAX_LEVEL}</li>` : ''}</ul>
           ${on ? '<i class="rank-you">TOI</i>' : ''}</div>`;
       }).join('')}</div>
     </section>
@@ -4408,7 +4408,7 @@ async function runHoldSpin(m, grid) {
   /* ---- collect sequence ---- */
   await wait(400);
   let total = 0;
-  m.updateBanner(`<b>COLLECTE</b><span class="pill gold hs-total">Total <em>0,00 K</em></span>`);
+  m.updateBanner(`<b>COLLECTE</b><span class="pill gold hs-total">Total <em>0,00 KE</em></span>`);
   const totalEl = m.banner.querySelector('.hs-total em');
   const tgt = center(totalEl);
   for (const c of cells) {
@@ -4444,7 +4444,7 @@ __mods['core/chrome.js'] = (() => {
 const { el } = __mods['ui.js'];
 const { sfx } = __mods['audio.js'];
 
-const fmtE = (c) => `${(c / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\u00a0K`;
+const fmtE = (c) => `${(c / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\u00a0KE`;
 
 // One menu for everything that is not "bet" or "play": bonus buys, autoplay, settings, rules.
 // spec: { title, buys: [{ id, icon, label, desc, price(cents), disabled }], autoplay, auto, toggles: [{ id, icon, label, on, toggle }] }
@@ -4772,7 +4772,7 @@ class SlotMachine {
         <div class="controls">
           <div class="ctl-info">
             <div class="ctl-group"><label>Solde</label><b class="bal"></b></div>
-            <div class="ctl-group"><label>Gain</label><b class="last-win">0,00 K</b></div>
+            <div class="ctl-group"><label>Gain</label><b class="last-win">0,00 KE</b></div>
           </div>
           <div class="ctl-bet">
             <button class="round-btn" data-act="bet-" aria-label="Diminuer la mise">−</button>
@@ -5206,7 +5206,7 @@ class SlotMachine {
       <div class="rays"></div>
       <h3>${summary ? `${summary}` : tier.label}</h3>
       ${summary && tier ? `<div class="tier-tag">${tier.label}</div>` : ''}
-      <div class="bw-amt">0,00 K</div>
+      <div class="bw-amt">0,00 KE</div>
       <p>×${fmtShort(x)} la mise</p>`);
     this.slotEl.appendChild(ov);
     const amtEl = ov.querySelector('.bw-amt');
@@ -5347,10 +5347,10 @@ const { gameMenu, toggleFull, setFull, isFull, MENU_BTN, FULL_BTN, autoFit } = _
 const fmtC = (c) => fmtEuro(Math.round(c) / 100);
 const shortC = (c) => {
   const x = c / 100;
-  if (x >= 1e6) return (x / 1e6).toFixed(1).replace('.', ',') + ' M\u00a0K';
-  if (x >= 100) return Math.round(x).toLocaleString('fr-FR') + '\u00a0K';
-  if (x >= 10) return x.toFixed(1).replace('.', ',') + '\u00a0K';
-  return x.toFixed(2).replace('.', ',') + '\u00a0K';
+  if (x >= 1e6) return (x / 1e6).toFixed(1).replace('.', ',') + ' M\u00a0KE';
+  if (x >= 100) return Math.round(x).toLocaleString('fr-FR') + '\u00a0KE';
+  if (x >= 10) return x.toFixed(1).replace('.', ',') + '\u00a0KE';
+  return x.toFixed(2).replace('.', ',') + '\u00a0KE';
 };
 const wpick = (l) => {
   let t = 0;
@@ -5441,7 +5441,7 @@ class BaseGame {
         <div class="controls">
           <div class="ctl-info">
             <div class="ctl-group"><label>Solde</label><b class="bal"></b></div>
-            <div class="ctl-group"><label>Gain</label><b class="last-win">0,00 K</b></div>
+            <div class="ctl-group"><label>Gain</label><b class="last-win">0,00 KE</b></div>
           </div>
           ${c.stepper ? `<div class="ctl-bet">
             <button class="round-btn" data-act="bet-" aria-label="Diminuer la mise">−</button>
@@ -5635,7 +5635,7 @@ class BaseGame {
     if (tier) { sfx.bigWin(); fx.coins(40); } else sfx.win();
     const ov = this.overlay(`<div class="rays"></div><h3>${summary || tier.label}</h3>
       ${summary && tier ? `<div class="tier-tag">${tier.label}</div>` : ''}
-      <div class="bw-amt">0,00 K</div><p>×${x >= 100 ? Math.round(x) : x.toFixed(1).replace('.', ',')} la mise</p>`, `bigwin ${tier?.cls || 'sum'}`);
+      <div class="bw-amt">0,00 KE</div><p>×${x >= 100 ? Math.round(x) : x.toFixed(1).replace('.', ',')} la mise</p>`, `bigwin ${tier?.cls || 'sum'}`);
     const amt = ov.querySelector('.bw-amt');
     const rain = tier ? setInterval(() => fx.coins(12), 260) : null;
     ov.addEventListener('click', () => { amt._skip = true; }, { once: true });
@@ -6188,7 +6188,7 @@ class HuffGame extends BaseGame {
     if (this.dead) return;
     // collect
     const total = Math.round(res.total * b);
-    this.setBanner('<b>COLLECTE</b><span class="pill gold">Total <em class="hs-tot">0,00 K</em></span>');
+    this.setBanner('<b>COLLECTE</b><span class="pill gold">Total <em class="hs-tot">0,00 KE</em></span>');
     const totEl = this.banner.querySelector('.hs-tot'), tgt = center(totEl);
     let run = 0;
     for (let i = 0; i < NC; i++) {
@@ -8331,7 +8331,7 @@ class StormGame extends BaseGame {
   }
 
   info() {
-    return this.rules(`<h4>Roulette européenne</h4><p>Un seul zéro, 37 cases. Pose tes jetons (100 K maximum par mise). Touche un numéro pour un plein, les bords et les coins pour cheval, carré ou transversale.</p>
+    return this.rules(`<h4>Roulette européenne</h4><p>Un seul zéro, 37 cases. Pose tes jetons (100 KE maximum par mise). Touche un numéro pour un plein, les bords et les coins pour cheval, carré ou transversale.</p>
       <ul class="rules"><li>Plein : 29 pour 1 (ou le multiplicateur de l’éclair)</li><li>Cheval : 17 · Transversale : 11 · Carré : 8 · Sixain : 5</li><li>Douzaines et colonnes : 2 · Rouge/Noir, Pair/Impair, 1-18/19-36 : 1</li></ul>
       <h4>Les éclairs</h4><p>Avant chaque tour, 1 à 5 numéros sont frappés et reçoivent un multiplicateur de <b>×50 à ×50 000</b>. Si la bille s’arrête sur un numéro frappé où tu as un plein, il paie ce multiplicateur à la place de 29 pour 1.</p>`);
   }
@@ -8522,7 +8522,7 @@ function ctRun(ch) {
 /* ===END ENGINE */
 
 const ICON = {
-  cf: '<circle r="10" fill="#ffe27a" stroke="#7a5208" stroke-width="1.6"/><circle r="6.8" fill="none" stroke="#b8860b" stroke-width="1.2"/><text y="3.6" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="10" fill="#7a5208">K</text>',
+  cf: '<circle r="10" fill="#ffe27a" stroke="#7a5208" stroke-width="1.6"/><circle r="6.8" fill="none" stroke="#b8860b" stroke-width="1.2"/><text y="3.6" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="8" fill="#7a5208">KE</text>',
   ch: '<circle r="10" fill="#fff" stroke="#10061f" stroke-width="1.4"/><circle r="7.4" fill="#e0283c"/><circle r="4.6" fill="#fff"/><circle r="2.2" fill="#10061f"/>',
   pa: '<circle r="9.4" fill="#fff" stroke="#10061f" stroke-width="1.4"/><circle cx="-3" cy="-3.2" r="3" fill="#ffd9ae"/><path d="M-6 6 Q0 10 6 6" stroke="#ff8a3d" stroke-width="2" fill="none" stroke-linecap="round"/>',
   ct: '<circle r="10" fill="#ffe27a" stroke="#10061f" stroke-width="1.4"/><circle cx="-3.4" cy="-2.6" r="1.8" fill="#10061f"/><circle cx="3.4" cy="-2.6" r="1.8" fill="#10061f"/><path d="M-6 1.4 Q0 10 6 1.4 Z" fill="#10061f"/><path d="M-2.6 5.4 Q0 8 2.6 5.4" fill="#ff5f7a"/>',
@@ -9160,7 +9160,7 @@ class MinesGame extends BaseGame {
     super(root, game, {
       music: EXTRA_THEMES.mines, autoplay: false, mainLabel: 'JOUER',
       cls: 'table-game mines',
-      head: `<div class="head-meters"><div class="meter m-cur"><small>Multiplicateur</small><b>×0,96</b></div><div class="meter m-nxt"><small>Prochain</small><b>×1,09</b></div><div class="meter m-cash"><small>Encaissable</small><b>0,00 K</b></div></div>`,
+      head: `<div class="head-meters"><div class="meter m-cur"><small>Multiplicateur</small><b>×0,96</b></div><div class="meter m-nxt"><small>Prochain</small><b>×1,09</b></div><div class="meter m-cash"><small>Encaissable</small><b>0,00 KE</b></div></div>`,
       stage: `<div class="mn-grid">${Array.from({ length: SIZE }, (_, i) => `<button class="mn-tile" data-i="${i}" disabled aria-label="Case ${i + 1}"><span class="mn-in"><span class="mn-front"></span><span class="mn-back"></span></span></button>`).join('')}</div>`,
       below: '<div class="mn-ctl"><span>Bombes</span><button class="round-btn" data-mines="-1">−</button><b class="mn-n">3</b><button class="round-btn" data-mines="1">+</button><div class="mn-presets">' + [1, 3, 5, 10, 24].map((n) => `<button data-mset="${n}">${n}</button>`).join('') + '</div></div>',
       hello: 'Choisis ta mise et le nombre de bombes.',
