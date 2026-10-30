@@ -4135,7 +4135,7 @@ const { getGame } = __mods['games/index.js'];
 const UPDATES = [
   {
     game: 'vortex', date: '2026-10-30', title: 'Cases bonus et relance', isNew: true,
-    items: ['Cases dorées ×2 et ×4 qui multiplient ton gain', 'À partir du 4e anneau : encaisse ou paie pour relancer', 'Résultat lisible : ROUGE ↓ ou NOIR à chaque anneau', 'Le gain s’affiche au centre de la roue'],
+    items: ['Zoom sur la bille et sa case à chaque anneau', 'Cases dorées ×2 et ×4 qui multiplient ton gain', 'À partir du 4e anneau : encaisse ou paie pour relancer', 'Le gain s’affiche au centre de la roue'],
   },
   {
     game: 'madwheel', date: '2026-10-30', title: 'Zoom immersif',
@@ -11224,6 +11224,7 @@ const bonusSlot = (i) => (BONUS[i] > 1 ? redSlots(i)[Math.floor(RINGS[i].red / 2
 const xs = (m) => (m >= 100 ? m.toLocaleString('fr-FR') : String(m).replace('.', ','));
 const ease = (t) => 1 - Math.pow(1 - t, 4); // long, readable crawl at the end of each ring's spin
 const SLOT = (Math.PI * 2) / SEG, FRONT = -Math.PI / 2; // the ball sits at 12 o'clock on each ring
+const ZOOM = 2.6; // camera zoom on the ball while a ring is decided
 
 class VortexGame extends BaseGame {
   constructor(root, game) {
@@ -11241,7 +11242,9 @@ class VortexGame extends BaseGame {
     this.ball = null;
     this.glow = null; // lit slot under the ball: { i, red, t0 }
     this.focus = null; // ring being decided: the others are dimmed
-    this.verdict = null; // label next to the ball: { text, kind, t0 }
+    this.verdict = null; // label under the ball: { text, kind, t0 }
+    this.cam = { z: 1, fx: 0, fy: 0 }; // camera: zoom z around the focus point (fx, fy)
+    this.camTo = { z: 1, fx: 0, fy: 0 };
     this.hub = { main: `×${xs(CENTER)}`, sub: 'AU CENTRE', col: '#fde68a' };
     this.hist = [];
     this.canvas = this.q('.vx-canvas');
@@ -11316,11 +11319,16 @@ class VortexGame extends BaseGame {
     this.frameLayer = { cv, size };
   }
 
+  // Camera: dive onto the ball and its slot while a ring is decided, back to the whole wheel otherwise.
+  zoomOn(i) { this.camTo = i == null ? { z: 1, fx: this.geo.cx, fy: this.geo.cy } : { z: ZOOM, fx: this.geo.cx, fy: this.laneY(i) }; }
+
   /* ---------- animation ---------- */
   frame(now) {
     if (this.dead) return;
     const dt = Math.min(0.05, (now - this.last) / 1000);
     this.last = now;
+    const k = Math.min(1, dt * (this.turbo ? 6 : 3.4)), cam = this.cam, to = this.camTo;
+    cam.z += (to.z - cam.z) * k; cam.fx += ((to.fx || this.geo.cx) - cam.fx) * k; cam.fy += ((to.fy || this.geo.cy) - cam.fy) * k;
     RINGS.forEach((_, i) => {
       const h = this.hold[i];
       if (!h) this.rot[i] += this.spin[i] * dt;
@@ -11360,8 +11368,8 @@ class VortexGame extends BaseGame {
     const k = opts[Math.floor(Math.random() * opts.length)], dir = Math.sign(this.spin[i]);
     const target = FRONT - (k + 0.5) * SLOT, from = this.rot[i];
     let d = (((target - from) * dir) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
-    d += Math.PI * 2 * (0.5 + Math.random() * 0.3);
-    return new Promise((done) => { this.hold[i] = { from, d, dir, t0: performance.now(), T: this.turbo ? 900 : 1700, done }; });
+    d += Math.PI * 2; // one whole extra turn: the chosen slot ends exactly under the ball
+    return new Promise((done) => { this.hold[i] = { from, d, dir, t0: performance.now(), T: this.turbo ? 1000 : 1900, done }; });
   }
 
   ladder(lv, cls) {
@@ -11408,6 +11416,7 @@ class VortexGame extends BaseGame {
         this.ladder(i);
         this.verdict = null;
         sfx.land();
+        this.zoomOn(i);
         const goes = passes(i), kind = goes ? (bonusHit(i) ? 'bonus' : 'red') : 'black';
         await this.settle(i, kind);
         if (this.dead) return;
@@ -11419,6 +11428,7 @@ class VortexGame extends BaseGame {
           this.hub = { main: `×${xs(Math.min(CAPX, acc * multAt(i + 1)))}`, sub: acc > 1 ? `BONUS ×${acc}` : (i + 1 < RINGS.length ? 'EN COURS' : 'JACKPOT'), col: acc > 1 ? '#fde047' : '#ff4d63' };
           this.hold[i] = null;
           this.verdict = null;
+          if (i + 1 >= RINGS.length) this.zoomOn(null);
           await this.dropBall(i + 1 < RINGS.length ? this.laneY(i + 1) : this.geo.cy, 380, 4);
           i++;
           continue;
@@ -11426,6 +11436,7 @@ class VortexGame extends BaseGame {
         if (i >= RETRY_FROM) {
           const win = Math.round(bet * Math.min(CAPX, acc * multAt(i))), price = Math.ceil(bet * retryPrice(i, acc));
           this.focus = null;
+          this.zoomOn(null);
           this.hub = { main: `+${fmtC(win)}`, sub: 'OU RELANCE ?', col: '#fde047' };
           this.msg(`Bloquée sur ×${xs(multAt(i))}${acc > 1 ? ` (bonus ×${acc})` : ''}. Encaisser ou relancer ?`);
           if (await this.offerRetry(win, price) && this.pay(price)) {
@@ -11440,6 +11451,8 @@ class VortexGame extends BaseGame {
       }
       if (this.dead) return;
       this.focus = null;
+      this.zoomOn(null);
+      await this.wait(this.turbo ? 250 : 450);
       this.land(i, bet, acc);
     });
   }
@@ -11451,6 +11464,7 @@ class VortexGame extends BaseGame {
     this.q('.vx-hist').innerHTML = this.hist.map((x) => `<span class="${x === 0 ? 'z' : x >= 8 ? 'hot' : ''}">${x ? `×${xs(x)}` : '✕'}</span>`).join('');
     const r = this.canvas.getBoundingClientRect();
     if (win > 0) {
+      this.verdict = null;
       this.hub = { main: `+${fmtC(win)}`, sub: `GAGNÉ · ×${xs(m)}`, col: '#fde047', big: true };
       this.win(win);
       this.setLast(win);
@@ -11467,6 +11481,10 @@ class VortexGame extends BaseGame {
   draw(now) {
     const c = this.ctx, { w, h, cx, cy, R, hubR } = this.geo, pulse = 0.5 + 0.5 * Math.sin(now / 260);
     c.clearRect(0, 0, w, h);
+    // camera: zoom around the focus point, which slides towards the middle of the view as it zooms in
+    const cam = this.cam, z = cam.z, zt = Math.max(0, (z - 1) / (ZOOM - 1));
+    const sx = cam.fx + (w / 2 - cam.fx) * zt, sy = cam.fy + (h * 0.46 - cam.fy) * zt;
+    c.save(); c.translate(sx, sy); c.scale(z, z); c.translate(-cam.fx, -cam.fy);
     const F = this.frameLayer;
     c.drawImage(F.cv, cx - F.size / 2, cy - F.size / 2, F.size, F.size);
     // bulbs chasing round the rim, gold and red
@@ -11481,7 +11499,8 @@ class VortexGame extends BaseGame {
     // rings
     this.layers.forEach((L, i) => {
       c.save(); c.translate(cx, cy); c.rotate(this.rot[i]);
-      c.drawImage(L.cv, -L.size / 2, -L.size / 2, L.size, L.size);
+      if (z > 1.05 && i === this.focus) this.ringVector(i); // close up: redraw the decided ring sharp
+      else c.drawImage(L.cv, -L.size / 2, -L.size / 2, L.size, L.size);
       c.restore();
     });
     // the ring being decided stays bright, the others dim
@@ -11511,6 +11530,7 @@ class VortexGame extends BaseGame {
     c.fillStyle = lg; c.fillRect(cx - laneW, top, laneW * 2, this.ringR(0) - hubR);
     const fs = Math.max(9, Math.min(12, this.geo.step * 0.4));
     c.font = `700 ${fs}px Inter, system-ui, sans-serif`; c.textBaseline = 'middle'; c.textAlign = 'left';
+    c.save(); c.globalAlpha = Math.max(0, 1 - zt * 1.6); // the lane labels fade out in close-up (the ladder stays below)
     for (let i = 0; i < RINGS.length; i++) {
       const y = this.laneY(i), cur = this.ball && this.ball.lv === i, t = i ? `×${xs(RINGS[i].m)}` : '✕';
       const tw = c.measureText(t).width + 10, x = cx + laneW + 4;
@@ -11518,6 +11538,7 @@ class VortexGame extends BaseGame {
       this.pill(x, y - fs * 0.85, tw, fs * 1.7, fs * 0.85); c.fill();
       c.fillStyle = cur ? '#fff' : 'rgba(255,255,255,.78)'; c.fillText(t, x + 5, y + 0.5);
     }
+    c.restore();
     // hub: glass disc that shows the bet, the running multiplier, then the result
     c.save(); c.shadowColor = 'rgba(0,0,0,.7)'; c.shadowBlur = 16;
     const hg = c.createRadialGradient(cx - hubR * 0.3, cy - hubR * 0.4, hubR * 0.1, cx, cy, hubR);
@@ -11533,19 +11554,6 @@ class VortexGame extends BaseGame {
     c.fillText(hb.sub, cx, cy + hubR * 0.38);
     // drop marker
     c.fillStyle = '#fde047'; c.beginPath(); c.moveTo(cx - 8, cy - R - 2); c.lineTo(cx + 8, cy - R - 2); c.lineTo(cx, cy - R + 9); c.closePath(); c.fill();
-    // verdict label beside the ball
-    const v = this.verdict;
-    if (v && this.ball) {
-      const age = (now - v.t0) / 1000, k = Math.min(1, age * 6), fsz = Math.max(11, Math.min(15, this.geo.step * 0.55));
-      c.font = `900 ${fsz}px Orbitron, Inter, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
-      const tw = c.measureText(v.text).width + 20, x = cx - laneW - 10 - tw / 2, y = this.ball.y;
-      c.save(); c.globalAlpha = k; c.translate(x, y); c.scale(0.8 + 0.2 * k, 0.8 + 0.2 * k);
-      c.shadowColor = v.kind === 'black' ? 'rgba(255,255,255,.6)' : v.kind === 'bonus' ? '#fde047' : '#ff2340'; c.shadowBlur = 16;
-      c.fillStyle = v.kind === 'black' ? '#f8fafc' : v.kind === 'bonus' ? '#fbbf24' : '#e11d48';
-      this.pill(-tw / 2, -fsz, tw, fsz * 2, fsz); c.fill();
-      c.shadowBlur = 0; c.fillStyle = v.kind === 'black' ? '#0b0b0f' : v.kind === 'bonus' ? '#3b0a00' : '#fff';
-      c.fillText(v.text, 0, 1); c.restore();
-    }
     // chrome ball
     const b = this.ball;
     if (b) {
@@ -11556,6 +11564,40 @@ class VortexGame extends BaseGame {
       bg.addColorStop(0, '#ffffff'); bg.addColorStop(0.3, '#e5e7eb'); bg.addColorStop(0.7, '#6b7280'); bg.addColorStop(1, '#1f2937');
       c.fillStyle = bg; c.beginPath(); c.arc(b.x, b.y, r, 0, 7); c.fill();
       c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.arc(b.x - r * 0.35, b.y - r * 0.38, r * 0.22, 0, 7); c.fill();
+    }
+    c.restore();
+    // verdict label, in screen space just under the ball
+    const v = this.verdict;
+    if (v && b) {
+      const age = (now - v.t0) / 1000, k = Math.min(1, age * 6), fsz = Math.max(13, Math.min(18, w * 0.03));
+      c.font = `900 ${fsz}px Orbitron, Inter, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+      const tw = c.measureText(v.text).width + 26, x = sx + (b.x - cam.fx) * z, y = sy + (b.y - cam.fy) * z + Math.max(6, this.geo.step * 0.3) * z + fsz * 1.6;
+      c.save(); c.globalAlpha = k; c.translate(x, y); c.scale(0.8 + 0.2 * k, 0.8 + 0.2 * k);
+      c.shadowColor = v.kind === 'black' ? 'rgba(255,255,255,.6)' : v.kind === 'bonus' ? '#fde047' : '#ff2340'; c.shadowBlur = 18;
+      c.fillStyle = v.kind === 'black' ? '#f8fafc' : v.kind === 'bonus' ? '#fbbf24' : '#e11d48';
+      this.pill(-tw / 2, -fsz * 1.05, tw, fsz * 2.1, fsz * 1.05); c.fill();
+      c.shadowBlur = 0; c.fillStyle = v.kind === 'black' ? '#0b0b0f' : v.kind === 'bonus' ? '#3b0a00' : '#fff';
+      c.fillText(v.text, 0, 1); c.restore();
+    }
+  }
+
+  // Sharp vector version of ring i (used when the camera is close); same look as its pre-rendered layer.
+  ringVector(i) {
+    const c = this.ctx, g = RINGS[i], R0 = this.ringR(i) - 1.2, R1 = this.ringR(i + 1) + 1.2, gap = Math.min(0.03, 1.6 / R1), bk = bonusSlot(i);
+    for (let k = 0; k < SEG; k++) {
+      const a0 = k * SLOT + gap / 2, a1 = (k + 1) * SLOT - gap / 2, red = isRed(g.red, k);
+      const gr = c.createRadialGradient(0, 0, R1, 0, 0, R0);
+      if (k === bk) { gr.addColorStop(0, '#7c2d12'); gr.addColorStop(0.45, '#f59e0b'); gr.addColorStop(0.8, '#fde047'); gr.addColorStop(1, '#b45309'); } else if (red) { gr.addColorStop(0, '#8d0a1d'); gr.addColorStop(0.45, '#f0213f'); gr.addColorStop(0.8, '#ff4d63'); gr.addColorStop(1, '#a50d22'); } else { gr.addColorStop(0, '#050608'); gr.addColorStop(0.5, '#23262f'); gr.addColorStop(0.8, '#2e323c'); gr.addColorStop(1, '#0b0c10'); }
+      c.beginPath(); c.arc(0, 0, R0, a0, a1); c.arc(0, 0, R1, a1, a0, true); c.closePath();
+      c.fillStyle = gr; c.fill();
+      c.beginPath(); c.arc(0, 0, R0 - 1, a0 + 0.004, a1 - 0.004);
+      c.strokeStyle = red ? 'rgba(255, 210, 215, .55)' : 'rgba(255, 255, 255, .14)'; c.lineWidth = 1.2; c.stroke();
+      if (k === bk) {
+        const mid = (a0 + a1) / 2, rm = (R0 + R1) / 2;
+        c.save(); c.translate(Math.cos(mid) * rm, Math.sin(mid) * rm); c.rotate(mid + Math.PI / 2);
+        c.font = `900 ${Math.max(8, (R0 - R1) * 0.5)}px Orbitron, Inter, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.fillStyle = '#3b0a00'; c.fillText(`×${BONUS[i]}`, 0, 1); c.restore();
+      }
     }
   }
 
