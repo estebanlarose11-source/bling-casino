@@ -1088,7 +1088,7 @@ body.gated { overflow: hidden; }
 .mw-top.hit { animation: jpHit .9s cubic-bezier(.3, 1.8, .5, 1); --jc: #ffd23f; }
 .mw-view { position: relative; border-radius: 18px; }
 .mw-view.zoom { overflow: hidden; } /* clip only while zoomed: the host stands outside the wheel at rest */
-.mw-view .mw-zone { transition: transform .75s cubic-bezier(.2, .8, .2, 1); transform-origin: 50% 3%; }
+.mw-view .mw-zone { transition: transform 1.2s cubic-bezier(.25, .7, .2, 1); transform-origin: 50% 3%; }
 .mw-view.zoom .mw-zone { transform: scale(2.3); }
 .mw-view .mw-host { transition: opacity .3s; }
 .mw-view.zoom .mw-host, .mw-view.zoom .mw-hub { opacity: 0; }
@@ -1098,7 +1098,7 @@ body.gated { overflow: hidden; }
   padding: 8px 22px; border-radius: 999px; background: var(--seg, #ffd23f); color: #fff; font: 900 clamp(18px, 4vw, 30px) Orbitron, sans-serif; letter-spacing: 1px;
   text-shadow: 0 2px 0 rgba(0, 0, 0, .45); box-shadow: 0 8px 30px rgba(0, 0, 0, .5), 0 0 30px var(--seg, #ffd23f); transition: transform .45s cubic-bezier(.3, 1.6, .5, 1) .25s, opacity .3s .25s; }
 .mw-view.zoom::before { opacity: 1; }
-.mw-view.zoom::after { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.mw-view.zoom.done::after { opacity: 1; transform: translate(-50%, 0) scale(1); }
 .mw-zone { --mwz: min(500px, 84vw, calc(100vh - 330px)); position: relative; width: var(--mwz); min-width: 240px; aspect-ratio: 1; margin: 14px auto 14px; }
 /* showman */
 .mw-host { position: absolute; z-index: 4; left: -17%; bottom: -2%; width: 24%; pointer-events: none; }
@@ -8658,7 +8658,7 @@ function wheelTick(v) {
 
 // Momentum, exponential friction, then a slow crawl over the last pegs (original curve).
 function spinWheel(el, from, to, o = {}) {
-  const AA = o.A || A, k = o.k || 0.5, w1 = o.w1 || 14, Th = to - from, th2 = AA * 1.3, tr = o.tr || 0.55, Tc = (2 * th2) / w1, th1 = Th - th2;
+  const AA = o.A || A, k = o.k || 0.5, w1 = o.w1 || 14, Th = to - from, th2 = AA * (o.crawl || 1.3), tr = o.tr || 0.55, Tc = (2 * th2) / w1, th1 = Th - th2;
   let w0 = 0, L = 0;
   const sc = (matchMedia('(prefers-reduced-motion: reduce)').matches ? 8 : 1) * (o.turbo ? 1.8 : 1);
   for (let it = 0; it < 4; it++) { w0 = (th1 + L) * k + w1; L = 0; const n = 60; for (let j = 0; j < n; j++) { const t = ((j + 0.5) * tr) / n; L += w0 * Math.exp(-k * t) * (1 - smooth(t / tr)) * (tr / n); } }
@@ -8673,7 +8673,7 @@ function spinWheel(el, from, to, o = {}) {
     const tt = t - T1; return from + dexpEnd + w1 * tt - (w1 * tt * tt) / (2 * Tc);
   };
   return new Promise((res) => {
-    let t0 = null, prevA = from, prevT = 0, lastN = Math.floor(from / AA);
+    let t0 = null, prevA = from, prevT = 0, lastN = Math.floor(from / AA), near = !o.near;
     const ptr = o.ptr;
     const frame = (ts) => {
       if (t0 === null) t0 = ts;
@@ -8683,6 +8683,7 @@ function spinWheel(el, from, to, o = {}) {
       if (nn !== lastN) { lastN = nn; wheelTick(sp < 500 ? 0.16 : 0.05); }
       if (ptr) { const fr = (((a % AA) + AA) % AA) / AA, d = fr > 0.6 ? Math.pow((fr - 0.6) / 0.4, 2) * (sp > 200 ? 20 : 28) : 0; ptr.style.transform = `translateX(-50%) rotate(${(-d).toFixed(1)}deg)`; }
       prevA = a; prevT = t;
+      if (!near && total - t <= o.near.lead) { near = true; o.near.fn(); } // e.g. start the zoom before the stop
       if (t >= total) { el.style.transform = `rotate(${to}deg)`; if (ptr) ptr.style.transform = 'translateX(-50%)'; res(); return; }
       requestAnimationFrame(frame);
     };
@@ -8814,7 +8815,8 @@ class MadWheelGame extends BaseGame {
       this.pose('pull');
       await this.wait(260);
       setTimeout(() => { if (!this.dead && this.host.classList.contains('pull')) this.pose('watch'); }, this.turbo ? 300 : 600);
-      await spinWheel(this.wheel, from, this.cur, { ptr: this.q('.mw-ptr'), k: 0.5, w1: 14, turbo: this.turbo });
+      // long slow crawl over the last slices, with the camera already zooming in on the pointer
+      await spinWheel(this.wheel, from, this.cur, { ptr: this.q('.mw-ptr'), k: 0.68, w1: 9, crawl: 2.2, turbo: this.turbo, near: { lead: 2.6, fn: () => this.zoomIn() } });
       topBox.classList.remove('hit');
       this.histAdd(seg);
       this.q('.mw-hub').innerHTML = isNaN(+seg) ? iconSVG(seg, 34) : `<b class="big">${seg}</b>`;
@@ -8850,17 +8852,20 @@ class MadWheelGame extends BaseGame {
     });
   }
 
-  // Camera dives onto the pointer to show the winning slice, holds, then pulls back.
+  // Camera dives onto the pointer while the wheel crawls over its last slices.
+  zoomIn() { if (!this.dead) this.q('.mw-view')?.classList.add('zoom'); }
+
+  // Once stopped: the result label pops up, the camera holds, then pulls back.
   async zoomOnResult(seg) {
     const view = this.q('.mw-view');
     if (!view || this.dead) return;
     view.dataset.seg = isNaN(+seg) ? NAME[seg] : seg;
     view.style.setProperty('--seg', COL[seg]);
-    view.classList.add('zoom');
+    view.classList.add('zoom', 'done');
     sfx.upgrade();
-    await this.wait(1900);
+    await this.wait(1600);
     if (this.dead) return;
-    view.classList.remove('zoom');
+    view.classList.remove('zoom', 'done');
     await this.wait(500);
   }
 
