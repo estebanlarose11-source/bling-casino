@@ -1856,6 +1856,93 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 }
 
 
+/* ============ Cosmic Heist ============ */
+/* Neon space. Light like Candy Queen: static nebula, two slow star layers, no filters or blend modes on the grid. */
+.g-cosmic { --slot-bg: radial-gradient(600px 300px at 15% -5%, rgba(34, 211, 238, .35), transparent 70%), radial-gradient(500px 280px at 95% 10%, rgba(244, 114, 182, .32), transparent 70%), linear-gradient(180deg, #170a3d 0%, #0b0526 55%, #04010f 100%); }
+.g-cosmic .slot-title h2 { font-family: Orbitron, 'Bebas Neue', sans-serif; letter-spacing: 2px; color: #ecfeff; text-shadow: 0 0 6px #22d3ee, 0 0 18px rgba(34, 211, 238, .7), 0 0 34px rgba(244, 114, 182, .55); }
+.cosmic-frame { position: relative; padding: 4px; border-radius: 22px; background: linear-gradient(135deg, #22d3ee, #a855f7 35%, #f472b6 65%, #facc15); box-shadow: 0 0 18px rgba(34, 211, 238, .55), 0 0 38px rgba(244, 114, 182, .35), 0 16px 40px rgba(0, 0, 0, .6); }
+.cosmic-frame > .slot-stage { border-radius: 18px; background: #070219; }
+.g-cosmic.radar .cosmic-frame { box-shadow: 0 0 0 3px #facc15, 0 0 30px rgba(250, 204, 21, .6); }
+
+.ch-stage { position: relative; display: flex; flex-direction: column; padding: 6px; overflow: hidden; contain: layout paint; }
+.ch-space { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  background: radial-gradient(ellipse at 12% 18%, rgba(168, 85, 247, .35), transparent 50%), radial-gradient(ellipse at 88% 80%, rgba(34, 211, 238, .22), transparent 55%), radial-gradient(ellipse at 60% 40%, rgba(244, 114, 182, .14), transparent 45%), linear-gradient(180deg, #120635, #070219 70%); }
+.ch-space::after { content: ''; position: absolute; inset: 0; opacity: 0; transition: opacity .5s; background: radial-gradient(ellipse at 50% 0%, rgba(250, 204, 21, .22), transparent 60%), radial-gradient(ellipse at 50% 100%, rgba(244, 114, 182, .32), transparent 60%); }
+.g-cosmic.in-free .ch-space::after, .g-cosmic.ch-boom .ch-space::after { opacity: 1; }
+.g-cosmic.fs-C .ch-space { background: radial-gradient(ellipse at 50% 50%, rgba(250, 204, 21, .25), transparent 55%), radial-gradient(ellipse at 10% 10%, rgba(244, 114, 182, .4), transparent 50%), linear-gradient(180deg, #2a0640, #0b0219); }
+.ch-stars { position: absolute; left: 0; top: 0; width: 100%; height: 200%; will-change: transform; animation: chDrift 60s linear infinite;
+  background-image: radial-gradient(circle, #fff 1px, transparent 1.5px), radial-gradient(circle, #a5f3fc 1px, transparent 1.5px), radial-gradient(circle, #f9a8d4 1px, transparent 1.5px);
+  background-size: 90px 90px, 140px 140px, 210px 210px; background-position: 0 0, 40px 70px, 120px 30px; opacity: .55; }
+.ch-stars.s2 { animation-duration: 110s; background-size: 160px 160px, 250px 250px, 330px 330px; background-position: 70px 20px, 10px 120px, 200px 200px; opacity: .35; }
+.g-cosmic.in-free .ch-stars { animation-duration: 14s; }
+.g-cosmic.in-free .ch-stars.s2 { animation-duration: 24s; }
+@keyframes chDrift { to { transform: translateY(-50%); } }
+.ch-planet { position: absolute; right: -40px; bottom: -50px; width: 170px; aspect-ratio: 1; border-radius: 50%; opacity: .45;
+  background: radial-gradient(circle at 35% 30%, #f0abfc, #a855f7 45%, #312e81 75%); box-shadow: 0 0 40px rgba(168, 85, 247, .6); }
+.ch-ring { position: absolute; right: -80px; bottom: 10px; width: 250px; height: 50px; border-radius: 50%; border: 3px solid rgba(250, 204, 21, .45); transform: rotate(-14deg); }
+
+/* board */
+.ch-board { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.ch-meter { margin-left: auto; display: flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 14px; background: linear-gradient(180deg, #1a0b45, #0b0526); box-shadow: 0 0 0 2px #22d3ee, 0 0 14px rgba(34, 211, 238, .45); }
+.ch-meter small { font: 800 10px Inter, sans-serif; letter-spacing: 2px; text-transform: uppercase; color: #a5f3fc; }
+.ch-meter b { display: inline-block; font: 900 clamp(20px, 2.4vw, 28px)/1 Orbitron, sans-serif; color: #fff; text-shadow: 0 0 8px #22d3ee; }
+.ch-lv { display: flex; gap: 4px; }
+.ch-lv i { font: 800 11px/1 Orbitron, sans-serif; font-style: normal; padding: 3px 6px; border-radius: 8px; color: #0b0526; }
+.ch-lv .l1 { background: #22d3ee; } .ch-lv .l2 { background: #f472b6; } .ch-lv .l3 { background: #facc15; }
+.ch-meter.hot { box-shadow: 0 0 0 2px #f472b6, 0 0 18px rgba(244, 114, 182, .6); }
+.g-cosmic .sg { width: min(100%, calc((100vh - var(--chrome) + 40px) * 6 / 5)); padding: 6px; gap: 5px; border-radius: 16px; background: rgba(10, 4, 34, .72); box-shadow: inset 0 0 0 1px rgba(34, 211, 238, .35); transition: none; }
+.g-cosmic .sg.tease { box-shadow: inset 0 0 0 3px #facc15, 0 0 22px rgba(250, 204, 21, .5); }
+.g-cosmic .sg-cell { border-radius: 12px; transition: none; background: linear-gradient(180deg, rgba(76, 29, 149, .32), rgba(15, 6, 48, .65)); box-shadow: inset 0 0 0 1px rgba(168, 85, 247, .22); }
+.g-cosmic .sg-cell.hi { background: linear-gradient(180deg, rgba(34, 211, 238, .2), rgba(15, 6, 48, .65)); }
+.g-cosmic .sg-sym svg { width: 88%; height: 88%; filter: none; }
+.g-cosmic .sg-cell.win { z-index: 1; box-shadow: inset 0 0 0 3px #fff, inset 0 0 18px #22d3ee; }
+.g-cosmic .sg-cell.win .sg-sym svg { animation: chWinSym .6s ease-in-out infinite; }
+@keyframes chWinSym { 50% { transform: scale(1.1); } }
+/* charge levels: blue, pink, gold neon tubes */
+.g-cosmic .sg-cell.chg::before { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background-image: linear-gradient(rgba(255, 255, 255, .12) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, .12) 1px, transparent 1px); background-size: 25% 25%; }
+.g-cosmic .sg-cell.c1 { background: linear-gradient(180deg, rgba(34, 211, 238, .45), rgba(8, 51, 68, .7)); box-shadow: inset 0 0 0 2px #22d3ee, inset 0 0 14px rgba(34, 211, 238, .6); }
+.g-cosmic .sg-cell.c2 { background: linear-gradient(180deg, rgba(244, 114, 182, .5), rgba(80, 7, 36, .7)); box-shadow: inset 0 0 0 2px #f472b6, inset 0 0 16px rgba(244, 114, 182, .7); }
+.g-cosmic .sg-cell.c3 { background: linear-gradient(180deg, rgba(250, 204, 21, .55), rgba(113, 63, 18, .7)); box-shadow: inset 0 0 0 2px #fde047, inset 0 0 18px rgba(250, 204, 21, .8); }
+.g-cosmic .sg-cell.scatter { background: radial-gradient(circle, rgba(168, 85, 247, .55), rgba(250, 204, 21, .15) 70%); }
+.g-cosmic .sg-cell.scatter svg { animation: chFloat 2s ease-in-out infinite; }
+@keyframes chFloat { 50% { transform: translateY(-5%) rotate(-4deg); } }
+.g-cosmic .sg-cell.nova { background: radial-gradient(circle, rgba(250, 204, 21, .55), rgba(244, 114, 182, .3) 60%, rgba(15, 6, 48, .6)); }
+.g-cosmic .sg-cell.nova svg { animation: chSpin 6s linear infinite; }
+@keyframes chSpin { to { transform: rotate(360deg); } }
+.g-cosmic .sg-cell.nvon, .g-cosmic .sg-cell.pulse { z-index: 1; box-shadow: inset 0 0 0 3px #fff, inset 0 0 24px #f472b6, 0 0 16px #f472b6; }
+.g-cosmic .sg-cell.beam { box-shadow: inset 0 0 0 3px #c084fc, inset 0 0 22px #a855f7; }
+.g-cosmic .lbl.chl { position: absolute; bottom: 3%; left: 50%; transform: translateX(-50%); font: 900 8.5cqh Orbitron, sans-serif; font-style: normal; padding: 1cqh 3cqh; border-radius: 3cqh; background: linear-gradient(90deg, #7c3aed, #c026d3); color: #fff; white-space: nowrap; box-shadow: 0 0 6px #a855f7; }
+.g-cosmic .lbl.chl.n { background: linear-gradient(90deg, #f472b6, #f59e0b); box-shadow: 0 0 6px #f472b6; }
+.g-cosmic .sg-cell.revealed .sg-sym { opacity: .08; }
+.ch-itm .loot { position: relative; width: 78%; aspect-ratio: 1; display: grid; place-items: center; font: 900 21cqh/1 Orbitron, sans-serif; color: #fff; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: linear-gradient(160deg, #ecfeff, #22d3ee 45%, #0e7490); }
+.ch-itm .loot.l2 { background: linear-gradient(160deg, #fce7f3, #f472b6 45%, #9d174d); }
+.ch-itm .loot.l3 { background: linear-gradient(160deg, #fffbeb, #facc15 45%, #b45309); }
+.ch-itm .loot span { position: relative; z-index: 1; padding: 4cqh 5cqh; border-radius: 8cqh; background: rgba(7, 2, 25, .82); box-shadow: 0 0 0 1.5px #fff; white-space: nowrap; }
+.ch-itm .clv b { color: #fff; text-shadow: 0 0 6px #a855f7, 0 2px 0 #4c1d95; font-size: 22cqh; bottom: 16%; }
+.ch-word { position: absolute; left: 50%; top: 50%; z-index: 5; pointer-events: none; transform: translate(-50%, -50%) scale(0); opacity: 0; will-change: transform, opacity; font: 900 clamp(28px, 5.4vw, 66px)/1 Orbitron, sans-serif; letter-spacing: 2px; white-space: nowrap;
+  color: #ecfeff; text-shadow: 0 0 8px #22d3ee, 0 0 22px #22d3ee, 0 4px 0 #0e7490; }
+.ch-word.t2, .ch-word.t3 { color: #fdf2f8; text-shadow: 0 0 8px #f472b6, 0 0 22px #f472b6, 0 4px 0 #9d174d; }
+.ch-word.t4, .ch-word.t5 { color: #fefce8; text-shadow: 0 0 8px #facc15, 0 0 22px #f59e0b, 0 4px 0 #92400e; }
+/* light intro / big win overlays */
+.ch-ov.slot-overlay { backdrop-filter: none; -webkit-backdrop-filter: none; background: radial-gradient(circle, rgba(30, 10, 80, .9), rgba(4, 1, 15, .96)); }
+.ch-ov h3 { color: #ecfeff; text-shadow: 0 0 10px #22d3ee, 0 0 26px #a855f7; }
+.ch-ov .intro-glyph { filter: none; }
+.ch-ov.bigwin .rays { animation: none; inset: 0; }
+.ch-ov .bw-amt { animation: none; text-shadow: 0 0 10px #f472b6, 0 4px 0 #831843; }
+@container (max-width: 520px) {
+  .ch-stage { padding: 4px; }
+  .ch-planet, .ch-ring { display: none; }
+  .ch-meter { padding: 3px 8px; gap: 5px; }
+  .ch-meter small { display: none; }
+  .ch-meter b { font-size: 18px; }
+  .ch-lv i { font-size: 10px; padding: 2px 4px; }
+  .g-cosmic .sg { padding: 4px; gap: 3px; }
+  .g-cosmic .sg-cell { border-radius: 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .ch-stars, .g-cosmic .sg-cell.nova svg { animation: none; } }
+
 /* ============ Rewarded ad popup (A-ADS) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
@@ -3680,6 +3767,136 @@ const ZEUS_FIG = `<svg class="zeus-svg" viewBox="0 0 200 300" aria-hidden="true"
 return { DEFS, ZEUS_FIG };
 })();
 
+// ---- art/cosmic.js ----
+__mods['art/cosmic.js'] = (() => {
+// SVG art for Cosmic Heist: neon crystals, space loot, the beacon scatter, the supernova, the black hole, the
+// vacuum ship and K-0B, the robot burglar (covers only).
+
+const lg = (id, a, b, c, x2 = 0, y2 = 1) => `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}"><stop offset="0" stop-color="${a}"/><stop offset=".5" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient>`;
+const ray = (cx, cy, R, r, n, rot = 0) => {
+  const p = [];
+  for (let k = 0; k < n * 2; k++) {
+    const a = (rot + k * 180 / n) * Math.PI / 180, d = k % 2 ? r : R;
+    p.push(`${(cx + d * Math.cos(a)).toFixed(1)},${(cy + d * Math.sin(a)).toFixed(1)}`);
+  }
+  return p.join(' ');
+};
+const spark = (x, y, s) => `M${x} ${y - s} Q${x} ${y} ${x + s} ${y} Q${x} ${y} ${x} ${y + s} Q${x} ${y} ${x - s} ${y} Q${x} ${y} ${x} ${y - s}Z`;
+const shine = (x, y, rx, ry, rot = -30) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" transform="rotate(${rot} ${x} ${y})" fill="#fff" opacity=".6"/>`;
+// neon outline: a wide soft stroke under a thin bright one
+const neon = (d, c, w = 2.2) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w * 3}" stroke-opacity=".28" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"/>`;
+const gem = (pts, fill, edge, facets) => `<polygon points="${pts}" fill="url(#${fill})"/>${neon(`M${pts.replace(/ /g, ' L')}Z`, edge)}<path d="${facets}" stroke="#fff" stroke-opacity=".55" stroke-width="1.1" fill="none"/>`;
+
+const SYMS = {
+  // 0 green prism
+  ch0: `${gem('32,6 58,54 6,54', 'chGreen', '#4ade80', 'M32 6 L32 54 M32 6 L20 54 M32 6 L44 54 M14 40 H50')}${shine(26, 26, 2.5, 7, 25)}`,
+  // 1 cyan cube
+  ch1: `<polygon points="32,6 56,19 56,45 32,58 8,45 8,19" fill="url(#chCyan)"/>
+    <polygon points="32,6 56,19 32,32 8,19" fill="#ecfeff" opacity=".45"/><polygon points="32,32 56,19 56,45 32,58" fill="#083344" opacity=".35"/>
+    ${neon('M32 6 L56 19 L56 45 L32 58 L8 45 L8 19 Z', '#22d3ee')}<path d="M8 19 L32 32 L56 19 M32 32 V58" stroke="#fff" stroke-opacity=".6" stroke-width="1.2" fill="none"/>`,
+  // 2 violet hexagon
+  ch2: `${gem('32,5 55,18 55,46 32,59 9,46 9,18', 'chViolet', '#c084fc', 'M32 15 L46 23 L46 41 L32 49 L18 41 L18 23 Z M32 5 V15 M55 18 L46 23 M55 46 L46 41 M32 59 V49 M9 46 L18 41 M9 18 L18 23')}${shine(22, 18, 2.5, 6)}`,
+  // 3 pink diamond
+  ch3: `${gem('32,4 56,32 32,60 8,32', 'chPink', '#f472b6', 'M8 32 H56 M32 4 L22 32 L32 60 L42 32 Z')}${shine(24, 20, 2.2, 6, 40)}`,
+  // 4 meteor
+  ch4: `<path d="M58 6 L30 26 M54 18 L32 32 M46 4 L26 22" stroke="url(#chTrail)" stroke-width="5" stroke-linecap="round" opacity=".85"/>
+    <path d="M10 34 Q8 20 22 18 Q30 12 38 20 Q50 22 48 36 Q50 50 36 54 Q24 60 14 50 Q6 44 10 34Z" fill="url(#chRock)" stroke="#fb923c" stroke-width="2"/>
+    <circle cx="22" cy="30" r="5" fill="#7c2d12" opacity=".7"/><circle cx="36" cy="42" r="6" fill="#7c2d12" opacity=".7"/><circle cx="35" cy="27" r="3" fill="#7c2d12" opacity=".7"/>
+    <path d="M14 46 Q20 52 30 52" stroke="#fde047" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>${shine(20, 23, 3, 5)}`,
+  // 5 satellite
+  ch5: `<g transform="rotate(-25 32 32)"><rect x="3" y="25" width="17" height="14" rx="2" fill="url(#chPanel)" stroke="#38bdf8" stroke-width="1.6"/><rect x="44" y="25" width="17" height="14" rx="2" fill="url(#chPanel)" stroke="#38bdf8" stroke-width="1.6"/>
+    <path d="M8.7 25 V39 M14.3 25 V39 M49.7 25 V39 M55.3 25 V39 M3 32 H20 M44 32 H61" stroke="#7dd3fc" stroke-width=".9" opacity=".8"/>
+    <path d="M20 32 H24 M40 32 H44" stroke="#e2e8f0" stroke-width="2.5"/>
+    <rect x="24" y="22" width="16" height="20" rx="4" fill="url(#chMetal)" stroke="#e2e8f0" stroke-width="1.6"/><rect x="28" y="27" width="8" height="5" rx="1.5" fill="#22d3ee"/>
+    <path d="M32 22 V13 M26 10 Q32 16 38 10" stroke="#e2e8f0" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="32" cy="9" r="2.5" fill="#f472b6"/></g>
+    <path d="M44 50 Q50 46 52 40 M48 56 Q57 50 59 40" stroke="#22d3ee" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>`,
+  // 6 rocket
+  ch6: `<path d="M24 50 Q32 66 40 50 Q36 56 32 54 Q28 56 24 50Z" fill="url(#chFlame)"/>
+    <path d="M20 40 L12 52 L24 48 Z M44 40 L52 52 L40 48 Z" fill="#f43f5e" stroke="#fda4af" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M32 4 Q46 16 44 44 L20 44 Q18 16 32 4Z" fill="url(#chMetal)" stroke="#e2e8f0" stroke-width="1.8"/>
+    <path d="M32 4 Q40 10 42 18 H22 Q24 10 32 4Z" fill="#f43f5e"/>
+    <circle cx="32" cy="27" r="6.5" fill="url(#chCyan)" stroke="#fff" stroke-width="2"/>${shine(30, 25, 1.6, 2.6)}
+    <rect x="22" y="42" width="20" height="6" rx="2" fill="#475569" stroke="#cbd5e1"/>`,
+  // 7 UFO
+  ch7: `<path d="M18 46 L10 60 M46 46 L54 60" stroke="#a3e635" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+    <path d="M20 30 Q20 12 32 12 Q44 12 44 30Z" fill="url(#chDome)" stroke="#a5f3fc" stroke-width="1.6"/>
+    <ellipse cx="32" cy="23" rx="5" ry="5.5" fill="#86efac"/><circle cx="30" cy="22" r="1.4" fill="#052e16"/><circle cx="34.5" cy="22" r="1.4" fill="#052e16"/>
+    <ellipse cx="32" cy="36" rx="29" ry="10" fill="url(#chMetal)" stroke="#e2e8f0" stroke-width="1.8"/>
+    <ellipse cx="32" cy="33" rx="20" ry="4" fill="#94a3b8" opacity=".5"/>
+    ${[10, 21, 32, 43, 54].map((x, k) => `<circle cx="${x}" cy="${37 + (k % 4 ? 1.5 : 0)}" r="2.6" fill="${['#f472b6', '#facc15', '#22d3ee', '#a3e635', '#f472b6'][k]}"/>`).join('')}
+    ${shine(25, 18, 2.2, 4)}`,
+  // 8 K-0B, the robot burglar (top symbol)
+  ch8: `<path d="M32 3 V10" stroke="#e2e8f0" stroke-width="2.4"/><circle cx="32" cy="4" r="3.4" fill="#f472b6"/>
+    <rect x="9" y="10" width="46" height="40" rx="12" fill="url(#chMetal)" stroke="#e2e8f0" stroke-width="2"/>
+    <rect x="4" y="22" width="6" height="14" rx="2" fill="#64748b"/><rect x="54" y="22" width="6" height="14" rx="2" fill="#64748b"/>
+    <path d="M11 20 H53 Q56 30 53 34 H11 Q8 30 11 20Z" fill="#0f172a" stroke="#a855f7" stroke-width="1.6"/>
+    <circle cx="23" cy="27" r="4.5" fill="#22d3ee"/><circle cx="41" cy="27" r="4.5" fill="#22d3ee"/><circle cx="24" cy="26" r="1.5" fill="#fff"/><circle cx="42" cy="26" r="1.5" fill="#fff"/>
+    <path d="M22 41 Q32 46 42 41" stroke="#0f172a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <rect x="18" y="50" width="28" height="10" rx="4" fill="#475569" stroke="#cbd5e1" stroke-width="1.4"/><text x="32" y="58" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="7" fill="#facc15">K-0B</text>`,
+  // scatter: beacon planet
+  chs: `<circle cx="32" cy="30" r="17" fill="url(#chPlanet)"/>
+    <path d="M17 24 Q32 30 47 22 M15 33 Q32 40 49 31" stroke="#fff" stroke-opacity=".35" stroke-width="2.4" fill="none"/>
+    <ellipse cx="32" cy="32" rx="30" ry="8" transform="rotate(-14 32 32)" fill="none" stroke="#facc15" stroke-width="3.5"/>
+    <path d="M15 24 A17 17 0 0 1 49 22" fill="none" stroke="#fff7c2" stroke-width="1.4" opacity=".7"/>
+    <circle cx="32" cy="30" r="17" fill="none" stroke="#f0abfc" stroke-width="2"/>
+    <path d="M44 14 Q50 9 56 10 M46 18 Q53 15 58 17" stroke="#facc15" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    <path d="${spark(10, 10, 4)}" fill="#fff"/><path d="${spark(56, 50, 3)}" fill="#fff"/>`,
+  // supernova
+  chn: `<polygon points="${ray(32, 32, 31, 10, 12)}" fill="url(#chNova)" opacity=".85"/>
+    <polygon points="${ray(32, 32, 22, 9, 8, 22)}" fill="#fff" opacity=".9"/>
+    <circle cx="32" cy="32" r="11" fill="url(#chCore)"/><circle cx="32" cy="32" r="11" fill="none" stroke="#fff" stroke-width="2"/>
+    <circle cx="32" cy="32" r="26" fill="none" stroke="#22d3ee" stroke-width="1.6" stroke-dasharray="3 5" opacity=".9"/>`,
+  // loot: black hole
+  chh: `<ellipse cx="32" cy="32" rx="30" ry="12" transform="rotate(-18 32 32)" fill="none" stroke="url(#chDisk)" stroke-width="6"/>
+    <circle cx="32" cy="32" r="14" fill="#020008"/><circle cx="32" cy="32" r="14" fill="none" stroke="#f0abfc" stroke-width="2.4"/>
+    <circle cx="32" cy="32" r="17" fill="none" stroke="#a855f7" stroke-width="1.2" opacity=".6"/>
+    <path d="M7 40 A30 12 -18 0 0 59 24" fill="none" stroke="url(#chDisk)" stroke-width="6" transform="rotate(0)"/>`,
+  // loot: vacuum ship
+  chv: `<path d="M20 38 L8 62 H56 L44 38Z" fill="url(#chBeam)"/>
+    <path d="M10 30 Q32 6 54 30 Q32 40 10 30Z" fill="url(#chMetal)" stroke="#e2e8f0" stroke-width="1.8"/>
+    <path d="M22 22 Q32 10 42 22Z" fill="url(#chDome)" stroke="#a5f3fc" stroke-width="1.4"/>
+    <ellipse cx="32" cy="32" rx="22" ry="6" fill="#334155" stroke="#22d3ee" stroke-width="1.6"/>
+    ${[16, 24, 32, 40, 48].map((x) => `<circle cx="${x}" cy="32.5" r="2" fill="#facc15"/>`).join('')}
+    ${shine(28, 17, 1.6, 3)}`,
+};
+
+const GRADS = [
+  lg('chGreen', '#dcfce7', '#22c55e', '#14532d'), lg('chCyan', '#ecfeff', '#22d3ee', '#0e7490'), lg('chViolet', '#f3e8ff', '#a855f7', '#4c1d95'),
+  lg('chPink', '#fce7f3', '#ec4899', '#831843'), lg('chRock', '#fdba74', '#9a3412', '#431407'), lg('chPanel', '#1e3a8a', '#1d4ed8', '#0c1a4a', 1, 1),
+  lg('chMetal', '#f8fafc', '#94a3b8', '#334155'), lg('chFlame', '#fff7c2', '#fb923c', '#e11d48'), lg('chDome', '#ecfeff', '#67e8f9', '#0e7490'),
+  lg('chPlanet', '#f0abfc', '#a855f7', '#312e81', 1, 1), lg('chNova', '#fde047', '#f472b6', '#7c3aed'), lg('chDisk', '#facc15', '#f472b6', '#7c3aed', 1, 0),
+  lg('chTrail', '#fde047', '#fb923c', '#e11d48', 1, 1),
+  '<radialGradient id="chCore"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#fde047"/><stop offset="1" stop-color="#f472b6"/></radialGradient>',
+  '<linearGradient id="chBeam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".8"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></linearGradient>',
+].join('');
+
+// K-0B full body for the covers, in a 200×300 box.
+const ROBOT = `<g>
+  <ellipse cx="100" cy="160" rx="96" ry="140" fill="url(#chAura)"/>
+  <path d="M70 196 L58 280 H84 L92 206 Z M130 196 L142 280 H116 L108 206 Z" fill="url(#chMetal)" stroke="#e2e8f0" stroke-width="2"/>
+  <rect x="50" y="272" width="40" height="16" rx="6" fill="#475569" stroke="#cbd5e1" stroke-width="2"/><rect x="110" y="272" width="40" height="16" rx="6" fill="#475569" stroke="#cbd5e1" stroke-width="2"/>
+  <path d="M146 130 Q178 150 172 196" stroke="#94a3b8" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <g transform="translate(150 186) rotate(-14)"><path d="M0 0 Q-16 6 -14 40 Q10 56 34 40 Q38 6 22 0 Z" fill="#7c3aed" stroke="#f0abfc" stroke-width="2"/>
+    <path d="M2 0 Q11 -10 20 0" stroke="#f0abfc" stroke-width="3" fill="none"/><text x="10" y="32" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="20" fill="#facc15">$</text>
+    ${[[0, 8], [18, 4], [8, -2]].map(([x, y]) => `<g transform="translate(${x} ${y})"><polygon points="0,-8 7,0 0,8 -7,0" fill="url(#chPink)" stroke="#fff" stroke-width="1"/></g>`).join('')}</g>
+  <path d="M54 130 Q24 120 22 88" stroke="#94a3b8" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <g transform="translate(22 78)"><use href="#ch1" x="-18" y="-22" width="36" height="36"/></g>
+  <rect x="50" y="118" width="100" height="88" rx="24" fill="url(#chMetal)" stroke="#e2e8f0" stroke-width="2.4"/>
+  <rect x="68" y="136" width="64" height="40" rx="10" fill="#0f172a" stroke="#22d3ee" stroke-width="2"/>
+  <path d="M74 160 H86 L92 148 L100 170 L106 156 H126" stroke="#22d3ee" stroke-width="3" fill="none" stroke-linejoin="round"/>
+  <circle cx="100" cy="192" r="6" fill="#f472b6"/>
+  <g transform="translate(36 6) scale(2)"><use href="#ch8" width="64" height="64"/></g>
+</g>`;
+
+const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${GRADS}
+<radialGradient id="chAura" cx=".5" cy=".45" r=".55"><stop offset="0" stop-color="#22d3ee" stop-opacity=".45"/><stop offset="1" stop-color="#7c3aed" stop-opacity="0"/></radialGradient>
+${Object.entries(SYMS).map(([id, body]) => `<symbol id="${id}" viewBox="0 0 64 64">${body}</symbol>`).join('\n')}
+<symbol id="ch-robot" viewBox="0 0 200 300">${ROBOT}</symbol>
+</defs></svg>`;
+
+return { DEFS };
+})();
+
 // ---- art/index.js ----
 __mods['art/index.js'] = (() => {
 // Every game's SVG art, mounted once so covers and games can <use> any symbol.
@@ -3690,13 +3907,14 @@ const { DEFS: BOUNTY } = __mods['art/bounty.js'];
 const { DEFS: ANUBIS } = __mods['art/anubis.js'];
 const { DEFS: CANDY } = __mods['art/candy.js'];
 const { DEFS: ZEUS } = __mods['art/zeus.js'];
+const { DEFS: COSMIC } = __mods['art/cosmic.js'];
 
 function mountAllArt() {
   if (document.getElementById('bling-art')) return;
   const host = document.createElement('div');
   host.id = 'bling-art';
   host.className = 'art-defs';
-  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS].join('');
+  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC].join('');
   document.body.prepend(host);
 }
 
@@ -3767,6 +3985,7 @@ const GAMES = [
 
 // The original Bling games: same rules and payouts, rebuilt on the shared cabinet (js/games/impl/).
 const ORIGINALS = [
+  {"id": "cosmic", "name": "Cosmic Heist", "cat": "slot", "tag": "Machine à sous", "sub": "Casse néon dans l’espace", "colors": ["#22d3ee", "#7c3aed"], "description": "K-0B, le robot cambrioleur, vide un astéroïde de ses cristaux. Les grappes de 5 symboles explosent en cascade et chargent leurs cases d’énergie : bleu, rose, puis doré. Quand une supernova éclate, toutes les cellules chargées livrent leur butin, avec des trous noirs qui multiplient leur ligne et leur colonne et des vaisseaux qui aspirent tout. 3 bonus avec les balises.", "features": ["Grappes de 5", "Cellules d’énergie à 3 niveaux", "Supernova et Surcharge", "Trous noirs ×2 à ×25", "Vaisseaux-aspirateurs", "3 bonus", "Radar à balises", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "zeus", "name": "Zeus Thunder", "cat": "slot", "tag": "Machine à sous", "sub": "Pay Anywhere, multiplicateurs ×500", "colors": ["#3b82f6", "#1e1b4b"], "description": "Sur l’Olympe, Zeus fait pleuvoir les gemmes. 8 symboles identiques n’importe où sur la grille 6×5 paient, les gains tombent en cascade et Zeus lance des orbes multiplicateurs de ×2 à ×500. 4 scatters lancent 15 tours gratuits avec un multiplicateur global qui ne se réinitialise jamais.", "features": ["Grille 6×5 Pay Anywhere", "Cascades", "Orbes ×2 à ×500", "15 Free Spins", "Multiplicateur global", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
   {"id": "huff", "name": "Huff la Puff XXTrem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Huff ’n’ Puff : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent XXTREM Puff avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. 5 scatters lancent le MEGA BONUS et sa roue du loup. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Huff ’n’ Puff", "4 scatters : roulette des maisons", "5 scatters : MEGA BONUS", "Cases ×2 à ×200", "Mini, Minor, Major, Jackpot ×5 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "candy", "name": "Candy Queen", "cat": "slot", "tag": "Machine à sous", "sub": "Bonbons, baguette et paillettes", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et pailletent leurs cases. D’un coup de baguette magique, elles se révèlent : bonbons, macarons, diamants sucrés, cœurs multiplicateurs et bocaux qui aspirent tout. 3 bonus féeriques avec les couronnes.", "features": ["Grappes de 5", "Cases pailletées", "Baguette magique", "Cœurs ×2 à ×100, bocaux", "3 bonus", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
@@ -3903,6 +4122,21 @@ const SPECS = {
       <svg x="8" y="104" width="160" height="115" viewBox="0 2 64 46" filter="url(#sh${u})"><use href="#wf" width="64" height="64"/></svg>
       ${sym('pg', 150, 250, 58, `filter="url(#sh${u})"`)}
       ${sym('jp', 60, 262, 46, `filter="url(#glow${u})"`)}`,
+  },
+  cosmic: {
+    bg: ['#2a0f6e', '#05021a'], light: '#22d3ee', title: ['COSMIC', 'HEIST'], font: 'orb', metal: ['#fff', '#a5f3fc', '#c026d3'], tag: '3 BONUS',
+    hero: (u) => `
+      <circle cx="250" cy="60" r="34" fill="url(#chPlanet)" opacity=".75"/><ellipse cx="250" cy="62" rx="56" ry="11" transform="rotate(-14 250 62)" fill="none" stroke="#facc15" stroke-width="3" opacity=".7"/>
+      ${sym('chn', 60, 70, 70, `filter="url(#glow${u})"`)}
+      <use href="#ch-robot" x="58" y="10" width="184" height="276" filter="url(#sh${u})"/>
+      ${sym('ch3', 46, 206, 54, `filter="url(#glow${u})"`)}${sym('ch7', 254, 196, 62, `filter="url(#sh${u})"`)}`,
+    art: (u) => `
+      <g fill="#fff">${[[30, 40, 1.6], [80, 22, 1.2], [140, 50, 1], [200, 30, 1.4], [276, 120, 1.2], [20, 160, 1.3], [286, 220, 1], [110, 100, 1]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" opacity=".8"/>`).join('')}</g>
+      <circle cx="244" cy="86" r="40" fill="url(#chPlanet)" opacity=".7"/><ellipse cx="244" cy="88" rx="66" ry="13" transform="rotate(-14 244 88)" fill="none" stroke="#facc15" stroke-width="3.5" opacity=".7"/>
+      <g opacity=".7" filter="url(#soft${u})">${sym('ch5', 52, 120, 60)}${sym('ch4', 262, 168, 52)}</g>
+      ${sym('chn', 70, 70, 80, `filter="url(#glow${u})"`)}
+      <use href="#ch-robot" x="56" y="44" width="188" height="282" filter="url(#sh${u})"/>
+      ${sym('ch3', 50, 252, 66, `filter="url(#glow${u})"`)}${sym('ch7', 250, 250, 76, `filter="url(#sh${u})"`)}${sym('ch1', 196, 292, 40, `filter="url(#glow${u})"`)}`,
   },
   candy: {
     bg: ['#8a0f74', '#14021f'], light: '#ff7ad9', title: ['CANDY', 'QUEEN'], font: 'bebas', metal: ['#fff', '#ffb3e6', '#d0219a'], tag: '3 BONUS',
@@ -4086,7 +4320,7 @@ const SPECS = {
 
 // Bright card colours (top, bottom) for the square lobby posters.
 const CARD = {
-  'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'],
+  'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
   mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'],
@@ -4202,6 +4436,10 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
+    game: 'cosmic', date: '2026-10-30', title: 'Nouveau jeu', isNew: true,
+    items: ['Un casse néon dans l’espace avec K-0B, le robot cambrioleur', 'Chaque gain charge sa case : bleu, rose, puis doré', 'La supernova fait exploser le butin, jusqu’à ×10 000', '3 bonus : Orbite Basse, Ceinture d’Astéroïdes et Hyper-Espace'],
+  },
+  {
     game: 'casse', date: '2026-10-30', title: 'Nouveau jeu', isNew: true,
     items: ['Une chambre forte et 9 coffres à percer', 'Liasses jusqu’à ×100, coffre doré qui double le butin', 'Le receleur fait une offre après chaque coffre', 'Attention à l’alarme : tu fuis avec 25 % du butin'],
   },
@@ -4285,7 +4523,7 @@ function renderLobby(root, params = {}) {
   };
 
   const body = filter === 'all'
-    ? row('Populaires', ['poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
+    ? row('Populaires', ['cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
       + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
       + row('Roues & tables', ORIGINALS.filter(FILTERS[3].test), 'table')
       + row('Jeux rapides', ORIGINALS.filter(FILTERS[4].test), 'quick')
@@ -4985,6 +5223,7 @@ class Music {
 const EXTRA_THEMES = {
   zeus: { sd: 0.24, len: 16, root: 130.81, pad: { wave: 'sawtooth', vol: 0.018, dur: 1.8, map: { 0: [0, 7, 12], 8: [-2, 5, 10] } }, lead: { wave: 'triangle', vol: 0.055, dur: 0.3, pat: [12, null, 15, 19, null, 17, 15, null, 14, null, 17, 22, null, 19, 17, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.5, pat: [-12, null, null, -12, null, null, -5, null, -14, null, null, -14, null, null, -7, null] }, kick: [0, 3, 8, 11], hat: [4, 12], kv: 0.26, hv: 0.02 },
   candy: { sd: 0.16, len: 16, root: 293.66, lead: { wave: 'triangle', vol: 0.06, dur: 0.2, pat: [12, 16, 19, 24, null, 19, 21, null, 17, 21, 24, 29, null, 24, 19, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.28, pat: [-12, null, -5, null, -12, null, -5, null, -7, null, 0, null, -7, null, -3, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.1, map: { 2: [0, 4, 7], 6: [0, 4, 9], 10: [-3, 0, 5], 14: [-5, -1, 2] } }, kick: [0, 8], hat: [2, 6, 10, 14], kv: 0.15, hv: 0.018 },
+  cosmic: { sd: 0.18, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.016, dur: 1.6, map: { 0: [0, 7, 15], 8: [-4, 3, 10] } }, lead: { wave: 'square', vol: 0.022, dur: 0.12, pat: [12, 19, 24, 19, 15, 19, 22, 19, 12, 19, 24, 27, 22, 19, 15, 10] }, bass: { wave: 'sawtooth', vol: 0.045, dur: 0.2, pat: [-12, null, -12, -12, null, -12, null, -12, -16, null, -16, -16, null, -14, null, -14] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.022 },
   wolf: { sd: 0.22, len: 16, root: 146.83, lead: { wave: 'triangle', vol: 0.05, dur: 0.22, pat: [12, null, 15, 12, 10, null, 7, null, 12, null, 15, 17, 19, null, 15, null] }, bass: { wave: 'sawtooth', vol: 0.05, dur: 0.3, pat: [-12, null, -12, null, -9, null, -9, null, -7, null, -7, null, -5, null, -9, null] }, kick: [0, 8, 10], hat: [4, 12], kv: 0.2, hv: 0.02 },
   storm: { sd: 0.19, len: 16, root: 110, lead: { wave: 'sawtooth', vol: 0.025, dur: 0.16, pat: [12, null, 15, null, 17, null, 15, 12, null, 10, null, 12, 15, null, 19, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.22, pat: [0, null, 0, null, -2, null, -2, null, -4, null, -4, null, -5, null, -5, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.025 },
   doublespin: { sd: 0.25, len: 16, root: 174.61, lead: { wave: 'triangle', vol: 0.05, dur: 0.3, pat: [12, null, 16, null, 19, null, 21, 19, null, 16, null, 14, 12, null, null, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.4, pat: [-12, null, null, -5, null, null, -7, null, -12, null, null, -5, null, null, -10, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.12, map: { 2: [0, 4, 7], 6: [0, 4, 9], 10: [-3, 0, 4], 14: [-5, -1, 2] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
@@ -11949,6 +12188,414 @@ class CasseGame extends BaseGame {
 return { CasseGame };
 })();
 
+// ---- games/impl/cosmic.js ----
+__mods['games/impl/cosmic.js'] = (() => {
+// Cosmic Heist: 6×5 cluster pays with cascades. Every winning cell gains an energy charge (levels 1 to 3); a
+// supernova cracks the charged cells open into loot worth more at higher charge, black holes that multiply their
+// whole row and column, and vacuum ships that collect all the loot once more. Tuned by simulation (RTP ≈ 92 %, buys ≈ 88 %).
+
+const { BaseGame, fmtC, art } = __mods['core/base.js'];
+const { SymbolGrid } = __mods['core/grid.js'];
+const { EXTRA_THEMES } = __mods['core/music.js'];
+const { sfx } = __mods['audio.js'];
+const { fx, sleep, center } = __mods['fx.js'];
+const { el, toast } = __mods['ui.js'];
+
+/* ===ENGINE */
+const C = 6, R = 5, N = 30, MINC = 5, CAPX = 10000;
+const P = {
+  w: [40, 34, 26, 18, 12, 8, 5, 3, 2],
+  val: [0.1, 0.12, 0.15, 0.2, 0.3, 0.5, 0.8, 1.5, 3], F: 2.2,
+  ps: 0.0092, psFS: 0.013, pn: 0.0032, pnFS: 0.012, radarF: 1.6,
+  item: [['l', 92], ['h', 5], ['v', 3]],
+  loot: [null,
+    [[0.2, 40], [0.4, 35], [0.6, 15], [1, 10]],
+    [[1, 40], [2, 35], [3, 15], [5, 10]],
+    [[5, 40], [10, 30], [20, 18], [50, 10], [100, 2]]],
+  hole: [[2, 50], [3, 30], [5, 15], [10, 5]],
+  holeFS: [[2, 40], [3, 28], [5, 18], [10, 10], [25, 4]],
+  boost: { A: 1.2, B: 0.52, C: 0.45 }, L: 0.7,
+};
+function wpick(l) { let t = 0; for (const x of l) t += x[1]; let r = Math.random() * t; for (const x of l) { if (r < x[1]) return x[0]; r -= x[1]; } return l[l.length - 1][0]; }
+function draw(o) {
+  const ps = (o.fs ? P.psFS : P.ps) * (o.radar ? P.radarF : 1), pn = o.fs ? P.pnFS : P.pn, r = Math.random();
+  if (r < ps) return 9;
+  if (r < ps + pn) return 10;
+  let x = Math.random() * P.w.reduce((a, b) => a + b, 0); for (let i = 0; i < P.w.length; i++) { if (x < P.w[i]) return i; x -= P.w[i]; } return 0;
+}
+const NB = [];
+for (let k = 0; k < N; k++) { const c = Math.floor(k / R), r = k % R, o = []; if (r > 0) o.push(k - 1); if (r < R - 1) o.push(k + 1); if (c > 0) o.push(k - R); if (c < C - 1) o.push(k + R); NB.push(o); }
+function clusters(grid) {
+  const out = [], seen = {};
+  for (let k = 0; k < N; k++) {
+    const t = grid[k]; if (t > 8 || seen[k]) continue;
+    const st = [k], cs = []; seen[k] = 1;
+    while (st.length) { const x = st.pop(); cs.push(x); for (const n of NB[x]) if (!seen[n] && grid[n] === t) { seen[n] = 1; st.push(n); } }
+    if (cs.length >= MINC) out.push({ t, cells: cs });
+  }
+  return out;
+}
+const sameLine = (a, b) => Math.floor(a / R) === Math.floor(b / R) || a % R === b % R;
+function crack(lv, o) {
+  const k = wpick(P.item);
+  if (k === 'h') return { k, f: wpick(o.fs ? P.holeFS : P.hole) };
+  if (k === 'v') return { k };
+  return { k: 'l', lv, v: wpick(P.loot[lv]) * P.L * (o.fs ? P.boost[o.mode] : 1) };
+}
+function spin(o) {
+  const bet = o.bet, grid = [], steps = [];
+  const charge = o.charge ? o.charge.slice() : new Array(N).fill(0);
+  let i, total = 0, rounds = 0;
+  for (i = 0; i < N; i++) grid.push(draw(o));
+  if (o.forceNova) { let has = false; for (i = 0; i < N; i++) if (grid[i] === 10) has = true; if (!has) grid[Math.floor(Math.random() * N)] = 10; }
+  steps.push({ k: 'init', grid: grid.slice(), charge: charge.slice() });
+  while (rounds < 80) {
+    const cl = clusters(grid); if (!cl.length) break;
+    let paid = 0; const rem = {}, wins = [];
+    cl.forEach((c) => { const p = bet * P.val[c.t] * P.F * (c.cells.length - MINC + 1); paid += p; wins.push({ t: c.t, n: c.cells.length, p, cells: c.cells }); c.cells.forEach((x) => { rem[x] = 1; if (charge[x] < 3) charge[x]++; }); });
+    total += paid;
+    for (let c = 0; c < C; c++) {
+      const keep = []; for (let r = 0; r < R; r++) { const j = c * R + r; if (!rem[j]) keep.push(grid[j]); }
+      const miss = R - keep.length;
+      for (let r = 0; r < R; r++) grid[c * R + r] = r < miss ? draw(o) : keep[r - miss];
+    }
+    steps.push({ k: 'win', wins, paid, rem: Object.keys(rem).map(Number), after: grid.slice(), charge: charge.slice() });
+    rounds++;
+  }
+  let scat = 0, nova = 0; for (i = 0; i < N; i++) { if (grid[i] === 9) scat++; else if (grid[i] === 10) nova++; }
+  const base = total; let act = null, nc = 0;
+  for (i = 0; i < N; i++) if (charge[i]) nc++;
+  if (nova > 0 && nc > 0) {
+    const surge = nova >= 2;
+    if (surge) for (i = 0; i < N; i++) if (charge[i] && charge[i] < 3) charge[i]++;
+    const items = [];
+    for (i = 0; i < N; i++) if (charge[i]) { const it = crack(charge[i], o); it.i = i; it.lv = charge[i]; items.push(it); if (it.k === 'l') it.fv = it.v; }
+    const holes = [];
+    items.forEach((h) => { if (h.k !== 'h') return; const tg = []; items.forEach((t) => { if (t.k === 'l' && sameLine(h.i, t.i)) { t.fv *= h.f; tg.push(t.i); } }); holes.push({ i: h.i, f: h.f, targets: tg }); });
+    let loot = 0, ships = 0; items.forEach((t) => { if (t.k === 'l') loot += t.fv * bet; else if (t.k === 'v') ships++; });
+    const pay = loot * (1 + ships);
+    act = { items, holes, loot, ships, pay, nova, surge };
+    total += pay;
+    if (o.mode !== 'B') charge.fill(o.mode === 'C' ? 1 : 0);
+  }
+  let capped = false; if (total >= bet * CAPX) { total = bet * CAPX; capped = true; }
+  steps.push({ k: 'end', base, act, scat, nova, nc });
+  return { steps, total, scat, nova, base, act, charge: o.fs ? charge : null, capped };
+}
+const modeOf = (s) => (s >= 5 ? 'C' : s === 4 ? 'B' : 'A');
+const SPINS = { A: 8, B: 10, C: 10 };
+/* ===END ENGINE */
+
+const NAMES = ['Prisme vert', 'Cube cyan', 'Hexagone violet', 'Diamant rose', 'Météorite', 'Satellite', 'Fusée', 'OVNI', 'K-0B'];
+const MODEN = { A: 'Orbite Basse', B: 'Ceinture d’Astéroïdes', C: 'Hyper-Espace' };
+const MODESUB = {
+  A: 'Les cellules chargées restent jusqu’à la supernova',
+  B: 'Les charges ne disparaissent jamais et continuent de monter',
+  C: 'Toute la grille est chargée et une supernova éclate à chaque tour',
+};
+const RADARC = 2, NOVAC = 3.15, PA = 93, PB = 275;
+const WORDS = ['STELLAIRE !', 'COSMIQUE !', 'GALACTIQUE !', 'HYPERNOVA !', 'INTERSIDÉRAL !', 'BIG BANG !'];
+const NEON = ['#22d3ee', '#f472b6', '#a855f7', '#facc15', '#4ade80', '#fff'];
+const LVN = ['', 'Cristal bleu', 'Cristal rose', 'Cristal doré'];
+const LVC = ['', '#22d3ee', '#f472b6', '#facc15'];
+const sym = (c) => (c < 9 ? art('ch' + c) : c === 9 ? art('chs') + '<i class="lbl chl">BALISE</i>' : art('chn') + '<i class="lbl chl n">SUPERNOVA</i>');
+const fxv = (v) => (v >= 10 ? String(Math.round(v)) : v.toFixed(2).replace(/\.?0+$/, '').replace('.', ','));
+const lootRange = (lv) => `×${fxv(P.loot[lv][0][0] * P.L)} à ×${fxv(P.loot[lv][P.loot[lv].length - 1][0] * P.L)}`;
+
+class CosmicGame extends BaseGame {
+  constructor(root, game) {
+    super(root, game, {
+      music: EXTRA_THEMES.cosmic,
+      frameCls: 'cosmic-frame',
+      stage: `<div class="ch-stage">
+        <div class="ch-space"><i class="ch-stars s1"></i><i class="ch-stars s2"></i><i class="ch-planet"></i><i class="ch-ring"></i></div>
+        <div class="ch-board">
+          <div class="grid-host"></div>
+          <div class="ch-word"></div>
+        </div>
+      </div>`,
+      head: '<div class="ch-meter"><small>Énergie</small><b>0</b><span class="ch-lv"><i class="l1">0</i><i class="l2">0</i><i class="l3">0</i></span></div>',
+      opts: [{ id: 'radar', icon: '📡', label: 'Radar à balises (mise ×2, balises ×1,6)' }],
+      buys: [
+        { id: 'nova', icon: '💥', label: 'Supernova garantie', desc: 'Un tour avec une supernova sur la grille', cost: (b) => Math.round(b * NOVAC) },
+        { id: 'A', icon: '🪐', label: `${MODEN.A} · 3 balises`, desc: `${SPINS.A} tours · ${MODESUB.A.toLowerCase()}`, cost: (b) => b * PA },
+        { id: 'B', icon: '☄️', label: `${MODEN.B} · 4 balises`, desc: `${SPINS.B} tours · ${MODESUB.B.toLowerCase()}`, cost: (b) => b * PB },
+      ],
+      hello: 'Grappes de 5+ · chaque gain charge sa case · la supernova fait exploser le butin',
+    });
+    this.radar = false;
+    this.charge = new Array(N).fill(0);
+    this.meter = this.q('.ch-meter');
+    this.meterVal = this.q('.ch-meter b');
+    this.lvEls = this.qa('.ch-lv i');
+    this.grid = new SymbolGrid(this.q('.grid-host'), {
+      cols: C, rows: R, game: this, art: sym,
+      cls: (v, i) => (this.charge[i] ? `chg c${this.charge[i]} ` : '') + (v === 9 ? 'scatter' : v === 10 ? 'nova' : v >= 7 ? 'hi' : ''),
+    });
+    this.grid.setAll(Array.from({ length: N }, () => Math.floor(Math.random() * 9)));
+  }
+
+  // Big word over the grid, restarted with WAAPI (no forced reflow).
+  word(k, text) {
+    const w = this.q('.ch-word');
+    w.textContent = text || WORDS[Math.min(k, WORDS.length - 1)];
+    w.className = `ch-word t${Math.min(k, 5)}`;
+    w.getAnimations().forEach((a) => a.cancel());
+    w.animate([
+      { opacity: 0, transform: 'translate(-50%,-50%) scale(.3)' },
+      { opacity: 1, transform: 'translate(-50%,-50%) scale(1.1)', offset: 0.2 },
+      { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.35 },
+      { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.7 },
+      { opacity: 0, transform: 'translate(-50%,-50%) scale(1.4)' },
+    ], { duration: this.turbo ? 600 : 1000, easing: 'ease-out' });
+  }
+
+  overlay(html, cls = '') { return super.overlay(html, `${cls} ch-ov`); }
+
+  stakeLabel() { return Math.round(this.bet * (this.radar ? RADARC : 1)); }
+  optOn(id) { return id === 'radar' && this.radar; }
+  onOpt(id) {
+    if (id !== 'radar' || this.busy) return;
+    this.radar = !this.radar;
+    this.slotEl.classList.toggle('radar', this.radar);
+    toast(this.radar ? 'Radar activé : mise ×2, balises 1,6 fois plus fréquentes' : 'Radar désactivé');
+    this.updateMeters();
+  }
+
+  // Paints the charge level of every cell and updates the energy meter.
+  applyCharge(arr) {
+    const cnt = [0, 0, 0, 0];
+    for (let i = 0; i < N; i++) {
+      const lv = arr?.[i] || 0;
+      cnt[lv]++;
+      if (this.charge[i] === lv) continue;
+      const cell = this.grid.cells[i];
+      cell.classList.remove('chg', 'c1', 'c2', 'c3');
+      if (lv) cell.classList.add('chg', 'c' + lv);
+      if (lv > this.charge[i]) cell.animate([{ filter: 'brightness(2.2)' }, { filter: 'none' }], { duration: 380 });
+      this.charge[i] = lv;
+    }
+    const n = N - cnt[0];
+    if (+this.meterVal.textContent !== n) {
+      this.meterVal.textContent = n;
+      this.meterVal.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.3)', offset: 0.4 }, { transform: 'scale(1)' }], { duration: 400 });
+    }
+    this.lvEls.forEach((e, k) => { e.textContent = cnt[k + 1]; });
+    this.meter.classList.toggle('hot', n > 0);
+    return n;
+  }
+
+  onMain() { this.round(() => this.playRound('spin')); }
+  async onBuy(kind) { await this.playRound(kind, true); }
+
+  async playRound(kind, prepaid = false) {
+    const b = this.bet;
+    const price = kind === 'spin' ? this.stakeLabel() : 0;
+    if (!prepaid && !this.pay(price)) return;
+    this.lastStake = kind === 'spin' ? price : b;
+    this.setLast(0); this.winAmt.textContent = ''; this.setBanner('');
+    let total = 0;
+    if (kind === 'A' || kind === 'B') {
+      total = await this.bonus(kind);
+    } else {
+      const res = spin({ bet: b, fs: false, radar: kind === 'spin' && this.radar, forceNova: kind === 'nova' });
+      await this.play(res, false, null);
+      total = res.total;
+      if (total > 0) { this.win(Math.round(total)); this.setLast(total); }
+      if (res.scat >= 3) {
+        this.stopAuto();
+        if (total > 0) await this.celebrate(Math.round(total));
+        total += await this.bonus(modeOf(res.scat));
+      } else if (total > 0) await this.celebrate(Math.round(total));
+    }
+    this.setLast(total);
+    this.msg(total >= b * CAPX ? `GAIN MAXIMUM ! ${fmtC(total)}` : total > 0 ? `Total du tour : ${fmtC(total)}` : 'Pas de gain');
+  }
+
+  async play(res, fs, mode) {
+    let run = 0, k = 0;
+    for (const st of res.steps) {
+      if (this.dead) return;
+      if (st.k === 'init') {
+        this.applyCharge(st.charge);
+        await this.grid.dropIn(st.grid, {
+          tease: (c) => { let sc = 0; for (let j = 0; j < c * R; j++) if (st.grid[j] === 9) sc++; return sc >= 2; },
+          onLand: (i, v) => {
+            if (v < 9) return;
+            sfx.land();
+            const p = center(this.grid.cells[i]);
+            fx.burst(p.x, p.y, 10, v === 10 ? NEON : ['#facc15', '#fff', '#f0abfc'], 5);
+          },
+        });
+      } else if (st.k === 'win') {
+        st.wins.forEach((w) => this.grid.floatOver(w.cells, `+${fmtC(Math.round(w.p))}`, '#a5f3fc'));
+        this.grid.mark(st.rem);
+        this.msg(st.wins.map((w) => `${w.n} × ${NAMES[w.t]} : +${fmtC(Math.round(w.p))}`).join(' · '));
+        this.word(k);
+        sfx.win();
+        await this.wait(750);
+        this.grid.unmark();
+        await this.grid.explode(st.rem, NEON);
+        this.applyCharge(st.charge);
+        await this.grid.cascade(st.after, new Set(st.rem));
+        run += st.paid; k++;
+        this.setLast(Math.round(run));
+        await this.wait(180);
+      } else if (st.k === 'end') {
+        if (st.act) await this.activate(st.act);
+        this.applyCharge(fs ? res.charge : null);
+      }
+    }
+  }
+
+  async activate(a) {
+    const b = this.bet;
+    for (let i = 0; i < N; i++) if (this.grid.values[i] === 10) this.grid.cells[i].classList.add('nvon');
+    sfx.feature();
+    this.flash('rgba(244,114,182,.55)');
+    this.shake();
+    this.slotEl.classList.add('ch-boom');
+    this.msg(a.nova > 1 ? `${a.nova} supernovas ! Les cellules chargées explosent…` : 'Supernova ! Les cellules chargées explosent…');
+    await this.wait(650);
+    const items = a.items.slice().sort((x, y) => x.i - y.i), disp = {}, nodes = {};
+    if (a.surge) {
+      this.word(5, 'SURCHARGE !');
+      this.msg('SURCHARGE : chaque cellule chargée monte d’un niveau !');
+      sfx.upgrade();
+      const up = this.charge.slice();
+      items.forEach((it) => { up[it.i] = it.lv; });
+      this.applyCharge(up);
+      await this.wait(900);
+    }
+    const step = items.length > 16 ? (this.turbo ? 25 : 55) : (this.turbo ? 45 : 110);
+    for (const it of items) {
+      if (this.dead) return;
+      const e = el('div', 'itm ch-itm');
+      if (it.k === 'h') e.innerHTML = `<div class="clv hole">${art('chh')}<b>×${it.f}</b></div>`;
+      else if (it.k === 'v') e.innerHTML = `<div class="clv ship">${art('chv')}</div>`;
+      else { disp[it.i] = it.v; e.innerHTML = `<div class="loot l${it.lv}"><span>×${fxv(it.v)}</span></div>`; }
+      const cell = this.grid.cells[it.i];
+      cell.classList.add('revealed');
+      cell.appendChild(e);
+      nodes[it.i] = e;
+      sfx.tick();
+      if (it.k !== 'l' || it.lv === 3) { const p = center(cell); fx.burst(p.x, p.y, 8, it.k === 'l' ? ['#facc15', '#fff'] : NEON, 5); }
+      await sleep(step);
+    }
+    await this.wait(400);
+    for (const h of a.holes || []) {
+      if (!h.targets.length || this.dead) continue;
+      this.msg(`Trou noir ×${h.f} : tout le butin de sa ligne et de sa colonne est multiplié !`);
+      const srcCell = this.grid.cells[h.i], src = center(srcCell);
+      srcCell.classList.add('pulse');
+      const hc = Math.floor(h.i / R), hr = h.i % R;
+      const beam = this.grid.cells.filter((_, j) => Math.floor(j / R) === hc || j % R === hr);
+      beam.forEach((c) => c.classList.add('beam'));
+      sfx.upgrade();
+      for (const ti of h.targets) {
+        disp[ti] *= h.f;
+        const cn = nodes[ti]?.querySelector('.loot span');
+        fx.trail(src, center(this.grid.cells[ti]), '#a855f7', 5);
+        await sleep(this.turbo ? 70 : 130);
+        if (cn) { cn.textContent = '×' + fxv(disp[ti]); cn.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.35)', offset: 0.4 }, { transform: 'scale(1)' }], { duration: 350 }); }
+        sfx.tick();
+      }
+      await this.wait(450);
+      beam.forEach((c) => c.classList.remove('beam'));
+      srcCell.classList.remove('pulse');
+    }
+    if (a.ships > 0 && !this.dead) {
+      const shipCells = items.filter((x) => x.k === 'v');
+      shipCells.forEach((x) => this.grid.cells[x.i].classList.add('pulse'));
+      this.msg(a.ships > 1 ? `${a.ships} vaisseaux aspirent tout le butin !` : 'Le vaisseau aspire tout le butin !');
+      sfx.feature();
+      await this.wait(500);
+      // measure everything first, then animate (no layout reads inside the animation loop)
+      const moves = [];
+      for (const x of items) {
+        if (disp[x.i] === undefined) continue;
+        const cn = nodes[x.i]?.querySelector('.loot'); if (!cn) continue;
+        let best = shipCells[0], bd = 1e9;
+        shipCells.forEach((p) => { const d = Math.abs(Math.floor(p.i / R) - Math.floor(x.i / R)) + Math.abs((p.i % R) - (x.i % R)); if (d < bd) { bd = d; best = p; } });
+        const r1 = this.grid.cells[x.i].getBoundingClientRect(), r2 = this.grid.cells[best.i].getBoundingClientRect();
+        moves.push({ cn, dx: r2.left - r1.left, dy: r2.top - r1.top });
+      }
+      const gap = moves.length > 14 ? 30 : 60;
+      moves.forEach((m, j) => {
+        m.cn.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${m.dx}px,${m.dy}px) scale(.15)`, opacity: 0 }],
+          { duration: 550, delay: j * gap, easing: 'cubic-bezier(.55,0,.9,.45)', fill: 'forwards' });
+      });
+      await sleep(550 + moves.length * gap);
+      sfx.coin();
+      sfx.bigWin();
+      this.msg(`Butin aspiré : ×${fxv(a.loot / b)} compté ${1 + a.ships} fois !`);
+      shipCells.forEach((x) => { const p = center(this.grid.cells[x.i]); fx.burst(p.x, p.y, 16, NEON, 7); });
+      await this.wait(700);
+      moves.forEach((m) => {
+        m.cn.getAnimations().forEach((an) => an.cancel());
+        m.cn.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: 'ease-out' });
+      });
+      await this.wait(700);
+      shipCells.forEach((x) => this.grid.cells[x.i].classList.remove('pulse'));
+    }
+    const parts = [];
+    if (a.loot > 0) parts.push(`butin ×${fxv(a.loot / b)}`);
+    if (a.ships > 0) parts.push(`${a.ships} vaisseau${a.ships > 1 ? 'x' : ''} (butin compté ×${1 + a.ships})`);
+    this.msg(`${parts.join(' · ') || 'Pas de butin'} → +${fmtC(Math.round(a.pay))}`);
+    if (a.pay >= b * 10) { const p = center(this.grid.el); fx.burst(p.x, p.y, 24, NEON, 9); }
+    await this.wait(1100);
+    this.slotEl.classList.remove('ch-boom');
+    this.grid.cells.forEach((c) => { c.querySelector('.itm')?.remove(); c.classList.remove('revealed', 'nvon', 'pulse'); });
+  }
+
+  // Same rules as the simulated bonus: +3 spins on 3 beacons, a supernova on every Hyper-Espace spin and at
+  // least one on the last spin of the other two.
+  async bonus(mode) {
+    let left = SPINS[mode], tot = 0, hadNova = false, done = 0;
+    let charge = mode === 'C' ? new Array(N).fill(1) : null;
+    const b = this.bet, cap = b * CAPX;
+    this.lastStake = b;
+    await this.featureIntro(MODEN[mode].toUpperCase(), `${left} tours gratuits · ${MODESUB[mode]}`, art(mode === 'C' ? 'chn' : 'chs'));
+    this.slotEl.classList.add('in-free', `fs-${mode}`);
+    this.applyCharge(charge);
+    while (left > 0 && tot < cap && !this.dead) {
+      left--; done++;
+      this.setBanner(`<b>${MODEN[mode].toUpperCase()}</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
+      const res = spin({ bet: b, fs: true, mode, charge, forceNova: mode === 'C' || (left === 0 && !hadNova) });
+      if (res.nova) hadNova = true;
+      await this.play(res, true, mode);
+      charge = res.charge;
+      const add = Math.min(res.total, cap - tot);
+      tot += add;
+      if (add > 0) this.win(Math.round(add), MODEN[mode]);
+      this.setLast(Math.round(tot));
+      if (res.scat >= 3) { left += 3; await this.featureIntro('+3 TOURS', 'Nouvelles balises captées !', art('chs'), 1300); }
+      await this.wait(300);
+    }
+    this.slotEl.classList.remove('in-free', `fs-${mode}`);
+    this.setBanner('');
+    this.applyCharge(null);
+    await this.celebrate(Math.round(tot), { summary: MODEN[mode].toUpperCase(), stake: b });
+    return tot;
+  }
+
+  info() {
+    const pay = (s) => (P.val[s] * P.F).toFixed(2).replace('.', ',');
+    const rows = NAMES.map((n, s) => `<div class="pay-item"><div class="pay-sym svg">${art('ch' + s)}</div><div class="pay-vals"><b>${n}</b><br><span>5 : ×${pay(s)} · chaque case de plus : +×${pay(s)}</span></div></div>`).join('');
+    return this.rules(`<h4>Symboles (× la mise)</h4><div class="paytable">${rows}
+      <div class="pay-item"><div class="pay-sym svg">${art('chs')}</div><div class="pay-vals"><b>Balise (scatter)</b><br><span>3 / 4 / 5 = les 3 bonus</span></div></div>
+      <div class="pay-item"><div class="pay-sym svg">${art('chn')}</div><div class="pay-vals"><b>Supernova</b><br><span>Fait exploser les cellules chargées</span></div></div></div>
+      <h4>Cellules d’énergie</h4><p>Grille 6×5, grappes de 5+ (horizontal ou vertical) en cascade. Chaque case d’une grappe gagnante gagne <b>un niveau de charge</b> (bleu, puis rose, puis doré). Quand une <b>supernova</b> est sur la grille à la fin des cascades, toutes les cellules chargées explosent et livrent leur butin : ${LVN[1].toLowerCase()} (${lootRange(1)}), ${LVN[2].toLowerCase()} (${lootRange(2)}), ${LVN[3].toLowerCase()} (${lootRange(3)}).</p>
+      <p><b>Trou noir</b> : multiplie tout le butin de sa ligne et de sa colonne (×2 à ×10, jusqu’à ×25 en bonus). <b>Vaisseau-aspirateur</b> : aspire tout le butin de la grille et le compte une fois de plus. <b>Surcharge</b> : avec 2 supernovas ou plus, chaque cellule chargée monte d’un niveau avant l’explosion.</p>
+      <h4>Bonus</h4><p>3 balises : <b>${MODEN.A}</b> (${SPINS.A} tours, ${MODESUB.A.toLowerCase()}). 4 : <b>${MODEN.B}</b> (${SPINS.B} tours, ${MODESUB.B.toLowerCase()}). 5 : <b>${MODEN.C}</b> (${SPINS.C} tours, ${MODESUB.C.toLowerCase()}). +3 tours avec 3 balises. Au moins une supernova garantie par bonus.</p>
+      <h4>Radar à balises</h4><p>Mise ×2, balises 1,6 fois plus fréquentes.</p>
+      <h4>Achats</h4><p>Supernova garantie ×${String(NOVAC).replace('.', ',')} · ${MODEN.A} ×${PA} · ${MODEN.B} ×${PB}. ${MODEN.C} ne s’achète pas. Gain maximum ×10 000.</p>`);
+  }
+}
+
+return { CosmicGame };
+})();
+
 // ---- games/impl/index.js ----
 __mods['games/impl/index.js'] = (() => {
 // Every original Bling game, rebuilt on the shared cabinet (js/core/), keyed by catalogue id.
@@ -11959,6 +12606,7 @@ const { PharaonGame } = __mods['games/impl/pharaon.js'];
 const { BountyGame } = __mods['games/impl/bounty.js'];
 const { AnubisGame } = __mods['games/impl/anubis.js'];
 const { CandyGame } = __mods['games/impl/candy.js'];
+const { CosmicGame } = __mods['games/impl/cosmic.js'];
 const { StormGame } = __mods['games/impl/storm.js'];
 const { DoubleSpinGame } = __mods['games/impl/doublespin.js'];
 const { MadWheelGame } = __mods['games/impl/madwheel.js'];
@@ -11975,6 +12623,7 @@ const IMPL = {
   zeus: ZeusGame,
   huff: HuffGame,
   candy: CandyGame,
+  cosmic: CosmicGame,
   anubis: AnubisGame,
   bling: BlingGame,
   pharaon: PharaonGame,
