@@ -1110,18 +1110,20 @@ body.gated { overflow: hidden; }
 .mw-top.rolling b { filter: blur(.5px); }
 .mw-top.hit { animation: jpHit .9s cubic-bezier(.3, 1.8, .5, 1); --jc: #ffd23f; }
 .mw-view { position: relative; border-radius: 18px; }
-.mw-view.zoom { overflow: hidden; } /* clip only while zoomed: the host stands outside the wheel at rest */
-.mw-view .mw-zone { transition: transform 1.2s cubic-bezier(.25, .7, .2, 1); transform-origin: 50% 3%; }
-.mw-view.zoom .mw-zone { transform: scale(2.3); }
-.mw-view .mw-host { transition: opacity .3s; }
-.mw-view.zoom .mw-host, .mw-view.zoom .mw-hub { opacity: 0; }
-.mw-view::before { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0; transition: opacity .5s;
+.mw-view.zooming { overflow: hidden; } /* clip only while zoomed: the host stands outside the wheel at rest */
+.mw-view .mw-zone { transform-origin: 50% 3%; }
+.mw-view.zooming .mw-zone { transform: scale(var(--zs, 1)); }
+.mw-view.unzoom .mw-zone { transition: transform .9s cubic-bezier(.4, 0, .2, 1); }
+.mw-view.zooming .mw-host, .mw-view.zooming .mw-hub { opacity: calc(1 - var(--zp, 0) * 2.5); }
+.mw-view.unzoom .mw-host, .mw-view.unzoom .mw-hub { transition: opacity .9s; }
+.mw-view::before { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0;
   background: radial-gradient(60% 55% at 50% 30%, transparent 55%, rgba(0, 0, 0, .75)); }
 .mw-view::after { content: attr(data-seg); position: absolute; left: 50%; bottom: 10%; z-index: 6; transform: translate(-50%, 20px) scale(.8); opacity: 0; pointer-events: none;
   padding: 8px 22px; border-radius: 999px; background: var(--seg, #ffd23f); color: #fff; font: 900 clamp(18px, 4vw, 30px) Orbitron, sans-serif; letter-spacing: 1px;
   text-shadow: 0 2px 0 rgba(0, 0, 0, .45); box-shadow: 0 8px 30px rgba(0, 0, 0, .5), 0 0 30px var(--seg, #ffd23f); transition: transform .45s cubic-bezier(.3, 1.6, .5, 1) .25s, opacity .3s .25s; }
-.mw-view.zoom::before { opacity: 1; }
-.mw-view.zoom.done::after { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.mw-view.zooming::before { opacity: var(--zp, 0); }
+.mw-view.unzoom::before { transition: opacity .9s; }
+.mw-view.done::after { opacity: 1; transform: translate(-50%, 0) scale(1); }
 .mw-zone { --mwz: min(500px, 84vw, calc(100vh - 330px)); position: relative; width: var(--mwz); min-width: 240px; aspect-ratio: 1; margin: 14px auto 14px; }
 /* showman */
 .mw-host { position: absolute; z-index: 4; left: -17%; bottom: -2%; width: 24%; pointer-events: none; }
@@ -4094,12 +4096,12 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
-    game: 'huff', date: '2026-10-30', title: 'MEGA BONUS et roue du loup',
-    items: ['5 scatters : le MEGA BONUS et sa roue du loup', 'JACKPOT ×5 000, MAJOR, bonus maisons en or ou bonus 5 tours', 'Les cases vides tournent pendant le bonus', 'Nouveau jackpot MINI et pièces jackpot dans les maisons en or'],
+    game: 'madwheel', date: '2026-10-30', title: 'Zoom immersif',
+    items: ['La caméra se rapproche de la roue pendant toute la rotation', 'Ralenti final et suspense sur les dernières cases', 'Le résultat s’affiche en grand à l’arrêt', 'Nouvelle roue : 22 × 1, 15 × 2, 7 × 5 et 4 × 10'],
   },
   {
-    game: 'madwheel', date: '2026-10-30', title: 'Zoom sur la roue',
-    items: ['La caméra plonge sur la flèche pendant le ralenti final', 'Suspense sur les dernières cases', 'Nouvelle roue : 22 × 1, 15 × 2, 7 × 5 et 4 × 10'],
+    game: 'huff', date: '2026-10-30', title: 'MEGA BONUS et roue du loup',
+    items: ['5 scatters : le MEGA BONUS et sa roue du loup', 'JACKPOT ×5 000, MAJOR, bonus maisons en or ou bonus 5 tours', 'Les cases vides tournent pendant le bonus', 'Nouveau jackpot MINI et pièces jackpot dans les maisons en or'],
   },
   {
     game: 'plinko', date: '2026-10-30', title: 'Nouveau jeu', isNew: true,
@@ -8767,6 +8769,7 @@ const CTC = { 5: 16, 10: 14, 15: 10, 20: 7, 25: 5, 50: 4, 100: 2, 200: 1, 500: 1
   for (let q2 = 0; q2 < 64; q2++) CTSEQ.push(q2 === 8 || q2 === 40 ? 'D' : q2 === 24 || q2 === 56 ? 'T' : at[q2]);
 })();
 const CAPX = 25000;
+const ZOOM_MAX = 2.4; // camera zoom on the pointer when the wheel stops
 const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 function drawTop() { const r = Math.random(); let a = 0; for (const k in TQ) { a += TQ[k]; if (r < a) return { seg: k, m: wpick(TM) }; } return null; }
 function chBoard() { const a = []; for (const v in CHB) for (let i = 0; i < CHB[v]; i++) a.push(+v); return shuffle(a); }
@@ -8832,7 +8835,7 @@ function spinWheel(el, from, to, o = {}) {
     const tt = t - T1; return from + dexpEnd + w1 * tt - (w1 * tt * tt) / (2 * Tc);
   };
   return new Promise((res) => {
-    let t0 = null, prevA = from, prevT = 0, lastN = Math.floor(from / AA), near = !o.near;
+    let t0 = null, prevA = from, prevT = 0, lastN = Math.floor(from / AA);
     const ptr = o.ptr;
     const frame = (ts) => {
       if (t0 === null) t0 = ts;
@@ -8842,7 +8845,7 @@ function spinWheel(el, from, to, o = {}) {
       if (nn !== lastN) { lastN = nn; wheelTick(sp < 500 ? 0.16 : 0.05); }
       if (ptr) { const fr = (((a % AA) + AA) % AA) / AA, d = fr > 0.6 ? Math.pow((fr - 0.6) / 0.4, 2) * (sp > 200 ? 20 : 28) : 0; ptr.style.transform = `translateX(-50%) rotate(${(-d).toFixed(1)}deg)`; }
       prevA = a; prevT = t;
-      if (!near && total - t <= o.near.lead) { near = true; o.near.fn(); } // e.g. start the zoom before the stop
+      o.onFrame?.(Math.min(1, t / total)); // spin progress 0..1, e.g. for a progressive camera zoom
       if (t >= total) { el.style.transform = `rotate(${to}deg)`; if (ptr) ptr.style.transform = 'translateX(-50%)'; res(); return; }
       requestAnimationFrame(frame);
     };
@@ -8975,7 +8978,8 @@ class MadWheelGame extends BaseGame {
       await this.wait(260);
       setTimeout(() => { if (!this.dead && this.host.classList.contains('pull')) this.pose('watch'); }, this.turbo ? 300 : 600);
       // long slow crawl over the last slices, with the camera already zooming in on the pointer
-      await spinWheel(this.wheel, from, this.cur, { ptr: this.q('.mw-ptr'), k: 0.68, w1: 9, crawl: 2.2, turbo: this.turbo, near: { lead: 2.6, fn: () => this.zoomIn() } });
+      this.zoomStart();
+      await spinWheel(this.wheel, from, this.cur, { ptr: this.q('.mw-ptr'), k: 0.68, w1: 9, crawl: 2.2, turbo: this.turbo, onFrame: (p) => this.zoomTo(p) });
       topBox.classList.remove('hit');
       this.histAdd(seg);
       this.q('.mw-hub').innerHTML = isNaN(+seg) ? iconSVG(seg, 34) : `<b class="big">${seg}</b>`;
@@ -9011,21 +9015,38 @@ class MadWheelGame extends BaseGame {
     });
   }
 
-  // Camera dives onto the pointer while the wheel crawls over its last slices.
-  zoomIn() { if (!this.dead) this.q('.mw-view')?.classList.add('zoom'); }
+  // The camera closes in on the pointer for the whole spin: slowly at first, then faster, fully in at the stop.
+  zoomStart() {
+    const view = this.q('.mw-view');
+    if (!view) return;
+    view.classList.remove('done', 'unzoom');
+    view.classList.add('zooming');
+    this.zoomTo(0);
+  }
+  zoomTo(p) {
+    const view = this.q('.mw-view');
+    if (!view || this.dead) return;
+    const e = p * p * (3 - 2 * p) * 0.35 + Math.pow(p, 2.2) * 0.65; // gentle start, steady build, no jump at the end
+    view.style.setProperty('--zs', (1 + (ZOOM_MAX - 1) * e).toFixed(4));
+    view.style.setProperty('--zp', e.toFixed(3));
+  }
 
   // Once stopped: the result label pops up, the camera holds, then pulls back.
   async zoomOnResult(seg) {
     const view = this.q('.mw-view');
     if (!view || this.dead) return;
+    this.zoomTo(1);
     view.dataset.seg = isNaN(+seg) ? NAME[seg] : seg;
     view.style.setProperty('--seg', COL[seg]);
-    view.classList.add('zoom', 'done');
+    view.classList.add('done');
     sfx.upgrade();
     await this.wait(1600);
     if (this.dead) return;
-    view.classList.remove('zoom', 'done');
-    await this.wait(500);
+    view.classList.add('unzoom');
+    view.style.setProperty('--zs', 1);
+    view.style.setProperty('--zp', 0);
+    await this.wait(900);
+    view.classList.remove('zooming', 'done', 'unzoom');
   }
 
   /* ---------- bonus screens ---------- */
