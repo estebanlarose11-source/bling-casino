@@ -426,7 +426,17 @@ section { margin-bottom: 28px; }
 }
 .hs-board.out { animation: ovOut .3s ease both; }
 .hs-cell { position: relative; border-radius: 10px; overflow: hidden; container-type: size; background: rgba(255, 255, 255, .03); border: 1px solid rgba(255, 255, 255, .06); transition: box-shadow .3s; }
-.hs-empty { position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .015) 0 8px, transparent 8px 16px); }
+.hs-empty { position: absolute; inset: 0; overflow: hidden; background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .015) 0 8px, transparent 8px 16px); }
+/* Huff bonus: empty cells spin like little reels while the scatters fall */
+.hc-strip { position: absolute; left: 50%; top: 0; width: 62cqh; margin-left: -31cqh; display: flex; flex-direction: column; opacity: 0; transition: opacity .2s; }
+.hc-strip svg { width: 62cqh; height: 62cqh; flex: none; margin: 10cqh 0; }
+.hc-board.spin .hcell:not(.locked) .hc-strip { opacity: .5; filter: blur(1.4px); animation: hcReel .26s linear infinite; }
+@keyframes hcReel { from { transform: translateY(-50%); } to { transform: translateY(0); } }
+.mega-wheel .mseg { stroke: #1a0f05; stroke-width: 1.2; }
+.mega-wheel .m-five { fill: #1d4ed8; } .mega-wheel .m-gold { fill: #d97706; } .mega-wheel .m-major { fill: #be123c; } .mega-wheel .m-grand { fill: #111827; stroke: #fbbf24; stroke-width: 2; }
+.mega-wheel .mtxt { font: 900 9px Orbitron, sans-serif; letter-spacing: .3px; fill: #fff; paint-order: stroke; stroke: rgba(0, 0, 0, .55); stroke-width: 1.6px; }
+.mega-wheel .m-grand + g .mtxt { fill: #fde047; }
+.mega-wheel[class*=mwon] .hr-res b { color: #fde047; text-shadow: 0 0 20px #f59e0b; }
 .hs-cell.spinning { border-color: rgba(34, 211, 238, .3); }
 .hs-reel { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; animation: hsReel .32s linear infinite; filter: blur(2px); opacity: .55; }
 .hs-reel span { height: 100cqh; display: grid; place-items: center; font-size: 50cqh; }
@@ -3669,7 +3679,7 @@ const GAMES = [
 // The original Bling games: same rules and payouts, rebuilt on the shared cabinet (js/games/impl/).
 const ORIGINALS = [
   {"id": "zeus", "name": "Zeus Thunder", "cat": "slot", "tag": "Machine à sous", "sub": "Pay Anywhere, multiplicateurs ×500", "colors": ["#3b82f6", "#1e1b4b"], "description": "Sur l’Olympe, Zeus fait pleuvoir les gemmes. 8 symboles identiques n’importe où sur la grille 6×5 paient, les gains tombent en cascade et Zeus lance des orbes multiplicateurs de ×2 à ×500. 4 scatters lancent 15 tours gratuits avec un multiplicateur global qui ne se réinitialise jamais.", "features": ["Grille 6×5 Pay Anywhere", "Cascades", "Orbes ×2 à ×500", "15 Free Spins", "Multiplicateur global", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
-  {"id": "huff", "name": "Huff la Puff XXTrem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Huff ’n’ Puff : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent XXTREM Puff avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Huff ’n’ Puff", "4 scatters : roulette des maisons", "Cases ×2 à ×200", "Minor, Major, Jackpot ×10 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
+  {"id": "huff", "name": "Huff la Puff XXTrem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Huff ’n’ Puff : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent XXTREM Puff avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. 5 scatters lancent le MEGA BONUS et sa roue du loup. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Huff ’n’ Puff", "4 scatters : roulette des maisons", "5 scatters : MEGA BONUS", "Cases ×2 à ×200", "Mini, Minor, Major, Jackpot ×5 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "candy", "name": "Candy Queen", "cat": "slot", "tag": "Machine à sous", "sub": "Bonbons, baguette et paillettes", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et pailletent leurs cases. D’un coup de baguette magique, elles se révèlent : bonbons, macarons, diamants sucrés, cœurs multiplicateurs et bocaux qui aspirent tout. 3 bonus féeriques avec les couronnes.", "features": ["Grappes de 5", "Cases pailletées", "Baguette magique", "Cœurs ×2 à ×100, bocaux", "3 bonus", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "anubis", "name": "Anubis Reborn", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "bling", "name": "Bling Tower", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
@@ -5894,7 +5904,8 @@ return { Reels };
 // ---- games/impl/huff-engine.js ----
 __mods['games/impl/huff-engine.js'] = (() => {
 // Huff la Puff XXTrem math (pure, testable in Node: node scripts/sim-huff.mjs).
-// Base game: 5×3, 25 lines (original pay table). 3 scatters = Huff 'n' Puff bonus, 4+ = XXTREM bonus (house roulette first).
+// Base game: 5×3, 25 lines (original pay table). 3 scatters = Huff 'n' Puff bonus, 4 = XXTREM bonus (house roulette first),
+// 5 = MEGA bonus: a wheel gives the GRAND or MAJOR jackpot, a bonus where every landing is a gold house, or a 5-spin bonus.
 // Bonus: scatters landing on the board colour cells red → blue → gold; on gold they jump to upgrade another red/blue cell
 // straight to gold. Values stay hidden until the wolf blows them open at the end.
 
@@ -5911,14 +5922,16 @@ const VALS = [null,
   [[15, 30], [20, 24], [25, 18], [30, 12], [40, 9], [50, 7]],
   [[70, 30], [80, 22], [100, 18], [120, 12], [150, 9], [200, 6]],
 ];
-const JPV = { mini: 150, minor: 300, major: 1000, grand: 10000 };
+const JPV = { mini: 150, minor: 300, major: 1000, grand: 5000 };
 const JPN = { mini: 'MINI', minor: 'MINOR', major: 'MAJOR', grand: 'JACKPOT' };
 const CAPX = 10000;
-const BONUS_SPINS = 3;
+const BONUS_SPINS = 3, MEGA_SPINS = 5;
+// MEGA wheel outcomes and their weights.
+const MEGA = [['grand', 3], ['major', 12], ['gold', 30], ['five', 55]];
 // pay: scale on the original line pays. sc: chance of a scatter on each reel (base game). pN/pX: chance per cell per bonus spin. house: roulette weights red/blue/gold.
 // jp: chance that a gold cell hides a jackpot instead of a multiplier.
 const TUNE = { pay: 0.63, sc: 0.085, pN: 0.03, pX: 0.034, house: [62, 30, 8], jp: { mini: 0.08, minor: 0.035, major: 0.008, grand: 0.0004 } };
-const BUYN = 76, BUYX = 305;
+const BUYN = 76, BUYX = 300, BUYM = 870;
 
 function pickW(arr) { let t = 0, i; for (i = 0; i < arr.length; i++) t += arr[i]; let r = Math.random() * t; for (i = 0; i < arr.length; i++) { if (r < arr[i]) return i; r -= arr[i]; } return arr.length - 1; }
 const rnd = (n) => Math.floor(Math.random() * n);
@@ -5947,17 +5960,20 @@ function evalLines(g) {
 }
 
 function spinHouse() { return 1 + pickW(TUNE.house); }
+function spinMega() { return MEGA[pickW(MEGA.map((m) => m[1]))][0]; }
 
-// kind 'n' (3 scatters): scatter cells start red. kind 'x' (4+): roulette colour on 6 cells (scatter cells first).
+// kind 'n' (3 scatters): scatter cells start red. kind 'x' (4): roulette colour on 6 cells (scatter cells first).
+// MEGA bonuses: 'g' scatter cells start gold and every landing is a gold house; 'f' scatter cells start red, 5 spins.
 function newBonus(scIdx, kind, house) {
-  const lv = new Array(NC).fill(0);
+  const lv = new Array(NC).fill(0), spins = kind === 'f' ? MEGA_SPINS : BONUS_SPINS;
+  if (kind === 'g') { scIdx.forEach((i) => { lv[i] = 3; }); return { lv, left: spins, spins, kind, house: 3, step: 0, gold: true }; }
   if (kind === 'x') {
     const pool = [...Array(NC).keys()].filter((i) => !scIdx.includes(i));
     const idx = scIdx.slice(0, 6);
     while (idx.length < 6) idx.push(pool.splice(rnd(pool.length), 1)[0]);
     idx.forEach((i) => { lv[i] = house; });
   } else scIdx.forEach((i) => { lv[i] = 1; });
-  return { lv, left: BONUS_SPINS, kind, house: house || 0, step: 0 };
+  return { lv, left: spins, spins, kind, house: house || 0, step: 0 };
 }
 
 const allGold = (st) => st.lv.every((l) => l === 3);
@@ -5970,16 +5986,16 @@ function stepBonus(st) {
   const land = []; for (let i = 0; i < NC; i++) if (Math.random() < p) land.push(i);
   for (const i of land) {
     const from = st.lv[i];
-    if (from < 3) { st.lv[i] = from + 1; hits.push({ i, from, to: from + 1 }); continue; }
+    if (from < 3) { const to = st.gold ? 3 : from + 1; st.lv[i] = to; hits.push({ i, from, to }); continue; }
     const tg = []; for (let k = 0; k < NC; k++) if (st.lv[k] === 1 || st.lv[k] === 2) tg.push(k);
     if (tg.length) { const k = tg[rnd(tg.length)]; hits.push({ i, from: 3, to: 3, target: k, tfrom: st.lv[k] }); st.lv[k] = 3; }
     else {
       const em = []; for (let k = 0; k < NC; k++) if (!st.lv[k]) em.push(k);
-      if (em.length) { const k = em[rnd(em.length)]; hits.push({ i, from: 3, to: 3, target: k, tfrom: 0 }); st.lv[k] = 1; }
+      if (em.length) { const k = em[rnd(em.length)]; hits.push({ i, from: 3, to: 3, target: k, tfrom: 0 }); st.lv[k] = st.gold ? 3 : 1; }
       else hits.push({ i, from: 3, to: 3 });
     }
   }
-  st.left = land.length ? BONUS_SPINS : st.left - 1;
+  st.left = land.length ? (st.spins || BONUS_SPINS) : st.left - 1;
   return { hits };
 }
 
@@ -5999,13 +6015,14 @@ function reveal(st) {
 }
 function playBonus(st) { while (!bonusDone(st)) stepBonus(st); return reveal(st).total; }
 
-return { ROWS, LINES, PAY, LV, JPV, JPN, CAPX, BONUS_SPINS, TUNE, BUYN, drawCell, genGrid, scattersIn, evalLines, spinHouse, newBonus, allGold, bonusDone, stepBonus, cellValue, reveal, playBonus, COLS, NC, SC, BUYX };
+return { ROWS, LINES, PAY, LV, JPV, JPN, CAPX, BONUS_SPINS, MEGA_SPINS, MEGA, TUNE, BUYN, BUYX, BUYM, drawCell, genGrid, scattersIn, evalLines, spinHouse, spinMega, newBonus, allGold, bonusDone, stepBonus, cellValue, reveal, playBonus, COLS, NC, SC };
 })();
 
 // ---- games/impl/huff.js ----
 __mods['games/impl/huff.js'] = (() => {
 // Huff la Puff XXTrem, rebuilt on the shared cabinet. Math in huff-engine.js.
-// 3 scatters: Huff 'n' Puff bonus (scatter cells turn red). 4+: XXTREM bonus, the house roulette gives 6 red, blue or gold cells.
+// 3 scatters: Huff 'n' Puff bonus (scatter cells turn red). 4: XXTREM bonus, the house roulette gives 6 red, blue or gold cells.
+// 5: MEGA bonus, the wolf's wheel gives the GRAND or MAJOR jackpot, the gold-houses bonus or a 5-spin bonus.
 // Scatters in the bonus colour cells red → blue → gold; values stay hidden until the wolf blows the houses away.
 
 const { BaseGame, fmtC, shortC } = __mods['core/base.js'];
@@ -6015,8 +6032,8 @@ const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el, animateNumber } = __mods['ui.js'];
 const { profiles } = __mods['profile.js'];
-const { ROWS, COLS, NC, SC, LINES, PAY, LV, JPV, JPN, CAPX, BONUS_SPINS, TUNE, BUYN, BUYX,
-  drawCell, genGrid, scattersIn, evalLines, spinHouse, newBonus, stepBonus, bonusDone, reveal, } = __mods['games/impl/huff-engine.js'];
+const { ROWS, COLS, NC, SC, LINES, PAY, LV, JPV, JPN, CAPX, BONUS_SPINS, MEGA_SPINS, TUNE, BUYN, BUYX, BUYM,
+  drawCell, genGrid, scattersIn, evalLines, spinHouse, spinMega, newBonus, stepBonus, bonusDone, reveal, } = __mods['games/impl/huff-engine.js'];
 
 const SAVE = 'huff_bonus';
 const saveKey = () => `${SAVE}:${profiles.store.current || ''}`; // one unfinished bonus per player
@@ -6027,6 +6044,10 @@ const LVHOUSE = [null, 'hs', 'hw', 'hb'];
 const LVCOL = [null, ['#fca5a5', '#ef4444', '#fff'], ['#bfdbfe', '#3b82f6', '#fff'], ['#fde68a', '#fbbf24', '#fff']];
 const WHEEL = [1, 2, 1, 1, 2, 1, 3, 1, 1, 2, 1, 1]; // 8 red, 3 blue, 1 gold (the result itself follows TUNE.house)
 const HOUSE_NAME = [null, 'MAISON ROUGE', 'MAISON BLEUE', 'MAISON OR'];
+// MEGA wheel as drawn (the result itself follows MEGA in the engine).
+const MWHEEL = ['five', 'gold', 'five', 'major', 'five', 'gold', 'five', 'grand', 'five', 'gold', 'five', 'major'];
+const MLAB = { five: ['5 TOURS', 'Bonus 5 tours'], gold: ['MAISONS OR', 'Bonus maisons en or'], major: ['MAJOR', 'MAJOR JACKPOT'], grand: ['JACKPOT', 'GRAND JACKPOT'] };
+const BONUS_NAME = { n: 'HUFF ’N’ PUFF', x: 'XXTREM PUFF', g: 'MAISONS EN OR', f: 'MEGA PUFF' };
 const art = (id) => `<svg viewBox="0 0 64 64" aria-hidden="true"><use href="#${id}" width="64" height="64"/></svg>`;
 const MUSIC = { sd: 0.21, len: 16, root: 196, lead: { wave: 'square', vol: 0.03, dur: 0.18, pat: [12, null, 16, null, 19, null, 16, null, 14, null, 17, null, 21, null, 19, null] }, bass: { wave: 'triangle', vol: 0.11, dur: 0.26, pat: [-12, null, -5, null, -12, null, -5, null, -7, null, 0, null, -7, null, 0, null] }, comp: { wave: 'square', vol: 0.016, dur: 0.12, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [5, 9, 12], 14: [5, 9, 12] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 };
 const LINE_COLORS = ['#ff4a4a', '#4aa8ff', '#ffd23f', '#6aff7a', '#d27aff', '#ff9a3a', '#3affd2', '#ff6ac8'];
@@ -6044,8 +6065,9 @@ class HuffGame extends BaseGame {
       buys: [
         { id: 'n', icon: '🏠', label: 'Huff ’n’ Puff · 3 scatters', desc: '3 cases rouges au départ, 3 tours remis à zéro à chaque scatter', cost: (b) => b * BUYN },
         { id: 'x', icon: '🐺', label: 'XXTREM · 4 scatters', desc: 'Roulette des maisons : 6 cases rouges, bleues ou dorées d’entrée', cost: (b) => b * BUYX },
+        { id: 'm', icon: '👑', label: 'MEGA BONUS · 5 scatters', desc: `La roue du loup : JACKPOT ×${JPV.grand}, MAJOR, bonus maisons en or ou bonus 5 tours`, cost: (b) => b * BUYM },
       ],
-      hello: '3 scatters = Huff ’n’ Puff · 4 scatters = XXTREM',
+      hello: '3 scatters = Huff ’n’ Puff · 4 = XXTREM · 5 = MEGA BONUS',
     });
     this.reels = new Reels(this.q('.reels-host'), {
       cols: COLS, rows: ROWS, game: this,
@@ -6106,7 +6128,7 @@ class HuffGame extends BaseGame {
     const bet = this.bet;
     this.setLast(0);
     this.reels.unmark(); this.svg.innerHTML = '';
-    const grid = genGrid(kind === 'x' ? 4 : 3);
+    const grid = genGrid(kind === 'm' ? 5 : kind === 'x' ? 4 : 3);
     await this.spinTo(grid);
     await this.trigger(scattersIn(grid), bet);
   }
@@ -6117,6 +6139,7 @@ class HuffGame extends BaseGame {
     this.flash('rgba(253,224,71,.45)');
     this.msg(`${sc.length} scatters !`);
     await this.wait(1100);
+    if (sc.length >= 5) return this.megaBonus(sc, bet);
     let st;
     if (sc.length >= 4) {
       await this.featureIntro('XXTREM PUFF', `${sc.length} scatters · la roulette des maisons décide de tes 6 cases`, art('wf'));
@@ -6186,6 +6209,68 @@ class HuffGame extends BaseGame {
     });
   }
 
+  /* ---------- MEGA bonus (5 scatters) ---------- */
+  async megaBonus(sc, bet) {
+    await this.featureIntro('MEGA BONUS', '5 scatters · la roue du loup choisit ton bonus', art('wf'));
+    const o = spinMega();
+    await this.megaWheel(o);
+    if (this.dead) return;
+    if (o === 'grand' || o === 'major') {
+      const total = Math.round(JPV[o] * bet);
+      this.jpHit(o);
+      fx.confetti(160); fx.coins(60);
+      this.win(total, 'Mega bonus');
+      this.setLast(total);
+      await this.celebrate(total, { summary: MLAB[o][1], stake: bet });
+      this.msg('Choisis ta mise et lance.');
+      return;
+    }
+    await this.runBonus(newBonus(sc, o === 'gold' ? 'g' : 'f'), bet, false);
+  }
+
+  megaWheel(outcome) {
+    const n = MWHEEL.length, seg = 360 / n, R = 100;
+    const pt = (a, r) => { const t = (a - 90) * Math.PI / 180; return `${(R + r * Math.cos(t)).toFixed(2)} ${(R + r * Math.sin(t)).toFixed(2)}`; };
+    const slices = MWHEEL.map((o, k) => {
+      const a0 = k * seg, a1 = a0 + seg, mid = a0 + seg / 2;
+      return `<path class="mseg m-${o}" d="M${R} ${R} L${pt(a0, 96)} A96 96 0 0 1 ${pt(a1, 96)} Z"/>
+        <g transform="rotate(${mid} 100 100)"><text class="mtxt" x="100" y="42" transform="rotate(90 100 42)" text-anchor="middle" dominant-baseline="middle">${MLAB[o][0]}</text></g>`;
+    }).join('');
+    const ov = this.overlay(`<h3>MEGA BONUS</h3>
+      <div class="hr-wheel"><div class="hr-pointer"></div><svg class="hr-disc" viewBox="0 0 200 200">${slices}<circle cx="100" cy="100" r="96" class="hr-rim"/></svg>
+      <div class="hr-hub">${art('wf')}</div></div>
+      <div class="hr-res">La roue du loup tourne…</div>`, 'house-roulette mega-wheel');
+    const disc = ov.querySelector('.hr-disc'), res = ov.querySelector('.hr-res');
+    const opts = MWHEEL.map((o, k) => (o === outcome ? k : -1)).filter((k) => k >= 0);
+    const k = opts[Math.floor(Math.random() * opts.length)];
+    const turns = this.turbo ? 4 : 7, dur = this.turbo ? 3200 : 6200;
+    const final = turns * 360 - (k * seg + seg / 2) + (Math.random() - 0.5) * seg * 0.6;
+    return new Promise((resolve) => {
+      requestAnimationFrame(() => {
+        disc.style.transition = `transform ${dur}ms cubic-bezier(.12,.85,.12,1)`;
+        disc.style.transform = `rotate(${final}deg)`;
+      });
+      let last = 0;
+      const tick = setInterval(() => {
+        const m = new DOMMatrix(getComputedStyle(disc).transform);
+        const ang = (Math.atan2(m.b, m.a) * 180 / Math.PI + 360) % 360, s = Math.floor(ang / seg);
+        if (s !== last) { last = s; sfx.tick(); }
+      }, 30);
+      setTimeout(async () => {
+        clearInterval(tick);
+        ov.classList.add(`mwon-${outcome}`);
+        res.innerHTML = `<b>${MLAB[outcome][1]}</b>${outcome === 'grand' || outcome === 'major' ? ` · ×${JPV[outcome].toLocaleString('fr-FR')} la mise` : outcome === 'gold' ? ' · chaque scatter devient une maison en or' : ` · ${MEGA_SPINS} tours qui se rechargent`}`;
+        sfx.jackpot();
+        const p = center(ov.querySelector('.hr-wheel'));
+        fx.burst(p.x, p.y, 70, ['#fde047', '#fbbf24', '#fff'], 10);
+        if (outcome !== 'five') { fx.confetti(140); fx.coins(50); }
+        await sleep(this.turbo ? 1000 : 2000);
+        ov.classList.add('out');
+        setTimeout(() => { ov.remove(); resolve(); }, 300);
+      }, dur + 120);
+    });
+  }
+
   /* ---------- colour-cell bonus ---------- */
   saveState(st, b) { try { localStorage.setItem(saveKey(), JSON.stringify({ st, b })); } catch { /* ignore */ } }
   clearState() { try { localStorage.removeItem(saveKey()); } catch { /* ignore */ } }
@@ -6201,7 +6286,8 @@ class HuffGame extends BaseGame {
   }
 
   cellHTML(lv) {
-    if (!lv) return '<div class="hs-empty"></div>';
+    // empty cells hold a hidden reel strip that spins with the board
+    if (!lv) return `<div class="hs-empty"><div class="hc-strip">${['hsc', 'hs', 'hw', 'hb', 'hsc', 'hs', 'hw', 'hb'].map(art).join('')}</div></div>`;
     return `<div class="hs-sym hc lv${lv}">${art(LVHOUSE[lv])}<b class="q">?</b></div>`;
   }
 
@@ -6214,8 +6300,8 @@ class HuffGame extends BaseGame {
 
   hud(st) {
     const cnt = [0, 0, 0, 0]; st.lv.forEach((l) => cnt[l]++);
-    this.setBanner(`<b>${st.kind === 'x' ? 'XXTREM PUFF' : 'HUFF ’N’ PUFF'}</b>
-      <span class="pill respins">${[0, 1, 2].map((k) => `<i class="dot${k < st.left ? ' on' : ''}"></i>`).join('')} Tours</span>
+    this.setBanner(`<b>${BONUS_NAME[st.kind] || BONUS_NAME.n}</b>
+      <span class="pill respins">${Array.from({ length: st.spins || BONUS_SPINS }, (_, k) => `<i class="dot${k < st.left ? ' on' : ''}"></i>`).join('')} Tours</span>
       <span class="pill hcnt c1">${cnt[1]}</span><span class="pill hcnt c2">${cnt[2]}</span><span class="pill hcnt c3">${cnt[3]}</span>`);
   }
 
@@ -6275,21 +6361,22 @@ class HuffGame extends BaseGame {
     this.slotEl.classList.add('in-hold');
     for (let i = 0; i < NC; i++) { this.paint(i, st.lv[i]); if (st.lv[i]) setTimeout(() => this.hsCells[i].classList.add('pop'), i * 50); }
     this.hud(st);
-    if (!resumed) { this.msg(`Bonus : ${BONUS_SPINS} tours, remis à ${BONUS_SPINS} à chaque scatter`); await this.wait(1100); }
+    const spins = st.spins || BONUS_SPINS;
+    if (!resumed) { this.msg(st.gold ? `Maisons en or : chaque scatter devient une maison en or · ${spins} tours` : `Bonus : ${spins} tours, remis à ${spins} à chaque scatter`); await this.wait(1100); }
     this.saveState(st, b);
     while (!bonusDone(st) && !this.dead) {
       this.hud(st);
       this.msg('Les scatters tombent…');
       board.classList.remove('spin'); void board.offsetWidth; board.classList.add('spin');
       sfx.spin();
-      await this.wait(650);
+      await this.wait(900);
       const { hits } = stepBonus(st);
       board.classList.remove('spin');
       if (!hits.length) sfx.tick();
       for (const h of hits) { if (this.dead) return; await this.landScatter(h, st); }
       this.saveState(st, b);
       this.hud(st);
-      if (hits.length) { this.msg(`${hits.length} scatter${hits.length > 1 ? 's' : ''} ! Les tours repartent à ${BONUS_SPINS}`); this.banner.querySelector('.respins')?.classList.add('reset'); }
+      if (hits.length) { this.msg(`${hits.length} scatter${hits.length > 1 ? 's' : ''} ! Les tours repartent à ${spins}`); this.banner.querySelector('.respins')?.classList.add('reset'); }
       else this.msg(st.left ? `Rien… ${st.left} tour${st.left > 1 ? 's' : ''} restant${st.left > 1 ? 's' : ''}` : 'Derniers tours terminés');
       await this.wait(hits.length ? 450 : 350);
     }
@@ -6325,7 +6412,7 @@ class HuffGame extends BaseGame {
     this.slotEl.classList.remove('in-hold');
     this.setBanner('');
     const big = (res.capped || res.vals.some((v) => v?.j === 'grand')) ? 'MAX WIN' : null;
-    await this.celebrate(total, { summary: big || (st.kind === 'x' ? 'XXTREM PUFF' : 'HUFF ’N’ PUFF'), stake: b });
+    await this.celebrate(total, { summary: big || BONUS_NAME[st.kind] || BONUS_NAME.n, stake: b });
     this.msg('Choisis ta mise et lance.');
   }
 
@@ -6389,8 +6476,9 @@ class HuffGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym svg">${art('hsc')}</div><div class="pay-vals"><b>Scatter BONUS</b><br><span>3 = Huff ’n’ Puff · 4 ou 5 = XXTREM Puff</span></div></div>
       <h4>Huff ’n’ Puff (3 scatters)</h4><ul class="rules"><li>Les cases où sont tombés les scatters deviennent <b>rouges</b>.</li><li>3 tours, remis à 3 à chaque scatter qui tombe.</li><li>Scatter sur une case vide : elle devient rouge. Sur une rouge : elle devient <b>bleue</b>. Sur une bleue : elle devient <b>dorée</b>.</li><li>Scatter sur une case dorée : elle ne monte plus, le scatter <b>bondit</b> sur une case rouge ou bleue et la rend dorée.</li></ul>
       <h4>XXTREM Puff (4 scatters)</h4><p>La roulette des maisons tourne d’abord : <b>maison rouge</b>, <b>maison bleue</b> ou <b>maison OR</b>. Tu commences avec 6 cases de cette couleur, puis le bonus se joue comme Huff ’n’ Puff.</p>
+      <h4>MEGA BONUS (5 scatters)</h4><p>La roue du loup choisit entre : le <b>GRAND JACKPOT ×${JPV.grand}</b> la mise, le <b>MAJOR ×${JPV.major}</b>, le bonus <b>maisons en or</b> (les 5 cases de départ et chaque scatter qui tombe deviennent directement des maisons en or) ou un bonus <b>${MEGA_SPINS} tours</b> qui se rechargent à ${MEGA_SPINS} au lieu de ${BONUS_SPINS}.</p>
       <h4>Valeurs cachées</h4><ul class="rules"><li>Rouge : ×2 à ×10 la mise.</li><li>Bleue : ×15 à ×50.</li><li>Rouge = maison de paille, bleue = maison en bois, dorée = maison en briques.</li><li>Dorée : ×70 à ×200, ou une <b>pièce jackpot</b> : MINI ×${JPV.mini}, MINOR ×${JPV.minor}, MAJOR ×${JPV.major} ou JACKPOT ×${JPV.grand} (max win). Le montant suit ta mise.</li><li>Tout reste caché jusqu’à la fin : le loup souffle sur les maisons et révèle chaque case.</li><li>Gain plafonné à ×${CAPX}.</li></ul>
-      <h4>Achats</h4><p>Huff ’n’ Puff ×${BUYN} · XXTREM Puff ×${BUYX}. RTP ≈ 92 %.</p>`);
+      <h4>Achats</h4><p>Huff ’n’ Puff ×${BUYN} · XXTREM Puff ×${BUYX} · MEGA BONUS ×${BUYM}. RTP ≈ 92 %.</p>`);
   }
 }
 
