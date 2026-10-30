@@ -1937,6 +1937,15 @@ class Profiles extends EventTarget {
     super();
     this.store = read();
     if (this.store.current && !this.store.users[this.store.current]) this.store.current = null;
+    // One-time reset after the RTP rework: every profile on this device goes back to 1 000 €.
+    try {
+      if (!localStorage.getItem('bling.start.v5')) {
+        localStorage.setItem('bling.start.v5', '1');
+        Object.values(this.store.users).forEach((u) => { u.bal = START; });
+        wallet.load(START, wallet.state);
+        this.save();
+      }
+    } catch { /* storage unavailable */ }
     wallet.addEventListener('change', () => {
       const me = this.current;
       if (!me || this.loading) return;
