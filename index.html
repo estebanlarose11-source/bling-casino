@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>SpinBet Casino</title>
-  <meta name="description" content="SpinBet Casino : machines à sous, roulettes, roue, blackjack, mines et crash en argent fictif.">
+  <meta name="description" content="SpinBet Casino : machines à sous, roulettes, roue, blackjack, mines, plinko et crash en argent fictif.">
   <meta name="theme-color" content="#0b0f17">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎰</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1403,6 +1403,20 @@ body.gated { overflow: hidden; }
 .m-cash b { color: #fde68a; }
 
 /* ============ Avion ============ */
+.g-plinko { --slot-bg: radial-gradient(520px 260px at 50% -5%, rgba(56, 189, 248, .35), transparent 70%), linear-gradient(180deg, #120d33 0%, #05030f 100%); }
+.pl-board { width: 100%; padding: 6px 0 2px; }
+.pl-canvas { display: block; width: 100%; }
+.pl-hist { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; max-width: 280px; }
+.pl-hist span { padding: 2px 7px; border-radius: 999px; background: var(--c); color: #1a0b06; font: 800 11px Inter, sans-serif; }
+.pl-ctl { display: flex; flex-wrap: wrap; gap: 10px 18px; justify-content: center; align-items: flex-end; padding: 10px 12px 4px; }
+.pl-grp { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.pl-grp > span { font-size: 11px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+.pl-seg { display: flex; gap: 3px; padding: 3px; border-radius: 12px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(255, 255, 255, .08); }
+.pl-seg button { min-width: 38px; padding: 7px 10px; border-radius: 9px; color: var(--muted); font: 800 13px Inter, sans-serif; transition: background .2s, color .2s; }
+.pl-seg button.on { background: #38bdf8; color: #04121f; }
+.pl-seg button:disabled:not(.on) { opacity: .45; }
+.pl-step { display: flex; align-items: center; gap: 10px; }
+.pl-step b { min-width: 24px; text-align: center; font: 900 18px Inter, sans-serif; }
 .g-avion { --slot-bg: radial-gradient(520px 260px at 50% -5%, rgba(240, 40, 79, .4), transparent 70%), linear-gradient(180deg, #2a0616 0%, #0b0208 100%); }
 .av-sky { position: relative; height: min(380px, calc(100vh - var(--chrome) + 40px)); min-height: 240px; overflow: hidden; border-radius: 12px; background: radial-gradient(ellipse at 20% 100%, rgba(240, 40, 79, .25), transparent 60%), linear-gradient(180deg, #120a2a, #070614); }
 .av-cv { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
@@ -3648,6 +3662,7 @@ const ORIGINALS = [
   {"id": "poker", "name": "Texas Hold’em", "cat": "table", "tag": "Poker", "sub": "No Limit contre 1 à 5 bots", "colors": ["#10b981", "#06301f"], "description": "Une vraie table de Texas Hold’em No Limit : choisis tes adversaires (1 à 5 bots aux caractères différents), les blindes et ton tapis, puis joue pré-flop, flop, turn et river jusqu’au showdown.", "features": ["1 à 5 bots", "Blindes au choix", "Pots secondaires", "Bots qui bluffent", "Raccourcis de mise", "Showdown animé"], "rtp": "Selon ton jeu", "vol": 3, "max": "Toute la table"},
   {"id": "mines", "name": "Mines", "cat": "quick", "tag": "Instantané", "sub": "Évite les bombes", "colors": ["#ffa51f", "#8a2a0c"], "description": "Retourne des cases sans toucher une bombe. Choisis de 1 à 24 bombes : plus il y en a, plus le multiplicateur grimpe vite. Encaisse quand tu veux.", "features": ["1 à 24 bombes", "Encaisse quand tu veux", "Multiplicateur croissant"], "rtp": "≈ 96 %", "vol": 3, "max": "Selon les bombes"},
   {"id": "avion", "name": "Avion", "cat": "quick", "tag": "Crash", "sub": "Encaisse avant l’explosion", "colors": ["#f0284f", "#4a0a1f"], "description": "L’avion décolle et le multiplicateur grimpe : encaisse avant qu’il explose. Tu peux régler un encaissement automatique.", "features": ["Courbe en direct", "Encaissement auto", "Historique des explosions"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
+  {"id": "plinko", "name": "Plinko", "cat": "quick", "tag": "Instantané", "sub": "Billes, clous et multiplicateurs", "colors": ["#38bdf8", "#4c1d95"], "description": "Lâche tes billes en haut de la pyramide : elles rebondissent de clou en clou et tombent dans une case multiplicateur. Choisis le risque, de 8 à 16 rangées, et lance jusqu’à 20 billes d’un coup.", "features": ["8 à 16 rangées", "3 niveaux de risque", "Jusqu’à 20 billes par lancer", "Multiplicateurs jusqu’à ×1 000"], "rtp": "≈ 94 %", "vol": 4, "max": "×1 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -3903,6 +3918,18 @@ const SPECS = {
       <g transform="translate(252 86) rotate(-62) scale(2.3)" filter="url(#glow${u})"><path d="M22 0 L-14 -7 L-10 0 L-14 7 Z" fill="#fff"/><path d="M4 0 L-6 -18 L-10 -18 L-4 0 Z M4 0 L-6 18 L-10 18 L-4 0 Z" fill="#ff3b6b"/><circle cx="-16" cy="0" r="4" fill="#ffd23f"/></g>
       <text x="120" y="170" text-anchor="middle" font-family="${FONTS.orb}" font-weight="900" font-size="46" fill="url(#tit${u})" stroke="#4a0418" stroke-width="2" paint-order="stroke" filter="url(#glow${u})">×1000</text>`,
   },
+  plinko: {
+    bg: ['#1e1b4b', '#05030f'], light: '#7dd3fc', title: ['PLINKO'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: 'JUSQU’À ×1 000',
+    art: (u) => {
+      let pegs = '';
+      for (let r = 0; r < 7; r++) for (let j = 0; j < r + 3; j++) pegs += `<circle cx="${150 + (j - (r + 2) / 2) * 30}" cy="${70 + r * 26}" r="4.2" fill="#e2e8f0"/>`;
+      const slots = [['×110', '#ef4444'], ['×14', '#f97316'], ['×2', '#f59e0b'], ['×0,5', '#facc15'], ['×0,3', '#fde047'], ['×0,5', '#facc15'], ['×2', '#f59e0b'], ['×14', '#f97316'], ['×110', '#ef4444']];
+      return `${pegs}
+        <path d="M150 50 C156 62 168 74 165 96 C162 118 140 124 135 148 C130 170 152 186 150 210" fill="none" stroke="#ff4f6d" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round" opacity=".7"/>
+        <g filter="url(#glow${u})"><circle cx="150" cy="210" r="11" fill="#ff3b5c"/><circle cx="146" cy="206" r="4" fill="#fff" opacity=".8"/></g>
+        ${slots.map(([t, c], k) => `<rect x="${150 + (k - 4) * 30 - 13}" y="250" width="26" height="22" rx="5" fill="${c}"/><text x="${150 + (k - 4) * 30}" y="265" text-anchor="middle" font-family="Inter,sans-serif" font-weight="800" font-size="${t.length > 3 ? 7.5 : 9}" fill="#1a0b06">${t}</text>`).join('')}`;
+    },
+  },
 };
 
 // Bright card colours (top, bottom) for the square lobby posters.
@@ -3910,7 +3937,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -4747,6 +4774,7 @@ const EXTRA_THEMES = {
   blackjack: { sd: 0.28, len: 16, root: 146.83, lead: { wave: 'triangle', vol: 0.045, dur: 0.35, pat: [7, null, 10, null, 12, null, 14, null, 15, null, 14, 12, 10, null, null, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.3, pat: [-12, null, -5, null, -10, null, -3, null, -8, null, -1, null, -7, null, 0, null] }, comp: { wave: 'triangle', vol: 0.018, dur: 0.2, map: { 2: [0, 3, 7, 10], 10: [-2, 2, 5, 9] } }, hat: [2, 6, 10, 14], hv: 0.015 },
   mines: { sd: 0.21, len: 16, root: 130.81, lead: { wave: 'sine', vol: 0.05, dur: 0.25, pat: [12, null, null, 13, null, null, 12, null, 15, null, null, 13, null, null, 12, null] }, bass: { wave: 'sawtooth', vol: 0.04, dur: 0.5, pat: [-12, null, null, null, null, null, null, null, -11, null, null, null, null, null, null, null] }, kick: [0, 6, 8], hat: [4, 12], kv: 0.2, hv: 0.02 },
   avion: { sd: 0.16, len: 16, root: 196, lead: { wave: 'sawtooth', vol: 0.022, dur: 0.12, pat: [12, 12, 19, 12, 17, 12, 15, 12, 12, 12, 19, 12, 22, 19, 17, 15] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.18, pat: [-12, null, -12, null, -12, null, -12, null, -9, null, -9, null, -7, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.025 },
+  plinko: { sd: 0.2, len: 16, root: 261.63, lead: { wave: 'triangle', vol: 0.045, dur: 0.16, pat: [12, null, 16, null, 19, null, 24, null, 19, null, 16, null, 14, null, 12, null] }, bass: { wave: 'sine', vol: 0.13, dur: 0.3, pat: [-12, null, null, null, -5, null, null, null, -8, null, null, null, -7, null, null, null] }, kick: [0, 8], hat: [4, 12], kv: 0.18, hv: 0.02 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -10594,6 +10622,291 @@ class PokerGame extends BaseGame {
 return { PokerGame };
 })();
 
+// ---- games/impl/plinko.js ----
+__mods['games/impl/plinko.js'] = (() => {
+// Plinko: balls bounce down a peg pyramid into multiplier slots. The slot is drawn when the ball is dropped
+// (one left/right coin flip per row); the canvas then animates a gravity path through those exact pegs.
+
+const { BaseGame, fmtC } = __mods['core/base.js'];
+const { EXTRA_THEMES } = __mods['core/music.js'];
+const { sfx, audioContext, isMuted } = __mods['audio.js'];
+const { fx } = __mods['fx.js'];
+
+/* ===ENGINE */
+const ROWS_MIN = 8, ROWS_MAX = 16, TARGET = 0.95;
+// Multiplier curve per risk: centre value and edge value at 8 and 16 rows.
+const RISKS = {
+  low: { name: 'Faible', centre: 0.5, edge: [5.6, 16] },
+  mid: { name: 'Moyen', centre: 0.4, edge: [13, 110] },
+  high: { name: 'Élevé', centre: 0.2, edge: [29, 1000] },
+};
+function binom(n) { const p = [1]; for (let i = 0; i < n; i++) { for (let k = p.length; k > 0; k--) p[k] = ((p[k] || 0) + p[k - 1]) / 2; p[0] /= 2; } return p; }
+const nice = (x) => (x >= 100 ? Math.round(x / 10) * 10 : x >= 10 ? Math.round(x) : Math.max(0.1, Math.round(x * 10) / 10));
+const TABLES = {};
+// Multipliers for each slot (0..n): centre and edge values are fixed, the curve between them rises geometrically.
+// Its steepness is searched so the return is as close to TARGET as the rounding allows (never above).
+function table(n, risk) {
+  const key = n + risk;
+  if (TABLES[key]) return TABLES[key];
+  const r = RISKS[risk], edge = r.edge[0] * Math.pow(r.edge[1] / r.edge[0], (n - ROWS_MIN) / (ROWS_MAX - ROWS_MIN)), P = binom(n);
+  const build = (q) => P.map((_, k) => nice(r.centre * Math.pow(edge / r.centre, Math.pow(Math.abs(k - n / 2) / (n / 2), q))));
+  const ret = (m) => m.reduce((a, x, k) => a + x * P[k], 0);
+  let lo = 0.2, hi = 8; // higher q = flatter centre = lower return
+  for (let i = 0; i < 60; i++) { const mid = (lo + hi) / 2; if (ret(build(mid)) > TARGET) lo = mid; else hi = mid; }
+  const m = build(hi);
+  return (TABLES[key] = { m, P, rtp: ret(m) });
+}
+// One ball: a left/right choice at every row; the slot is the number of rights.
+function drop(n) { const path = []; for (let i = 0; i < n; i++) path.push(Math.random() < 0.5 ? 0 : 1); return { path, slot: path.reduce((a, b) => a + b, 0) }; }
+/* ===END ENGINE */
+
+const BALLS = [1, 3, 5, 10, 20];
+const RISK_IDS = Object.keys(RISKS);
+const fx2 = (x) => (x >= 100 ? x.toLocaleString('fr-FR') : String(x).replace('.', ','));
+// Slot colour from cool (centre) to hot (edges).
+const slotColour = (t) => `hsl(${Math.round(48 - 52 * t)}, ${Math.round(85 + 10 * t)}%, ${Math.round(52 - 4 * t)}%)`;
+
+// Soft peg "tick": pitch rises as the ball goes down.
+function pegSound(row, n) {
+  if (isMuted()) return;
+  const c = audioContext(); if (!c) return;
+  const t = c.currentTime, o = c.createOscillator(), g = c.createGain();
+  o.type = 'sine';
+  o.frequency.value = 520 + (row / n) * 520 + Math.random() * 40;
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(0.05, t + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+  o.connect(g).connect(c.destination);
+  o.start(t); o.stop(t + 0.1);
+}
+
+class PlinkoGame extends BaseGame {
+  constructor(root, game) {
+    super(root, game, {
+      music: EXTRA_THEMES.plinko, autoplay: false, mainLabel: 'LANCER',
+      cls: 'table-game plinko',
+      head: '<div class="pl-hist" aria-label="Derniers multiplicateurs"></div>',
+      stage: '<div class="pl-board"><canvas class="pl-canvas"></canvas></div>',
+      below: `<div class="pl-ctl">
+        <div class="pl-grp"><span>Risque</span><div class="pl-seg">${RISK_IDS.map((r) => `<button type="button" data-risk="${r}">${RISKS[r].name}</button>`).join('')}</div></div>
+        <div class="pl-grp"><span>Rangées</span><div class="pl-step"><button type="button" class="round-btn" data-rows="-1" aria-label="Moins de rangées">−</button><b class="pl-rows"></b><button type="button" class="round-btn" data-rows="1" aria-label="Plus de rangées">+</button></div></div>
+        <div class="pl-grp"><span>Billes par lancer</span><div class="pl-seg">${BALLS.map((b) => `<button type="button" data-balls="${b}">${b}</button>`).join('')}</div></div>
+      </div>`,
+      hello: 'Choisis ta mise, le risque et le nombre de rangées, puis lance.',
+    });
+    this.rows = this.loadNum('plinko_rows', 12, ROWS_MIN, ROWS_MAX);
+    this.risk = RISK_IDS[this.loadNum('plinko_risk', 1, 0, RISK_IDS.length - 1)];
+    this.nBalls = BALLS[this.loadNum('plinko_balls', 0, 0, BALLS.length - 1)];
+    this.balls = [];
+    this.queued = 0;
+    this.pegGlow = new Map();
+    this.slotHit = [];
+    this.hist = [];
+    this.canvas = this.q('.pl-canvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.root.addEventListener('click', (e) => {
+      const r = e.target.closest('[data-risk]'); if (r && !this.inPlay()) this.setRisk(r.dataset.risk);
+      const n = e.target.closest('[data-rows]'); if (n && !this.inPlay()) this.setRows(this.rows + +n.dataset.rows);
+      const b = e.target.closest('[data-balls]'); if (b) this.setBalls(+b.dataset.balls);
+    });
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.pl-board'));
+    this.frame = this.frame.bind(this);
+    this.paintCtl();
+    this.layout();
+  }
+
+  inPlay() { return this.balls.length > 0 || this.queued > 0; }
+  get tab() { return table(this.rows, this.risk); }
+
+  setRisk(r) { this.risk = r; this.saveKey('plinko_risk', RISK_IDS.indexOf(r)); this.slotHit = []; this.paintCtl(); this.draw(); }
+  setRows(n) { this.rows = Math.max(ROWS_MIN, Math.min(ROWS_MAX, n)); this.saveKey('plinko_rows', this.rows); this.slotHit = []; this.pegGlow.clear(); this.paintCtl(); this.layout(); }
+  setBalls(n) { this.nBalls = n; this.saveKey('plinko_balls', BALLS.indexOf(n)); this.paintCtl(); }
+
+  paintCtl() {
+    const busy = this.inPlay();
+    this.qa('[data-risk]').forEach((b) => { b.classList.toggle('on', b.dataset.risk === this.risk); b.disabled = busy; });
+    this.qa('[data-balls]').forEach((b) => b.classList.toggle('on', +b.dataset.balls === this.nBalls));
+    this.q('.pl-rows').textContent = this.rows;
+    this.q('[data-rows="-1"]').disabled = busy || this.rows <= ROWS_MIN;
+    this.q('[data-rows="1"]').disabled = busy || this.rows >= ROWS_MAX;
+    const lab = this.mainBtn?.querySelector('.main-label');
+    if (lab) lab.textContent = this.nBalls > 1 ? `LANCER ×${this.nBalls}` : 'LANCER';
+  }
+
+  onMeters() { if (this.balls) this.paintCtl(); } // also called by the cabinet before our constructor runs
+
+  /* ---------- geometry ---------- */
+  layout() {
+    const box = this.q('.pl-board'), w = Math.max(260, box.clientWidth), n = this.rows;
+    const gap = Math.min(44, (w - 24) / (n + 2)), h = gap * (n + 1) + gap * 1.6 + 46;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);
+    this.canvas.style.height = `${h}px`;
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.geo = { w, h, gap, cx: w / 2, top: gap * 1.2, pegR: Math.max(2.4, gap * 0.11), ballR: Math.max(4.5, gap * 0.24) };
+    this.geo.slotY = this.geo.top + gap * n + gap * 0.25;
+    this.draw();
+  }
+  pegX(row, j) { return this.geo.cx + (j - (row + 2) / 2) * this.geo.gap; }
+  pegY(row) { return this.geo.top + row * this.geo.gap; }
+  slotX(k) { return this.geo.cx + (k - this.rows / 2) * this.geo.gap; }
+
+  // Gravity arcs from peg to peg along the drawn path (x linear, y = y0 + v0 t + g t² / 2).
+  plan(path) {
+    const { gap, pegR, ballR } = this.geo, n = this.rows, g = gap * 60, legs = [];
+    let x = this.geo.cx + (Math.random() - 0.5) * gap * 0.16, y = this.pegY(0) - gap * 1.1, vy = 0, c = 0;
+    for (let r = 0; r <= n; r++) {
+      const last = r === n;
+      const tx = last ? this.slotX(c) : this.pegX(r, c + 1) + (Math.random() - 0.5) * gap * 0.1;
+      const ty = last ? this.geo.slotY + gap * 0.55 : this.pegY(r) - pegR - ballR * 0.9;
+      const dy = ty - y, T = (-vy + Math.sqrt(vy * vy + 2 * g * dy)) / g;
+      legs.push({ x0: x, y0: y, x1: tx, vy, g, T, row: last ? -1 : r, peg: last ? null : `${r}:${c + 1}` });
+      if (last) break;
+      const dir = path[r];
+      x = tx; y = ty; vy = -gap * (3.5 + Math.random() * 2);
+      c += dir;
+    }
+    return legs;
+  }
+
+  /* ---------- play ---------- */
+  onMain() {
+    if (this.dead) return;
+    const n = this.nBalls;
+    for (let i = 0; i < n; i++) {
+      this.queued++;
+      setTimeout(() => { this.queued--; if (!this.dead) this.dropOne(); this.paintCtl(); }, i * (this.turbo ? 90 : 160));
+    }
+    this.paintCtl();
+  }
+
+  dropOne() {
+    const bet = this.bet;
+    if (!this.pay(bet)) { this.queued = 0; return; }
+    this.lastStake = bet;
+    const res = drop(this.rows), tab = this.tab;
+    this.balls.push({ bet, slot: res.slot, mult: tab.m[res.slot], legs: this.plan(res.path), leg: 0, t: 0, trail: [], hue: Math.random() * 30 });
+    sfx.click();
+    if (!this.raf) { this.last = performance.now(); this.raf = requestAnimationFrame(this.frame); }
+  }
+
+  land(b) {
+    const win = Math.round(b.bet * b.mult);
+    this.slotHit[b.slot] = 1;
+    this.lastStake = b.bet;
+    if (win > 0) this.win(win);
+    this.setLast(win);
+    this.hist.unshift(b.mult); this.hist = this.hist.slice(0, 12);
+    this.q('.pl-hist').innerHTML = this.hist.map((m) => `<span style="--c:${slotColour(Math.min(1, Math.log10(Math.max(m, 0.1) * 10) / 4))}">×${fx2(m)}</span>`).join('');
+    const net = win - b.bet;
+    this.msg(`×${fx2(b.mult)} · ${win > 0 ? `+${fmtC(win)}` : 'perdu'}${net > 0 ? ` <span class="pill hot">+${fmtC(net)}</span>` : ''}`);
+    const rect = this.canvas.getBoundingClientRect(), px = rect.left + this.slotX(b.slot), py = rect.top + this.geo.slotY + this.geo.gap * 0.4;
+    if (b.mult >= 10) {
+      fx.burst(px, py, b.mult >= 100 ? 60 : 26, ['#fde047', '#fbbf24', '#fff'], b.mult >= 100 ? 10 : 6);
+      fx.floatText(px, py - 30, `×${fx2(b.mult)}`, '#fde047', 26);
+      if (b.mult >= 100) { this.flash('rgba(253,224,71,.5)'); this.celebrate(win, { stake: b.bet }); } else sfx.win();
+    } else if (b.mult >= 1) sfx.coin(); else sfx.tick();
+  }
+
+  frame(now) {
+    if (this.dead) return;
+    const dt = Math.min(0.05, (now - this.last) / 1000) * (this.turbo ? 1.6 : 1);
+    this.last = now;
+    for (const b of this.balls) {
+      b.t += dt;
+      let L = b.legs[b.leg];
+      while (L && b.t >= L.T) {
+        b.t -= L.T;
+        if (L.peg) { this.pegGlow.set(L.peg, 1); pegSound(L.row, this.rows); }
+        b.leg++;
+        L = b.legs[b.leg];
+      }
+      if (!L) { b.done = true; continue; }
+      const k = b.t / L.T;
+      b.x = L.x0 + (L.x1 - L.x0) * k;
+      b.y = L.y0 + L.vy * b.t + 0.5 * L.g * b.t * b.t;
+      b.trail.push([b.x, b.y]); if (b.trail.length > 7) b.trail.shift();
+    }
+    const done = this.balls.filter((b) => b.done);
+    if (done.length) { this.balls = this.balls.filter((b) => !b.done); done.forEach((b) => this.land(b)); this.paintCtl(); }
+    for (const [k, v] of this.pegGlow) { const nv = v - dt * 3; if (nv <= 0) this.pegGlow.delete(k); else this.pegGlow.set(k, nv); }
+    this.slotHit = this.slotHit.map((v) => Math.max(0, (v || 0) - dt * 3));
+    this.draw();
+    const busy = this.balls.length || this.pegGlow.size || this.slotHit.some((v) => v > 0);
+    this.raf = busy ? requestAnimationFrame(this.frame) : null;
+  }
+
+  /* ---------- drawing ---------- */
+  draw() {
+    if (!this.geo) return;
+    const c = this.ctx, { w, h, gap, pegR, ballR } = this.geo, n = this.rows, tab = this.tab;
+    c.clearRect(0, 0, w, h);
+    // pegs
+    for (let r = 0; r < n; r++) {
+      for (let j = 0; j < r + 3; j++) {
+        const x = this.pegX(r, j), y = this.pegY(r), glow = this.pegGlow.get(`${r}:${j}`) || 0;
+        if (glow) { c.fillStyle = `rgba(255, 220, 120, ${0.35 * glow})`; c.beginPath(); c.arc(x, y, pegR * (2.2 + glow * 2), 0, 7); c.fill(); }
+        const gr = c.createRadialGradient(x - pegR * 0.35, y - pegR * 0.4, pegR * 0.1, x, y, pegR);
+        gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.5, glow ? '#ffe9a8' : '#d9dbe6'); gr.addColorStop(1, glow ? '#e0a52a' : '#7c8094');
+        c.fillStyle = gr; c.beginPath(); c.arc(x, y, pegR * (1 + glow * 0.25), 0, 7); c.fill();
+      }
+    }
+    // slots
+    const sw = gap * 0.9, sh = Math.max(20, gap * 0.72);
+    for (let k = 0; k <= n; k++) {
+      const hit = this.slotHit[k] || 0, x = this.slotX(k) - sw / 2, y = this.geo.slotY + hit * 6, t = Math.abs(k - n / 2) / (n / 2);
+      const col = slotColour(t);
+      c.save();
+      c.shadowColor = col; c.shadowBlur = 6 + hit * 18;
+      c.fillStyle = col;
+      this.rr(x, y, sw, sh, 5); c.fill();
+      c.restore();
+      c.fillStyle = 'rgba(0,0,0,.28)'; this.rr(x, y + sh - 4, sw, 4, 2); c.fill();
+      const lab = fx2(tab.m[k]);
+      c.fillStyle = '#1a0b06';
+      c.font = `800 ${Math.min(13, Math.max(6, sw / (lab.length * 0.62 + 0.5)))}px Inter, system-ui, sans-serif`;
+      c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText(lab, x + sw / 2, y + sh / 2 - 1);
+    }
+    // balls
+    for (const b of this.balls) {
+      if (b.x == null) continue;
+      b.trail.forEach(([tx, ty], i) => { c.fillStyle = `rgba(255, 90, 110, ${(i + 1) / b.trail.length * 0.18})`; c.beginPath(); c.arc(tx, ty, ballR * (0.5 + i / b.trail.length * 0.4), 0, 7); c.fill(); });
+      c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.ellipse(b.x + 2, b.y + ballR * 0.9, ballR * 0.8, ballR * 0.35, 0, 0, 7); c.fill();
+      const gr = c.createRadialGradient(b.x - ballR * 0.35, b.y - ballR * 0.4, ballR * 0.1, b.x, b.y, ballR);
+      gr.addColorStop(0, '#fff4f4'); gr.addColorStop(0.35, `hsl(${350 + b.hue}, 95%, 62%)`); gr.addColorStop(1, `hsl(${345 + b.hue}, 90%, 32%)`);
+      c.fillStyle = gr; c.beginPath(); c.arc(b.x, b.y, ballR, 0, 7); c.fill();
+    }
+  }
+
+  rr(x, y, w, h, r) {
+    const c = this.ctx;
+    c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+  }
+
+  destroy() {
+    // balls still falling are paid out where they were headed
+    this.balls.forEach((b) => { const win = Math.round(b.bet * b.mult); if (win > 0) { this.lastStake = b.bet; this.win(win); } });
+    this.balls = [];
+    this.queued = 0;
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.ro?.disconnect();
+    super.destroy();
+  }
+
+  info() {
+    const rows = RISK_IDS.map((r) => { const t = table(this.rows, r); return `<li><b>${RISKS[r].name}</b> : ×${fx2(t.m[0])} sur les bords, ×${fx2(t.m[this.rows / 2 | 0])} au centre · retour ${(t.rtp * 100).toFixed(1).replace('.', ',')} %</li>`; }).join('');
+    return this.rules(`<h4>Règles</h4><p>Lâche une ou plusieurs billes : à chaque clou, elles partent à gauche ou à droite (une chance sur deux) et finissent dans une case. Ta mise est multipliée par la valeur de la case.</p>
+      <p>Les cases du centre sont les plus fréquentes et paient peu ; celles des bords sont très rares et paient gros. Plus il y a de rangées, plus les bords sont rares et chers.</p>
+      <h4>Avec ${this.rows} rangées</h4><ul class="rules">${rows}</ul>
+      <p class="muted small">Tu peux relancer des billes pendant que les autres tombent. Le risque et le nombre de rangées se changent quand toutes les billes sont arrivées.</p>`);
+  }
+}
+
+return { PlinkoGame };
+})();
+
 // ---- games/impl/index.js ----
 __mods['games/impl/index.js'] = (() => {
 // Every original Bling game, rebuilt on the shared cabinet (js/core/), keyed by catalogue id.
@@ -10612,6 +10925,7 @@ const { LightningBJGame } = __mods['games/impl/lightningbj.js'];
 const { PokerGame } = __mods['games/impl/poker.js'];
 const { MinesGame } = __mods['games/impl/mines.js'];
 const { AvionGame } = __mods['games/impl/avion.js'];
+const { PlinkoGame } = __mods['games/impl/plinko.js'];
 
 const IMPL = {
   zeus: ZeusGame,
@@ -10629,6 +10943,7 @@ const IMPL = {
   poker: PokerGame,
   mines: MinesGame,
   avion: AvionGame,
+  plinko: PlinkoGame,
 };
 
 return { IMPL };
