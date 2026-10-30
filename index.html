@@ -3261,7 +3261,7 @@ const cards = (scale = 1) => [
   { id: 'T', glyph: '10', cls: 'card c-t', w: 17, pays: { 3: 4 * scale, 4: 10 * scale, 5: 25 * scale } },
 ];
 
-// Multiplies every non-scatter paytable entry; values tuned with scripts/simulate.mjs (~96% RTP).
+// Multiplies every non-scatter paytable entry; values tuned by simulation (~92% RTP, buys ~88%).
 const scalePays = (symbols, k) => symbols.map((s) => (s.pays && !s.scatter
   ? { ...s, pays: Object.fromEntries(Object.entries(s.pays).map(([n, p]) => [n, Math.round(p * k * 100) / 100])) }
   : s));
@@ -3286,7 +3286,7 @@ const GAMES = [
       ...cards(),
       { id: 'moon', glyph: '🌕', label: 'SCATTER', scatter: true, w: 6, reels: [0, 2, 4], pays: { 3: 2 } },
       { id: 'coin', glyph: '🪙', coin: true, w: 15, noFree: true },
-    ], 3.4),
+    ], 3.18),
     freeSpins: { scatter: 'moon', count: { 3: 8 }, type: 'sticky-wilds', title: 'Blow Down Free Spins', retrigger: 3 },
     holdSpin: {
       coin: 'coin', trigger: 6, respins: 3, landChance: 0.08,
@@ -3306,27 +3306,28 @@ const GAMES = [
       ],
       jackpots: { mini: 10, minor: 25, major: 100, grand: 1000 },
     },
-    buyBonus: { cost: 65, feature: 'hold' },
+    buyBonus: { cost: 68, feature: 'hold' },
+    freeBuyCost: 76,
   },
 ];
 
 // The original Bling games: same rules and payouts, rebuilt on the shared cabinet (js/games/impl/).
 const ORIGINALS = [
-  {"id": "zeus", "name": "Zeus Thunder", "cat": "slot", "tag": "Machine à sous", "sub": "Pay Anywhere, multiplicateurs ×500", "colors": ["#3b82f6", "#1e1b4b"], "description": "Sur l’Olympe, Zeus fait pleuvoir les gemmes. 8 symboles identiques n’importe où sur la grille 6×5 paient, les gains tombent en cascade et Zeus lance des orbes multiplicateurs de ×2 à ×500. 4 scatters lancent 15 tours gratuits avec un multiplicateur global qui ne se réinitialise jamais.", "features": ["Grille 6×5 Pay Anywhere", "Cascades", "Orbes ×2 à ×500", "15 Free Spins", "Multiplicateur global", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 96 %", "vol": 5, "max": "×5 000"},
-  {"id": "huff", "name": "Huff la Puff XXTrem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Huff ’n’ Puff : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent XXTREM Puff avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Huff ’n’ Puff", "4 scatters : roulette des maisons", "Cases ×2 à ×200", "Minor, Major, Jackpot ×10 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 96 %", "vol": 5, "max": "×10 000"},
-  {"id": "candy", "name": "Candy Queen", "cat": "slot", "tag": "Machine à sous", "sub": "Bonbons, baguette et paillettes", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et pailletent leurs cases. D’un coup de baguette magique, elles se révèlent : bonbons, macarons, diamants sucrés, cœurs multiplicateurs et bocaux qui aspirent tout. 3 bonus féeriques avec les couronnes.", "features": ["Grappes de 5", "Cases pailletées", "Baguette magique", "Cœurs ×2 à ×100, bocaux", "3 bonus", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 96 %", "vol": 4, "max": "×10 000"},
-  {"id": "anubis", "name": "Anubis Reborn", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +15 à +10 000, crânes dorés jusqu’à ×100). Un crâne à 10 000 donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +15 à +10 000", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "Très généreux (Jugement boosté)", "vol": 5, "max": "×10 000"},
-  {"id": "bling", "name": "Bling Tower", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
-  {"id": "pharaon", "name": "Pharaon Gold", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 95 %", "vol": 3, "max": "Non plafonné"},
-  {"id": "bounty", "name": "Bounty Reef", "cat": "slot", "tag": "Machine à sous", "sub": "Free spins bounty", "colors": ["#0c93b8", "#0a2a58"], "description": "Gains en groupes sur une petite grille. 3 scatters lancent un bonus de 8 tours, 4 scatters le bonus Bounty de 12 tours avec multiplicateur plus fort.", "features": ["Gains n’importe où", "Bonus 8 et 12 tours", "Multiplicateur ×2 ou ×5", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 96 %", "vol": 3, "max": "Non plafonné"},
-  {"id": "madwheel", "name": "Mad Wheel", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Top Slot, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Top Slot et quatre jeux bonus animés : Pile ou Face, Chasse au Cash, Pachinko et Méga Folie.", "features": ["Top Slot ×2 à ×50", "Pile ou Face", "Chasse au Cash", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "Selon la case misée", "vol": 5, "max": "×25 000"},
-  {"id": "storm", "name": "Lightning Storm", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 97 %", "vol": 4, "max": "×50 000"},
-  {"id": "doublespin", "name": "Double Spin", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, la jaune prend un multiplicateur de ×10 à ×100 000 sur ton plein.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "Très généreux (jeu de test)", "vol": 5, "max": "×100 000"},
-  {"id": "blackjack", "name": "Blackjack", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 3 pour 2", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 3 pour 2.", "features": ["Doubler", "Séparer une paire", "Blackjack 3 pour 2", "Animations de cartes"], "rtp": "≈ 99 %", "vol": 1, "max": "×2,5"},
+  {"id": "zeus", "name": "Zeus Thunder", "cat": "slot", "tag": "Machine à sous", "sub": "Pay Anywhere, multiplicateurs ×500", "colors": ["#3b82f6", "#1e1b4b"], "description": "Sur l’Olympe, Zeus fait pleuvoir les gemmes. 8 symboles identiques n’importe où sur la grille 6×5 paient, les gains tombent en cascade et Zeus lance des orbes multiplicateurs de ×2 à ×500. 4 scatters lancent 15 tours gratuits avec un multiplicateur global qui ne se réinitialise jamais.", "features": ["Grille 6×5 Pay Anywhere", "Cascades", "Orbes ×2 à ×500", "15 Free Spins", "Multiplicateur global", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
+  {"id": "huff", "name": "Huff la Puff XXTrem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Huff ’n’ Puff : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent XXTREM Puff avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Huff ’n’ Puff", "4 scatters : roulette des maisons", "Cases ×2 à ×200", "Minor, Major, Jackpot ×10 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
+  {"id": "candy", "name": "Candy Queen", "cat": "slot", "tag": "Machine à sous", "sub": "Bonbons, baguette et paillettes", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et pailletent leurs cases. D’un coup de baguette magique, elles se révèlent : bonbons, macarons, diamants sucrés, cœurs multiplicateurs et bocaux qui aspirent tout. 3 bonus féeriques avec les couronnes.", "features": ["Grappes de 5", "Cases pailletées", "Baguette magique", "Cœurs ×2 à ×100, bocaux", "3 bonus", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
+  {"id": "anubis", "name": "Anubis Reborn", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
+  {"id": "bling", "name": "Bling Tower", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
+  {"id": "pharaon", "name": "Pharaon Gold", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
+  {"id": "bounty", "name": "Bounty Reef", "cat": "slot", "tag": "Machine à sous", "sub": "Free spins bounty", "colors": ["#0c93b8", "#0a2a58"], "description": "Gains en groupes sur une petite grille. 3 scatters lancent un bonus de 8 tours, 4 scatters le bonus Bounty de 12 tours avec multiplicateur plus fort.", "features": ["Gains n’importe où", "Bonus 8 et 12 tours", "Multiplicateur ×2 ou ×5", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
+  {"id": "madwheel", "name": "Mad Wheel", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Top Slot, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Top Slot et quatre jeux bonus animés : Pile ou Face, Chasse au Cash, Pachinko et Méga Folie.", "features": ["Top Slot ×2 à ×50", "Pile ou Face", "Chasse au Cash", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
+  {"id": "storm", "name": "Lightning Storm", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
+  {"id": "doublespin", "name": "Double Spin", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
+  {"id": "blackjack", "name": "Blackjack", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 6 pour 5", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 6 pour 5.", "features": ["Doubler", "Séparer une paire", "Blackjack 6 pour 5", "Animations de cartes"], "rtp": "≈ 98 %", "vol": 1, "max": "×2,2"},
   {"id": "lightningbj", "name": "Lightning Blackjack", "cat": "table", "tag": "Cartes", "sub": "Multiplicateurs éclair jusqu’à ×1000", "colors": ["#3b82f6", "#0b0f3a"], "description": "Le blackjack frappé par la foudre : avant chaque distribution, les scores 17, 18, 19, 20 et 21 reçoivent un multiplicateur de ×1 à ×1000. Gagne ta main sur ce score et ton gain est multiplié tout de suite. Side bets Paires Parfaites, 21+3 et Bust It.", "features": ["Multiplicateurs ×1 à ×1000", "Gain multiplié dans la manche", "Paires Parfaites", "21+3", "Bust It", "Doubler et séparer"], "rtp": "≈ 97,5 %", "vol": 4, "max": "×1 500"},
   {"id": "poker", "name": "Texas Hold’em", "cat": "table", "tag": "Poker", "sub": "No Limit contre 1 à 5 bots", "colors": ["#10b981", "#06301f"], "description": "Une vraie table de Texas Hold’em No Limit : choisis tes adversaires (1 à 5 bots aux caractères différents), les blindes et ton tapis, puis joue pré-flop, flop, turn et river jusqu’au showdown.", "features": ["1 à 5 bots", "Blindes au choix", "Pots secondaires", "Bots qui bluffent", "Raccourcis de mise", "Showdown animé"], "rtp": "Selon ton jeu", "vol": 3, "max": "Toute la table"},
-  {"id": "mines", "name": "Mines", "cat": "quick", "tag": "Instantané", "sub": "Évite les bombes", "colors": ["#ffa51f", "#8a2a0c"], "description": "Retourne des cases sans toucher une bombe. Choisis de 1 à 24 bombes : plus il y en a, plus le multiplicateur grimpe vite. Encaisse quand tu veux.", "features": ["1 à 24 bombes", "Encaisse quand tu veux", "Multiplicateur croissant"], "rtp": "≈ 99 %", "vol": 3, "max": "Selon les bombes"},
-  {"id": "avion", "name": "Avion", "cat": "quick", "tag": "Crash", "sub": "Encaisse avant l’explosion", "colors": ["#f0284f", "#4a0a1f"], "description": "L’avion décolle et le multiplicateur grimpe : encaisse avant qu’il explose. Tu peux régler un encaissement automatique.", "features": ["Courbe en direct", "Encaissement auto", "Historique des explosions"], "rtp": "≈ 97 %", "vol": 4, "max": "×1 000"},
+  {"id": "mines", "name": "Mines", "cat": "quick", "tag": "Instantané", "sub": "Évite les bombes", "colors": ["#ffa51f", "#8a2a0c"], "description": "Retourne des cases sans toucher une bombe. Choisis de 1 à 24 bombes : plus il y en a, plus le multiplicateur grimpe vite. Encaisse quand tu veux.", "features": ["1 à 24 bombes", "Encaisse quand tu veux", "Multiplicateur croissant"], "rtp": "≈ 96 %", "vol": 3, "max": "Selon les bombes"},
+  {"id": "avion", "name": "Avion", "cat": "quick", "tag": "Crash", "sub": "Encaisse avant l’explosion", "colors": ["#f0284f", "#4a0a1f"], "description": "L’avion décolle et le multiplicateur grimpe : encaisse avant qu’il explose. Tu peux régler un encaissement automatique.", "features": ["Courbe en direct", "Encaissement auto", "Historique des explosions"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -5543,8 +5544,8 @@ const CAPX = 10000;
 const BONUS_SPINS = 3;
 // pay: scale on the original line pays. sc: chance of a scatter on each reel (base game). pN/pX: chance per cell per bonus spin. house: roulette weights red/blue/gold.
 // jp: chance that a gold cell hides a jackpot instead of a multiplier.
-const TUNE = { pay: 0.67, sc: 0.085, pN: 0.03, pX: 0.034, house: [62, 30, 8], jp: { minor: 0.035, major: 0.008, grand: 0.0008 } };
-const BUYN = 70, BUYX = 280;
+const TUNE = { pay: 0.638, sc: 0.085, pN: 0.03, pX: 0.034, house: [62, 30, 8], jp: { minor: 0.035, major: 0.008, grand: 0.0004 } };
+const BUYN = 75, BUYX = 300;
 
 function pickW(arr) { let t = 0, i; for (i = 0; i < arr.length; i++) t += arr[i]; let r = Math.random() * t; for (i = 0; i < arr.length; i++) { if (r < arr[i]) return i; r -= arr[i]; } return arr.length - 1; }
 const rnd = (n) => Math.floor(Math.random() * n);
@@ -6015,7 +6016,7 @@ class HuffGame extends BaseGame {
       <h4>Huff ’n’ Puff (3 scatters)</h4><ul class="rules"><li>Les cases où sont tombés les scatters deviennent <b>rouges</b>.</li><li>3 tours, remis à 3 à chaque scatter qui tombe.</li><li>Scatter sur une case vide : elle devient rouge. Sur une rouge : elle devient <b>bleue</b>. Sur une bleue : elle devient <b>dorée</b>.</li><li>Scatter sur une case dorée : elle ne monte plus, le scatter <b>bondit</b> sur une case rouge ou bleue et la rend dorée.</li></ul>
       <h4>XXTREM Puff (4 scatters)</h4><p>La roulette des maisons tourne d’abord : <b>maison rouge</b>, <b>maison bleue</b> ou <b>maison OR</b>. Tu commences avec 6 cases de cette couleur, puis le bonus se joue comme Huff ’n’ Puff.</p>
       <h4>Valeurs cachées</h4><ul class="rules"><li>Rouge : ×2 à ×10 la mise.</li><li>Bleue : ×15 à ×50.</li><li>Dorée : ×70 à ×200, ou MINOR ×${JPV.minor}, MAJOR ×${JPV.major}, JACKPOT ×${JPV.grand} (max win).</li><li>Tout reste caché jusqu’à la fin : le loup souffle sur les maisons et révèle chaque case.</li><li>Gain plafonné à ×${CAPX}.</li></ul>
-      <h4>Achats</h4><p>Huff ’n’ Puff ×${BUYN} · XXTREM Puff ×${BUYX}. RTP ≈ 96 %.</p>`);
+      <h4>Achats</h4><p>Huff ’n’ Puff ×${BUYN} · XXTREM Puff ×${BUYX}. RTP ≈ 92 %.</p>`);
   }
 }
 
@@ -6176,9 +6177,9 @@ const PAYS = [
   [1.5, 2, 12], [2, 5, 15], [2.5, 10, 25], [10, 25, 50],
 ];
 const SCATTER_PAY = { 4: 3, 5: 5, 6: 100 };
-// tuned with scripts/sim-zeus.mjs for ≈ 96 % RTP
+// tuned by simulation for ≈ 92 % RTP (free spins buy ≈ 87 %)
 const TUNE = {
-  payScale: 0.6,
+  payScale: 0.575,
   w: [21, 19, 17, 15, 13, 10, 8, 6.5, 4.5],
   sc: 2.0, scFree: 1.8,
   orb: 0.014, orbFree: 0.09,
@@ -6505,7 +6506,7 @@ const { fx } = __mods['fx.js'];
 /* ===ENGINE (original) */
 const SYM = [['💎', 40, 2], ['👑', 20, 3], ['💰', 10, 4], ['💵', 5, 6], ['🪙', 3, 8], ['🍾', 2, 9], ['💸', 1.5, 9]];
 const SC = '💲', SCW = 0.35, TOT = SYM.reduce((a, s) => a + s[2], SCW);
-const COLS = 6, ROWS = 7, N = 42, MINC = 5, CAPX = 10000, BUYN = 100, BUYB = 300;
+const COLS = 6, ROWS = 7, N = 42, MINC = 5, CAPX = 10000, BUYN = 83, BUYB = 262;
 function rnd() { let r = Math.random() * TOT; if (r < SCW) return SC; r -= SCW; for (let i = 0; i < SYM.length; i++) { if (r < SYM[i][2]) return SYM[i][0]; r -= SYM[i][2]; } return SYM[5][0]; }
 function val(s) { for (const x of SYM) if (x[0] === s) return x[1]; return 0; }
 function clusters(grid) {
@@ -6601,7 +6602,7 @@ class BlingGame extends BaseGame {
         c.cells.forEach((i) => { if (this.mm[i] > mx) mx = this.mm[i]; sm += this.mm[i]; ups.push(i); rem.add(i); });
         if (isFree) mx = Math.max(1, sm);
         if (mx > best) best = mx;
-        const p = Math.round(bet * val(c.s) * 0.08 * (c.cells.length - 3) * mx);
+        const p = Math.round(bet * val(c.s) * 0.0786 * (c.cells.length - 3) * mx);
         paid += p;
         this.grid.floatOver(c.cells, `+${fmtC(p)}`);
       });
@@ -6667,7 +6668,7 @@ class BlingGame extends BaseGame {
   }
 
   info() {
-    const rows = SYM.map(([s, v]) => `<div class="pay-item"><div class="pay-sym svg">${art(MAP[s])}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>Valeur ${v} · gain = mise × ${v} × 0,08 × (taille − 3) × multiplicateur</span></div></div>`).join('');
+    const rows = SYM.map(([s, v]) => `<div class="pay-item"><div class="pay-sym svg">${art(MAP[s])}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>Valeur ${v} · gain = mise × ${v} × 0,0786 × (taille − 3) × multiplicateur</span></div></div>`).join('');
     return this.rules(`<h4>Symboles</h4><div class="paytable">${rows}</div>
       <h4>Cascades et multiplicateurs</h4><p>Grille 6×7. Une grappe de <b>5 symboles identiques ou plus</b> (côte à côte) paie, disparaît et de nouveaux symboles tombent. Chaque case qui gagne <b>garde un multiplicateur qui monte de +2</b> à chaque connexion ; une grappe paie avec le plus grand multiplicateur de ses cases. En jeu de base, les multiplicateurs repartent à zéro après un tour gagnant.</p>
       <h4>Bonus</h4><p>${art(MAP[SC]).replace('<svg', '<svg style="width:22px;height:22px;vertical-align:middle"')} 3 scatters : 10 tours, toutes les cases à ×2. 4 scatters : 15 tours à ×5. Pendant le bonus, les multiplicateurs restent et une grappe paie avec <b>la somme</b> des multiplicateurs de ses cases. 3 scatters de plus : +3 tours. Gain maximum ×10 000.</p>
@@ -6776,7 +6777,7 @@ class PharaonGame extends BaseGame {
         if (c.cells.some((i) => !locked.has(i))) {
           fresh = true;
           const nk = c.cells.filter((i) => !locked.has(i)).length;
-          paid += bet * val(c.s) * 0.07 * (c.cells.length - 2) * (nk / c.cells.length);
+          paid += bet * val(c.s) * 0.0675 * (c.cells.length - 2) * (nk / c.cells.length);
           c.cells.forEach((i) => { if (!locked.has(i)) newIdx.push(i); });
         }
       });
@@ -6835,7 +6836,7 @@ class PharaonGame extends BaseGame {
   info() {
     const rows = [...SYM.map((s) => s[0]), SC].map((s) => `<div class="pay-item"><div class="pay-sym svg">${art(MAP[s])}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>${s === SC ? '3 = bonus 8 tours ×4 · 4+ = Bounty 12 tours ×10' : `Valeur ${val(s)}`}</span></div></div>`).join('');
     return this.rules(`<h4>Symboles</h4><div class="paytable">${rows}</div>
-      <h4>Cases verrouillées</h4><p>Grille 5×4. Une grappe de <b>5 symboles identiques ou plus</b> paie (mise × valeur × 0,07 × (taille − 2), au prorata des nouvelles cases), puis <b>se verrouille</b>. Les autres cases sont relancées et le <b>multiplicateur monte de +1</b> à chaque nouvelle connexion, jusqu’à 15 fois.</p>
+      <h4>Cases verrouillées</h4><p>Grille 5×4. Une grappe de <b>5 symboles identiques ou plus</b> paie (mise × valeur × 0,0675 × (taille − 2), au prorata des nouvelles cases), puis <b>se verrouille</b>. Les autres cases sont relancées et le <b>multiplicateur monte de +1</b> à chaque nouvelle connexion, jusqu’à 15 fois.</p>
       <h4>Bonus</h4><p>3 soleils : 8 tours qui démarrent à ×4. 4 soleils ou plus : Bounty, 12 tours à ×10. Pendant le bonus, <b>le multiplicateur reste</b> d’un tour à l’autre. 3 soleils de plus : +3 tours.</p>
       <h4>Achats</h4><p>Bonus ×${BUYN} la mise · Bonus Bounty ×${BUYB} la mise.</p>`);
   }
@@ -6857,14 +6858,14 @@ const { fx, center } = __mods['fx.js'];
 /* ===ENGINE (original) */
 const SYM = [['💎', 8, 3], ['👑', 6, 4], ['🗝️', 4, 6], ['⚓', 3, 8], ['🧭', 2, 10], ['🍺', 1, 12]];
 const SC = '⭐', SCW = 3, TOT = SYM.reduce((a, s) => a + s[2], SCW);
-const BUYN = 60, BUYB = 200;
+const BUYN = 6.7, BUYB = 25;
 function rnd() { let r = Math.random() * TOT; if (r < SCW) return SC; r -= SCW; for (let i = 0; i < SYM.length; i++) { if (r < SYM[i][2]) return SYM[i][0]; r -= SYM[i][2]; } return SYM[5][0]; }
 const sym = () => SYM[Math.floor(Math.random() * SYM.length)][0];
 function resolveWin(grid, bet) {
   const cnt = {}; let scat = 0;
   grid.forEach((s) => { if (s === SC) scat++; else cnt[s] = (cnt[s] || 0) + 1; });
   let win = 0; const hits = [];
-  SYM.forEach((s) => { const n = cnt[s[0]] || 0; if (n >= 6) { win += Math.round(bet * s[1] * 0.25 * (n - 4)); hits.push(s[0]); } });
+  SYM.forEach((s) => { const n = cnt[s[0]] || 0; if (n >= 6) { win += Math.round(bet * s[1] * 0.243 * (n - 4)); hits.push(s[0]); } });
   return { win, scat, hits };
 }
 /* ===END ENGINE */
@@ -6878,8 +6879,8 @@ class BountyGame extends BaseGame {
       defs: DEFS, music: MUSIC,
       stage: '<div class="reels-host"></div><div class="bubbles"></div>',
       buys: [
-        { id: 'normal', icon: '⭐', label: 'Bonus 3 étoiles · ×2', desc: '8 tours gratuits, gains ×2', cost: (b) => b * BUYN },
-        { id: 'bounty', icon: '🏴‍☠️', label: 'Bonus Bounty · 4 étoiles · ×5', desc: '12 tours gratuits, gains ×5', cost: (b) => b * BUYB },
+        { id: 'normal', icon: '⭐', label: 'Bonus 3 étoiles · ×2', desc: '8 tours gratuits, gains ×2', cost: (b) => Math.round(b * BUYN) },
+        { id: 'bounty', icon: '🏴‍☠️', label: 'Bonus Bounty · 4 étoiles · ×5', desc: '12 tours gratuits, gains ×5', cost: (b) => Math.round(b * BUYB) },
       ],
       hello: '6 symboles identiques n’importe où pour gagner',
     });
@@ -6955,11 +6956,11 @@ class BountyGame extends BaseGame {
   }
 
   info() {
-    const rows = [...SYM, [SC, 0]].map(([s, v]) => `<div class="pay-item"><div class="pay-sym svg">${art(MAP[s])}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>${s === SC ? '3 = 8 tours ×2 · 4+ = 12 tours ×5' : `6 : ×${(v * 0.5).toFixed(2).replace('.', ',')} · 8 : ×${v.toFixed(2).replace('.', ',')} · 10 : ×${(v * 1.5).toFixed(2).replace('.', ',')}`}</span></div></div>`).join('');
+    const rows = [...SYM, [SC, 0]].map(([s, v]) => `<div class="pay-item"><div class="pay-sym svg">${art(MAP[s])}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>${s === SC ? '3 = 8 tours ×2 · 4+ = 12 tours ×5' : `6 : ×${(v * 0.486).toFixed(2).replace('.', ',')} · 8 : ×${(v * 0.972).toFixed(2).replace('.', ',')} · 10 : ×${(v * 1.458).toFixed(2).replace('.', ',')}`}</span></div></div>`).join('');
     return this.rules(`<h4>Symboles (× la mise)</h4><div class="paytable">${rows}</div>
-      <h4>Gains n’importe où</h4><p>Grille 5×3. <b>6 symboles identiques ou plus</b>, où qu’ils soient, paient mise × valeur × 0,25 × (nombre − 4).</p>
+      <h4>Gains n’importe où</h4><p>Grille 5×3. <b>6 symboles identiques ou plus</b>, où qu’ils soient, paient mise × valeur × 0,243 × (nombre − 4).</p>
       <h4>Bonus</h4><p>3 étoiles : 8 tours gratuits avec gains ×2. 4 étoiles ou plus : Bounty, 12 tours avec gains ×5. 3 étoiles pendant le bonus : +3 tours.</p>
-      <h4>Achats</h4><p>Bonus ×${BUYN} la mise · Bonus Bounty ×${BUYB} la mise.</p>`);
+      <h4>Achats</h4><p>Bonus ×${String(BUYN).replace('.', ',')} la mise · Bonus Bounty ×${BUYB} la mise.</p>`);
   }
 }
 
@@ -6978,7 +6979,7 @@ const { fx, sleep, center } = __mods['fx.js'];
 
 /* ===ENGINE (original) */
 const C = 5, R = 6, N = 30, MINC = 5, F = 0.33, UINC = 3, CAPX = 10000;
-const SYMN = 9, VAL = [40, 20, 12, 8, 3, 2, 1.5, 1, 0.8], W = [2, 3, 4, 5, 30, 30, 28, 26, 24], WILD = -2, SC = -1, WW = 1.3, SCW = 1.8;
+const SYMN = 9, VAL = [40, 20, 12, 8, 3, 2, 1.5, 1, 0.8], W = [2, 3, 4, 5, 30, 30, 28, 26, 24], WILD = -2, SC = -1, WW = 1.3, SCW = 1.72;
 const SW = W.reduce((a, b) => a + b, 0), TOT = SW + WW + SCW;
 const PG = 0.002;
 let GKT = null;
@@ -7000,9 +7001,9 @@ function clusters(grid) {
   }
   return out;
 }
-const JW = [['cube', 62], ['sk', 21.5], ['g', 0.6], ['red', 3]], JPC = 0.175;
-// Judgment skulls add +15 to +10 000 to the value of the next cubes; a 10 000 skull is an instant max win.
-const SKV = [[15, 30], [20, 22], [25, 16], [30, 12], [40, 9], [50, 7], [75, 5], [100, 4], [150, 2.5], [200, 2], [300, 1.3], [500, 0.9], [750, 0.5], [1000, 0.35], [2000, 0.15], [5000, 0.06], [10000, 0.02]];
+const JW = [['cube', 62], ['sk', 12], ['g', 0.2], ['red', 3]], JPC = 0.175;
+// Judgment skulls add +2 to +500 to the value of the next cubes; a very rare 10 000 skull is an instant max win.
+const SKV = [[2, 30], [3, 22], [4, 16], [5, 12], [6, 9], [8, 7], [10, 5], [15, 4], [20, 2.5], [25, 2], [40, 1.3], [60, 0.9], [100, 0.5], [150, 0.3], [250, 0.12], [500, 0.04], [10000, 0.0003]];
 const SK_MAX = 10000;
 function skVal() { let t = 0; SKV.forEach((x) => { t += x[1]; }); let r = Math.random() * t; for (const x of SKV) { if (r < x[1]) return x[0]; r -= x[1]; } return SKV[0][0]; }
 function pickItem(cubes) {
@@ -7304,7 +7305,7 @@ class AnubisGame extends BaseGame {
         this.hide(ri);
         const fi = this.cubeCell(c, 0);
         this.paint(fi, art('cb') + lab(fxv(S)), 'cube win');
-        x.n = 1; x.m = S; x.mod = true; x.T = S;
+        x.n = 1; x.T = S;
         this.label(c, '= ' + fxv(S), 'lr'); draw(); sfx.coin();
         const p = center(this.grid.cells[fi]); fx.burst(p.x, p.y, 30, ['#f87171', '#ef4444', '#fff'], 7);
         await this.wait(850);
@@ -7343,7 +7344,7 @@ class AnubisGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym svg">${art('sc')}</div><div class="pay-vals"><b>Scatter</b><br><span>3 = Monde souterrain · 4+ = Jugement</span></div></div></div>
       <h4>Cascades</h4><p>Grille 5×6. Une grappe de <b>5 symboles ou plus</b> paie mise × valeur × 0,33 × (taille − 4) × multiplicateur, disparaît et les symboles tombent.</p>
       <h4>Monde souterrain</h4><p>10 tours. Chaque colonne a son multiplicateur, qui monte de +3 à chaque gain qui la touche. Un <b>crâne doré</b> multiplie sa colonne (×2 à ×100).</p>
-      <h4>Jugement</h4><p>Les cubes tombent dans les colonnes avec la valeur affichée en haut. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne</b> : ajoute de <b>+15 à +10 000</b> à la valeur des prochains cubes de sa colonne. Un crâne à <b>10 000</b> donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie la colonne. <b>Cube rouge</b> : additionne toute la colonne dans un seul cube, qui devient la nouvelle valeur.</p>
+      <h4>Jugement</h4><p>Les cubes tombent dans les colonnes avec la valeur affichée en haut. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne</b> : ajoute de <b>+2 à +500</b> à la valeur des prochains cubes de sa colonne. Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie la colonne. <b>Cube rouge</b> : additionne toute la colonne dans un seul cube et libère de la place ; la valeur des prochains cubes ne change pas.</p>
       <h4>Achats</h4><p>Monde souterrain ×${BUYU} · Jugement ×${BUYJ}. Gain maximum ×10 000.</p>`);
   }
 }
@@ -7354,7 +7355,7 @@ return { AnubisGame };
 // ---- games/impl/candy.js ----
 __mods['games/impl/candy.js'] = (() => {
 // Candy Queen: 6×5 cluster pays with cascades. Winning cells turn into glitter tiles; the magic wand reveals them
-// as candies, heart multipliers and candy jars. The math is the original Raton Voleur engine, unchanged (RTP ≈ 96 %).
+// as candies, heart multipliers and candy jars. Engine from Raton Voleur, retuned by simulation (RTP ≈ 92 %, buys ≈ 88 %).
 
 const { BaseGame, fmtC, art } = __mods['core/base.js'];
 const { SymbolGrid } = __mods['core/grid.js'];
@@ -7368,7 +7369,7 @@ const C = 6, R = 5, N = 30, MINC = 5, CAPX = 10000;
 const P = {
   w: [28, 26, 22, 18, 14, 10, 8, 6, 4, 3],
   val: [0.06, 0.08, 0.1, 0.14, 0.2, 0.35, 0.5, 1, 2, 4], F: 6.3,
-  ps: 0.0088, psFS: 0.014, pr: 0.00347, prFS: 0.01, huntF: 1.7,
+  ps: 0.0088, psFS: 0.014, pr: 0.003, prFS: 0.01, huntF: 1.65,
   item: [['b', 60], ['s', 24], ['g', 8], ['c', 5], ['p', 3]],
   bronze: [[0.4, 50], [0.6, 30], [1, 20]], silver: [[2, 50], [3, 30], [5, 20]], gold: [[10, 50], [20, 30], [40, 15], [100, 5]],
   clover: [[2, 50], [3, 30], [5, 15], [10, 5]],
@@ -7448,7 +7449,7 @@ const modeOf = (s) => (s >= 5 ? 'C' : s === 4 ? 'B' : 'A');
 const NAMES = ['Boule de gomme', 'Bonbon bleu', 'Étoile sucrée', 'Cœur gélifié', 'Sucette', 'Donut', 'Cupcake', 'Glace', 'Potion d’amour', 'Bague diamant'];
 const MODEN = { A: 'Bal de Sucre', B: 'Palais Pailleté', C: 'Pluie d’Étoiles' };
 const MODESUB = { A: 'Les cases pailletées restent jusqu’au coup de baguette', B: 'Les cases pailletées ne disparaissent jamais', C: 'Une baguette magique à chaque tour' };
-const HUNTC = 2, RBC = 4.3, PA = 100, PB = 250;
+const HUNTC = 2, RBC = 4.9, PA = 116, PB = 290;
 const WORDS = ['SWEET !', 'DÉLICIEUX !', 'SUGAR RUSH !', 'DIVIN !', 'ROYAL !', 'QUEEN !'];
 const NEON = ['#ff4fb8', '#ff9ee0', '#38bdf8', '#fde047', '#c084fc', '#a3e635', '#fff'];
 const ITEMN = { b: 'Bonbon', s: 'Macaron', g: 'Diamant sucré' };
@@ -7469,7 +7470,7 @@ class CandyGame extends BaseGame {
         </div>
       </div>`,
       head: '<div class="cq-meter"><small>Cases pailletées</small><b>0</b></div>',
-      opts: [{ id: 'hunt', icon: '👑', label: 'Chasse aux couronnes (mise ×2, couronnes ×1,7)' }],
+      opts: [{ id: 'hunt', icon: '👑', label: 'Chasse aux couronnes (mise ×2, couronnes ×1,65)' }],
       buys: [
         { id: 'rb', icon: '🪄', label: 'Baguette magique garantie', desc: 'Un tour avec une baguette sur la grille', cost: (b) => Math.round(b * RBC) },
         { id: 'A', icon: '🍬', label: `${MODEN.A} · 3 couronnes`, desc: `8 tours · ${MODESUB.A.toLowerCase()}`, cost: (b) => b * PA },
@@ -7524,7 +7525,7 @@ class CandyGame extends BaseGame {
     if (id !== 'hunt' || this.busy) return;
     this.hunt = !this.hunt;
     this.slotEl.classList.toggle('hunting', this.hunt);
-    toast(this.hunt ? 'Chasse aux couronnes : mise ×2, couronnes 1,7 fois plus fréquentes' : 'Chasse aux couronnes désactivée');
+    toast(this.hunt ? 'Chasse aux couronnes : mise ×2, couronnes 1,65 fois plus fréquentes' : 'Chasse aux couronnes désactivée');
     this.updateMeters();
   }
 
@@ -7733,7 +7734,7 @@ class CandyGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym svg">${art('cqw')}</div><div class="pay-vals"><b>Baguette magique</b><br><span>Révèle toutes les cases pailletées</span></div></div></div>
       <h4>Cases pailletées</h4><p>Grille 6×5, grappes de 5+ en cascade. Chaque case d’une grappe gagnante devient <b>pailletée</b>. Avec une <b>baguette magique</b> sur la grille, elles se révèlent : ${ITEMN.b.toLowerCase()}s (×0,4 à ×1), ${ITEMN.s.toLowerCase()}s (×2 à ×5), ${ITEMN.g.toLowerCase()}s (×10 à ×100), <b>cœurs</b> qui multiplient les bonbons des 4 cases autour (×2 à ×10, jusqu’à ×100 en bonus), et <b>bocaux</b> qui aspirent tous les bonbons et ajoutent les gains des cascades.</p>
       <h4>Bonus</h4><p>3 couronnes : <b>${MODEN.A}</b> (8 tours, les cases restent jusqu’au coup de baguette). 4 : <b>${MODEN.B}</b> (12 tours, cases pailletées permanentes). 5 : <b>${MODEN.C}</b> (12 tours, baguette à chaque tour). +3 tours avec 3 couronnes. Au moins un coup de baguette garanti.</p>
-      <h4>Chasse aux couronnes</h4><p>Mise ×2, couronnes 1,7 fois plus fréquentes.</p>
+      <h4>Chasse aux couronnes</h4><p>Mise ×2, couronnes 1,65 fois plus fréquentes.</p>
       <h4>Achats</h4><p>Baguette garantie ×${RBC.toString().replace('.', ',')} · ${MODEN.A} ×${PA} · ${MODEN.B} ×${PB}. Gain maximum ×10 000.</p>`);
   }
 }
@@ -7955,7 +7956,7 @@ const { fx, center } = __mods['fx.js'];
 
 /* ===ENGINE (original) */
 const ND = [[1, 0.12], [2, 0.22], [3, 0.30], [4, 0.22], [5, 0.14]];
-const MD = [[50, 0.671674], [100, 0.140926], [150, 0.075], [200, 0.045], [250, 0.028], [300, 0.015], [400, 0.01], [500, 0.008], [1000, 0.004], [2000, 0.0015], [5000, 0.0006], [10000, 0.0002], [20000, 0.00008], [50000, 0.00002]];
+const MD = [[50, 0.919307], [100, 0.140926], [150, 0.075], [200, 0.045], [250, 0.028], [300, 0.015], [400, 0.01], [500, 0.008], [1000, 0.004], [2000, 0.0015], [5000, 0.0006], [10000, 0.0002], [20000, 0.00008], [50000, 0.00002]];
 function drawLucky() { const n = wpick(ND), pool = [...Array(NP).keys()], res = {}; for (let j = 0; j < n; j++) { const k = Math.floor(Math.random() * pool.length), num = pool.splice(k, 1)[0]; res[num] = wpick(MD); } return res; }
 const L = buildDefs(29);
 function settle(bs, r, lucky) { let t = 0; for (const k in bs) { const d = L.DEF[k]; if (!d.n.includes(r)) continue; t += (d.n.length === 1 && d.p === 29 && lucky[r]) ? bs[k] * (lucky[r] + 1) : bs[k] * (d.p + 1); } return t; }
@@ -8089,10 +8090,11 @@ const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 
 /* ===ENGINE (original) */
-const MD = [[10, 0.30], [15, 0.18], [20, 0.13], [25, 0.09], [50, 0.08], [75, 0.05], [100, 0.04], [150, 0.03], [200, 0.025], [300, 0.018], [500, 0.013], [750, 0.008], [1000, 0.006], [2000, 0.0035], [5000, 0.0015], [10000, 0.0007], [25000, 0.0003], [50000, 0.0001], [100000, 0.00004]];
+const MD = [[10, 1.898664], [15, 0.18], [20, 0.13], [25, 0.09], [50, 0.08], [75, 0.05], [100, 0.04], [150, 0.03], [200, 0.025], [300, 0.018], [500, 0.013], [750, 0.008], [1000, 0.006], [2000, 0.0035], [5000, 0.0015], [10000, 0.0007], [25000, 0.0003], [50000, 0.0001], [100000, 0.00004]];
 const drawMult = () => wpick(MD);
-const L = buildDefs(35);
-function settle(bs, rw, ry, M) { let t = 0; for (const k in bs) { const d = L.DEF[k]; if (d.n.includes(rw)) t += bs[k] * (d.p + 1); if (d.n.length === 1 && d.n[0] === ry) t += bs[k] * M; } return t; }
+const L = buildDefs(33);
+// The yellow multiplier only pays when both balls stop on the same number and the player has a straight on it (straights ≈ 95 %).
+function settle(bs, rw, ry, M) { let t = 0; for (const k in bs) { const d = L.DEF[k]; if (d.n.includes(rw)) t += bs[k] * (d.p + 1); if (d.n.length === 1 && d.n[0] === ry && ry === rw) t += bs[k] * M; } return t; }
 /* ===END ENGINE */
 
 const name = (n) => `${n} (${colr(n) === 'g' ? 'zéro' : colr(n) === 'r' ? 'rouge' : 'noir'})`;
@@ -8103,7 +8105,7 @@ class DoubleSpinGame extends BaseGame {
       music: EXTRA_THEMES.doublespin, stepper: false, autoplay: false, mainLabel: 'LANCER', betLabel: 'Mise totale',
       cls: 'table-game',
       head: '<div class="head-meters"><div class="meter ymult"><small>Bille jaune</small><b>×?</b></div></div><div class="hist pairs"></div>',
-      stage: `<div class="wheel-zone"><svg class="rwheel" viewBox="0 0 300 300">${wheelSVG(2)}</svg><div class="rres"></div><div class="rres y"></div><div class="bolt-bar">⚪ La blanche paie les mises classiques · 🟡 la jaune paie son multiplicateur sur ton plein</div></div>`,
+      stage: `<div class="wheel-zone"><svg class="rwheel" viewBox="0 0 300 300">${wheelSVG(2)}</svg><div class="rres"></div><div class="rres y"></div><div class="bolt-bar">⚪ La blanche paie les mises classiques · 🟡 la jaune paie son multiplicateur si elle rejoint la blanche sur ton plein</div></div>`,
       below: `<div class="felt">${tableHTML(L)}${BetBoard.chipsHTML()}</div>`,
       hello: 'Pose tes jetons puis lance les deux billes.',
     });
@@ -8171,13 +8173,14 @@ class DoubleSpinGame extends BaseGame {
       ye?.classList.add('yel');
       const ret = settle(placed, rw, ry, M), net = ret - tt;
       let m = `⚪ ${name(rw)} · 🟡 ${name(ry)} ×${M}`;
-      if (placed['n' + ry]) m += ` · bille jaune sur ton plein ! +${fmtC(placed['n' + ry] * M)}`;
+      if (placed['n' + ry] && ry === rw) m += ` · les deux billes sur ton plein ! +${fmtC(placed['n' + ry] * M)}`;
+      else if (ry === rw) m += ' · les deux billes sur le même numéro !';
       m += ' · ' + (net > 0 ? `Tu gagnes ${fmtC(net)}` : net < 0 ? `Tu perds ${fmtC(-net)}` : 'Mise rendue');
       this.msg(m);
       if (ret > 0) {
         this.win(ret);
         this.setLast(ret);
-        if (placed['n' + ry] && ye) { const p = center(ye); fx.burst(p.x, p.y, 50, ['#ffd23f', '#fff'], 9); this.flash('rgba(255,210,63,.8)'); }
+        if (placed['n' + ry] && ry === rw && ye) { const p = center(ye); fx.burst(p.x, p.y, 50, ['#ffd23f', '#fff'], 9); this.flash('rgba(255,210,63,.8)'); }
         if (net > 0) await this.celebrate(ret);
       }
       this.board.bets = {}; this.board.stack = [];
@@ -8187,8 +8190,8 @@ class DoubleSpinGame extends BaseGame {
 
   info() {
     return this.rules(`<h4>Deux billes</h4><p>Roulette européenne à un zéro. Avant chaque tour, un multiplicateur de <b>×10 à ×100 000</b> est tiré pour la bille jaune.</p>
-      <ul class="rules"><li>⚪ <b>Bille blanche</b> : paie toutes les mises normalement (plein 35 pour 1, cheval 17, transversale 11, carré 8, sixain 5, douzaines et colonnes 2, chances simples 1).</li>
-      <li>🟡 <b>Bille jaune</b> : si elle tombe sur un numéro où tu as un plein, elle paie la mise × son multiplicateur, en plus de la blanche.</li></ul>
+      <ul class="rules"><li>⚪ <b>Bille blanche</b> : paie toutes les mises normalement (plein 33 pour 1, cheval 17, transversale 11, carré 8, sixain 5, douzaines et colonnes 2, chances simples 1).</li>
+      <li>🟡 <b>Bille jaune</b> : si elle tombe sur <b>le même numéro que la blanche</b> et que tu as un plein dessus, elle paie la mise × son multiplicateur, en plus de la blanche.</li></ul>
 `);
   }
 }
@@ -8207,14 +8210,16 @@ const { sfx, audioContext, isMuted } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 
 /* ===ENGINE (original) */
-const SEGS = (() => { const a = []; let i; for (i = 0; i < 12; i++) a.push('1'); for (i = 0; i < 12; i++) a.push('2'); a.push('cf', 'ch', 'pa'); for (i = 0; i < 12; i++) a.push('5'); for (i = 0; i < 12; i++) a.push('10'); a.push('cf', 'ct', 'pa'); return a; })();
+// 54 cases spread evenly around the wheel; with the Top Slot odds below every spot returns about 94 %.
+const SEG_COUNT = [['1', 22, 0.5], ['2', 15, 0.5], ['5', 7, 0.5], ['10', 4, 0.5], ['cf', 2, 0.3], ['pa', 2, 0.7], ['ch', 1, 0.25], ['ct', 1, 0.75]];
+const SEGS = SEG_COUNT.flatMap(([k, n, ph], j) => Array.from({ length: n }, (_, i) => ({ k, at: (i + ph) / n + j * 1e-4 }))).sort((a, b) => a.at - b.at).map((x) => x.k);
 const NS = SEGS.length, A = 360 / NS;
 const COL = { 1: '#f5c518', 2: '#3aa0ff', 5: '#ff5fa8', 10: '#a259ff', cf: '#1dd3b0', ch: '#8bd93b', pa: '#ff8a3d', ct: '#ff3d54' };
 const NAME = { 1: '1', 2: '2', 5: '5', 10: '10', cf: 'Pile ou Face', ch: 'Chasse au Cash', pa: 'Pachinko', ct: 'Méga Folie' };
 const SPOTS = ['1', '2', '5', '10', 'cf', 'ch', 'pa', 'ct'];
 const HINT = { 1: '1 pour 1', 2: '2 pour 1', 5: '5 pour 1', 10: '10 pour 1', cf: 'Pile ou Face', ch: 'Chasse au Cash', pa: 'Pachinko', ct: 'Méga Folie' };
 const TM = [[2, 30], [3, 20], [5, 18], [7, 10], [10, 9], [15, 5], [20, 3.5], [25, 2.5], [30, 1.5], [50, 0.5]];
-const TQ = { 1: 0.086, 2: 0.09, 5: 0.0507, 10: 0.0351, cf: 0.12, ch: 0.14, pa: 0.14, ct: 0.10 };
+const TQ = { 1: 0.0562, 2: 0.0351, 5: 0.0458, 10: 0.0309, cf: 0.1141, ch: 0.1335, pa: 0.1369, ct: 0.0986 };
 const CL = [[4, 24], [6, 19], [8, 15], [10, 12], [14, 10], [20, 8], [30, 5.5], [40, 3.5], [100, 2], [200, 1.23]];
 const CHB = { 10: 26, 12: 18, 14: 14, 16: 11, 18: 8, 20: 8, 24: 6, 30: 5, 40: 4, 50: 3, 60: 2, 80: 1, 200: 1, 950: 1 };
 const PV = [500, 250, 100, 50, 25, 'D', 8, 5, 5, 8, 'D', 25, 50, 100, 250, 500];
@@ -8598,7 +8603,7 @@ class MadWheelGame extends BaseGame {
   destroy() { this.ov?.remove(); super.destroy(); }
 
   info() {
-    return this.rules(`<h4>La roue</h4><p>54 cases : 1 (×12), 2 (×12), 5 (×12), 10 (×12) et 6 cases bonus. Mise sur une ou plusieurs cases : un chiffre paie autant de fois la mise (1 pour 1, 2 pour 1…), mise rendue en plus.</p>
+    return this.rules(`<h4>La roue</h4><p>54 cases : 1 (×22), 2 (×15), 5 (×7), 10 (×4) et 6 cases bonus (Pile ou Face ×2, Pachinko ×2, Chasse au Cash ×1, Méga Folie ×1). Mise sur une ou plusieurs cases : un chiffre paie autant de fois la mise (1 pour 1, 2 pour 1…), mise rendue en plus.</p>
       <h4>Top Slot</h4><p>Avant chaque tour, le Top Slot peut tirer une case et un multiplicateur de ×2 à ×50. Si la roue s’arrête sur cette case, son gain est multiplié.</p>
       <h4>Les 4 bonus</h4><ul class="rules"><li>${iconSVG('cf', 18)} <b>Pile ou Face</b> : une pièce, deux multiplicateurs.</li><li>${iconSVG('ch', 18)} <b>Chasse au Cash</b> : 108 multiplicateurs mélangés, choisis une cible.</li><li>${iconSVG('pa', 18)} <b>Pachinko</b> : le palet tombe dans une case ; ×2 double tout et on relance.</li><li>${iconSVG('ct', 18)} <b>Méga Folie</b> : choisis ta flèche, la roue géante peut doubler ou tripler.</li></ul>
       <p>Gain maximum ×25 000 la mise d’une case.</p>`);
@@ -8610,7 +8615,7 @@ return { MadWheelGame };
 
 // ---- games/impl/blackjack.js ----
 __mods['games/impl/blackjack.js'] = (() => {
-// Blackjack, rebuilt on the shared cabinet. 6-deck shoe, dealer stands on 17, blackjack pays 3:2 (original rules).
+// Blackjack, rebuilt on the shared cabinet. 6-deck shoe, dealer stands on 17, blackjack pays 6:5.
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
@@ -8634,7 +8639,7 @@ class BlackjackGame extends BaseGame {
       stage: `<div class="bj-table">
         <div class="bj-shoe"></div>
         <div class="bj-zone dealer"><div class="bj-label">Croupier <b class="dt"></b></div><div class="bj-cards dc"></div></div>
-        <div class="bj-arc">LE BLACKJACK PAIE 3 POUR 2 · LE CROUPIER RESTE À 17</div>
+        <div class="bj-arc">LE BLACKJACK PAIE 6 POUR 5 · LE CROUPIER RESTE À 17</div>
         <div class="bj-hands"></div>
       </div>`,
       below: `<div class="bj-actions"><button class="bj-btn" data-bj="hit">Tirer <small>+1 carte</small></button><button class="bj-btn" data-bj="stand">Rester</button><button class="bj-btn" data-bj="dbl">Doubler <small>×2, 1 carte</small></button><button class="bj-btn" data-bj="spl">Séparer <small>2 mains</small></button></div>`,
@@ -8836,7 +8841,7 @@ class BlackjackGame extends BaseGame {
     this.results = this.hands.map((h) => {
       const ps = score(h.cards).t; let pay = 0, res;
       if (ps > 21) res = { k: 'lose', t: 'Perdu (dépassé)' };
-      else if (isBJ(h) && !dbj) { pay = Math.floor(h.bet * 2.5); res = { k: 'win', t: `Blackjack ! +${fmtC(pay - h.bet)}` }; big = true; }
+      else if (isBJ(h) && !dbj) { pay = Math.floor(h.bet * 2.2); res = { k: 'win', t: `Blackjack ! +${fmtC(pay - h.bet)}` }; big = true; }
       else if (isBJ(h) && dbj) { pay = h.bet; res = { k: 'push', t: 'Égalité' }; }
       else if (dbj) res = { k: 'lose', t: 'Blackjack du croupier' };
       else if (ds > 21 || ps > ds) { pay = h.bet * 2; res = { k: 'win', t: `Gagné +${fmtC(h.bet)}` }; }
@@ -8849,7 +8854,7 @@ class BlackjackGame extends BaseGame {
     this.renderActions();
     this.hands.forEach((h, i) => {
       const r = this.results[i], el = this.handEl(i); if (!el) return;
-      const n = (r.k === 'win' ? '+' : r.k === 'lose' ? '−' : '') + (r.k === 'push' ? 'Égalité' : fmtC(Math.abs((r.k === 'win' ? (isBJ(h) ? Math.floor(h.bet * 1.5) : h.bet) : h.bet))));
+      const n = (r.k === 'win' ? '+' : r.k === 'lose' ? '−' : '') + (r.k === 'push' ? 'Égalité' : fmtC(Math.abs((r.k === 'win' ? (isBJ(h) ? Math.floor(h.bet * 1.2) : h.bet) : h.bet))));
       this.floatAt(el, n, r.k === 'win' ? '#4ade80' : r.k === 'lose' ? '#f87171' : '#e2e8f0', 22);
       if (r.k === 'win') { const p = center(el); fx.burst(p.x, p.y, big ? 50 : 24, ['#fde047', '#4ade80', '#fff'], 8); }
     });
@@ -8864,7 +8869,7 @@ class BlackjackGame extends BaseGame {
   }
 
   info() {
-    return this.rules(`<h4>Règles</h4><ul class="rules"><li>Sabot de 6 jeux, mélangé quand il reste moins de 60 cartes.</li><li>Le but : approcher 21 sans dépasser. Les figures valent 10, l’As 1 ou 11.</li><li><b>Tirer</b> une carte, <b>Rester</b>, <b>Doubler</b> (mise ×2, une seule carte), <b>Séparer</b> une paire en deux mains.</li><li>Le croupier tire jusqu’à 17.</li><li>Blackjack naturel : <b>3 pour 2</b>. Victoire : 1 pour 1. Égalité : mise rendue.</li></ul>`);
+    return this.rules(`<h4>Règles</h4><ul class="rules"><li>Sabot de 6 jeux, mélangé quand il reste moins de 60 cartes.</li><li>Le but : approcher 21 sans dépasser. Les figures valent 10, l’As 1 ou 11.</li><li><b>Tirer</b> une carte, <b>Rester</b>, <b>Doubler</b> (mise ×2, une seule carte), <b>Séparer</b> une paire en deux mains.</li><li>Le croupier tire jusqu’à 17.</li><li>Blackjack naturel : <b>6 pour 5</b>. Victoire : 1 pour 1. Égalité : mise rendue.</li></ul>`);
   }
 }
 
@@ -8873,7 +8878,7 @@ return { BlackjackGame };
 
 // ---- games/impl/mines.js ----
 __mods['games/impl/mines.js'] = (() => {
-// Mines, rebuilt on the shared cabinet. Same multiplier table as the original (99% return).
+// Mines, rebuilt on the shared cabinet. Multiplier table with a 96% return.
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
@@ -8882,7 +8887,7 @@ const { fx, center } = __mods['fx.js'];
 
 /* ===ENGINE (original) */
 const SIZE = 25;
-function mult(k, m) { let r = 0.99; for (let i = 0; i < k; i++) r *= (SIZE - i) / (SIZE - m - i); return r; }
+function mult(k, m) { let r = 0.96; for (let i = 0; i < k; i++) r *= (SIZE - i) / (SIZE - m - i); return r; }
 /* ===END ENGINE */
 
 const fm = (x) => '×' + x.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -8894,7 +8899,7 @@ class MinesGame extends BaseGame {
     super(root, game, {
       music: EXTRA_THEMES.mines, autoplay: false, mainLabel: 'JOUER',
       cls: 'table-game mines',
-      head: `<div class="head-meters"><div class="meter m-cur"><small>Multiplicateur</small><b>×0,99</b></div><div class="meter m-nxt"><small>Prochain</small><b>×1,13</b></div><div class="meter m-cash"><small>Encaissable</small><b>0,00 €</b></div></div>`,
+      head: `<div class="head-meters"><div class="meter m-cur"><small>Multiplicateur</small><b>×0,96</b></div><div class="meter m-nxt"><small>Prochain</small><b>×1,09</b></div><div class="meter m-cash"><small>Encaissable</small><b>0,00 €</b></div></div>`,
       stage: `<div class="mn-grid">${Array.from({ length: SIZE }, (_, i) => `<button class="mn-tile" data-i="${i}" disabled aria-label="Case ${i + 1}"><span class="mn-in"><span class="mn-front"></span><span class="mn-back"></span></span></button>`).join('')}</div>`,
       below: '<div class="mn-ctl"><span>Bombes</span><button class="round-btn" data-mines="-1">−</button><b class="mn-n">3</b><button class="round-btn" data-mines="1">+</button><div class="mn-presets">' + [1, 3, 5, 10, 24].map((n) => `<button data-mset="${n}">${n}</button>`).join('') + '</div></div>',
       hello: 'Choisis ta mise et le nombre de bombes.',
@@ -9012,7 +9017,7 @@ class MinesGame extends BaseGame {
 
   info() {
     return this.rules(`<h4>Règles</h4><p>Grille 5×5. Choisis de 1 à 24 bombes puis retourne des cases. Chaque diamant augmente le multiplicateur ; une bombe fait perdre la mise. <b>Encaisse quand tu veux.</b></p>
-      <p>Multiplicateur après k diamants : 0,99 × produit de (25 − i) / (25 − bombes − i). Plus il y a de bombes, plus il grimpe vite.</p>`);
+      <p>Multiplicateur après k diamants : 0,96 × produit de (25 − i) / (25 − bombes − i). Plus il y a de bombes, plus il grimpe vite.</p>`);
   }
 }
 
@@ -9030,7 +9035,7 @@ const { fx } = __mods['fx.js'];
 
 /* ===ENGINE (original) */
 const AUTOS = [0, 1.5, 2, 3, 5, 10, 20, 50, 100], MAXM = 1000;
-function crashPoint() { const r = Math.random(); let c = Math.floor((100 * 0.97) / (1 - r)) / 100; if (c < 1) c = 1; return Math.min(c, MAXM); }
+function crashPoint() { const r = Math.random(); let c = Math.floor((100 * 0.95) / (1 - r)) / 100; if (c < 1) c = 1; return Math.min(c, MAXM); }
 const growth = (t) => Math.exp(0.1 * t + 0.003 * t * t);
 /* ===END ENGINE */
 
@@ -9195,7 +9200,7 @@ class AvionGame extends BaseGame {
 
   info() {
     return this.rules(`<h4>Règles</h4><p>L’avion décolle et le multiplicateur grimpe. <b>Encaisse</b> avant qu’il explose : tu gagnes ta mise × le multiplicateur du moment. S’il explose avant, la mise est perdue.</p>
-      <p>Tu peux régler un <b>encaissement automatique</b> (×1,5 à ×100). Multiplicateur maximum ×1 000. Retour théorique ≈ 97 %.</p>`);
+      <p>Tu peux régler un <b>encaissement automatique</b> (×1,5 à ×100). Multiplicateur maximum ×1 000. Retour théorique ≈ 95 %.</p>`);
   }
 }
 
