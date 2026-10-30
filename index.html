@@ -658,6 +658,17 @@ body.gated { overflow: hidden; }
 .gate-chip b { font-size: 14px; }
 .gate-chip i { font-style: normal; font-size: 12px; color: var(--muted); }
 .gate-note { margin: 18px 0 0 !important; font-size: 11px; color: var(--muted); }
+.gate-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; margin-bottom: 14px; border-radius: 14px; background: #0c0a0b; border: 1px solid var(--line); }
+.gate-tabs button { padding: 10px 8px; border-radius: 10px; color: var(--muted); font: 800 14px Inter, sans-serif; transition: background .2s, color .2s; }
+.gate-tabs button.on { background: var(--panel-3); color: var(--text); }
+.gate-input[type="email"], .gate-input[type="password"] { font-size: 16px; font-weight: 600; }
+.gate-input[hidden], .gate-link[hidden] { display: none; }
+.gate-link { align-self: center; padding: 4px 8px; color: var(--muted); font-size: 13px; text-decoration: underline; }
+.gate-link:hover { color: var(--text); }
+.gate-or { display: flex; align-items: center; gap: 10px; margin: 16px 0 12px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; }
+.gate-or::before, .gate-or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.gate-guest { width: 100%; }
+.gate-guest-note { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.4; }
 .locked-game { text-align: center; padding: 60px 20px; }
 
 .me-chip { display: flex; align-items: center; gap: 10px; padding: 4px 12px 4px 4px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); position: relative; transition: border-color .2s; }
@@ -1896,16 +1907,91 @@ const wallet = new Wallet();
 return { START, REFILL_BELOW, round, fmt, wallet };
 })();
 
+// ---- cloud.js ----
+__mods['cloud.js'] = (() => {
+// Online accounts: Firebase Authentication (e-mail + password) and Firestore (one document per player: users/{uid}).
+// Paste the web config of your Firebase project below to turn accounts on. Left empty, the site keeps the
+// local pseudo profiles saved on each device.
+const FIREBASE_CONFIG = {
+  apiKey: '',
+  authDomain: '',
+  projectId: '',
+  appId: '',
+};
+const SDK = 'https://www.gstatic.com/firebasejs/10.12.2/';
+const enabled = !!FIREBASE_CONFIG.apiKey;
+
+const loadScript = (src) => new Promise((ok, ko) => {
+  const s = document.createElement('script');
+  s.src = src;
+  s.onload = ok;
+  s.onerror = () => ko(new Error(`Cannot load ${src}`));
+  document.head.appendChild(s);
+});
+
+let fb = null;
+function init() {
+  if (!fb) {
+    fb = (async () => {
+      for (const part of ['app', 'auth', 'firestore']) await loadScript(`${SDK}firebase-${part}-compat.js`);
+      const app = firebase.initializeApp(FIREBASE_CONFIG);
+      const auth = app.auth();
+      auth.languageCode = 'fr';
+      return { auth, db: app.firestore() };
+    })();
+    fb.catch(() => { fb = null; }); // let a later attempt retry
+  }
+  return fb;
+}
+
+const ERR = {
+  'auth/invalid-email': 'Adresse e-mail invalide',
+  'auth/missing-email': 'Entre ton adresse e-mail',
+  'auth/missing-password': 'Entre ton mot de passe',
+  'auth/weak-password': 'Mot de passe trop court : 6 caractères minimum',
+  'auth/email-already-in-use': 'Un compte existe déjà avec cette adresse',
+  'auth/invalid-credential': 'E-mail ou mot de passe incorrect',
+  'auth/invalid-login-credentials': 'E-mail ou mot de passe incorrect',
+  'auth/wrong-password': 'E-mail ou mot de passe incorrect',
+  'auth/user-not-found': 'E-mail ou mot de passe incorrect',
+  'auth/too-many-requests': 'Trop d’essais, réessaie dans quelques minutes',
+  'auth/network-request-failed': 'Pas de connexion internet',
+};
+const message = (e) => ERR[e?.code] || 'Connexion impossible pour le moment, réessaie';
+
+const users = async () => (await init()).db.collection('users');
+
+const cloud = {
+  enabled,
+  message,
+  // cb(user | null) runs now with the remembered session, then on every sign-in / sign-out.
+  async onUser(cb) { return (await init()).auth.onAuthStateChanged(cb); },
+  async signUp(email, password) { return (await (await init()).auth.createUserWithEmailAndPassword(email, password)).user; },
+  async signIn(email, password) { return (await (await init()).auth.signInWithEmailAndPassword(email, password)).user; },
+  async signOut() { await (await init()).auth.signOut(); },
+  async resetPassword(email) { await (await init()).auth.sendPasswordResetEmail(email); },
+  async load(uid) { const d = await (await users()).doc(uid).get(); return d.exists ? d.data() : null; },
+  // JSON round trip: Firestore refuses undefined values.
+  async save(uid, data) { await (await users()).doc(uid).set(JSON.parse(JSON.stringify(data))); },
+};
+
+return { cloud };
+})();
+
 // ---- profile.js ----
 __mods['profile.js'] = (() => {
-// Player profiles, keyed by pseudo, saved on this device (localStorage 'bling.profiles.v1').
+// Player profiles. Three modes: 'cloud' (account with e-mail + password, saved in Firestore through cloud.js),
+// 'guest' (kept in memory only, gone when the page closes) and 'local' (pseudo profiles saved on this device in
+// localStorage 'bling.profiles.v1', used while no Firebase project is configured).
 // Each profile keeps its own balance, stats, progression (XP, level), daily bonus and ad counters.
 // The wallet always works on the active profile: login() loads its balance and every wallet change is saved back.
 // Swap this module's read/write for an API later to move profiles to a server.
 
 const { wallet, START } = __mods['wallet.js'];
+const { cloud } = __mods['cloud.js'];
 
 const KEY = 'bling.profiles.v1';
+const SAVE_DELAY = 4000; // cloud writes are grouped: one write per 4 s of play at most
 const NAME_MIN = 3, NAME_MAX = 16;
 const NAME_RE = /^[\p{L}\p{N}_.-]+(?: [\p{L}\p{N}_.-]+)*$/u;
 
@@ -1935,11 +2021,12 @@ function blank(name, adopt) {
 class Profiles extends EventTarget {
   constructor() {
     super();
-    this.store = read();
+    this.mode = cloud.enabled ? null : 'local';
+    this.store = cloud.enabled ? { current: null, users: {} } : read();
     if (this.store.current && !this.store.users[this.store.current]) this.store.current = null;
     // One-time reset after the RTP rework: every profile on this device goes back to 1 000 €.
     try {
-      if (!localStorage.getItem('bling.start.v5')) {
+      if (this.mode === 'local' && !localStorage.getItem('bling.start.v5')) {
         localStorage.setItem('bling.start.v5', '1');
         Object.values(this.store.users).forEach((u) => { u.bal = START; });
         wallet.load(START, wallet.state);
@@ -1954,13 +2041,73 @@ class Profiles extends EventTarget {
       this.save();
     });
     if (this.current) this.bind();
+    else if (cloud.enabled) wallet.load(START, null); // until an account or a guest session is opened
+    this.ready = cloud.enabled ? this.restore() : Promise.resolve();
+    addEventListener('pagehide', () => this.flush());
+    document.addEventListener('visibilitychange', () => { if (document.hidden) this.flush(); });
+  }
+
+  get online() { return this.mode === 'cloud'; }
+  get guest() { return this.mode === 'guest'; }
+
+  // Reopens the account remembered by Firebase on this browser, if any. Resolves once that is known.
+  restore() {
+    return new Promise((resolve) => {
+      let first = true;
+      cloud.onUser(async (user) => {
+        if (!first) return;
+        first = false;
+        try { if (user && !this.mode) await this.openAccount(user); } catch (e) { console.error(e); }
+        resolve();
+      }).catch((e) => { console.error(e); resolve(); });
+    });
+  }
+
+  // Loads (or creates) the player's document and makes it the active profile.
+  async openAccount(user, pseudo) {
+    let data = await cloud.load(user.uid);
+    const isNew = !data;
+    if (isNew) {
+      data = blank(pseudo || user.email.split('@')[0], false);
+      data.email = user.email;
+      await cloud.save(user.uid, data);
+    }
+    data.lastSeen = Date.now();
+    this.mode = 'cloud';
+    this.store = { current: user.uid, users: { [user.uid]: data } };
+    this.bind();
+    this.dispatchEvent(new CustomEvent('change', { detail: { isNew } }));
+    return { profile: data, isNew };
+  }
+
+  async signUp(email, password, pseudo) { return this.openAccount(await cloud.signUp(email, password), pseudo); }
+  async signIn(email, password) { return this.openAccount(await cloud.signIn(email, password)); }
+
+  // A fresh 1 000 € profile that is never saved.
+  playAsGuest() {
+    this.mode = 'guest';
+    this.store = { current: 'guest', users: { guest: blank('Invité', false) } };
+    this.bind();
+    this.dispatchEvent(new CustomEvent('change', { detail: { isNew: true } }));
+    return { profile: this.current, isNew: true };
   }
 
   get current() { return this.store.current ? this.store.users[this.store.current] : null; }
 
   list() { return Object.values(this.store.users).sort((a, b) => b.lastSeen - a.lastSeen); }
 
-  save() { try { localStorage.setItem(KEY, JSON.stringify(this.store)); } catch { /* ignore */ } }
+  save() {
+    if (this.mode === 'local') { try { localStorage.setItem(KEY, JSON.stringify(this.store)); } catch { /* ignore */ } }
+    if (this.mode === 'cloud' && !this.saveT) this.saveT = setTimeout(() => this.flush(), SAVE_DELAY);
+  }
+
+  // Sends the pending cloud write now (page hidden, logout).
+  flush() {
+    if (!this.saveT) return;
+    clearTimeout(this.saveT);
+    this.saveT = null;
+    if (this.mode === 'cloud' && this.current) cloud.save(this.store.current, this.current).catch((e) => console.error(e));
+  }
 
   // Returns an error message, or null when the pseudo is valid.
   validate(raw) {
@@ -1989,8 +2136,15 @@ class Profiles extends EventTarget {
   }
 
   logout() {
-    this.store.current = null;
-    this.save();
+    if (this.mode === 'local') {
+      this.store.current = null;
+      this.save();
+    } else {
+      if (this.mode === 'cloud') { this.flush(); cloud.signOut().catch((e) => console.error(e)); }
+      this.mode = null;
+      this.store = { current: null, users: {} };
+      wallet.load(START, null); // nothing from the last player stays on screen behind the gate
+    }
     this.dispatchEvent(new CustomEvent('change', { detail: {} }));
   }
 
@@ -2530,6 +2684,7 @@ __mods['hud.js'] = (() => {
 // the sidebar rank card and the level-up / rank-up notifications.
 
 const { profiles, NAME_MAX } = __mods['profile.js'];
+const { cloud } = __mods['cloud.js'];
 const { progress, rankBadge, rankOf } = __mods['progress.js'];
 const { dailyStatus } = __mods['daily.js'];
 const { fmt, wallet } = __mods['wallet.js'];
@@ -2540,8 +2695,24 @@ const { BRAND } = __mods['brand.js'];
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
-/* ---------- pseudo gate ---------- */
+/* ---------- gate: account login (Firebase) or pseudo (local) ---------- */
+function closeGate() {
+  const g = document.querySelector('.gate');
+  if (!g) return;
+  g.classList.remove('show');
+  document.body.classList.remove('gated');
+  setTimeout(() => g.remove(), 300);
+}
+
+function welcome(profile, isNew) {
+  sfx.win();
+  if (profiles.guest) toast('Mode invité : ta progression ne sera pas sauvegardée', 'info');
+  else toast(isNew ? `Bienvenue ${esc(profile.name)} ! Ton profil est créé` : `Bon retour ${esc(profile.name)} !`, 'ok');
+  if (dailyStatus().ready) setTimeout(() => toast('🎁 Ton bonus du jour t’attend dans ton profil', 'info'), 1200);
+}
+
 function showGate() {
+  if (cloud.enabled) return showAccountGate();
   if (document.querySelector('.gate')) return;
   const list = profiles.list().slice(0, 6);
   const g = el('div', 'gate', `<div class="gate-card">
@@ -2565,17 +2736,98 @@ function showGate() {
     if (e) { err.textContent = e; input.classList.remove('bad'); void input.offsetWidth; input.classList.add('bad'); return; }
     sfx.unlock();
     const { profile, isNew } = profiles.login(name);
-    g.classList.remove('show');
-    document.body.classList.remove('gated');
-    setTimeout(() => g.remove(), 300);
-    sfx.win();
-    toast(isNew ? `Bienvenue ${esc(profile.name)} ! Ton profil est créé` : `Bon retour ${esc(profile.name)} !`, 'ok');
-    if (dailyStatus().ready) setTimeout(() => toast('🎁 Ton bonus du jour t’attend dans ton profil', 'info'), 1200);
+    closeGate();
+    welcome(profile, isNew);
   };
   g.querySelector('form').addEventListener('submit', (e) => { e.preventDefault(); go(input.value); });
   input.addEventListener('input', () => { err.textContent = ''; });
   g.querySelectorAll('.gate-chip').forEach((b) => { b.onclick = () => go(b.dataset.name); });
   setTimeout(() => input.focus(), 350);
+}
+
+// E-mail + password, with a guest option whose progress is never saved.
+function showAccountGate() {
+  if (document.querySelector('.gate')) return;
+  const g = el('div', 'gate', `<div class="gate-card">
+      <div class="gate-logo"><span class="logo-mark">${BRAND.mark}</span><span>${BRAND.logo[0]}<em>${BRAND.logo[1]}</em></span></div>
+      <div class="gate-tabs" role="tablist"><button type="button" class="on" data-tab="in">Se connecter</button><button type="button" data-tab="up">Créer un compte</button></div>
+      <p class="muted">Ton solde, ton niveau et tes bonus sont sauvegardés dans ton compte, sur tous tes appareils.</p>
+      <form class="gate-form" novalidate>
+        <input class="gate-input" name="pseudo" maxlength="${NAME_MAX}" placeholder="Ton pseudo" aria-label="Pseudo" autocapitalize="off" spellcheck="false" hidden>
+        <input class="gate-input" name="email" type="email" placeholder="Adresse e-mail" aria-label="Adresse e-mail" autocomplete="email" autocapitalize="off" spellcheck="false">
+        <input class="gate-input" name="password" type="password" placeholder="Mot de passe" aria-label="Mot de passe" autocomplete="current-password">
+        <small class="gate-err" role="alert"></small>
+        <button class="btn primary lg" type="submit">Se connecter</button>
+        <button type="button" class="gate-link" data-forgot>Mot de passe oublié ?</button>
+      </form>
+      <div class="gate-or"><span>ou</span></div>
+      <button type="button" class="btn ghost lg gate-guest" data-guest>Jouer en tant qu’invité</button>
+      <small class="gate-guest-note">En invité, ta progression n’est pas sauvegardée : tout repart à zéro quand tu quittes le site.</small>
+      <p class="gate-note">Démo de divertissement · argent fictif · 18+</p>
+    </div>`);
+  document.body.appendChild(g);
+  document.body.classList.add('gated');
+  requestAnimationFrame(() => g.classList.add('show'));
+  const f = g.querySelector('form'), err = g.querySelector('.gate-err'), submit = f.querySelector('[type="submit"]');
+  const pseudo = f.elements.pseudo, email = f.elements.email, password = f.elements.password;
+  let tab = 'in', busy = false;
+  const fail = (msg, input) => {
+    err.textContent = msg;
+    if (input) { input.classList.remove('bad'); void input.offsetWidth; input.classList.add('bad'); input.focus(); }
+  };
+  const setTab = (t) => {
+    tab = t;
+    g.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === t));
+    pseudo.hidden = t === 'in';
+    g.querySelector('[data-forgot]').hidden = t === 'up';
+    password.autocomplete = t === 'up' ? 'new-password' : 'current-password';
+    password.placeholder = t === 'up' ? 'Mot de passe (6 caractères min.)' : 'Mot de passe';
+    submit.textContent = t === 'up' ? 'Créer mon compte' : 'Se connecter';
+    err.textContent = '';
+    (t === 'up' ? pseudo : email).focus();
+  };
+  const setBusy = (v) => { busy = v; g.querySelectorAll('button, input').forEach((n) => { n.disabled = v; }); };
+  g.querySelectorAll('[data-tab]').forEach((b) => { b.onclick = () => setTab(b.dataset.tab); });
+  f.addEventListener('input', () => { err.textContent = ''; });
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (busy) return;
+    sfx.unlock();
+    const mail = email.value.trim();
+    if (tab === 'up') { const bad = profiles.validate(pseudo.value); if (bad) return fail(bad, pseudo); }
+    if (!mail) return fail('Entre ton adresse e-mail', email);
+    if (!password.value) return fail('Entre ton mot de passe', password);
+    if (tab === 'up' && password.value.length < 6) return fail('Mot de passe trop court : 6 caractères minimum', password);
+    setBusy(true);
+    submit.textContent = tab === 'up' ? 'Création du compte…' : 'Connexion…';
+    try {
+      const { profile, isNew } = tab === 'up'
+        ? await profiles.signUp(mail, password.value, pseudo.value.trim().replace(/\s+/g, ' '))
+        : await profiles.signIn(mail, password.value);
+      closeGate();
+      welcome(profile, isNew);
+    } catch (ex) {
+      console.error(ex);
+      setBusy(false);
+      setTab(tab);
+      fail(cloud.message(ex));
+    }
+  });
+  g.querySelector('[data-forgot]').onclick = async () => {
+    const mail = email.value.trim();
+    if (!mail) return fail('Entre ton adresse e-mail, puis clique sur « Mot de passe oublié ? »', email);
+    try {
+      await cloud.resetPassword(mail);
+      toast('E-mail envoyé : suis le lien reçu pour choisir un nouveau mot de passe', 'ok');
+    } catch (ex) { fail(cloud.message(ex)); }
+  };
+  g.querySelector('[data-guest]').onclick = () => {
+    sfx.unlock();
+    const { profile, isNew } = profiles.playAsGuest();
+    closeGate();
+    welcome(profile, isNew);
+  };
+  setTimeout(() => email.focus(), 350);
 }
 
 /* ---------- header chip + sidebar card ---------- */
@@ -2586,7 +2838,7 @@ function renderChip() {
   if (chip) {
     chip.style.setProperty('--rk', p.rank.color);
     chip.innerHTML = `<span class="lvl-ring" style="--p:${(p.pct * 100).toFixed(1)}%"><b>${p.level}</b></span>
-      <span class="me-name"><b>${esc(me.name)}</b><small>${p.rank.name}${p.boosted ? ' · ⚡ XP ×2' : ''}</small></span>
+      <span class="me-name"><b>${esc(me.name)}</b><small>${profiles.guest ? 'Non sauvegardé' : p.rank.name}${p.boosted ? ' · ⚡ XP ×2' : ''}</small></span>
       ${d.ready ? '<i class="gift-dot" title="Bonus du jour disponible">🎁</i>' : ''}`;
   }
   if (side) {
@@ -2636,7 +2888,7 @@ function mountHud() {
   wallet.addEventListener('change', redraw);
   setInterval(redraw, 30000); // the daily gift dot appears when the 24 h are over
   redraw();
-  if (!profiles.current) showGate();
+  profiles.ready.then(() => { if (!profiles.current) showGate(); });
 }
 
 return { showGate, mountHud };
@@ -2827,7 +3079,7 @@ function renderProfile(root) {
         <div class="xp-bar"><div style="width:${(p.pct * 100).toFixed(1)}%"></div></div>
         <div class="xp-row"><span>${p.level >= MAX_LEVEL ? 'Niveau maximum atteint' : `${n0(p.xp)} / ${n0(p.need)} XP`}</span>${p.level < MAX_LEVEL ? `<span>Niveau ${p.level + 1} : <b>+${fmt(levelReward(p.level + 1))}</b></span>` : ''}</div>
       </div>
-      <button class="btn ghost me-switch" data-switch>Changer de pseudo</button>
+      <button class="btn ghost me-switch" data-switch>${profiles.online ? 'Se déconnecter' : profiles.guest ? 'Créer un compte ou se connecter' : 'Changer de pseudo'}</button>
     </section>
 
     <section class="panel daily-card${d.ready ? ' ready' : ''}">
