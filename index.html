@@ -11208,10 +11208,11 @@ class VortexGame extends BaseGame {
       hello: 'Choisis ta mise et lâche la bille sur la roue.',
     });
     this.rot = RINGS.map((_, i) => i * 0.7);
-    this.spin = RINGS.map((_, i) => (i % 2 ? -1 : 1) * (0.32 + i * 0.07));
-    this.hold = RINGS.map(() => null); // ring held still: { from, d, dir, t0, T } while settling, or true when stopped
-    this.bubble = null;
-    this.mark = null;
+    this.spin = RINGS.map((_, i) => (i % 2 ? -1 : 1) * (0.22 + i * 0.05));
+    this.hold = RINGS.map(() => null); // { from, d, dir, t0, T, done } while settling, true once stopped
+    this.ball = null;
+    this.glow = null; // lit slot under the ball: { i, red, t0 }
+    this.hub = { main: `×${xs(CENTER)}`, sub: 'AU CENTRE', col: '#fde68a' };
     this.hist = [];
     this.canvas = this.q('.vx-canvas');
     this.ctx = this.canvas.getContext('2d');
@@ -11223,25 +11224,62 @@ class VortexGame extends BaseGame {
     this.raf = requestAnimationFrame(this.frame);
   }
 
+  /* ---------- geometry and pre-rendered layers ---------- */
   layout() {
-    // Face-on wheel with room above it for the falling ball.
-    const w = Math.max(260, this.q('.vx-board').clientWidth), R = Math.min(w * 0.46, 290);
-    const cy = R + Math.max(40, R * 0.22), h = Math.round(cy + R + 14);
+    const w = Math.max(260, this.q('.vx-board').clientWidth), R = Math.min(w * 0.46, 300);
+    const cy = R + Math.max(34, R * 0.16), h = Math.round(cy + R + 16);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     this.canvas.width = Math.round(w * dpr); this.canvas.height = Math.round(h * dpr);
     this.canvas.style.height = `${h}px`;
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    this.geo = { w, h, cx: w / 2, cy, R };
+    const outer = R * 0.89, hubR = R * 0.215;
+    this.geo = { w, h, cx: w / 2, cy, R, outer, hubR, step: (outer - hubR) / RINGS.length, dpr };
+    this.buildLayers();
+  }
+  ringR(i) { return this.geo.outer - i * this.geo.step; }
+  laneY(i) { return this.geo.cy - (this.ringR(i) + this.ringR(i + 1)) / 2; }
+
+  // Each ring is drawn once into its own canvas (gradients, glow, bevels), then only rotated every frame.
+  buildLayers() {
+    const { R, dpr } = this.geo;
+    this.layers = RINGS.map((g, i) => {
+      const R0 = this.ringR(i) - 1.2, R1 = this.ringR(i + 1) + 1.2, size = Math.ceil((R0 + 12) * 2);
+      const cv = document.createElement('canvas'); cv.width = size * dpr; cv.height = size * dpr;
+      const c = cv.getContext('2d'); c.scale(dpr, dpr);
+      const o = size / 2, gap = Math.min(0.03, 1.6 / R1);
+      for (let k = 0; k < SEG; k++) {
+        const a0 = k * SLOT + gap / 2, a1 = (k + 1) * SLOT - gap / 2, red = isRed(g.red, k);
+        const gr = c.createRadialGradient(o, o, R1, o, o, R0);
+        if (red) { gr.addColorStop(0, '#8d0a1d'); gr.addColorStop(0.45, '#f0213f'); gr.addColorStop(0.8, '#ff4d63'); gr.addColorStop(1, '#a50d22'); } else { gr.addColorStop(0, '#050608'); gr.addColorStop(0.5, '#23262f'); gr.addColorStop(0.8, '#2e323c'); gr.addColorStop(1, '#0b0c10'); }
+        c.save();
+        if (red) { c.shadowColor = 'rgba(255, 35, 64, .75)'; c.shadowBlur = 7; }
+        c.beginPath(); c.arc(o, o, R0, a0, a1); c.arc(o, o, R1, a1, a0, true); c.closePath();
+        c.fillStyle = gr; c.fill();
+        c.restore();
+        // glossy top edge
+        c.beginPath(); c.arc(o, o, R0 - 1, a0 + 0.004, a1 - 0.004);
+        c.strokeStyle = red ? 'rgba(255, 210, 215, .55)' : 'rgba(255, 255, 255, .14)'; c.lineWidth = 1.2; c.stroke();
+      }
+      return { cv, size };
+    });
+    // static frame: soft halo, dark metal rim with a thin gold bevel
+    const size = Math.ceil(R * 2 + 40), cv = document.createElement('canvas');
+    cv.width = size * dpr; cv.height = size * dpr;
+    const c = cv.getContext('2d'); c.scale(dpr, dpr);
+    const o = size / 2;
+    const halo = c.createRadialGradient(o, o, R * 0.7, o, o, R + 20);
+    halo.addColorStop(0, 'rgba(255, 35, 64, .25)'); halo.addColorStop(1, 'rgba(255, 35, 64, 0)');
+    c.fillStyle = halo; c.fillRect(0, 0, size, size);
+    const metal = c.createLinearGradient(0, o - R, 0, o + R);
+    metal.addColorStop(0, '#3a3f4b'); metal.addColorStop(0.5, '#111318'); metal.addColorStop(1, '#2b2f38');
+    c.beginPath(); c.arc(o, o, R, 0, 7); c.fillStyle = metal; c.fill();
+    c.beginPath(); c.arc(o, o, R - 1, 0, 7); c.strokeStyle = 'rgba(253, 224, 71, .7)'; c.lineWidth = 1.5; c.stroke();
+    c.beginPath(); c.arc(o, o, this.ringR(0) + 3, 0, 7); c.strokeStyle = 'rgba(253, 224, 71, .55)'; c.lineWidth = 1.5; c.stroke();
+    c.beginPath(); c.arc(o, o, this.ringR(0) + 1.5, 0, 7); c.fillStyle = '#050507'; c.fill();
+    this.frameLayer = { cv, size };
   }
 
-  // Ring i: outer radius (the rim takes the first 6 %), and where the ball rests on it: 12 o'clock.
-  ringR(i) { return this.geo.R * (0.94 - i * 0.084); }
-  restPoint(i) {
-    if (i >= RINGS.length) return { x: this.geo.cx, y: this.geo.cy, s: 0.9 };
-    const mid = (this.ringR(i) + this.ringR(i + 1)) / 2;
-    return { x: this.geo.cx, y: this.geo.cy - mid, s: 0.9 };
-  }
-
+  /* ---------- animation ---------- */
   frame(now) {
     if (this.dead) return;
     const dt = Math.min(0.05, (now - this.last) / 1000);
@@ -11256,29 +11294,34 @@ class VortexGame extends BaseGame {
         if (t >= 1) { this.hold[i] = true; h.done(); }
       }
     });
-    if (this.bubble?.anim) {
-      const b = this.bubble, a = b.anim, t = Math.min(1, (now - a.t0) / a.T), k = a.fall ? t * t : ease(t);
-      b.x = a.x0 + (a.x1 - a.x0) * k; b.y = a.y0 + (a.y1 - a.y0) * k; b.s = a.s0 + (a.s1 - a.s0) * k;
-      if (t >= 1) { b.anim = null; a.done(); }
-    }
+    const b = this.ball;
+    if (b?.anim) {
+      const a = b.anim, t = Math.min(1, (now - a.t0) / a.T);
+      // gravity drop, then a small bounce on landing
+      const fall = Math.min(1, t / 0.78), y = a.y0 + (a.y1 - a.y0) * fall * fall;
+      const bt = Math.max(0, (t - 0.78) / 0.22), bounce = Math.sin(bt * Math.PI) * a.hop;
+      b.y = y - bounce;
+      b.trail.push(b.y); if (b.trail.length > 6) b.trail.shift();
+      if (t >= 1) { b.y = a.y1; b.anim = null; a.done(); }
+    } else if (b) { b.trail.push(b.y); if (b.trail.length > 6) b.trail.shift(); }
     this.draw(now);
     this.raf = requestAnimationFrame(this.frame);
   }
 
-  moveBubble(to, T, fall) {
-    const b = this.bubble;
-    return new Promise((done) => { b.anim = { x0: b.x, y0: b.y, s0: b.s, x1: to.x, y1: to.y, s1: to.s, t0: performance.now(), T: this.turbo ? T * 0.55 : T, fall, done }; });
+  dropBall(y1, T, hop) {
+    const b = this.ball;
+    return new Promise((done) => { b.anim = { y0: b.y, y1, t0: performance.now(), T: this.turbo ? T * 0.55 : T, hop, done }; });
   }
 
-  // Spins ring i on to rest with a slot of the wanted colour under the bubble.
+  // Spins ring i on to rest with a slot of the wanted colour under the ball (12 o'clock).
   settle(i, red) {
     const opts = [];
     for (let k = 0; k < SEG; k++) if (isRed(RINGS[i].red, k) === red) opts.push(k);
     const k = opts[Math.floor(Math.random() * opts.length)], dir = Math.sign(this.spin[i]);
-    const target = FRONT - (k + 0.5) * SLOT + (Math.random() - 0.5) * SLOT * 0.5, from = this.rot[i];
+    const target = FRONT - (k + 0.5) * SLOT, from = this.rot[i];
     let d = (((target - from) * dir) % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
-    d += Math.PI * 2 * (0.6 + Math.random() * 0.3);
-    return new Promise((done) => { this.hold[i] = { from, d, dir, t0: performance.now(), T: this.turbo ? 500 : 950, done }; });
+    d += Math.PI * 2 * (0.5 + Math.random() * 0.3);
+    return new Promise((done) => { this.hold[i] = { from, d, dir, t0: performance.now(), T: this.turbo ? 520 : 1000, done }; });
   }
 
   ladder(lv, cls) {
@@ -11292,27 +11335,28 @@ class VortexGame extends BaseGame {
       if (!this.pay(bet)) return;
       this.lastStake = bet;
       this.setLast(0); this.winAmt.textContent = '';
-      this.mark = null;
       this.hold = RINGS.map(() => null);
+      this.glow = null;
       const stop = play();
-      this.msg('La bille tombe sur la roue…');
-      this.bubble = { x: this.geo.cx, y: -30, s: 0.9, bet, lv: 0 };
+      this.hub = { main: fmtC(bet), sub: 'MISE', col: '#fff' };
+      this.msg('La bille tombe…');
+      this.ball = { x: this.geo.cx, y: this.geo.cy - this.geo.R - 26, lv: 0, trail: [] };
       sfx.spin();
-      await this.moveBubble(this.restPoint(0), 650, true);
+      await this.dropBall(this.laneY(0), 620, 7);
       for (let i = 0; i <= Math.min(stop, RINGS.length - 1) && !this.dead; i++) {
-        this.bubble.lv = i;
+        this.ball.lv = i;
         this.ladder(i);
         sfx.land();
         const goes = i < stop;
         await this.settle(i, goes);
         if (this.dead) return;
+        this.glow = { i, red: goes, t0: performance.now() };
         if (!goes) break;
-        // through the hole: down to the next ring, which keeps spinning until the bubble arrives
         sfx.coin();
-        this.bubble.lv = i + 1;
+        this.hub = { main: `×${xs(multAt(i + 1))}`, sub: i + 1 < RINGS.length ? 'EN COURS' : 'JACKPOT', col: '#ff4d63' };
         this.hold[i] = null;
-        await this.moveBubble(this.restPoint(i + 1), 420, true);
-        if (i + 1 < RINGS.length) this.msg(`Rouge ! La bille tombe · ×${xs(multAt(i + 1))}`);
+        await this.dropBall(i + 1 < RINGS.length ? this.laneY(i + 1) : this.geo.cy, 360, 4);
+        this.ball.lv = i + 1;
       }
       if (this.dead) return;
       this.land(stop, bet);
@@ -11321,93 +11365,102 @@ class VortexGame extends BaseGame {
 
   land(stop, bet) {
     const m = multAt(stop), win = Math.round(bet * m);
-    this.mark = stop < RINGS.length ? stop : null;
     this.ladder(stop, win > 0 ? 'hit' : 'lost');
     this.hist.unshift(m); this.hist = this.hist.slice(0, 10);
     this.q('.vx-hist').innerHTML = this.hist.map((x) => `<span class="${x === 0 ? 'z' : x >= 8 ? 'hot' : ''}">${x ? `×${xs(x)}` : '✕'}</span>`).join('');
-    const r = this.canvas.getBoundingClientRect(), p = this.restPoint(stop);
+    const r = this.canvas.getBoundingClientRect();
     if (win > 0) {
+      this.hub = { main: `+${fmtC(win)}`, sub: `GAGNÉ · ×${xs(m)}`, col: '#fde047', big: true };
       this.win(win);
       this.setLast(win);
       this.msg(`${stop >= RINGS.length ? 'CENTRE DE LA ROUE ! ' : ''}×${xs(m)} · +${fmtC(win)}`);
-      fx.burst(r.left + p.x, r.top + p.y, m >= 8 ? 50 : 20, ['#fde047', '#ef4444', '#fff'], m >= 8 ? 9 : 5);
-      if (m >= 12) { this.flash('rgba(239,68,68,.45)'); this.celebrate(win, { summary: stop >= RINGS.length ? 'CENTRE DE LA ROUE' : null }); } else if (m >= 2) sfx.win(); else sfx.coin();
+      fx.burst(r.left + this.geo.cx, r.top + this.geo.cy, m >= 8 ? 60 : 24, ['#fde047', '#ff2340', '#fff'], m >= 8 ? 10 : 6);
+      if (m >= 12) { this.flash('rgba(255,35,64,.4)'); this.celebrate(win, { summary: stop >= RINGS.length ? 'CENTRE DE LA ROUE' : null }); } else if (m >= 2) sfx.win(); else sfx.coin();
     } else {
+      this.hub = { main: 'PERDU', sub: `MISE ${fmtC(bet)}`, col: '#9ca3af' };
       this.msg(`Case noire : la bille est bloquée. Tu perds ${fmtC(bet)}.`);
-      this.shake();
       sfx.puff();
     }
   }
 
   /* ---------- drawing ---------- */
   draw(now) {
-    const c = this.ctx, { w, h, cx, cy, R } = this.geo, pulse = 0.6 + 0.4 * Math.sin(now / 300);
+    const c = this.ctx, { w, h, cx, cy, R, hubR } = this.geo, pulse = 0.5 + 0.5 * Math.sin(now / 260);
     c.clearRect(0, 0, w, h);
-    // gold rim with lights
-    c.save(); c.shadowColor = 'rgba(239, 68, 68, .45)'; c.shadowBlur = 30;
-    const rim = c.createLinearGradient(0, cy - R, 0, cy + R);
-    rim.addColorStop(0, '#fde68a'); rim.addColorStop(0.5, '#b45309'); rim.addColorStop(1, '#fbbf24');
-    c.fillStyle = rim; c.beginPath(); c.arc(cx, cy, R, 0, 7); c.fill(); c.restore();
-    for (let k = 0; k < 36; k++) {
-      const a = (k / 36) * Math.PI * 2, on = (Math.floor(now / 160) + k) % 3 === 0;
-      c.fillStyle = on ? '#fff7d6' : 'rgba(120, 53, 15, .9)';
-      c.beginPath(); c.arc(cx + Math.cos(a) * R * 0.97, cy + Math.sin(a) * R * 0.97, Math.max(2, R * 0.012), 0, 7); c.fill();
+    const F = this.frameLayer;
+    c.drawImage(F.cv, cx - F.size / 2, cy - F.size / 2, F.size, F.size);
+    // bulbs chasing round the rim, gold and red
+    const nL = 36, rl = (R + this.ringR(0) + 3) / 2, br = Math.max(2.2, (R - this.ringR(0)) * 0.2), step = Math.floor(now / 110);
+    for (let k = 0; k < nL; k++) {
+      const a = (k / nL) * Math.PI * 2 - Math.PI / 2, x = cx + Math.cos(a) * rl, y = cy + Math.sin(a) * rl;
+      const on = (step + k) % 4 === 0 || (this.busy && (step + k) % 2 === 0), col = k % 2 ? '255, 70, 90' : '255, 214, 120';
+      const g = c.createRadialGradient(x, y, 0, x, y, br * (on ? 2.6 : 1.4));
+      g.addColorStop(0, on ? '#fffaf0' : `rgba(${col}, .45)`); g.addColorStop(0.35, `rgba(${col}, ${on ? 0.95 : 0.35})`); g.addColorStop(1, `rgba(${col}, 0)`);
+      c.fillStyle = g; c.beginPath(); c.arc(x, y, br * (on ? 2.6 : 1.4), 0, 7); c.fill();
     }
-    // the ball's path from the top down to the centre
-    c.fillStyle = 'rgba(255, 255, 255, .06)';
-    c.fillRect(cx - R * 0.05, cy - this.ringR(0), R * 0.1, this.ringR(0));
-    // spinning rings, outer first
+    // rings
+    this.layers.forEach((L, i) => {
+      c.save(); c.translate(cx, cy); c.rotate(this.rot[i]);
+      c.drawImage(L.cv, -L.size / 2, -L.size / 2, L.size, L.size);
+      c.restore();
+    });
+    // lit slot under the ball
+    if (this.glow) {
+      const g = this.glow, age = (now - g.t0) / 1000, a = g.red ? Math.max(0, 1 - age * 1.6) : 0.55 + 0.35 * pulse;
+      if (a > 0) {
+        const R0 = this.ringR(g.i), R1 = this.ringR(g.i + 1);
+        c.save(); c.shadowColor = g.red ? '#ff2340' : '#ffffff'; c.shadowBlur = 18;
+        c.beginPath(); c.arc(cx, cy, R0 - 1, FRONT - SLOT / 2, FRONT + SLOT / 2); c.arc(cx, cy, R1 + 1, FRONT + SLOT / 2, FRONT - SLOT / 2, true); c.closePath();
+        c.fillStyle = g.red ? `rgba(255, 90, 110, ${0.65 * a})` : `rgba(255, 255, 255, ${0.28 * a})`; c.fill();
+        c.strokeStyle = g.red ? `rgba(255, 220, 225, ${a})` : `rgba(255, 255, 255, ${a})`; c.lineWidth = 2; c.stroke();
+        c.restore();
+      }
+    }
+    // glass lane at 12 o'clock with the multiplier of each ring beside it
+    const laneW = this.geo.step * 0.62, top = cy - this.ringR(0);
+    const lg = c.createLinearGradient(cx - laneW, 0, cx + laneW, 0);
+    lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, 'rgba(255,255,255,.10)'); lg.addColorStop(1, 'rgba(255,255,255,0)');
+    c.fillStyle = lg; c.fillRect(cx - laneW, top, laneW * 2, this.ringR(0) - hubR);
+    const fs = Math.max(9, Math.min(12, this.geo.step * 0.4));
+    c.font = `700 ${fs}px Inter, system-ui, sans-serif`; c.textBaseline = 'middle'; c.textAlign = 'left';
     for (let i = 0; i < RINGS.length; i++) {
-      const R0 = this.ringR(i), R1 = this.ringR(i + 1), rot = this.rot[i], n = RINGS[i].red;
-      for (let k = 0; k < SEG; k++) {
-        const a0 = rot + k * SLOT, a1 = a0 + SLOT, red = isRed(n, k);
-        const g = c.createRadialGradient(cx, cy, R1, cx, cy, R0);
-        if (red) { g.addColorStop(0, '#7f1d1d'); g.addColorStop(0.5, '#dc2626'); g.addColorStop(1, '#991b1b'); } else { g.addColorStop(0, '#030304'); g.addColorStop(0.5, '#1f2026'); g.addColorStop(1, '#0b0b0e'); }
-        c.beginPath(); c.arc(cx, cy, R0, a0, a1); c.arc(cx, cy, R1, a1, a0, true); c.closePath();
-        c.fillStyle = g; c.fill();
-        c.strokeStyle = 'rgba(251, 191, 36, .45)'; c.lineWidth = 1; c.stroke();
-      }
-      // multiplier painted at 6 o'clock, fixed while the ring turns
-      const lr = (R0 + R1) / 2, lit = this.bubble && this.bubble.lv === i;
-      c.font = `800 ${Math.max(9, (R0 - R1) * 0.44)}px Orbitron, Inter, sans-serif`;
-      c.textAlign = 'center'; c.textBaseline = 'middle';
-      c.fillStyle = 'rgba(0, 0, 0, .55)'; c.fillRect(cx - (R0 - R1) * 0.95, cy + lr - (R0 - R1) * 0.32, (R0 - R1) * 1.9, (R0 - R1) * 0.64);
-      c.fillStyle = lit ? '#fde047' : 'rgba(255, 255, 255, .9)';
-      c.fillText(i ? `×${xs(RINGS[i].m)}` : '✕', cx, cy + lr + 1);
+      const y = this.laneY(i), cur = this.ball && this.ball.lv === i, t = i ? `×${xs(RINGS[i].m)}` : '✕';
+      const tw = c.measureText(t).width + 10, x = cx + laneW + 4;
+      c.fillStyle = cur ? 'rgba(255, 35, 64, .9)' : 'rgba(5, 6, 9, .72)';
+      this.pill(x, y - fs * 0.85, tw, fs * 1.7, fs * 0.85); c.fill();
+      c.fillStyle = cur ? '#fff' : 'rgba(255,255,255,.78)'; c.fillText(t, x + 5, y + 0.5);
     }
-    // gloss over the wheel
-    const gl = c.createLinearGradient(0, cy - R, 0, cy + R * 0.2);
-    gl.addColorStop(0, 'rgba(255,255,255,.12)'); gl.addColorStop(1, 'rgba(255,255,255,0)');
-    c.fillStyle = gl; c.beginPath(); c.arc(cx, cy, this.ringR(0), Math.PI, 0); c.fill();
-    // centre: the ×1000 hub
-    const Rc = this.ringR(RINGS.length), hub = c.createRadialGradient(cx, cy, 2, cx, cy, Rc);
-    hub.addColorStop(0, `rgba(253, 224, 71, ${0.7 + 0.3 * pulse})`); hub.addColorStop(0.55, '#ea580c'); hub.addColorStop(1, '#431407');
-    c.fillStyle = hub; c.beginPath(); c.arc(cx, cy, Rc, 0, 7); c.fill();
-    c.strokeStyle = '#fbbf24'; c.lineWidth = 2; c.stroke();
-    c.font = `900 ${Math.max(11, Rc * 0.42)}px Orbitron, Inter, sans-serif`; c.fillStyle = '#fff7d6';
-    c.fillText(`×${xs(CENTER)}`, cx, cy + 1);
-    // gold marker above the wheel: where the ball drops in
-    c.fillStyle = '#fbbf24'; c.beginPath(); c.moveTo(cx - 12, cy - R - 4); c.lineTo(cx + 12, cy - R - 4); c.lineTo(cx, cy - R + 14); c.closePath(); c.fill();
-    // the bet bubble
-    const b = this.bubble;
+    // hub: glass disc that shows the bet, the running multiplier, then the result
+    c.save(); c.shadowColor = 'rgba(0,0,0,.7)'; c.shadowBlur = 16;
+    const hg = c.createRadialGradient(cx - hubR * 0.3, cy - hubR * 0.4, hubR * 0.1, cx, cy, hubR);
+    hg.addColorStop(0, '#2c303a'); hg.addColorStop(1, '#07080b');
+    c.fillStyle = hg; c.beginPath(); c.arc(cx, cy, hubR - 2, 0, 7); c.fill(); c.restore();
+    c.beginPath(); c.arc(cx, cy, hubR - 2, 0, 7); c.strokeStyle = 'rgba(253, 224, 71, .8)'; c.lineWidth = 2; c.stroke();
+    c.beginPath(); c.arc(cx, cy - hubR * 0.15, hubR * 0.8, Math.PI * 1.1, Math.PI * 1.9); c.strokeStyle = 'rgba(255,255,255,.12)'; c.lineWidth = hubR * 0.12; c.stroke();
+    const hb = this.hub, mainSize = Math.min(hubR * (hb.big ? 0.42 : 0.5), (hubR * 1.7) / Math.max(3, hb.main.length * 0.62));
+    c.textAlign = 'center'; c.fillStyle = hb.col;
+    c.save(); if (hb.big) { c.shadowColor = hb.col; c.shadowBlur = 14 * pulse + 4; }
+    c.font = `900 ${mainSize}px Orbitron, Inter, sans-serif`; c.fillText(hb.main, cx, cy - hubR * 0.06); c.restore();
+    c.font = `700 ${Math.max(8, hubR * 0.15)}px Inter, sans-serif`; c.fillStyle = 'rgba(255,255,255,.6)';
+    c.fillText(hb.sub, cx, cy + hubR * 0.38);
+    // drop marker
+    c.fillStyle = '#fde047'; c.beginPath(); c.moveTo(cx - 8, cy - R - 2); c.lineTo(cx + 8, cy - R - 2); c.lineTo(cx, cy - R + 9); c.closePath(); c.fill();
+    // chrome ball
+    const b = this.ball;
     if (b) {
-      const r = Math.max(15, (this.ringR(0) - this.ringR(1)) * 0.95) * b.s; // a bit wider than a ring so the bet stays readable
-      c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.arc(b.x + r * 0.15, b.y + r * 0.2, r, 0, 7); c.fill();
-      const bg = c.createRadialGradient(b.x - r * 0.35, b.y - r * 0.45, r * 0.1, b.x, b.y, r);
-      bg.addColorStop(0, 'rgba(255,255,255,.95)'); bg.addColorStop(0.35, 'rgba(255, 220, 230, .55)'); bg.addColorStop(1, 'rgba(255, 35, 64, .55)');
+      const r = Math.max(6, this.geo.step * 0.3);
+      b.trail.forEach((ty, k) => { c.fillStyle = `rgba(255, 255, 255, ${((k + 1) / b.trail.length) * 0.12})`; c.beginPath(); c.arc(b.x, ty, r * (0.6 + (k / b.trail.length) * 0.3), 0, 7); c.fill(); });
+      c.fillStyle = 'rgba(0,0,0,.45)'; c.beginPath(); c.ellipse(b.x + r * 0.25, b.y + r * 0.55, r * 0.9, r * 0.45, 0, 0, 7); c.fill();
+      const bg = c.createRadialGradient(b.x - r * 0.35, b.y - r * 0.4, r * 0.05, b.x, b.y, r);
+      bg.addColorStop(0, '#ffffff'); bg.addColorStop(0.3, '#e5e7eb'); bg.addColorStop(0.7, '#6b7280'); bg.addColorStop(1, '#1f2937');
       c.fillStyle = bg; c.beginPath(); c.arc(b.x, b.y, r, 0, 7); c.fill();
-      c.strokeStyle = 'rgba(255,255,255,.8)'; c.lineWidth = 1.5; c.stroke();
-      c.fillStyle = '#1a0408'; c.font = `900 ${r * 0.4}px Inter, sans-serif`;
-      c.fillText(shortC(b.bet), b.x, b.y - r * 0.12);
-      c.font = `800 ${r * 0.34}px Orbitron, Inter, sans-serif`; c.fillStyle = '#b3001b';
-      c.fillText(b.lv ? `×${xs(multAt(b.lv))}` : 'MISE', b.x, b.y + r * 0.36);
-      // red square framing the bubble where it stopped
-      if (this.mark != null) {
-        const s = r * 2.3;
-        c.save(); c.strokeStyle = '#ff2340'; c.lineWidth = 3; c.shadowColor = '#ff2340'; c.shadowBlur = 16 * pulse;
-        c.strokeRect(b.x - s / 2, b.y - s / 2, s, s); c.restore();
-      }
+      c.fillStyle = 'rgba(255,255,255,.9)'; c.beginPath(); c.arc(b.x - r * 0.35, b.y - r * 0.38, r * 0.22, 0, 7); c.fill();
     }
+  }
+
+  pill(x, y, w, h, r) {
+    const c = this.ctx;
+    c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
   }
 
   destroy() {
