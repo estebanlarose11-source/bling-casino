@@ -4528,7 +4528,7 @@ const PLACEMENTS = {
 };
 
 const demoProvider = { name: 'demo', show: async () => ({ completed: true }) };
-// A-ADS (unit 2460498, the bottom banner uses unit 2460587): the rewarded ad opens in a popup only when the player asks for it.
+// A-ADS (unit 2460587, same unit as the bottom banner): the rewarded ad opens in a popup only when the player asks for it.
 // The reward is paid once the countdown is over; closing the popup earlier cancels it.
 const AADS_SECONDS = 15;
 const aadsProvider = {
@@ -4539,12 +4539,12 @@ const aadsProvider = {
     box.innerHTML = `
       <div class="aads-card">
         <div class="aads-head"><b>Publicité${o.of > 1 ? ` ${o.step} / ${o.of}` : ''}</b><button class="aads-x" aria-label="Fermer">✕</button></div>
-        <!-- BEGIN AADS AD UNIT 2460498 -->
+        <!-- BEGIN AADS AD UNIT 2460587 -->
         <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
-          <iframe data-aa='2460498' src='//acceptable.a-ads.com/2460498/?size=Adaptive'
+          <iframe data-aa='2460587' src='//acceptable.a-ads.com/2460587/?size=Adaptive'
                   style='border:0; padding:0; width:70%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
         </div>
-        <!-- END AADS AD UNIT 2460498 -->
+        <!-- END AADS AD UNIT 2460587 -->
         <button class="btn primary lg aads-done" disabled>Récompense dans <span>${AADS_SECONDS}</span> s</button>
       </div>`;
     document.body.appendChild(box);
