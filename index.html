@@ -2684,11 +2684,11 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .ro-top h3 { margin: 0; font: 900 clamp(20px, 5vw, 30px) 'Bebas Neue', Impact, sans-serif; letter-spacing: 1.5px; color: #fde68a; text-shadow: 0 3px 0 #78350f; }
 .ro-mine { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .ro-mine small { font: 800 9px Inter, sans-serif; letter-spacing: 1.5px; color: #fbbf24; }
-.ro-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.ro-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 9px; }
 .ro-cube { position: relative; aspect-ratio: 1; display: grid; place-items: center; padding: 0; border-radius: 12px; border: 0; cursor: pointer; color: #fff;
   background: linear-gradient(145deg, #fde68a 0%, #f59e0b 45%, #b45309 100%); box-shadow: inset -6px -6px 0 rgba(0, 0, 0, .22), inset 5px 5px 0 rgba(255, 255, 255, .35), 0 6px 0 #78350f, 0 10px 16px rgba(0, 0, 0, .45); transition: transform .2s, filter .2s; }
 .ro-cube i { position: absolute; left: 6px; top: 4px; font: 900 11px KeCoin, Orbitron, sans-serif; font-style: normal; color: #7c2d12; }
-.ro-cube b { font: 900 clamp(13px, 3.4vw, 20px) KeCoin, Orbitron, sans-serif; text-shadow: 0 2px 0 rgba(0, 0, 0, .35); }
+.ro-cube b { font: 900 clamp(11px, 3vw, 18px) KeCoin, Orbitron, sans-serif; text-shadow: 0 2px 0 rgba(0, 0, 0, .35); }
 .ro-ask .ro-grid .ro-cube:not(:disabled) { animation: roPick 1.1s ease-in-out infinite; }
 .ro-ask .ro-grid .ro-cube:not(:disabled):hover { transform: translateY(-4px) scale(1.04); filter: brightness(1.12); }
 @keyframes roPick { 50% { box-shadow: inset -6px -6px 0 rgba(0, 0, 0, .22), inset 5px 5px 0 rgba(255, 255, 255, .35), 0 6px 0 #78350f, 0 0 18px #fde047; } }
@@ -2714,7 +2714,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .ro-cash { background: linear-gradient(180deg, #16a34a, #14532d); border-color: #4ade80 !important; }
 .ro-go { background: linear-gradient(180deg, #d97706, #92400e); border-color: #fde047 !important; }
 .ro-deciding .ro-btns button { animation: roPick 1.1s ease-in-out infinite; }
-@media (max-width: 520px) { .ro-grid { gap: 7px; } .ro-btns button { min-width: 120px; font-size: 14px; } .ro-cube.mine { width: 52px; } }
+@media (max-width: 520px) { .ro-grid { gap: 6px; } .ro-btns button { min-width: 120px; font-size: 14px; } .ro-cube.mine { width: 52px; } }
 
 /* ============ Taco Fiesta ============ */
 .g-taco { --slot-bg: radial-gradient(600px 300px at 15% -5%, rgba(244, 63, 94, .35), transparent 70%), radial-gradient(500px 300px at 95% 10%, rgba(250, 204, 21, .28), transparent 70%), linear-gradient(180deg, #5b0f3a 0%, #2a0a2e 55%, #12041a 100%); }
@@ -5874,7 +5874,7 @@ const ORIGINALS = [
   {"id": "doublespin", "name": "La Double Bille", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
   {"id": "plateau", "name": "Le Plateau", "cat": "table", "tag": "Jeu de roue", "sub": "Roue, dés et plateau de multiplicateurs", "colors": ["#22c55e", "#0c1a14"], "description": "Une grande roue de 78 cases : mise sur 1, 2, 5, 10 ou sur les bonus 2 lancers et 4 lancers. Dans les bonus, lance 2 dés et fais avancer ton pion sur un plateau de 28 cases jusqu’à ×200. Et si la roue tombe sur Chance, elle repart et ce tour paie ×10 !", "features": ["Cases 1, 2, 5 et 10", "Bonus 2 lancers et 4 lancers", "Plateau jusqu’à ×200 par case", "Double = lancer en plus", "Case Chance ×10"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
   {"id": "peche", "name": "La Pêche", "cat": "table", "tag": "Jeu de roue", "sub": "Roue à éclairs et pêche aux multiplicateurs", "colors": ["#38bdf8", "#071a2e"], "description": "Une roue de 54 cases : ×2 blanc, ×2 ciel et trois poissons. À chaque lancer, des éclairs multiplient des cases. Sur un poisson, direction l’étang : le pêcheur attrape un poisson et son multiplicateur, de ×3 à ×100 (bleu), ×8 à ×500 (orange) ou ×20 à ×5 000 (rouge) !", "features": ["Cases ×2 blanc et ×2 ciel", "4 éclairs à chaque lancer", "Poisson bleu ×3 à ×100", "Poisson orange ×8 à ×500", "Poisson rouge ×20 à ×5 000"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
-  {"id": "roueor", "name": "La Roue d’Or", "cat": "table", "tag": "Jeu de roue", "sub": "Un quart d’or, 15 cubes à ouvrir", "colors": ["#fbbf24", "#14110a"], "description": "Une roue noire et métal avec un quart en or. Si elle s’arrête sur l’or, place au bonus des 15 cubes : choisis le tien, ouvre les autres petit à petit et décide à chaque étape si tu encaisses l’offre ou si tu continues, jusqu’à ×1 000 !", "features": ["1 lancer sur 4 donne le bonus", "15 cubes à multiplicateurs", "Encaisse l’offre ou continue", "Jusqu’à ×1 000", "Tours automatiques"], "rtp": "≈ 95 %", "vol": 5, "max": "×1 000"},
+  {"id": "roueor", "name": "La Roue d’Or", "cat": "table", "tag": "Jeu de roue", "sub": "Un quart d’or, 24 cubes à ouvrir", "colors": ["#fbbf24", "#14110a"], "description": "Une roue noire et métal avec un quart en or. Si elle s’arrête sur l’or, place au bonus des 24 cubes : choisis le tien, ouvre les autres petit à petit et décide à chaque étape si tu encaisses l’offre ou si tu continues, jusqu’à ×1 000 !", "features": ["1 lancer sur 4 donne le bonus", "24 cubes à multiplicateurs", "Encaisse l’offre ou continue", "Jusqu’à ×1 000", "Tours automatiques"], "rtp": "≈ 95 %", "vol": 5, "max": "×1 000"},
   {"id": "blackjack", "name": "Le 21", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 6 pour 5", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 6 pour 5.", "features": ["Doubler", "Séparer une paire", "Blackjack 6 pour 5", "Animations de cartes"], "rtp": "≈ 98 %", "vol": 1, "max": "×2,2"},
   {"id": "lightningbj", "name": "Le 21 Électrique", "cat": "table", "tag": "Cartes", "sub": "Multiplicateurs éclair jusqu’à ×1000", "colors": ["#3b82f6", "#0b0f3a"], "description": "Le blackjack frappé par la foudre : avant chaque distribution, les scores 17, 18, 19, 20 et 21 reçoivent un multiplicateur de ×1 à ×1000. Gagne ta main sur ce score et ton gain est multiplié tout de suite. Side bets Paires Parfaites, 21+3 et Bust It.", "features": ["Multiplicateurs ×1 à ×1000", "Gain multiplié dans la manche", "Paires Parfaites", "21+3", "Bust It", "Doubler et séparer"], "rtp": "≈ 97,5 %", "vol": 4, "max": "×1 500"},
   {"id": "poker", "name": "Le Texas", "cat": "table", "tag": "Poker", "sub": "No Limit contre 1 à 5 bots", "colors": ["#10b981", "#06301f"], "description": "Une vraie table de Texas Hold’em No Limit : choisis tes adversaires (1 à 5 bots aux caractères différents), les blindes et ton tapis, puis joue pré-flop, flop, turn et river jusqu’au showdown.", "features": ["1 à 5 bots", "Blindes au choix", "Pots secondaires", "Bots qui bluffent", "Raccourcis de mise", "Showdown animé"], "rtp": "Selon ton jeu", "vol": 3, "max": "Toute la table"},
@@ -6321,7 +6321,7 @@ const SPECS = {
     },
   },
   roueor: {
-    bg: ['#3b2a05', '#030303'], light: '#fbbf24', title: ['LA ROUE', 'D’OR'], font: 'cinzel', metal: ['#fff7d6', '#fbbf24', '#92400e'], tag: 'BONUS DES 15 CUBES',
+    bg: ['#3b2a05', '#030303'], light: '#fbbf24', title: ['LA ROUE', 'D’OR'], font: 'cinzel', metal: ['#fff7d6', '#fbbf24', '#92400e'], tag: 'BONUS DES 24 CUBES',
     art: (u) => {
       const P = (a, r) => [150 + r * Math.cos((a - 90) * Math.PI / 180), 125 + r * Math.sin((a - 90) * Math.PI / 180)];
       let w = ''; for (let i = 0; i < 24; i++) { const a = P(i * 15, 95), b = P((i + 1) * 15, 95); w += `<path d="M150 125 L${a[0].toFixed(1)} ${a[1].toFixed(1)} A95 95 0 0 1 ${b[0].toFixed(1)} ${b[1].toFixed(1)} Z" fill="${i < 6 ? `url(#gold${u})` : i % 2 ? '#374151' : '#1f2937'}" stroke="#0a0a0f" stroke-width="1"/>`; }
@@ -6449,9 +6449,10 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'roueor', date: '2026-10-31', title: '24 cubes', items: ['Le bonus passe à 24 cubes à ouvrir', 'Un quart des cubes restants s’ouvre à chaque étape'] },
   {
     game: 'roueor', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
-    items: ['Une roue noire et métal avec un quart en or', 'Sur l’or : bonus des 15 cubes à multiplicateurs', 'Choisis ton cube, ouvre les autres et décide : encaisser ou continuer ?', 'Jusqu’à ×1 000 la mise'],
+    items: ['Une roue noire et métal avec un quart en or', 'Sur l’or : bonus des 24 cubes à multiplicateurs', 'Choisis ton cube, ouvre les autres et décide : encaisser ou continuer ?', 'Jusqu’à ×1 000 la mise'],
   },
   { game: 'storm', date: '2026-10-31', title: 'Tours automatiques', items: ['Dans « Bonus & menu » : 10 à 250 tours automatiques', 'Tes mises sont remises toutes seules à chaque tour'] },
   { game: 'doublespin', date: '2026-10-31', title: 'Tours automatiques', items: ['Dans « Bonus & menu » : 10 à 250 tours automatiques', 'Tes mises sont remises toutes seules à chaque tour'] },
@@ -9027,7 +9028,7 @@ const FILES = {
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', '463c45c93a'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'a4708b012c'],
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', 'eeaf8034d2'],
-  roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '74cb1911ad'],
+  roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', 'b23d8cda76'],
 };
 const loading = {};
 

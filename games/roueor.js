@@ -2,7 +2,7 @@
 // ---- games/impl/roueor.js ----
 __mods['games/impl/roueor.js'] = (() => {
 // La Roue d'Or: a dark metal wheel with one golden quarter. Anywhere else: nothing. On the gold: the wheel goes
-// and the bonus starts: 15 cubes hide multipliers. The player keeps one cube (hidden); a quarter of the others is
+// and the bonus starts: 24 cubes hide multipliers. The player keeps one cube (hidden); a quarter of the others is
 // revealed, then the player can cash out the offer (the average of the cubes still hidden, his included) or go on.
 // When no other cube is left, his cube is opened. Every cube is drawn from VALS (mean ≈ 3,8): the bonus is worth
 // 3,8 × the stake on average, whatever the choices (the offer is always the fair average), so the return is ≈ 95 %.
@@ -14,7 +14,7 @@ const { fx, center } = __mods['fx.js'];
 
 /* ===ENGINE */
 const GOLD = 0.25; // share of the wheel that is gold
-const CUBES = 15;
+const CUBES = 24;
 const VALS = [[0.5, 3622], [1, 2312], [1.5, 1477], [2, 943], [3, 602], [5, 384], [8, 245], [10, 157], [15, 100], [25, 64], [50, 41], [100, 26], [250, 15], [1000, 11]];
 const drawCubes = () => Array.from({ length: CUBES }, () => wpick(VALS));
 const isGold = (deg) => deg < GOLD * 360; // pointer angle on the wheel, the gold arc is [0°, 90°)
@@ -64,14 +64,14 @@ class RoueOrGame extends BaseGame {
       stage: `<div class="pt-view ro-view">
           <div class="pt-zone ro-zone"><div class="pt-ptr ro-ptr"></div>${wheelSVG()}<div class="pt-hub ro-hub">LA ROUE<br>D’OR</div></div>
           <div class="ro-bonus" hidden>
-            <div class="ro-top"><h3>BONUS DES 15 CUBES</h3><div class="ro-mine"><small>TON CUBE</small><div class="ro-cube mine"><b>?</b></div></div></div>
+            <div class="ro-top"><h3>BONUS DES 24 CUBES</h3><div class="ro-mine"><small>TON CUBE</small><div class="ro-cube mine"><b>?</b></div></div></div>
             <div class="ro-grid">${Array.from({ length: CUBES }, (_, i) => `<button type="button" class="ro-cube" data-c="${i}" disabled><i>${i + 1}</i><b></b></button>`).join('')}</div>
             <div class="ro-say">Choisis ton cube !</div>
             <div class="ro-deal" hidden><div class="ro-offer"><small>OFFRE (moyenne des cubes cachés)</small><b>—</b></div>
               <div class="ro-btns"><button type="button" class="ro-cash">ENCAISSER</button><button type="button" class="ro-go">CONTINUER</button></div></div>
           </div>
         </div>`,
-      hello: 'Un quart de la roue est en or : si elle s’arrête dessus, c’est le bonus des 15 cubes !',
+      hello: 'Un quart de la roue est en or : si elle s’arrête dessus, c’est le bonus des 24 cubes !',
     });
     this.cur = 0; this.histArr = [];
     this.wheel = this.q('.ro-wheel');
@@ -166,13 +166,13 @@ class RoueOrGame extends BaseGame {
     await this.zoomResult(true);
     if (this.dead) return;
     if (this.auto) this.stopAuto(); // the bonus needs the player's choices
-    this.msg('★ BONUS DES 15 CUBES ★');
+    this.msg('★ BONUS DES 24 CUBES ★');
     const M = await this.bonus();
     if (this.dead) return;
     const won = Math.round(bet * M);
     this.win(won, 'Bonus des cubes');
     this.setLast(won);
-    this.msg(`Bonus des 15 cubes : ×${xs(M)} → ${fmtC(won)}`);
+    this.msg(`Bonus des 24 cubes : ×${xs(M)} → ${fmtC(won)}`);
     await this.celebrate(won, { summary: 'BONUS DES CUBES' });
   }
 
@@ -248,8 +248,8 @@ class RoueOrGame extends BaseGame {
 
   info() {
     const t = VALS.map(([v]) => `×${xs(v)}`).join(' · ');
-    return this.rules(`<h4>La roue</h4><p>Choisis ta mise et lance. Un quart de la roue est en or : si la flèche s’arrête sur l’or, la roue disparaît et le <b>bonus des 15 cubes</b> commence. Sinon, la mise est perdue.</p>
-      <h4>Le bonus des 15 cubes</h4><p>Chaque cube cache un multiplicateur. Choisis ton cube : il reste caché. Un quart des autres cubes s’ouvre, puis tu peux <b>encaisser l’offre</b> ou <b>continuer</b>. L’offre est la moyenne exacte des cubes encore cachés (le tien compris). Quand tous les autres sont ouverts, ton cube s’ouvre et tu gagnes sa valeur.</p>
+    return this.rules(`<h4>La roue</h4><p>Choisis ta mise et lance. Un quart de la roue est en or : si la flèche s’arrête sur l’or, la roue disparaît et le <b>bonus des 24 cubes</b> commence. Sinon, la mise est perdue.</p>
+      <h4>Le bonus des 24 cubes</h4><p>Chaque cube cache un multiplicateur. Choisis ton cube : il reste caché. Un quart des autres cubes s’ouvre, puis tu peux <b>encaisser l’offre</b> ou <b>continuer</b>. L’offre est la moyenne exacte des cubes encore cachés (le tien compris). Quand tous les autres sont ouverts, ton cube s’ouvre et tu gagnes sa valeur.</p>
       <p class="muted small">Valeurs possibles : ${t}.</p>
       <h4>Équité</h4><p>Un lancer sur 4 donne le bonus, qui vaut en moyenne ×3,8 la mise, que tu encaisses ou non. Retour au joueur ≈ 95 %.</p>`);
   }
