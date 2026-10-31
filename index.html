@@ -1231,6 +1231,9 @@ body.gated { overflow: hidden; }
 .g-bolt { position: fixed; inset: 0; z-index: 86; pointer-events: none; animation: gFlash .38s ease-out forwards; }
 .table-game .slot-frame { padding: 6px; }
 .table-game .spin-btn.wide:disabled { filter: grayscale(.7) brightness(.6); }
+.spin-btn { position: relative; }
+.fr-badge { position: absolute; top: -8px; right: -10px; padding: 3px 7px; border-radius: 99px; background: linear-gradient(180deg, #4ade80, #15803d); color: #fff; font: 900 11px Inter, sans-serif; box-shadow: 0 0 0 2px #0b0f17, 0 0 12px rgba(74, 222, 128, .7); pointer-events: none; animation: bumpIt 1.4s ease-in-out infinite; }
+.fr-badge.off { filter: grayscale(1); animation: none; }
 
 /* ============ Mad Wheel ============ */
 .g-madwheel { --slot-bg: radial-gradient(520px 260px at 50% -5%, rgba(255, 61, 110, .4), transparent 70%), linear-gradient(180deg, #2a0a5a 0%, #0c0420 100%); }
@@ -2344,6 +2347,18 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .ref-stats > div { flex: 1; max-width: 200px; padding: 12px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); text-align: center; }
 .ref-stats b { display: block; font: 900 22px Orbitron, sans-serif; color: #fbbf24; }
 .ref-stats small { color: var(--muted); }
+.ref-offer { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 14px 0 10px; }
+.ref-card { position: relative; overflow: hidden; padding: 16px 18px; border-radius: 16px; border: 1px solid; }
+.ref-card.you { background: linear-gradient(135deg, rgba(251, 191, 36, .22), rgba(180, 83, 9, .12)); border-color: rgba(251, 191, 36, .6); box-shadow: 0 0 24px rgba(251, 191, 36, .18); }
+.ref-card.friend { background: linear-gradient(135deg, rgba(74, 222, 128, .18), rgba(22, 101, 52, .1)); border-color: rgba(74, 222, 128, .5); }
+.ref-card small { display: block; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; font-size: 11px; color: var(--muted); }
+.ref-card b { display: block; font: 900 clamp(24px, 4vw, 34px) Orbitron, sans-serif; margin: 4px 0; }
+.ref-card.you b { color: #fbbf24; } .ref-card.friend b { color: #4ade80; }
+.ref-card span { font-weight: 700; font-size: 14px; }
+.ref-wait { display: grid; gap: 6px; margin-bottom: 12px; }
+.ref-wait h4 { margin: 4px 0; }
+.ref-w { display: flex; justify-content: space-between; padding: 8px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); }
+.ref-w span { color: #fbbf24; font-weight: 700; }
 .ref-need { padding: 12px 14px; border-radius: 12px; background: rgba(251, 191, 36, .1); border: 1px solid rgba(251, 191, 36, .4); }
 .defi-top { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 22px; align-items: start; }
 .defi-cover { display: block; border-radius: 22px; overflow: hidden; box-shadow: 0 14px 40px rgba(0, 0, 0, .5); }
@@ -2651,6 +2666,7 @@ const cloud = {
   },
   // Referral: referrals/{newUid} = { by, name, at }, written once by the new account.
   async addReferral(uid, by, name) { await (await init()).db.collection('referrals').doc(uid).set({ by, name: String(name).slice(0, 16), at: Date.now() }); },
+  async boardOf(uid) { const d = await (await init()).db.collection('leaderboard').doc(uid).get(); return d.exists ? d.data() : null; },
   async referralsOf(uid) {
     const q = await (await init()).db.collection('referrals').where('by', '==', uid).limit(60).get();
     return q.docs.map((d) => ({ uid: d.id, ...d.data() }));
@@ -2986,6 +3002,7 @@ class Progress extends EventTarget {
       me.prog = p;
       return out;
     });
+    if (ups?.length) profiles.publish?.();
     for (const L of ups || []) {
       const reward = levelReward(L);
       wallet.grant(reward);
@@ -3424,6 +3441,14 @@ const gifts = {
     return true;
   },
   add(g) { profiles.update('gifts', (me) => { me.gifts = [...(me.gifts || []), { game: g.game, buy: g.buy, label: g.label, at: Date.now() }]; }); },
+  // Free spins on one game (profile.freeRounds = { gameId: count }), played at FREE_BET from the main button.
+  rounds: (game) => profiles.current?.freeRounds?.[game] || 0,
+  addRounds(game, n) { profiles.update('freeRounds', (me) => { me.freeRounds = { ...(me.freeRounds || {}), [game]: (me.freeRounds?.[game] || 0) + n }; }); },
+  useRound(game) {
+    if (!gifts.rounds(game)) return false;
+    profiles.update('freeRounds', (me) => { me.freeRounds = { ...me.freeRounds, [game]: me.freeRounds[game] - 1 }; });
+    return true;
+  },
 };
 
 function spinWheel() {
@@ -3654,7 +3679,8 @@ return { renderMissions, missionStatus: status };
 __mods['social.js'] = (() => {
 // Referral (#parrainage) and the weekly challenge (#defi), both on Firestore (see firebase/firestore.rules).
 // Referral: a link ?ref=<uid>; a new account opened from it gets REF_KE and writes referrals/{newUid} = { by };
-// the referrer collects REF_KE per friend from the parrainage page or at login.
+// once that friend reaches level REF_LEVEL (read from their public leaderboard entry), the referrer collects
+// REF_PARRAIN KE + REF_SPINS free spins on Huff la Puff, from the parrainage page or at login.
 // Challenge: one imposed game per week; the score is the biggest win in × the stake on that game (so every bet
 // size is on an equal footing), saved in challenges/{week}/scores/{uid}.
 
@@ -3665,7 +3691,7 @@ const { toast } = __mods['ui.js'];
 const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
-const REF_KE = 200, REF_MAX = 50, REF_KEY = 'spinbet_ref';
+const REF_KE = 1000, REF_PARRAIN = 50000, REF_SPINS = 50, REF_GAME = 'huff', REF_LEVEL = 2, REF_MAX = 50, REF_KEY = 'spinbet_ref';
 const SITE = 'https://estebanlarose11-source.github.io/bling-casino/';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const uid = () => (profiles.mode === 'cloud' ? profiles.store.current : null);
@@ -3678,19 +3704,25 @@ const uid = () => (profiles.mode === 'cloud' ? profiles.store.current : null);
 const pendingRef = () => { try { return localStorage.getItem(REF_KEY); } catch { return null; } };
 const refLink = () => (uid() ? `${SITE}?ref=${uid()}` : null);
 
-// Referrer side: pays REF_KE for every friend not paid yet.
+// Referrer side: pays every friend who reached level REF_LEVEL and was not paid yet. Returns { paid, waiting }.
 async function collectReferrals() {
   const me = uid();
-  if (!me) return 0;
+  if (!me) return { paid: 0, waiting: [] };
   const list = await cloud.referralsOf(me).catch(() => []);
   const paid = new Set(profiles.current?.refPaid || []);
-  const fresh = list.filter((r) => !paid.has(r.uid)).slice(0, Math.max(0, REF_MAX - paid.size));
-  if (!fresh.length) return 0;
-  profiles.update('refPaid', (p) => { p.refPaid = [...paid, ...fresh.map((r) => r.uid)]; });
-  wallet.grant(REF_KE * fresh.length);
-  toast(`🤝 ${fresh.length > 1 ? `${fresh.length} amis ont rejoint` : `${esc(fresh[0].name || 'Un ami')} a rejoint`} SpinBet grâce à toi : +${fmt(REF_KE * fresh.length)}`, 'ok');
-  return fresh.length;
+  const todo = list.filter((r) => !paid.has(r.uid));
+  const boards = await Promise.all(todo.map((r) => cloud.boardOf(r.uid).catch(() => null)));
+  const ok = [], waiting = [];
+  todo.forEach((r, k) => { const lv = boards[k]?.level || 1; if (lv >= REF_LEVEL && paid.size + ok.length < REF_MAX) ok.push(r); else waiting.push({ ...r, level: lv }); });
+  if (ok.length) {
+    profiles.update('refPaid', (p) => { p.refPaid = [...paid, ...ok.map((r) => r.uid)]; });
+    wallet.grant(REF_PARRAIN * ok.length);
+    giftsMod().addRounds(REF_GAME, REF_SPINS * ok.length);
+    toast(`🤝 ${ok.length > 1 ? `${ok.length} filleuls ont atteint` : `${esc(ok[0].name || 'Ton filleul')} a atteint`} le niveau ${REF_LEVEL} : +${fmt(REF_PARRAIN * ok.length)} et ${REF_SPINS * ok.length} tours offerts sur Huff la Puff !`, 'ok');
+  }
+  return { paid: ok.length, waiting };
 }
+const giftsMod = () => __mods['wheel.js'].gifts;
 
 profiles.addEventListener('change', async (e) => {
   const me = uid();
@@ -3710,16 +3742,21 @@ profiles.addEventListener('change', async (e) => {
 async function renderReferral(root) {
   const link = refLink(), paid = profiles.current?.refPaid?.length || 0;
   root.innerHTML = `
-    <section class="panel social-page">
+    <section class="panel social-page ref-page">
       <span class="eyebrow">🤝 Parrainage</span>
       <h1>Invite tes amis</h1>
-      <p class="muted">Partage ton lien. Quand un ami crée son compte avec, <b>vous gagnez ${fmt(REF_KE)} chacun</b> (jusqu’à ${REF_MAX} amis).</p>
+      <div class="ref-offer">
+        <div class="ref-card you"><small>Pour toi</small><b>${fmt(REF_PARRAIN)}</b><span>+ ${REF_SPINS} tours offerts sur Huff la Puff</span></div>
+        <div class="ref-card friend"><small>Pour ton ami</small><b>+${fmt(REF_KE)}</b><span>en plus de son solde de départ</span></div>
+      </div>
+      <p class="muted">Ta récompense arrive quand ton ami atteint le <b>niveau ${REF_LEVEL}</b> (jusqu’à ${REF_MAX} amis).</p>
       ${link ? `<div class="ref-box"><input readonly value="${link}" aria-label="Ton lien de parrainage"><button class="btn primary" data-copy>Copier</button>${navigator.share ? '<button class="btn ghost" data-share>Partager</button>' : ''}</div>
-        <div class="ref-stats"><div><b>${paid}</b><small>ami${paid > 1 ? 's' : ''} parrainé${paid > 1 ? 's' : ''}</small></div><div><b>${fmt(paid * REF_KE)}</b><small>gagnés</small></div></div>
-        <button class="btn ghost" data-check>🔄 Vérifier mes nouveaux filleuls</button>`
+        <div class="ref-stats"><div><b>${paid}</b><small>filleul${paid > 1 ? 's' : ''} validé${paid > 1 ? 's' : ''}</small></div><div><b>${fmt(paid * REF_PARRAIN)}</b><small>gagnés</small></div></div>
+        <div class="ref-wait" data-wait></div>
+        <button class="btn ghost" data-check>🔄 Vérifier mes filleuls</button>`
       : '<p class="ref-need">Le parrainage demande un <b>compte</b> (e-mail et mot de passe) : déconnecte-toi du mode invité et crée ton compte depuis l’écran d’accueil.</p>'}
       <h4>Comment ça marche ?</h4>
-      <ol class="app-list"><li>Copie ton lien et envoie-le (WhatsApp, Snap, Discord…).</li><li>Ton ami ouvre le lien et crée son compte : il reçoit ${fmt(REF_KE)} tout de suite.</li><li>Tu reçois aussi ${fmt(REF_KE)}, ici ou à ta prochaine connexion.</li></ol>
+      <ol class="app-list"><li>Copie ton lien et envoie-le (WhatsApp, Snap, Discord…).</li><li>Ton ami ouvre le lien et crée son compte : il reçoit <b>${fmt(REF_KE)} de plus</b> tout de suite.</li><li>Dès qu’il atteint le niveau ${REF_LEVEL}, tu reçois <b>${fmt(REF_PARRAIN)}</b> et <b>${REF_SPINS} tours offerts</b> sur Huff la Puff (à ${fmt(0.8)} la mise), ici ou à ta prochaine connexion.</li></ol>
     </section>`;
   const input = root.querySelector('.ref-box input');
   root.querySelector('[data-copy]')?.addEventListener('click', async () => {
@@ -3727,12 +3764,17 @@ async function renderReferral(root) {
     toast('Lien copié ✅', 'ok');
   });
   root.querySelector('[data-share]')?.addEventListener('click', () => navigator.share({ title: 'SpinBet Casino', text: `Rejoins-moi sur SpinBet Casino : ${fmt(REF_KE)} offerts à l’inscription 🎰`, url: link }).catch(() => {}));
+  const showWaiting = (w) => {
+    const box = root.querySelector('[data-wait]');
+    if (box) box.innerHTML = w.length ? `<h4>En attente du niveau ${REF_LEVEL}</h4>${w.map((r) => `<div class="ref-w"><b>${esc(r.name || 'Ami')}</b><span>Niveau ${r.level} / ${REF_LEVEL}</span></div>`).join('')}` : '';
+  };
+  if (link) collectReferrals().then((r) => { if (root.isConnected) { showWaiting(r.waiting); if (r.paid) renderReferral(root); } });
   root.querySelector('[data-check]')?.addEventListener('click', async (e) => {
     e.currentTarget.disabled = true;
-    const n = await collectReferrals();
-    if (!n) toast('Pas de nouveau filleul pour l’instant');
-    else { sfx.unlock(); sfx.bigWin(); fx.coins(40); }
-    renderReferral(root);
+    const r = await collectReferrals();
+    if (!r.paid) toast(r.waiting.length ? `Tes filleuls n’ont pas encore atteint le niveau ${REF_LEVEL}` : 'Pas de nouveau filleul pour l’instant');
+    else { sfx.unlock(); sfx.bigWin(); fx.coins(60); fx.confetti(90); }
+    if (root.isConnected) { if (r.paid) renderReferral(root); else { showWaiting(r.waiting); e.currentTarget.disabled = false; } }
   });
 }
 
@@ -6910,6 +6952,7 @@ const wpick = (l) => {
 };
 const BETS = [10, 20, 40, 80, 160, 320, 640, 1280, 2000, 5000, 10000];
 const GIFT_MAX_BET = 100; // free bonus rounds from the daily wheel are played at up to 1 KE
+const FREE_BET = 80; // free spins (referral reward) are played at 0,80 KE
 
 const TIERS = [
   { x: 150, label: 'XXTREM WIN', cls: 'legend' },
@@ -6936,6 +6979,11 @@ class BaseGame {
     this.render();
     this.bind();
     this.unfit = autoFit(this.root);
+    const fr = gifts.rounds(game.id);
+    if (fr && this.cfg.bets.includes(FREE_BET)) {
+      this.bi = this.cfg.bets.indexOf(FREE_BET); this.updateMeters();
+      setTimeout(() => toast(`🎁 Tu as ${fr} tours offerts à ${fmtC(FREE_BET)} : appuie sur Lancer !`, 'ok'), 600);
+    }
   }
 
   /* ---------- persistence ---------- */
@@ -6949,7 +6997,12 @@ class BaseGame {
   /* ---------- money (cents) ---------- */
   get bet() { return this.cfg.bets[this.bi]; }
   balC() { wallet.fresh(); return wallet.cents; }
+  // A main-button stake of FREE_BET is free while the player has free rounds on this game (referral reward).
   pay(c) {
+    if (!this.buying && c === FREE_BET && this.bet === FREE_BET && gifts.useRound(this.game.id)) {
+      this.updateMeters();
+      return true;
+    }
     if (!wallet.debit(c / 100)) { toast('Solde insuffisant : rechargez votre argent fictif', 'warn'); this.stopAuto(); return false; }
     return true;
   }
@@ -7000,7 +7053,7 @@ class BaseGame {
             <div class="ctl-group center"><label>${c.betLabel || 'Mise'}</label><b class="bet-val"></b></div>
             <button class="round-btn" data-act="bet+" aria-label="Augmenter la mise">+</button>
           </div>` : `<div class="ctl-bet"><div class="ctl-group center"><label>${c.betLabel || 'Mise totale'}</label><b class="bet-val"></b></div></div>`}
-          <button class="spin-btn${c.mainLabel ? ' wide' : ''}" data-act="main" aria-label="${c.mainAria || 'Lancer'}">${main}<span class="auto-count"></span></button>
+          <button class="spin-btn${c.mainLabel ? ' wide' : ''}" data-act="main" aria-label="${c.mainAria || 'Lancer'}">${main}<span class="auto-count"></span><span class="fr-badge" hidden></span></button>
           <div class="ctl-opts">${MENU_BTN}${FULL_BTN}</div>
         </div>
       </div>`;
@@ -7064,6 +7117,8 @@ class BaseGame {
     this.q('.bal').textContent = fmtC(this.balC());
     this.q('.bet-val').textContent = fmtC(this.stakeLabel ? this.stakeLabel() : this.bet);
     this.q('.auto-count').textContent = this.auto ? this.auto : '';
+    const fr = gifts.rounds(this.game.id), frb = this.q('.fr-badge');
+    if (frb) { frb.hidden = !fr; frb.textContent = `🎁 ${fr}`; frb.classList.toggle('off', this.bet !== FREE_BET); frb.title = `${fr} tours offerts à ${fmtC(FREE_BET)} de mise`; }
     this.slotEl.classList.toggle('auto-on', !!this.auto);
     this.q('[data-act="bet-"]')?.toggleAttribute('disabled', this.busy || this.bi === 0);
     this.q('[data-act="bet+"]')?.toggleAttribute('disabled', this.busy || this.bi === this.cfg.bets.length - 1);
@@ -7151,7 +7206,10 @@ class BaseGame {
     const x = this.cfg.buys.find((y) => y.id === id);
     this.stopAuto();
     this.round(async () => {
-      if (!(this.bet <= GIFT_MAX_BET && gifts.use(this.game.id, id)) && !this.pay(x.cost(this.bet))) return;
+      this.buying = true;
+      const ok = (this.bet <= GIFT_MAX_BET && gifts.use(this.game.id, id)) || this.pay(x.cost(this.bet));
+      this.buying = false;
+      if (!ok) return;
       this.lastStake = this.bet;
       await this.onBuy(id);
     });
