@@ -2608,15 +2608,17 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 @media (prefers-reduced-motion: reduce) { .dg-embers, .dg-glow, .g-dragons .sg-cell.egg svg { animation: none; } }
 
 /* ============ Small A-ADS banner, closable ============ */
-.ad-bar { position: fixed; z-index: 250; left: calc(var(--side, 0px) + (100% - var(--side, 0px)) / 2); bottom: 10px; transform: translateX(-50%); width: min(728px, calc(100% - var(--side, 0px) - 24px)); height: 90px;
-  padding: 4px; border-radius: 12px; background: #111; border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(0, 0, 0, .6); }
-.ad-bar-x { position: absolute; top: -12px; right: -8px; z-index: 2; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line); background: #222; color: #fff; font-size: 13px; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 2px 8px rgba(0, 0, 0, .6); }
+.ad-bar { position: fixed; z-index: 250; left: var(--side, 0px); right: 0; margin: 0 auto; bottom: 10px; width: min(728px, calc(100% - var(--side, 0px) - 24px)); height: 90px;
+  display: flex; align-items: flex-start; gap: 4px; padding: 4px; border-radius: 12px; background: #111; border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(0, 0, 0, .6); }
+/* the ad takes the space left of the cross: nothing may overlap it, not even the cross (A-ADS "partly hidden") */
+.ad-bar > #frame { flex: 1; min-width: 0; }
+.ad-bar-x { flex: none; order: 2; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line); background: #222; color: #fff; font-size: 13px; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 2px 8px rgba(0, 0, 0, .6); }
 .ad-bar-x:hover { background: #f0284f; }
 body.ad-bar-on .foot { padding-bottom: 120px; }
 body.ad-bar-on .gate { padding-bottom: 120px; }
 body.fs-on .ad-bar { display: none; }
 @media (max-width: 900px) {
-  .ad-bar { left: 50%; width: calc(100% - 16px); height: 60px; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+  .ad-bar { left: 0; width: calc(100% - 16px); height: 60px; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
   body.ad-bar-on .foot { padding-bottom: 170px; }
 }
 
