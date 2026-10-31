@@ -1316,6 +1316,12 @@ body.gated { overflow: hidden; }
 .rt-tools { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
 .rt-tools button { padding: 7px 12px; border-radius: 9px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(255, 255, 255, .15); font-size: 13px; font-weight: 600; }
 .rt-tools button:hover { background: rgba(255, 255, 255, .12); }
+.rt-tools .rt-autoplay { background: linear-gradient(180deg, #2563eb, #1e3a8a); border-color: #60a5fa; color: #fff; }
+.rt-tools .rt-autoplay.on { background: linear-gradient(180deg, #db2777, #831843); border-color: #f9a8d4; animation: proBreath 1.6s ease-in-out infinite; }
+.rt-autopick { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 8px; padding: 8px; border-radius: 12px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(96, 165, 250, .4); }
+.rt-autopick[hidden] { display: none; }
+.rt-autopick span { font-size: 12px; font-weight: 700; color: #bfdbfe; margin-right: 4px; }
+.rt-autopick button { min-width: 48px; padding: 7px 10px; border-radius: 9px; background: linear-gradient(180deg, #3b82f6, #1d4ed8); color: #fff; font: 800 13px KeCoin, Orbitron, sans-serif; border: 0; }
 .rt-tools .rt-auto.on { background: linear-gradient(180deg, #16a34a, #14532d); border-color: #4ade80; color: #fff; box-shadow: 0 0 10px rgba(74, 222, 128, .45); }
 .g-bolt { position: fixed; inset: 0; z-index: 86; pointer-events: none; animation: gFlash .38s ease-out forwards; }
 .table-game .slot-frame { padding: 6px; }
@@ -6655,6 +6661,12 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'roueor', date: '2026-10-31', title: 'Bouton Tours auto', items: ['Nouveau bouton ▶ Tours auto sous les niveaux : 10 à 250 tours d’affilée', 'Les tours s’arrêtent tout seuls quand le bonus tombe'] },
+  { game: 'peche', date: '2026-10-31', title: 'Bouton Tours auto', items: ['Nouveau bouton ▶ Tours auto sous les jetons : 10 à 250 tours d’affilée', 'Le même bouton arrête les tours (■ Stop)'] },
+  { game: 'plateau', date: '2026-10-31', title: 'Bouton Tours auto', items: ['Nouveau bouton ▶ Tours auto sous les jetons : 10 à 250 tours d’affilée', 'Le même bouton arrête les tours (■ Stop)'] },
+  { game: 'madwheel', date: '2026-10-31', title: 'Bouton Tours auto', items: ['Nouveau bouton ▶ Tours auto sous les jetons : 10 à 250 tours d’affilée', 'Le même bouton arrête les tours (■ Stop)'] },
+  { game: 'storm', date: '2026-10-31', title: 'Bouton Tours auto', items: ['Nouveau bouton ▶ Tours auto sous les jetons : 10 à 250 tours d’affilée', 'Le même bouton arrête les tours (■ Stop)'] },
+  { game: 'doublespin', date: '2026-10-31', title: 'Bouton Tours auto', items: ['Nouveau bouton ▶ Tours auto sous les jetons : 10 à 250 tours d’affilée', 'Le même bouton arrête les tours (■ Stop)'] },
   { game: 'cosmic', date: '2026-10-31', title: 'Nouveau décor spatial', items: ['Nébuleuse qui bouge, étoiles filantes et lune en orbite', 'Cadre néon animé, ondes lumineuses autour des gains', 'Cases dorées qui scintillent'] },
   { game: 'poker', date: '2026-10-31', title: 'Table relookée', items: ['Tapis feutré avec liseré doré et bordure en bois', 'Cartes illustrées et retournement en 3D', 'Jetons en relief, chrono lumineux sur le joueur qui parle, couronne pour le gagnant'] },
   { game: 'roueor', date: '2026-10-31', title: '3 niveaux et mélange', items: ['Choisis Simple, Moyen ou Compliqué : moins d’or sur la roue = plus gros cubes (jusqu’à ×5 000)', 'Dans le bonus, les 24 multiplicateurs sont montrés, puis cachés et mélangés avant ton choix'] },
@@ -8490,6 +8502,7 @@ class BaseGame {
     this.q('[data-act="bet-"]')?.toggleAttribute('disabled', this.busy || this.bi === 0);
     this.q('[data-act="bet+"]')?.toggleAttribute('disabled', this.busy || this.bi === this.cfg.bets.length - 1);
     this.onMeters?.();
+    this.board?.paintAuto?.();
   }
 
   // Can the stake go up one step? Not past the balance (the first stake is always allowed).
@@ -9126,6 +9139,8 @@ class BetBoard {
     try { this.auto = localStorage.getItem(this.autoKey) === '1'; } catch { this.auto = false; }
     root.querySelectorAll('[data-k]').forEach((e) => { this.els[e.dataset.k] = e; });
     root.addEventListener('click', (e) => {
+      const as = e.target.closest('[data-autospin]');
+      if (as) { this.startAuto(+as.dataset.autospin); return; }
       const k = e.target.closest('[data-k]')?.dataset.k;
       if (k) this.add(k);
       const ch = e.target.closest('[data-chip]');
@@ -9137,7 +9152,8 @@ class BetBoard {
 
   static chipsHTML(extra = '') {
     return `<div class="rt-chips">${CHIPS.map((v) => `<button class="rchip" data-chip="${v}" style="--cc:${CC[v]}">${chipLab(v)}</button>`).join('')}</div>
-      <div class="rt-tools"><button data-tool="undo">↶ Annuler</button><button data-tool="clear">✕ Effacer</button><button data-tool="again">⟲ Rejouer</button><button data-tool="dbl">×2 Doubler</button><button data-tool="auto" class="rt-auto" title="Remet automatiquement tes dernières mises après chaque tour">🔁 Remise auto</button>${extra}</div>`;
+      <div class="rt-tools"><button data-tool="undo">↶ Annuler</button><button data-tool="clear">✕ Effacer</button><button data-tool="again">⟲ Rejouer</button><button data-tool="dbl">×2 Doubler</button><button data-tool="auto" class="rt-auto" title="Remet automatiquement tes dernières mises après chaque tour">🔁 Remise auto</button><button data-tool="autoplay" class="rt-autoplay" title="Lance plusieurs tours d’affilée avec les mêmes mises">▶ Tours auto</button>${extra}</div>
+      <div class="rt-autopick" hidden><span>Combien de tours ?</span>${[10, 25, 50, 100, 250].map((n) => `<button data-autospin="${n}">${n}</button>`).join('')}</div>`;
   }
 
   total() { let t = 0; for (const k in this.bets) t += this.bets[k]; return t; }
@@ -9165,7 +9181,28 @@ class BetBoard {
     for (const k in this.last) { this.bets[k] = this.last[k]; this.stack.push([k, this.last[k]]); }
   }
 
+  // Automatic spins straight from the table: the same bets are played n times in a row.
+  startAuto(n) {
+    const g = this.game, pick = this.root.querySelector('.rt-autopick');
+    if (pick) pick.hidden = true;
+    if (g.busy || g.auto) return;
+    if (!this.total() && !this.last) { g.msg?.('Pose d’abord tes jetons, puis lance les tours auto.'); return; }
+    g.auto = n; g.updateMeters(); g.onMain();
+  }
+  paintAuto() {
+    const b = this.root.querySelector('.rt-autoplay');
+    if (!b) return;
+    b.classList.toggle('on', !!this.game.auto);
+    b.textContent = this.game.auto ? `■ Stop (${this.game.auto})` : '▶ Tours auto';
+  }
+
   tool(t) {
+    if (t === 'autoplay') {
+      if (this.game.auto) { this.game.stopAuto(); return; }
+      const pick = this.root.querySelector('.rt-autopick');
+      if (pick) pick.hidden = !pick.hidden;
+      return;
+    }
     if (t === 'auto') {
       this.auto = !this.auto;
       try { localStorage.setItem(this.autoKey, this.auto ? '1' : '0'); } catch { /* ignore */ }
@@ -9238,7 +9275,7 @@ const FILES = {
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', '5d7c3dd24f'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '461b177bb0'],
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', '9f5b8073ff'],
-  roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', 'cb77a59f0d'],
+  roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', 'a91ebf3389'],
 };
 const loading = {};
 

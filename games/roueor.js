@@ -82,13 +82,21 @@ class RoueOrGame extends BaseGame {
               <div class="ro-btns"><button type="button" class="ro-cash">ENCAISSER</button><button type="button" class="ro-go">CONTINUER</button></div></div>
           </div>
         </div>`,
-      below: `<div class="ro-modes">${MODES.map((m, i) => `<button type="button" data-mode="${i}"><b>${m.label}</b><small>Bonus ${Math.round(m.gold * 1000) / 10} % · jusqu’à ×${maxOf(m).toLocaleString('fr-FR')}</small></button>`).join('')}</div>`,
+      below: `<div class="ro-modes">${MODES.map((m, i) => `<button type="button" data-mode="${i}"><b>${m.label}</b><small>Bonus ${Math.round(m.gold * 1000) / 10} % · jusqu’à ×${maxOf(m).toLocaleString('fr-FR')}</small></button>`).join('')}</div>
+        <div class="rt-tools"><button type="button" class="rt-autoplay" data-ro-auto>▶ Tours auto</button></div>
+        <div class="rt-autopick" hidden><span>Combien de tours ?</span>${[10, 25, 50, 100, 250].map((n) => `<button type="button" data-ro-n="${n}">${n}</button>`).join('')}</div>`,
       hello: 'Si la roue s’arrête sur l’or, c’est le bonus des 24 cubes ! Choisis ton niveau : plus c’est compliqué, plus les cubes sont gros.',
     });
     this.mi = this.loadNum('roueor_mode', 1, 0, MODES.length - 1);
     this.cur = 0; this.histArr = [];
     this.setMode(this.mi);
     this.root.addEventListener('click', (e) => {
+      if (e.target.closest('[data-ro-auto]')) {
+        if (this.auto) this.stopAuto(); else this.q('.rt-autopick').hidden = !this.q('.rt-autopick').hidden;
+        return;
+      }
+      const rn = e.target.closest('[data-ro-n]');
+      if (rn) { this.q('.rt-autopick').hidden = true; if (!this.busy && !this.auto) { this.auto = +rn.dataset.roN; this.updateMeters(); this.onMain(); } return; }
       const md = e.target.closest('[data-mode]');
       if (md && !this.busy && !md.disabled) { this.setMode(+md.dataset.mode); sfx.click(); }
       if (!this.answer) return;
@@ -110,7 +118,11 @@ class RoueOrGame extends BaseGame {
     this.qa('[data-mode]').forEach((b) => b.classList.toggle('on', +b.dataset.mode === i));
   }
 
-  onMeters() { this.qa('[data-mode]').forEach((b) => { b.disabled = this.busy; }); }
+  onMeters() {
+    this.qa('[data-mode]').forEach((b) => { b.disabled = this.busy; });
+    const ab = this.q('[data-ro-auto]');
+    if (ab) { ab.classList.toggle('on', !!this.auto); ab.textContent = this.auto ? `■ Stop (${this.auto})` : '▶ Tours auto'; }
+  }
 
   ask() { return new Promise((res) => { this.answer = res; }); }
   say(t) { this.q('.ro-say').innerHTML = t; }
