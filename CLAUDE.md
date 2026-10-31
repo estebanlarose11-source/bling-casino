@@ -1,6 +1,19 @@
 # SpinBet Casino
 
-Le site entier est dans `index.html` (modules `__mods['…']`), publié avec GitHub Pages depuis `main`.
+Le site est publié avec GitHub Pages depuis `main`.
+
+- `index.html` : tout le site (modules `__mods['…']`, CSS, art SVG, catalogue `games/index.js`, lobby, pages).
+- `games/<fichier>.js` : le code de chaque jeu, chargé à la première ouverture du jeu (`games/impl/index.js`
+  dans `index.html` liste `[fichier, module, classe, version]`). **Après toute modification d'un fichier de
+  `games/`, lancer `python3 tools/build.py`** : il met à jour les versions (`?v=`), sinon les joueurs gardent
+  l'ancienne version en cache.
+- Nouveau jeu : son module dans `games/<id>.js`, une entrée dans `FILES` (puis `tools/build.py`), le catalogue
+  `ORIGINALS`, la couverture (`covers.js` : `SPECS` et `CARD`), la musique (`EXTRA_THEMES`), le CSS dans
+  `index.html` et l'affiche `UPDATES`.
+- `sw.js` + `manifest.webmanifest` + `assets/` : application installable. Changer `CACHE` dans `sw.js` si
+  `assets/` change.
+- `firebase/firestore.rules` : règles Firestore (à recoller dans la console Firebase si elles changent, voir
+  `FIREBASE.md`). Toute nouvelle collection Firestore doit y être ajoutée, sinon elle est refusée.
 
 ## Affiche « Mise à jour » (à faire à chaque mise à jour d'un jeu)
 
