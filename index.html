@@ -1316,6 +1316,7 @@ body.gated { overflow: hidden; }
 .rt-tools { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
 .rt-tools button { padding: 7px 12px; border-radius: 9px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(255, 255, 255, .15); font-size: 13px; font-weight: 600; }
 .rt-tools button:hover { background: rgba(255, 255, 255, .12); }
+.rt-tools .rt-auto.on { background: linear-gradient(180deg, #16a34a, #14532d); border-color: #4ade80; color: #fff; box-shadow: 0 0 10px rgba(74, 222, 128, .45); }
 .g-bolt { position: fixed; inset: 0; z-index: 86; pointer-events: none; animation: gFlash .38s ease-out forwards; }
 .table-game .slot-frame { padding: 6px; }
 .table-game .spin-btn.wide:disabled { filter: grayscale(.7) brightness(.6); }
@@ -6390,6 +6391,11 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'storm', date: '2026-10-31', title: 'Remise auto', items: ['Nouveau bouton 🔁 Remise auto sous les jetons', 'Tes dernières mises reviennent toutes seules après chaque tour'] },
+  { game: 'doublespin', date: '2026-10-31', title: 'Remise auto', items: ['Nouveau bouton 🔁 Remise auto sous les jetons', 'Tes dernières mises reviennent toutes seules après chaque tour'] },
+  { game: 'madwheel', date: '2026-10-31', title: 'Remise auto', items: ['Nouveau bouton 🔁 Remise auto sous les jetons', 'Tes dernières mises reviennent toutes seules après chaque tour'] },
+  { game: 'plateau', date: '2026-10-31', title: 'Remise auto', items: ['Nouveau bouton 🔁 Remise auto sous les jetons', 'Tes dernières mises reviennent toutes seules après chaque tour'] },
+  { game: 'peche', date: '2026-10-31', title: 'Remise auto', items: ['Nouveau bouton 🔁 Remise auto sous les jetons', 'Tes dernières mises reviennent toutes seules après chaque tour'] },
   {
     game: 'peche', date: '2026-10-31', title: 'Roue corrigée',
     items: ['La roue tourne bien sur son centre', 'La pêche s’affiche à la place de la roue : on voit tout le pêcheur sans faire défiler'],
@@ -8836,6 +8842,9 @@ class BetBoard {
     Object.assign(this, { game, root, L });
     this.bets = {}; this.stack = []; this.last = null; this.chip = 100;
     this.els = {};
+    // "Remise auto": the last bets are put back on the table after every round (remembered per game)
+    this.autoKey = `${game.game?.id || 'table'}_rebet`;
+    try { this.auto = localStorage.getItem(this.autoKey) === '1'; } catch { this.auto = false; }
     root.querySelectorAll('[data-k]').forEach((e) => { this.els[e.dataset.k] = e; });
     root.addEventListener('click', (e) => {
       const k = e.target.closest('[data-k]')?.dataset.k;
@@ -8849,7 +8858,7 @@ class BetBoard {
 
   static chipsHTML(extra = '') {
     return `<div class="rt-chips">${CHIPS.map((v) => `<button class="rchip" data-chip="${v}" style="--cc:${CC[v]}">${chipLab(v)}</button>`).join('')}</div>
-      <div class="rt-tools"><button data-tool="undo">↶ Annuler</button><button data-tool="clear">✕ Effacer</button><button data-tool="again">⟲ Rejouer</button><button data-tool="dbl">×2 Doubler</button>${extra}</div>`;
+      <div class="rt-tools"><button data-tool="undo">↶ Annuler</button><button data-tool="clear">✕ Effacer</button><button data-tool="again">⟲ Rejouer</button><button data-tool="dbl">×2 Doubler</button><button data-tool="auto" class="rt-auto" title="Remet automatiquement tes dernières mises après chaque tour">🔁 Remise auto</button>${extra}</div>`;
   }
 
   total() { let t = 0; for (const k in this.bets) t += this.bets[k]; return t; }
@@ -8864,7 +8873,27 @@ class BetBoard {
     this.paint();
   }
 
+  // After a round: the table is cleared, then the same bets go back on it when "Remise auto" is on.
+  afterRound() {
+    this.bets = {}; this.stack = [];
+    this.rebet();
+    this.paint();
+  }
+  rebet() {
+    if (!this.auto || !this.last || this.total()) return;
+    const sum = Object.values(this.last).reduce((a, b) => a + b, 0);
+    if (sum > this.game.balC()) return;
+    for (const k in this.last) { this.bets[k] = this.last[k]; this.stack.push([k, this.last[k]]); }
+  }
+
   tool(t) {
+    if (t === 'auto') {
+      this.auto = !this.auto;
+      try { localStorage.setItem(this.autoKey, this.auto ? '1' : '0'); } catch { /* ignore */ }
+      if (!this.game.busy) this.rebet();
+      this.paint();
+      return;
+    }
     if (this.game.busy) return;
     const sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
     if (t === 'undo' && this.stack.length) { const x = this.stack.pop(); this.bets[x[0]] -= x[1]; if (!this.bets[x[0]]) delete this.bets[x[0]]; }
@@ -8875,6 +8904,7 @@ class BetBoard {
   }
 
   paint() {
+    this.root.querySelector('.rt-auto')?.classList.toggle('on', !!this.auto);
     for (const k in this.els) {
       const e = this.els[k], a = this.bets[k] || 0;
       let ch = e.querySelector('.rt-chip');
@@ -8907,9 +8937,9 @@ const FILES = {
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '9640e5a788'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],
-  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', 'c4d334ebb6'],
-  storm: ['storm', 'games/impl/storm.js', 'StormGame', '46308b2938'],
-  doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', 'e70efd2787'],
+  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '1c48d3fe77'],
+  storm: ['storm', 'games/impl/storm.js', 'StormGame', '7285f23095'],
+  doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '5b76855e9c'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '7069fc4250'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'bdcfd7b479'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', '648f87164c'],
@@ -8927,8 +8957,8 @@ const FILES = {
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', 'c401e351a3'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', '463c45c93a'],
-  plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '8809dc3baa'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '556430dfc3'],
+  plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c291a4074a'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '1c8f3f3821'],
 };
 const loading = {};
 

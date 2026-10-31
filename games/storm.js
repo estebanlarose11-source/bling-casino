@@ -119,8 +119,7 @@ class StormGame extends BaseGame {
         if (lucky[r] && placed['n' + r]) { this.flash('rgba(255,230,120,.8)'); thunder(); }
         if (net > 0) await this.celebrate(ret);
       }
-      this.board.bets = {}; this.board.stack = [];
-      this.board.paint();
+      this.board.afterRound();
     });
   }
 

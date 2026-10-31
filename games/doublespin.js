@@ -103,8 +103,7 @@ class DoubleSpinGame extends BaseGame {
         if (placed['n' + ry] && ry === rw && ye) { const p = center(ye); fx.burst(p.x, p.y, 50, ['#ffd23f', '#fff'], 9); this.flash('rgba(255,210,63,.8)'); }
         if (net > 0) await this.celebrate(ret);
       }
-      this.board.bets = {}; this.board.stack = [];
-      this.board.paint();
+      this.board.afterRound();
     });
   }
 

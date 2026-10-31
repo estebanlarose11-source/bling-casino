@@ -275,8 +275,7 @@ class MadWheelGame extends BaseGame {
         this.setLast(ret);
         if (ret > (placed[seg] || 0)) await this.celebrate(ret, { summary: isNaN(+seg) ? NAME[seg].toUpperCase() : null });
       }
-      this.board.bets = {}; this.board.stack = [];
-      this.board.paint();
+      this.board.afterRound();
     });
   }
 

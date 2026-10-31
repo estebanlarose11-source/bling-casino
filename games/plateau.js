@@ -236,8 +236,7 @@ class PlateauGame extends BaseGame {
         this.setLast(ret);
         if (ret > b) await this.celebrate(ret, { summary: ICON[seg] ? NAME[seg].toUpperCase() : null });
       }
-      this.board.bets = {}; this.board.stack = [];
-      this.board.paint();
+      this.board.afterRound();
     });
   }
 
