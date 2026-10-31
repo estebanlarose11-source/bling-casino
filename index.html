@@ -1826,6 +1826,8 @@ body.gated { overflow: hidden; }
 .gm-tog.on .sw { background: var(--green); }
 .gm-tog.on .sw::after { transform: translateX(14px); }
 .gm-info { width: 100%; margin-top: 16px; }
+.gm-stake { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 10px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); }
+.gm-stake b { min-width: 110px; text-align: center; font: 800 18px Orbitron, sans-serif; }
 @media (max-width: 420px) { .gm-toggles { grid-template-columns: 1fr; } }
 
 /* ============ Full screen ============ */
@@ -2471,6 +2473,36 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pn-ladder span.done { background: linear-gradient(180deg, #16a34a, #14532d); border-color: #4ade80; color: #fff; }
 .pn-ladder span.next { border-color: #fde047; color: #fef9c3; box-shadow: 0 0 10px rgba(253, 224, 71, .45); }
 @media (max-width: 520px) { .pn-spot i { width: 18px; height: 18px; } .pn-cash { min-width: 120px; font-size: 14px; } .pn-ball { width: 32px; height: 32px; } }
+
+/* ============ Le Ticket ============ */
+.g-ticket { --slot-bg: radial-gradient(600px 300px at 50% -10%, rgba(250, 204, 21, .3), transparent 70%), radial-gradient(500px 300px at 90% 100%, rgba(236, 72, 153, .22), transparent 70%), linear-gradient(180deg, #1d0f2e 0%, #07060b 100%); }
+.tk-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 12px 8px; }
+.tk-tabs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: min(100%, 520px); }
+.tk-tab { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; border-radius: 10px; border: 1px solid #3b2a55; background: #1a1328; color: #cbd5e1; cursor: pointer; }
+.tk-tab i { font: 900 13px Orbitron, sans-serif; font-style: normal; } .tk-tab span { font-size: 10px; font-weight: 700; white-space: nowrap; }
+.tk-tab.on { border-color: #fde047; box-shadow: 0 0 12px rgba(253, 224, 71, .45); }
+.tk-tab.won { background: linear-gradient(180deg, #16a34a, #14532d); border-color: #4ade80; color: #fff; }
+.tk-tab.lost { background: #2a1520; color: #94a3b8; }
+.tk-tab:disabled { opacity: .5; cursor: default; }
+.tk-card { width: min(100%, 440px); padding: 12px; border-radius: 18px; background: linear-gradient(160deg, #fde047, #f59e0b 45%, #ec4899); box-shadow: 0 12px 30px rgba(0, 0, 0, .5), inset 0 0 0 3px rgba(255, 255, 255, .45); color: #1f1300; }
+.tk-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.tk-top b { font: 900 26px 'Bebas Neue', Impact, sans-serif; letter-spacing: 2px; color: #4a044e; text-shadow: 0 1px 0 #fff; }
+.tk-top span { font: 900 13px Orbitron, sans-serif; color: #4a044e; }
+.tk-rule { margin: 2px 0 8px; font-size: 12px; font-weight: 800; color: #4a044e; }
+.tk-zone { position: relative; border-radius: 12px; overflow: hidden; background: #fffbeb; }
+.tk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 8px; }
+.tk-cell { display: grid; place-items: center; aspect-ratio: 1.45; border-radius: 10px; background: #fef3c7; border: 2px dashed #f59e0b; }
+.tk-cell b { font: 900 clamp(12px, 3.6vw, 18px) Orbitron, sans-serif; color: #7c2d12; text-align: center; }
+.tk-cell.win { background: radial-gradient(circle, #fef08a, #facc15); border: 2px solid #16a34a; animation: tkWin .8s ease-in-out infinite alternate; }
+.tk-cell.win b { color: #14532d; }
+@keyframes tkWin { to { box-shadow: 0 0 16px rgba(22, 163, 74, .8); transform: scale(1.04); } }
+.tk-foil { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.tk-foot { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.tk-say { flex: 1; font-size: 13px; font-weight: 800; color: #3b0764; }
+.tk-all { padding: 8px 12px; border-radius: 12px; border: 2px solid #4a044e; background: #fff; color: #4a044e; font: 900 12px Orbitron, sans-serif; cursor: pointer; }
+.tk-all:disabled { opacity: .45; cursor: default; }
+.meter.pos b { color: #4ade80; } .meter.neg b { color: #f87171; }
+@media (max-width: 520px) { .tk-top b { font-size: 22px; } .tk-top span { font-size: 11px; } .tk-all { font-size: 10px; } }
 
 /* ============ Taco Fiesta ============ */
 .g-taco { --slot-bg: radial-gradient(600px 300px at 15% -5%, rgba(244, 63, 94, .35), transparent 70%), radial-gradient(500px 300px at 95% 10%, rgba(250, 204, 21, .28), transparent 70%), linear-gradient(180deg, #5b0f3a 0%, #2a0a2e 55%, #12041a 100%); }
@@ -5620,6 +5652,7 @@ const ORIGINALS = [
   {"id": "poulet", "name": "Le Poulet", "cat": "quick", "tag": "Instantané", "sub": "Traverse la route, voie après voie", "colors": ["#facc15", "#14200c"], "description": "Aide le poulet à traverser la route ! Chaque voie franchie fait grimper le multiplicateur, mais si une voiture arrive, c’est perdu. Choisis ta difficulté et encaisse quand tu veux.", "features": ["4 difficultés", "Jusqu’à 24 voies", "Encaisse quand tu veux", "Multiplicateur à chaque voie"], "rtp": "96 %", "vol": 4, "max": "×2 041"},
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Empile les étages, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! Chaque étage glisse de plus en plus vite : lâche-le bien au-dessus du précédent. Chaque étage posé multiplie ta mise, mais gare aux étages ratés et aux coups de vent.", "features": ["Jeu d’adresse", "Jusqu’à 30 étages", "Ça va de plus en plus vite", "Bonus PARFAIT", "Encaisse quand tu veux"], "rtp": "96 % (visée parfaite)", "vol": 4, "max": "×125,8"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
+  {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
   {"id": "taco", "name": "La Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200 KE tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200 KE", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
@@ -6018,6 +6051,17 @@ const SPECS = {
       <path d="M150 260 Q176 180 206 120" stroke="#fde047" stroke-width="3" stroke-dasharray="6 8" fill="none" opacity=".8"/>
       <ellipse cx="150" cy="262" rx="60" ry="12" fill="#fff" opacity=".25"/>`,
   },
+  ticket: {
+    bg: ['#4a1d6e', '#07060b'], light: '#facc15', title: ['LE TICKET'], font: 'bebas', metal: ['#fff', '#fde047', '#db2777'], tag: '5 TICKETS',
+    art: (u) => {
+      const tk = (x, y, r, sc) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><rect x="-70" y="-48" width="140" height="96" rx="10" fill="url(#gold${u})" stroke="#fff" stroke-width="3"/>
+        <rect x="-60" y="-30" width="120" height="68" rx="6" fill="#fffbeb"/>${[0, 1, 2].map((i) => [0, 1].map((j) => `<rect x="${-54 + i * 38}" y="${-24 + j * 32}" width="32" height="26" rx="4" fill="${sc && !(i === 2 && j === 1) ? '#fef08a' : '#9ca3af'}"/>${sc && !(i === 2 && j === 1) ? `<text x="${-38 + i * 38}" y="${-6 + j * 32}" text-anchor="middle" font-family="Orbitron,sans-serif" font-weight="900" font-size="11" fill="#7c2d12">${i === j ? '×50' : '×5'}</text>` : ''}`).join('')).join('')}
+        <text x="0" y="-36" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="13" fill="#4a044e">LE TICKET</text></g>`;
+      return `<circle cx="150" cy="140" r="120" fill="#facc15" opacity=".12"/>${tk(100, 200, -14, false)}${tk(196, 120, 10, true)}
+        <g transform="translate(240 210) rotate(30)" filter="url(#sh${u})"><circle r="22" fill="url(#gold${u})" stroke="#78350f" stroke-width="3"/><rect x="-4" y="18" width="8" height="40" rx="3" fill="#78350f"/></g>
+        <g fill="#fde047">${[[50, 60, 7], [260, 50, 9], [40, 150, 5], [150, 30, 5]].map(([x, y, s]) => `<path d="M${x} ${y - s} Q${x} ${y} ${x + s} ${y} Q${x} ${y} ${x} ${y + s} Q${x} ${y} ${x - s} ${y} Q${x} ${y} ${x} ${y - s}Z"/>`).join('')}</g>`;
+    },
+  },
 };
 
 // Bright card colours (top, bottom) for the square lobby posters.
@@ -6025,7 +6069,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -6137,6 +6181,21 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  {
+    game: 'ticket', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
+    items: ['Achète un lot de 5 tickets à gratter', 'Gratte au doigt ou à la souris', '3 montants identiques = gagné', 'Les gains suivent le prix du ticket, jusqu’à ×1 000', 'Bilan à la fin : rentable ou non ?'],
+  },
+  { game: 'cosmic', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'zeus', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'huff', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'candy', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'anubis', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'bling', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'pharaon', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'bounty', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'taco', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'billets', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
+  { game: 'dragons', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   {
     game: 'poulet', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
     items: ['Fais traverser la route au poulet, voie après voie', 'Chaque voie franchie multiplie ta mise', '4 difficultés : de Facile à Extrême (jusqu’à ×2 041)', 'Encaisse quand tu veux avant la voiture !'],
@@ -6791,19 +6850,25 @@ const fmtE = (c) => `${(c / 100).toLocaleString('fr-FR', { minimumFractionDigits
 function gameMenu(spec) {
   return new Promise((resolve) => {
     const back = el('div', 'modal-back gm-back');
-    const buys = spec.buys?.length ? `<section class="gm-sec"><h4>Bonus</h4><div class="buy-list">${spec.buys.map((x) => `
+    const buyItems = (list) => list.map((x) => `
         <button class="buy-item ${x.cls || ''}" data-go="buy:${x.id}" ${x.disabled ? 'disabled' : ''}>
           <span class="bi-ico">${x.icon || '★'}</span>
           <span class="bi-txt"><b>${x.label}</b><small>${x.desc}</small></span>
           <span class="bi-price">${fmtE(x.price)}</span>
-        </button>`).join('')}</div></section>` : '';
+        </button>`).join('');
+    const buys = spec.buys?.length ? `<section class="gm-sec"><h4>Bonus</h4><div class="buy-list">${buyItems(spec.buys)}</div></section>` : '';
+    // Stake stepper: changes the game's bet without leaving the menu (bonus prices follow).
+    const st = spec.stake;
+    const stake = st ? `<section class="gm-sec"><h4>Mise par spin</h4><div class="gm-stake">
+        <button class="round-btn" data-bet="-1" aria-label="Diminuer la mise" ${st.down ? '' : 'disabled'}>−</button><b class="gm-bet">${st.value}</b>
+        <button class="round-btn" data-bet="1" aria-label="Augmenter la mise" ${st.up ? '' : 'disabled'}>+</button></div></section>` : '';
     const auto = spec.autoplay ? `<section class="gm-sec"><h4>Spins automatiques</h4>
         ${spec.auto ? `<button class="btn gm-stop" data-go="stop">■ Arrêter (${spec.auto} restants)</button>` : `<div class="choice-grid">${[10, 25, 50, 100, 250].map((n) => `<button class="btn" data-go="auto:${n}" ${spec.busy ? 'disabled' : ''}>${n}</button>`).join('')}</div>`}
       </section>` : '';
     const toggles = `<section class="gm-sec"><h4>Réglages</h4><div class="gm-toggles">${spec.toggles.map((t, i) => `
         <button class="gm-tog${t.on ? ' on' : ''}" data-tog="${i}"><span>${t.icon}</span>${t.label}<i class="sw"></i></button>`).join('')}</div></section>`;
     back.innerHTML = `<div class="modal gm"><button class="modal-x" data-go="" aria-label="Fermer">✕</button>
-      <h3>${spec.title || 'Menu'}</h3>${buys}${auto}${toggles}
+      <h3>${spec.title || 'Menu'}</h3>${stake}${buys}${auto}${toggles}
       <button class="btn ghost gm-info" data-go="info">ⓘ Règles et table des gains</button></div>`;
     document.body.appendChild(back);
     requestAnimationFrame(() => back.classList.add('show'));
@@ -6817,6 +6882,17 @@ function gameMenu(spec) {
     addEventListener('keydown', onKey);
     back.addEventListener('click', (e) => {
       if (e.target === back) return close(null);
+      const sb = e.target.closest('[data-bet]');
+      if (sb) {
+        if (sb.disabled) return;
+        const n = st.change(+sb.dataset.bet);
+        back.querySelector('.gm-bet').textContent = n.value;
+        back.querySelector('[data-bet="-1"]').disabled = !n.down;
+        back.querySelector('[data-bet="1"]').disabled = !n.up;
+        const bl = back.querySelector('.buy-list');
+        if (bl && n.buys) bl.innerHTML = buyItems(n.buys);
+        return;
+      }
       const tg = e.target.closest('[data-tog]');
       if (tg) {
         const t = spec.toggles[+tg.dataset.tog];
@@ -7040,6 +7116,7 @@ const EXTRA_THEMES = {
   poulet: { sd: 0.15, len: 16, root: 261.63, lead: { wave: 'square', vol: 0.024, dur: 0.1, pat: [12, null, 16, 12, 19, null, 16, null, 12, null, 16, 12, 21, 19, 16, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.16, pat: [-12, null, -5, null, -12, null, -5, null, -7, null, -3, null, -5, null, -8, null] }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
   gratteciel: { sd: 0.17, len: 16, root: 196, pad: { wave: 'sawtooth', vol: 0.014, dur: 1.6, map: { 0: [0, 4, 7], 8: [-3, 0, 4] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.16, pat: [12, 14, 16, 19, null, 16, 19, 24, 21, null, 19, 16, 14, null, 12, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.22, pat: [-12, null, -12, null, -12, null, -12, null, -15, null, -15, null, -10, null, -10, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.18, hv: 0.02 },
   penalty: { sd: 0.16, len: 16, root: 220, lead: { wave: 'sawtooth', vol: 0.022, dur: 0.14, pat: [12, null, 12, 14, 16, null, 12, null, 19, null, 17, 16, 14, null, 12, null] }, bass: { wave: 'triangle', vol: 0.13, dur: 0.18, pat: [-12, null, -12, null, -7, null, -7, null, -10, null, -10, null, -5, null, -5, null] }, kick: [0, 6, 8, 14], hat: [4, 12], kv: 0.2, hv: 0.022 },
+  ticket: { sd: 0.16, len: 16, root: 246.94, lead: { wave: 'triangle', vol: 0.055, dur: 0.14, pat: [12, 16, 19, null, 24, null, 19, 16, 14, 17, 21, null, 26, null, 21, 17] }, bass: { wave: 'sine', vol: 0.14, dur: 0.2, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -7, null, -5, null] }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -7588,10 +7665,12 @@ class SlotMachine {
 
   // "Bonus & menu": bonus buys, autoplay and settings in one sheet.
   async openMenu() {
-    const bet = this.bet;
+    const buys = () => this.buyList().map((x) => ({ ...x, price: Math.round(x.cost * this.bet * 100), disabled: this.busy || !!this.free || !wallet.canAfford(x.cost * this.bet) }));
+    const stake = () => ({ value: fmt(this.bet), down: !this.busy && !this.free && this.betIdx > 0, up: !this.busy && !this.free && this.betIdx < BETS.length - 1, buys: buys() });
     const r = await gameMenu({
       title: this.game.name,
-      buys: this.buyList().map((x) => ({ ...x, price: Math.round(x.cost * bet * 100), disabled: this.busy || !!this.free || !wallet.canAfford(x.cost * bet) })),
+      buys: buys(),
+      stake: { ...stake(), change: (d) => { this.changeBet(d); return stake(); } },
       autoplay: true, auto: this.auto, busy: this.busy || !!this.free,
       toggles: [
         { icon: '⚡', label: 'Turbo', on: this.turbo, toggle: () => (this.turbo = !this.turbo) },
@@ -7938,19 +8017,23 @@ class BaseGame {
 
   // "Bonus & menu": bonus buys, autoplay and settings in one sheet.
   async openMenu() {
-    const bet = this.bet, c = this.cfg;
+    const c = this.cfg;
     const toggles = [];
     if (c.turbo) toggles.push({ icon: '⚡', label: 'Turbo', on: this.turbo, toggle: () => { this.turbo = !this.turbo; this.saveKey(`${this.game.id}_turbo`, this.turbo ? 1 : 0); return this.turbo; } });
     c.opts.forEach((o) => toggles.push({ icon: o.icon, label: o.label, on: !!this.optOn?.(o.id), toggle: () => { this.onOpt?.(o.id); return !!this.optOn?.(o.id); } }));
     toggles.push({ icon: '🎵', label: 'Musique', on: musicOn(), toggle: () => { this.music.setEnabled(!musicOn()); return musicOn(); } });
     toggles.push({ icon: '🔊', label: 'Effets sonores', on: !isMuted(), toggle: () => { setMuted(!isMuted()); return !isMuted(); } });
+    const buys = () => c.buys.map((x) => {
+      const bet = this.bet, free = !!gifts.find(this.game.id, x.id) && bet <= GIFT_MAX_BET;
+      if (gifts.find(this.game.id, x.id) && !free) x = { ...x, desc: `🎁 Offert jusqu’à ${fmtC(GIFT_MAX_BET)} de mise · ${x.desc}` };
+      return free ? { ...x, label: `🎁 OFFERT · ${x.label}`, price: 0, disabled: this.busy, cls: 'gift' } : { ...x, price: x.cost(bet), disabled: this.busy || this.balC() < x.cost(bet) };
+    });
+    // Stake stepper in the menu, for games with the usual −/+ bet (and not locked mid-round).
+    const stake = () => ({ value: fmtC(this.stakeLabel ? this.stakeLabel() : this.bet), down: !this.busy && !this.playing && this.bi > 0, up: !this.busy && !this.playing && this.bi < c.bets.length - 1, buys: buys() });
     const r = await gameMenu({
       title: this.game.name,
-      buys: c.buys.map((x) => {
-        const free = !!gifts.find(this.game.id, x.id) && bet <= GIFT_MAX_BET;
-        if (gifts.find(this.game.id, x.id) && !free) x = { ...x, desc: `🎁 Offert jusqu’à ${fmtC(GIFT_MAX_BET)} de mise · ${x.desc}` };
-        return free ? { ...x, label: `🎁 OFFERT · ${x.label}`, price: 0, disabled: this.busy, cls: 'gift' } : { ...x, price: x.cost(bet), disabled: this.busy || this.balC() < x.cost(bet) };
-      }),
+      buys: buys(),
+      stake: c.stepper ? { ...stake(), change: (d) => { this.changeBet(d); return stake(); } } : null,
       autoplay: c.autoplay, auto: this.auto, busy: this.busy,
       toggles,
     });
@@ -8595,6 +8678,7 @@ const FILES = {
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', '805445d519'],
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '81eb5c1498'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', 'c401e351a3'],
+  ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'eb7ef61ea3'],
 };
 const loading = {};
 
