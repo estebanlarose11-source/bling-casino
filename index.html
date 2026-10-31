@@ -2496,66 +2496,67 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 @container (max-width: 520px) { .bv-top { grid-template-columns: 1fr 1fr; } .bv-logo { grid-column: 1 / -1; order: -1; } .bv-jp { padding: 4px 8px; } .bv-grand { width: 100%; } .bv-boxes, .bv-gold { display: none; } }
 @media (prefers-reduced-motion: reduce) { .bv-shine, .g-billets .rs-cell.cash svg, .g-billets .rs-cell.fsb svg { animation: none; } }
 
-/* ============ Robo Fusion ============ */
-.g-robofusion { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(34, 211, 238, .3), transparent 70%), radial-gradient(500px 300px at 90% 100%, rgba(168, 85, 247, .25), transparent 70%), linear-gradient(180deg, #06142a 0%, #030711 100%); }
-.g-robofusion .slot-title h2 { font-family: Orbitron, sans-serif; color: #e0f2fe; text-shadow: 0 0 8px #22d3ee, 0 0 22px rgba(34, 211, 238, .6); }
-.rf-frame { padding: 6px; border-radius: 18px; background: linear-gradient(135deg, #22d3ee, #6366f1 50%, #a855f7); box-shadow: 0 0 22px rgba(34, 211, 238, .45), 0 16px 40px rgba(0, 0, 0, .6); }
-.rf-frame > .slot-stage { position: relative; overflow: hidden; border-radius: 13px; padding: 8px 10px 10px; background: #050b18; }
-.rf-frame > .slot-stage > :not(.rf-shop) { position: relative; z-index: 1; }
-/* workshop: blueprint grid, conveyor belt, robot arms */
-.rf-shop { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 30%, #0c2445, #050b18 70%); }
-.rf-grid { position: absolute; inset: 0; opacity: .35; background-image: linear-gradient(rgba(34, 211, 238, .25) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 211, 238, .25) 1px, transparent 1px); background-size: 28px 28px; mask-image: radial-gradient(ellipse, #000 30%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse, #000 30%, transparent 75%); }
-.rf-belt { position: absolute; left: 0; right: 0; bottom: 0; height: 22px; background: repeating-linear-gradient(90deg, #1f2937 0 18px, #374151 18px 22px); border-top: 2px solid #22d3ee; box-shadow: 0 -4px 14px rgba(34, 211, 238, .35); animation: rfBelt 1.2s linear infinite; }
-@keyframes rfBelt { to { background-position: 22px 0; } }
-.rf-arm { position: absolute; top: 18%; width: 70px; height: 150px; opacity: .55; }
-.rf-arm::before { content: ''; position: absolute; left: 30px; top: 0; width: 10px; height: 110px; border-radius: 5px; background: linear-gradient(90deg, #64748b, #cbd5e1, #64748b); transform-origin: 50% 0; animation: rfArm 3s ease-in-out infinite alternate; }
-.rf-arm::after { content: ''; position: absolute; left: 24px; top: -8px; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle, #22d3ee 30%, #0e7490); box-shadow: 0 0 12px #22d3ee; }
-.rf-arm.l { left: 0; } .rf-arm.r { right: 0; } .rf-arm.r::before { animation-delay: -1.5s; }
-@keyframes rfArm { from { transform: rotate(-18deg); } to { transform: rotate(18deg); } }
+/* ============ Fruit Slice ============ */
+.g-fruits { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(253, 224, 71, .45), transparent 70%), radial-gradient(500px 300px at 95% 100%, rgba(244, 63, 94, .3), transparent 70%), linear-gradient(180deg, #fb923c 0%, #db2777 55%, #831843 100%); }
+.g-fruits .slot-title h2 { font-family: 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; color: #fff; text-shadow: 0 3px 0 #be185d, 0 6px 0 #831843; }
+.fs-frame { padding: 7px; border-radius: 20px; background: repeating-linear-gradient(135deg, #facc15 0 16px, #f97316 16px 32px, #22c55e 32px 48px, #f43f5e 48px 64px); box-shadow: 0 0 22px rgba(253, 224, 71, .45), 0 16px 40px rgba(0, 0, 0, .45); }
+.fs-frame > .slot-stage { position: relative; overflow: hidden; border-radius: 14px; padding: 8px 10px 10px; background: #fff7ed; }
+.fs-frame > .slot-stage > :not(.fs-bar) { position: relative; z-index: 1; }
+/* juice bar on the beach: sun, palms, falling juice drops, wooden counter */
+.fs-bar { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(180deg, #38bdf8 0%, #7dd3fc 40%, #fde68a 75%, #fbbf24 100%); }
+.fs-sun { position: absolute; left: 50%; top: -60px; width: 200px; height: 200px; margin-left: -100px; border-radius: 50%; background: radial-gradient(circle, #fff7c2, #fde047 40%, rgba(253, 224, 71, 0) 70%); animation: fsSun 5s ease-in-out infinite alternate; }
+@keyframes fsSun { to { transform: scale(1.1); } }
+.fs-palm { position: absolute; bottom: 14%; width: 120px; height: 200px; opacity: .55; }
+.fs-palm::before { content: ''; position: absolute; left: 56px; bottom: 0; width: 10px; height: 150px; border-radius: 5px; background: repeating-linear-gradient(180deg, #92400e 0 8px, #b45309 8px 12px); transform: rotate(6deg); transform-origin: bottom; }
+.fs-palm::after { content: ''; position: absolute; left: 0; top: 10px; width: 120px; height: 60px; border-radius: 50%; background: radial-gradient(ellipse at 50% 100%, transparent 30%, #16a34a 31%, #15803d 60%, transparent 61%); transform-origin: 50% 100%; animation: fsPalm 4s ease-in-out infinite alternate; }
+@keyframes fsPalm { to { transform: rotate(5deg); } }
+.fs-palm.l { left: -10px; } .fs-palm.r { right: -10px; transform: scaleX(-1); }
+.fs-drops { position: absolute; inset: -30% 0 0; opacity: .5; background-image: radial-gradient(circle, #f43f5e 2px, transparent 2.6px), radial-gradient(circle, #fde047 2px, transparent 2.6px), radial-gradient(circle, #22c55e 1.6px, transparent 2.2px); background-size: 120px 140px, 90px 120px, 150px 170px; background-position: 10px 0, 60px 40px, 30px 90px; animation: fsDrops 7s linear infinite; }
+@keyframes fsDrops { to { transform: translateY(30%); } }
+.fs-counter { position: absolute; left: 0; right: 0; bottom: 0; height: 16%; background: repeating-linear-gradient(90deg, #b45309 0 40px, #92400e 40px 42px), #b45309; box-shadow: inset 0 6px 0 #fbbf24; }
 /* jackpot panel */
-.rf-top { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
-.rf-logo { text-align: center; padding: 4px 16px; border-radius: 10px; background: #020617; box-shadow: inset 0 0 0 2px #22d3ee, 0 0 16px rgba(34, 211, 238, .35); }
-.rf-logo b { display: block; font: 900 clamp(18px, 3.4vw, 30px)/1 Orbitron, sans-serif; color: #e0f2fe; text-shadow: 0 0 10px #22d3ee; letter-spacing: 2px; }
-.rf-logo em { display: block; font: 900 clamp(11px, 1.8vw, 15px)/1.2 Orbitron, sans-serif; font-style: normal; color: #f0abfc; letter-spacing: 4px; text-shadow: 0 0 8px #a855f7; }
-.rf-jp, .rf-grand { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 12px; border-radius: 8px; background: #0b1324; box-shadow: inset 0 0 0 1px #1e3a5f; font-variant-numeric: tabular-nums; }
-.rf-jp small, .rf-grand small { font: 800 11px Inter, sans-serif; letter-spacing: 1.5px; }
-.rf-jp b, .rf-grand b { font: 900 clamp(12px, 1.7vw, 16px) Orbitron, sans-serif; color: #e0f2fe; }
-.rf-jp.mini small { color: #fdba74; } .rf-jp.major small { color: #93c5fd; }
-.rf-grand { width: min(60%, 320px); margin: 0 auto 8px; justify-content: center; background: linear-gradient(180deg, #2a1d05, #0f0a02); box-shadow: inset 0 0 0 2px #fbbf24, 0 0 18px rgba(251, 191, 36, .35); }
-.rf-grand small { color: #fde047; } .rf-grand b { font-size: clamp(15px, 2.2vw, 20px); color: #fff7c2; }
-.rf-jp.flash, .rf-grand.flash { animation: bvFlash .3s ease-in-out 6 alternate; }
-/* reels in pairs: each pair is one workbench, the halves meet at its centre */
-.g-robofusion .rs { gap: 0; grid-template-columns: 1fr 1fr 12px 1fr 1fr 12px 1fr 1fr; aspect-ratio: calc((6 + .36) / 3); padding: 6px; border-radius: 12px; background: #0b1324; box-shadow: inset 0 0 0 1px rgba(34, 211, 238, .4); width: min(100%, calc((100vh - var(--chrome) - 110px) * 6.36 / 3)); }
-.g-robofusion .rs-reel:nth-child(3) { grid-column: 4; } .g-robofusion .rs-reel:nth-child(4) { grid-column: 5; }
-.g-robofusion .rs-reel:nth-child(5) { grid-column: 7; } .g-robofusion .rs-reel:nth-child(6) { grid-column: 8; }
-.g-robofusion .rs-reel { background: linear-gradient(180deg, #0f1d36, #142a4d 50%, #0f1d36); }
-.g-robofusion .rs-reel:nth-child(odd) { border-radius: 8px 0 0 8px; box-shadow: inset -1px 0 0 rgba(34, 211, 238, .5); }
-.g-robofusion .rs-reel:nth-child(even) { border-radius: 0 8px 8px 0; }
-.g-robofusion .rs-reel::before { background: linear-gradient(rgba(5, 11, 24, .85), transparent); }
-.g-robofusion .rs-reel::after { background: linear-gradient(transparent, rgba(5, 11, 24, .85)); }
-.g-robofusion .rs-cell svg { width: 100%; height: 90%; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .55)); transition: transform .26s cubic-bezier(.3, 1.5, .5, 1); }
-.g-robofusion .rs-cell.lt { justify-items: end; } .g-robofusion .rs-cell.rt { justify-items: start; }
-.g-robofusion .rs-cell.lt svg { transform: translateX(-4%); } .g-robofusion .rs-cell.rt svg { transform: translateX(4%); }
-.g-robofusion .rs-cell.parts svg, .g-robofusion .rs-cell.batt svg { width: 72%; height: 72%; transform: none; justify-self: center; }
-.g-robofusion .rs-cell.parts { opacity: .65; }
-.g-robofusion .rs-cell.batt svg { animation: rfBatt 1.4s ease-in-out infinite; }
-@keyframes rfBatt { 50% { filter: drop-shadow(0 0 10px #22d3ee); } }
-/* assembling: the halves close the gap, a weld line glows, the eyes light up */
-.g-robofusion .rs-cell.fuse svg { transform: translateX(0) !important; }
-.g-robofusion .rs-cell.fuse { z-index: 2; }
-.g-robofusion .rs-cell.lt.fused::after { content: ''; position: absolute; right: -1px; top: 8%; bottom: 8%; width: 3px; border-radius: 2px; background: #fff; box-shadow: 0 0 8px #fde047, 0 0 16px #fb923c; animation: rfWeld .6s ease-out forwards; }
-@keyframes rfWeld { to { opacity: .25; } }
-.g-robofusion .rs-cell.fused svg { filter: drop-shadow(0 0 8px rgba(34, 211, 238, .9)) brightness(1.15); animation: rfJoy .5s ease-in-out infinite alternate; }
-.g-robofusion .rs-cell.fused .eye { filter: url(#none); }
-@keyframes rfJoy { to { filter: drop-shadow(0 0 14px rgba(34, 211, 238, 1)) brightness(1.3); } }
-.g-robofusion .rs-cell.jp.fused svg { filter: drop-shadow(0 0 14px #fde047); }
-.rf-word { position: absolute; left: 50%; top: 58%; z-index: 6 !important; pointer-events: none; opacity: 0; font: 900 clamp(30px, 6vw, 70px)/1 Orbitron, sans-serif; letter-spacing: 2px; white-space: nowrap; color: #e0f2fe; text-shadow: 0 0 10px #22d3ee, 0 0 24px #6366f1, 0 4px 0 #1e3a8a; }
-.rf-word.jp { color: #fff7c2; text-shadow: 0 0 12px #fde047, 0 0 26px #f59e0b, 0 4px 0 #92400e; }
-.rf-word.fs { color: #ecfeff; text-shadow: 0 0 12px #22d3ee, 0 4px 0 #0e7490; }
-.g-robofusion.in-free .rf-shop { background: radial-gradient(ellipse at 50% 30%, #3b0f5c, #0b0518 70%); }
-.pay-sym.rfp { width: 84px; }
-@container (max-width: 520px) { .rf-top { grid-template-columns: 1fr 1fr; } .rf-logo { grid-column: 1 / -1; order: -1; } .rf-grand { width: 100%; } .rf-arm { display: none; } }
-@media (prefers-reduced-motion: reduce) { .rf-belt, .rf-arm::before { animation: none; } }
+.fs-top { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
+.fs-logo { text-align: center; padding: 2px 18px 4px; border-radius: 14px; background: linear-gradient(180deg, #fff, #ffe4e6); box-shadow: 0 0 0 3px #f43f5e, 0 4px 0 #be185d; }
+.fs-logo b { display: block; font: 400 clamp(24px, 4.2vw, 40px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 2px; color: #f43f5e; text-shadow: 0 2px 0 #fde047; }
+.fs-logo em { display: block; font: 900 clamp(11px, 1.6vw, 14px)/1 Orbitron, sans-serif; font-style: normal; letter-spacing: 6px; color: #16a34a; }
+.fs-jp, .fs-grand { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 12px; border-radius: 99px; background: rgba(255, 255, 255, .85); box-shadow: 0 0 0 2px rgba(190, 24, 93, .35); font-variant-numeric: tabular-nums; }
+.fs-jp small, .fs-grand small { font: 800 11px Inter, sans-serif; letter-spacing: 1.5px; }
+.fs-jp b, .fs-grand b { font: 900 clamp(12px, 1.7vw, 16px) Orbitron, sans-serif; color: #831843; }
+.fs-jp.mini small { color: #dc2626; } .fs-jp.major small { color: #7e22ce; }
+.fs-grand { width: min(60%, 320px); margin: 0 auto 8px; justify-content: center; background: linear-gradient(180deg, #fff7c2, #fbbf24); box-shadow: 0 0 0 2px #b45309, 0 0 18px rgba(251, 191, 36, .6); }
+.fs-grand small { color: #78350f; } .fs-grand b { font-size: clamp(15px, 2.2vw, 20px); color: #78350f; }
+.fs-jp.flash, .fs-grand.flash { animation: bvFlash .3s ease-in-out 6 alternate; }
+/* reels in pairs (cutting boards): the halves meet at the centre of each pair */
+.g-fruits .rs { gap: 0; grid-template-columns: 1fr 1fr 12px 1fr 1fr 12px 1fr 1fr; aspect-ratio: calc((6 + .36) / 3); padding: 6px; border-radius: 14px; background: rgba(255, 255, 255, .55); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .8), 0 6px 18px rgba(131, 24, 67, .25); width: min(100%, calc((100vh - var(--chrome) - 110px) * 6.36 / 3)); }
+.g-fruits .rs-reel:nth-child(3) { grid-column: 4; } .g-fruits .rs-reel:nth-child(4) { grid-column: 5; }
+.g-fruits .rs-reel:nth-child(5) { grid-column: 7; } .g-fruits .rs-reel:nth-child(6) { grid-column: 8; }
+.g-fruits .rs-reel { background: linear-gradient(180deg, #fde7c4, #fbd7a0 50%, #fde7c4); }
+.g-fruits .rs-reel:nth-child(odd) { border-radius: 10px 0 0 10px; box-shadow: inset -1px 0 0 rgba(146, 64, 14, .35); }
+.g-fruits .rs-reel:nth-child(even) { border-radius: 0 10px 10px 0; }
+.g-fruits .rs-reel::before { background: linear-gradient(rgba(253, 231, 196, .9), transparent); }
+.g-fruits .rs-reel::after { background: linear-gradient(transparent, rgba(253, 231, 196, .9)); }
+.g-fruits .rs-cell svg { width: 100%; height: 92%; filter: drop-shadow(0 4px 4px rgba(120, 53, 15, .3)); transition: transform .26s cubic-bezier(.3, 1.5, .5, 1); }
+.g-fruits .rs-cell.lt { justify-items: end; } .g-fruits .rs-cell.rt { justify-items: start; }
+.g-fruits .rs-cell.lt svg { transform: translateX(-5%) rotate(-4deg); } .g-fruits .rs-cell.rt svg { transform: translateX(5%) rotate(4deg); }
+.g-fruits .rs-cell.parts svg, .g-fruits .rs-cell.batt svg { width: 72%; height: 72%; transform: none; justify-self: center; }
+.g-fruits .rs-cell.parts { opacity: .6; }
+.g-fruits .rs-cell.batt svg { animation: fsBlend .5s ease-in-out infinite alternate; }
+@keyframes fsBlend { to { transform: rotate(4deg) translateY(-3%); } }
+.g-fruits .rs.has-win .rs-cell:not(.win) { opacity: 1; filter: none; }
+/* rejoining: the halves straighten and close the gap, the seam glows with juice */
+.g-fruits .rs-cell.fuse svg { transform: none !important; }
+.g-fruits .rs-cell.fuse { z-index: 2; }
+.g-fruits .rs-cell.lt.fused::after { content: ''; position: absolute; right: -2px; top: 10%; bottom: 10%; width: 4px; border-radius: 2px; background: #fff; box-shadow: 0 0 10px #fde047, 0 0 18px #f43f5e; animation: rfWeld .7s ease-out forwards; }
+@keyframes rfWeld { to { opacity: 0; } }
+.g-fruits .rs-cell.fused svg { animation: fsJoy .45s ease-in-out infinite alternate; }
+@keyframes fsJoy { to { transform: scale(1.06) !important; filter: drop-shadow(0 0 10px rgba(253, 224, 71, .95)) brightness(1.1); } }
+.fs-word { position: absolute; left: 50%; top: 58%; z-index: 6 !important; pointer-events: none; opacity: 0; font: 400 clamp(38px, 7vw, 86px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; white-space: nowrap; color: #fff; text-shadow: 0 4px 0 #f43f5e, 0 8px 0 #9d174d, 0 0 20px rgba(253, 224, 71, .8); }
+.fs-word.jp { color: #fff7c2; text-shadow: 0 4px 0 #d97706, 0 8px 0 #78350f, 0 0 24px #fde047; }
+.fs-word.fs { color: #fff; text-shadow: 0 4px 0 #ec4899, 0 8px 0 #7e22ce; }
+.g-fruits.in-free .fs-bar { background: linear-gradient(180deg, #a855f7 0%, #ec4899 50%, #fb923c 100%); }
+.pay-sym.frp { width: 84px; }
+@container (max-width: 520px) { .fs-top { grid-template-columns: 1fr 1fr; } .fs-logo { grid-column: 1 / -1; order: -1; } .fs-grand { width: 100%; } .fs-palm { display: none; } }
+@media (prefers-reduced-motion: reduce) { .fs-drops, .fs-sun, .fs-palm::after { animation: none; } }
 
 /* ============ Rewarded ad popup (A-ADS) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
@@ -5168,63 +5169,62 @@ const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="t
 return { DEFS };
 })();
 
-// ---- art/robofusion.js ----
-__mods['art/robofusion.js'] = (() => {
-// SVG art for Robo Fusion: nine robots drawn whole in a 128×64 box (each reel shows one half), the joker chip, the
-// battery and the spare parts. Faces are symmetric so a left and a right half line up at x = 64.
+// ---- art/fruits.js ----
+__mods['art/fruits.js'] = (() => {
+// SVG art for Fruit Slice: nine fruits drawn whole in a 128×70 box centred on x = 64 (each reel shows one half, with
+// a juicy cut edge along the seam), the rainbow star-fruit joker, the blender scatter and the peels that never match.
 
-const lg = (id, a, b, c) => `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient>`;
-const T = (x, y, s, t, c) => `<text x="${x}" y="${y}" font-family="Orbitron, Arial Black, sans-serif" font-weight="900" font-size="${s}" fill="${c}" text-anchor="middle">${t}</text>`;
-const HEADS = [
-  'M20 14 Q20 6 28 6 H100 Q108 6 108 14 V54 Q108 60 100 60 H28 Q20 60 20 54 Z',
-  'M18 60 V34 Q18 4 64 4 Q110 4 110 34 V60 Z',
-  'M30 4 H98 L112 22 V48 L98 60 H30 L16 48 V22 Z',
-  'M24 10 Q64 0 104 10 L110 56 Q64 64 18 56 Z',
-];
-const eyes = (k, c) => [
-  `<circle cx="46" cy="26" r="9" fill="#0b1020"/><circle cx="82" cy="26" r="9" fill="#0b1020"/><circle class="eye" cx="46" cy="26" r="5" fill="${c}"/><circle class="eye" cx="82" cy="26" r="5" fill="${c}"/>`,
-  `<rect x="30" y="18" width="68" height="15" rx="7" fill="#0b1020"/><rect class="eye" x="35" y="22" width="58" height="7" rx="3.5" fill="${c}"/>`,
-  `<rect x="36" y="17" width="18" height="16" rx="3" fill="#0b1020"/><rect x="74" y="17" width="18" height="16" rx="3" fill="#0b1020"/><rect class="eye" x="40" y="21" width="10" height="8" fill="${c}"/><rect class="eye" x="78" y="21" width="10" height="8" fill="${c}"/>`,
-  `<path d="M36 24 Q46 14 56 24 Q46 34 36 24Z M72 24 Q82 14 92 24 Q82 34 72 24Z" fill="#0b1020"/><circle class="eye" cx="46" cy="24" r="4" fill="${c}"/><circle class="eye" cx="82" cy="24" r="4" fill="${c}"/>`,
-][k];
-const ROBOTS = [
-  // id, body light / mid / dark, eye colour, head, eyes, plate text
-  ['rf0', '#e5e7eb', '#9ca3af', '#4b5563', '#22d3ee', 0, 0, '×2'],
-  ['rf1', '#fecaca', '#ef4444', '#7f1d1d', '#fde047', 1, 1, '×5'],
-  ['rf2', '#bfdbfe', '#3b82f6', '#1e3a8a', '#f472b6', 2, 2, '×10'],
-  ['rf3', '#fed7aa', '#f97316', '#7c2d12', '#22d3ee', 3, 3, '×20'],
-  ['rf4', '#bbf7d0', '#22c55e', '#14532d', '#fde047', 0, 2, '×50'],
-  ['rf5', '#e9d5ff', '#a855f7', '#4c1d95', '#4ade80', 1, 0, '×100'],
-  ['rf6', '#fde4c8', '#c2763a', '#6b3a12', '#fde047', 2, 0, 'MINI'],
-  ['rf7', '#f1f5f9', '#94a3b8', '#334155', '#38bdf8', 3, 1, 'MAJEUR'],
-  ['rf8', '#fff7c2', '#fbbf24', '#92400e', '#ef4444', 1, 1, 'JACKPOT'],
-];
-function robot([id, c0, c1, c2, eye, head, ey, plate], k) {
-  const gold = k === 8, ant = k % 3;
-  return `<symbol id="${id}" viewBox="0 -6 128 70">
-    ${ant === 0 ? `<path d="M64 6 V0" stroke="${c2}" stroke-width="3"/><circle cx="64" cy="1" r="3" fill="${eye}"/>` : ant === 1 ? `<path d="M52 6 L46 0 M76 6 L82 0" stroke="${c2}" stroke-width="3"/><circle cx="46" cy="1" r="2.5" fill="${eye}"/><circle cx="82" cy="1" r="2.5" fill="${eye}"/>` : ''}
-    <rect x="8" y="24" width="12" height="18" rx="3" fill="${c2}"/><rect x="108" y="24" width="12" height="18" rx="3" fill="${c2}"/>
-    <path d="${HEADS[head]}" fill="url(#g${id})" stroke="${gold ? '#fff7c2' : c2}" stroke-width="${gold ? 3 : 2}" stroke-linejoin="round"/>
-    <path d="M30 12 Q64 6 98 12" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
-    ${eyes(ey, eye)}
-    <rect x="${64 - (plate.length > 4 ? 30 : 20)}" y="40" width="${plate.length > 4 ? 60 : 40}" height="15" rx="4" fill="#0b1020" stroke="${gold ? '#fde047' : '#e5e7eb'}" stroke-opacity=".7"/>
-    ${T(64, 51.5, plate.length > 5 ? 9.5 : 11, plate, gold ? '#fde047' : '#fff')}
-    ${gold ? `<path d="M48 5 L54 -2 L60 4 L64 -4 L68 4 L74 -2 L80 5 Z" fill="#fde047" stroke="#92400e" transform="translate(0 4)"/>` : ''}
-  </symbol>`;
-}
+const lg = (id, a, b, c, x2 = 0, y2 = 1) => `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient>`;
+const rg = (id, a, b, c) => `<radialGradient id="${id}" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></radialGradient>`;
+const T = (x, y, s, t, c) => `<text x="${x}" y="${y}" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="${s}" fill="${c}" text-anchor="middle" stroke="rgba(0,0,0,.45)" stroke-width="1.6" paint-order="stroke">${t}</text>`;
+const shine = (x, y, rx, ry) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" transform="rotate(-30 ${x} ${y})" fill="#fff" opacity=".55"/>`;
+// the cut: a band of flesh on each side of x = 64, so a lone half looks freshly sliced
+const cut = (y0, y1, flesh, seeds = '') => `<rect x="61.5" y="${y0}" width="5" height="${y1 - y0}" rx="2.5" fill="${flesh}" opacity=".95"/>${seeds}`;
+const plate = (t, gold) => `<rect x="${64 - (t.length > 4 ? 26 : 17)}" y="54" width="${t.length > 4 ? 52 : 34}" height="13" rx="6.5" fill="${gold ? '#78350f' : 'rgba(0,0,0,.55)'}" stroke="${gold ? '#fde047' : '#fff'}" stroke-opacity=".8"/>${T(64, 64, t.length > 5 ? 8.5 : 9.5, t, gold ? '#fde047' : '#fff')}`;
+
+const FRUITS = {
+  // cherries ×2: one cherry per half, stems joined at the top
+  fr0: `<path d="M44 26 Q52 2 64 4 Q76 2 84 26" fill="none" stroke="#3f6212" stroke-width="3" stroke-linecap="round"/><path d="M64 4 Q72 -2 80 4 Q72 8 64 4Z" fill="#4d7c0f"/>
+    <circle cx="44" cy="38" r="17" fill="url(#frCherry)"/><circle cx="84" cy="38" r="17" fill="url(#frCherry)"/>${shine(38, 31, 3, 6)}${shine(78, 31, 3, 6)}${cut(26, 48, '#fda4af')}${plate('×2')}`,
+  // lemon ×5
+  fr1: `<path d="M24 31 Q26 2 64 2 Q102 2 104 31 Q102 60 64 60 Q26 60 24 31Z" fill="url(#frLemon)" stroke="#a16207" stroke-width="1.5"/><path d="M24 31 L16 31 M104 31 L112 31" stroke="#ca8a04" stroke-width="7" stroke-linecap="round"/>
+    ${shine(44, 16, 6, 11)}${cut(4, 58, '#fef9c3')}${plate('×5')}`,
+  // orange ×10
+  fr2: `<circle cx="64" cy="30" r="28" fill="url(#frOrange)"/>${[[50, 18], [74, 22], [58, 40], [80, 38], [46, 32]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1" fill="#c2410c" opacity=".6"/>`).join('')}
+    <path d="M64 2 Q70 -4 78 0 Q70 4 64 2Z" fill="#16a34a"/>${shine(52, 18, 5, 9)}${cut(3, 57, '#fed7aa')}${plate('×10')}`,
+  // peach ×20, its cleft runs down the seam
+  fr3: `<path d="M64 6 Q100 2 100 32 Q100 58 64 58 Q28 58 28 32 Q28 2 64 6Z" fill="url(#frPeach)"/><path d="M64 7 Q60 30 64 56" fill="none" stroke="#be185d" stroke-opacity=".35" stroke-width="2"/>
+    <path d="M64 6 Q72 -4 86 0 Q76 8 64 6Z" fill="#65a30d"/>${shine(46, 20, 5, 10)}${cut(8, 56, '#fde68a')}${plate('×20')}`,
+  // watermelon ×50
+  fr4: `<ellipse cx="64" cy="31" rx="46" ry="27" fill="url(#frMelon)"/>${[-30, -15, 0, 15, 30].map((d) => `<path d="M${64 + d} 5 Q${64 + d * 1.25} 31 ${64 + d} 57" fill="none" stroke="#14532d" stroke-width="4" opacity=".55"/>`).join('')}
+    ${shine(36, 18, 5, 11)}${cut(5, 57, '#f43f5e', '<circle cx="63" cy="20" r="1.4" fill="#111"/><circle cx="65" cy="34" r="1.4" fill="#111"/><circle cx="63" cy="46" r="1.4" fill="#111"/>')}${plate('×50')}`,
+  // pineapple ×100
+  fr5: `<path d="M64 14 L54 -4 L60 -2 L64 -8 L68 -2 L74 -4 Z M64 14 L46 2 L58 6 Z M64 14 L82 2 L70 6 Z" fill="url(#frLeaf)"/>
+    <ellipse cx="64" cy="36" rx="25" ry="24" fill="url(#frPine)"/><clipPath id="frPineClip"><ellipse cx="64" cy="36" rx="25" ry="24"/></clipPath><g clip-path="url(#frPineClip)" stroke="#92400e" stroke-width="1.2" opacity=".55" fill="none">${[-24, -12, 0, 12, 24].map((d) => `<path d="M${40 + d} 14 L${88 + d} 60 M${88 - d} 14 L${40 - d} 60"/>`).join('')}</g>
+    ${shine(54, 26, 4, 8)}${cut(13, 59, '#fef08a')}${plate('×100')}`,
+  // MINI: strawberry
+  fr6: `<path d="M64 12 Q98 10 92 32 Q86 52 64 60 Q42 52 36 32 Q30 10 64 12Z" fill="url(#frStraw)"/>${[[48, 24], [58, 34], [72, 24], [80, 34], [52, 44], [70, 46], [64, 22]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.4" ry="2" fill="#fde68a"/>`).join('')}
+    <path d="M64 14 L50 4 L60 8 L64 0 L68 8 L78 4 Z" fill="#16a34a"/>${shine(46, 22, 4, 8)}${cut(12, 58, '#fecdd3')}${plate('MINI', 1)}`,
+  // MAJEUR: grapes
+  fr7: `<path d="M64 6 V0 M64 4 Q74 -4 84 2" stroke="#3f6212" stroke-width="2.5" fill="none"/>${[[50, 14], [64, 12], [78, 14], [44, 26], [57, 25], [71, 25], [84, 26], [50, 38], [64, 37], [78, 38], [57, 49], [71, 49]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="8" fill="url(#frGrape)"/><circle cx="${x - 2.5}" cy="${y - 2.5}" r="2" fill="#fff" opacity=".5"/>`).join('')}
+    ${cut(6, 56, '#d9f99d')}${plate('MAJEUR', 1)}`,
+  // JACKPOT: golden apple with a crown
+  fr8: `<path d="M64 12 Q96 2 98 30 Q98 58 64 60 Q30 58 30 30 Q32 2 64 12Z" fill="url(#frGold)" stroke="#fff7c2" stroke-width="2"/><path d="M48 4 L54 -4 L60 2 L64 -6 L68 2 L74 -4 L80 4 Z" fill="#fde047" stroke="#92400e"/>
+    ${shine(46, 22, 5, 10)}${cut(12, 58, '#fef3c7')}${plate('JACKPOT', 1)}`,
+};
 
 const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-  ${ROBOTS.map(([id, c0, c1, c2]) => lg('g' + id, c0, c1, c2)).join('')}
-  ${lg('grfj', '#f0abfc', '#8b5cf6', '#1e1b4b')}${lg('grfb', '#a5f3fc', '#06b6d4', '#164e63')}
-  ${ROBOTS.map(robot).join('')}
-  <symbol id="rfj" viewBox="0 -6 128 70"><rect x="14" y="6" width="100" height="52" rx="8" fill="url(#grfj)" stroke="#f5d0fe" stroke-width="2.5"/>
-    ${[22, 34, 46, 58, 70, 82, 94, 106].map((x) => `<rect x="${x - 2}" y="0" width="4" height="7" fill="#e5e7eb"/><rect x="${x - 2}" y="57" width="4" height="7" fill="#e5e7eb"/>`).join('')}
-    <rect x="34" y="16" width="60" height="32" rx="4" fill="#0b1020"/><path d="M68 18 L56 34 H64 L60 46 L74 28 H66 Z" fill="#fde047"/>${T(64, 14, 7, 'JOKER', '#fff')}</symbol>
-  <symbol id="rfb" viewBox="0 0 64 64"><rect x="18" y="10" width="28" height="48" rx="5" fill="url(#grfb)" stroke="#cffafe" stroke-width="2"/><rect x="26" y="5" width="12" height="6" rx="2" fill="#cffafe"/>
-    <path d="M35 18 L25 36 H32 L29 50 L40 31 H33 Z" fill="#fde047" stroke="#854d0e" stroke-width="1"/></symbol>
-  <symbol id="rfp" viewBox="0 0 64 64"><g fill="#475569" stroke="#1e293b" stroke-width="1.5" opacity=".9">
-    <path d="M24 16 l3 0 1 4 4 2 3 -3 2 2 -3 3 2 4 4 1 0 3 -4 1 -2 4 3 3 -2 2 -3 -3 -4 2 -1 4 -3 0 -1 -4 -4 -2 -3 3 -2 -2 3 -3 -2 -4 -4 -1 0 -3 4 -1 2 -4 -3 -3 2 -2 3 3 4 -2z"/><circle cx="25.5" cy="29.5" r="4" fill="#1e293b"/>
-    <rect x="38" y="36" width="16" height="7" rx="2" transform="rotate(-30 46 40)"/><circle cx="46" cy="22" r="5"/><path d="M14 48 h24 v5 h-24z"/></g></symbol>
+  ${rg('frCherry', '#fecdd3', '#e11d48', '#7f1d1d')}${rg('frLemon', '#fef9c3', '#facc15', '#a16207')}${rg('frOrange', '#fed7aa', '#f97316', '#9a3412')}${rg('frPeach', '#fde4cf', '#fb923c', '#db2777')}
+  ${rg('frMelon', '#bbf7d0', '#22c55e', '#14532d')}${rg('frPine', '#fef08a', '#eab308', '#a16207')}${rg('frStraw', '#fecaca', '#ef4444', '#991b1b')}${rg('frGrape', '#e9d5ff', '#9333ea', '#3b0764')}
+  ${rg('frGold', '#fff7c2', '#fbbf24', '#b45309')}${lg('frLeaf', '#86efac', '#16a34a', '#14532d')}${lg('frJoker', '#f472b6', '#facc15', '#22d3ee', 1, 1)}${lg('frBlend', '#e0f2fe', '#93c5fd', '#3b82f6')}
+  ${Object.entries(FRUITS).map(([id, body]) => `<symbol id="${id}" viewBox="0 -8 128 76">${body}</symbol>`).join('\n')}
+  <symbol id="frj" viewBox="0 -8 128 76"><path d="M64 0 L74 22 L100 22 L80 38 L88 62 L64 48 L40 62 L48 38 L28 22 L54 22 Z" fill="url(#frJoker)" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
+    ${shine(54, 20, 4, 7)}${cut(4, 54, '#fff')}${T(64, 40, 10, 'JOKER', '#fff')}</symbol>
+  <symbol id="frb" viewBox="0 0 64 64"><rect x="22" y="50" width="22" height="10" rx="3" fill="#334155"/><path d="M18 8 H46 L42 50 H22 Z" fill="url(#frBlend)" opacity=".75" stroke="#e0f2fe" stroke-width="2"/>
+    <path d="M21 30 H43 L42 50 H22 Z" fill="#f472b6" opacity=".85"/><circle cx="28" cy="40" r="3" fill="#fde047"/><circle cx="37" cy="36" r="3" fill="#4ade80"/><rect x="16" y="4" width="32" height="6" rx="3" fill="#334155"/>
+    ${shine(24, 20, 2, 7)}</symbol>
+  <symbol id="frp" viewBox="0 0 64 64"><g opacity=".9"><path d="M14 44 Q24 30 40 34 Q30 42 14 44Z" fill="#facc15" stroke="#a16207"/><path d="M30 20 Q44 12 52 24 Q40 26 30 20Z" fill="#16a34a" stroke="#14532d"/>
+    <ellipse cx="24" cy="24" rx="2.5" ry="4" fill="#3f2a14"/><ellipse cx="44" cy="44" rx="2.5" ry="4" fill="#3f2a14" transform="rotate(30 44 44)"/><ellipse cx="34" cy="52" rx="2" ry="3.4" fill="#3f2a14"/></g></symbol>
 </defs></svg>`;
 
 return { DEFS };
@@ -5243,14 +5243,14 @@ const { DEFS: ZEUS } = __mods['art/zeus.js'];
 const { DEFS: COSMIC } = __mods['art/cosmic.js'];
 const { DEFS: TACO } = __mods['art/taco.js'];
 const { DEFS: BILLETS } = __mods['art/billets.js'];
-const { DEFS: ROBOFUSION } = __mods['art/robofusion.js'];
+const { DEFS: FRUITS } = __mods['art/fruits.js'];
 
 function mountAllArt() {
   if (document.getElementById('bling-art')) return;
   const host = document.createElement('div');
   host.id = 'bling-art';
   host.className = 'art-defs';
-  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC, TACO, BILLETS, ROBOFUSION].join('');
+  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC, TACO, BILLETS, FRUITS].join('');
   document.body.prepend(host);
 }
 
@@ -5344,7 +5344,7 @@ const ORIGINALS = [
   {"id": "robots", "name": "Course de Robots", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
   {"id": "taco", "name": "Taco Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "billets", "name": "Coffre aux Billets", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200 KE tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200 KE", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
-  {"id": "robofusion", "name": "Robo Fusion", "cat": "slot", "tag": "Machine à sous", "sub": "Assemble les deux moitiés", "colors": ["#22d3ee", "#050b18"], "description": "Dans l’atelier néon, les rouleaux vont par paires : à gauche des moitiés gauches de robots, à droite des moitiés droites. Quand les deux moitiés du même robot s’arrêtent côte à côte, elles se soudent et le robot paie sa puissance. Puces jokers, robots MINI, MAJEUR et JACKPOT ×500, et des batteries qui lancent les free spins.", "features": ["3 paires de rouleaux", "Robots à assembler", "Puce joker", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "Free spins : robots ×3", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
+  {"id": "fruits", "name": "Fruit Slice", "cat": "slot", "tag": "Machine à sous", "sub": "Recolle les fruits tranchés", "colors": ["#f43f5e", "#831843"], "description": "Au bar à jus de la plage, les fruits sont tranchés en deux : les rouleaux vont par paires, moitiés gauches d’un côté, moitiés droites de l’autre. Quand les deux moitiés du même fruit s’arrêtent côte à côte, elles se recollent dans une giclée de jus et paient la valeur du fruit. Caramboles jokers, fraise MINI, raisin MAJEUR et pomme d’or JACKPOT ×500.", "features": ["3 paires de rouleaux", "Fruits à recoller", "Carambole joker", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "Smoothie Time : fruits ×3", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -5696,16 +5696,15 @@ const SPECS = {
         ${b('bv1', 70, 120, 120, -18)}${b('bv4', 230, 110, 120, 16)}${b('bv5', 150, 90, 130, -4)}${b('bvg', 150, 175, 170, 3)}${b('bvf', 60, 230, 90, -10)}${b('bvj', 245, 225, 90, 12)}`;
     },
   },
-  robofusion: {
-    bg: ['#0c3a6b', '#03081a'], light: '#22d3ee', title: ['ROBO', 'FUSION'], font: 'orb', metal: ['#fff', '#a5f3fc', '#7c3aed'], tag: 'JACKPOT ×500',
+  fruits: {
+    bg: ['#f97316', '#9d174d'], light: '#fde047', title: ['FRUIT', 'SLICE'], font: 'bebas', metal: ['#fff', '#fde047', '#f43f5e'], tag: 'JACKPOT ×500',
     art: (u) => {
-      const r = (id, x, y, w, rot) => `<g transform="translate(${x} ${y}) rotate(${rot})" filter="url(#sh${u})"><use href="#${id}" x="${-w / 2}" y="${-w * 0.27}" width="${w}" height="${w * 0.547}"/></g>`;
-      const halfL = (id, x, y, w) => `<svg x="${x}" y="${y}" width="${w / 2}" height="${w * 0.547}" viewBox="0 -6 64 70" filter="url(#sh${u})"><use href="#${id}" width="128" height="70" y="-6"/></svg>`;
-      const halfR = (id, x, y, w) => `<svg x="${x}" y="${y}" width="${w / 2}" height="${w * 0.547}" viewBox="64 -6 64 70" filter="url(#sh${u})"><use href="#${id}" width="128" height="70" y="-6"/></svg>`;
-      return `<g opacity=".3">${Array.from({ length: 12 }, (_, k) => `<path d="M${k * 28} 0 V300 M0 ${k * 28} H300" stroke="#22d3ee" stroke-width=".8"/>`).join('')}</g>
-        ${halfL('rf8', 50, 70, 190)}${halfR('rf8', 160, 70, 190)}
-        <path d="M150 70 V170" stroke="#fde047" stroke-width="3" opacity=".9" filter="url(#glow${u})"/>
-        ${r('rf2', 70, 215, 110, -10)}${r('rf5', 232, 210, 110, 9)}`;
+      const half = (id, side, x, y, w, r) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><svg x="${-w / 4}" y="${-w * 0.3}" width="${w / 2}" height="${w * 0.6}" viewBox="${side ? 64 : 0} -8 64 76"><use href="#${id}" width="128" height="76" y="-8"/></svg></g>`;
+      const full = (id, x, y, w, r) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><use href="#${id}" x="${-w / 2}" y="${-w * 0.3}" width="${w}" height="${w * 0.594}"/></g>`;
+      return `<circle cx="150" cy="40" r="90" fill="#fde047" opacity=".35"/>
+        ${half('fr4', 0, 110, 110, 200, -14)}${half('fr4', 1, 196, 110, 200, 14)}
+        ${[[150, 70, '#f43f5e'], [140, 130, '#22c55e'], [162, 95, '#fde047']].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="5" fill="${c}"/>`).join('')}
+        ${full('fr5', 70, 220, 120, -8)}${full('fr8', 232, 215, 120, 8)}${full('fr0', 150, 250, 90, 0)}`;
     },
   },
 };
@@ -5715,7 +5714,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], robofusion: ["#1aa6d6", "#3b0f7a"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], fruits: ["#fb923c", "#db2777"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -5828,9 +5827,10 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
-    game: 'robofusion', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
-    items: ["Des rouleaux par paires : moitiés gauches et moitiés droites de robots", "Deux moitiés du même robot côte à côte : il est soudé et paie", "Robots MINI, MAJEUR et JACKPOT ×500", "Free spins où chaque robot paie ×3"],
+    game: 'fruits', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
+    items: ["Des fruits tranchés en deux sur des paires de rouleaux", "Deux moitiés du même fruit côte à côte : il se recolle et paie", "Fraise MINI, raisin MAJEUR et pomme d’or JACKPOT ×500", "Smoothie Time : free spins où chaque fruit paie ×3"],
   },
+
   {
     game: 'billets', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
     items: ["Billets de 5 à 200 KE dans une chambre forte dorée", "La mallette collecte tous les billets cash", "MINI ×10, MAJEUR ×50 et JACKPOT ×500", "8 free spins avec des mallettes sur tous les rouleaux"],
@@ -6673,7 +6673,7 @@ const EXTRA_THEMES = {
   'robots': { sd: 0.14, len: 16, root: 164.81, lead: { wave: 'sawtooth', vol: 0.02, dur: 0.1, pat: [12, 12, 15, null, 12, 12, 17, null, 12, 12, 19, 17, 15, null, 14, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.15, pat: [-12, -12, null, -12, -12, null, -10, null, -12, -12, null, -12, -9, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.025 },
   'taco': { sd: 0.16, len: 16, root: 220, lead: { wave: 'triangle', vol: 0.06, dur: 0.14, pat: [12, null, 16, 19, null, 16, 12, null, 14, null, 17, 21, null, 17, 14, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -10, null, -3, null] }, comp: { wave: 'square', vol: 0.016, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [2, 5, 9] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
   billets: { sd: 0.17, len: 16, root: 146.83, lead: { wave: 'square', vol: 0.028, dur: 0.12, pat: [12, null, 16, 19, null, 24, 19, 16, 14, null, 17, 21, null, 26, 21, 17] }, bass: { wave: 'triangle', vol: 0.13, dur: 0.2, pat: [-12, null, -12, null, -5, null, -5, null, -10, null, -10, null, -3, null, -5, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [-1, 2, 7] } }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.022 },
-  robofusion: { sd: 0.16, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.015, dur: 1.6, map: { 0: [0, 7, 12], 8: [-3, 4, 9] } }, lead: { wave: 'square', vol: 0.024, dur: 0.1, pat: [12, 15, 19, null, 24, 19, 15, null, 12, 15, 17, null, 22, 17, 15, null] }, bass: { wave: 'sawtooth', vol: 0.045, dur: 0.16, pat: [-12, -12, null, -12, null, -12, -10, null, -12, -12, null, -12, null, -9, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.024 },
+  fruits: { sd: 0.15, len: 16, root: 261.63, lead: { wave: 'triangle', vol: 0.06, dur: 0.14, pat: [12, 16, 19, null, 16, 19, 24, null, 14, 17, 21, null, 17, 21, 26, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -7, null, 0, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [-1, 2, 7] } }, kick: [0, 8], hat: [2, 6, 10, 14], kv: 0.16, hv: 0.02 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -8221,7 +8221,7 @@ const FILES = {
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '577a616908'],
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', '4652b72c40'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', '0d0eb8802e'],
-  robofusion: ['robofusion', 'games/impl/robofusion.js', 'RoboFusionGame', '2da9970ea0'],
+  fruits: ['fruits', 'games/impl/fruits.js', 'FruitSliceGame', 'd7f082805f'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '71f88c0b85'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '59dfe1e0c8'],

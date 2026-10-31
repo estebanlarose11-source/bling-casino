@@ -1,9 +1,10 @@
-// SpinBet Casino · RoboFusionGame — loaded on demand by games/impl/index.js (index.html).
-// ---- games/impl/robofusion.js ----
-__mods['games/impl/robofusion.js'] = (() => {
-// Robo Fusion: 3 pairs of reels × 3 rows in a neon robot workshop. Left reels carry left halves of robots, right reels
-// right halves; when both halves of the same robot stop side by side in a pair they slide together, get welded and
-// pay the robot's power. Joker chip halves complete any half; 3+ batteries start free spins. RTP ≈ 92 %, buy ≈ 88 %.
+// SpinBet Casino · FruitSliceGame — loaded on demand by games/impl/index.js (index.html).
+// ---- games/impl/fruits.js ----
+__mods['games/impl/fruits.js'] = (() => {
+// Fruit Slice: 3 pairs of reels × 3 rows at a tropical juice bar. Left reels carry left halves of sliced fruits, right
+// reels right halves; when both halves of the same fruit stop side by side in a pair they snap back together with a
+// splash of juice and pay the fruit's value. Rainbow star-fruit halves are jokers; 3+ blenders start free spins.
+// RTP ≈ 92 %, buy ≈ 88 %.
 
 const { BaseGame, fmtC, art } = __mods['core/base.js'];
 const { Reels } = __mods['core/reels.js'];
@@ -12,9 +13,9 @@ const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 
 /* ===ENGINE */
-// 3 pairs of reels × 4 rows. Left reels show left halves of robots, right reels right halves; a left and a right half
-// of the same robot side by side in a pair assemble and pay the robot's power × the bet (× K). A joker half
-// completes any half; spare parts (gears, bolts) never assemble. 3+ batteries: free spins where joker halves are more common and every robot pays double.
+// 3 pairs of reels × 3 rows. Left reels show left halves of fruits, right reels right halves; both halves of the same
+// fruit side by side in a pair rejoin and pay the fruit's value × the bet (× K). A joker half completes any half;
+// peels never match. 3+ blenders: free spins where joker halves are more common and every fruit pays ×fsMult.
 const PAIRS = 3, COLS = 6, ROWS = 3, N = 18, JOKER = 9, BATT = 10, PARTS = 11, CAPX = 5000, FS_SPINS = 8;
 const POWER = [2, 5, 10, 20, 50, 100], JP = [10, 50, 500]; // robots 6, 7, 8 are MINI, MAJEUR, JACKPOT (× the bet)
 const P = {
@@ -53,30 +54,32 @@ function spin(o) {
 /* ===END ENGINE */
 
 const RIGHT = 100; // reel values carry their side: v (left half) or RIGHT + v (right half)
-const RID = ['rf0', 'rf1', 'rf2', 'rf3', 'rf4', 'rf5', 'rf6', 'rf7', 'rf8'];
-const RNAME = ['Bip', 'Rouge', 'Pixel', 'Mécano', 'Vert-de-gris', 'Néon', 'MINI', 'MAJEUR', 'JACKPOT'];
+const RID = ['fr0', 'fr1', 'fr2', 'fr3', 'fr4', 'fr5', 'fr6', 'fr7', 'fr8'];
+const RNAME = ['Cerises', 'Citron', 'Orange', 'Pêche', 'Pastèque', 'Ananas', 'MINI', 'MAJEUR', 'JACKPOT'];
+const FNAME = ['Cerises', 'Citron', 'Orange', 'Pêche', 'Pastèque', 'Ananas', 'Fraise MINI', 'Raisin MAJEUR', 'Pomme d’or JACKPOT'];
+const JUICE = [['#e11d48', '#fda4af'], ['#facc15', '#fef9c3'], ['#f97316', '#fed7aa'], ['#fb923c', '#fde68a'], ['#f43f5e', '#22c55e'], ['#eab308', '#fef08a'], ['#ef4444', '#fecdd3'], ['#9333ea', '#d9f99d'], ['#fbbf24', '#fff7c2']];
 const BUY_FS = 67;
-const SPARK = ['#fde047', '#fb923c', '#fff', '#22d3ee'];
-const half = (id, side) => `<svg viewBox="${side ? 64 : 0} -6 64 70" preserveAspectRatio="${side ? 'xMinYMid' : 'xMaxYMid'} meet" aria-hidden="true"><use href="#${id}" width="128" height="70" y="-6"/></svg>`;
+
+const half = (id, side) => `<svg viewBox="${side ? 64 : 0} -8 64 76" preserveAspectRatio="${side ? 'xMinYMid' : 'xMaxYMid'} meet" aria-hidden="true"><use href="#${id}" width="128" height="76" y="-8"/></svg>`;
 function cellArt(code) {
   const side = code >= RIGHT ? 1 : 0, v = code % RIGHT;
-  if (v === BATT) return art('rfb');
-  if (v === PARTS) return art('rfp');
-  return half(v === JOKER ? 'rfj' : RID[v], side);
+  if (v === BATT) return art('frb');
+  if (v === PARTS) return art('frp');
+  return half(v === JOKER ? 'frj' : RID[v], side);
 }
 const encode = (g) => g.map((v, i) => (Math.floor(i / ROWS) % 2 ? RIGHT + v : v));
 
-class RoboFusionGame extends BaseGame {
+class FruitSliceGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
-      music: EXTRA_THEMES.robofusion,
-      frameCls: 'rf-frame',
-      stage: `<div class="rf-shop"><i class="rf-belt"></i><i class="rf-arm l"></i><i class="rf-arm r"></i><i class="rf-grid"></i></div>
-        <div class="rf-top"><div class="rf-jp mini"><small>MINI</small><b data-jp="0"></b></div><div class="rf-logo"><b>ROBO</b><em>FUSION</em></div><div class="rf-jp major"><small>MAJEUR</small><b data-jp="1"></b></div></div>
-        <div class="rf-grand"><small>JACKPOT</small><b data-jp="2"></b></div>
-        <div class="reels-host"></div><div class="rf-word"></div>`,
-      buys: [{ id: 'fs', icon: '🔋', label: `Free spins · ${FS_SPINS} tours`, desc: `Jokers fréquents, chaque robot paie ×${P.fsMult}`, cost: (b) => b * BUY_FS }],
-      hello: 'Deux moitiés du même robot côte à côte = il est assemblé et paie sa puissance',
+      music: EXTRA_THEMES.fruits,
+      frameCls: 'fs-frame',
+      stage: `<div class="fs-bar"><i class="fs-sun"></i><i class="fs-palm l"></i><i class="fs-palm r"></i><i class="fs-drops"></i><i class="fs-counter"></i></div>
+        <div class="fs-top"><div class="fs-jp mini"><small>MINI</small><b data-jp="0"></b></div><div class="fs-logo"><b>FRUIT</b><em>SLICE</em></div><div class="fs-jp major"><small>MAJEUR</small><b data-jp="1"></b></div></div>
+        <div class="fs-grand"><small>JACKPOT</small><b data-jp="2"></b></div>
+        <div class="reels-host"></div><div class="fs-word"></div>`,
+      buys: [{ id: 'fs', icon: '🥤', label: `Free spins · ${FS_SPINS} tours`, desc: `Jokers fréquents, chaque fruit paie ×${P.fsMult}`, cost: (b) => b * BUY_FS }],
+      hello: 'Deux moitiés du même fruit côte à côte = il se recolle et paie sa valeur',
     });
     this.reels = new Reels(this.q('.reels-host'), {
       cols: COLS, rows: ROWS, game: this,
@@ -91,8 +94,8 @@ class RoboFusionGame extends BaseGame {
   onBetChange() { this.qa('[data-jp]').forEach((n) => { n.textContent = fmtC(JP[+n.dataset.jp] * this.bet); }); }
 
   word(t, cls = '') {
-    const w = this.q('.rf-word');
-    w.textContent = t; w.className = `rf-word ${cls}`;
+    const w = this.q('.fs-word');
+    w.textContent = t; w.className = `fs-word ${cls}`;
     w.getAnimations().forEach((a) => a.cancel());
     w.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.3)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.1)', offset: 0.25 },
       { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.7 }, { opacity: 0, transform: 'translate(-50%,-62%) scale(1.15)' }], { duration: this.turbo ? 700 : 1150, easing: 'ease-out' });
@@ -120,7 +123,7 @@ class RoboFusionGame extends BaseGame {
       } else if (total > 0) await this.celebrate(Math.round(total));
     }
     this.setLast(total);
-    this.msg(total >= b * CAPX ? `GAIN MAXIMUM ! ${fmtC(total)}` : total > 0 ? `Total du tour : ${fmtC(total)}` : 'Aucun robot assemblé');
+    this.msg(total >= b * CAPX ? `GAIN MAXIMUM ! ${fmtC(total)}` : total > 0 ? `Total du tour : ${fmtC(total)}` : 'Aucun fruit recollé');
   }
 
   async show(res, b, fs) {
@@ -129,7 +132,7 @@ class RoboFusionGame extends BaseGame {
       onStop: (c) => { for (let r = 0; r < ROWS; r++) if (res.g[c * ROWS + r] === BATT) { sfx.land(); const p = center(this.reels.cell(c * ROWS + r)); fx.burst(p.x, p.y, 10, ['#22d3ee', '#fde047'], 4); } },
     });
     if (this.dead) return;
-    // the assemblies, one after the other: halves slide together, weld sparks along the seam, eyes light up
+    // the fruits rejoin one after the other: halves slide together, juice splashes along the seam
     for (const f of res.fits) {
       if (this.dead) return;
       const L = this.reels.cell(f.li), Rc = this.reels.cell(f.ri);
@@ -137,17 +140,18 @@ class RoboFusionGame extends BaseGame {
       sfx.click();
       await this.wait(260);
       const a = L.getBoundingClientRect(), z = Rc.getBoundingClientRect(), sx = (a.right + z.left) / 2;
-      for (let k = 0; k < 4; k++) { fx.burst(sx, a.top + (a.height * (k + 0.5)) / 4, 8, SPARK, 4); sfx.tick(); await sleep(this.turbo ? 25 : 60); }
+      const J = JUICE[f.s];
+      for (let k = 0; k < 3; k++) { fx.burst(sx, a.top + (a.height * (k + 0.5)) / 3, 12, [...J, '#fff'], 5); sfx.tick(); await sleep(this.turbo ? 25 : 55); }
       L.classList.add('fused'); Rc.classList.add('fused');
       const amt = Math.round(f.x * b);
       this.floatAt(L, `+${fmtC(amt)}`, f.jp ? '#fde047' : '#a5f3fc', f.jp ? 30 : 22);
       const nm = f.s >= 6 ? `${RNAME[f.s]} !` : `${RNAME[f.s]} ×${POWER[f.s]}`;
-      this.msg(`Robot assemblé : ${nm}${fs ? ` · ×${P.fsMult}` : ''} → +${fmtC(amt)}`);
-      if (f.jp) { this.word(RNAME[f.s] + ' !', 'jp'); this.flash('rgba(253,224,71,.6)'); sfx.jackpot(); this.q(f.s === 8 ? '.rf-grand' : f.s === 7 ? '.rf-jp.major' : '.rf-jp.mini')?.classList.add('flash'); fx.confetti(80); await this.wait(900); }
+      this.msg(`Fruit recollé : ${nm}${fs ? ` · ×${P.fsMult}` : ''} → +${fmtC(amt)}`);
+      if (f.jp) { this.word(RNAME[f.s] + ' !', 'jp'); this.flash('rgba(253,224,71,.6)'); sfx.jackpot(); this.q(f.s === 8 ? '.fs-grand' : f.s === 7 ? '.fs-jp.major' : '.fs-jp.mini')?.classList.add('flash'); fx.confetti(80); await this.wait(900); }
       else sfx.win();
       await this.wait(this.turbo ? 200 : 420);
     }
-    if (res.fits.length >= 3) this.word(res.fits.length >= 5 ? 'MÉGA USINE !' : 'FUSION !');
+    if (res.fits.length >= 3) this.word(res.fits.length >= 5 ? 'TUTTI FRUTTI !' : 'JUICY !');
     if (res.fits.length) await this.wait(700);
     this.reels.el.querySelectorAll('.fuse, .fused').forEach((n) => n.classList.remove('fuse', 'fused'));
     this.qa('.flash').forEach((n) => n.classList.remove('flash'));
@@ -158,12 +162,12 @@ class RoboFusionGame extends BaseGame {
     const b = this.bet, cap = b * CAPX;
     let left = FS_SPINS, tot = 0, done = 0;
     this.lastStake = b;
-    await this.featureIntro('FREE SPINS', `${FS_SPINS} tours gratuits · jokers fréquents · chaque robot paie ×${P.fsMult}`, art('rfb'));
+    await this.featureIntro('SMOOTHIE TIME', `${FS_SPINS} tours gratuits · jokers fréquents · chaque fruit paie ×${P.fsMult}`, art('frb'));
     this.inFree = true;
     this.slotEl.classList.add('in-free');
     while (left > 0 && tot < cap && !this.dead) {
       left--; done++;
-      this.setBanner(`<b>FREE SPINS</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill">Robots ×${P.fsMult}</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
+      this.setBanner(`<b>SMOOTHIE TIME</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill">Fruits ×${P.fsMult}</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
       const res = spin({ fs: true });
       const add = Math.min(res.total * b, cap - tot);
       await this.show(res, b, true);
@@ -176,20 +180,20 @@ class RoboFusionGame extends BaseGame {
     this.inFree = false;
     this.slotEl.classList.remove('in-free');
     this.setBanner('');
-    await this.celebrate(Math.round(tot), { summary: 'FREE SPINS', stake: b });
+    await this.celebrate(Math.round(tot), { summary: 'SMOOTHIE TIME', stake: b });
     return tot;
   }
 
   info() {
-    const full = (id) => `<svg viewBox="0 -6 128 70" aria-hidden="true"><use href="#${id}" width="128" height="70" y="-6"/></svg>`;
-    const rows = RID.map((id, s) => `<div class="pay-item"><div class="pay-sym svg rfp">${full(id)}</div><div class="pay-vals"><b>${RNAME[s]}</b><br><span>${s < 6 ? `Puissance ${POWER[s]} : ×${String(Math.round(POWER[s] * P.K * 100) / 100).replace('.', ',')} la mise` : `Jackpot ${RNAME[s]} : ×${JP[s - 6]} la mise`}</span></div></div>`).join('');
-    return this.rules(`<h4>Robots (gain quand il est assemblé)</h4><div class="paytable">${rows}
-      <div class="pay-item"><div class="pay-sym svg rfp">${full('rfj')}</div><div class="pay-vals"><b>Puce joker</b><br><span>Une demi-puce complète n’importe quelle moitié de robot. Deux demi-puces = robot Néon.</span></div></div>
-      <div class="pay-item"><div class="pay-sym svg">${art('rfb')}</div><div class="pay-vals"><b>Batterie</b><br><span>3 ou plus : ${FS_SPINS} free spins</span></div></div></div>
-      <h4>Assemblage</h4><p>Les rouleaux vont par paires. Le rouleau de gauche porte des moitiés gauches de robots, celui de droite des moitiés droites. Quand les deux moitiés du même robot s’arrêtent sur la même ligne d’une paire, il est assemblé et paie. 3 paires × 3 lignes = jusqu’à 9 robots par tour. Les pièces détachées ne s’assemblent jamais.</p>
-      <h4>Free spins</h4><p>3 batteries ou plus : ${FS_SPINS} tours gratuits, jokers bien plus fréquents, chaque robot paie ×${P.fsMult}. 3 batteries de plus : +3 tours. Achat ×${BUY_FS} la mise. Gain maximum ×${CAPX.toLocaleString('fr-FR')}.</p>`);
+    const full = (id) => `<svg viewBox="0 -8 128 76" aria-hidden="true"><use href="#${id}" width="128" height="76" y="-8"/></svg>`;
+    const rows = RID.map((id, s) => `<div class="pay-item"><div class="pay-sym svg frp">${full(id)}</div><div class="pay-vals"><b>${FNAME[s]}</b><br><span>${s < 6 ? `Valeur ${POWER[s]} : ×${String(Math.round(POWER[s] * P.K * 100) / 100).replace('.', ',')} la mise` : `Jackpot : ×${JP[s - 6]} la mise`}</span></div></div>`).join('');
+    return this.rules(`<h4>Fruits (gain quand le fruit est recollé)</h4><div class="paytable">${rows}
+      <div class="pay-item"><div class="pay-sym svg frp">${full('frj')}</div><div class="pay-vals"><b>Carambole joker</b><br><span>Une demi-carambole complète n’importe quelle moitié de fruit. Deux moitiés de carambole = Ananas.</span></div></div>
+      <div class="pay-item"><div class="pay-sym svg">${art('frb')}</div><div class="pay-vals"><b>Mixeur</b><br><span>3 ou plus : ${FS_SPINS} free spins</span></div></div></div>
+      <h4>Les fruits tranchés</h4><p>Les rouleaux vont par paires. Le rouleau de gauche porte des moitiés gauches de fruits, celui de droite des moitiés droites. Quand les deux moitiés du même fruit s’arrêtent sur la même ligne d’une paire, il se recolle et paie. 3 paires × 3 lignes = jusqu’à 9 fruits par tour. Les épluchures ne se recollent jamais.</p>
+      <h4>Smoothie Time</h4><p>3 mixeurs ou plus : ${FS_SPINS} tours gratuits, jokers bien plus fréquents, chaque fruit paie ×${P.fsMult}. 3 mixeurs de plus : +3 tours. Achat ×${BUY_FS} la mise. Gain maximum ×${CAPX.toLocaleString('fr-FR')}.</p>`);
   }
 }
 
-return { RoboFusionGame };
+return { FruitSliceGame };
 })();
