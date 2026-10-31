@@ -2156,23 +2156,48 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 }
 
 /* ============ Daily wheel ============ */
-.wheel-page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 420px); gap: 28px; align-items: center; background: radial-gradient(500px 260px at 100% 0%, rgba(251, 191, 36, .16), transparent 70%), var(--panel); }
-.wheel-page h1 { margin: 6px 0 8px; font-size: clamp(26px, 4vw, 36px); }
+.wheel-page { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 460px); gap: 28px; align-items: center; overflow: hidden; background: radial-gradient(520px 300px at 100% 10%, rgba(251, 191, 36, .2), transparent 70%), radial-gradient(420px 260px at 0% 100%, rgba(124, 58, 237, .2), transparent 70%), var(--panel); }
+.wheel-page h1 { margin: 6px 0 8px; font-size: clamp(26px, 4vw, 38px); }
+.wh-legend { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 16px; }
+.wh-legend span { padding: 5px 10px; border-radius: 99px; font-size: 12.5px; font-weight: 700; background: color-mix(in srgb, var(--c) 22%, transparent); border: 1px solid color-mix(in srgb, var(--c) 60%, transparent); }
 .wh-last { margin-top: 12px; }
-.wh-wrap { position: relative; width: 100%; max-width: 420px; aspect-ratio: 1; margin: 0 auto; }
-.wh-rot { width: 100%; height: 100%; filter: drop-shadow(0 12px 30px rgba(0, 0, 0, .55)); }
+.wh-stage { position: relative; display: grid; place-items: center; padding: 10px 0 30px; }
+.wh-rays { position: absolute; inset: -20%; background: repeating-conic-gradient(from 0deg, rgba(251, 191, 36, .14) 0 10deg, transparent 10deg 20deg); -webkit-mask-image: radial-gradient(circle, #000 25%, transparent 65%); mask-image: radial-gradient(circle, #000 25%, transparent 65%); animation: whRays 30s linear infinite; pointer-events: none; }
+.wheel-page.spinning .wh-rays { animation-duration: 4s; }
+@keyframes whRays { to { transform: rotate(360deg); } }
+.wh-wrap { position: relative; width: 100%; max-width: 440px; aspect-ratio: 1; margin: 0 auto; }
+.wh-rot { width: 100%; height: 100%; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .6)) drop-shadow(0 0 30px rgba(251, 191, 36, .25)); will-change: transform; }
 .wh-svg { width: 100%; height: 100%; display: block; }
-.wh-svg .wb0 { fill: #fff; } .wh-svg .wb1 { fill: #fde68a; }
-.wh-pointer { position: absolute; z-index: 2; left: 50%; top: -6px; width: 34px; height: 44px; transform: translateX(-50%); background: linear-gradient(180deg, #ff5468, #b0102a); clip-path: polygon(0 0, 100% 0, 50% 100%); filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .5)); }
+.wh-svg .wb { fill: #fde68a; }
+.wh-svg .wb0 { animation: whBulb 1.2s steps(1) infinite; } .wh-svg .wb1 { animation: whBulb 1.2s steps(1) -.4s infinite; } .wh-svg .wb2 { animation: whBulb 1.2s steps(1) -.8s infinite; }
+.wheel-page.spinning .wh-svg .wb { animation-duration: .3s; }
+@keyframes whBulb { 0%, 33% { fill: #fff; filter: drop-shadow(0 0 4px #fde047); } 34%, 100% { fill: #92400e; filter: none; } }
+.wh-svg .wseg.won { animation: whWon .5s ease-in-out infinite alternate; }
+@keyframes whWon { to { filter: brightness(1.6) drop-shadow(0 0 8px #fff); } }
+.wh-pointer { position: absolute; z-index: 3; left: 50%; top: -14px; width: 44px; height: 58px; transform: translateX(-50%); transform-origin: 50% 20%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6)); }
+.wh-pointer::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, #fff7c2, #fbbf24 40%, #b45309); clip-path: polygon(50% 100%, 6% 22%, 22% 0, 78% 0, 94% 22%); }
+.wh-pointer i { position: absolute; left: 50%; top: 10px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #ff2340 60%, #7f1d1d); }
+.wh-pointer.flick { animation: whFlick .14s ease-out; }
+@keyframes whFlick { 40% { transform: translateX(-50%) rotate(-16deg); } }
+.wh-hub { position: absolute; z-index: 3; left: 50%; top: 50%; width: 22%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; border: 0; cursor: pointer; background: transparent; color: #fff; font: 900 clamp(14px, 2.6vw, 22px) Orbitron, sans-serif; text-shadow: 0 2px 4px #000; }
+.wh-hub:not(:disabled) { animation: whHub 1.2s ease-in-out infinite; }
+.wh-hub:not(:disabled):hover { transform: translate(-50%, -50%) scale(1.06); }
+@keyframes whHub { 50% { box-shadow: 0 0 0 8px rgba(255, 35, 64, .25), 0 0 26px rgba(255, 35, 64, .6); } }
+.wh-hub:disabled { cursor: default; }
+.wh-s { color: #ff2340; font-size: 1.2em; text-shadow: 0 0 2px #fff; }
+.wh-stand { position: absolute; bottom: 0; left: 50%; width: 46%; height: 34px; transform: translateX(-50%); border-radius: 50% 50% 12px 12px / 30% 30% 12px 12px; background: linear-gradient(180deg, #fbbf24, #92400e); box-shadow: 0 10px 24px rgba(0, 0, 0, .55); z-index: -1; }
 .wh-gifts { margin-top: 18px; display: grid; gap: 8px; }
 .wh-gifts h4 { margin: 0; }
 .wh-gift { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(22, 163, 74, .14); border: 1px solid rgba(74, 222, 128, .4); color: inherit; text-decoration: none; font-weight: 700; }
 .wh-gift em { margin-left: auto; font-style: normal; font-size: 12px; padding: 4px 10px; border-radius: 8px; background: #16a34a; color: #fff; }
-.wh-modal { text-align: center; max-width: 340px; }
-.wh-big { font-size: 64px; line-height: 1; animation: bumpIt .6s cubic-bezier(.3, 1.8, .5, 1); }
+.wh-modal { position: relative; text-align: center; max-width: 340px; overflow: hidden; }
+.wh-burst { position: absolute; inset: -40%; background: repeating-conic-gradient(rgba(251, 191, 36, .18) 0 12deg, transparent 12deg 24deg); animation: whRays 8s linear infinite; z-index: 0; }
+.wh-modal > :not(.wh-burst) { position: relative; z-index: 1; }
+.wh-big { font-size: 72px; line-height: 1; animation: bumpIt .6s cubic-bezier(.3, 1.8, .5, 1); filter: drop-shadow(0 6px 12px rgba(0, 0, 0, .5)); }
 .wh-modal p { font-size: 18px; font-weight: 700; }
 .buy-item.gift { border-color: #4ade80; box-shadow: 0 0 0 1px rgba(74, 222, 128, .5), 0 0 18px rgba(74, 222, 128, .25); }
-@media (max-width: 760px) { .wheel-page { grid-template-columns: 1fr; } .wh-wrap { max-width: 340px; } }
+@media (max-width: 760px) { .wheel-page { grid-template-columns: 1fr; } .wh-wrap { max-width: 340px; } .wh-stage { order: -1; } }
+@media (prefers-reduced-motion: reduce) { .wh-rays, .wh-svg .wb { animation: none; } }
 
 /* ============ Pile ou Face Turbo ============ */
 .g-pileface { --slot-bg: radial-gradient(600px 320px at 50% -10%, rgba(251, 191, 36, .3), transparent 70%), radial-gradient(500px 300px at 90% 100%, rgba(56, 189, 248, .22), transparent 70%), linear-gradient(180deg, #1c1404 0%, #07080d 100%); }
@@ -3412,60 +3437,93 @@ function spinWheel() {
   return { i, s, reward };
 }
 
+const SEGCOL = { ke: ['#7c3aed', '#4c1d95'], ke2: ['#db2777', '#831843'], xp: ['#0891b2', '#164e63'], gift: ['#16a34a', '#14532d'], small: ['#334155', '#0f172a'], jack: ['#fbbf24', '#b45309'] };
+const segStyle = (s) => (s.jackpot ? 'jack' : s.k === 'gift' ? 'gift' : s.k === 'xp' ? 'xp' : s.v >= 100 ? 'ke2' : s.v <= 20 ? 'small' : 'ke');
+const segIcon = (s) => (s.jackpot ? '👑' : s.k === 'gift' ? '🎁' : s.k === 'xp' ? '⭐' : '💰');
+
 function wheelSVG() {
   const n = SEGS.length, R = 150, a = (2 * Math.PI) / n;
-  const pt = (ang, r) => `${(R + r * Math.sin(ang)).toFixed(1)} ${(R - r * Math.cos(ang)).toFixed(1)}`;
-  let g = '';
+  const pt = (ang, r) => [(R + r * Math.sin(ang)).toFixed(1), (R - r * Math.cos(ang)).toFixed(1)];
+  let g = '', defs = '';
+  Object.entries(SEGCOL).forEach(([k, [c0, c1]]) => { defs += `<radialGradient id="wg-${k}" cx="150" cy="150" r="140" gradientUnits="userSpaceOnUse"><stop offset=".25" stop-color="${c1}"/><stop offset=".85" stop-color="${c0}"/><stop offset="1" stop-color="${c1}"/></radialGradient>`; });
   SEGS.forEach((s, k) => {
-    const a0 = k * a - a / 2, a1 = a0 + a, mid = k * a;
-    g += `<path d="M${R} ${R} L${pt(a0, R - 8)} A${R - 8} ${R - 8} 0 0 1 ${pt(a1, R - 8)} Z" fill="${s.c}" stroke="#0b0f17" stroke-width="2"/>`;
-    g += `<text transform="translate(${pt(mid, R - 52)}) rotate(${(mid * 180) / Math.PI})" text-anchor="middle" dominant-baseline="middle" font-family="Orbitron, sans-serif" font-weight="900" font-size="${s.jackpot ? 17 : 14}" fill="#fff">${segText(s)}</text>`;
+    const a0 = k * a - a / 2, a1 = a0 + a, mid = k * a, [x0, y0] = pt(a0, R - 14), [x1, y1] = pt(a1, R - 14);
+    g += `<path class="wseg" data-k="${k}" d="M${R} ${R} L${x0} ${y0} A${R - 14} ${R - 14} 0 0 1 ${x1} ${y1} Z" fill="url(#wg-${segStyle(s)})"/>`;
+    const [ix, iy] = pt(mid, R - 36), [tx, ty] = pt(mid, R - 82), rot = (mid * 180) / Math.PI;
+    g += `<text transform="translate(${ix} ${iy}) rotate(${rot})" text-anchor="middle" dominant-baseline="middle" font-size="18">${segIcon(s)}</text>`;
+    g += `<text transform="translate(${tx} ${ty}) rotate(${rot - 90})" text-anchor="middle" dominant-baseline="middle" font-family="Orbitron, sans-serif" font-weight="900" font-size="${s.jackpot ? 14 : 12}" fill="${s.jackpot ? '#1a1205' : '#fff'}" stroke="${s.jackpot ? 'none' : 'rgba(0,0,0,.45)'}" stroke-width="2" paint-order="stroke">${s.k === 'gift' ? 'BONUS' : segText(s)}</text>`;
   });
+  let sep = '';
+  for (let k = 0; k < n; k++) { const [x, y] = pt(k * a - a / 2, R - 14); sep += `<path d="M${R} ${R} L${x} ${y}" stroke="url(#wgGold)" stroke-width="2.5"/>`; }
   let bulbs = '';
-  for (let k = 0; k < 24; k++) bulbs += `<circle cx="${pt((k * Math.PI) / 12, R - 3).split(' ')[0]}" cy="${pt((k * Math.PI) / 12, R - 3).split(' ')[1]}" r="3.2" class="wb${k % 2}"/>`;
-  return `<svg viewBox="0 0 300 300" class="wh-svg"><circle cx="150" cy="150" r="149" fill="#fbbf24"/>${g}${bulbs}
-    <circle cx="150" cy="150" r="30" fill="#0b0f17" stroke="#fbbf24" stroke-width="5"/><text x="150" y="152" text-anchor="middle" dominant-baseline="middle" font-family="Orbitron, sans-serif" font-weight="900" font-size="22" fill="#ff2340">S</text></svg>`;
+  for (let k = 0; k < 24; k++) { const [x, y] = pt((k * Math.PI) / 12, R - 7); bulbs += `<circle cx="${x}" cy="${y}" r="3.6" class="wb wb${k % 3}"/>`; }
+  return `<svg viewBox="0 0 300 300" class="wh-svg"><defs>${defs}
+      <linearGradient id="wgGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7c2"/><stop offset=".4" stop-color="#fbbf24"/><stop offset=".7" stop-color="#b45309"/><stop offset="1" stop-color="#fde68a"/></linearGradient>
+      <radialGradient id="wgHub" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#3f3f46"/><stop offset="1" stop-color="#09090b"/></radialGradient>
+      <radialGradient id="wgShine" cx=".5" cy=".5" r=".5"><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset=".97" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+    <circle cx="150" cy="150" r="149" fill="url(#wgGold)"/><circle cx="150" cy="150" r="141" fill="#1c1917"/>
+    ${g}${sep}<circle cx="150" cy="150" r="136" fill="url(#wgShine)"/><circle cx="150" cy="150" r="136" fill="none" stroke="url(#wgGold)" stroke-width="3"/>${bulbs}
+    <circle cx="150" cy="150" r="36" fill="url(#wgGold)"/><circle cx="150" cy="150" r="30" fill="url(#wgHub)"/>
+</svg>`;
 }
 
 function renderWheel(root) {
   const ready = wheelReady(), last = profiles.current?.wheel, gl = gifts.list();
   root.innerHTML = `
-    <section class="panel wheel-page">
+    <section class="panel wheel-page${ready ? ' ready' : ''}">
       <div class="wh-copy">
         <span class="eyebrow">🎡 Gratuit chaque jour</span>
         <h1>La Roue du jour</h1>
         <p class="muted">Un tour gratuit par jour : des KE, de l’XP ou un <b>bonus offert</b> à jouer dans une machine à sous. Chaque case a exactement la même chance de tomber.</p>
+        <div class="wh-legend">${[['💰', 'KE', 'ke'], ['⭐', 'XP', 'xp'], ['🎁', 'Bonus offert', 'gift'], ['👑', 'Jackpot 500 KE', 'jack']].map(([i, t, k]) => `<span style="--c:${SEGCOL[k][0]}">${i} ${t}</span>`).join('')}</div>
         <button class="btn primary lg" data-spin ${ready ? '' : 'disabled'}>${ready ? '🎡 Lancer la roue' : `Prochain tour dans <span data-wait></span>`}</button>
         ${!profiles.current ? '<p class="muted small">Connecte-toi ou joue en invité pour tourner la roue.</p>' : ''}
         ${last && !ready ? `<p class="wh-last">Aujourd’hui : <b>${last.reward}</b></p>` : ''}
         ${gl.length ? `<div class="wh-gifts"><h4>🎁 Tes bonus offerts</h4>${gl.map((g) => `<a class="wh-gift" href="#game-${g.game}">${g.label}<em>Jouer</em></a>`).join('')}<p class="muted small">Ouvre « Bonus & menu » dans le jeu : le bonus y est marqué OFFERT (mise jusqu’à 1 KE).</p></div>` : ''}
       </div>
-      <div class="wh-wrap"><div class="wh-pointer"></div><div class="wh-rot">${wheelSVG()}</div></div>
+      <div class="wh-stage"><div class="wh-rays"></div>
+        <div class="wh-wrap"><div class="wh-pointer"><i></i></div><div class="wh-rot">${wheelSVG()}</div><button class="wh-hub" data-spin2 aria-label="Lancer la roue" ${ready ? '' : 'disabled'}>${ready ? 'GO' : '<span class="wh-s">S</span>'}</button></div>
+        <div class="wh-stand"></div></div>
     </section>`;
   const waitEl = root.querySelector('[data-wait]');
   if (waitEl) {
     const tick = () => { if (!waitEl.isConnected) return clearInterval(t); const s = Math.ceil(msToMidnight() / 1000); waitEl.textContent = `${Math.floor(s / 3600)}h ${String(Math.floor((s % 3600) / 60)).padStart(2, '0')}m ${String(s % 60).padStart(2, '0')}s`; if (s <= 0) renderWheel(root); };
     const t = setInterval(tick, 1000); tick();
   }
-  const rot = root.querySelector('.wh-rot');
-  if (last && !ready) rot.style.transform = `rotate(${-last.seg * 30}deg)`;
-  root.querySelector('[data-spin]').onclick = async (e) => {
-    const btn = e.currentTarget;
+  const rot = root.querySelector('.wh-rot'), pointer = root.querySelector('.wh-pointer');
+  if (last && !ready) { rot.style.transform = `rotate(${-last.seg * 30}deg)`; root.querySelector(`.wseg[data-k="${last.seg}"]`)?.classList.add('won'); }
+  const go = async () => {
+    const btn = root.querySelector('[data-spin]');
+    if (btn.disabled) return;
     const r = spinWheel();
     if (!r) return toast('Reviens demain pour un nouveau tour !', 'warn');
-    btn.disabled = true;
+    btn.disabled = true; root.querySelector('[data-spin2]').disabled = true;
+    root.querySelector('.wheel-page').classList.add('spinning');
     sfx.unlock(); sfx.feature();
-    const deg = 360 * 6 - r.i * 30 + (Math.random() - 0.5) * 18;
-    rot.animate([{ transform: 'rotate(0deg)' }, { transform: `rotate(${deg}deg)` }], { duration: 5200, easing: 'cubic-bezier(.15,.6,.12,1)', fill: 'forwards' });
-    const ticks = setInterval(() => sfx.tick(), 140);
-    await sleep(5200);
-    clearInterval(ticks);
-    if (r.s.jackpot || r.s.k === 'gift') { sfx.bigWin(); fx.confetti(90); } else sfx.win();
-    fx.coins(r.s.k === 'ke' ? 40 : 20, rot);
-    const ov = el('div', 'modal-back show wh-win', `<div class="modal wh-modal"><div class="wh-big">${r.s.k === 'gift' ? '🎁' : r.s.k === 'xp' ? '⭐' : '💰'}</div><h3>${r.s.jackpot ? 'JACKPOT !' : 'Bravo !'}</h3><p>${r.reward}</p>${r.s.k === 'gift' ? '<p class="muted small">Ouvre « Bonus & menu » dans le jeu pour le lancer gratuitement.</p>' : ''}<button class="btn primary">Super !</button></div>`);
+    // driven frame by frame so the pointer can click on every segment it passes
+    const total = 360 * 7 - r.i * 30 + (Math.random() - 0.5) * 20, T = 6200, t0 = performance.now();
+    let lastSeg = 0;
+    await new Promise((done) => {
+      const frame = (now) => {
+        const u = Math.min(1, (now - t0) / T), e = 1 - Math.pow(1 - u, 4), ang = total * e;
+        rot.style.transform = `rotate(${ang}deg)`;
+        const seg = Math.floor((ang + 15) / 30);
+        if (seg !== lastSeg) { lastSeg = seg; sfx.tick(); pointer.classList.remove('flick'); void pointer.offsetWidth; pointer.classList.add('flick'); }
+        if (u < 1 && root.isConnected) requestAnimationFrame(frame); else done();
+      };
+      requestAnimationFrame(frame);
+    });
+    root.querySelector('.wheel-page').classList.remove('spinning');
+    root.querySelector(`.wseg[data-k="${r.i}"]`)?.classList.add('won');
+    if (r.s.jackpot || r.s.k === 'gift') { sfx.bigWin(); fx.confetti(120); } else sfx.win();
+    fx.coins(r.s.k === 'ke' ? 50 : 24, rot);
+    await sleep(700);
+    const ov = el('div', 'modal-back show wh-win', `<div class="modal wh-modal"><div class="wh-burst"></div><div class="wh-big">${segIcon(r.s)}</div><h3>${r.s.jackpot ? 'JACKPOT !' : 'Bravo !'}</h3><p>${r.reward}</p>${r.s.k === 'gift' ? '<p class="muted small">Ouvre « Bonus & menu » dans le jeu pour le lancer gratuitement.</p>' : ''}<button class="btn primary">Super !</button></div>`);
     document.body.appendChild(ov);
     ov.onclick = (ev) => { if (ev.target === ov || ev.target.closest('button')) { ov.remove(); renderWheel(root); } };
   };
+  root.querySelector('[data-spin]').onclick = go;
+  root.querySelector('[data-spin2]').onclick = go;
 }
 
 return { renderWheel, wheelReady, gifts };
