@@ -80,7 +80,7 @@ class CasseGame extends BaseGame {
     super(root, game, {
       music: EXTRA_THEMES.casse, autoplay: false, mainLabel: 'NOUVEAU CASSE',
       cls: 'table-game casse',
-      head: `<div class="head-meters"><div class="meter cs-loot"><small>Butin</small><b>0,00 KE</b></div><div class="meter cs-offer-m"><small>Offre</small><b>—</b></div></div>`,
+      head: `<div class="head-meters"><div class="meter cs-loot"><small>Butin</small><b>0,00\u00a0\uE1E0</b></div><div class="meter cs-offer-m"><small>Offre</small><b>—</b></div></div>`,
       // gradients inline: the cabinet only mounts shared art defs once per page
       stage: `${DEFS}<div class="cs-room"><div class="cs-beam"></div><div class="cs-grid">${Array.from({ length: N }, (_, i) => `<button type="button" class="cs-vault" data-v="${i}" disabled aria-label="Coffre ${i + 1}">
           <span class="cs-inner"></span><span class="cs-door">${doorSVG(i + 1)}</span><span class="cs-drill"><i></i></span></button>`).join('')}</div>

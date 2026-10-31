@@ -156,7 +156,6 @@ class HuffGame extends BaseGame {
     super(root, game, {
       defs: DEFS,
       music: MUSIC,
-      defaultBet: 2,
       betLabel: 'Mise totale',
       head: `<div class="jackpots">${['mini', 'minor', 'major', 'grand'].map((k) => `<div class="jp jp-${k}" data-jp="${k}"><small>${JPN[k]}</small><b></b></div>`).join('')}</div>`,
       stage: '<div class="reels-host"></div><svg class="paylines" viewBox="0 0 500 300" preserveAspectRatio="none"></svg>',
@@ -485,7 +484,7 @@ class HuffGame extends BaseGame {
     if (this.dead) return;
     // collect
     const total = Math.round(res.total * b);
-    this.setBanner('<b>COLLECTE</b><span class="pill gold">Total <em class="hs-tot">0,00 KE</em></span>');
+    this.setBanner('<b>COLLECTE</b><span class="pill gold">Total <em class="hs-tot">0,00\u00a0\uE1E0</em></span>');
     const totEl = this.banner.querySelector('.hs-tot'), tgt = center(totEl);
     let run = 0;
     for (let i = 0; i < NC; i++) {

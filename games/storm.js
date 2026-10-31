@@ -125,7 +125,7 @@ class StormGame extends BaseGame {
   }
 
   info() {
-    return this.rules(`<h4>Roulette européenne</h4><p>Un seul zéro, 37 cases. Pose tes jetons (100 KE maximum par mise). Touche un numéro pour un plein, les bords et les coins pour cheval, carré ou transversale.</p>
+    return this.rules(`<h4>Roulette européenne</h4><p>Un seul zéro, 37 cases. Pose tes jetons (10 000\u00a0\uE1E0 maximum par case). Touche un numéro pour un plein, les bords et les coins pour cheval, carré ou transversale.</p>
       <ul class="rules"><li>Plein : 29 pour 1 (ou le multiplicateur de l’éclair)</li><li>Cheval : 17 · Transversale : 11 · Carré : 8 · Sixain : 5</li><li>Douzaines et colonnes : 2 · Rouge/Noir, Pair/Impair, 1-18/19-36 : 1</li></ul>
       <h4>Les éclairs</h4><p>Avant chaque tour, 1 à 5 numéros sont frappés et reçoivent un multiplicateur de <b>×50 à ×50 000</b>. Si la bille s’arrête sur un numéro frappé où tu as un plein, il paie ce multiplicateur à la place de 29 pour 1.</p>`);
   }

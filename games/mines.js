@@ -22,7 +22,7 @@ class MinesGame extends BaseGame {
     super(root, game, {
       music: EXTRA_THEMES.mines, autoplay: false, mainLabel: 'JOUER',
       cls: 'table-game mines',
-      head: `<div class="head-meters"><div class="meter m-cur"><small>Multiplicateur</small><b>×0,96</b></div><div class="meter m-nxt"><small>Prochain</small><b>×1,09</b></div><div class="meter m-cash"><small>Encaissable</small><b>0,00 KE</b></div></div>`,
+      head: `<div class="head-meters"><div class="meter m-cur"><small>Multiplicateur</small><b>×0,96</b></div><div class="meter m-nxt"><small>Prochain</small><b>×1,09</b></div><div class="meter m-cash"><small>Encaissable</small><b>0,00\u00a0\uE1E0</b></div></div>`,
       stage: `<div class="mn-grid">${Array.from({ length: SIZE }, (_, i) => `<button class="mn-tile" data-i="${i}" disabled aria-label="Case ${i + 1}"><span class="mn-in"><span class="mn-front"></span><span class="mn-back"></span></span></button>`).join('')}</div>`,
       below: '<div class="mn-ctl"><span>Bombes</span><button class="round-btn" data-mines="-1">−</button><b class="mn-n">3</b><button class="round-btn" data-mines="1">+</button><div class="mn-presets">' + [1, 3, 5, 10, 24].map((n) => `<button data-mset="${n}">${n}</button>`).join('') + '</div></div>',
       hello: 'Choisis ta mise et le nombre de bombes.',

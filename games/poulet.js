@@ -42,7 +42,7 @@ class PouletGame extends BaseGame {
     super(root, game, {
       music: EXTRA_THEMES.poulet, autoplay: false, mainLabel: 'JOUER',
       cls: 'table-game poulet',
-      head: '<div class="head-meters"><div class="meter pl-cur"><small>Multiplicateur</small><b>—</b></div><div class="meter pl-nxt"><small>Prochain</small><b>—</b></div><div class="meter pl-cash"><small>Encaissable</small><b>0,00 KE</b></div></div>',
+      head: '<div class="head-meters"><div class="meter pl-cur"><small>Multiplicateur</small><b>—</b></div><div class="meter pl-nxt"><small>Prochain</small><b>—</b></div><div class="meter pl-cash"><small>Encaissable</small><b>0,00\u00a0\uE1E0</b></div></div>',
       stage: '<div class="pl-road"><div class="pl-track"></div></div><div class="pl-bar"><span class="pl-say">Choisis ta mise et la difficulté, puis JOUER.</span><button type="button" class="pl-go" disabled>AVANCER ➜</button></div>',
       below: `<div class="pl-modes">${MODES.map((m, i) => `<button type="button" data-mode="${i}"><b>${m.label}</b><small>${m.lanes} voies · max ×${xs(mult(m.lanes, m))}</small></button>`).join('')}</div>`,
       hello: 'Fais traverser le poulet : chaque voie franchie multiplie ta mise !',

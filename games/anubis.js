@@ -303,7 +303,7 @@ class AnubisGame extends BaseGame {
   // multipliers and shows the total multiplier and the amount won.
   async finale(cols, bet, cap) {
     const g = this.grid.el, gr = g.getBoundingClientRect();
-    const box = el('div', 'an-sum', '<small>TOTAL DU JUGEMENT</small><b>×0</b><em>0,00 KE</em>');
+    const box = el('div', 'an-sum', '<small>TOTAL DU JUGEMENT</small><b>×0</b><em>0,00\u00a0\uE1E0</em>');
     g.appendChild(box);
     await box.animate([{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.08)', opacity: 1, offset: 0.7 }, { transform: 'translate(-50%,-50%)' }], { duration: 380, easing: 'ease-out' }).finished;
     const bx = box.querySelector('b'), em = box.querySelector('em'), tc = center(bx);

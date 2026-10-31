@@ -93,7 +93,7 @@ const BOTS = [
   { name: 'Mamie Jo', av: '👵', style: 'Suiveuse', tight: -0.1, agg: 0.15, bluff: 0.03, station: true },
   { name: 'Ace', av: '🕶️', style: 'Imprévisible', tight: 0, agg: 0.55, bluff: 0.18, wild: 0.14 },
 ];
-const BLINDS = [[5, 10], [25, 50], [100, 200], [500, 1000]]; // cents
+const BLINDS = [[100, 200], [500, 1000], [2500, 5000], [10000, 20000]]; // cents: 1/2 to 100/200\u00a0\uE1E0
 const DEPTHS = [50, 100, 200]; // starting stack in big blinds
 const SLOTS = { 2: [0, 3], 3: [0, 2, 4], 4: [0, 1, 3, 5], 5: [0, 1, 2, 4, 5], 6: [0, 1, 2, 3, 4, 5] };
 // seat centres (%) on the wide oval and on the tall (phone) oval, clockwise from the player at the bottom

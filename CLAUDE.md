@@ -36,7 +36,11 @@ Toute modification qui touche aux gains doit être vérifiée par simulation ava
 
 ## Monnaie
 
-La monnaie du site est le KE (pas d'euro).
+La monnaie du site est le KE (pas d'euro). Dans les montants affichés, « KE » est remplacé par son logo (une pièce
+avec un K barré) : le caractère `\uE1E0`, dessiné par une mini-police intégrée dans le CSS. Écrire les montants avec
+`fmt()` / `fmtC()` ou `…\u00a0\uE1E0` ; garder « KE » en toutes lettres dans les textes partagés hors du site.
+
+Mises : KE entiers, de 1 à 10 000 KE (`BETS` dans `core/base.js`), plafonnées par le solde du joueur.
 
 ## Codes cadeaux (page Recharger)
 

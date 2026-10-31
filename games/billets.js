@@ -313,7 +313,7 @@ class BilletsGame extends BaseGame {
   }
 
   info() {
-    const rows = NOTE_IDS.map((id, s) => `<div class="pay-item"><div class="pay-sym svg bvp">${bill(id)}</div><div class="pay-vals"><b>Billet de ${NOTE_VALS[s]} KE</b><br><span>3 : ×${xv(P.pays[s][0] * P.K)} · 4 : ×${xv(P.pays[s][1] * P.K)} · 5 : ×${xv(P.pays[s][2] * P.K)} (par façon)</span></div></div>`).join('');
+    const rows = NOTE_IDS.map((id, s) => `<div class="pay-item"><div class="pay-sym svg bvp">${bill(id)}</div><div class="pay-vals"><b>Billet de ${NOTE_VALS[s]}\u00a0\uE1E0</b><br><span>3 : ×${xv(P.pays[s][0] * P.K)} · 4 : ×${xv(P.pays[s][1] * P.K)} · 5 : ×${xv(P.pays[s][2] * P.K)} (par façon)</span></div></div>`).join('');
     return this.rules(`<h4>Billets (× la mise, par façon)</h4><div class="paytable">${rows}
       <div class="pay-item"><div class="pay-sym svg bvp">${bill('bvw')}</div><div class="pay-vals"><b>Coffre-fort WILD</b><br><span>Rouleaux 2 à 4, remplace tous les billets</span></div></div></div>
       <h4>243 façons de gagner</h4><p>Un billet paie dès qu’il apparaît sur 3 rouleaux d’affilée ou plus depuis la gauche, à n’importe quelle hauteur.</p>
