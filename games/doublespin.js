@@ -22,7 +22,7 @@ const name = (n) => `${n} (${colr(n) === 'g' ? 'zéro' : colr(n) === 'r' ? 'roug
 class DoubleSpinGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
-      music: EXTRA_THEMES.doublespin, stepper: false, autoplay: false, mainLabel: 'LANCER', betLabel: 'Mise totale',
+      music: EXTRA_THEMES.doublespin, stepper: false, autoplay: true, mainLabel: 'LANCER', betLabel: 'Mise totale',
       cls: 'table-game',
       head: '<div class="head-meters"><div class="meter ymult"><small>Bille jaune</small><b>×?</b></div></div><div class="hist pairs"></div>',
       stage: `<div class="wheel-zone"><svg class="rwheel" viewBox="0 0 300 300">${wheelSVG(2)}</svg><div class="rres"></div><div class="rres y"></div><div class="bolt-bar">⚪ La blanche paie les mises classiques · 🟡 la jaune paie son multiplicateur si elle rejoint la blanche sur ton plein</div></div>`,
@@ -37,7 +37,7 @@ class DoubleSpinGame extends BaseGame {
 
   stakeLabel() { return this.board ? this.board.total() : 0; }
   chipSound() { sfx.click(); }
-  onMeters() { if (this.mainBtn) this.mainBtn.disabled = this.busy || !this.board?.total(); }
+  onMeters() { if (this.mainBtn) this.mainBtn.disabled = !this.auto && (this.busy || !this.board?.total()); }
 
   async revealMult(M) {
     const box = this.q('.ymult'), mv = box.querySelector('b');
@@ -68,7 +68,9 @@ class DoubleSpinGame extends BaseGame {
   }
 
   onMain() {
-    if (!this.board.total()) return;
+    // automatic spins: the last bets go back on the table for each spin
+    if (!this.board.total() && this.auto) { this.board.rebet(true); this.board.paint(); }
+    if (!this.board.total()) { this.stopAuto(); return; }
     this.round(async () => {
       const placed = { ...this.board.bets }, tt = this.board.total();
       if (!this.pay(tt)) return;

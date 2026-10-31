@@ -99,7 +99,7 @@ function tick(v) {
 class PlateauGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
-      music: EXTRA_THEMES.plateau, stepper: false, autoplay: false, mainLabel: 'LANCER', betLabel: 'Mise totale',
+      music: EXTRA_THEMES.plateau, stepper: false, autoplay: true, mainLabel: 'LANCER', betLabel: 'Mise totale',
       cls: 'table-game plateau',
       head: '<div class="hist pt-hist"></div>',
       stage: `<div class="pt-view">
@@ -124,7 +124,7 @@ class PlateauGame extends BaseGame {
 
   stakeLabel() { return this.board ? this.board.total() : 0; }
   chipSound() { sfx.click(); }
-  onMeters() { if (this.mainBtn) this.mainBtn.disabled = this.busy || !this.board?.total(); }
+  onMeters() { if (this.mainBtn) this.mainBtn.disabled = !this.auto && (this.busy || !this.board?.total()); }
 
   histAdd(seg) {
     this.histArr.unshift(seg); this.histArr = this.histArr.slice(0, 12);
@@ -184,7 +184,9 @@ class PlateauGame extends BaseGame {
   }
 
   onMain() {
-    if (!this.board.total()) return;
+    // automatic spins: the last bets go back on the table for each spin
+    if (!this.board.total() && this.auto) { this.board.rebet(true); this.board.paint(); }
+    if (!this.board.total()) { this.stopAuto(); return; }
     this.round(async () => {
       const placed = {}, tt = this.board.total();
       SPOTS.forEach((k) => { placed[k] = this.board.bets[k] || 0; });

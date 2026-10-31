@@ -84,7 +84,7 @@ function tick(v) {
 class PecheGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
-      music: EXTRA_THEMES.peche, stepper: false, autoplay: false, mainLabel: 'LANCER', betLabel: 'Mise totale',
+      music: EXTRA_THEMES.peche, stepper: false, autoplay: true, mainLabel: 'LANCER', betLabel: 'Mise totale',
       cls: 'table-game peche',
       head: '<div class="hist pt-hist pe-hist"></div>',
       stage: `<div class="pe-view">
@@ -108,7 +108,7 @@ class PecheGame extends BaseGame {
 
   stakeLabel() { return this.board ? this.board.total() : 0; }
   chipSound() { sfx.click(); }
-  onMeters() { if (this.mainBtn) this.mainBtn.disabled = this.busy || !this.board?.total(); }
+  onMeters() { if (this.mainBtn) this.mainBtn.disabled = !this.auto && (this.busy || !this.board?.total()); }
 
   histAdd(seg, m) {
     this.histArr.unshift([seg, m]); this.histArr = this.histArr.slice(0, 12);
@@ -151,7 +151,9 @@ class PecheGame extends BaseGame {
   }
 
   onMain() {
-    if (!this.board.total()) return;
+    // automatic spins: the last bets go back on the table for each spin
+    if (!this.board.total() && this.auto) { this.board.rebet(true); this.board.paint(); }
+    if (!this.board.total()) { this.stopAuto(); return; }
     this.round(async () => {
       const placed = {}, tt = this.board.total();
       SPOTS.forEach((k) => { placed[k] = this.board.bets[k] || 0; });

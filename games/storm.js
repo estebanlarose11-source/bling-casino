@@ -20,7 +20,7 @@ function settle(bs, r, lucky) { let t = 0; for (const k in bs) { const d = L.DEF
 class StormGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
-      music: EXTRA_THEMES.storm, stepper: false, autoplay: false, mainLabel: 'LANCER', betLabel: 'Mise totale',
+      music: EXTRA_THEMES.storm, stepper: false, autoplay: true, mainLabel: 'LANCER', betLabel: 'Mise totale',
       cls: 'table-game',
       head: '<div class="hist"></div>',
       stage: `<div class="wheel-zone"><svg class="rwheel" viewBox="0 0 300 300">${wheelSVG(1)}</svg><div class="rres"></div><div class="bolt-bar">⚡ Avant chaque tour, la foudre frappe 1 à 5 numéros chanceux</div></div>`,
@@ -36,7 +36,7 @@ class StormGame extends BaseGame {
 
   stakeLabel() { return this.board ? this.board.total() : 0; }
   chipSound() { sfx.click(); }
-  onMeters() { if (this.mainBtn) this.mainBtn.disabled = this.busy || !this.board?.total(); }
+  onMeters() { if (this.mainBtn) this.mainBtn.disabled = !this.auto && (this.busy || !this.board?.total()); }
 
   clearLucky() { this.qa('.rt-c.lucky').forEach((e) => { e.classList.remove('lucky'); e.querySelector('.lm')?.remove(); }); this.lucky = {}; }
 
@@ -83,7 +83,9 @@ class StormGame extends BaseGame {
   }
 
   onMain() {
-    if (!this.board.total()) return this.msg('Pose au moins un jeton sur le tapis.');
+    // automatic spins: the last bets go back on the table for each spin
+    if (!this.board.total() && this.auto) { this.board.rebet(true); this.board.paint(); }
+    if (!this.board.total()) { this.stopAuto(); return this.msg('Pose au moins un jeton sur le tapis.'); }
     this.round(async () => {
       const placed = { ...this.board.bets }, tt = this.board.total();
       if (!this.pay(tt)) return;
