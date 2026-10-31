@@ -48,3 +48,8 @@ Quand le propriétaire demande un code : `python3 tools/code.py` (5 000 KE ; `py
 à 2 500 KE). Le script ajoute le SHA-256 du code dans `CODES` (`pages/account.js`) et affiche le code : le donner au
 propriétaire, puis commit + push sur `main`. Ne jamais écrire un code en clair dans le dépôt. Chaque code ne sert
 qu'une fois, par un compte connecté (collection Firestore `codes`).
+
+## Version en un seul fichier
+
+`python3 tools/bundle.py` → `dist/spinbet-casino.html` (non versionné) : tout le site en un fichier (jeux intégrés,
+icônes en data:, sans service worker ni manifest), pour un Artifact ou un hébergement d'un seul fichier.
