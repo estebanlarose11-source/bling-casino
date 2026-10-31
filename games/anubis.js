@@ -10,6 +10,7 @@ const { SymbolGrid } = __mods['core/grid.js'];
 const { DEFS } = __mods['art/anubis.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
+const { el } = __mods['ui.js'];
 
 /* ===ENGINE (original) */
 const C = 5, R = 6, N = 30, MINC = 5, F = 0.33, UINC = 3, CAPX = 10000;
@@ -62,6 +63,7 @@ const SKULL = (c, eye) => `<g transform="translate(19 30) scale(.42)"><path d="M
 const EXTRA_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <symbol id="cbk" viewBox="0 0 64 64">${cubeSVG('#3f3f46', '#18181b', '#09090b', '#a855f7', SKULL('#e4e4e7', '#a855f7'))}</symbol>
   <symbol id="cbg" viewBox="0 0 64 64">${cubeSVG('#fde68a', '#d97706', '#92400e', '#fff7c2', SKULL('#fff7c2', '#92400e'))}</symbol>
+  <symbol id="cbn" viewBox="0 0 64 64">${cubeSVG('#3f3f46', '#1c1c1f', '#0c0c0e', '#52525b', '')}</symbol>
   <symbol id="cbr" viewBox="0 0 64 64">${cubeSVG('#fca5a5', '#dc2626', '#7f1d1d', '#fecaca', '<path d="M20 40 Q24 30 28 38 Q32 26 36 36 Q40 28 44 40" stroke="#fde047" stroke-width="3" fill="none" stroke-linecap="round"/>')}</symbol>
 </defs></svg>`;
 const WORDS = ['DIVIN !', 'SACRÉ !', 'PHARAONIQUE !', 'ÉTERNEL !', 'IMMORTEL !', 'JUGEMENT DIVIN !'];
@@ -322,6 +324,39 @@ class AnubisGame extends BaseGame {
     this.grid.cells[fi].classList.remove('merged', 'heat');
   }
 
+  // Respin of one column: a fluid cascade of black cubes runs through its empty cells. stop(item) slows it down
+  // and, when something drops, lands that item in the column's next free slot (no item: the cubes fade away).
+  startStrip(c, n) {
+    const free = R - n;
+    if (free <= 0) return { stop: async () => {} };
+    const g = this.grid.el.getBoundingClientRect(), r0 = this.grid.cells[c * R].getBoundingClientRect(), r1 = this.grid.cells[c * R + free - 1].getBoundingClientRect();
+    const pitch = free > 1 ? (r1.top - r0.top) / (free - 1) : r0.height + 4;
+    const box = el('div', 'jstrip spin');
+    box.style.cssText = `left:${r0.left - g.left}px;top:${r0.top - g.top}px;width:${r0.width}px;height:${r1.bottom - r0.top}px;--h:${r0.height}px;--gap:${pitch - r0.height}px`;
+    const reel = el('div', 'jreel');
+    const tile = (h, cls = '') => `<div class="jt ${cls}">${h || art('cbn')}</div>`;
+    const LOOP = 8;
+    reel.innerHTML = Array.from({ length: free + LOOP }, () => tile()).join('');
+    box.appendChild(reel);
+    this.grid.el.appendChild(box);
+    const loop = reel.animate([{ transform: `translateY(${-LOOP * pitch}px)` }, { transform: 'translateY(0)' }], { duration: (this.turbo ? 45 : 75) * LOOP, iterations: Infinity });
+    return {
+      stop: async (itemHTML) => {
+        loop.cancel();
+        const extra = 6;
+        const tiles = Array.from({ length: free + extra }, () => tile());
+        if (itemHTML) tiles[free - 1] = tile(itemHTML, 'item');
+        reel.innerHTML = tiles.join('');
+        box.classList.remove('spin');
+        await reel.animate([{ transform: `translateY(${-extra * pitch}px)` }, { transform: `translateY(${pitch * 0.14}px)`, offset: 0.82 }, { transform: 'translateY(0)' }],
+          { duration: this.turbo ? 220 : 430, easing: 'cubic-bezier(.3,.75,.4,1)', fill: 'forwards' }).finished;
+        if (!itemHTML) await box.animate([{ opacity: 1 }, { opacity: 0 }], { duration: this.turbo ? 90 : 170, fill: 'forwards' }).finished;
+        box.remove();
+      },
+      cancel: () => { loop.cancel(); box.remove(); },
+    };
+  }
+
   async judgment(startCells) {
     const bet = this.bet, cap = bet * CAPX;
     let respins = 3, capHit = false, rounds = 0, maxWin = false;
@@ -343,31 +378,32 @@ class AnubisGame extends BaseGame {
     draw(); info();
     await this.wait(400);
 
-    const addCube = async (c) => {
+    const addCube = async (c, landed) => {
       const x = cols[c];
       if (x.n >= R) return;
       const v = x.m, row = R - 1 - x.n, i = this.cubeCell(c, x.n);
       x.n++; x.T += v;
       this.paint(i, art('cb') + lab(fxv(v)), 'cube');
       draw();
-      await this.fall(i, row);
+      if (!landed) await this.fall(i, row);
+      else this.grid.sym(i).animate([{ transform: 'scale(1.12,.86)' }, { transform: 'none' }], { duration: 220, easing: 'ease-out' });
       sfx.land();
       const p = center(this.grid.cells[i]); fx.burst(p.x, p.y + 10, 14, ['#bae6fd', '#38bdf8', '#fff'], 4);
       if (x.n >= R) await this.melt(c, x, 'full'); // the column reached the top: it melts and keeps going
     };
-    const showAt = async (c, x, id, txt, cls) => {
+    const showAt = async (c, x, id, txt, cls, landed) => {
       const i = this.cubeCell(c, x.n);
       this.paint(i, art(id) + (txt ? lab(txt) : ''), cls);
-      await this.fall(i, R - 1 - x.n);
+      if (!landed) await this.fall(i, R - 1 - x.n);
       sfx.land();
       return i;
     };
-    const apply = async (c, k) => {
+    const apply = async (c, k, landed) => {
       const x = cols[c];
-      if (k === 'cube') return addCube(c);
+      if (k === 'cube') return addCube(c, landed);
       if (k === 'sk') {
         const n = skVal(), big = n >= 500;
-        const i3 = await showAt(c, x, 'cbk', '+' + fxv(n), 'sks' + (big ? ' big' : ''));
+        const i3 = await showAt(c, x, 'cbk', '+' + fxv(n), 'sks' + (big ? ' big' : ''), landed);
         await this.wait(300);
         const p = center(this.grid.cells[i3]);
         if (n >= SK_MAX) {
@@ -388,7 +424,7 @@ class AnubisGame extends BaseGame {
         if (big) { this.flash('rgba(226,232,240,.6)'); sfx.jackpot(); } else sfx.upgrade();
         await this.wait(300); this.lava(i3);
       } else if (k === 'g') {
-        const kk = gkVal(), i4 = await showAt(c, x, 'cbg', '×' + kk, 'gsk');
+        const kk = gkVal(), i4 = await showAt(c, x, 'cbg', '×' + kk, 'gsk', landed);
         await this.wait(420);
         x.T *= kk; this.label(c, '×' + kk, 'lg'); draw();
         this.flash('rgba(253,224,71,.6)'); sfx.jackpot();
@@ -398,7 +434,7 @@ class AnubisGame extends BaseGame {
         for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.remove('win', 'golden');
         this.lava(i4);
       } else if (k === 'red') {
-        const ri = await showAt(c, x, 'cbr', '', 'rc');
+        const ri = await showAt(c, x, 'cbr', '', 'rc', landed);
         this.msg('Cube rouge : la glace fond !');
         await this.wait(350);
         const p = center(this.grid.cells[ri]);
@@ -415,18 +451,19 @@ class AnubisGame extends BaseGame {
     while (respins > 0 && !capHit && rounds < 120 && !this.dead) {
       rounds++;
       this.msg('Relance…');
-      // the lava under every column scrolls like a reel, then the columns stop one after the other
-      const spinning = cols.map((x, c) => { const cs = []; for (let j = x.n; j < R; j++) cs.push(this.grid.cells[this.cubeCell(c, j)]); cs.forEach((el) => el.classList.add('spin')); return cs; });
-      sfx.reelStop?.(0);
-      await this.wait(this.turbo ? 200 : 420);
+      // a cascade of black cubes runs through the empty cells of every column, then the columns stop one by one
+      const strips = cols.map((x, c) => this.startStrip(c, x.n));
+      await this.wait(this.turbo ? 220 : 480);
       let got = false;
-      for (let c2 = 0; c2 < C && !capHit; c2++) {
-        await this.wait(this.turbo ? 50 : 120);
-        spinning[c2].forEach((el) => el.classList.remove('spin'));
-        sfx.tick();
-        if (Math.random() < JPC) { got = true; await apply(c2, pickItem(cols[c2].n)); info(); if (maxWin || total() >= CAPX) capHit = true; }
+      for (let c2 = 0; c2 < C && !capHit && !this.dead; c2++) {
+        await this.wait(this.turbo ? 40 : 110);
+        const hit = Math.random() < JPC, k = hit ? pickItem(cols[c2].n) : null;
+        const preview = k === 'cube' ? art('cb') + lab(fxv(cols[c2].m)) : k === 'sk' ? art('cbk') : k === 'g' ? art('cbg') : k === 'red' ? art('cbr') : null;
+        await strips[c2].stop(preview);
+        sfx.reelStop?.(c2);
+        if (k) { got = true; await apply(c2, k, true); info(); if (maxWin || total() >= CAPX) capHit = true; }
       }
-      spinning.flat().forEach((el) => el.classList.remove('spin'));
+      strips.forEach((st) => st.cancel?.());
       respins = got ? 3 : respins - 1;
       info();
     }

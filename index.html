@@ -1156,9 +1156,15 @@ body.gated { overflow: hidden; }
 .g-anubis.judge .sg-cell.lava:nth-child(3n) { background-position: 100% 100%, center, center; background-size: 170% 170%, cover, cover; }
 .g-anubis.judge .sg-cell.lava:nth-child(5n+1) { background-position: 0 100%, center, center; background-size: 120% 160%, cover, cover; }
 .g-anubis.judge .sg-cell.lava::before, .g-anubis.judge .sg-cell.lava::after { opacity: 0; transition: opacity .25s; }
-.g-anubis.judge .sg-cell.lava.spin::before { opacity: .9; }
-.g-anubis.judge .sg-cell.lava.spin::after { opacity: 1; filter: blur(1.5px); }
-.g-anubis.judge .sg-cell.lava.spin { box-shadow: inset 0 0 0 2px rgba(253, 186, 116, .55), inset 0 0 22px rgba(249, 115, 22, .7); }
+.g-anubis .sg-cell.lava::before, .g-anubis .sg-cell.lava::after { display: none; }
+/* respin cascade of black cubes over a column's empty cells */
+.jstrip { position: absolute; z-index: 3; overflow: hidden; pointer-events: none; border-radius: 3px; }
+.jreel { display: flex; flex-direction: column; gap: var(--gap); will-change: transform; }
+.jt { flex: none; height: var(--h); display: grid; place-items: center; position: relative; container-type: size; border-radius: 3px; background: linear-gradient(145deg, #2a2c2b, #121313); box-shadow: inset 2px 2px 0 rgba(255, 255, 255, .07), inset -2px -2px 0 rgba(0, 0, 0, .6); }
+.jt svg { width: 84%; height: 84%; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .7)); }
+.jt.item { background: radial-gradient(circle at 50% 40%, rgba(224, 242, 254, .3), transparent 70%), linear-gradient(145deg, #4b4f4c, #252826); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .5), 0 0 16px rgba(255, 255, 255, .25); }
+.jt .sg-lab { font-size: 20cqh; }
+.jstrip.spin .jreel { filter: blur(1.2px) brightness(.9); }
 .g-anubis.judge .sg-cell.cube { background: radial-gradient(circle at 50% 40%, rgba(224, 242, 254, .45), rgba(14, 116, 144, .4) 65%), linear-gradient(145deg, #4b4f4c, #252826); }
 /* column totals on top: big chiselled stone digits */
 .g-anubis.judge .jrow { gap: 6px; margin-bottom: 4px; }
@@ -5561,7 +5567,7 @@ const UPDATES = [
   },
   {
     game: 'anubis', date: '2026-10-31', title: 'Temple et Jugement en lave',
-    items: ['Nouveau temple animé : torches, soleil et sable', 'Cascades plus vivantes : liens lumineux, explosions et rebonds', 'Jugement : grille de pierre dans un temple brumeux, gros totaux de colonne en haut, 3 barres de relance', 'Crânes en cubes noirs, cubes rouges qui font fondre la glace', 'Une colonne pleine fond en un seul cube et continue'],
+    items: ['Nouveau temple animé : torches, soleil et sable', 'Cascades plus vivantes : liens lumineux, explosions et rebonds', 'Jugement : grille de pierre, cascade de cubes noirs à chaque relance, gros totaux de colonne en haut, 3 barres de relance', 'Crânes en cubes noirs, cubes rouges qui font fondre la glace', 'Une colonne pleine fond en un seul cube et continue'],
   },
   {
     game: 'candy', date: '2026-10-31', title: 'Nouvelles règles',
@@ -7924,7 +7930,7 @@ const FILES = {
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'ec65ad09e6'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f7ff05ea7f'],
-  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'f0d72f8ee1'],
+  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'fde932e4ec'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '9640e5a788'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],
