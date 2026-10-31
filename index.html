@@ -2554,7 +2554,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pt-zone { --ptz: min(470px, 84vw, calc(100vh - 330px)); position: relative; width: var(--ptz); min-width: 240px; aspect-ratio: 1; margin: 16px auto 10px; transition: opacity .4s, transform .4s; }
 .pt-zone.away { opacity: 0; transform: scale(.9); pointer-events: none; }
 .pt-svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 12px 30px rgba(0, 0, 0, .6)); }
-.pt-wheel { transform-origin: 150px 150px; }
+.pt-wheel, .pe-wheel { transform-origin: 150px 150px; }
 .pt-bulb { animation: ptBulb 1s steps(1) infinite; }
 @keyframes ptBulb { 50% { opacity: .25; } }
 .pt-ptr { position: absolute; left: 50%; top: -12px; z-index: 2; width: 30px; height: 40px; transform: translateX(-50%); transform-origin: 50% 20%; background: linear-gradient(180deg, #fff, #ffd23f); clip-path: polygon(0 0, 100% 0, 50% 100%); filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .6)); }
@@ -2639,7 +2639,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pe-spot.w small, .pe-spot.s small { color: #0f172a; text-shadow: none; }
 .pe-spot b svg { filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .3)); }
 .pe-spots { grid-template-columns: repeat(5, 1fr); }
-.pe-bonus { position: relative; margin: 12px auto; width: min(640px, 96vw); border-radius: 18px; overflow: hidden; box-shadow: 0 16px 40px rgba(0, 0, 0, .6), inset 0 0 0 3px #7dd3fc; }
+.pe-bonus[hidden], .pe-zone[hidden] { display: none !important; }
+.pe-bonus { position: relative; margin: 12px auto; width: 100%; max-width: 640px; box-sizing: border-box; border-radius: 18px; overflow: hidden; box-shadow: 0 16px 40px rgba(0, 0, 0, .6), inset 0 0 0 3px #7dd3fc; }
 .pe-sky { position: relative; height: 130px; background: linear-gradient(180deg, #38bdf8, #bae6fd); }
 .pe-sun { position: absolute; right: 24px; top: 16px; width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle, #fff7d6, #fde047 60%, #f59e0b); box-shadow: 0 0 40px #fde047; }
 .pe-title { position: absolute; left: 128px; right: 84px; top: 12px; margin: 0; text-align: center; font: 900 clamp(17px, 4.4vw, 28px)/1.05 'Bebas Neue', Impact, sans-serif; letter-spacing: 1.5px; color: #fff; text-shadow: 0 3px 0 #0c4a6e, 0 0 14px rgba(12, 74, 110, .6); }
@@ -2657,7 +2658,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pe-fish { position: absolute; left: 0; animation: peSwim var(--dur) ease-in-out var(--del) infinite alternate; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .35)); }
 .pe-fish svg { display: block; transform: scaleX(var(--dir)); }
 .pe-fish svg text { transform-box: fill-box; transform-origin: center; transform: scaleX(var(--dir)); }
-@keyframes peSwim { from { transform: translateX(4%); } to { transform: translateX(calc(min(640px, 96vw) - 140px)); } }
+@keyframes peSwim { from { left: 1%; } to { left: calc(99% - var(--w)); } }
 .pe-fish.flee { transition: opacity .8s; opacity: .25; }
 .pe-fish.hooked { z-index: 2; filter: drop-shadow(0 0 12px #fde047); }
 .pe-fish.caught { animation: peCaught .6s cubic-bezier(.3, 1.6, .5, 1) forwards; }
@@ -6390,6 +6391,10 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
+    game: 'peche', date: '2026-10-31', title: 'Roue corrigée',
+    items: ['La roue tourne bien sur son centre', 'La pêche s’affiche à la place de la roue : on voit tout le pêcheur sans faire défiler'],
+  },
+  {
     game: 'plateau', date: '2026-10-31', title: 'Zoom et nouveau plateau',
     items: ['La caméra zoome sur la flèche pendant que la roue tourne', 'Le plateau du bonus remplace la roue seulement quand tu gagnes un bonus', 'Plateau relooké : cases en relief, grosses cases qui brillent, pion doré'],
   },
@@ -8923,7 +8928,7 @@ const FILES = {
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', 'c401e351a3'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', '463c45c93a'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '8809dc3baa'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '697b9e42cb'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '556430dfc3'],
 };
 const loading = {};
 

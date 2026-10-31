@@ -206,9 +206,9 @@ class PecheGame extends BaseGame {
     this.q('.pe-title').innerHTML = `PÊCHE AU ${NAME[k].toUpperCase()}${L > 1 ? ` · ⚡×${L}` : ''}`;
     list.innerHTML = vals.map((x, i) => {
       const sz = size(x), top = 8 + ((i * 37) % 78), dur = (7 + ((i * 13) % 9)) * (1 + sz / 200), del = -((i * 1.7) % dur);
-      return `<div class="pe-fish" data-i="${i}" style="top:${top}%;--dur:${dur.toFixed(1)}s;--del:${del.toFixed(1)}s;--dir:${i % 2 ? -1 : 1}">${fishSVG(COL[k], sz, `×${xs(x)}`)}</div>`;
+      return `<div class="pe-fish" data-i="${i}" style="top:${top}%;--w:${sz}px;--dur:${dur.toFixed(1)}s;--del:${del.toFixed(1)}s;--dir:${i % 2 ? -1 : 1}">${fishSVG(COL[k], sz, `×${xs(x)}`)}</div>`;
     }).join('');
-    zone.classList.add('away'); box.hidden = false;
+    zone.hidden = true; box.hidden = false;
     box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400 });
     const br = box.getBoundingClientRect();
     if (br.top < 60 || br.bottom > innerHeight - 20) scrollBy({ top: br.top - 70, behavior: 'smooth' });
@@ -259,7 +259,10 @@ class PecheGame extends BaseGame {
     v >= hi / 20 ? sfx.bigWin() : sfx.win();
     say(`Pris ! Un poisson à <b>×${xs(v)}</b>${L > 1 ? ` · éclair ×${L} = <b>×${xs(v * L)}</b>` : ''}`);
     await this.wait(2200);
-    box.hidden = true; zone.classList.remove('away');
+    box.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300 });
+    await this.wait(280);
+    box.hidden = true; zone.hidden = false;
+    zone.animate([{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 400, easing: 'cubic-bezier(.3,1.4,.5,1)' });
     this.q('.pe-arm').classList.remove('reel');
     this.drawLine(null);
     return v;
