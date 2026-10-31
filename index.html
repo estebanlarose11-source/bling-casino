@@ -2573,6 +2573,19 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 /* full screen: the reels take the room left by the title, jackpots, message and controls */
 .game-host.is-full:has(> .g-dragons, > .g-billets) { --sgx: -70px; }
 @media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .g-dragons, > .g-billets) { --sgx: 0px; } }
+/* phones held upright: there is room in height, not in width.
+   Coffre aux Billets turns its banknotes upright (tall cells, notes rotated) so they are much bigger;
+   Têtes de Dragon gets taller cells, since the half heads are taller than wide. */
+@media (max-width: 600px) and (orientation: portrait) {
+  .g-billets .rs { aspect-ratio: calc(var(--cols) / 1.75 / var(--rows)); width: min(100%, calc((100vh - var(--chrome) + 75px) * var(--cols) / 1.75 / var(--rows))); gap: 4px; }
+  .g-billets .rs-cell { padding: 0; }
+  .g-billets .rs-cell svg { position: absolute; left: 50%; top: 50%; width: calc(100cqh / var(--rows) - 6px); height: calc(100cqw - 6px); translate: -50% -50%; rotate: -90deg; }
+  .g-billets .bv-val { top: 50%; font-size: min(5.5cqh, 21cqw); padding: 1cqh 1.6cqh; border-radius: 1.4cqh; }
+  .g-billets .bv-val.case { top: 32%; }
+  .bv-fly svg { position: absolute; left: 50%; top: 50%; width: 100cqh; height: 100cqw; translate: -50% -50%; rotate: -90deg; }
+  .bv-fly .bv-val { font-size: min(16cqh, 22cqw); }
+  .g-dragons .sg { aspect-ratio: 1.6; width: min(100%, calc((100vh - var(--chrome) + 120px) * 1.6)); }
+}
 /* phones: these two machines run edge to edge so the symbols get the whole width */
 @media (max-width: 600px) { .game-host:not(.is-full):has(> .g-dragons), .game-host:not(.is-full):has(> .g-billets) { margin-left: -12px; margin-right: -12px; } .slot.g-dragons, .slot.g-billets { padding-left: 4px; padding-right: 4px; } }
 @media (prefers-reduced-motion: reduce) { .dg-embers, .dg-glow, .g-dragons .sg-cell.egg svg { animation: none; } }
@@ -5852,11 +5865,11 @@ const { getGame } = __mods['games/index.js'];
 const UPDATES = [
   {
     game: 'dragons', date: '2026-10-31', title: 'Grille agrandie', isNew: true,
-    items: ['Cases beaucoup plus grandes, sur toute la largeur', 'Plus de gros cadre : l’antre du dragon autour des têtes', 'Jackpots regroupés sur une seule ligne', 'Affichage corrigé sur téléphone'],
+    items: ['Cases beaucoup plus grandes, sur toute la largeur', 'Plus de gros cadre : l’antre du dragon autour des têtes', 'Jackpots regroupés sur une seule ligne', 'Sur téléphone : cases plus hautes, têtes plus grandes'],
   },
   {
     game: 'billets', date: '2026-10-31', title: 'Grille agrandie', isNew: true,
-    items: ['Billets beaucoup plus grands, sur toute la largeur', 'Plus de cadre métallique : la chambre forte autour des rouleaux', 'Jackpots regroupés sur une seule ligne'],
+    items: ['Billets beaucoup plus grands, sur toute la largeur', 'Plus de cadre métallique : la chambre forte autour des rouleaux', 'Jackpots regroupés sur une seule ligne', 'Sur téléphone : billets à la verticale, deux fois plus grands'],
   },
   {
     game: 'dragons', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
