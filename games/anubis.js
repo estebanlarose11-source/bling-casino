@@ -299,6 +299,51 @@ class AnubisGame extends BaseGame {
     void l.offsetWidth; l.classList.add('go');
   }
 
+  // End of the Judgment: every cube is sucked into a counter in the middle of the grid, which adds up their
+  // multipliers and shows the total multiplier and the amount won.
+  async finale(cols, bet, cap) {
+    const g = this.grid.el, gr = g.getBoundingClientRect();
+    const box = el('div', 'an-sum', '<small>TOTAL DU JUGEMENT</small><b>×0</b><em>0,00 KE</em>');
+    g.appendChild(box);
+    await box.animate([{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.08)', opacity: 1, offset: 0.7 }, { transform: 'translate(-50%,-50%)' }], { duration: 380, easing: 'ease-out' }).finished;
+    const bx = box.querySelector('b'), em = box.querySelector('em'), tc = center(bx);
+    const list = [];
+    for (let c = 0; c < C; c++) for (let j = 0; j < cols[c].n; j++) list.push([this.cubeCell(c, j), cols[c].vals[j]]);
+    const gap = Math.max(this.turbo ? 35 : 60, Math.min(this.turbo ? 110 : 190, 2600 / list.length));
+    let sum = 0;
+    const flights = [];
+    for (const [i, v] of list) {
+      if (this.dead) return;
+      const cell = this.grid.cells[i], r = cell.getBoundingClientRect();
+      const fly = el('div', 'sg-cell cube jfly an-suck', `<div class="sg-sym">${cell.firstChild.innerHTML}</div>`);
+      fly.style.cssText = `left:${r.left - gr.left}px;top:${r.top - gr.top}px;width:${r.width}px;height:${r.height}px`;
+      g.appendChild(fly);
+      this.lava(i);
+      const dx = tc.x - (r.left + r.width / 2), dy = tc.y - (r.top + r.height / 2), side = Math.random() < 0.5 ? -1 : 1;
+      flights.push(fly.animate([
+        { transform: 'none', opacity: 1, filter: 'none' },
+        { transform: `translate(${dx * 0.25 + side * 18}px, ${dy * 0.25}px) scale(1.12) rotate(${side * 8}deg)`, filter: 'brightness(1.5)', offset: 0.3 },
+        { transform: `translate(${dx}px, ${dy}px) scale(.15) rotate(${side * 40}deg)`, opacity: 0.6, filter: 'brightness(2.5)' },
+      ], { duration: this.turbo ? 320 : 520, easing: 'cubic-bezier(.6,0,.9,.5)', fill: 'forwards' }).finished.then(() => {
+        fly.remove();
+        sum += v;
+        bx.textContent = '×' + fxv(sum);
+        em.textContent = fmtC(Math.min(cap, Math.round(bet * sum)));
+        bx.getAnimations().forEach((a) => a.cancel());
+        bx.animate([{ transform: 'scale(1.25)', filter: 'brightness(1.8)' }, { transform: 'none', filter: 'none' }], { duration: 220, easing: 'ease-out' });
+        fx.burst(tc.x, tc.y, 8, ['#fde68a', '#fbbf24', '#fff'], 4);
+        sfx.tick();
+      }));
+      await this.wait(gap);
+    }
+    await Promise.all(flights);
+    if (this.dead) return;
+    box.classList.add('done');
+    this.flash('rgba(253,224,71,.45)');
+    sfx.bigWin(); fx.burst(tc.x, tc.y, 50, ['#fde047', '#fff', '#f59e0b'], 9); fx.coins?.(30);
+    await this.wait(1600);
+  }
+
   // A glowing orb flies from element a up to element b, leaving a trail of sparks, and bursts on arrival.
   async beam(a, b, color) {
     const p = center(a), q = center(b);
@@ -530,9 +575,11 @@ class AnubisGame extends BaseGame {
       respins = got ? 3 : respins - 1;
       info();
     }
-    for (let c3 = 0; c3 < C; c3++) for (let j5 = 0; j5 < cols[c3].n; j5++) this.grid.cells[this.cubeCell(c3, j5)].classList.add('win');
+    if (!maxWin && total() > 0) await this.finale(cols, bet, cap);
+    else for (let c3 = 0; c3 < C; c3++) for (let j5 = 0; j5 < cols[c3].n; j5++) this.grid.cells[this.cubeCell(c3, j5)].classList.add('win');
     this.msg(maxWin || total() >= CAPX ? `MAX WIN ! ×${fxv(CAPX)}` : `Fin du bonus : ×${fxv(total())}`);
     await this.wait(1100);
+    this.q('.an-sum')?.remove();
     this.jrow.classList.remove('on');
     this.slotEl.classList.remove('in-free', 'judge');
     this.setBanner('');

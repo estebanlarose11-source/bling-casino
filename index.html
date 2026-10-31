@@ -1183,6 +1183,16 @@ body.gated { overflow: hidden; }
 .g-anubis.judge .jrow > div.hit b { animation: anHit .5s cubic-bezier(.3, 1.8, .5, 1); }
 @keyframes anHit { 0% { transform: skewX(-6deg) scale(1.45); filter: drop-shadow(0 0 14px #fff) brightness(1.4); } }
 .g-anubis.judge .jrow .lbl { top: 100%; }
+/* end of the Judgment: the cubes are sucked into a counter in the middle of the grid */
+.an-sum { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 8; min-width: 64%; padding: 14px 20px 16px; text-align: center; border-radius: 16px; pointer-events: none;
+  background: radial-gradient(circle at 50% 30%, rgba(120, 53, 15, .94), rgba(12, 10, 8, .96) 72%); box-shadow: 0 0 0 2px #fbbf24, 0 0 40px rgba(251, 191, 36, .55), 0 18px 40px rgba(0, 0, 0, .7); }
+.an-sum small { display: block; font: 800 11px Inter, sans-serif; letter-spacing: 2.5px; color: #fde68a; }
+.an-sum b { display: block; margin: 4px 0 2px; font: 400 clamp(46px, 8vw, 88px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px;
+  background: linear-gradient(180deg, #fff, #fde047 45%, #f59e0b 60%, #fff7c2); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #451a03) drop-shadow(0 0 14px rgba(251, 191, 36, .7)); }
+.an-sum em { display: block; font: 900 clamp(16px, 2.6vw, 26px) Orbitron, sans-serif; font-style: normal; color: #fff; text-shadow: 0 0 10px rgba(251, 191, 36, .8); font-variant-numeric: tabular-nums; }
+.an-sum.done { animation: anSum .7s ease-in-out infinite alternate; }
+@keyframes anSum { to { box-shadow: 0 0 0 3px #fff7c2, 0 0 70px rgba(253, 224, 71, .9), 0 18px 40px rgba(0, 0, 0, .7); } }
+.sg-cell.an-suck { z-index: 7; }
 /* skull light: an orb climbs from the skull to the column's multiplier */
 .an-beam { position: fixed; z-index: 96; width: 26px; height: 26px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff 0 22%, var(--c) 50%, transparent 72%); box-shadow: 0 0 18px 6px var(--c), 0 0 46px 14px color-mix(in srgb, var(--c) 45%, transparent); }
 .an-beam-dot { position: fixed; z-index: 95; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, var(--c) 60%); box-shadow: 0 0 10px 3px var(--c); animation: anBeamDot .6s ease-out forwards; }
@@ -5872,7 +5882,7 @@ const { getGame } = __mods['games/index.js'];
 const UPDATES = [
   {
     game: 'anubis', date: '2026-10-31', title: 'Jugement : cubes multiplicateurs',
-    items: ['Plus de glaçons : le cube bleu tombe et devient un cube noir marqué du multiplicateur de sa colonne', 'Chaque cube garde sa valeur, même si la colonne monte ensuite', 'En haut de chaque colonne : seulement son multiplicateur', 'Cube de lave : tous les cubes s’accumulent sur le dernier', 'Crâne noir : une lumière monte jusqu’au multiplicateur de la colonne'],
+    items: ['Plus de glaçons : le cube bleu tombe et devient un cube noir marqué du multiplicateur de sa colonne', 'Chaque cube garde sa valeur, même si la colonne monte ensuite', 'En haut de chaque colonne : seulement son multiplicateur', 'Cube de lave : tous les cubes s’accumulent sur le dernier', 'Crâne noir : une lumière monte jusqu’au multiplicateur de la colonne', 'Fin du bonus : tous les cubes sont aspirés et additionnés en un grand total'],
   },
   {
     game: 'dragons', date: '2026-10-31', title: 'Grille agrandie', isNew: true,
@@ -8263,7 +8273,7 @@ const FILES = {
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'ec65ad09e6'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f7ff05ea7f'],
-  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '5429747e2d'],
+  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '59bde622a0'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '9640e5a788'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],
