@@ -2496,67 +2496,70 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 @container (max-width: 520px) { .bv-top { grid-template-columns: 1fr 1fr; } .bv-logo { grid-column: 1 / -1; order: -1; } .bv-jp { padding: 4px 8px; } .bv-grand { width: 100%; } .bv-boxes, .bv-gold { display: none; } }
 @media (prefers-reduced-motion: reduce) { .bv-shine, .g-billets .rs-cell.cash svg, .g-billets .rs-cell.fsb svg { animation: none; } }
 
-/* ============ Fruit Slice ============ */
-.g-fruits { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(253, 224, 71, .45), transparent 70%), radial-gradient(500px 300px at 95% 100%, rgba(244, 63, 94, .3), transparent 70%), linear-gradient(180deg, #fb923c 0%, #db2777 55%, #831843 100%); }
-.g-fruits .slot-title h2 { font-family: 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; color: #fff; text-shadow: 0 3px 0 #be185d, 0 6px 0 #831843; }
-.fs-frame { padding: 7px; border-radius: 20px; background: repeating-linear-gradient(135deg, #facc15 0 16px, #f97316 16px 32px, #22c55e 32px 48px, #f43f5e 48px 64px); box-shadow: 0 0 22px rgba(253, 224, 71, .45), 0 16px 40px rgba(0, 0, 0, .45); }
-.fs-frame > .slot-stage { position: relative; overflow: hidden; border-radius: 14px; padding: 8px 10px 10px; background: #fff7ed; }
-.fs-frame > .slot-stage > :not(.fs-bar) { position: relative; z-index: 1; }
-/* juice bar on the beach: sun, palms, falling juice drops, wooden counter */
-.fs-bar { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: linear-gradient(180deg, #38bdf8 0%, #7dd3fc 40%, #fde68a 75%, #fbbf24 100%); }
-.fs-sun { position: absolute; left: 50%; top: -60px; width: 200px; height: 200px; margin-left: -100px; border-radius: 50%; background: radial-gradient(circle, #fff7c2, #fde047 40%, rgba(253, 224, 71, 0) 70%); animation: fsSun 5s ease-in-out infinite alternate; }
-@keyframes fsSun { to { transform: scale(1.1); } }
-.fs-palm { position: absolute; bottom: 14%; width: 120px; height: 200px; opacity: .55; }
-.fs-palm::before { content: ''; position: absolute; left: 56px; bottom: 0; width: 10px; height: 150px; border-radius: 5px; background: repeating-linear-gradient(180deg, #92400e 0 8px, #b45309 8px 12px); transform: rotate(6deg); transform-origin: bottom; }
-.fs-palm::after { content: ''; position: absolute; left: 0; top: 10px; width: 120px; height: 60px; border-radius: 50%; background: radial-gradient(ellipse at 50% 100%, transparent 30%, #16a34a 31%, #15803d 60%, transparent 61%); transform-origin: 50% 100%; animation: fsPalm 4s ease-in-out infinite alternate; }
-@keyframes fsPalm { to { transform: rotate(5deg); } }
-.fs-palm.l { left: -10px; } .fs-palm.r { right: -10px; transform: scaleX(-1); }
-.fs-drops { position: absolute; inset: -30% 0 0; opacity: .5; background-image: radial-gradient(circle, #f43f5e 2px, transparent 2.6px), radial-gradient(circle, #fde047 2px, transparent 2.6px), radial-gradient(circle, #22c55e 1.6px, transparent 2.2px); background-size: 120px 140px, 90px 120px, 150px 170px; background-position: 10px 0, 60px 40px, 30px 90px; animation: fsDrops 7s linear infinite; }
-@keyframes fsDrops { to { transform: translateY(30%); } }
-.fs-counter { position: absolute; left: 0; right: 0; bottom: 0; height: 16%; background: repeating-linear-gradient(90deg, #b45309 0 40px, #92400e 40px 42px), #b45309; box-shadow: inset 0 6px 0 #fbbf24; }
+/* ============ Têtes de Dragon ============ */
+.g-dragons { --slot-bg: radial-gradient(700px 360px at 50% 110%, rgba(234, 88, 12, .45), transparent 70%), radial-gradient(500px 300px at 50% -10%, rgba(127, 29, 29, .4), transparent 70%), linear-gradient(180deg, #1c0a05 0%, #0a0503 100%); }
+.g-dragons .slot-title h2 { font-family: Cinzel, Georgia, serif; letter-spacing: 1px; background: linear-gradient(180deg, #fff7c2, #fbbf24 50%, #b45309 52%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 2px 0 #3b0a02); }
+.dg-frame { padding: 6px; border-radius: 16px; background: linear-gradient(135deg, #78350f, #fbbf24 30%, #92400e 55%, #fde68a 80%, #78350f); box-shadow: 0 0 24px rgba(234, 88, 12, .45), 0 16px 40px rgba(0, 0, 0, .7); }
+.dg-frame > .slot-stage { position: relative; overflow: hidden; border-radius: 11px; padding: 8px 10px 10px; background: #120805; }
+.dg-frame > .slot-stage > :not(.dg-lair) { position: relative; z-index: 1; }
+/* the lair: lava glow, rising embers, piles of gold */
+.dg-lair { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 120%, #7c2d12, #1c0a05 60%), linear-gradient(180deg, #1a0d08, #0c0604); }
+.dg-glow { position: absolute; left: 10%; right: 10%; bottom: -30%; height: 60%; border-radius: 50%; background: radial-gradient(ellipse, rgba(249, 115, 22, .55), transparent 70%); animation: dgGlow 3s ease-in-out infinite alternate; }
+@keyframes dgGlow { to { opacity: .55; transform: scaleX(1.1); } }
+.dg-embers { position: absolute; inset: 0; background-image: radial-gradient(circle, #fdba74 1.3px, transparent 2px), radial-gradient(circle, #f97316 1px, transparent 1.8px); background-size: 90px 130px, 130px 110px; background-position: 10px 0, 60px 40px; animation: anEmbers 5s linear infinite; mask-image: linear-gradient(0deg, #000 20%, transparent 90%); -webkit-mask-image: linear-gradient(0deg, #000 20%, transparent 90%); opacity: .8; }
+.dg-gold { position: absolute; bottom: 0; width: 28%; height: 22%; border-radius: 50% 50% 0 0; background: radial-gradient(circle at 30% 30%, #fde047 2px, transparent 3px) 0 0 / 12px 10px, radial-gradient(ellipse at 50% 100%, #b45309, #78350f 70%); opacity: .7; }
+.dg-gold.l { left: -4%; } .dg-gold.r { right: -4%; }
 /* jackpot panel */
-.fs-top { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
-.fs-logo { text-align: center; padding: 2px 18px 4px; border-radius: 14px; background: linear-gradient(180deg, #fff, #ffe4e6); box-shadow: 0 0 0 3px #f43f5e, 0 4px 0 #be185d; }
-.fs-logo b { display: block; font: 400 clamp(24px, 4.2vw, 40px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 2px; color: #f43f5e; text-shadow: 0 2px 0 #fde047; }
-.fs-logo em { display: block; font: 900 clamp(11px, 1.6vw, 14px)/1 Orbitron, sans-serif; font-style: normal; letter-spacing: 6px; color: #16a34a; }
-.fs-jp, .fs-grand { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 12px; border-radius: 99px; background: rgba(255, 255, 255, .85); box-shadow: 0 0 0 2px rgba(190, 24, 93, .35); font-variant-numeric: tabular-nums; }
-.fs-jp small, .fs-grand small { font: 800 11px Inter, sans-serif; letter-spacing: 1.5px; }
-.fs-jp b, .fs-grand b { font: 900 clamp(12px, 1.7vw, 16px) Orbitron, sans-serif; color: #831843; }
-.fs-jp.mini small { color: #dc2626; } .fs-jp.major small { color: #7e22ce; }
-.fs-grand { width: min(60%, 320px); margin: 0 auto 8px; justify-content: center; background: linear-gradient(180deg, #fff7c2, #fbbf24); box-shadow: 0 0 0 2px #b45309, 0 0 18px rgba(251, 191, 36, .6); }
-.fs-grand small { color: #78350f; } .fs-grand b { font-size: clamp(15px, 2.2vw, 20px); color: #78350f; }
-.fs-jp.flash, .fs-grand.flash { animation: bvFlash .3s ease-in-out 6 alternate; }
-/* reels in pairs (cutting boards): the halves meet at the centre of each pair */
-.g-fruits .rs { gap: 0; grid-template-columns: 1fr 1fr 12px 1fr 1fr 12px 1fr 1fr; aspect-ratio: calc((6 + .36) / 3); padding: 6px; border-radius: 14px; background: rgba(255, 255, 255, .55); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .8), 0 6px 18px rgba(131, 24, 67, .25); width: min(100%, calc((100vh - var(--chrome) - 110px) * 6.36 / 3)); }
-.g-fruits .rs-reel:nth-child(3) { grid-column: 4; } .g-fruits .rs-reel:nth-child(4) { grid-column: 5; }
-.g-fruits .rs-reel:nth-child(5) { grid-column: 7; } .g-fruits .rs-reel:nth-child(6) { grid-column: 8; }
-.g-fruits .rs-reel { background: linear-gradient(180deg, #fde7c4, #fbd7a0 50%, #fde7c4); }
-.g-fruits .rs-reel:nth-child(odd) { border-radius: 10px 0 0 10px; box-shadow: inset -1px 0 0 rgba(146, 64, 14, .35); }
-.g-fruits .rs-reel:nth-child(even) { border-radius: 0 10px 10px 0; }
-.g-fruits .rs-reel::before { background: linear-gradient(rgba(253, 231, 196, .9), transparent); }
-.g-fruits .rs-reel::after { background: linear-gradient(transparent, rgba(253, 231, 196, .9)); }
-.g-fruits .rs-cell svg { width: 100%; height: 92%; filter: drop-shadow(0 4px 4px rgba(120, 53, 15, .3)); transition: transform .26s cubic-bezier(.3, 1.5, .5, 1); }
-.g-fruits .rs-cell.lt { justify-items: end; } .g-fruits .rs-cell.rt { justify-items: start; }
-.g-fruits .rs-cell.lt svg { transform: translateX(-5%) rotate(-4deg); } .g-fruits .rs-cell.rt svg { transform: translateX(5%) rotate(4deg); }
-.g-fruits .rs-cell.parts svg, .g-fruits .rs-cell.batt svg { width: 72%; height: 72%; transform: none; justify-self: center; }
-.g-fruits .rs-cell.parts { opacity: .6; }
-.g-fruits .rs-cell.batt svg { animation: fsBlend .5s ease-in-out infinite alternate; }
-@keyframes fsBlend { to { transform: rotate(4deg) translateY(-3%); } }
-.g-fruits .rs.has-win .rs-cell:not(.win) { opacity: 1; filter: none; }
-/* rejoining: the halves straighten and close the gap, the seam glows with juice */
-.g-fruits .rs-cell.fuse svg { transform: none !important; }
-.g-fruits .rs-cell.fuse { z-index: 2; }
-.g-fruits .rs-cell.lt.fused::after { content: ''; position: absolute; right: -2px; top: 10%; bottom: 10%; width: 4px; border-radius: 2px; background: #fff; box-shadow: 0 0 10px #fde047, 0 0 18px #f43f5e; animation: rfWeld .7s ease-out forwards; }
-@keyframes rfWeld { to { opacity: 0; } }
-.g-fruits .rs-cell.fused svg { animation: fsJoy .45s ease-in-out infinite alternate; }
-@keyframes fsJoy { to { transform: scale(1.06) !important; filter: drop-shadow(0 0 10px rgba(253, 224, 71, .95)) brightness(1.1); } }
-.fs-word { position: absolute; left: 50%; top: 58%; z-index: 6 !important; pointer-events: none; opacity: 0; font: 400 clamp(38px, 7vw, 86px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; white-space: nowrap; color: #fff; text-shadow: 0 4px 0 #f43f5e, 0 8px 0 #9d174d, 0 0 20px rgba(253, 224, 71, .8); }
-.fs-word.jp { color: #fff7c2; text-shadow: 0 4px 0 #d97706, 0 8px 0 #78350f, 0 0 24px #fde047; }
-.fs-word.fs { color: #fff; text-shadow: 0 4px 0 #ec4899, 0 8px 0 #7e22ce; }
-.g-fruits.in-free .fs-bar { background: linear-gradient(180deg, #a855f7 0%, #ec4899 50%, #fb923c 100%); }
-.pay-sym.frp { width: 84px; }
-@container (max-width: 520px) { .fs-top { grid-template-columns: 1fr 1fr; } .fs-logo { grid-column: 1 / -1; order: -1; } .fs-grand { width: 100%; } .fs-palm { display: none; } }
-@media (prefers-reduced-motion: reduce) { .fs-drops, .fs-sun, .fs-palm::after { animation: none; } }
+.dg-top { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
+.dg-logo { text-align: center; padding: 3px 18px 5px; border-radius: 8px; background: linear-gradient(180deg, #3b0a02, #120805); box-shadow: inset 0 0 0 2px #b45309, 0 0 16px rgba(234, 88, 12, .4); }
+.dg-logo b { display: block; font: 900 clamp(20px, 3.6vw, 32px)/1 Cinzel, Georgia, serif; letter-spacing: 3px; background: linear-gradient(180deg, #fff7c2, #fbbf24 50%, #b45309 52%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dg-logo em { display: block; font: 700 11px Cinzel, Georgia, serif; font-style: normal; letter-spacing: 4px; color: #fdba74; text-transform: uppercase; }
+.dg-jp, .dg-grand { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 12px; border-radius: 6px; background: linear-gradient(180deg, #1f0d07, #0c0604); box-shadow: inset 0 0 0 1px #78350f; font-variant-numeric: tabular-nums; }
+.dg-jp small, .dg-grand small { font: 800 11px Cinzel, Georgia, serif; letter-spacing: 1.5px; }
+.dg-jp b, .dg-grand b { font: 900 clamp(12px, 1.7vw, 16px) Orbitron, sans-serif; color: #fde68a; }
+.dg-jp.mini small { color: #fdba74; } .dg-jp.major small { color: #cbd5e1; }
+.dg-grand { width: min(60%, 320px); margin: 0 auto 8px; justify-content: center; background: linear-gradient(180deg, #3b2005, #120805); box-shadow: inset 0 0 0 2px #fbbf24, 0 0 18px rgba(251, 191, 36, .4); }
+.dg-grand small { color: #fde047; } .dg-grand b { font-size: clamp(15px, 2.2vw, 20px); color: #fff7c2; }
+.dg-jp.flash, .dg-grand.flash { animation: bvFlash .3s ease-in-out 6 alternate; }
+/* grid: 3 pairs of reels, every cell framed; inside a pair a bright divider separates the halves */
+.g-dragons .sg { grid-template-columns: 1fr 1fr 14px 1fr 1fr 14px 1fr 1fr; grid-auto-flow: row; gap: 5px 0; aspect-ratio: calc(6.5 / 3); width: min(100%, calc((100vh - var(--chrome) - 110px) * 6.5 / 3)); padding: 6px; border-radius: 10px; background: rgba(12, 6, 4, .75); box-shadow: inset 0 0 0 1px #78350f; }
+.g-dragons .sg-cell:nth-child(3n+1) { grid-row: 1; } .g-dragons .sg-cell:nth-child(3n+2) { grid-row: 2; } .g-dragons .sg-cell:nth-child(3n) { grid-row: 3; }
+.g-dragons .sg-cell:nth-child(-n+3) { grid-column: 1; }
+.g-dragons .sg-cell:nth-child(n+4):nth-child(-n+6) { grid-column: 2; }
+.g-dragons .sg-cell:nth-child(n+7):nth-child(-n+9) { grid-column: 4; }
+.g-dragons .sg-cell:nth-child(n+10):nth-child(-n+12) { grid-column: 5; }
+.g-dragons .sg-cell:nth-child(n+13):nth-child(-n+15) { grid-column: 7; }
+.g-dragons .sg-cell:nth-child(n+16):nth-child(-n+18) { grid-column: 8; }
+.g-dragons .sg-cell { overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #3b1d10, #1a0c06 75%); border: 2px solid #92400e; box-shadow: inset 0 0 12px rgba(0, 0, 0, .7); transition: border-color .3s, border-radius .3s; }
+.g-dragons .sg-cell.lt { border-radius: 8px 0 0 8px; border-right-color: #fbbf24; }
+.g-dragons .sg-cell.rt { border-radius: 0 8px 8px 0; border-left: 0; }
+.g-dragons .sg-cell.lt::after { content: ''; position: absolute; right: -1px; top: 6%; bottom: 6%; width: 2px; background: #fde68a; box-shadow: 0 0 6px #fbbf24; transition: opacity .3s; }
+.g-dragons .sg-cell.lt .sg-sym { justify-items: end; } .g-dragons .sg-cell.rt .sg-sym { justify-items: start; }
+.g-dragons .sg-sym svg { width: 100%; height: 94%; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .7)); }
+.g-dragons .sg-cell.egg .sg-sym, .g-dragons .sg-cell.stone .sg-sym { justify-items: center; }
+.g-dragons .sg-cell.egg svg, .g-dragons .sg-cell.stone svg { width: 74%; height: 74%; }
+.g-dragons .sg-cell.stone { opacity: .75; }
+.g-dragons .sg-cell.egg { background: radial-gradient(circle, rgba(245, 158, 11, .45), #1a0c06 70%); }
+.g-dragons .sg-cell.egg svg { animation: dgEgg 1.2s ease-in-out infinite; }
+@keyframes dgEgg { 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
+/* fusing: the divider and the inner borders fade, the pair turns into one glowing frame */
+.g-dragons .sg-cell.fusing { border-color: #fde047; box-shadow: inset 0 0 18px rgba(253, 224, 71, .45), 0 0 14px rgba(251, 191, 36, .6); z-index: 2; }
+.g-dragons .sg-cell.lt.fusing { border-right-color: transparent; border-radius: 8px 0 0 8px; }
+.g-dragons .sg-cell.lt.fusing::after { opacity: 0; }
+.g-dragons .sg-cell.hidden .sg-sym { opacity: 0; }
+.dg-fused { position: absolute; z-index: 5; display: grid; place-items: center; border-radius: 8px; border: 3px solid #fde047; background: radial-gradient(ellipse at 50% 45%, rgba(251, 146, 60, .55), #2a1208 75%); box-shadow: 0 0 22px rgba(251, 191, 36, .8), inset 0 0 22px rgba(253, 224, 71, .4); animation: dgFuse .45s cubic-bezier(.3, 1.6, .5, 1); pointer-events: none; }
+.dg-fused svg { width: 96%; height: 96%; filter: drop-shadow(0 0 10px rgba(253, 186, 116, .9)); }
+.dg-fused.jp { border-color: #fff7c2; box-shadow: 0 0 34px rgba(253, 224, 71, 1), inset 0 0 26px rgba(253, 224, 71, .6); }
+.dg-fused .eye { animation: dgEye .4s ease-in-out infinite alternate; }
+@keyframes dgFuse { from { transform: scale(.85); filter: brightness(2); } }
+@keyframes dgEye { to { fill: #fff; } }
+.dg-word { position: absolute; left: 50%; top: 58%; z-index: 6 !important; pointer-events: none; opacity: 0; font: 900 clamp(28px, 5.6vw, 64px)/1 Cinzel, Georgia, serif; letter-spacing: 2px; white-space: nowrap;
+  background: linear-gradient(180deg, #fff7c2, #fbbf24 45%, #ea580c 60%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #3b0a02) drop-shadow(0 0 16px rgba(249, 115, 22, .9)); }
+.dg-word.jp { filter: drop-shadow(0 3px 0 #78350f) drop-shadow(0 0 22px #fde047); }
+.g-dragons.in-free .dg-lair { background: radial-gradient(ellipse at 50% 120%, #6d28d9, #1e0b2e 60%), linear-gradient(180deg, #1a0d20, #0a050c); }
+.pay-sym.dgp { width: 84px; }
+@container (max-width: 520px) { .dg-top { grid-template-columns: 1fr 1fr; } .dg-logo { grid-column: 1 / -1; order: -1; } .dg-grand { width: 100%; } .dg-gold { display: none; } .g-dragons .sg { grid-template-columns: 1fr 1fr 8px 1fr 1fr 8px 1fr 1fr; } }
+@media (prefers-reduced-motion: reduce) { .dg-embers, .dg-glow, .g-dragons .sg-cell.egg svg { animation: none; } }
 
 /* ============ Rewarded ad popup (A-ADS) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
@@ -5169,62 +5172,61 @@ const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="t
 return { DEFS };
 })();
 
-// ---- art/fruits.js ----
-__mods['art/fruits.js'] = (() => {
-// SVG art for Fruit Slice: nine fruits drawn whole in a 128×70 box centred on x = 64 (each reel shows one half, with
-// a juicy cut edge along the seam), the rainbow star-fruit joker, the blender scatter and the peels that never match.
+// ---- art/dragons.js ----
+__mods['art/dragons.js'] = (() => {
+// SVG art for Têtes de Dragon: nine dragon heads drawn whole and symmetric in a 128×76 box (x = 64 is the cut line;
+// each cell shows one half), the pearl joker, the dragon egg scatter and the stones that never match.
 
-const lg = (id, a, b, c, x2 = 0, y2 = 1) => `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient>`;
-const rg = (id, a, b, c) => `<radialGradient id="${id}" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></radialGradient>`;
-const T = (x, y, s, t, c) => `<text x="${x}" y="${y}" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="${s}" fill="${c}" text-anchor="middle" stroke="rgba(0,0,0,.45)" stroke-width="1.6" paint-order="stroke">${t}</text>`;
-const shine = (x, y, rx, ry) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" transform="rotate(-30 ${x} ${y})" fill="#fff" opacity=".55"/>`;
-// the cut: a band of flesh on each side of x = 64, so a lone half looks freshly sliced
-const cut = (y0, y1, flesh, seeds = '') => `<rect x="61.5" y="${y0}" width="5" height="${y1 - y0}" rx="2.5" fill="${flesh}" opacity=".95"/>${seeds}`;
-const plate = (t, gold) => `<rect x="${64 - (t.length > 4 ? 26 : 17)}" y="54" width="${t.length > 4 ? 52 : 34}" height="13" rx="6.5" fill="${gold ? '#78350f' : 'rgba(0,0,0,.55)'}" stroke="${gold ? '#fde047' : '#fff'}" stroke-opacity=".8"/>${T(64, 64, t.length > 5 ? 8.5 : 9.5, t, gold ? '#fde047' : '#fff')}`;
-
-const FRUITS = {
-  // cherries ×2: one cherry per half, stems joined at the top
-  fr0: `<path d="M44 26 Q52 2 64 4 Q76 2 84 26" fill="none" stroke="#3f6212" stroke-width="3" stroke-linecap="round"/><path d="M64 4 Q72 -2 80 4 Q72 8 64 4Z" fill="#4d7c0f"/>
-    <circle cx="44" cy="38" r="17" fill="url(#frCherry)"/><circle cx="84" cy="38" r="17" fill="url(#frCherry)"/>${shine(38, 31, 3, 6)}${shine(78, 31, 3, 6)}${cut(26, 48, '#fda4af')}${plate('×2')}`,
-  // lemon ×5
-  fr1: `<path d="M24 31 Q26 2 64 2 Q102 2 104 31 Q102 60 64 60 Q26 60 24 31Z" fill="url(#frLemon)" stroke="#a16207" stroke-width="1.5"/><path d="M24 31 L16 31 M104 31 L112 31" stroke="#ca8a04" stroke-width="7" stroke-linecap="round"/>
-    ${shine(44, 16, 6, 11)}${cut(4, 58, '#fef9c3')}${plate('×5')}`,
-  // orange ×10
-  fr2: `<circle cx="64" cy="30" r="28" fill="url(#frOrange)"/>${[[50, 18], [74, 22], [58, 40], [80, 38], [46, 32]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1" fill="#c2410c" opacity=".6"/>`).join('')}
-    <path d="M64 2 Q70 -4 78 0 Q70 4 64 2Z" fill="#16a34a"/>${shine(52, 18, 5, 9)}${cut(3, 57, '#fed7aa')}${plate('×10')}`,
-  // peach ×20, its cleft runs down the seam
-  fr3: `<path d="M64 6 Q100 2 100 32 Q100 58 64 58 Q28 58 28 32 Q28 2 64 6Z" fill="url(#frPeach)"/><path d="M64 7 Q60 30 64 56" fill="none" stroke="#be185d" stroke-opacity=".35" stroke-width="2"/>
-    <path d="M64 6 Q72 -4 86 0 Q76 8 64 6Z" fill="#65a30d"/>${shine(46, 20, 5, 10)}${cut(8, 56, '#fde68a')}${plate('×20')}`,
-  // watermelon ×50
-  fr4: `<ellipse cx="64" cy="31" rx="46" ry="27" fill="url(#frMelon)"/>${[-30, -15, 0, 15, 30].map((d) => `<path d="M${64 + d} 5 Q${64 + d * 1.25} 31 ${64 + d} 57" fill="none" stroke="#14532d" stroke-width="4" opacity=".55"/>`).join('')}
-    ${shine(36, 18, 5, 11)}${cut(5, 57, '#f43f5e', '<circle cx="63" cy="20" r="1.4" fill="#111"/><circle cx="65" cy="34" r="1.4" fill="#111"/><circle cx="63" cy="46" r="1.4" fill="#111"/>')}${plate('×50')}`,
-  // pineapple ×100
-  fr5: `<path d="M64 14 L54 -4 L60 -2 L64 -8 L68 -2 L74 -4 Z M64 14 L46 2 L58 6 Z M64 14 L82 2 L70 6 Z" fill="url(#frLeaf)"/>
-    <ellipse cx="64" cy="36" rx="25" ry="24" fill="url(#frPine)"/><clipPath id="frPineClip"><ellipse cx="64" cy="36" rx="25" ry="24"/></clipPath><g clip-path="url(#frPineClip)" stroke="#92400e" stroke-width="1.2" opacity=".55" fill="none">${[-24, -12, 0, 12, 24].map((d) => `<path d="M${40 + d} 14 L${88 + d} 60 M${88 - d} 14 L${40 - d} 60"/>`).join('')}</g>
-    ${shine(54, 26, 4, 8)}${cut(13, 59, '#fef08a')}${plate('×100')}`,
-  // MINI: strawberry
-  fr6: `<path d="M64 12 Q98 10 92 32 Q86 52 64 60 Q42 52 36 32 Q30 10 64 12Z" fill="url(#frStraw)"/>${[[48, 24], [58, 34], [72, 24], [80, 34], [52, 44], [70, 46], [64, 22]].map(([x, y]) => `<ellipse cx="${x}" cy="${y}" rx="1.4" ry="2" fill="#fde68a"/>`).join('')}
-    <path d="M64 14 L50 4 L60 8 L64 0 L68 8 L78 4 Z" fill="#16a34a"/>${shine(46, 22, 4, 8)}${cut(12, 58, '#fecdd3')}${plate('MINI', 1)}`,
-  // MAJEUR: grapes
-  fr7: `<path d="M64 6 V0 M64 4 Q74 -4 84 2" stroke="#3f6212" stroke-width="2.5" fill="none"/>${[[50, 14], [64, 12], [78, 14], [44, 26], [57, 25], [71, 25], [84, 26], [50, 38], [64, 37], [78, 38], [57, 49], [71, 49]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="8" fill="url(#frGrape)"/><circle cx="${x - 2.5}" cy="${y - 2.5}" r="2" fill="#fff" opacity=".5"/>`).join('')}
-    ${cut(6, 56, '#d9f99d')}${plate('MAJEUR', 1)}`,
-  // JACKPOT: golden apple with a crown
-  fr8: `<path d="M64 12 Q96 2 98 30 Q98 58 64 60 Q30 58 30 30 Q32 2 64 12Z" fill="url(#frGold)" stroke="#fff7c2" stroke-width="2"/><path d="M48 4 L54 -4 L60 2 L64 -6 L68 2 L74 -4 L80 4 Z" fill="#fde047" stroke="#92400e"/>
-    ${shine(46, 22, 5, 10)}${cut(12, 58, '#fef3c7')}${plate('JACKPOT', 1)}`,
-};
+const rg = (id, a, b, c) => `<radialGradient id="${id}" cx=".5" cy=".35" r=".7"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></radialGradient>`;
+const lg = (id, a, b, c) => `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient>`;
+const T = (x, y, s, t, c) => `<text x="${x}" y="${y}" font-family="Cinzel, Georgia, serif" font-weight="900" font-size="${s}" fill="${c}" text-anchor="middle" stroke="rgba(0,0,0,.6)" stroke-width="1.6" paint-order="stroke">${t}</text>`;
+const mirror = (d) => `<path d="${d}"/><path d="${d}" transform="translate(128 0) scale(-1 1)"/>`;
+const HORNS = [
+  'M42 14 Q30 2 22 -6 Q26 6 36 18 Z',
+  'M44 12 Q40 -2 34 -8 Q34 4 38 16 Z M36 18 Q22 12 14 4 Q20 16 30 24 Z',
+  'M40 16 Q22 14 18 2 Q20 -6 30 -4 Q24 4 30 8 Q36 10 42 12 Z',
+];
+const HEAD = 'M64 4 C82 4 96 12 99 26 C101 36 96 42 90 48 C84 55 74 61 64 61 C54 61 44 55 38 48 C32 42 27 36 29 26 C32 12 46 4 64 4 Z';
+function dragon([id, c0, c1, c2, eye, horn, label, gold]) {
+  return `<symbol id="${id}" viewBox="0 -8 128 76">
+    <g fill="${c2}">${mirror(HORNS[horn])}</g>
+    <g fill="${c1}" stroke="${c2}" stroke-width="1.2">${mirror('M30 26 L14 20 L24 30 L10 34 L28 38 Z')}</g>
+    <path d="${HEAD}" fill="url(#g${id})" stroke="${gold ? '#fff7c2' : c2}" stroke-width="${gold ? 2.6 : 1.8}"/>
+    <path d="M52 48 Q64 44 76 48 Q76 58 64 60 Q52 58 52 48Z" fill="${c0}" opacity=".55"/>
+    <g fill="none" stroke="${c2}" stroke-width="1.2" opacity=".55">${mirror('M50 12 Q56 9 62 12')}${mirror('M44 17 Q50 14 56 17')}</g>
+    <g fill="#0b0b0f">${mirror('M38 22 L56 27 L52 33 L40 31 Z')}</g>
+    <g fill="${eye}" class="eye">${mirror('M42 25 L53 28 L50 31 L43 30 Z')}</g>
+    <g fill="#0b0b0f">${mirror('M47 26.5 L48.5 26.5 L48 31 L46.6 31 Z')}</g>
+    <g fill="${c2}">${mirror('M36 20 L56 24 L52 21 L38 17 Z')}</g>
+    <g fill="#0b0b0f">${mirror('M59 50 Q57 47 60 46 Q61 48 59 50Z')}</g>
+    <g fill="#f8fafc">${mirror('M54 57 L56 61 L58 57 Z')}${mirror('M44 52 L46 57 L48 53 Z')}</g>
+    ${label ? `<rect x="${64 - (label.length > 4 ? 26 : 16)}" y="56" width="${label.length > 4 ? 52 : 32}" height="12" rx="3" fill="${gold ? '#451a03' : 'rgba(0,0,0,.7)'}" stroke="${gold ? '#fde047' : c0}" stroke-opacity=".9"/>${T(64, 65.5, label.length > 5 ? 8 : 9, label, gold ? '#fde047' : '#fff')}` : ''}
+  </symbol>`;
+}
+const DRAGONS = [
+  ['dg0', '#bbf7d0', '#22c55e', '#14532d', '#fde047', 0, '×2'],
+  ['dg1', '#bfdbfe', '#3b82f6', '#1e3a8a', '#a5f3fc', 1, '×5'],
+  ['dg2', '#fecaca', '#dc2626', '#7f1d1d', '#fde047', 2, '×10'],
+  ['dg3', '#e9d5ff', '#9333ea', '#3b0764', '#4ade80', 0, '×20'],
+  ['dg4', '#9ca3af', '#374151', '#030712', '#ef4444', 1, '×50'],
+  ['dg5', '#ffffff', '#cbd5e1', '#475569', '#22d3ee', 2, '×100'],
+  ['dg6', '#fde4c8', '#c2763a', '#6b3a12', '#fde047', 0, 'MINI', 1],
+  ['dg7', '#f1f5f9', '#94a3b8', '#334155', '#38bdf8', 1, 'MAJEUR', 1],
+  ['dg8', '#fff7c2', '#fbbf24', '#92400e', '#ef4444', 2, 'JACKPOT', 1],
+];
 
 const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-  ${rg('frCherry', '#fecdd3', '#e11d48', '#7f1d1d')}${rg('frLemon', '#fef9c3', '#facc15', '#a16207')}${rg('frOrange', '#fed7aa', '#f97316', '#9a3412')}${rg('frPeach', '#fde4cf', '#fb923c', '#db2777')}
-  ${rg('frMelon', '#bbf7d0', '#22c55e', '#14532d')}${rg('frPine', '#fef08a', '#eab308', '#a16207')}${rg('frStraw', '#fecaca', '#ef4444', '#991b1b')}${rg('frGrape', '#e9d5ff', '#9333ea', '#3b0764')}
-  ${rg('frGold', '#fff7c2', '#fbbf24', '#b45309')}${lg('frLeaf', '#86efac', '#16a34a', '#14532d')}${lg('frJoker', '#f472b6', '#facc15', '#22d3ee', 1, 1)}${lg('frBlend', '#e0f2fe', '#93c5fd', '#3b82f6')}
-  ${Object.entries(FRUITS).map(([id, body]) => `<symbol id="${id}" viewBox="0 -8 128 76">${body}</symbol>`).join('\n')}
-  <symbol id="frj" viewBox="0 -8 128 76"><path d="M64 0 L74 22 L100 22 L80 38 L88 62 L64 48 L40 62 L48 38 L28 22 L54 22 Z" fill="url(#frJoker)" stroke="#fff" stroke-width="2.5" stroke-linejoin="round"/>
-    ${shine(54, 20, 4, 7)}${cut(4, 54, '#fff')}${T(64, 40, 10, 'JOKER', '#fff')}</symbol>
-  <symbol id="frb" viewBox="0 0 64 64"><rect x="22" y="50" width="22" height="10" rx="3" fill="#334155"/><path d="M18 8 H46 L42 50 H22 Z" fill="url(#frBlend)" opacity=".75" stroke="#e0f2fe" stroke-width="2"/>
-    <path d="M21 30 H43 L42 50 H22 Z" fill="#f472b6" opacity=".85"/><circle cx="28" cy="40" r="3" fill="#fde047"/><circle cx="37" cy="36" r="3" fill="#4ade80"/><rect x="16" y="4" width="32" height="6" rx="3" fill="#334155"/>
-    ${shine(24, 20, 2, 7)}</symbol>
-  <symbol id="frp" viewBox="0 0 64 64"><g opacity=".9"><path d="M14 44 Q24 30 40 34 Q30 42 14 44Z" fill="#facc15" stroke="#a16207"/><path d="M30 20 Q44 12 52 24 Q40 26 30 20Z" fill="#16a34a" stroke="#14532d"/>
-    <ellipse cx="24" cy="24" rx="2.5" ry="4" fill="#3f2a14"/><ellipse cx="44" cy="44" rx="2.5" ry="4" fill="#3f2a14" transform="rotate(30 44 44)"/><ellipse cx="34" cy="52" rx="2" ry="3.4" fill="#3f2a14"/></g></symbol>
+  ${DRAGONS.map(([id, c0, c1, c2]) => rg('g' + id, c0, c1, c2)).join('')}
+  ${rg('dgPearl', '#ffffff', '#c4b5fd', '#6d28d9')}${rg('dgEgg', '#fef3c7', '#f59e0b', '#7c2d12')}${lg('dgStone', '#57534e', '#3f3a36', '#1c1917')}
+  ${DRAGONS.map(dragon).join('')}
+  <symbol id="dgj" viewBox="0 -8 128 76"><circle cx="64" cy="30" r="27" fill="url(#dgPearl)" stroke="#f5d0fe" stroke-width="2"/>
+    <path d="M44 34 Q52 14 72 16 Q60 22 62 32 Q64 42 80 40 Q70 52 52 46 Q42 42 44 34Z" fill="#fff" opacity=".35"/>
+    <circle cx="54" cy="20" r="5" fill="#fff" opacity=".8"/>${T(64, 66, 10, 'JOKER', '#f5d0fe')}</symbol>
+  <symbol id="dge" viewBox="0 0 64 64"><path d="M32 4 C48 4 54 26 54 38 C54 52 44 60 32 60 C20 60 10 52 10 38 C10 26 16 4 32 4Z" fill="url(#dgEgg)" stroke="#78350f" stroke-width="2"/>
+    ${[[24, 22, 5], [40, 30, 6], [26, 44, 4], [42, 48, 3.5], [34, 14, 3]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.7}" fill="#7c2d12" opacity=".55"/>`).join('')}
+    <path d="M30 26 L34 34 L30 40 L36 48" fill="none" stroke="#fde047" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="24" cy="18" rx="3" ry="6" fill="#fff" opacity=".45" transform="rotate(-20 24 18)"/></symbol>
+  <symbol id="dgs" viewBox="0 0 64 64"><path d="M10 44 L18 26 L32 20 L48 24 L56 40 L46 52 L22 54 Z" fill="url(#dgStone)" stroke="#0c0a09" stroke-width="2"/>
+    <path d="M18 26 L28 34 L32 20 M28 34 L46 52 M28 34 L22 54" fill="none" stroke="#0c0a09" stroke-width="1.2" opacity=".7"/></symbol>
 </defs></svg>`;
 
 return { DEFS };
@@ -5243,14 +5245,14 @@ const { DEFS: ZEUS } = __mods['art/zeus.js'];
 const { DEFS: COSMIC } = __mods['art/cosmic.js'];
 const { DEFS: TACO } = __mods['art/taco.js'];
 const { DEFS: BILLETS } = __mods['art/billets.js'];
-const { DEFS: FRUITS } = __mods['art/fruits.js'];
+const { DEFS: DRAGONS } = __mods['art/dragons.js'];
 
 function mountAllArt() {
   if (document.getElementById('bling-art')) return;
   const host = document.createElement('div');
   host.id = 'bling-art';
   host.className = 'art-defs';
-  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC, TACO, BILLETS, FRUITS].join('');
+  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC, TACO, BILLETS, DRAGONS].join('');
   document.body.prepend(host);
 }
 
@@ -5344,7 +5346,7 @@ const ORIGINALS = [
   {"id": "robots", "name": "Course de Robots", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
   {"id": "taco", "name": "Taco Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "billets", "name": "Coffre aux Billets", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200 KE tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200 KE", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
-  {"id": "fruits", "name": "Fruit Slice", "cat": "slot", "tag": "Machine à sous", "sub": "Recolle les fruits tranchés", "colors": ["#f43f5e", "#831843"], "description": "Au bar à jus de la plage, les fruits sont tranchés en deux : les rouleaux vont par paires, moitiés gauches d’un côté, moitiés droites de l’autre. Quand les deux moitiés du même fruit s’arrêtent côte à côte, elles se recollent dans une giclée de jus et paient la valeur du fruit. Caramboles jokers, fraise MINI, raisin MAJEUR et pomme d’or JACKPOT ×500.", "features": ["3 paires de rouleaux", "Fruits à recoller", "Carambole joker", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "Smoothie Time : fruits ×3", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
+  {"id": "dragons", "name": "Têtes de Dragon", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, œufs de dragon pour les free spins.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "Free spins : dragons ×3", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -5696,15 +5698,13 @@ const SPECS = {
         ${b('bv1', 70, 120, 120, -18)}${b('bv4', 230, 110, 120, 16)}${b('bv5', 150, 90, 130, -4)}${b('bvg', 150, 175, 170, 3)}${b('bvf', 60, 230, 90, -10)}${b('bvj', 245, 225, 90, 12)}`;
     },
   },
-  fruits: {
-    bg: ['#f97316', '#9d174d'], light: '#fde047', title: ['FRUIT', 'SLICE'], font: 'bebas', metal: ['#fff', '#fde047', '#f43f5e'], tag: 'JACKPOT ×500',
+  dragons: {
+    bg: ['#7c2d12', '#0c0604'], light: '#f97316', title: ['TÊTES', 'DE DRAGON'], font: 'cinzel', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500',
     art: (u) => {
-      const half = (id, side, x, y, w, r) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><svg x="${-w / 4}" y="${-w * 0.3}" width="${w / 2}" height="${w * 0.6}" viewBox="${side ? 64 : 0} -8 64 76"><use href="#${id}" width="128" height="76" y="-8"/></svg></g>`;
       const full = (id, x, y, w, r) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><use href="#${id}" x="${-w / 2}" y="${-w * 0.3}" width="${w}" height="${w * 0.594}"/></g>`;
-      return `<circle cx="150" cy="40" r="90" fill="#fde047" opacity=".35"/>
-        ${half('fr4', 0, 110, 110, 200, -14)}${half('fr4', 1, 196, 110, 200, 14)}
-        ${[[150, 70, '#f43f5e'], [140, 130, '#22c55e'], [162, 95, '#fde047']].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="5" fill="${c}"/>`).join('')}
-        ${full('fr5', 70, 220, 120, -8)}${full('fr8', 232, 215, 120, 8)}${full('fr0', 150, 250, 90, 0)}`;
+      return `<ellipse cx="150" cy="260" rx="170" ry="70" fill="#f97316" opacity=".35"/>
+        ${full('dg8', 150, 105, 250, 0)}${full('dg2', 62, 225, 120, -10)}${full('dg1', 238, 225, 120, 10)}
+        <g fill="#fdba74">${[[40, 60], [260, 50], [90, 30], [220, 150], [30, 170]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.5" opacity=".8"/>`).join('')}</g>`;
     },
   },
 };
@@ -5714,7 +5714,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], fruits: ["#fb923c", "#db2777"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -5827,9 +5827,10 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
-    game: 'fruits', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
-    items: ["Des fruits tranchés en deux sur des paires de rouleaux", "Deux moitiés du même fruit côte à côte : il se recolle et paie", "Fraise MINI, raisin MAJEUR et pomme d’or JACKPOT ×500", "Smoothie Time : free spins où chaque fruit paie ×3"],
+    game: 'dragons', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
+    items: ["Des têtes de dragon coupées en deux sur des paires de rouleaux", "Deux moitiés de la même tête : les cases fusionnent et le dragon paie", "Cascades : tout retombe et chaque nouvelle tête repaie", "Dragons MINI, MAJEUR et JACKPOT ×500"],
   },
+
 
   {
     game: 'billets', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
@@ -6673,7 +6674,7 @@ const EXTRA_THEMES = {
   'robots': { sd: 0.14, len: 16, root: 164.81, lead: { wave: 'sawtooth', vol: 0.02, dur: 0.1, pat: [12, 12, 15, null, 12, 12, 17, null, 12, 12, 19, 17, 15, null, 14, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.15, pat: [-12, -12, null, -12, -12, null, -10, null, -12, -12, null, -12, -9, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.025 },
   'taco': { sd: 0.16, len: 16, root: 220, lead: { wave: 'triangle', vol: 0.06, dur: 0.14, pat: [12, null, 16, 19, null, 16, 12, null, 14, null, 17, 21, null, 17, 14, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -10, null, -3, null] }, comp: { wave: 'square', vol: 0.016, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [2, 5, 9] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
   billets: { sd: 0.17, len: 16, root: 146.83, lead: { wave: 'square', vol: 0.028, dur: 0.12, pat: [12, null, 16, 19, null, 24, 19, 16, 14, null, 17, 21, null, 26, 21, 17] }, bass: { wave: 'triangle', vol: 0.13, dur: 0.2, pat: [-12, null, -12, null, -5, null, -5, null, -10, null, -10, null, -3, null, -5, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [-1, 2, 7] } }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.022 },
-  fruits: { sd: 0.15, len: 16, root: 261.63, lead: { wave: 'triangle', vol: 0.06, dur: 0.14, pat: [12, 16, 19, null, 16, 19, 24, null, 14, 17, 21, null, 17, 21, 26, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -7, null, 0, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [-1, 2, 7] } }, kick: [0, 8], hat: [2, 6, 10, 14], kv: 0.16, hv: 0.02 },
+  dragons: { sd: 0.24, len: 16, root: 98, pad: { wave: 'sawtooth', vol: 0.02, dur: 2, map: { 0: [0, 3, 7], 8: [-2, 3, 8] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.3, pat: [12, null, 15, null, 19, null, 18, 15, null, 12, null, 10, 12, null, null, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.5, pat: [-12, null, null, -12, null, null, -9, null, -12, null, null, -12, null, null, -7, null] }, kick: [0, 3, 8, 11], hat: [4, 12], kv: 0.26, hv: 0.02 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -8221,7 +8222,7 @@ const FILES = {
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '577a616908'],
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', '4652b72c40'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', '0d0eb8802e'],
-  fruits: ['fruits', 'games/impl/fruits.js', 'FruitSliceGame', 'd7f082805f'],
+  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '1750c9d15c'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '71f88c0b85'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '59dfe1e0c8'],
