@@ -2439,6 +2439,63 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .defi-list li em { margin-left: auto; font: 900 14px Orbitron, sans-serif; font-style: normal; color: #fbbf24; }
 @media (max-width: 700px) { .defi-top { grid-template-columns: 1fr; } .defi-cover { width: 160px; } }
 
+/* ============ Coffre aux Billets ============ */
+.g-billets { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(251, 191, 36, .35), transparent 70%), linear-gradient(180deg, #4a3208 0%, #2a1a05 60%, #120b02 100%); }
+.g-billets .slot-title h2 { font-family: 'Bebas Neue', Orbitron, sans-serif; letter-spacing: 3px; background: linear-gradient(180deg, #fff7c2, #fbbf24 50%, #b45309 52%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 2px 0 #3b2a05); }
+.bv-frame { padding: 8px; border-radius: 18px; background: linear-gradient(180deg, #9ca3af, #4b5563 20%, #374151 80%, #9ca3af); box-shadow: inset 0 0 0 2px #1f2937, 0 0 0 2px #111, 0 18px 40px rgba(0, 0, 0, .6); }
+.bv-frame > .slot-stage { position: relative; overflow: hidden; border-radius: 12px; padding: 8px 10px 10px; background: #1a1206; }
+.bv-frame > .slot-stage > :not(.bv-vault) { position: relative; z-index: 1; }
+/* the vault: safe-deposit boxes, stacks of gold bars, a warm light */
+.bv-vault { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 20%, #8a6420, #4a3208 55%, #1f1404); }
+.bv-boxes { position: absolute; top: 0; bottom: 30%; width: 26%; opacity: .55; background: linear-gradient(90deg, rgba(0, 0, 0, .35) 1px, transparent 1px) 0 0 / 22px 100%, linear-gradient(rgba(0, 0, 0, .35) 1px, transparent 1px) 0 0 / 100% 16px, linear-gradient(180deg, #b8892e, #7a5615); box-shadow: inset 0 0 30px rgba(0, 0, 0, .6); }
+.bv-boxes::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, #fde68a 1.2px, transparent 1.8px) 9px 6px / 22px 16px; opacity: .6; }
+.bv-boxes.l { left: 0; } .bv-boxes.r { right: 0; }
+.bv-gold { position: absolute; bottom: 0; width: 30%; height: 34%; background: repeating-linear-gradient(0deg, #7c4a06 0 3px, transparent 3px 18px), repeating-linear-gradient(90deg, #fde047 0 26px, #f59e0b 26px 30px, #b45309 30px 32px); clip-path: polygon(0 30%, 30% 0, 100% 0, 100% 100%, 0 100%); filter: drop-shadow(0 -4px 10px rgba(253, 224, 71, .4)); }
+.bv-gold.l { left: 0; } .bv-gold.r { right: 0; transform: scaleX(-1); }
+.bv-shine { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255, 247, 194, .18) 50%, transparent 65%); background-size: 300% 100%; animation: bvShine 6s ease-in-out infinite; }
+@keyframes bvShine { 0% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
+/* jackpot panel */
+.bv-top { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
+.bv-logo { text-align: center; padding: 4px 18px; border-radius: 10px; background: linear-gradient(180deg, #4b5563, #1f2937); box-shadow: inset 0 0 0 2px #9ca3af, 0 4px 10px rgba(0, 0, 0, .5); }
+.bv-logo b { display: block; font: 400 clamp(22px, 4vw, 36px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; background: linear-gradient(180deg, #fff7c2, #fbbf24 50%, #b45309 52%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.bv-logo em { display: block; font: 700 10px Inter, sans-serif; font-style: normal; letter-spacing: 3px; text-transform: uppercase; color: #fde68a; }
+.bv-jp, .bv-grand { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 12px; border-radius: 8px; background: linear-gradient(180deg, #111827, #1f2937); box-shadow: inset 0 0 0 1px #4b5563; font-variant-numeric: tabular-nums; }
+.bv-jp small, .bv-grand small { font: 800 11px Inter, sans-serif; letter-spacing: 1.5px; }
+.bv-jp b, .bv-grand b { font: 900 clamp(13px, 1.8vw, 17px) Orbitron, sans-serif; color: #fde68a; }
+.bv-jp.mini small { color: #f3c79a; } .bv-jp.major small { color: #93c5fd; }
+.bv-grand { width: min(60%, 340px); margin: 0 auto 8px; justify-content: center; background: linear-gradient(180deg, #2a1d05, #0f0a02); box-shadow: inset 0 0 0 2px #fbbf24, 0 0 18px rgba(251, 191, 36, .35); }
+.bv-grand small { color: #fde047; } .bv-grand b { font-size: clamp(16px, 2.4vw, 22px); color: #fff7c2; text-shadow: 0 0 10px rgba(251, 191, 36, .8); }
+.bv-jp.flash, .bv-grand.flash { animation: bvFlash .3s ease-in-out 6 alternate; }
+@keyframes bvFlash { to { box-shadow: inset 0 0 0 2px #fff, 0 0 26px rgba(253, 224, 71, .9); transform: scale(1.04); } }
+/* reels: landscape cells so the banknotes fit */
+.g-billets .rs { aspect-ratio: calc(var(--cols) * 1.72 / var(--rows)); width: min(100%, calc((100vh - var(--chrome) - 110px) * var(--cols) * 1.72 / var(--rows))); gap: 5px; padding: 5px; border-radius: 10px; background: linear-gradient(180deg, #d1d5db, #6b7280); box-shadow: inset 0 0 0 2px #374151; }
+.g-billets .rs-reel { border-radius: 6px; background: linear-gradient(180deg, #2b2416, #3d3420 50%, #2b2416); }
+.g-billets .rs-reel::before { background: linear-gradient(rgba(20, 14, 4, .75), transparent); }
+.g-billets .rs-reel::after { background: linear-gradient(transparent, rgba(20, 14, 4, .75)); }
+.g-billets .rs-cell { padding: 3% 2%; }
+.g-billets .rs-cell svg { width: 100%; height: 100%; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .55)); }
+.g-billets .rs-cell.win { z-index: 2; }
+.g-billets .rs-cell.win svg { filter: drop-shadow(0 0 6px #fde047) drop-shadow(0 0 14px rgba(253, 224, 71, .8)); animation: bvWin .7s ease-in-out infinite; }
+@keyframes bvWin { 50% { transform: scale(1.06) rotate(-1deg); } }
+.g-billets .rs-cell.cash svg, .g-billets .rs-cell.fsb svg { animation: bvGlint 2.2s ease-in-out infinite; }
+@keyframes bvGlint { 50% { filter: drop-shadow(0 0 8px rgba(253, 224, 71, .9)); } }
+.g-billets .rs-cell.collecting svg { filter: drop-shadow(0 0 10px #fde047) drop-shadow(0 0 22px rgba(251, 191, 36, .9)); animation: bvWin .5s ease-in-out infinite; }
+.bv-val { position: absolute; left: 50%; top: 56%; transform: translate(-50%, -50%); font: 900 8.5cqh/1 Orbitron, sans-serif; color: #fff; padding: 1.2cqh 2.6cqh; border-radius: 2cqh; background: linear-gradient(180deg, #16a34a, #14532d); box-shadow: 0 0 0 2px #fde68a, 0 3px 6px rgba(0, 0, 0, .5); white-space: nowrap; pointer-events: none; }
+.bv-val.case { top: 34%; background: linear-gradient(180deg, #f59e0b, #92400e); box-shadow: 0 0 0 2px #fff7c2, 0 0 14px rgba(251, 191, 36, .8); }
+.bv-fly { position: fixed; z-index: 90; pointer-events: none; display: grid; place-items: center; container-type: size; }
+.bv-fly svg { width: 100%; height: 100%; }
+.bv-fly .bv-val { font-size: 22cqh; }
+.bv-rain { position: fixed; top: -80px; z-index: 95; width: 90px; height: 52px; pointer-events: none; animation: bvRain 2.4s cubic-bezier(.3, .2, .6, 1) forwards; }
+.bv-rain svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .4)); }
+@keyframes bvRain { to { transform: translate(var(--dx), 110vh) rotate(var(--r)); } }
+.bv-word { position: absolute; left: 50%; top: 58%; z-index: 6 !important; pointer-events: none; opacity: 0; font: 400 clamp(36px, 7vw, 84px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; white-space: nowrap;
+  background: linear-gradient(180deg, #fff, #fde047 45%, #f59e0b 55%, #fff7c2); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #78350f) drop-shadow(0 0 16px rgba(251, 191, 36, .8)); }
+.bv-word.fs { background: linear-gradient(180deg, #fff, #86efac 45%, #16a34a 55%, #dcfce7); -webkit-background-clip: text; background-clip: text; }
+.g-billets.in-free .bv-vault { background: radial-gradient(ellipse at 50% 20%, #2f7a4a, #14432a 55%, #08180f); }
+.pay-sym.bvp { width: 84px; }
+@container (max-width: 520px) { .bv-top { grid-template-columns: 1fr 1fr; } .bv-logo { grid-column: 1 / -1; order: -1; } .bv-jp { padding: 4px 8px; } .bv-grand { width: 100%; } .bv-boxes, .bv-gold { display: none; } }
+@media (prefers-reduced-motion: reduce) { .bv-shine, .g-billets .rs-cell.cash svg, .g-billets .rs-cell.fsb svg { animation: none; } }
+
 /* ============ Rewarded ad popup (A-ADS) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
@@ -4992,6 +5049,64 @@ ${Object.entries(SYMS).map(([id, body]) => `<symbol id="${id}" viewBox="0 0 64 6
 return { DEFS };
 })();
 
+// ---- art/billets.js ----
+__mods['art/billets.js'] = (() => {
+// SVG art for Coffre aux Billets: euro-style KE banknotes (colour and motif by value), the cash bill, FREE SPINS,
+// MINI / MAJEUR / JACKPOT notes, the safe WILD and the collecting briefcase. Notes are drawn in a 112×64 box.
+
+const lg = (id, a, b, c, x2 = 1, y2 = 1) => `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}"><stop offset="0" stop-color="${a}"/><stop offset=".55" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient>`;
+const wave = (y, a, f, ph) => { let d = `M4 ${y}`; for (let x = 4; x <= 108; x += 4) d += ` L${x} ${(y + a * Math.sin(x / f + ph)).toFixed(1)}`; return d; };
+const guil = (col) => `<g fill="none" stroke="${col}" stroke-width=".6" opacity=".45">${[12, 18, 24, 30, 36, 42, 48, 54].map((y, k) => `<path d="${wave(y, 2.2, 5 + k % 3, k)}"/>`).join('')}</g>`;
+const arch = (x, col) => `<g transform="translate(${x} 12)" fill="${col}"><path d="M0 40 V16 Q14 -2 28 16 V40 H22 V18 Q14 8 6 18 V40 Z" opacity=".55"/><rect x="-3" y="38" width="34" height="4" opacity=".55"/><path d="M6 18 Q14 8 22 18" fill="none" stroke="#fff" stroke-width=".8" opacity=".5"/></g>`;
+const ring = (cx, cy) => Array.from({ length: 10 }, (_, k) => { const a = (k / 10) * Math.PI * 2; return `<rect x="${(cx + 9 * Math.cos(a) - 1.2).toFixed(1)}" y="${(cy + 9 * Math.sin(a) - 1.2).toFixed(1)}" width="2.4" height="2.4" transform="rotate(45 ${(cx + 9 * Math.cos(a)).toFixed(1)} ${(cy + 9 * Math.sin(a)).toFixed(1)})" fill="#fff" opacity=".7"/>`; }).join('');
+const holoAt = (x) => `<rect x="${x}" y="4" width="9" height="56" fill="url(#bvHolo)" opacity=".85"/><path d="M${x + 4.5} 10 l3 4 -3 4 -3 -4z M${x + 4.5} 28 l3 4 -3 4 -3 -4z M${x + 4.5} 46 l3 4 -3 4 -3 -4z" fill="#fff" opacity=".6"/>`;
+const holo = `<rect x="80" y="4" width="10" height="56" fill="url(#bvHolo)"/><path d="M85 10 l3 4 -3 4 -3 -4z M85 28 l3 4 -3 4 -3 -4z M85 46 l3 4 -3 4 -3 -4z" fill="#fff" opacity=".6"/>`;
+const T = (x, y, s, t, c, anchor = 'start', w = 900) => `<text x="${x}" y="${y}" font-family="Arial Black, Arial, sans-serif" font-weight="${w}" font-size="${s}" fill="${c}" text-anchor="${anchor}">${t}</text>`;
+
+// A value banknote: base colour gradient, guilloche, arch window, star ring, hologram stripe, values in two corners.
+function note(id, val, c0, c1, c2, ink) {
+  return `<symbol id="${id}" viewBox="0 0 112 64">
+    <rect x="1.5" y="1.5" width="109" height="61" rx="4" fill="url(#g${id})" stroke="${c2}" stroke-width="1.5"/>
+    <rect x="5" y="5" width="102" height="54" rx="2" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width=".8"/>
+    ${guil('#fff')}${arch(16, c2)}${ring(86, 20)}${holoAt(52)}
+    ${T(8, 22, 17, val, ink)}${T(105, 57, 20, val, '#fff', 'end')}
+    ${T(105, 13, 6, 'KE', ink, 'end')}${T(8, 58.5, 4, 'BANQUE SPINBET · SB' + String(val).padStart(3, '0') + '842', ink, 'start', 700)}
+    <path d="M100 4 L108 4 L108 12" fill="none" stroke="#fff" stroke-opacity=".5"/>
+  </symbol>`;
+}
+const NOTES = [['bv0', 5, '#d8dcd9', '#9aa5a0', '#5c6b64', '#2f3b36'], ['bv1', 10, '#f3b5ae', '#d9534f', '#8c2620', '#5a1410'], ['bv2', 20, '#b9d4f0', '#3b82c4', '#1f4f80', '#123158'],
+  ['bv3', 50, '#f9d0a2', '#f08c2e', '#a3520f', '#5e2c05'], ['bv4', 100, '#bfe6c8', '#4caf6e', '#256b3d', '#123d22'], ['bv5', 200, '#f2dfa8', '#d4a537', '#8a6614', '#4d3806']];
+
+const special = (id, c0, c1, c2, inner) => `<symbol id="${id}" viewBox="0 0 112 64">
+    <rect x="1.5" y="1.5" width="109" height="61" rx="4" fill="url(#g${id})" stroke="${c2}" stroke-width="2"/>
+    <rect x="5" y="5" width="102" height="54" rx="2" fill="none" stroke="#fff7c2" stroke-opacity=".6" stroke-width="1"/>${guil('#fff7c2')}${inner}</symbol>`;
+
+const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  ${NOTES.map(([id, , c0, c1, c2]) => lg('g' + id, c0, c1, c2)).join('')}
+  ${lg('gbvc', '#fffbe6', '#f6e3a1', '#c9a227')}${lg('gbvf', '#7ee2a8', '#109157', '#064e2c')}${lg('gbvm', '#f3c79a', '#b4692c', '#6b3a12')}
+  ${lg('gbvj', '#a9d3ff', '#3a6fb8', '#1a2e5c')}${lg('gbvg', '#3a2b0b', '#111', '#3a2b0b')}${lg('gbvw', '#e5e7eb', '#9ca3af', '#4b5563')}${lg('gbvk', '#a16207', '#78350f', '#451a03')}
+  ${lg('bvGold', '#fff7c2', '#fbbf24', '#b45309', 0, 1)}
+  <linearGradient id="bvHolo" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0f2fe"/><stop offset=".25" stop-color="#f5d0fe"/><stop offset=".5" stop-color="#fef9c3"/><stop offset=".75" stop-color="#bbf7d0"/><stop offset="1" stop-color="#e0e7ff"/></linearGradient>
+  ${NOTES.map((n) => note(...n)).join('')}
+  ${special('bvc', '#fffbe6', '#f6e3a1', '#a16207', `${arch(12, '#c9a227')}${holo}${T(56, 16, 7, 'BILLET CASH', '#7c5a07', 'middle')}`)}
+  ${special('bvf', '#7ee2a8', '#109157', '#064e2c', `${arch(8, '#064e2c')}${T(60, 32, 15, 'FREE', '#fde047', 'middle')}${T(60, 50, 15, 'SPINS', '#fde047', 'middle')}${ring(96, 14)}`)}
+  ${special('bvm', '#f3c79a', '#b4692c', '#6b3a12', `${arch(8, '#6b3a12')}${T(62, 40, 19, 'MINI', '#fff7ed', 'middle')}${T(62, 54, 7, '× 10 LA MISE', '#fde68a', 'middle')}`)}
+  ${special('bvj', '#a9d3ff', '#3a6fb8', '#1a2e5c', `${arch(8, '#1a2e5c')}${T(62, 38, 17, 'MAJEUR', '#fff', 'middle')}${T(62, 54, 7, '× 50 LA MISE', '#bfdbfe', 'middle')}`)}
+  ${special('bvg', '#3a2b0b', '#111', '#fbbf24', `<rect x="5" y="5" width="102" height="54" rx="2" fill="none" stroke="url(#bvGold)" stroke-width="2.5"/>${ring(16, 32)}${ring(96, 32)}${T(56, 32, 14, 'JACKPOT', 'url(#bvGold)', 'middle')}${T(56, 54, 17, '×500', 'url(#bvGold)', 'middle')}`)}
+  <symbol id="bvw" viewBox="0 0 112 64"><rect x="1.5" y="1.5" width="109" height="61" rx="5" fill="url(#gbvw)" stroke="#1f2937" stroke-width="2"/>
+    <rect x="30" y="6" width="52" height="52" rx="6" fill="#374151" stroke="#d1d5db" stroke-width="2"/><circle cx="56" cy="32" r="17" fill="url(#gbvw)" stroke="#111827" stroke-width="2"/>
+    ${Array.from({ length: 12 }, (_, k) => { const a = (k / 12) * Math.PI * 2; return `<line x1="${(56 + 13 * Math.cos(a)).toFixed(1)}" y1="${(32 + 13 * Math.sin(a)).toFixed(1)}" x2="${(56 + 16 * Math.cos(a)).toFixed(1)}" y2="${(32 + 16 * Math.sin(a)).toFixed(1)}" stroke="#111827" stroke-width="1.4"/>`; }).join('')}
+    <circle cx="56" cy="32" r="6" fill="#111827"/><path d="M56 32 L56 21" stroke="#fbbf24" stroke-width="2.4" stroke-linecap="round"/>
+    <rect x="6" y="22" width="20" height="20" rx="3" fill="#111827"/>${T(16, 36, 9, 'W', '#fbbf24', 'middle')}<rect x="86" y="22" width="20" height="20" rx="3" fill="#111827"/>${T(96, 36, 9, 'W', '#fbbf24', 'middle')}</symbol>
+  <symbol id="bvk" viewBox="0 0 112 64"><rect x="40" y="4" width="32" height="10" rx="4" fill="none" stroke="#451a03" stroke-width="4"/>
+    <rect x="8" y="12" width="96" height="48" rx="7" fill="url(#gbvk)" stroke="#451a03" stroke-width="2"/><rect x="8" y="28" width="96" height="4" fill="#451a03" opacity=".6"/>
+    <rect x="30" y="24" width="12" height="12" rx="2" fill="url(#bvGold)" stroke="#78350f"/><rect x="70" y="24" width="12" height="12" rx="2" fill="url(#bvGold)" stroke="#78350f"/>
+    <path d="M14 18 Q56 12 98 18" fill="none" stroke="#fde68a" stroke-opacity=".35" stroke-width="2"/>${T(56, 52, 10, 'COLLECTE', '#fde68a', 'middle')}</symbol>
+</defs></svg>`;
+
+return { DEFS };
+})();
+
 // ---- art/index.js ----
 __mods['art/index.js'] = (() => {
 // Every game's SVG art, mounted once so covers and games can <use> any symbol.
@@ -5004,13 +5119,14 @@ const { DEFS: CANDY } = __mods['art/candy.js'];
 const { DEFS: ZEUS } = __mods['art/zeus.js'];
 const { DEFS: COSMIC } = __mods['art/cosmic.js'];
 const { DEFS: TACO } = __mods['art/taco.js'];
+const { DEFS: BILLETS } = __mods['art/billets.js'];
 
 function mountAllArt() {
   if (document.getElementById('bling-art')) return;
   const host = document.createElement('div');
   host.id = 'bling-art';
   host.className = 'art-defs';
-  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC, TACO].join('');
+  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC, TACO, BILLETS].join('');
   document.body.prepend(host);
 }
 
@@ -5103,6 +5219,7 @@ const ORIGINALS = [
   {"id": "pileface", "name": "Pile ou Face Turbo", "cat": "quick", "tag": "Instantané", "sub": "Double ou rien, jusqu’à 20 fois", "colors": ["#fbbf24", "#1c1404"], "description": "Une pièce, deux faces, et ton gain qui double à chaque bonne prédiction. Lance la série, choisis Pile ou Face jusqu’à 20 fois d’affilée et encaisse quand tu veux : ×1,92 après un lancer, ×3,84 après deux… et plus d’un million de fois la mise après 20 !", "features": ["Jusqu’à 20 lancers", "Gain doublé à chaque fois", "Encaisse quand tu veux", "Vrai 50/50", "Raccourcis clavier P / F"], "rtp": "96 %", "vol": 4, "max": "×1 006 633"},
   {"id": "robots", "name": "Course de Robots", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
   {"id": "taco", "name": "Taco Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
+  {"id": "billets", "name": "Coffre aux Billets", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200 KE tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200 KE", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -5445,6 +5562,15 @@ const SPECS = {
       ${sym('tfp', 150, 120, 150, `filter="url(#glow${u})"`)}
       ${sym('tfw', 70, 214, 100, `filter="url(#sh${u})"`)}${sym('tf3', 236, 210, 92, `filter="url(#sh${u})"`)}${sym('tf2', 250, 100, 56, `filter="url(#sh${u})"`)}${sym('tf4', 48, 110, 58, `filter="url(#sh${u})"`)}`,
   },
+  billets: {
+    bg: ['#8a6420', '#1f1404'], light: '#fde047', title: ['COFFRE', 'AUX BILLETS'], font: 'bebas', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500',
+    art: (u) => {
+      const b = (id, x, y, w, r) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><use href="#${id}" x="${-w / 2}" y="${-w * 0.2857}" width="${w}" height="${w * 0.5714}"/></g>`;
+      return `<g opacity=".5">${[0, 1, 2, 3, 4, 5, 6].map((k) => `<rect x="${k * 44}" y="0" width="40" height="120" fill="#a77a26" stroke="#5c3d0a"/>`).join('')}</g>
+        <path d="M0 230 L60 190 L300 190 L300 300 L0 300Z" fill="#b8860b" opacity=".6"/>
+        ${b('bv1', 70, 120, 120, -18)}${b('bv4', 230, 110, 120, 16)}${b('bv5', 150, 90, 130, -4)}${b('bvg', 150, 175, 170, 3)}${b('bvf', 60, 230, 90, -10)}${b('bvj', 245, 225, 90, 12)}`;
+    },
+  },
 };
 
 // Bright card colours (top, bottom) for the square lobby posters.
@@ -5452,7 +5578,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -5564,6 +5690,10 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  {
+    game: 'billets', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
+    items: ["Billets de 5 à 200 KE dans une chambre forte dorée", "La mallette collecte tous les billets cash", "MINI ×10, MAJEUR ×50 et JACKPOT ×500", "8 free spins avec des mallettes sur tous les rouleaux"],
+  },
   {
     game: 'bling', date: '2026-10-31', title: 'Nouveau look néon',
     items: ['Ville néon animée avec projecteurs et pluie de paillettes', 'Cases en verre qui brillent', 'Liens lumineux entre les gemmes gagnantes et explosions dorées', 'Compteur de cascades et grands mots de victoire'],
@@ -6401,6 +6531,7 @@ const EXTRA_THEMES = {
   'pileface': { sd: 0.15, len: 16, root: 196, lead: { wave: 'square', vol: 0.025, dur: 0.1, pat: [12, null, 19, null, 24, 19, null, 16, 12, null, 19, null, 22, 19, 17, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.18, pat: [-12, null, -12, null, -5, null, -5, null, -8, null, -8, null, -7, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.022 },
   'robots': { sd: 0.14, len: 16, root: 164.81, lead: { wave: 'sawtooth', vol: 0.02, dur: 0.1, pat: [12, 12, 15, null, 12, 12, 17, null, 12, 12, 19, 17, 15, null, 14, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.15, pat: [-12, -12, null, -12, -12, null, -10, null, -12, -12, null, -12, -9, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.025 },
   'taco': { sd: 0.16, len: 16, root: 220, lead: { wave: 'triangle', vol: 0.06, dur: 0.14, pat: [12, null, 16, 19, null, 16, 12, null, 14, null, 17, 21, null, 17, 14, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -10, null, -3, null] }, comp: { wave: 'square', vol: 0.016, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [2, 5, 9] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
+  billets: { sd: 0.17, len: 16, root: 146.83, lead: { wave: 'square', vol: 0.028, dur: 0.12, pat: [12, null, 16, 19, null, 24, 19, 16, 14, null, 17, 21, null, 26, 21, 17] }, bass: { wave: 'triangle', vol: 0.13, dur: 0.2, pat: [-12, null, -12, null, -5, null, -5, null, -10, null, -10, null, -3, null, -5, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [-1, 2, 7] } }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.022 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -7948,6 +8079,7 @@ const FILES = {
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '577a616908'],
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', '4652b72c40'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', '0d0eb8802e'],
+  billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '71f88c0b85'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '59dfe1e0c8'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'fd9cc76f92'],
