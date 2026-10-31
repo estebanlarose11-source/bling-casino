@@ -2739,7 +2739,7 @@ __mods['wallet.js'] = (() => {
 const KEY = 'casino_bal';
 const SKEY = 'bling.stats.v3';
 const START = 100000;
-const REFILL_BELOW = 10000;
+const REFILL_BELOW = 100000; // refill (with 2 ads, 3 times a day) as soon as the balance is under 1 000 KE
 
 function readBal() {
   try {
@@ -4520,7 +4520,9 @@ const { doubleDaily, dailyStatus } = __mods['daily.js'];
 const { adPolicy } = __mods['adpolicy.js'];
 
 const PLACEMENTS = {
-  credits: { label: '+100 jetons', dailyCap: 20, cooldownMin: 0, reward: () => { wallet.grant(100); return '+100 jetons ajoutés'; } },
+  credits: { label: '+250 KE', dailyCap: 20, cooldownMin: 0, reward: () => { wallet.grant(250); return '+250 KE ajoutés'; } },
+  // Refill to START: only under REFILL_BELOW, 3 times a day, after 2 ads of 15 s in a row.
+  refill: { label: 'Recharger à 1 000 KE', views: 2, dailyCap: 3, cooldownMin: 0, when: () => wallet.canRefill(), whenMsg: 'Possible seulement sous 1 000 KE', reward: () => { wallet.refill(); return 'Solde rechargé à 1 000,00 KE'; } },
   daily_x2: { label: 'Doubler mon bonus du jour', dailyCap: 1, cooldownMin: 0, when: () => dailyStatus().canDouble, reward: () => `Bonus du jour doublé : +${doubleDaily()} KE` },
   xp_boost: { label: 'XP ×2 pendant 15 min', dailyCap: 3, cooldownMin: 60, reward: () => { progress.boost(15); return 'XP ×2 activé pendant 15 minutes'; } },
 };
@@ -4531,12 +4533,12 @@ const demoProvider = { name: 'demo', show: async () => ({ completed: true }) };
 const AADS_SECONDS = 15;
 const aadsProvider = {
   name: 'a-ads',
-  show: () => new Promise((resolve) => {
+  show: (id, o = {}) => new Promise((resolve) => {
     const box = document.createElement('div');
     box.className = 'aads-modal';
     box.innerHTML = `
       <div class="aads-card">
-        <div class="aads-head"><b>Publicité</b><button class="aads-x" aria-label="Fermer">✕</button></div>
+        <div class="aads-head"><b>Publicité${o.of > 1 ? ` ${o.step} / ${o.of}` : ''}</b><button class="aads-x" aria-label="Fermer">✕</button></div>
         <!-- BEGIN AADS AD UNIT 2460498 -->
         <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
           <iframe data-aa='2460498' src='//acceptable.a-ads.com/2460498/?size=Adaptive'
@@ -4553,7 +4555,7 @@ const aadsProvider = {
       if (left > 0) { done.querySelector('span').textContent = left; return; }
       clearInterval(tick);
       done.disabled = false;
-      done.textContent = 'Récupérer ma récompense';
+      done.textContent = o.of > 1 && o.step < o.of ? 'Pub suivante' : 'Récupérer ma récompense';
     }, 1000);
     const close = (completed) => { clearInterval(tick); box.remove(); resolve({ completed }); };
     done.onclick = () => close(true);
@@ -4578,7 +4580,7 @@ const ads = {
     if (!P || !profiles.current) return { ok: false, reason: 'Connecte-toi d’abord', left: 0, waitMs: 0 };
     const left = Math.max(0, P.dailyCap - (a.counts[id] || 0));
     const waitMs = Math.max(0, (a.last[id] || 0) + P.cooldownMin * 60000 - Date.now());
-    if (P.when && !P.when()) return { ok: false, reason: 'Pas disponible pour le moment', left, waitMs };
+    if (P.when && !P.when()) return { ok: false, reason: P.whenMsg || 'Pas disponible pour le moment', left, waitMs };
     if (!left) return { ok: false, reason: 'Limite du jour atteinte, reviens demain', left, waitMs };
     if (waitMs) return { ok: false, reason: `Disponible dans ${Math.ceil(waitMs / 60000)} min`, left, waitMs };
     return { ok: true, reason: '', left, waitMs: 0 };
@@ -4589,8 +4591,14 @@ const ads = {
     const st = this.status(id);
     if (!st.ok) return { ok: false, message: st.reason };
     let res;
-    if (adPolicy.noAds()) res = { completed: true }; // the owner (or a ?nopub device) gets the reward without an ad
-    else try { res = await provider.show(id); } catch { res = { completed: false }; }
+    // some placements need several ads in a row (refill: 2); the owner (or a ?nopub device) gets it without any ad
+    const views = PLACEMENTS[id].views || 1;
+    res = { completed: true };
+    if (!adPolicy.noAds()) {
+      for (let k = 1; k <= views && res.completed; k++) {
+        try { res = await provider.show(id, { step: k, of: views }); } catch { res = { completed: false }; }
+      }
+    }
     if (!res?.completed) return { ok: false, message: 'Pub interrompue : pas de récompense' };
     profiles.update('ads', (me) => {
       const a = record();
@@ -8509,24 +8517,26 @@ const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
 function renderRefill(root) {
-  const ok = wallet.canRefill(), ad = ads.status('credits'), daily = dailyStatus();
+  const ok = wallet.canRefill(), rf = ads.status('refill'), ad = ads.status('credits'), daily = dailyStatus();
   root.innerHTML = `
     <section class="panel daily">
-      <div class="daily-gift${ok ? ' ready' : ''}">💰</div>
+      <div class="daily-gift${rf.ok ? ' ready' : ''}">💰</div>
       <h1>Recharger mon solde</h1>
-      <p class="muted">Tu démarres avec ${fmt(START / 100)} d’argent fictif. Tu peux recharger à ${fmt(START / 100)} uniquement quand ton solde passe <b>sous ${fmt(REFILL_BELOW / 100)}</b>.</p>
+      <p class="muted">Quand ton solde passe <b>sous ${fmt(REFILL_BELOW / 100)}</b>, regarde <b>2 pubs de 15 secondes</b> et ton solde remonte à ${fmt(START / 100)}. Possible <b>${PLACEMENTS.refill.dailyCap} fois par jour</b>.</p>
       <div class="refill-bal"><small>Solde actuel</small><b>${fmt(wallet.balance)}</b></div>
-      <button class="btn primary lg" data-refill ${ok ? '' : 'disabled'}>${ok ? `Recharger à ${fmt(START / 100)}` : `Disponible sous ${fmt(REFILL_BELOW / 100)}`}</button>
-      ${ok ? '' : `<p class="muted small">Encore ${fmt(wallet.balance - REFILL_BELOW / 100)} à jouer avant de pouvoir recharger.</p>`}
+      <button class="btn primary lg" data-refill ${rf.ok ? '' : 'disabled'}>${rf.ok ? `▶ 2 pubs · recharger à ${fmt(START / 100)}` : ok ? rf.reason : `Disponible sous ${fmt(REFILL_BELOW / 100)}`}</button>
+      <p class="muted small">${rf.left} recharge${rf.left > 1 ? 's' : ''} restante${rf.left > 1 ? 's' : ''} aujourd’hui.</p>
       <div class="sep"></div>
-      <button class="btn lg ad-btn" data-ad ${ad.ok ? '' : 'disabled'}>▶ Regarder une pub <span>${PLACEMENTS.credits.label}</span></button>
-      <p class="muted small">${ad.ok ? `Encore ${ad.left} pub${ad.left > 1 ? 's' : ''} récompensée${ad.left > 1 ? 's' : ''} aujourd’hui, même au-dessus de ${fmt(REFILL_BELOW / 100)}.` : ad.reason}</p>
+      <button class="btn lg ad-btn" data-ad ${ad.ok ? '' : 'disabled'}>▶ Regarder une pub de 15 s <span>${PLACEMENTS.credits.label}</span></button>
+      <p class="muted small">${ad.ok ? `Encore ${ad.left} pub${ad.left > 1 ? 's' : ''} récompensée${ad.left > 1 ? 's' : ''} aujourd’hui, quel que soit ton solde.` : ad.reason}</p>
       <a class="btn ghost" href="#profil">${daily.ready ? '🎁 Ton bonus du jour est disponible' : '🎁 Bonus du jour et niveaux'}</a>
     </section>`;
-  root.querySelector('[data-refill]').onclick = (e) => {
-    if (!wallet.refill()) return toast(`Recharge possible seulement sous ${fmt(REFILL_BELOW / 100)}`, 'warn');
-    sfx.unlock(); sfx.bigWin(); fx.coins(80, e.currentTarget);
-    toast(`Solde rechargé à ${fmt(START / 100)}`, 'ok');
+  root.querySelector('[data-refill]').onclick = async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    const r = await ads.watch('refill');
+    if (r.ok) { sfx.unlock(); sfx.bigWin(); fx.coins(80, btn); }
+    toast(r.message, r.ok ? 'ok' : 'warn');
     renderRefill(root);
   };
   root.querySelector('[data-ad]').onclick = async (e) => {
@@ -8764,7 +8774,7 @@ function route() {
    Banner: always on the login screen (so A-ADS can check it), never while a game is open, never for players of
    level AD_FREE_LEVEL or more, hidden 30 min after its cross is clicked. Nobody sees ads at all when
    adPolicy.noAds() (the owner, or a ?nopub device). A player who runs out of tokens is offered a rewarded ad
-   (+100 tokens), at most once every 20 min. */
+   (+250 KE) or the 2-ad refill, at most once every 20 min. */
 function mountAdBar() {
   const AD_FREE_LEVEL = 15, CLOSE_KEY = 'spinbet_adbar_closed', OFFER_KEY = 'spinbet_adoffer';
   const bar = document.getElementById('ad-bar');
@@ -8798,7 +8808,7 @@ function mountAdBar() {
     put(OFFER_KEY, Date.now());
     const card = document.createElement('div');
     card.className = 'ad-offer';
-    card.innerHTML = '<b>Plus de jetons ?</b><p>Regarde une courte pub et reçois <b>+100 jetons</b> tout de suite.</p><div><button class="btn primary" data-go>▶ Regarder</button><button class="btn ghost" data-no>Non merci</button></div>';
+    card.innerHTML = '<b>Plus de jetons ?</b><p>Regarde une pub de 15 secondes et reçois <b>+250 KE</b> tout de suite. Ou recharge à 1 000 KE avec 2 pubs.</p><div><button class="btn primary" data-go>▶ +250 KE</button><a class="btn ghost" href="#recharger" data-no>Recharger</a></div>';
     document.body.appendChild(card);
     card.querySelector('[data-no]').onclick = () => card.remove();
     card.querySelector('[data-go]').onclick = async () => {
