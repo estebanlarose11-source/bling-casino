@@ -2546,6 +2546,54 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .meter.pos b { color: #4ade80; } .meter.neg b { color: #f87171; }
 @media (max-width: 520px) { .tk-logo b { font-size: 28px; } .tk-jack b { font-size: 13px; } .tk-cell { min-height: 48px; } .tk-cell svg { width: 18px; height: 18px; } .tk-serial { display: none; } .tk-card { padding: 10px 10px 8px; } }
 
+/* ============ Le Plateau ============ */
+.g-plateau { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(34, 197, 94, .22), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(255, 138, 61, .22), transparent 70%), linear-gradient(180deg, #0c1a14 0%, #06070b 100%); }
+.pt-hist { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; max-width: 330px; }
+.pt-hist span { display: grid; place-items: center; min-width: 24px; height: 24px; padding: 0 4px; border-radius: 7px; font: 900 12px KeCoin, Orbitron, sans-serif; color: #fff; text-shadow: 0 1px 2px #000; }
+.pt-view { position: relative; }
+.pt-zone { --ptz: min(470px, 84vw, calc(100vh - 330px)); position: relative; width: var(--ptz); min-width: 240px; aspect-ratio: 1; margin: 16px auto 10px; transition: opacity .4s, transform .4s; }
+.pt-zone.away { opacity: 0; transform: scale(.9); pointer-events: none; }
+.pt-svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 12px 30px rgba(0, 0, 0, .6)); }
+.pt-wheel { transform-origin: 150px 150px; }
+.pt-bulb { animation: ptBulb 1s steps(1) infinite; }
+@keyframes ptBulb { 50% { opacity: .25; } }
+.pt-ptr { position: absolute; left: 50%; top: -12px; z-index: 2; width: 30px; height: 40px; transform: translateX(-50%); transform-origin: 50% 20%; background: linear-gradient(180deg, #fff, #ffd23f); clip-path: polygon(0 0, 100% 0, 50% 100%); filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .6)); }
+.pt-hub { position: absolute; left: 50%; top: 50%; width: 19%; aspect-ratio: 1; transform: translate(-50%, -50%); display: grid; place-items: center; text-align: center; border-radius: 50%; font: 900 clamp(9px, 1.9vw, 12px)/1.05 KeCoin, Orbitron, sans-serif; color: #ffd23f; }
+.pt-hub .big { font: 900 clamp(26px, 6vw, 40px) 'Bebas Neue', Impact, sans-serif; color: #fff; }
+.pt-hub .x { font-size: clamp(18px, 4vw, 26px); color: #fde047; animation: ptPulse .6s ease-in-out infinite alternate; }
+@keyframes ptPulse { to { transform: scale(1.15); } }
+.pt-boardwrap { position: relative; display: flex; justify-content: center; margin: 12px 0; }
+.pt-board { position: relative; width: min(520px, 94vw, calc(100vh - 260px)); min-width: 280px; aspect-ratio: 1; display: grid; grid-template: repeat(8, 1fr) / repeat(8, 1fr); gap: 3px; padding: 6px; border-radius: 16px; background: linear-gradient(135deg, #14532d, #0b2e1c); box-shadow: 0 16px 40px rgba(0, 0, 0, .6), inset 0 0 0 3px #facc15; }
+.pt-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 6px; background: #f8fafc; color: #0f172a; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .18); transition: transform .2s, box-shadow .2s; }
+.pt-cell b { font: 900 clamp(10px, 2.6vw, 16px) 'Bebas Neue', Impact, sans-serif; letter-spacing: .5px; }
+.pt-cell small { font-size: 12px; font-weight: 900; }
+.pt-cell.start { background: linear-gradient(135deg, #ef4444, #991b1b); color: #fff; }
+.pt-cell.start b { font-size: clamp(8px, 1.9vw, 12px); }
+.pt-cell.t1 { background: #e2e8f0; } .pt-cell.t2 { background: #bae6fd; } .pt-cell.t3 { background: #bbf7d0; }
+.pt-cell.t4 { background: linear-gradient(135deg, #fde047, #f59e0b); }
+.pt-cell.t5 { background: linear-gradient(135deg, #f0abfc, #a21caf); color: #fff; }
+.pt-cell.pass { box-shadow: inset 0 0 0 2px rgba(250, 204, 21, .7); }
+.pt-cell.hit { transform: scale(1.12); z-index: 1; box-shadow: 0 0 0 3px #fde047, 0 0 18px rgba(253, 224, 71, .9); }
+.pt-mid { grid-row: 2 / 8; grid-column: 2 / 8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border-radius: 12px; background: radial-gradient(circle, rgba(255, 255, 255, .08), transparent 70%); text-align: center; }
+.pt-title { margin: 0; font: 900 clamp(22px, 5vw, 36px) 'Bebas Neue', Impact, sans-serif; letter-spacing: 2px; color: #fde047; text-shadow: 0 3px 0 #713f12; }
+.pt-dice { display: flex; gap: 14px; }
+.pt-die { width: clamp(40px, 9vw, 60px); aspect-ratio: 1; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 14%; gap: 6%; border-radius: 22%; background: linear-gradient(145deg, #fff, #e5e7eb); box-shadow: 0 6px 0 #9ca3af, 0 10px 18px rgba(0, 0, 0, .5); }
+.pt-die i { border-radius: 50%; } .pt-die i.on { background: radial-gradient(circle at 35% 35%, #374151, #000); }
+.pt-die.rolling { animation: ptRoll .14s linear infinite; }
+@keyframes ptRoll { 50% { transform: rotate(20deg) translateY(-6px); } }
+.pt-info { display: flex; gap: 14px; font-weight: 700; font-size: 14px; color: #d1fae5; }
+.pt-info b { font: 900 16px KeCoin, Orbitron, sans-serif; color: #fff; }
+.pt-say { min-height: 22px; font-weight: 700; font-size: 14px; color: #fff; padding: 0 8px; }
+.pt-say .dbl { color: #fde047; }
+.pt-pawn { position: absolute; z-index: 3; width: 7%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50% 50% 45% 45%; background: radial-gradient(circle at 35% 30%, #fff, #ef4444 40%, #7f1d1d); box-shadow: 0 4px 6px rgba(0, 0, 0, .6), 0 0 0 2px #fff; transition: left .14s ease-out, top .14s ease-out; pointer-events: none; }
+.pt-spots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.pt-spot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px; border-radius: 12px; background: linear-gradient(180deg, color-mix(in srgb, var(--sc) 85%, #fff), var(--sc)); border: 2px solid rgba(255, 255, 255, .5); box-shadow: 0 4px 0 color-mix(in srgb, var(--sc) 55%, #000); color: #fff; }
+.pt-spot b { font: 900 26px/1 'Bebas Neue', Impact, sans-serif; text-shadow: 0 2px 0 rgba(0, 0, 0, .35); display: grid; place-items: center; min-height: 30px; }
+.pt-spot small { font-size: 10px; font-weight: 800; text-shadow: 0 1px 1px rgba(0, 0, 0, .5); }
+.pt-spot.hit { animation: jpHit .9s cubic-bezier(.3, 1.8, .5, 1); box-shadow: 0 0 0 3px #fff, 0 0 22px var(--sc); }
+.pt-note { margin: 10px 0 4px; font-size: 13px; text-align: center; color: #fecdd3; display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; }
+@media (max-width: 600px) { .pt-spots { grid-template-columns: repeat(3, 1fr); } }
+
 /* ============ Taco Fiesta ============ */
 .g-taco { --slot-bg: radial-gradient(600px 300px at 15% -5%, rgba(244, 63, 94, .35), transparent 70%), radial-gradient(500px 300px at 95% 10%, rgba(250, 204, 21, .28), transparent 70%), linear-gradient(180deg, #5b0f3a 0%, #2a0a2e 55%, #12041a 100%); }
 .g-taco .slot-title h2 { font-family: KeCoin, 'Bebas Neue', Orbitron, sans-serif; letter-spacing: 3px; color: #fde047; text-shadow: 0 3px 0 #be123c, 0 6px 0 #6b0f2a; }
@@ -5702,6 +5750,7 @@ const ORIGINALS = [
   {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Top Slot, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Top Slot et quatre jeux bonus animés : Pile ou Face, Chasse au Cash, Pachinko et Méga Folie.", "features": ["Top Slot ×2 à ×50", "Pile ou Face", "Chasse au Cash", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
   {"id": "doublespin", "name": "La Double Bille", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
+  {"id": "plateau", "name": "Le Plateau", "cat": "table", "tag": "Jeu de roue", "sub": "Roue, dés et plateau de multiplicateurs", "colors": ["#22c55e", "#0c1a14"], "description": "Une grande roue de 78 cases : mise sur 1, 2, 5, 10 ou sur les bonus 2 lancers et 4 lancers. Dans les bonus, lance 2 dés et fais avancer ton pion sur un plateau de 28 cases jusqu’à ×200. Et si la roue tombe sur Chance, elle repart et ce tour paie ×10 !", "features": ["Cases 1, 2, 5 et 10", "Bonus 2 lancers et 4 lancers", "Plateau jusqu’à ×200 par case", "Double = lancer en plus", "Case Chance ×10"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
   {"id": "blackjack", "name": "Le 21", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 6 pour 5", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 6 pour 5.", "features": ["Doubler", "Séparer une paire", "Blackjack 6 pour 5", "Animations de cartes"], "rtp": "≈ 98 %", "vol": 1, "max": "×2,2"},
   {"id": "lightningbj", "name": "Le 21 Électrique", "cat": "table", "tag": "Cartes", "sub": "Multiplicateurs éclair jusqu’à ×1000", "colors": ["#3b82f6", "#0b0f3a"], "description": "Le blackjack frappé par la foudre : avant chaque distribution, les scores 17, 18, 19, 20 et 21 reçoivent un multiplicateur de ×1 à ×1000. Gagne ta main sur ce score et ton gain est multiplié tout de suite. Side bets Paires Parfaites, 21+3 et Bust It.", "features": ["Multiplicateurs ×1 à ×1000", "Gain multiplié dans la manche", "Paires Parfaites", "21+3", "Bust It", "Doubler et séparer"], "rtp": "≈ 97,5 %", "vol": 4, "max": "×1 500"},
   {"id": "poker", "name": "Le Texas", "cat": "table", "tag": "Poker", "sub": "No Limit contre 1 à 5 bots", "colors": ["#10b981", "#06301f"], "description": "Une vraie table de Texas Hold’em No Limit : choisis tes adversaires (1 à 5 bots aux caractères différents), les blindes et ton tapis, puis joue pré-flop, flop, turn et river jusqu’au showdown.", "features": ["1 à 5 bots", "Blindes au choix", "Pots secondaires", "Bots qui bluffent", "Raccourcis de mise", "Showdown animé"], "rtp": "Selon ton jeu", "vol": 3, "max": "Toute la table"},
@@ -6125,6 +6174,18 @@ const SPECS = {
         <g fill="#fde047">${[[50, 60, 7], [260, 50, 9], [40, 150, 5], [150, 30, 5]].map(([x, y, s]) => `<path d="M${x} ${y - s} Q${x} ${y} ${x + s} ${y} Q${x} ${y} ${x} ${y + s} Q${x} ${y} ${x - s} ${y} Q${x} ${y} ${x} ${y - s}Z"/>`).join('')}</g>`;
     },
   },
+  plateau: {
+    bg: ['#14532d', '#05070a'], light: '#86efac', title: ['LE PLATEAU'], font: 'bebas', metal: ['#fff', '#fde047', '#16a34a'], tag: 'BONUS AUX DÉS',
+    art: (u) => {
+      const C = ['#f5c518', '#3aa0ff', '#ff5fa8', '#a259ff', '#22c55e', '#f5c518', '#3aa0ff', '#ff8a3d', '#f5c518', '#3aa0ff', '#ff5fa8', '#e11d48'];
+      let w = ''; for (let i = 0; i < 24; i++) { const a0 = (i * 15 - 90) * Math.PI / 180, a1 = ((i + 1) * 15 - 90) * Math.PI / 180; w += `<path d="M150 125 L${(150 + 95 * Math.cos(a0)).toFixed(1)} ${(125 + 95 * Math.sin(a0)).toFixed(1)} A95 95 0 0 1 ${(150 + 95 * Math.cos(a1)).toFixed(1)} ${(125 + 95 * Math.sin(a1)).toFixed(1)} Z" fill="${C[i % 12]}" stroke="#0b0716" stroke-width="1"/>`; }
+      const die = (x, y, r, n) => { const P = { 3: [[-1, -1], [0, 0], [1, 1]], 5: [[-1, -1], [1, -1], [0, 0], [-1, 1], [1, 1]] }[n]; return `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><rect x="-26" y="-26" width="52" height="52" rx="11" fill="#fff" stroke="#9ca3af" stroke-width="2"/>${P.map(([a, b]) => `<circle cx="${a * 13}" cy="${b * 13}" r="5" fill="#111"/>`).join('')}</g>`; };
+      return `<circle cx="150" cy="125" r="101" fill="#0b0716"/>${w}<circle cx="150" cy="125" r="22" fill="#140b2a" stroke="#fde047" stroke-width="3"/>
+        <path d="M150 22 l-10 -14 h20 Z" fill="#fde047"/>
+        <g opacity=".9">${[0, 1, 2, 3, 4, 5].map((i) => `<rect x="${30 + i * 42}" y="236" width="38" height="26" rx="4" fill="${['#e2e8f0', '#bbf7d0', '#fde047', '#bae6fd', '#f0abfc', '#e2e8f0'][i]}"/><text x="${49 + i * 42}" y="255" text-anchor="middle" font-family="Bebas Neue,Impact,sans-serif" font-size="16" fill="#0f172a">×${[2, 5, 20, 3, 200, 10][i]}</text>`).join('')}</g>
+        ${die(70, 205, -18, 5)}${die(232, 200, 14, 3)}`;
+    },
+  },
 };
 
 // Bright card colours (top, bottom) for the square lobby posters.
@@ -6132,7 +6193,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -6244,6 +6305,10 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  {
+    game: 'plateau', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
+    items: ['Une grande roue : mise sur 1, 2, 5, 10 ou sur les bonus', 'Bonus 2 lancers et 4 lancers : lance les dés et avance sur le plateau', 'Cases du plateau jusqu’à ×200, un double donne un lancer en plus', 'Case Chance : la roue repart et ce tour paie ×10 !'],
+  },
   {
     game: 'gratteciel', date: '2026-10-31', title: 'Nouvelle tour en cubes',
     items: ['La grue promène un cube en haut de l’écran : touche pour le lâcher', 'Le cube tombe sur un socle carré, puis sur la tour', 'Ça va de plus en plus vite à chaque cube', 'PARFAIT quand il tombe pile au-dessus'],
@@ -7188,6 +7253,7 @@ const EXTRA_THEMES = {
   gratteciel: { sd: 0.17, len: 16, root: 196, pad: { wave: 'sawtooth', vol: 0.014, dur: 1.6, map: { 0: [0, 4, 7], 8: [-3, 0, 4] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.16, pat: [12, 14, 16, 19, null, 16, 19, 24, 21, null, 19, 16, 14, null, 12, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.22, pat: [-12, null, -12, null, -12, null, -12, null, -15, null, -15, null, -10, null, -10, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.18, hv: 0.02 },
   penalty: { sd: 0.16, len: 16, root: 220, lead: { wave: 'sawtooth', vol: 0.022, dur: 0.14, pat: [12, null, 12, 14, 16, null, 12, null, 19, null, 17, 16, 14, null, 12, null] }, bass: { wave: 'triangle', vol: 0.13, dur: 0.18, pat: [-12, null, -12, null, -7, null, -7, null, -10, null, -10, null, -5, null, -5, null] }, kick: [0, 6, 8, 14], hat: [4, 12], kv: 0.2, hv: 0.022 },
   ticket: { sd: 0.16, len: 16, root: 246.94, lead: { wave: 'triangle', vol: 0.055, dur: 0.14, pat: [12, 16, 19, null, 24, null, 19, 16, 14, 17, 21, null, 26, null, 21, 17] }, bass: { wave: 'sine', vol: 0.14, dur: 0.2, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -7, null, -5, null] }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
+  plateau: { sd: 0.17, len: 16, root: 196, lead: { wave: 'square', vol: 0.026, dur: 0.12, pat: [12, 16, 19, 16, 24, null, 19, 16, 14, 17, 21, 17, 26, null, 21, null] }, bass: { wave: 'triangle', vol: 0.13, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -7, null, -5, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.18, hv: 0.02 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -8763,6 +8829,7 @@ const FILES = {
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', 'c401e351a3'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', '463c45c93a'],
+  plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '2f4a09a1d8'],
 };
 const loading = {};
 
