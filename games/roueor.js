@@ -1,11 +1,12 @@
 // SpinBet Casino · RoueOrGame — loaded on demand by games/impl/index.js (index.html).
 // ---- games/impl/roueor.js ----
 __mods['games/impl/roueor.js'] = (() => {
-// La Roue d'Or: a dark metal wheel with one golden quarter. Anywhere else: nothing. On the gold: the wheel goes
+// La Roue d'Or: a dark metal wheel with one golden part (Simple 40 %, Moyen 25 %, Compliqué 12,5 % of the wheel;
+// the smaller the gold, the bigger the cubes). Anywhere else: nothing. On the gold: the wheel goes
 // and the bonus starts: 24 cubes hide multipliers. The player keeps one cube (hidden); a quarter of the others is
 // revealed, then the player can cash out the offer (the average of the cubes still hidden, his included) or go on.
-// When no other cube is left, his cube is opened. Every cube is drawn from VALS (mean ≈ 3,8): the bonus is worth
-// 3,8 × the stake on average, whatever the choices (the offer is always the fair average), so the return is ≈ 95 %.
+// When no other cube is left, his cube is opened. Cubes are drawn from the level's table: (gold share) × (mean cube)
+// ≈ 0,95 in every level, whatever the choices (the offer is always the fair average), so the return is ≈ 95 %.
 
 const { BaseGame, fmtC, wpick } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
@@ -13,11 +14,16 @@ const { sfx, audioContext, isMuted } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
 
 /* ===ENGINE */
-const GOLD = 0.25; // share of the wheel that is gold
 const CUBES = 24;
-const VALS = [[0.5, 3622], [1, 2312], [1.5, 1477], [2, 943], [3, 602], [5, 384], [8, 245], [10, 157], [15, 100], [25, 64], [50, 41], [100, 26], [250, 15], [1000, 11]];
-const drawCubes = () => Array.from({ length: CUBES }, () => wpick(VALS));
-const isGold = (deg) => deg < GOLD * 360; // pointer angle on the wheel, the gold arc is [0°, 90°)
+// gold: share of the wheel that gives the bonus; vals: [multiplier, weight] of each cube (mean × gold ≈ 0,95)
+const MODES = [
+  { id: 'simple', label: 'Simple', gold: 0.40, vals: [[0.5, 3554], [1, 2294], [1.5, 1480], [2, 955], [3, 616], [4, 398], [5, 257], [8, 166], [10, 107], [15, 69], [25, 45], [50, 29], [100, 19], [250, 12]] },
+  { id: 'moyen', label: 'Moyen', gold: 0.25, vals: [[0.5, 3622], [1, 2312], [1.5, 1477], [2, 943], [3, 602], [5, 384], [8, 245], [10, 157], [15, 100], [25, 64], [50, 41], [100, 26], [250, 15], [1000, 11]] },
+  { id: 'dur', label: 'Compliqué', gold: 0.125, vals: [[1, 3807], [2, 2359], [3, 1461], [4, 905], [5, 561], [8, 348], [10, 215], [15, 133], [25, 83], [50, 51], [100, 32], [250, 20], [500, 12], [1000, 6], [5000, 5]] },
+];
+const drawCubes = (m) => Array.from({ length: CUBES }, () => wpick(m.vals));
+const isGold = (deg, m) => deg < m.gold * 360; // pointer angle on the wheel, the gold arc is [0°, gold × 360°)
+const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const reveals = (left) => Math.max(1, Math.round(left / 4)); // a quarter of the other cubes still hidden
 const offerOf = (hidden) => hidden.reduce((a, v) => a + v, 0) / hidden.length; // fair offer: their average
 /* ===END ENGINE */
@@ -27,14 +33,19 @@ const SL = 24, SA = 360 / SL;
 const pt = (a, r) => { const t = ((a - 90) * Math.PI) / 180; return [150 + r * Math.cos(t), 150 + r * Math.sin(t)]; };
 const arc = (a0, a1, r0, r1) => { const p0 = pt(a0, r1), p1 = pt(a1, r1), p2 = pt(a1, r0), p3 = pt(a0, r0), lg = a1 - a0 > 180 ? 1 : 0; return `M${p0[0].toFixed(2)} ${p0[1].toFixed(2)} A${r1} ${r1} 0 ${lg} 1 ${p1[0].toFixed(2)} ${p1[1].toFixed(2)} L${p2[0].toFixed(2)} ${p2[1].toFixed(2)} A${r0} ${r0} 0 ${lg} 0 ${p3[0].toFixed(2)} ${p3[1].toFixed(2)} Z`; };
 
-function wheelSVG() {
+const maxOf = (m) => m.vals[m.vals.length - 1][0];
+const meanOf = (m) => m.vals.reduce((a, [v, w]) => a + v * w, 0) / m.vals.reduce((a, [, w]) => a + w, 0);
+const big = (v, m) => v >= maxOf(m) / 40; // red "big" cubes
+
+function wheelSVG(m) {
+  const G = m.gold * 360;
   let s = '<g class="ro-wheel">';
   // dark brushed-metal slices
   for (let i = 0; i < SL; i++) s += `<path d="${arc(i * SA, (i + 1) * SA, 30, 146)}" fill="url(#roMetal${i % 2})" stroke="#0a0a0f" stroke-width="1.2"/>`;
   // the golden quarter, one piece, with shine
-  s += `<path d="${arc(0, 90, 30, 146)}" fill="url(#roGold)" stroke="#7c5a0b" stroke-width="2"/><path class="ro-shine" d="${arc(0, 90, 30, 146)}" fill="url(#roShine)"/>`;
-  s += `<text x="150" y="44" text-anchor="middle" font-family="'Bebas Neue',Impact,sans-serif" font-size="22" fill="#7c2d12" transform="rotate(45 150 150)">BONUS</text>`;
-  for (let i = 0; i < 3; i++) s += `<text x="150" y="${70 + i * 22}" text-anchor="middle" font-size="12" fill="#fff7d6" transform="rotate(45 150 150)">★</text>`;
+  s += `<path d="${arc(0, G, 30, 146)}" fill="url(#roGold)" stroke="#7c5a0b" stroke-width="2"/><path class="ro-shine" d="${arc(0, G, 30, 146)}" fill="url(#roShine)"/>`;
+  s += `<text x="150" y="44" text-anchor="middle" font-family="'Bebas Neue',Impact,sans-serif" font-size="${G < 60 ? 16 : 22}" fill="#7c2d12" transform="rotate(${G / 2} 150 150)">BONUS</text>`;
+  for (let i = 0; i < 3; i++) s += `<text x="150" y="${70 + i * 22}" text-anchor="middle" font-size="12" fill="#fff7d6" transform="rotate(${G / 2} 150 150)">★</text>`;
   s += '</g>';
   let bl = '';
   for (let b = 0; b < 40; b++) { const p = pt((b * 360) / 40, 148.5); bl += `<circle class="pt-bulb" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="1.5" fill="${b % 2 ? '#fff' : '#fbbf24'}" style="animation-delay:${b % 2 ? '.5' : '0'}s"/>`; }
@@ -62,7 +73,7 @@ class RoueOrGame extends BaseGame {
       cls: 'table-game roueor',
       head: '<div class="hist pt-hist ro-hist"></div>',
       stage: `<div class="pt-view ro-view">
-          <div class="pt-zone ro-zone"><div class="pt-ptr ro-ptr"></div>${wheelSVG()}<div class="pt-hub ro-hub">LA ROUE<br>D’OR</div></div>
+          <div class="pt-zone ro-zone"><div class="pt-ptr ro-ptr"></div><div class="ro-wheelhost"></div><div class="pt-hub ro-hub">LA ROUE<br>D’OR</div></div>
           <div class="ro-bonus" hidden>
             <div class="ro-top"><h3>BONUS DES 24 CUBES</h3><div class="ro-mine"><small>TON CUBE</small><div class="ro-cube mine"><b>?</b></div></div></div>
             <div class="ro-grid">${Array.from({ length: CUBES }, (_, i) => `<button type="button" class="ro-cube" data-c="${i}" disabled><i>${i + 1}</i><b></b></button>`).join('')}</div>
@@ -71,11 +82,15 @@ class RoueOrGame extends BaseGame {
               <div class="ro-btns"><button type="button" class="ro-cash">ENCAISSER</button><button type="button" class="ro-go">CONTINUER</button></div></div>
           </div>
         </div>`,
-      hello: 'Un quart de la roue est en or : si elle s’arrête dessus, c’est le bonus des 24 cubes !',
+      below: `<div class="ro-modes">${MODES.map((m, i) => `<button type="button" data-mode="${i}"><b>${m.label}</b><small>Bonus ${Math.round(m.gold * 1000) / 10} % · jusqu’à ×${maxOf(m).toLocaleString('fr-FR')}</small></button>`).join('')}</div>`,
+      hello: 'Si la roue s’arrête sur l’or, c’est le bonus des 24 cubes ! Choisis ton niveau : plus c’est compliqué, plus les cubes sont gros.',
     });
+    this.mi = this.loadNum('roueor_mode', 1, 0, MODES.length - 1);
     this.cur = 0; this.histArr = [];
-    this.wheel = this.q('.ro-wheel');
+    this.setMode(this.mi);
     this.root.addEventListener('click', (e) => {
+      const md = e.target.closest('[data-mode]');
+      if (md && !this.busy && !md.disabled) { this.setMode(+md.dataset.mode); sfx.click(); }
       if (!this.answer) return;
       const c = e.target.closest('.ro-cube[data-c]');
       const k = c && !c.disabled ? +c.dataset.c : e.target.closest('.ro-cash') ? 'cash' : e.target.closest('.ro-go') ? 'go' : null;
@@ -83,6 +98,19 @@ class RoueOrGame extends BaseGame {
       const r = this.answer; this.answer = null; r(k);
     });
   }
+
+  get mode() { return MODES[this.mi]; }
+
+  // Level: redraws the wheel with its gold share (keeping the wheel's current angle).
+  setMode(i) {
+    this.mi = i; this.saveKey('roueor_mode', i);
+    this.q('.ro-wheelhost').innerHTML = wheelSVG(this.mode);
+    this.wheel = this.q('.ro-wheel');
+    this.wheel.style.transform = `rotate(${this.cur}deg)`;
+    this.qa('[data-mode]').forEach((b) => b.classList.toggle('on', +b.dataset.mode === i));
+  }
+
+  onMeters() { this.qa('[data-mode]').forEach((b) => { b.disabled = this.busy; }); }
 
   ask() { return new Promise((res) => { this.answer = res; }); }
   say(t) { this.q('.ro-say').innerHTML = t; }
@@ -143,7 +171,7 @@ class RoueOrGame extends BaseGame {
     this.lastStake = bet;
     this.setLast(0); this.winAmt.textContent = '';
     this.focusStage();
-    const deg = Math.random() * 360, gold = isGold(deg);
+    const m = this.mode, deg = Math.random() * 360, gold = isGold(deg, m);
     this.msg('La roue tourne…');
     this.q('.ro-hub').innerHTML = 'BONNE<br>CHANCE';
     const view = this.q('.ro-view');
@@ -167,7 +195,7 @@ class RoueOrGame extends BaseGame {
     if (this.dead) return;
     if (this.auto) this.stopAuto(); // the bonus needs the player's choices
     this.msg('★ BONUS DES 24 CUBES ★');
-    const M = await this.bonus();
+    const M = await this.bonus(m);
     if (this.dead) return;
     const won = Math.round(bet * M);
     this.win(won, 'Bonus des cubes');
@@ -176,8 +204,8 @@ class RoueOrGame extends BaseGame {
     await this.celebrate(won, { summary: 'BONUS DES CUBES' });
   }
 
-  async bonus() {
-    const vals = drawCubes(), zone = this.q('.ro-zone'), box = this.q('.ro-bonus'), deal = this.q('.ro-deal');
+  async bonus(m) {
+    const vals = drawCubes(m), zone = this.q('.ro-zone'), box = this.q('.ro-bonus'), deal = this.q('.ro-deal');
     const cubes = this.qa('.ro-grid .ro-cube'), mine = this.q('.ro-cube.mine');
     cubes.forEach((c) => { c.className = 'ro-cube'; c.disabled = false; c.querySelector('b').textContent = ''; });
     mine.className = 'ro-cube mine'; mine.querySelector('b').textContent = '?';
@@ -187,7 +215,42 @@ class RoueOrGame extends BaseGame {
     await this.wait(480);
     zone.hidden = true; box.hidden = false;
     box.animate([{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 400, easing: 'cubic-bezier(.3,1.4,.5,1)' });
-    cubes.forEach((c, i) => c.animate([{ transform: 'translateY(-30px) scale(.5)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 350, delay: i * 40, easing: 'cubic-bezier(.3,1.6,.5,1)', fill: 'backwards' }));
+    this.q('.ro-top h3').textContent = `BONUS ${m.label.toUpperCase()} · 24 CUBES`;
+    // 1. every multiplier is shown face up
+    cubes.forEach((c, i) => {
+      c.disabled = true;
+      c.querySelector('b').textContent = `×${xs(vals[i])}`;
+      c.classList.add('show', big(vals[i], m) ? 'big' : vals[i] >= 5 ? 'mid' : 'low');
+      c.animate([{ transform: 'translateY(-30px) scale(.5)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 350, delay: i * 40, easing: 'cubic-bezier(.3,1.6,.5,1)', fill: 'backwards' });
+    });
+    this.say('Voici les 24 multiplicateurs de ce bonus… retiens bien les gros !');
+    await this.wait(this.turbo ? 2200 : 4200);
+    if (this.dead) return 0;
+    // 2. they turn face down
+    this.say('Les cubes se cachent…');
+    for (let i = 0; i < CUBES; i++) {
+      const c = cubes[i];
+      c.animate([{ transform: 'rotateY(0)' }, { transform: 'rotateY(90deg)' }, { transform: 'rotateY(0)' }], { duration: 360 });
+      setTimeout(() => { c.className = 'ro-cube'; c.querySelector('b').textContent = ''; }, 180);
+      if (i % 3 === 0) sfx.tick();
+      await this.wait(this.turbo ? 25 : 45);
+    }
+    await this.wait(500);
+    // 3. shuffle: the cubes swap places for a moment, and the multipliers are mixed for real
+    this.say('On mélange !');
+    shuffle(vals);
+    const rects = cubes.map((c) => c.getBoundingClientRect());
+    for (let round = 0; round < 3 && !this.dead; round++) {
+      const to = shuffle([...Array(CUBES).keys()]);
+      cubes.forEach((c, i) => {
+        const dx = rects[to[i]].left - rects[i].left, dy = rects[to[i]].top - rects[i].top;
+        c.animate([{ transform: 'none' }, { transform: `translate(${dx}px, ${dy}px) rotate(${(Math.random() - 0.5) * 40}deg)` }, { transform: 'none' }], { duration: this.turbo ? 420 : 700, easing: 'ease-in-out' });
+      });
+      sfx.spin?.();
+      await this.wait(this.turbo ? 420 : 700);
+    }
+    if (this.dead) return 0;
+    cubes.forEach((c) => { c.disabled = false; });
     this.say('Choisis ton cube ! Il restera caché jusqu’à la fin.');
     this.slotEl.classList.add('ro-ask');
     const pick = await this.ask();
@@ -210,9 +273,9 @@ class RoueOrGame extends BaseGame {
         await this.wait(this.turbo ? 250 : 550);
         const c = cubes[i], v = vals[i];
         c.querySelector('b').textContent = `×${xs(v)}`;
-        c.classList.add('open', v >= 25 ? 'big' : v >= 5 ? 'mid' : 'low');
+        c.classList.add('open', big(v, m) ? 'big' : v >= 5 ? 'mid' : 'low');
         const p = center(c);
-        if (v >= 25) { fx.burst(p.x, p.y, 20, ['#f87171', '#fff'], 6); sfx.puff(); } else { fx.burst(p.x, p.y, 8, ['#fde047', '#fff'], 4); sfx.tick(); }
+        if (big(v, m)) { fx.burst(p.x, p.y, 20, ['#f87171', '#fff'], 6); sfx.puff(); } else { fx.burst(p.x, p.y, 8, ['#fde047', '#fff'], 4); sfx.tick(); }
       }
       if (this.dead) return 0;
       if (!others.length) break;
@@ -236,7 +299,7 @@ class RoueOrGame extends BaseGame {
       for (const i of others) {
         const c = cubes[i], v = vals[i];
         c.querySelector('b').textContent = `×${xs(v)}`;
-        c.classList.add('open', 'late', v >= 25 ? 'big' : v >= 5 ? 'mid' : 'low');
+        c.classList.add('open', 'late', big(v, m) ? 'big' : v >= 5 ? 'mid' : 'low');
         sfx.tick();
         await this.wait(this.turbo ? 60 : 140);
       }
@@ -259,11 +322,11 @@ class RoueOrGame extends BaseGame {
   }
 
   info() {
-    const t = VALS.map(([v]) => `×${xs(v)}`).join(' · ');
-    return this.rules(`<h4>La roue</h4><p>Choisis ta mise et lance. Un quart de la roue est en or : si la flèche s’arrête sur l’or, la roue disparaît et le <b>bonus des 24 cubes</b> commence. Sinon, la mise est perdue.</p>
-      <h4>Le bonus des 24 cubes</h4><p>Chaque cube cache un multiplicateur. Choisis ton cube : il reste caché. Un quart des autres cubes s’ouvre, puis tu peux <b>encaisser l’offre</b> ou <b>continuer</b>. L’offre est la moyenne exacte des cubes encore cachés (le tien compris). Quand tous les autres sont ouverts, ton cube s’ouvre et tu gagnes sa valeur.</p>
-      <p class="muted small">Valeurs possibles : ${t}.</p>
-      <h4>Équité</h4><p>Un lancer sur 4 donne le bonus, qui vaut en moyenne ×3,8 la mise, que tu encaisses ou non. Retour au joueur ≈ 95 %.</p>`);
+    const lv = MODES.map((m) => `<b>${m.label}</b> : ${Math.round(m.gold * 1000) / 10} % de la roue en or, cubes de ×${xs(m.vals[0][0])} à ×${xs(maxOf(m))} (moyenne ×${xs(Math.round(meanOf(m) * 10) / 10)})`).join('<br>');
+    return this.rules(`<h4>La roue</h4><p>Choisis ta mise, ton niveau, et lance. Si la flèche s’arrête sur l’or, la roue disparaît et le <b>bonus des 24 cubes</b> commence. Sinon, la mise est perdue.</p>
+      <h4>Les niveaux</h4><p>${lv}</p><p>Plus c’est compliqué, moins il y a d’or sur la roue, mais plus les multiplicateurs des cubes sont gros.</p>
+      <h4>Le bonus des 24 cubes</h4><p>Les 24 multiplicateurs sont d’abord montrés, puis les cubes se retournent et sont mélangés. Choisis ton cube : il reste caché. Un quart des autres cubes s’ouvre, puis tu peux <b>encaisser l’offre</b> ou <b>continuer</b>. L’offre est la moyenne exacte des cubes encore cachés (le tien compris). Quand tous les autres sont ouverts, ton cube s’ouvre et tu gagnes sa valeur.</p>
+      <h4>Équité</h4><p>Dans chaque niveau, (part d’or) × (valeur moyenne d’un cube) ≈ 0,95 : retour au joueur ≈ 95 %, que tu encaisses ou non.</p>`);
   }
 }
 
