@@ -112,8 +112,7 @@ class DragonsGame extends BaseGame {
       music: EXTRA_THEMES.dragons,
       frameCls: 'dg-frame',
       stage: `<div class="dg-lair"><i class="dg-glow"></i><i class="dg-embers"></i><i class="dg-gold l"></i><i class="dg-gold r"></i></div>
-        <div class="dg-top"><div class="dg-jp mini"><small>MINI</small><b data-jp="0"></b></div><div class="dg-logo"><b>TÊTES</b><em>de dragon</em></div><div class="dg-jp major"><small>MAJEUR</small><b data-jp="1"></b></div></div>
-        <div class="dg-grand"><small>JACKPOT</small><b data-jp="2"></b></div>
+        <div class="dg-top"><div class="dg-jp mini"><small>MINI</small><b data-jp="0"></b></div><div class="dg-grand"><small>JACKPOT</small><b data-jp="2"></b></div><div class="dg-jp major"><small>MAJEUR</small><b data-jp="1"></b></div></div>
         <div class="grid-host"></div><div class="dg-word"></div>`,
       buys: [
         { id: 'A', icon: '🐉', label: `${MODEN.A} · ${FS_SPINS} tours`, desc: 'Des dragons multiplicateurs ×2 à ×10 peuvent tomber', cost: (b) => b * BUY_FS },
@@ -123,7 +122,7 @@ class DragonsGame extends BaseGame {
     });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: COLS, rows: ROWS, game: this, art: cellArt,
-      cls: (v, i) => (Math.floor(i / ROWS) % 2 ? 'rt ' : 'lt ') + (v >= JPCELL ? 'full jpc' : v >= MULT ? 'full mult' : v === SCAT ? 'full scat' : v === SUPER ? 'full super' : v === STONE ? 'full stone' : v === PEARL ? 'pearl' : v >= 6 ? 'jp' : ''),
+      cls: (v, i) => (Math.floor(i / ROWS) % 2 ? 'dgR ' : 'dgL ') + (v >= JPCELL ? 'full jpc' : v >= MULT ? 'full mult' : v === SCAT ? 'full scat' : v === SUPER ? 'full super' : v === STONE ? 'full stone' : v === PEARL ? 'pearl' : v >= 6 ? 'jp' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => draw({ fs: false })));
     this.onBetChange();

@@ -2442,37 +2442,35 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 /* ============ Coffre aux Billets ============ */
 .g-billets { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(251, 191, 36, .35), transparent 70%), linear-gradient(180deg, #4a3208 0%, #2a1a05 60%, #120b02 100%); }
 .g-billets .slot-title h2 { font-family: 'Bebas Neue', Orbitron, sans-serif; letter-spacing: 3px; background: linear-gradient(180deg, #fff7c2, #fbbf24 50%, #b45309 52%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 2px 0 #3b2a05); }
-.bv-frame { padding: 8px; border-radius: 18px; background: linear-gradient(180deg, #9ca3af, #4b5563 20%, #374151 80%, #9ca3af); box-shadow: inset 0 0 0 2px #1f2937, 0 0 0 2px #111, 0 18px 40px rgba(0, 0, 0, .6); }
-.bv-frame > .slot-stage { position: relative; overflow: hidden; border-radius: 12px; padding: 8px 10px 10px; background: #1a1206; }
+.bv-frame { padding: 0; border-radius: 16px; background: none; box-shadow: 0 0 50px rgba(251, 191, 36, .16); }
+.bv-frame > .slot-stage { position: relative; overflow: hidden; border-radius: 16px; padding: 6px; background: #1a1206; }
 .bv-frame > .slot-stage > :not(.bv-vault) { position: relative; z-index: 1; }
 /* the vault: safe-deposit boxes, stacks of gold bars, a warm light */
 .bv-vault { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 20%, #8a6420, #4a3208 55%, #1f1404); }
 .bv-boxes { position: absolute; top: 0; bottom: 30%; width: 26%; opacity: .55; background: linear-gradient(90deg, rgba(0, 0, 0, .35) 1px, transparent 1px) 0 0 / 22px 100%, linear-gradient(rgba(0, 0, 0, .35) 1px, transparent 1px) 0 0 / 100% 16px, linear-gradient(180deg, #b8892e, #7a5615); box-shadow: inset 0 0 30px rgba(0, 0, 0, .6); }
 .bv-boxes::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle, #fde68a 1.2px, transparent 1.8px) 9px 6px / 22px 16px; opacity: .6; }
 .bv-boxes.l { left: 0; } .bv-boxes.r { right: 0; }
-.bv-gold { position: absolute; bottom: 0; width: 30%; height: 34%; background: repeating-linear-gradient(0deg, #7c4a06 0 3px, transparent 3px 18px), repeating-linear-gradient(90deg, #fde047 0 26px, #f59e0b 26px 30px, #b45309 30px 32px); clip-path: polygon(0 30%, 30% 0, 100% 0, 100% 100%, 0 100%); filter: drop-shadow(0 -4px 10px rgba(253, 224, 71, .4)); }
+.bv-gold { display: none; position: absolute; bottom: 0; width: 30%; height: 34%; background: repeating-linear-gradient(0deg, #7c4a06 0 3px, transparent 3px 18px), repeating-linear-gradient(90deg, #fde047 0 26px, #f59e0b 26px 30px, #b45309 30px 32px); clip-path: polygon(0 30%, 30% 0, 100% 0, 100% 100%, 0 100%); filter: drop-shadow(0 -4px 10px rgba(253, 224, 71, .4)); }
 .bv-gold.l { left: 0; } .bv-gold.r { right: 0; transform: scaleX(-1); }
 .bv-shine { position: absolute; inset: 0; background: linear-gradient(115deg, transparent 35%, rgba(255, 247, 194, .18) 50%, transparent 65%); background-size: 300% 100%; animation: bvShine 6s ease-in-out infinite; }
 @keyframes bvShine { 0% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
 /* jackpot panel */
-.bv-top { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
-.bv-logo { text-align: center; padding: 4px 18px; border-radius: 10px; background: linear-gradient(180deg, #4b5563, #1f2937); box-shadow: inset 0 0 0 2px #9ca3af, 0 4px 10px rgba(0, 0, 0, .5); }
-.bv-logo b { display: block; font: 400 clamp(22px, 4vw, 36px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; background: linear-gradient(180deg, #fff7c2, #fbbf24 50%, #b45309 52%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.bv-logo em { display: block; font: 700 10px Inter, sans-serif; font-style: normal; letter-spacing: 3px; text-transform: uppercase; color: #fde68a; }
-.bv-jp, .bv-grand { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 12px; border-radius: 8px; background: linear-gradient(180deg, #111827, #1f2937); box-shadow: inset 0 0 0 1px #4b5563; font-variant-numeric: tabular-nums; }
+.bv-top { display: grid; grid-template-columns: 1fr minmax(0, 1.2fr) 1fr; gap: 6px; align-items: center; margin-bottom: 6px; }
+.bv-jp, .bv-grand { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 5px 12px; border-radius: 999px; background: rgba(10, 7, 2, .6); box-shadow: inset 0 0 0 1px rgba(253, 230, 138, .18); font-variant-numeric: tabular-nums; }
 .bv-jp small, .bv-grand small { font: 800 11px Inter, sans-serif; letter-spacing: 1.5px; }
 .bv-jp b, .bv-grand b { font: 900 clamp(13px, 1.8vw, 17px) Orbitron, sans-serif; color: #fde68a; }
 .bv-jp.mini small { color: #f3c79a; } .bv-jp.major small { color: #93c5fd; }
-.bv-grand { width: min(60%, 340px); margin: 0 auto 8px; justify-content: center; background: linear-gradient(180deg, #2a1d05, #0f0a02); box-shadow: inset 0 0 0 2px #fbbf24, 0 0 18px rgba(251, 191, 36, .35); }
+.bv-grand { justify-content: center; background: rgba(42, 29, 5, .75); box-shadow: inset 0 0 0 1px #fbbf24, 0 0 18px rgba(251, 191, 36, .35); }
 .bv-grand small { color: #fde047; } .bv-grand b { font-size: clamp(16px, 2.4vw, 22px); color: #fff7c2; text-shadow: 0 0 10px rgba(251, 191, 36, .8); }
 .bv-jp.flash, .bv-grand.flash { animation: bvFlash .3s ease-in-out 6 alternate; }
 @keyframes bvFlash { to { box-shadow: inset 0 0 0 2px #fff, 0 0 26px rgba(253, 224, 71, .9); transform: scale(1.04); } }
-/* reels: landscape cells so the banknotes fit */
-.g-billets .rs { aspect-ratio: calc(var(--cols) * 1.72 / var(--rows)); width: min(100%, calc((100vh - var(--chrome) - 110px) * var(--cols) * 1.72 / var(--rows))); gap: 5px; padding: 5px; border-radius: 10px; background: linear-gradient(180deg, #d1d5db, #6b7280); box-shadow: inset 0 0 0 2px #374151; }
-.g-billets .rs-reel { border-radius: 6px; background: linear-gradient(180deg, #2b2416, #3d3420 50%, #2b2416); }
+/* reels: landscape cells so the banknotes fit; no box around them, the vault shows between the reels */
+.game-host:not(.is-full):has(> .g-billets) { max-width: max(420px, min(1180px, calc((100vh - var(--chrome) + var(--sgx, 10px)) * 5 * 1.72 / 3 + 60px))); }
+.g-billets .rs { aspect-ratio: calc(var(--cols) * 1.72 / var(--rows)); width: min(100%, calc((100vh - var(--chrome) + var(--sgx, 10px)) * var(--cols) * 1.72 / var(--rows))); gap: 6px; padding: 0; background: none; }
+.g-billets .rs-reel { border-radius: 10px; background: linear-gradient(180deg, rgba(20, 14, 4, .5), rgba(40, 30, 10, .35) 50%, rgba(20, 14, 4, .5)); box-shadow: inset 0 0 0 1px rgba(253, 230, 138, .12); }
 .g-billets .rs-reel::before { background: linear-gradient(rgba(20, 14, 4, .75), transparent); }
 .g-billets .rs-reel::after { background: linear-gradient(transparent, rgba(20, 14, 4, .75)); }
-.g-billets .rs-cell { padding: 3% 2%; }
+.g-billets .rs-cell { padding: 2% 1.5%; }
 .g-billets .rs-cell svg { width: 100%; height: 100%; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .55)); }
 .g-billets .rs-cell.win { z-index: 2; }
 .g-billets .rs-cell.win svg { filter: drop-shadow(0 0 6px #fde047) drop-shadow(0 0 14px rgba(253, 224, 71, .8)); animation: bvWin .7s ease-in-out infinite; }
@@ -2493,36 +2491,34 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .bv-word.fs { background: linear-gradient(180deg, #fff, #86efac 45%, #16a34a 55%, #dcfce7); -webkit-background-clip: text; background-clip: text; }
 .g-billets.in-free .bv-vault { background: radial-gradient(ellipse at 50% 20%, #2f7a4a, #14432a 55%, #08180f); }
 .pay-sym.bvp { width: 84px; }
-@container (max-width: 520px) { .bv-top { grid-template-columns: 1fr 1fr; } .bv-logo { grid-column: 1 / -1; order: -1; } .bv-jp { padding: 4px 8px; } .bv-grand { width: 100%; } .bv-boxes, .bv-gold { display: none; } }
+@container (max-width: 520px) { .bv-top { grid-template-columns: 1fr 1fr; gap: 4px; } .bv-grand { grid-column: 1 / -1; order: -1; } .bv-jp { padding: 3px 10px; } .bv-boxes, .bv-gold { display: none; } .bv-frame > .slot-stage { padding: 4px; border-radius: 12px; } .g-billets .rs { gap: 3px; } .g-billets .rs-reel { border-radius: 6px; } }
 @media (prefers-reduced-motion: reduce) { .bv-shine, .g-billets .rs-cell.cash svg, .g-billets .rs-cell.fsb svg { animation: none; } }
 
 /* ============ Têtes de Dragon ============ */
 .g-dragons { --slot-bg: radial-gradient(700px 360px at 50% 110%, rgba(234, 88, 12, .45), transparent 70%), radial-gradient(500px 300px at 50% -10%, rgba(127, 29, 29, .4), transparent 70%), linear-gradient(180deg, #1c0a05 0%, #0a0503 100%); }
 .g-dragons .slot-title h2 { font-family: Cinzel, Georgia, serif; letter-spacing: 1px; background: linear-gradient(180deg, #fff7c2, #fbbf24 50%, #b45309 52%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; filter: drop-shadow(0 2px 0 #3b0a02); }
-.dg-frame { padding: 6px; border-radius: 16px; background: linear-gradient(135deg, #78350f, #fbbf24 30%, #92400e 55%, #fde68a 80%, #78350f); box-shadow: 0 0 24px rgba(234, 88, 12, .45), 0 16px 40px rgba(0, 0, 0, .7); }
-.dg-frame > .slot-stage { position: relative; overflow: hidden; border-radius: 11px; padding: 8px 10px 10px; background: #120805; }
+.dg-frame { padding: 0; border-radius: 16px; background: none; box-shadow: 0 0 50px rgba(234, 88, 12, .25); }
+.dg-frame > .slot-stage { position: relative; overflow: hidden; border-radius: 16px; padding: 6px; background: #120805; }
 .dg-frame > .slot-stage > :not(.dg-lair) { position: relative; z-index: 1; }
 /* the lair: lava glow, rising embers, piles of gold */
 .dg-lair { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 120%, #7c2d12, #1c0a05 60%), linear-gradient(180deg, #1a0d08, #0c0604); }
 .dg-glow { position: absolute; left: 10%; right: 10%; bottom: -30%; height: 60%; border-radius: 50%; background: radial-gradient(ellipse, rgba(249, 115, 22, .55), transparent 70%); animation: dgGlow 3s ease-in-out infinite alternate; }
 @keyframes dgGlow { to { opacity: .55; transform: scaleX(1.1); } }
 .dg-embers { position: absolute; inset: 0; background-image: radial-gradient(circle, #fdba74 1.3px, transparent 2px), radial-gradient(circle, #f97316 1px, transparent 1.8px); background-size: 90px 130px, 130px 110px; background-position: 10px 0, 60px 40px; animation: anEmbers 5s linear infinite; mask-image: linear-gradient(0deg, #000 20%, transparent 90%); -webkit-mask-image: linear-gradient(0deg, #000 20%, transparent 90%); opacity: .8; }
-.dg-gold { position: absolute; bottom: 0; width: 28%; height: 22%; border-radius: 50% 50% 0 0; background: radial-gradient(circle at 30% 30%, #fde047 2px, transparent 3px) 0 0 / 12px 10px, radial-gradient(ellipse at 50% 100%, #b45309, #78350f 70%); opacity: .7; }
+.dg-gold { display: none; position: absolute; bottom: 0; width: 28%; height: 22%; border-radius: 50% 50% 0 0; background: radial-gradient(circle at 30% 30%, #fde047 2px, transparent 3px) 0 0 / 12px 10px, radial-gradient(ellipse at 50% 100%, #b45309, #78350f 70%); opacity: .7; }
 .dg-gold.l { left: -4%; } .dg-gold.r { right: -4%; }
 /* jackpot panel */
-.dg-top { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; margin-bottom: 6px; }
-.dg-logo { text-align: center; padding: 3px 18px 5px; border-radius: 8px; background: linear-gradient(180deg, #3b0a02, #120805); box-shadow: inset 0 0 0 2px #b45309, 0 0 16px rgba(234, 88, 12, .4); }
-.dg-logo b { display: block; font: 900 clamp(20px, 3.6vw, 32px)/1 Cinzel, Georgia, serif; letter-spacing: 3px; background: linear-gradient(180deg, #fff7c2, #fbbf24 50%, #b45309 52%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.dg-logo em { display: block; font: 700 11px Cinzel, Georgia, serif; font-style: normal; letter-spacing: 4px; color: #fdba74; text-transform: uppercase; }
-.dg-jp, .dg-grand { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 12px; border-radius: 6px; background: linear-gradient(180deg, #1f0d07, #0c0604); box-shadow: inset 0 0 0 1px #78350f; font-variant-numeric: tabular-nums; }
+.dg-top { display: grid; grid-template-columns: 1fr minmax(0, 1.2fr) 1fr; gap: 6px; align-items: center; margin-bottom: 6px; }
+.dg-jp, .dg-grand { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 5px 12px; border-radius: 999px; background: rgba(12, 6, 4, .6); box-shadow: inset 0 0 0 1px rgba(251, 191, 36, .2); font-variant-numeric: tabular-nums; }
 .dg-jp small, .dg-grand small { font: 800 11px Cinzel, Georgia, serif; letter-spacing: 1.5px; }
 .dg-jp b, .dg-grand b { font: 900 clamp(12px, 1.7vw, 16px) Orbitron, sans-serif; color: #fde68a; }
 .dg-jp.mini small { color: #fdba74; } .dg-jp.major small { color: #cbd5e1; }
-.dg-grand { width: min(60%, 320px); margin: 0 auto 8px; justify-content: center; background: linear-gradient(180deg, #3b2005, #120805); box-shadow: inset 0 0 0 2px #fbbf24, 0 0 18px rgba(251, 191, 36, .4); }
+.dg-grand { justify-content: center; background: rgba(59, 32, 5, .75); box-shadow: inset 0 0 0 1px #fbbf24, 0 0 18px rgba(251, 191, 36, .4); }
 .dg-grand small { color: #fde047; } .dg-grand b { font-size: clamp(15px, 2.2vw, 20px); color: #fff7c2; }
 .dg-jp.flash, .dg-grand.flash { animation: bvFlash .3s ease-in-out 6 alternate; }
-/* grid: 3 pairs of reels, every cell framed; inside a pair a bright divider separates the halves */
-.g-dragons .sg { grid-template-columns: 1fr 1fr 14px 1fr 1fr 14px 1fr 1fr; grid-auto-flow: row; gap: 5px 0; aspect-ratio: calc(6.5 / 3); width: min(100%, calc((100vh - var(--chrome) - 110px) * 6.5 / 3)); padding: 6px; border-radius: 10px; background: rgba(12, 6, 4, .75); box-shadow: inset 0 0 0 1px #78350f; }
+/* grid: 3 pairs of reels, no frames: soft cells over the lair; inside a pair a thin glowing divider separates the halves */
+.game-host:not(.is-full):has(> .g-dragons) { max-width: max(420px, min(1180px, calc((100vh - var(--chrome) + var(--sgx, 10px)) * 6.5 / 3 + 60px))); }
+.g-dragons .sg { grid-template-columns: 1fr 1fr 10px 1fr 1fr 10px 1fr 1fr; grid-auto-flow: row; gap: 6px 0; aspect-ratio: calc(6.5 / 3); width: min(100%, calc((100vh - var(--chrome) + var(--sgx, 10px)) * 6.5 / 3)); padding: 0; background: none; }
 .g-dragons .sg-cell:nth-child(3n+1) { grid-row: 1; } .g-dragons .sg-cell:nth-child(3n+2) { grid-row: 2; } .g-dragons .sg-cell:nth-child(3n) { grid-row: 3; }
 .g-dragons .sg-cell:nth-child(-n+3) { grid-column: 1; }
 .g-dragons .sg-cell:nth-child(n+4):nth-child(-n+6) { grid-column: 2; }
@@ -2530,24 +2526,24 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .g-dragons .sg-cell:nth-child(n+10):nth-child(-n+12) { grid-column: 5; }
 .g-dragons .sg-cell:nth-child(n+13):nth-child(-n+15) { grid-column: 7; }
 .g-dragons .sg-cell:nth-child(n+16):nth-child(-n+18) { grid-column: 8; }
-.g-dragons .sg-cell { overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #3b1d10, #1a0c06 75%); border: 2px solid #92400e; box-shadow: inset 0 0 12px rgba(0, 0, 0, .7); transition: border-color .3s, border-radius .3s; }
-.g-dragons .sg-cell.lt { border-radius: 8px 0 0 8px; border-right-color: #fbbf24; }
-.g-dragons .sg-cell.rt { border-radius: 0 8px 8px 0; border-left: 0; }
-.g-dragons .sg-cell.lt::after { content: ''; position: absolute; right: -1px; top: 6%; bottom: 6%; width: 2px; background: #fde68a; box-shadow: 0 0 6px #fbbf24; transition: opacity .3s; }
-.g-dragons .sg-cell.lt .sg-sym { justify-items: end; } .g-dragons .sg-cell.rt .sg-sym { justify-items: start; }
+.g-dragons .sg-cell { overflow: hidden; background: radial-gradient(ellipse at 50% 45%, rgba(90, 40, 16, .5), rgba(14, 6, 3, .55) 80%); box-shadow: inset 0 0 0 1px rgba(251, 191, 36, .12); transition: box-shadow .3s, background .3s; }
+.g-dragons .sg-cell.dgL { border-radius: 12px 0 0 12px; }
+.g-dragons .sg-cell.dgR { border-radius: 0 12px 12px 0; }
+.g-dragons .sg-cell.dgL::after { content: ''; position: absolute; right: 0; top: 14%; bottom: 14%; width: 1px; background: rgba(253, 230, 138, .55); box-shadow: 0 0 5px #fbbf24; transition: opacity .3s; }
+.g-dragons .sg-cell.dgL .sg-sym { justify-items: end; } .g-dragons .sg-cell.dgR .sg-sym { justify-items: start; }
 .g-dragons .sg-sym svg { width: 100%; height: 94%; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .7)); }
 .g-dragons .sg-cell.full .sg-sym { justify-items: center; }
 .g-dragons .sg-cell.full svg { width: 80%; height: 80%; }
 .g-dragons .sg-cell.stone svg { width: 70%; height: 70%; }
 .g-dragons .sg-cell.stone { opacity: .75; }
 .g-dragons .sg-cell.scat, .g-dragons .sg-cell.super { background: radial-gradient(circle, rgba(245, 158, 11, .45), #1a0c06 70%); }
-.g-dragons .sg-cell.super { border-color: #fde047; box-shadow: inset 0 0 18px rgba(249, 115, 22, .8), 0 0 14px rgba(253, 224, 71, .6); }
+.g-dragons .sg-cell.super { box-shadow: inset 0 0 0 2px #fde047, inset 0 0 18px rgba(249, 115, 22, .8), 0 0 14px rgba(253, 224, 71, .6); }
 .g-dragons .sg-cell.scat svg, .g-dragons .sg-cell.super svg { animation: dgEgg 1.4s ease-in-out infinite; }
 .g-dragons .sg-cell.super svg { animation: dgSuper 1.1s ease-in-out infinite; }
 @keyframes dgSuper { 50% { transform: scale(1.08) rotate(4deg); filter: drop-shadow(0 0 12px #f97316) brightness(1.2); } }
 .g-dragons .sg-cell.mult { background: radial-gradient(circle, rgba(234, 88, 12, .5), #1a0c06 70%); }
-.g-dragons .sg-cell.jpc { background: radial-gradient(circle, rgba(253, 224, 71, .5), #1a0c06 70%); border-color: #fde047; }
-.g-dragons .sg-cell.pulse { border-color: #fff; box-shadow: inset 0 0 22px rgba(253, 224, 71, .8), 0 0 18px rgba(253, 224, 71, .9); z-index: 3; }
+.g-dragons .sg-cell.jpc { background: radial-gradient(circle, rgba(253, 224, 71, .5), #1a0c06 70%); box-shadow: inset 0 0 0 2px #fde047; }
+.g-dragons .sg-cell.pulse { box-shadow: inset 0 0 0 2px #fff, inset 0 0 22px rgba(253, 224, 71, .8), 0 0 18px rgba(253, 224, 71, .9); z-index: 3; }
 .g-dragons .sg-cell.pulse svg { animation: dgSuper .5s ease-in-out infinite; }
 .dg-cv { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); font: 900 24cqh/1 Cinzel, Georgia, serif; color: #fff7c2; text-shadow: 0 0 6px #000, 0 0 12px #f97316, 0 2px 0 #7f1d1d; pointer-events: none; white-space: nowrap; }
 .dg-cv.jp { font-size: 14cqh; color: #78350f; text-shadow: 0 1px 0 #fff7c2; }
@@ -2555,9 +2551,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .dg-cv.su { background: linear-gradient(90deg, #f59e0b, #dc2626); box-shadow: 0 0 8px #fde047; }
 @keyframes dgEgg { 25% { transform: rotate(-6deg); } 75% { transform: rotate(6deg); } }
 /* fusing: the divider and the inner borders fade, the pair turns into one glowing frame */
-.g-dragons .sg-cell.fusing { border-color: #fde047; box-shadow: inset 0 0 18px rgba(253, 224, 71, .45), 0 0 14px rgba(251, 191, 36, .6); z-index: 2; }
-.g-dragons .sg-cell.lt.fusing { border-right-color: transparent; border-radius: 8px 0 0 8px; }
-.g-dragons .sg-cell.lt.fusing::after { opacity: 0; }
+.g-dragons .sg-cell.fusing { background: radial-gradient(ellipse at 50% 45%, rgba(251, 146, 60, .45), rgba(42, 18, 8, .7) 80%); box-shadow: inset 0 0 18px rgba(253, 224, 71, .45), 0 0 14px rgba(251, 191, 36, .6); z-index: 2; }
+.g-dragons .sg-cell.dgL.fusing::after { opacity: 0; }
 .g-dragons .sg-cell.hidden .sg-sym { opacity: 0; }
 .dg-fused { position: absolute; z-index: 5; display: grid; place-items: center; border-radius: 8px; border: 3px solid #fde047; background: radial-gradient(ellipse at 50% 45%, rgba(251, 146, 60, .55), #2a1208 75%); box-shadow: 0 0 22px rgba(251, 191, 36, .8), inset 0 0 22px rgba(253, 224, 71, .4); animation: dgFuse .45s cubic-bezier(.3, 1.6, .5, 1); pointer-events: none; }
 .dg-fused svg { width: 96%; height: 96%; filter: drop-shadow(0 0 10px rgba(253, 186, 116, .9)); }
@@ -2572,7 +2567,12 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .g-dragons.fs-S .dg-lair { background: radial-gradient(ellipse at 50% 120%, #f59e0b, #7c2d12 45%, #1c0a05 75%); }
 .g-dragons.fs-S .dg-glow { opacity: 1; animation-duration: 1s; }
 .pay-sym.dgp { width: 84px; }
-@container (max-width: 520px) { .dg-top { grid-template-columns: 1fr 1fr; } .dg-logo { grid-column: 1 / -1; order: -1; } .dg-grand { width: 100%; } .dg-gold { display: none; } .g-dragons .sg { grid-template-columns: 1fr 1fr 8px 1fr 1fr 8px 1fr 1fr; } }
+@container (max-width: 520px) { .dg-top { grid-template-columns: 1fr 1fr; gap: 4px; } .dg-grand { grid-column: 1 / -1; order: -1; } .dg-jp { padding: 3px 10px; } .dg-gold { display: none; } .dg-frame > .slot-stage { padding: 4px; border-radius: 12px; } .g-dragons .sg { grid-template-columns: 1fr 1fr 5px 1fr 1fr 5px 1fr 1fr; gap: 4px 0; } .g-dragons .sg-cell.dgL { border-radius: 8px 0 0 8px; } .g-dragons .sg-cell.dgR { border-radius: 0 8px 8px 0; } }
+/* full screen: the reels take the room left by the title, jackpots, message and controls */
+.game-host.is-full:has(> .g-dragons, > .g-billets) { --sgx: -70px; }
+@media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .g-dragons, > .g-billets) { --sgx: 0px; } }
+/* phones: these two machines run edge to edge so the symbols get the whole width */
+@media (max-width: 600px) { .game-host:not(.is-full):has(> .g-dragons), .game-host:not(.is-full):has(> .g-billets) { margin-left: -12px; margin-right: -12px; } .slot.g-dragons, .slot.g-billets { padding-left: 4px; padding-right: 4px; } }
 @media (prefers-reduced-motion: reduce) { .dg-embers, .dg-glow, .g-dragons .sg-cell.egg svg { animation: none; } }
 
 /* ============ Rewarded ad popup (A-ADS) ============ */
@@ -5849,6 +5849,14 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
+    game: 'dragons', date: '2026-10-31', title: 'Grille agrandie', isNew: true,
+    items: ['Cases beaucoup plus grandes, sur toute la largeur', 'Plus de gros cadre : l’antre du dragon autour des têtes', 'Jackpots regroupés sur une seule ligne', 'Affichage corrigé sur téléphone'],
+  },
+  {
+    game: 'billets', date: '2026-10-31', title: 'Grille agrandie', isNew: true,
+    items: ['Billets beaucoup plus grands, sur toute la largeur', 'Plus de cadre métallique : la chambre forte autour des rouleaux', 'Jackpots regroupés sur une seule ligne'],
+  },
+  {
     game: 'dragons', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
     items: ['Têtes de dragon coupées en deux : les moitiés fusionnent et paient', 'Cascades : tout retombe et chaque nouvelle tête repaie', 'Dragon scatter : 10 free spins avec dragons multiplicateurs', 'SUPER scatter : Super Bonus avec multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT'],
   },
@@ -8244,8 +8252,8 @@ const FILES = {
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '577a616908'],
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', '4652b72c40'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', '0d0eb8802e'],
-  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '3edabd1ecf'],
-  billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '71f88c0b85'],
+  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '0e1f2d5a5e'],
+  billets: ['billets', 'games/impl/billets.js', 'BilletsGame', 'e1f4e77d76'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '59dfe1e0c8'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'fd9cc76f92'],

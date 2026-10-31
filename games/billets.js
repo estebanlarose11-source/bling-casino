@@ -77,8 +77,7 @@ class BilletsGame extends BaseGame {
       music: EXTRA_THEMES.billets,
       frameCls: 'bv-frame',
       stage: `<div class="bv-vault"><i class="bv-boxes l"></i><i class="bv-boxes r"></i><i class="bv-gold l"></i><i class="bv-gold r"></i><i class="bv-shine"></i></div>
-        <div class="bv-top"><div class="bv-jp mini"><small>MINI</small><b data-jp="mini"></b></div><div class="bv-logo"><b>COFFRE</b><em>aux billets</em></div><div class="bv-jp major"><small>MAJEUR</small><b data-jp="major"></b></div></div>
-        <div class="bv-grand"><small>JACKPOT</small><b data-jp="grand"></b></div>
+        <div class="bv-top"><div class="bv-jp mini"><small>MINI</small><b data-jp="mini"></b></div><div class="bv-grand"><small>JACKPOT</small><b data-jp="grand"></b></div><div class="bv-jp major"><small>MAJEUR</small><b data-jp="major"></b></div></div>
         <div class="reels-host"></div><div class="bv-word"></div>`,
       buys: [
         { id: 'case', icon: '💼', label: 'Mallette garantie', desc: 'Un tour avec une mallette de collecte sur le rouleau 5', cost: (b) => Math.round(b * BUY_CASE) },
