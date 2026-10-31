@@ -1846,6 +1846,14 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .g-candy .lbl.cql { position: absolute; bottom: 3%; left: 50%; transform: translateX(-50%); font: 900 9cqh Orbitron, sans-serif; font-style: normal; padding: 1cqh 3cqh; border-radius: 3cqh; background: linear-gradient(90deg, #ff2d95, #c026d3); color: #fff; white-space: nowrap; }
 .g-candy .lbl.cql.w { background: linear-gradient(90deg, #38bdf8, #a855f7); }
 .g-candy .sg-cell.revealed .sg-sym { opacity: .1; }
+.cq-ladder { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; }
+.cq-ladder span { min-width: 44px; text-align: center; padding: 4px 8px; border-radius: 10px; background: rgba(59, 7, 100, .6); border: 1px solid rgba(255, 158, 224, .3); font: 900 13px Orbitron, sans-serif; color: #f5d0fe; transition: transform .2s, background .2s; }
+.cq-ladder span.past { opacity: .45; }
+.cq-ladder span.on { background: linear-gradient(180deg, #ff4fb8, #be185d); color: #fff; border-color: #fff; transform: scale(1.12); box-shadow: 0 0 14px rgba(255, 79, 184, .7); }
+.g-candy .sg-cell.special { background: radial-gradient(circle, rgba(253, 224, 71, .5), rgba(255, 79, 184, .35) 60%, rgba(59, 7, 100, .5)); box-shadow: inset 0 0 0 2px #fde047, inset 0 0 16px rgba(253, 224, 71, .6); }
+.g-candy .sg-cell.special svg { animation: crownFloat 1.4s ease-in-out infinite; }
+.g-candy .sg-cell.beam { box-shadow: inset 0 0 0 3px #fff, inset 0 0 24px #ff4fb8; background: rgba(255, 79, 184, .35); }
+@container (max-width: 520px) { .cq-ladder span { min-width: 34px; padding: 2px 5px; font-size: 11px; } }
 .cq-itm .coin { position: relative; width: 80%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; font: 900 25cqh/1 Orbitron, sans-serif; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .5); overflow: visible;
   background: repeating-conic-gradient(from 10deg, #ff4fb8 0 30deg, #ffe1f3 30deg 60deg); box-shadow: 0 0 0 3px #fff, 0 0 0 5px #ff4fb8; }
 .cq-itm .coin span { position: relative; z-index: 1; padding: 4cqh 6cqh; border-radius: 10cqh; background: #be185d; box-shadow: 0 0 0 1.5px #fff; white-space: nowrap; }
@@ -3219,7 +3227,7 @@ const { sfx } = __mods['audio.js'];
 
 const GIFTS = [
   { game: 'cosmic', buy: 'A', label: 'Orbite Basse offert sur Cosmic Heist' },
-  { game: 'candy', buy: 'A', label: 'Bonus offert sur Candy Queen' },
+  { game: 'candy', buy: 'fs', label: 'Bal de la Reine offert sur Candy Queen' },
 ];
 const SEGS = [
   { k: 'ke', v: 20, c: '#334155' }, { k: 'ke', v: 50, c: '#7c3aed' }, { k: 'xp', v: 60, c: '#0891b2' },
@@ -3236,7 +3244,8 @@ const msToMidnight = () => { const d = new Date(); d.setHours(24, 0, 0, 0); retu
 /* ---------- free bonus rounds won on the wheel ---------- */
 const gifts = {
   list: () => profiles.current?.gifts || [],
-  find: (game, buy) => gifts.list().find((g) => g.game === game && g.buy === buy),
+  // (candy 'A' = the Candy Queen bonus before its rework, now 'fs')
+  find: (game, buy) => gifts.list().find((g) => g.game === game && (g.buy === buy || (game === 'candy' && g.buy === 'A' && buy === 'fs'))),
   use(game, buy) {
     const g = gifts.find(game, buy);
     if (!g) return false;
@@ -4551,7 +4560,7 @@ const ORIGINALS = [
   {"id": "cosmic", "name": "Cosmic Heist", "cat": "slot", "tag": "Machine à sous", "sub": "Casse néon dans l’espace", "colors": ["#22d3ee", "#7c3aed"], "description": "K-0B, le robot cambrioleur, vide un astéroïde de ses cristaux. Les grappes de 5 symboles explosent en cascade et chargent leurs cases d’énergie : bleu, rose, puis doré. Quand une supernova éclate, toutes les cellules chargées livrent leur butin, avec des trous noirs qui multiplient leur ligne et leur colonne et des vaisseaux qui aspirent tout. 3 bonus avec les balises.", "features": ["Grappes de 5", "Cellules d’énergie à 3 niveaux", "Supernova et Surcharge", "Trous noirs ×2 à ×25", "Vaisseaux-aspirateurs", "3 bonus", "Radar à balises", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "zeus", "name": "Zeus Thunder", "cat": "slot", "tag": "Machine à sous", "sub": "Pay Anywhere, multiplicateurs ×500", "colors": ["#3b82f6", "#1e1b4b"], "description": "Sur l’Olympe, Zeus fait pleuvoir les gemmes. 8 symboles identiques n’importe où sur la grille 6×5 paient, les gains tombent en cascade et Zeus lance des orbes multiplicateurs de ×2 à ×500. 4 scatters lancent 15 tours gratuits avec un multiplicateur global qui ne se réinitialise jamais.", "features": ["Grille 6×5 Pay Anywhere", "Cascades", "Orbes ×2 à ×500", "15 Free Spins", "Multiplicateur global", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
   {"id": "huff", "name": "Huff la Puff XXTrem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Huff ’n’ Puff : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent XXTREM Puff avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. 5 scatters lancent le MEGA BONUS et sa roue du loup. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Huff ’n’ Puff", "4 scatters : roulette des maisons", "5 scatters : MEGA BONUS", "Cases ×2 à ×200", "Mini, Minor, Major, Jackpot ×5 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
-  {"id": "candy", "name": "Candy Queen", "cat": "slot", "tag": "Machine à sous", "sub": "Bonbons, baguette et paillettes", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et pailletent leurs cases. D’un coup de baguette magique, elles se révèlent : bonbons, macarons, diamants sucrés, cœurs multiplicateurs et bocaux qui aspirent tout. 3 bonus féeriques avec les couronnes.", "features": ["Grappes de 5", "Cases pailletées", "Baguette magique", "Cœurs ×2 à ×100, bocaux", "3 bonus", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
+  {"id": "candy", "name": "Candy Queen", "cat": "slot", "tag": "Machine à sous", "sub": "Bonbons spéciaux et multiplicateur royal", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et chaque cascade fait grimper le multiplicateur jusqu’à ×20. Les grosses grappes créent des bonbons spéciaux : cœur explosif, bocal bombe et baguette magique. 4 couronnes ouvrent le Bal de la Reine, où le multiplicateur ne redescend jamais.", "features": ["Grappes de 5", "Multiplicateur de cascades ×1 à ×20", "Cœur explosif, bocal bombe, baguette", "Bal de la Reine : multiplicateur permanent", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "anubis", "name": "Anubis Reborn", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "bling", "name": "Bling Tower", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "pharaon", "name": "Pharaon Gold", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
@@ -5031,6 +5040,10 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  {
+    game: 'candy', date: '2026-10-31', title: 'Nouvelles règles',
+    items: ['Chaque cascade fait grimper le multiplicateur jusqu’à ×20', 'Les grosses grappes créent des bonbons spéciaux : cœur explosif, bocal bombe, baguette magique', 'Bal de la Reine : le multiplicateur ne redescend jamais', 'Nouvel achat : bonbon spécial garanti'],
+  },
   {
     game: 'taco', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
     items: ["243 façons de gagner et un sombrero WILD", "Frappe les piñatas : gains, multiplicateurs ou FIESTA", "Fiesta : 8 tours gratuits avec multiplicateur global", "Jusqu’à ×5 000 la mise"],
@@ -8870,108 +8883,119 @@ return { AnubisGame };
 
 // ---- games/impl/candy.js ----
 __mods['games/impl/candy.js'] = (() => {
-// Candy Queen: 6×5 cluster pays with cascades. Winning cells turn into glitter tiles; the magic wand reveals them
-// as candies, heart multipliers and candy jars. Engine from Raton Voleur, retuned by simulation (RTP ≈ 92 %, buys ≈ 88 %).
+// Candy Queen: 6×5 cluster pays with cascades. Every cascade raises the Queen's multiplier (×1, ×2, ×3, ×5, ×8, ×12,
+// ×20); big clusters leave a special candy behind (8+: exploding heart, row and column; 10+: candy-jar bomb, 3×3;
+// 12+: magic wand, every candy of the most common kind). In the Queen's Ball free spins the multiplier never resets.
+// Tuned by simulation (RTP ≈ 92 %, buys ≈ 88 %).
 
 const { BaseGame, fmtC, art } = __mods['core/base.js'];
 const { SymbolGrid } = __mods['core/grid.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
-const { fx, sleep, center } = __mods['fx.js'];
+const { fx, center } = __mods['fx.js'];
 const { el, toast } = __mods['ui.js'];
 
-/* ===ENGINE (original) */
-const C = 6, R = 5, N = 30, MINC = 5, CAPX = 10000;
+/* ===ENGINE */
+const C = 6, R = 5, N = 30, MINC = 5, CAPX = 10000, CROWN = 10, HEART = 12, JAR = 13, WAND = 14;
 const P = {
-  w: [28, 26, 22, 18, 14, 10, 8, 6, 4, 3],
-  val: [0.06, 0.08, 0.1, 0.14, 0.2, 0.35, 0.5, 1, 2, 4], F: 6.3,
-  ps: 0.0088, psFS: 0.014, pr: 0.003, prFS: 0.01, huntF: 1.65,
-  item: [['b', 60], ['s', 24], ['g', 8], ['c', 5], ['p', 3]],
-  bronze: [[0.4, 50], [0.6, 30], [1, 20]], silver: [[2, 50], [3, 30], [5, 20]], gold: [[10, 50], [20, 30], [40, 15], [100, 5]],
-  clover: [[2, 50], [3, 30], [5, 15], [10, 5]],
-  boost: { A: 2.7, B: 1.8, C: 1.5 }, cexp: 1.9,
+  w: [40, 34, 26, 18, 12, 8, 6, 4, 3, 2],
+  val: [0.06, 0.08, 0.1, 0.14, 0.2, 0.35, 0.5, 1, 2, 4], F: 4.25, piece: 0.25,
+  ps: 0.016, psFS: 0.018, huntF: 1.56, spFS: 0.01,
+  ladder: [1, 2, 3, 5, 8, 12, 20],
 };
-const CLFS = (() => { const l = []; for (let f = 2; f <= 100; f++) l.push([f, Math.pow(f, -P.cexp)]); return l; })();
-function wsum(l) { let t = 0; for (const x of l) t += x[1]; return t; }
-function wpick(l) { const t = wsum(l); let r = Math.random() * t; for (const x of l) { if (r < x[1]) return x[0]; r -= x[1]; } return l[l.length - 1][0]; }
-const SWf = () => P.w.reduce((a, b) => a + b, 0);
 function draw(o) {
-  const ps = (o.fs ? P.psFS : P.ps) * (o.hunt ? P.huntF : 1), pr = o.fs ? P.prFS : P.pr, r = Math.random();
-  if (r < ps) return 10;
-  if (r < ps + pr) return 11;
-  let x = Math.random() * SWf(); for (let i = 0; i < P.w.length; i++) { if (x < P.w[i]) return i; x -= P.w[i]; } return 0;
+  const r = Math.random(), ps = (o.fs ? P.psFS : P.ps) * (o.hunt ? P.huntF : 1);
+  if (r < ps) return CROWN;
+  if (o.fs && r < ps + P.spFS) return [HEART, JAR, WAND][Math.floor(Math.random() * 3)];
+  let t = 0; for (const x of P.w) t += x;
+  let x = Math.random() * t; for (let i = 0; i < P.w.length; i++) { if (x < P.w[i]) return i; x -= P.w[i]; } return 0;
 }
 const NB = [];
 for (let k = 0; k < N; k++) { const c = Math.floor(k / R), r = k % R, o = []; if (r > 0) o.push(k - 1); if (r < R - 1) o.push(k + 1); if (c > 0) o.push(k - R); if (c < C - 1) o.push(k + R); NB.push(o); }
-function clusters(grid) {
+function clusters(g) {
   const out = [], seen = {};
   for (let k = 0; k < N; k++) {
-    const t = grid[k]; if (t > 9 || seen[k]) continue;
+    const t = g[k]; if (t > 9 || seen[k]) continue;
     const st = [k], cs = []; seen[k] = 1;
-    while (st.length) { const x = st.pop(); cs.push(x); for (const n of NB[x]) { if (!seen[n] && grid[n] === t) { seen[n] = 1; st.push(n); } } }
+    while (st.length) { const x = st.pop(); cs.push(x); for (const n of NB[x]) if (!seen[n] && g[n] === t) { seen[n] = 1; st.push(n); } }
     if (cs.length >= MINC) out.push({ t, cells: cs });
   }
   return out;
 }
-function revealItem(o) {
-  const k = wpick(P.item);
-  if (k === 'b') return { k: 'b', v: wpick(P.bronze) };
-  if (k === 's') return { k: 's', v: wpick(P.silver) };
-  if (k === 'g') return { k: 'g', v: wpick(P.gold) };
-  if (k === 'c') return { k: 'c', f: o.fs ? wpick(CLFS) : wpick(P.clover) };
-  return { k: 'p' };
+const special = (n) => (n >= 12 ? WAND : n >= 10 ? JAR : n >= 8 ? HEART : null);
+// Cells a special candy clears (regular candies only): heart = its row and column, jar = 3×3, wand = every candy of
+// the most common kind on the grid.
+function blast(g, i) {
+  const c0 = Math.floor(i / R), r0 = i % R, out = [];
+  if (g[i] === HEART) { for (let k = 0; k < N; k++) if (k !== i && g[k] < 10 && (Math.floor(k / R) === c0 || k % R === r0)) out.push(k); }
+  else if (g[i] === JAR) { for (let k = 0; k < N; k++) if (k !== i && g[k] < 10 && Math.abs(Math.floor(k / R) - c0) <= 1 && Math.abs(k % R - r0) <= 1) out.push(k); }
+  else {
+    const cnt = new Array(10).fill(0); for (const v of g) if (v < 10) cnt[v]++;
+    let best = 0; for (let s = 1; s < 10; s++) if (cnt[s] > cnt[best] || (cnt[s] === cnt[best] && P.val[s] > P.val[best])) best = s;
+    for (let k = 0; k < N; k++) if (g[k] === best) out.push(k);
+  }
+  return out;
 }
+function fall(g, rem, o) {
+  for (let c = 0; c < C; c++) {
+    const keep = []; for (let r = 0; r < R; r++) { const j = c * R + r; if (!rem[j]) keep.push(g[j]); }
+    const miss = R - keep.length;
+    for (let r = 0; r < R; r++) g[c * R + r] = r < miss ? draw(o) : keep[r - miss];
+  }
+}
+// One spin. o.lv = multiplier ladder step to start from (free spins keep it), o.forceSp drops a special candy.
 function spin(o) {
-  const bet = o.bet, grid = [], gold = (o.gold || []).slice(), steps = [];
-  let i, total = 0, rounds = 0;
-  if (!gold.length) for (i = 0; i < N; i++) gold.push(false);
-  for (i = 0; i < N; i++) grid.push(draw(o));
-  if (o.forceRainbow || o.mode === 'C') { const p0 = Math.floor(Math.random() * N); grid[p0] = 11; }
-  steps.push({ k: 'init', grid: grid.slice(), gold: gold.slice() });
-  while (rounds < 80) {
-    const cl = clusters(grid); if (!cl.length) break;
-    let paid = 0; const rem = {}, wins = [];
-    cl.forEach((c) => { const p = bet * P.val[c.t] * P.F * (c.cells.length - MINC + 1); paid += p; wins.push({ t: c.t, n: c.cells.length, p, cells: c.cells }); c.cells.forEach((x) => { rem[x] = 1; gold[x] = true; }); });
-    total += paid;
-    for (let c = 0; c < C; c++) {
-      const keep = []; for (let r = 0; r < R; r++) { const j = c * R + r; if (!rem[j]) keep.push(grid[j]); }
-      const miss = R - keep.length;
-      for (let r = 0; r < R; r++) { const j2 = c * R + r; grid[j2] = r < miss ? draw(o) : keep[r - miss]; }
+  const bet = o.bet, g = [], steps = [];
+  let lv = o.lv || 0, total = 0, rounds = 0;
+  for (let i = 0; i < N; i++) g.push(draw(o));
+  if (o.forceSp) g[Math.floor(Math.random() * N)] = [HEART, JAR, WAND][Math.floor(Math.random() * 3)];
+  steps.push({ k: 'init', grid: g.slice(), lv });
+  while (rounds < 60) {
+    const m = P.ladder[Math.min(lv, P.ladder.length - 1)];
+    const cl = clusters(g);
+    if (cl.length) {
+      let paid = 0; const rem = {}, wins = [], made = [];
+      cl.forEach((c) => {
+        const p = bet * P.val[c.t] * P.F * (c.cells.length - MINC + 1) * m;
+        paid += p; wins.push({ t: c.t, n: c.cells.length, p, cells: c.cells });
+        c.cells.forEach((x) => { rem[x] = 1; });
+        const sp = special(c.cells.length);
+        if (sp) { const at = c.cells[Math.floor(Math.random() * c.cells.length)]; delete rem[at]; g[at] = sp; made.push({ i: at, sp }); }
+      });
+      total += paid; fall(g, rem, o); lv++; rounds++;
+      steps.push({ k: 'win', wins, paid, m, made, rem: Object.keys(rem).map(Number), after: g.slice(), lv });
+      continue;
     }
-    steps.push({ k: 'win', wins, paid, rem: Object.keys(rem).map(Number), after: grid.slice(), gold: gold.slice() });
-    rounds++;
+    // no cluster left: the special candies on the grid go off, one after the other
+    const sps = []; for (let k = 0; k < N; k++) if (g[k] >= HEART) sps.push(k);
+    if (!sps.length) break;
+    const rem = {}, fx = []; let paid = 0;
+    for (const i of sps) {
+      const cells = blast(g, i).filter((k) => !rem[k]);
+      let p = 0; cells.forEach((k) => { p += bet * P.val[g[k]] * P.F * P.piece * m; rem[k] = 1; });
+      rem[i] = 1; paid += p; fx.push({ i, sp: g[i], cells, p });
+    }
+    total += paid; fall(g, rem, o); lv++; rounds++;
+    steps.push({ k: 'blast', fx, paid, m, rem: Object.keys(rem).map(Number), after: g.slice(), lv });
   }
-  let scat = 0, rb = 0; for (i = 0; i < N; i++) { if (grid[i] === 10) scat++; else if (grid[i] === 11) rb++; }
-  const base = total; let act = null;
-  let ng = 0; for (i = 0; i < N; i++) if (gold[i]) ng++;
-  if (rb > 0 && ng > 0) {
-    const items = [], byPos = {}, bm = (o.fs ? (P.boost[o.mode] || 1) : 1); let pots = 0;
-    for (i = 0; i < N; i++) if (gold[i]) { const it = revealItem(o); it.i = i; byPos[i] = it; items.push(it); if (it.k === 'b' || it.k === 's' || it.k === 'g') it.fv = it.v * bm; else if (it.k === 'p') pots++; }
-    const cl = [];
-    items.forEach((it) => { if (it.k === 'c') { const tg = []; NB[it.i].forEach((n) => { const t = byPos[n]; if (t && t.fv !== undefined) { t.fv *= it.f; tg.push(n); } }); cl.push({ i: it.i, f: it.f, targets: tg }); } });
-    let coin = 0; items.forEach((it) => { if (it.fv !== undefined) coin += it.fv * bet; });
-    const pay = coin * (1 + pots) + pots * base;
-    act = { items, coin, pots, pay, rb, bm, cl };
-    total += pay;
-    if (o.mode !== 'B') { for (i = 0; i < N; i++) gold[i] = false; }
-  }
+  let scat = 0; for (const v of g) if (v === CROWN) scat++;
   let capped = false; if (total >= bet * CAPX) { total = bet * CAPX; capped = true; }
-  steps.push({ k: 'end', base, act, scat, rb, ng });
-  return { steps, total, scat, rb, base, act, gold: o.fs ? gold : null, capped };
+  steps.push({ k: 'end', scat });
+  return { steps, total, scat, lv, capped };
 }
-const modeOf = (s) => (s >= 5 ? 'C' : s === 4 ? 'B' : 'A');
+const FS = { trig: 4, spins: 10, retrig: 3, extra: 5 };
 /* ===END ENGINE */
 
 const NAMES = ['Boule de gomme', 'Bonbon bleu', 'Étoile sucrée', 'Cœur gélifié', 'Sucette', 'Donut', 'Cupcake', 'Glace', 'Potion d’amour', 'Bague diamant'];
-const MODEN = { A: 'Bal de Sucre', B: 'Palais Pailleté', C: 'Pluie d’Étoiles' };
-const MODESUB = { A: 'Les cases pailletées restent jusqu’au coup de baguette', B: 'Les cases pailletées ne disparaissent jamais', C: 'Une baguette magique à chaque tour' };
-const HUNTC = 2, RBC = 4.9, PA = 116, PB = 290;
+const SPN = { [HEART]: 'Cœur explosif', [JAR]: 'Bocal bombe', [WAND]: 'Baguette magique' };
+const SPD = { [HEART]: 'efface sa ligne et sa colonne', [JAR]: 'efface les 8 cases autour', [WAND]: 'efface tous les bonbons de la sorte la plus présente' };
+const SPART = { [HEART]: 'cqh', [JAR]: 'cqj', [WAND]: 'cqw' };
+const SPLBL = { [HEART]: 'CŒUR', [JAR]: 'BOCAL', [WAND]: 'BAGUETTE' };
+const HUNTC = 2, SPC = 4.3, PFS = 144;
 const WORDS = ['SWEET !', 'DÉLICIEUX !', 'SUGAR RUSH !', 'DIVIN !', 'ROYAL !', 'QUEEN !'];
 const NEON = ['#ff4fb8', '#ff9ee0', '#38bdf8', '#fde047', '#c084fc', '#a3e635', '#fff'];
-const ITEMN = { b: 'Bonbon', s: 'Macaron', g: 'Diamant sucré' };
-const sym = (c) => (c < 10 ? art('cq' + c) : c === 10 ? art('cqs') + '<i class="lbl cql">COURONNE</i>' : art('cqw') + '<i class="lbl cql w">MAGIE</i>');
-const fxv = (v) => (v >= 10 ? String(Math.round(v)) : v.toFixed(1).replace('.0', '').replace('.', ','));
-const heartSVG = '<svg viewBox="0 0 64 64" aria-hidden="true"><use href="#cqh" width="64" height="64"/></svg>';
+const sym = (c) => (c < 10 ? art('cq' + c) : c === CROWN ? art('cqs') + '<i class="lbl cql">COURONNE</i>' : art(SPART[c]) + `<i class="lbl cql w">${SPLBL[c]}</i>`);
+const mOf = (lv) => P.ladder[Math.min(lv, P.ladder.length - 1)];
 
 class CandyGame extends BaseGame {
   constructor(root, game) {
@@ -8981,34 +9005,40 @@ class CandyGame extends BaseGame {
       stage: `<div class="cq-stage">
         <div class="cq-sky"><i class="cq-lolli l1"></i><i class="cq-lolli l2"></i></div>
         <div class="cq-board">
+          <div class="cq-ladder">${P.ladder.map((m, k) => `<span data-lv="${k}">×${m}</span>`).join('')}</div>
           <div class="grid-host"></div>
           <div class="cq-word"></div>
         </div>
       </div>`,
-      head: '<div class="cq-meter"><small>Cases pailletées</small><b>0</b></div>',
-      opts: [{ id: 'hunt', icon: '👑', label: 'Chasse aux couronnes (mise ×2, couronnes ×1,65)' }],
+      head: '<div class="cq-meter"><small>Multiplicateur</small><b>×1</b></div>',
+      opts: [{ id: 'hunt', icon: '👑', label: 'Chasse aux couronnes (mise ×2, couronnes ×1,56)' }],
       buys: [
-        { id: 'rb', icon: '🪄', label: 'Baguette magique garantie', desc: 'Un tour avec une baguette sur la grille', cost: (b) => Math.round(b * RBC) },
-        { id: 'A', icon: '🍬', label: `${MODEN.A} · 3 couronnes`, desc: `8 tours · ${MODESUB.A.toLowerCase()}`, cost: (b) => b * PA },
-        { id: 'B', icon: '💎', label: `${MODEN.B} · 4 couronnes`, desc: `12 tours · ${MODESUB.B.toLowerCase()}`, cost: (b) => b * PB },
+        { id: 'sp', icon: '🍬', label: 'Bonbon spécial garanti', desc: 'Un tour avec un cœur, un bocal ou une baguette sur la grille', cost: (b) => Math.round(b * SPC) },
+        { id: 'fs', icon: '👑', label: `Bal de la Reine · ${FS.spins} tours`, desc: 'Le multiplicateur ne redescend jamais pendant le bonus', cost: (b) => b * PFS },
       ],
-      hello: 'Grappes de 5+ · la baguette révèle les cases pailletées',
+      hello: 'Grappes de 5+ · chaque cascade monte le multiplicateur · grosses grappes = bonbons spéciaux',
     });
     this.hunt = false;
-    this.gold = new Array(N).fill(false);
-    this.meter = this.q('.cq-meter');
     this.meterVal = this.q('.cq-meter b');
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: C, rows: R, game: this, art: sym,
-      cls: (v, i) => (this.gold[i] ? 'gold ' : '') + (v === 10 ? 'scatter' : v === 11 ? 'rainbow' : v >= 7 ? 'hi' : ''),
+      cls: (v) => (v === CROWN ? 'scatter' : v >= HEART ? 'rainbow special' : v >= 7 ? 'hi' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => Math.floor(Math.random() * 10)));
+    this.setLv(0);
   }
 
-  // Big word over the grid: SWEET!, DÉLICIEUX!, SUGAR RUSH!… (restarted with WAAPI, no forced reflow).
-  word(k) {
+  setLv(lv, bump) {
+    const m = mOf(lv);
+    this.meterVal.textContent = `×${m}`;
+    this.q('.cq-meter').classList.toggle('hot', m > 1);
+    this.qa('.cq-ladder span').forEach((s) => { const k = +s.dataset.lv; s.classList.toggle('on', k === Math.min(lv, P.ladder.length - 1)); s.classList.toggle('past', k < lv); });
+    if (bump) this.meterVal.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.4)', offset: 0.4 }, { transform: 'scale(1)' }], { duration: 400 });
+  }
+
+  word(k, text) {
     const w = this.q('.cq-word');
-    w.textContent = WORDS[Math.min(k, WORDS.length - 1)];
+    w.textContent = text || WORDS[Math.min(k, WORDS.length - 1)];
     w.className = `cq-word t${Math.min(k, 5)}`;
     w.getAnimations().forEach((a) => a.cancel());
     w.animate([
@@ -9020,19 +9050,6 @@ class CandyGame extends BaseGame {
     ], { duration: this.turbo ? 600 : 1000, easing: 'ease-out' });
   }
 
-  // A few hearts popping out of a point (capped so big wins never flood the page).
-  hearts(x, y, n = 4, spread = 1) {
-    n = Math.min(n, 6);
-    for (let k = 0; k < n; k++) {
-      const h = el('div', 'cq-heart', heartSVG);
-      const s = 14 + Math.random() * 14;
-      h.style.cssText = `left:${x}px;top:${y}px;width:${s}px;height:${s}px;--dx:${(Math.random() - 0.5) * 140 * spread}px;--dy:${-50 - Math.random() * 100 * spread}px;animation-delay:${k * 40}ms`;
-      document.body.appendChild(h);
-      setTimeout(() => h.remove(), 1250 + k * 40);
-    }
-  }
-
-  // Bonus intro / big win screens in their light version (see .cq-ov).
   overlay(html, cls = '') { return super.overlay(html, `${cls} cq-ov`); }
 
   stakeLabel() { return Math.round(this.bet * (this.hunt ? HUNTC : 1)); }
@@ -9041,23 +9058,8 @@ class CandyGame extends BaseGame {
     if (id !== 'hunt' || this.busy) return;
     this.hunt = !this.hunt;
     this.slotEl.classList.toggle('hunting', this.hunt);
-    toast(this.hunt ? 'Chasse aux couronnes : mise ×2, couronnes 1,65 fois plus fréquentes' : 'Chasse aux couronnes désactivée');
+    toast(this.hunt ? 'Chasse aux couronnes : mise ×2, couronnes 1,56 fois plus fréquentes' : 'Chasse aux couronnes désactivée');
     this.updateMeters();
-  }
-
-  applyGold(arr) {
-    let n = 0;
-    for (let i = 0; i < N; i++) {
-      const on = !!arr?.[i];
-      if (this.gold[i] !== on) { this.gold[i] = on; this.grid.cells[i].classList.toggle('gold', on); }
-      if (on) n++;
-    }
-    if (+this.meterVal.textContent !== n) {
-      this.meterVal.textContent = n;
-      this.meterVal.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.3)', offset: 0.4 }, { transform: 'scale(1)' }], { duration: 400 });
-    }
-    this.meter.classList.toggle('hot', n > 0);
-    return n;
   }
 
   onMain() { this.round(() => this.playRound('spin')); }
@@ -9070,188 +9072,123 @@ class CandyGame extends BaseGame {
     this.lastStake = kind === 'spin' ? price : b;
     this.setLast(0); this.winAmt.textContent = ''; this.setBanner('');
     let total = 0;
-    if (kind === 'A' || kind === 'B') {
-      total = await this.bonus(kind);
-    } else {
-      const res = spin({ bet: b, fs: false, hunt: kind === 'spin' && this.hunt, forceRainbow: kind === 'rb' });
-      await this.play(res, false, null);
+    if (kind === 'fs') total = await this.bonus();
+    else {
+      const res = spin({ bet: b, fs: false, hunt: kind === 'spin' && this.hunt, forceSp: kind === 'sp' });
+      await this.play(res);
       total = res.total;
       if (total > 0) { this.win(Math.round(total)); this.setLast(total); }
-      if (res.scat >= 3) {
+      if (res.scat >= FS.trig) {
         this.stopAuto();
         if (total > 0) await this.celebrate(Math.round(total));
-        total += await this.bonus(modeOf(res.scat));
-      } else if (total > 0) { if (total >= this.lastStake * 10) this.cheer(); await this.celebrate(Math.round(total)); }
+        total += await this.bonus();
+      } else if (total > 0) await this.celebrate(Math.round(total));
+      this.setLv(0);
     }
     this.setLast(total);
     this.msg(total >= b * CAPX ? `GAIN MAXIMUM ! ${fmtC(total)}` : total > 0 ? `Total du tour : ${fmtC(total)}` : 'Pas de gain');
   }
 
-  cheer() {
-    const p = center(this.grid.el);
-    this.hearts(p.x, p.y, 6, 1.2);
-  }
-
-  async play(res, fs, mode) {
+  async play(res) {
     let run = 0, k = 0;
     for (const st of res.steps) {
       if (this.dead) return;
       if (st.k === 'init') {
-        this.applyGold(st.gold);
+        this.setLv(st.lv);
         await this.grid.dropIn(st.grid, {
-          tease: (c) => { let sc = 0; for (let j = 0; j < c * R; j++) if (st.grid[j] === 10) sc++; return sc >= 2; },
+          tease: (c) => { let sc = 0; for (let j = 0; j < c * R; j++) if (st.grid[j] === CROWN) sc++; return sc >= 3; },
           onLand: (i, v) => {
             if (v < 10) return;
             sfx.land();
             const p = center(this.grid.cells[i]);
-            fx.burst(p.x, p.y, 10, v === 11 ? NEON : ['#fde047', '#fff', '#ff9ee0'], 5);
+            fx.burst(p.x, p.y, 10, v === CROWN ? ['#fde047', '#fff', '#ff9ee0'] : NEON, 5);
           },
         });
       } else if (st.k === 'win') {
         st.wins.forEach((w) => this.grid.floatOver(w.cells, `+${fmtC(Math.round(w.p))}`, '#ffe1f3'));
-        this.grid.mark(st.rem);
-        this.msg(st.wins.map((w) => `${w.n} × ${NAMES[w.t]} : +${fmtC(Math.round(w.p))}`).join(' · '));
+        this.grid.mark(st.wins.flatMap((w) => w.cells));
+        this.msg(`${st.wins.map((w) => `${w.n} × ${NAMES[w.t]}`).join(' · ')}${st.m > 1 ? ` · ×${st.m}` : ''} : +${fmtC(Math.round(st.paid))}`);
         this.word(k);
         sfx.win();
         await this.wait(750);
         this.grid.unmark();
         await this.grid.explode(st.rem, NEON);
-        this.applyGold(st.gold);
+        for (const mk of st.made) {
+          this.grid.set(mk.i, mk.sp);
+          this.grid.cells[mk.i].animate([{ transform: 'scale(.2)' }, { transform: 'scale(1.2)', offset: 0.6 }, { transform: 'scale(1)' }], { duration: 450, easing: 'ease-out' });
+          sfx.upgrade();
+          this.msg(`Grappe de ${st.wins.find((w) => w.cells.includes(mk.i))?.n || 8} : ${SPN[mk.sp]} créé !`);
+          await this.wait(500);
+        }
         await this.grid.cascade(st.after, new Set(st.rem));
         run += st.paid; k++;
+        this.setLv(st.lv, true);
         this.setLast(Math.round(run));
         await this.wait(180);
-      } else if (st.k === 'end') {
-        if (st.act) await this.activate(st.act, mode, fs);
-        else if (!fs) this.applyGold(null);
-        else if (res.gold) this.applyGold(res.gold);
+      } else if (st.k === 'blast') {
+        for (const b of st.fx) {
+          if (this.dead) return;
+          const src = this.grid.cells[b.i];
+          src.classList.add('pulse');
+          b.cells.forEach((c) => this.grid.cells[c].classList.add('beam'));
+          this.msg(`${SPN[b.sp]} : ${SPD[b.sp]} !${b.p > 0 ? ` +${fmtC(Math.round(b.p))}` : ''}`);
+          this.word(5, b.sp === WAND ? 'MAGIE !' : 'BOUM !');
+          this.shake();
+          sfx.feature();
+          const p = center(src);
+          fx.burst(p.x, p.y, 30, NEON, 9);
+          await this.wait(800);
+          b.cells.forEach((c) => this.grid.cells[c].classList.remove('beam'));
+          src.classList.remove('pulse');
+        }
+        await this.grid.explode(st.rem, NEON);
+        await this.grid.cascade(st.after, new Set(st.rem));
+        run += st.paid; k++;
+        this.setLv(st.lv, true);
+        this.setLast(Math.round(run));
+        await this.wait(180);
       }
     }
   }
 
-  async activate(a, mode, fs) {
-    const b = this.bet;
-    for (let i = 0; i < N; i++) if (this.grid.values[i] === 11) this.grid.cells[i].classList.add('rbon');
-    sfx.feature();
-    this.slotEl.classList.add('cq-magic');
-    this.msg('Coup de baguette ! Les cases pailletées se révèlent…');
-    await this.wait(700);
-    const items = a.items.slice().sort((x, y) => x.i - y.i), disp = {}, nodes = {};
-    const step = items.length > 16 ? (this.turbo ? 25 : 55) : (this.turbo ? 45 : 110);
-    for (const it of items) {
-      if (this.dead) return;
-      const e = el('div', 'itm cq-itm');
-      if (it.k === 'c') e.innerHTML = `<div class="clv">${art('cqh')}<b>×${it.f}</b></div>`;
-      else if (it.k === 'p') e.innerHTML = `<div class="clv pot">${art('cqj')}</div>`;
-      else { disp[it.i] = it.v * a.bm; e.innerHTML = `<div class="coin ${it.k}"><span>×${fxv(disp[it.i])}</span></div>`; }
-      const cell = this.grid.cells[it.i];
-      cell.classList.add('revealed');
-      cell.appendChild(e);
-      nodes[it.i] = e;
-      sfx.tick();
-      if (it.k === 'g' || it.k === 'p' || it.k === 'c') { const p = center(cell); fx.burst(p.x, p.y, 8, ['#fde047', '#ff9ee0', '#fff'], 5); }
-      await sleep(step);
-    }
-    await this.wait(400);
-    for (const cv of a.cl || []) {
-      if (!cv.targets.length || this.dead) continue;
-      this.msg(`Cœur ×${cv.f} : les bonbons autour de lui sont multipliés !`);
-      const srcCell = this.grid.cells[cv.i], src = center(srcCell);
-      srcCell.classList.add('pulse');
-      sfx.upgrade();
-      for (const ti of cv.targets) {
-        disp[ti] *= cv.f;
-        const cn = nodes[ti]?.querySelector('.coin span');
-        fx.trail(src, center(this.grid.cells[ti]), '#ff2d95', 5);
-        await sleep(this.turbo ? 80 : 150);
-        if (cn) { cn.textContent = '×' + fxv(disp[ti]); cn.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.3)', offset: 0.4 }, { transform: 'scale(1)' }], { duration: 350 }); }
-        sfx.tick();
-      }
-      await this.wait(450);
-      srcCell.classList.remove('pulse');
-    }
-    if (a.pots > 0 && !this.dead) {
-      const potCells = items.filter((x) => x.k === 'p');
-      potCells.forEach((x) => this.grid.cells[x.i].classList.add('pulse'));
-      this.msg(a.pots > 1 ? `${a.pots} bocaux aspirent tous les bonbons !` : 'Le bocal aspire tous les bonbons !');
-      sfx.feature();
-      await this.wait(500);
-      // measure everything first, then animate (no layout reads inside the animation loop)
-      const moves = [];
-      for (const x of items) {
-        if (disp[x.i] === undefined) continue;
-        const cn = nodes[x.i]?.querySelector('.coin'); if (!cn) continue;
-        let best = potCells[0], bd = 1e9;
-        potCells.forEach((p) => { const d = Math.abs(Math.floor(p.i / R) - Math.floor(x.i / R)) + Math.abs((p.i % R) - (x.i % R)); if (d < bd) { bd = d; best = p; } });
-        const r1 = this.grid.cells[x.i].getBoundingClientRect(), r2 = this.grid.cells[best.i].getBoundingClientRect();
-        moves.push({ cn, dx: r2.left - r1.left, dy: r2.top - r1.top });
-      }
-      const gap = moves.length > 14 ? 30 : 60;
-      moves.forEach((m, j) => {
-        m.cn.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${m.dx}px,${m.dy}px) scale(.15)`, opacity: 0 }],
-          { duration: 550, delay: j * gap, easing: 'cubic-bezier(.55,0,.9,.45)', fill: 'forwards' });
-      });
-      await sleep(550 + moves.length * gap);
-      sfx.coin();
-      this.msg(`Le bocal déborde : bonbons ×${fxv(a.coin / b)} récoltés !`);
-      sfx.bigWin();
-      potCells.forEach((x) => { const p = center(this.grid.cells[x.i]); fx.burst(p.x, p.y, 16, NEON, 7); });
-      await this.wait(700);
-      moves.forEach((m) => {
-        m.cn.getAnimations().forEach((an) => an.cancel());
-        m.cn.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: 'ease-out' });
-      });
-      await this.wait(700);
-      potCells.forEach((x) => this.grid.cells[x.i].classList.remove('pulse'));
-    }
-    const parts = [];
-    if (a.coin > 0) parts.push(`bonbons ×${fxv(a.coin / b)}`);
-    if (a.pots > 0) parts.push(`${a.pots} bocal${a.pots > 1 ? 'x' : ''} (bonbons comptés ×${1 + a.pots})`);
-    this.msg(`${parts.join(' · ')} → +${fmtC(Math.round(a.pay))}`);
-    if (a.pay >= b * 10) this.cheer();
-    await this.wait(1100);
-    this.slotEl.classList.remove('cq-magic');
-    this.grid.cells.forEach((c) => { c.querySelector('.itm')?.remove(); c.classList.remove('revealed', 'rbon', 'pulse'); });
-    if (mode !== 'B') this.applyGold(null);
-  }
-
-  async bonus(mode) {
-    let left = mode === 'A' ? 8 : 12, gold = null, tot = 0, hadRb = false, done = 0;
+  // Same rules as the simulator: the multiplier carries over from spin to spin, +5 spins for 3 crowns.
+  async bonus() {
+    let left = FS.spins, lv = 0, tot = 0, done = 0;
     const b = this.bet, cap = b * CAPX;
     this.lastStake = b;
-    await this.featureIntro(MODEN[mode].toUpperCase(), `${left} tours gratuits · ${MODESUB[mode]}`, art('cqs'));
+    await this.featureIntro('BAL DE LA REINE', `${FS.spins} tours gratuits · le multiplicateur ne redescend jamais`, art('cqs'));
     this.slotEl.classList.add('in-free');
+    this.setLv(0);
     while (left > 0 && tot < cap && !this.dead) {
       left--; done++;
-      this.setBanner(`<b>${MODEN[mode].toUpperCase()}</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
-      const res = spin({ bet: b, fs: true, mode, gold, forceRainbow: left === 0 && !hadRb });
-      if (res.rb > 0) hadRb = true;
-      await this.play(res, true, mode);
-      gold = res.gold;
-      this.applyGold(gold);
+      this.setBanner(`<b>BAL DE LA REINE</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill">Multiplicateur ×${mOf(lv)}</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
+      const res = spin({ bet: b, fs: true, lv });
+      await this.play(res);
+      lv = res.lv;
       const add = Math.min(res.total, cap - tot);
       tot += add;
-      if (add > 0) this.win(Math.round(add), MODEN[mode]);
+      if (add > 0) this.win(Math.round(add), 'Bal de la Reine');
       this.setLast(Math.round(tot));
-      if (res.scat >= 3) { left += 3; await this.featureIntro('+3 TOURS', 'Encore des couronnes !', art('cqs'), 1300); }
+      if (res.scat >= FS.retrig) { left += FS.extra; await this.featureIntro(`+${FS.extra} TOURS`, 'Encore des couronnes !', art('cqs'), 1300); }
       await this.wait(300);
     }
     this.slotEl.classList.remove('in-free');
     this.setBanner('');
-    this.applyGold(null);
-    await this.celebrate(Math.round(tot), { summary: MODEN[mode].toUpperCase(), stake: b });
+    this.setLv(0);
+    await this.celebrate(Math.round(tot), { summary: 'BAL DE LA REINE', stake: b });
     return tot;
   }
 
   info() {
-    const rows = NAMES.map((n, s) => `<div class="pay-item"><div class="pay-sym svg">${art('cq' + s)}</div><div class="pay-vals"><b>${n}</b><br><span>5 : ×${(P.val[s] * P.F).toFixed(2).replace('.', ',')} · chaque case de plus : +×${(P.val[s] * P.F).toFixed(2).replace('.', ',')}</span></div></div>`).join('');
+    const pay = (s) => (P.val[s] * P.F).toFixed(2).replace('.', ',');
+    const rows = NAMES.map((n, s) => `<div class="pay-item"><div class="pay-sym svg">${art('cq' + s)}</div><div class="pay-vals"><b>${n}</b><br><span>5 : ×${pay(s)} · chaque case de plus : +×${pay(s)}</span></div></div>`).join('');
+    const sp = [HEART, JAR, WAND].map((s, k) => `<div class="pay-item"><div class="pay-sym svg">${art(SPART[s])}</div><div class="pay-vals"><b>${SPN[s]}</b><br><span>Grappe de ${[8, 10, 12][k]}+ · ${SPD[s]}</span></div></div>`).join('');
     return this.rules(`<h4>Symboles (× la mise)</h4><div class="paytable">${rows}
-      <div class="pay-item"><div class="pay-sym svg">${art('cqs')}</div><div class="pay-vals"><b>Couronne (scatter)</b><br><span>3 / 4 / 5 = les 3 bonus</span></div></div>
-      <div class="pay-item"><div class="pay-sym svg">${art('cqw')}</div><div class="pay-vals"><b>Baguette magique</b><br><span>Révèle toutes les cases pailletées</span></div></div></div>
-      <h4>Cases pailletées</h4><p>Grille 6×5, grappes de 5+ en cascade. Chaque case d’une grappe gagnante devient <b>pailletée</b>. Avec une <b>baguette magique</b> sur la grille, elles se révèlent : ${ITEMN.b.toLowerCase()}s (×0,4 à ×1), ${ITEMN.s.toLowerCase()}s (×2 à ×5), ${ITEMN.g.toLowerCase()}s (×10 à ×100), <b>cœurs</b> qui multiplient les bonbons des 4 cases autour (×2 à ×10, jusqu’à ×100 en bonus), et <b>bocaux</b> qui aspirent tous les bonbons et ajoutent les gains des cascades.</p>
-      <h4>Bonus</h4><p>3 couronnes : <b>${MODEN.A}</b> (8 tours, les cases restent jusqu’au coup de baguette). 4 : <b>${MODEN.B}</b> (12 tours, cases pailletées permanentes). 5 : <b>${MODEN.C}</b> (12 tours, baguette à chaque tour). +3 tours avec 3 couronnes. Au moins un coup de baguette garanti.</p>
-      <h4>Chasse aux couronnes</h4><p>Mise ×2, couronnes 1,65 fois plus fréquentes.</p>
-      <h4>Achats</h4><p>Baguette garantie ×${RBC.toString().replace('.', ',')} · ${MODEN.A} ×${PA} · ${MODEN.B} ×${PB}. Gain maximum ×10 000.</p>`);
+      <div class="pay-item"><div class="pay-sym svg">${art('cqs')}</div><div class="pay-vals"><b>Couronne</b><br><span>4 ou plus : Bal de la Reine</span></div></div></div>
+      <h4>Multiplicateur de cascades</h4><p>Grille 6×5, grappes de 5+ (horizontal ou vertical). Les bonbons gagnants disparaissent et d’autres tombent. Chaque cascade fait monter le multiplicateur du tour : ${P.ladder.map((m) => `×${m}`).join(', ')}.</p>
+      <h4>Bonbons spéciaux</h4><div class="paytable">${sp}</div><p>Une grande grappe laisse un bonbon spécial à sa place. Quand plus aucune grappe ne se forme, les bonbons spéciaux explosent : chaque bonbon effacé paie ${String(P.piece * 100)} % de sa valeur de grappe, multiplicateur compris, puis les cascades reprennent.</p>
+      <h4>Bal de la Reine</h4><p>4 couronnes ou plus : ${FS.spins} tours gratuits. Le multiplicateur <b>ne redescend jamais</b> pendant le bonus et des bonbons spéciaux tombent parfois du ciel. 3 couronnes : +${FS.extra} tours.</p>
+      <h4>Options</h4><p>Chasse aux couronnes : mise ×2, couronnes 1,56 fois plus fréquentes. Achats : bonbon spécial garanti ×${String(SPC).replace('.', ',')} · Bal de la Reine ×${PFS}. Gain maximum ×10 000.</p>`);
   }
 }
 
