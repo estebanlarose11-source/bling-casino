@@ -1183,6 +1183,12 @@ body.gated { overflow: hidden; }
 .g-anubis.judge .jrow > div.hit b { animation: anHit .5s cubic-bezier(.3, 1.8, .5, 1); }
 @keyframes anHit { 0% { transform: skewX(-6deg) scale(1.45); filter: drop-shadow(0 0 14px #fff) brightness(1.4); } }
 .g-anubis.judge .jrow .lbl { top: 100%; }
+/* skull light: an orb climbs from the skull to the column's multiplier */
+.an-beam { position: fixed; z-index: 96; width: 26px; height: 26px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff 0 22%, var(--c) 50%, transparent 72%); box-shadow: 0 0 18px 6px var(--c), 0 0 46px 14px color-mix(in srgb, var(--c) 45%, transparent); }
+.an-beam-dot { position: fixed; z-index: 95; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, var(--c) 60%); box-shadow: 0 0 10px 3px var(--c); animation: anBeamDot .6s ease-out forwards; }
+@keyframes anBeamDot { to { transform: scale(.1); opacity: 0; } }
+.g-anubis.judge .jrow > div.charged::before { content: ''; position: absolute; left: 50%; top: 40%; width: 130%; aspect-ratio: 1; border-radius: 50%; pointer-events: none; transform: translate(-50%, -50%); background: radial-gradient(circle, rgba(255, 255, 255, .7), rgba(192, 132, 252, .45) 35%, transparent 70%); animation: anCharge .7s ease-out forwards; }
+@keyframes anCharge { from { opacity: 1; transform: translate(-50%, -50%) scale(.3); } to { opacity: 0; transform: translate(-50%, -50%) scale(1.4); } }
 /* respins: three bars under the grid */
 .jbars { display: none; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px auto 4px; width: min(100%, calc((100vh - var(--chrome)) * 5 / 6)); min-width: min(100%, 240px); padding: 0 6px; }
 .g-anubis.judge .jbars { display: grid; }
@@ -5866,7 +5872,7 @@ const { getGame } = __mods['games/index.js'];
 const UPDATES = [
   {
     game: 'anubis', date: '2026-10-31', title: 'Jugement : cubes multiplicateurs',
-    items: ['Plus de glaçons : le cube bleu tombe et devient un cube noir marqué du multiplicateur de sa colonne', 'Chaque cube garde sa valeur, même si la colonne monte ensuite', 'En haut de chaque colonne : seulement son multiplicateur', 'Cube de lave : tous les cubes s’accumulent sur le dernier'],
+    items: ['Plus de glaçons : le cube bleu tombe et devient un cube noir marqué du multiplicateur de sa colonne', 'Chaque cube garde sa valeur, même si la colonne monte ensuite', 'En haut de chaque colonne : seulement son multiplicateur', 'Cube de lave : tous les cubes s’accumulent sur le dernier', 'Crâne noir : une lumière monte jusqu’au multiplicateur de la colonne'],
   },
   {
     game: 'dragons', date: '2026-10-31', title: 'Grille agrandie', isNew: true,
@@ -8257,7 +8263,7 @@ const FILES = {
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'ec65ad09e6'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f7ff05ea7f'],
-  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '8a359c54ec'],
+  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '5429747e2d'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '9640e5a788'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],

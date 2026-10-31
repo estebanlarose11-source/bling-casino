@@ -299,6 +299,33 @@ class AnubisGame extends BaseGame {
     void l.offsetWidth; l.classList.add('go');
   }
 
+  // A glowing orb flies from element a up to element b, leaving a trail of sparks, and bursts on arrival.
+  async beam(a, b, color) {
+    const p = center(a), q = center(b);
+    const orb = el('div', 'an-beam');
+    orb.style.cssText = `left:${p.x}px;top:${p.y}px;--c:${color}`;
+    document.body.appendChild(orb);
+    const dx = q.x - p.x, dy = q.y - p.y, dur = this.turbo ? 420 : 760;
+    const anim = orb.animate([
+      { transform: 'translate(-50%,-50%) scale(.3)', opacity: 0 },
+      { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 1, offset: 0.15 },
+      { transform: `translate(calc(-50% + ${dx * 0.12}px), calc(-50% + ${dy * 0.12}px)) scale(1)`, offset: 0.3 },
+      { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1.1)`, opacity: 1 },
+    ], { duration: dur, easing: 'cubic-bezier(.55,0,.35,1)' });
+    const iv = setInterval(() => {
+      const r = orb.getBoundingClientRect(), d = el('i', 'an-beam-dot');
+      d.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top + r.height / 2}px;--c:${color}`;
+      document.body.appendChild(d);
+      setTimeout(() => d.remove(), 650);
+    }, 18);
+    await anim.finished;
+    clearInterval(iv);
+    orb.remove();
+    fx.burst(q.x, q.y, 26, [color, '#fff', '#fde68a'], 6);
+    const top = b.closest('div');
+    top.classList.remove('charged'); void top.offsetWidth; top.classList.add('charged');
+  }
+
   // Lava cube (or a column that reached the top): every cube of column c piles onto the last one, which takes the
   // sum and drops to the bottom of the column, freeing the cells above it.
   async pile(c, x, why) {
@@ -450,11 +477,13 @@ class AnubisGame extends BaseGame {
           return;
         }
         if (!x.mod) { x.m = n; x.mod = true; } else x.m += n;
-        fx.trail(p, center(this.jrow.children[c]), big ? '#fde047' : '#a855f7', 10);
-        this.label(c, '+' + fxv(n), big ? 'lg' : 'ls');
-        await this.grid.shatter([i3], big ? ['#fde047', '#fff', '#f59e0b'] : ['#a855f7', '#27272a', '#e4e4e7']);
+        // a ball of light leaves the skull and climbs to the column's multiplier, which only changes when it arrives
+        const shat = this.grid.shatter([i3], big ? ['#fde047', '#fff', '#f59e0b'] : ['#a855f7', '#27272a', '#e4e4e7']);
+        await this.beam(this.grid.cells[i3], this.jrow.children[c].querySelector('b'), big ? '#fde047' : '#c084fc');
         draw();
+        this.label(c, '+' + fxv(n), big ? 'lg' : 'ls');
         this.grid.bump(this.jrow.children[c]);
+        await shat;
         if (big) { this.flash('rgba(226,232,240,.6)'); sfx.jackpot(); } else sfx.upgrade();
         await this.wait(300); this.lava(i3);
       } else if (k === 'g') {
