@@ -324,6 +324,35 @@ class AnubisGame extends BaseGame {
     this.grid.cells[fi].classList.remove('merged', 'heat');
   }
 
+  // Drops html into cell i: it falls from row fromRow (-1 = above the grid) through the empty cells, accelerating,
+  // then hits the stack (squash, the cube below takes the blow, dust) and becomes the cell's content.
+  async land(i, html, cls, fromRow) {
+    const c = Math.floor(i / R), row = i % R;
+    const g = this.grid.el.getBoundingClientRect(), tr = this.grid.cells[i].getBoundingClientRect();
+    const top0 = this.grid.cells[c * R].getBoundingClientRect(), pitch = this.grid.cells[c * R + 1].getBoundingClientRect().top - top0.top;
+    const fly = el('div', `sg-cell jfly ${cls}`, `<div class="sg-sym">${html}</div>`);
+    fly.style.cssText = `left:${tr.left - g.left}px;top:${tr.top - g.top}px;width:${tr.width}px;height:${tr.height}px`;
+    this.grid.el.appendChild(fly);
+    const dist = row - fromRow;
+    if (dist > 0) {
+      const dy = (fromRow - row) * pitch, T = (this.turbo ? 50 : 90) + Math.sqrt(dist) * (this.turbo ? 80 : 165);
+      this.grid.cells[i].classList.add('target');
+      await fly.animate([{ transform: `translateY(${dy}px)`, opacity: fromRow < 0 ? 0 : 1 }, { transform: `translateY(${dy * 0.92}px)`, opacity: 1, offset: 0.12 }, { transform: 'translateY(0)' }],
+        { duration: T, easing: 'cubic-bezier(.5,0,.95,.6)', fill: 'forwards' }).finished;
+      this.grid.cells[i].classList.remove('target');
+    }
+    if (this.dead) return;
+    fly.firstChild.animate([{ transform: 'scale(1.16,.8) translateY(9%)' }, { transform: 'scale(.95,1.06)', offset: 0.5 }, { transform: 'none' }], { duration: 260, easing: 'ease-out' });
+    if (row < R - 1) this.grid.sym(i + 1).animate([{ transform: 'scale(1.07,.88) translateY(6%)' }, { transform: 'none' }], { duration: 240, easing: 'ease-out' });
+    sfx.land();
+    const b = fly.getBoundingClientRect();
+    fx.burst(b.left + b.width * 0.2, b.bottom - 2, 5, ['#e7e5e4', '#a8a29e', '#bae6fd'], 2.5);
+    fx.burst(b.left + b.width * 0.8, b.bottom - 2, 5, ['#e7e5e4', '#a8a29e', '#bae6fd'], 2.5);
+    await sleep(this.turbo ? 90 : 170);
+    this.paint(i, html, cls);
+    fly.remove();
+  }
+
   // Respin of one column: a fluid cascade of black cubes runs through its empty cells. stop(item) slows it down
   // and, when something drops, lands that item in the column's next free slot (no item: the cubes fade away).
   startStrip(c, n) {
@@ -345,7 +374,7 @@ class AnubisGame extends BaseGame {
         loop.cancel();
         const extra = 6;
         const tiles = Array.from({ length: free + extra }, () => tile());
-        if (itemHTML) tiles[free - 1] = tile(itemHTML, 'item');
+        if (itemHTML) tiles[0] = tile(itemHTML, 'item'); // the item rides in on the top tile, then falls (land)
         reel.innerHTML = tiles.join('');
         box.classList.remove('spin');
         await reel.animate([{ transform: `translateY(${-extra * pitch}px)` }, { transform: `translateY(${pitch * 0.14}px)`, offset: 0.82 }, { transform: 'translateY(0)' }],
@@ -381,21 +410,16 @@ class AnubisGame extends BaseGame {
     const addCube = async (c, landed) => {
       const x = cols[c];
       if (x.n >= R) return;
-      const v = x.m, row = R - 1 - x.n, i = this.cubeCell(c, x.n);
+      const v = x.m, i = this.cubeCell(c, x.n);
       x.n++; x.T += v;
-      this.paint(i, art('cb') + lab(fxv(v)), 'cube');
+      await this.land(i, art('cb') + lab(fxv(v)), 'cube', landed ? 0 : -1);
       draw();
-      if (!landed) await this.fall(i, row);
-      else this.grid.sym(i).animate([{ transform: 'scale(1.12,.86)' }, { transform: 'none' }], { duration: 220, easing: 'ease-out' });
-      sfx.land();
-      const p = center(this.grid.cells[i]); fx.burst(p.x, p.y + 10, 14, ['#bae6fd', '#38bdf8', '#fff'], 4);
+      const p = center(this.grid.cells[i]); fx.burst(p.x, p.y + 10, 10, ['#bae6fd', '#38bdf8', '#fff'], 3);
       if (x.n >= R) await this.melt(c, x, 'full'); // the column reached the top: it melts and keeps going
     };
     const showAt = async (c, x, id, txt, cls, landed) => {
       const i = this.cubeCell(c, x.n);
-      this.paint(i, art(id) + (txt ? lab(txt) : ''), cls);
-      if (!landed) await this.fall(i, R - 1 - x.n);
-      sfx.land();
+      await this.land(i, art(id) + (txt ? lab(txt) : ''), cls, landed ? 0 : -1);
       return i;
     };
     const apply = async (c, k, landed) => {
