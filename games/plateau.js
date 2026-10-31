@@ -82,7 +82,8 @@ function cellRC(i) {
 function boardHTML() {
   return BOARD.map((v, i) => {
     const [r, c] = cellRC(i);
-    return `<div class="pt-cell ${i ? tier(v) : 'start'}" data-i="${i}" style="grid-row:${r + 1};grid-column:${c + 1}">${i ? `<b>×${v}</b>` : '<b>DÉPART</b><small>➜</small>'}</div>`;
+    const corner = i % 7 === 0;
+    return `<div class="pt-cell ${i ? tier(v) : 'start'}${corner ? ' corner' : ''}" data-i="${i}" style="grid-row:${r + 1};grid-column:${c + 1}"><i>${i}</i>${i ? `<b>×${v}</b>${v >= 20 ? '<em>★</em>' : ''}` : '<b>DÉPART</b><small>⟲</small>'}</div>`;
   }).join('');
 }
 
@@ -105,9 +106,9 @@ class PlateauGame extends BaseGame {
           <div class="pt-zone"><div class="pt-ptr"></div>${wheelSVG()}<div class="pt-hub">LE<br>PLATEAU</div></div>
           <div class="pt-boardwrap" hidden>
             <div class="pt-board">${boardHTML()}
-              <div class="pt-mid"><h3 class="pt-title">2 LANCERS</h3><div class="pt-dice">${dieHTML(1)}${dieHTML(1)}</div>
-                <div class="pt-info"><span>Lancers : <b class="pt-left">2</b></span><span>Total : <b class="pt-tot">×0</b></span></div><div class="pt-say"></div></div>
-              <div class="pt-pawn"></div>
+              <div class="pt-mid"><div class="pt-logo">LE PLATEAU</div><h3 class="pt-title">2 LANCERS</h3><div class="pt-dice">${dieHTML(1)}${dieHTML(1)}</div>
+                <div class="pt-info"><span><small>LANCERS</small><b class="pt-left">2</b></span><span class="tot"><small>TOTAL</small><b class="pt-tot">×0</b></span></div><div class="pt-say"></div></div>
+              <div class="pt-pawn"><i></i></div>
             </div>
           </div>
         </div>`,
@@ -131,7 +132,7 @@ class PlateauGame extends BaseGame {
   }
 
   // Spins the wheel to case idx: fast start, long slow end, a tick on every case.
-  spin(idx) {
+  spin(idx, onFrame) {
     const from = this.cur, delta = ((-(idx + 0.5) * A - from) % 360 + 360) % 360;
     const to = from + 360 * (this.turbo ? 3 : 5) + delta + (Math.random() - 0.5) * A * 0.6;
     this.cur = to;
@@ -145,10 +146,41 @@ class PlateauGame extends BaseGame {
         this.wheel.style.transform = `rotate(${a}deg)`;
         const n = Math.floor(a / A);
         if (n !== lastN) { lastN = n; tick(p > 0.7 ? 0.16 : 0.05); ptr.animate([{ transform: 'translateX(-50%) rotate(-16deg)' }, { transform: 'translateX(-50%)' }], { duration: 140 }); }
+        onFrame?.(p);
         if (p < 1) requestAnimationFrame(frame); else res();
       };
       requestAnimationFrame(frame);
     });
+  }
+
+  // Camera: closes in on the pointer for the whole spin (gentle start, fully in at the stop), like La Roue Folle.
+  zoomStart() {
+    const view = this.q('.pt-view');
+    view.classList.remove('done', 'unzoom');
+    view.classList.add('zooming');
+    this.zoomTo(0);
+  }
+  zoomTo(p) {
+    const view = this.q('.pt-view');
+    if (!view || this.dead) return;
+    const e = p * p * (3 - 2 * p) * 0.35 + Math.pow(p, 2.2) * 0.65;
+    view.style.setProperty('--zs', (1 + 1.4 * e).toFixed(4));
+    view.style.setProperty('--zp', e.toFixed(3));
+  }
+  async zoomOnResult(seg, mult) {
+    const view = this.q('.pt-view');
+    this.zoomTo(1);
+    view.dataset.seg = (ICON[seg] ? NAME[seg].toUpperCase() : seg) + (mult > 1 ? ` · ×${mult}` : '');
+    view.style.setProperty('--seg', COL[seg]);
+    view.classList.add('done');
+    sfx.upgrade?.();
+    await this.wait(1500);
+    if (this.dead) return;
+    view.classList.add('unzoom');
+    view.style.setProperty('--zs', 1);
+    view.style.setProperty('--zp', 0);
+    await this.wait(900);
+    view.classList.remove('zooming', 'done', 'unzoom');
   }
 
   onMain() {
@@ -169,12 +201,15 @@ class PlateauGame extends BaseGame {
         this.q('.pt-hl')?.remove();
         const idx = Math.floor(Math.random() * NS);
         seg = SEGS[idx];
-        await this.spin(idx);
+        this.zoomStart();
+        await this.spin(idx, (p) => this.zoomTo(p));
         if (this.dead) return;
         this.histAdd(seg);
         this.wheel.insertAdjacentHTML('beforeend', `<path class="pt-hl" d="${slicePath(idx)}" fill="#fff"/>`);
         this.q('.pt-hub').innerHTML = ICON[seg] ? ICON[seg](40) : `<b class="big">${seg}</b>`;
         const p = center(this.q('.pt-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);
+        await this.zoomOnResult(seg, mult);
+        if (this.dead) return;
         if (seg !== 'ch') break;
         mult = CHANCE_X;
         sfx.feature(); fx.confetti(50);
@@ -216,7 +251,7 @@ class PlateauGame extends BaseGame {
     const setInfo = () => { this.q('.pt-left').textContent = left; this.q('.pt-tot').textContent = `×${M}`; };
     setInfo();
     this.q('.pt-say').textContent = 'Lance les dés et avance sur le plateau !';
-    zone.classList.add('away'); wrap.hidden = false;
+    zone.hidden = true; wrap.hidden = false;
     wrap.animate([{ opacity: 0, transform: 'scale(.85)' }, { opacity: 1, transform: 'none' }], { duration: 400, easing: 'cubic-bezier(.3,1.4,.5,1)' });
     this.placePawn(0, false);
     const br = this.q('.pt-board').getBoundingClientRect();
@@ -239,6 +274,7 @@ class PlateauGame extends BaseGame {
       M += m.v;
       if (!m.dbl) left--;
       setInfo();
+      const tb = this.q('.pt-tot'); tb.classList.remove('bump'); void tb.offsetWidth; tb.classList.add('bump');
       const p = center(cell);
       if (m.v) { fx.burst(p.x, p.y, 14 + Math.min(40, m.v), ['#fde047', '#fff', COL.b4], 6); fx.floatText(p.x, p.y - 20, `+×${m.v}`, '#fde047', m.v >= 20 ? 28 : 20); }
       m.v >= 20 ? sfx.bigWin?.() : sfx.coin();
@@ -246,7 +282,10 @@ class PlateauGame extends BaseGame {
     }
     this.q('.pt-say').innerHTML = `Total du bonus : <b>×${M}</b>${mult > 1 ? ` × ${mult} (Chance)` : ''}`;
     await this.wait(1500);
-    wrap.hidden = true; zone.classList.remove('away');
+    wrap.animate([{ opacity: 1 }, { opacity: 0, transform: 'scale(.92)' }], { duration: 300 });
+    await this.wait(280);
+    wrap.hidden = true; zone.hidden = false;
+    zone.animate([{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 400, easing: 'cubic-bezier(.3,1.4,.5,1)' });
     return M;
   }
 

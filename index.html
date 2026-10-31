@@ -2562,30 +2562,57 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pt-hub .big { font: 900 clamp(26px, 6vw, 40px) 'Bebas Neue', Impact, sans-serif; color: #fff; }
 .pt-hub .x { font-size: clamp(18px, 4vw, 26px); color: #fde047; animation: ptPulse .6s ease-in-out infinite alternate; }
 @keyframes ptPulse { to { transform: scale(1.15); } }
-.pt-boardwrap { position: relative; display: flex; justify-content: center; margin: 12px 0; }
-.pt-board { position: relative; width: min(520px, 94vw, calc(100vh - 260px)); min-width: 280px; aspect-ratio: 1; display: grid; grid-template: repeat(8, 1fr) / repeat(8, 1fr); gap: 3px; padding: 6px; border-radius: 16px; background: linear-gradient(135deg, #14532d, #0b2e1c); box-shadow: 0 16px 40px rgba(0, 0, 0, .6), inset 0 0 0 3px #facc15; }
-.pt-cell { display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 6px; background: #f8fafc; color: #0f172a; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .18); transition: transform .2s, box-shadow .2s; }
-.pt-cell b { font: 900 clamp(10px, 2.6vw, 16px) 'Bebas Neue', Impact, sans-serif; letter-spacing: .5px; }
-.pt-cell small { font-size: 12px; font-weight: 900; }
+.pt-view { border-radius: 18px; }
+.pt-view.zooming { overflow: hidden; }
+.pt-view .pt-zone { transform-origin: 50% 3%; }
+.pt-view.zooming .pt-zone { transform: scale(var(--zs, 1)); }
+.pt-view.unzoom .pt-zone { transition: transform .9s cubic-bezier(.4, 0, .2, 1); }
+.pt-view.zooming .pt-hub { opacity: calc(1 - var(--zp, 0) * 2.5); }
+.pt-view.unzoom .pt-hub { transition: opacity .9s; }
+.pt-view::before { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0; background: radial-gradient(60% 55% at 50% 30%, transparent 55%, rgba(0, 0, 0, .75)); }
+.pt-view::after { content: attr(data-seg); position: absolute; left: 50%; bottom: 10%; z-index: 6; transform: translate(-50%, 20px) scale(.8); opacity: 0; pointer-events: none; white-space: nowrap;
+  padding: 8px 22px; border-radius: 999px; background: var(--seg, #ffd23f); color: #fff; font: 900 clamp(18px, 4vw, 30px) KeCoin, Orbitron, sans-serif; letter-spacing: 1px;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .45); box-shadow: 0 8px 30px rgba(0, 0, 0, .5), 0 0 30px var(--seg, #ffd23f); transition: transform .45s cubic-bezier(.3, 1.6, .5, 1) .25s, opacity .3s .25s; }
+.pt-view.zooming::before { opacity: var(--zp, 0); }
+.pt-view.unzoom::before { transition: opacity .9s; }
+.pt-view.done::after { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.pt-zone[hidden], .pt-boardwrap[hidden] { display: none !important; }
+.pt-boardwrap { position: relative; display: flex; justify-content: center; margin: 14px 0; }
+.pt-board { position: relative; width: min(540px, 94vw, calc(100vh - 230px)); min-width: 280px; aspect-ratio: 1; display: grid; grid-template: repeat(8, 1fr) / repeat(8, 1fr); gap: 3px; padding: 8px; border-radius: 18px;
+  background: radial-gradient(circle at 50% 45%, #1f7a45, #0d3b22 70%), #0d3b22; box-shadow: 0 18px 44px rgba(0, 0, 0, .65), inset 0 0 0 4px #facc15, inset 0 0 0 7px #7c5a0b, inset 0 0 40px rgba(0, 0, 0, .5); }
+.pt-cell { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 7px; color: #0f172a; background: linear-gradient(160deg, #fff, #e2e8f0); box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .2), inset 0 2px 0 rgba(255, 255, 255, .8), 0 2px 3px rgba(0, 0, 0, .35); transition: transform .2s, box-shadow .2s; }
+.pt-cell i { position: absolute; left: 3px; top: 1px; font: 700 7px Inter, sans-serif; font-style: normal; opacity: .45; }
+.pt-cell b { font: 900 clamp(11px, 2.8vw, 18px) 'Bebas Neue', Impact, sans-serif; letter-spacing: .5px; }
+.pt-cell em { position: absolute; right: 2px; top: 0; font-size: 9px; font-style: normal; color: #fff7d6; text-shadow: 0 0 4px #f59e0b; }
+.pt-cell small { font-size: 13px; font-weight: 900; }
+.pt-cell.corner b { font-size: clamp(13px, 3.2vw, 21px); }
 .pt-cell.start { background: linear-gradient(135deg, #ef4444, #991b1b); color: #fff; }
 .pt-cell.start b { font-size: clamp(8px, 1.9vw, 12px); }
-.pt-cell.t1 { background: #e2e8f0; } .pt-cell.t2 { background: #bae6fd; } .pt-cell.t3 { background: #bbf7d0; }
-.pt-cell.t4 { background: linear-gradient(135deg, #fde047, #f59e0b); }
-.pt-cell.t5 { background: linear-gradient(135deg, #f0abfc, #a21caf); color: #fff; }
-.pt-cell.pass { box-shadow: inset 0 0 0 2px rgba(250, 204, 21, .7); }
-.pt-cell.hit { transform: scale(1.12); z-index: 1; box-shadow: 0 0 0 3px #fde047, 0 0 18px rgba(253, 224, 71, .9); }
-.pt-mid { grid-row: 2 / 8; grid-column: 2 / 8; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border-radius: 12px; background: radial-gradient(circle, rgba(255, 255, 255, .08), transparent 70%); text-align: center; }
+.pt-cell.t2 { background: linear-gradient(160deg, #e0f2fe, #7dd3fc); }
+.pt-cell.t3 { background: linear-gradient(160deg, #dcfce7, #4ade80); }
+.pt-cell.t4 { background: linear-gradient(160deg, #fef9c3, #f59e0b); }
+.pt-cell.t5 { background: linear-gradient(160deg, #f5d0fe, #a21caf); color: #fff; animation: ptGlow 1.6s ease-in-out infinite alternate; }
+@keyframes ptGlow { to { box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .2), 0 0 14px #f0abfc; } }
+.pt-cell.pass { box-shadow: inset 0 0 0 2px rgba(250, 204, 21, .9), 0 2px 3px rgba(0, 0, 0, .35); }
+.pt-cell.hit { transform: scale(1.16); z-index: 2; box-shadow: 0 0 0 3px #fde047, 0 0 22px rgba(253, 224, 71, .95); }
+.pt-mid { grid-row: 2 / 8; grid-column: 2 / 8; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border-radius: 14px; text-align: center; background: radial-gradient(circle, rgba(255, 255, 255, .1), transparent 70%); }
+.pt-logo { position: absolute; inset: 0; display: grid; place-items: center; font: 900 clamp(30px, 8vw, 58px) 'Bebas Neue', Impact, sans-serif; letter-spacing: 4px; color: rgba(255, 255, 255, .06); transform: rotate(-24deg); pointer-events: none; }
 .pt-title { margin: 0; font: 900 clamp(22px, 5vw, 36px) 'Bebas Neue', Impact, sans-serif; letter-spacing: 2px; color: #fde047; text-shadow: 0 3px 0 #713f12; }
 .pt-dice { display: flex; gap: 14px; }
 .pt-die { width: clamp(40px, 9vw, 60px); aspect-ratio: 1; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 14%; gap: 6%; border-radius: 22%; background: linear-gradient(145deg, #fff, #e5e7eb); box-shadow: 0 6px 0 #9ca3af, 0 10px 18px rgba(0, 0, 0, .5); }
 .pt-die i { border-radius: 50%; } .pt-die i.on { background: radial-gradient(circle at 35% 35%, #374151, #000); }
 .pt-die.rolling { animation: ptRoll .14s linear infinite; }
 @keyframes ptRoll { 50% { transform: rotate(20deg) translateY(-6px); } }
-.pt-info { display: flex; gap: 14px; font-weight: 700; font-size: 14px; color: #d1fae5; }
-.pt-info b { font: 900 16px KeCoin, Orbitron, sans-serif; color: #fff; }
+.pt-info { display: flex; gap: 10px; }
+.pt-info span { display: flex; flex-direction: column; align-items: center; min-width: 74px; padding: 4px 10px; border-radius: 10px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(250, 204, 21, .5); }
+.pt-info small { font: 800 9px Inter, sans-serif; letter-spacing: 1.5px; color: #bbf7d0; }
+.pt-info b { font: 900 18px KeCoin, Orbitron, sans-serif; color: #fff; }
+.pt-info .tot b { color: #fde047; }
 .pt-say { min-height: 22px; font-weight: 700; font-size: 14px; color: #fff; padding: 0 8px; }
 .pt-say .dbl { color: #fde047; }
-.pt-pawn { position: absolute; z-index: 3; width: 7%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50% 50% 45% 45%; background: radial-gradient(circle at 35% 30%, #fff, #ef4444 40%, #7f1d1d); box-shadow: 0 4px 6px rgba(0, 0, 0, .6), 0 0 0 2px #fff; transition: left .14s ease-out, top .14s ease-out; pointer-events: none; }
+.pt-pawn { position: absolute; z-index: 3; width: 6.5%; aspect-ratio: 1; translate: -50% -50%; transition: left .14s ease-out, top .14s ease-out; pointer-events: none; filter: drop-shadow(0 5px 3px rgba(0, 0, 0, .55)); }
+.pt-pawn i { position: absolute; inset: 0; border-radius: 50% 50% 46% 46%; background: radial-gradient(circle at 35% 28%, #fff, #fde047 30%, #d97706 70%, #78350f); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .25), 0 0 0 2px #fff; }
+.pt-pawn::after { content: ''; position: absolute; left: 20%; right: 20%; bottom: -14%; height: 22%; border-radius: 50%; background: rgba(0, 0, 0, .35); z-index: -1; }
 .pt-spots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
 .pt-spot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 4px; border-radius: 12px; background: linear-gradient(180deg, color-mix(in srgb, var(--sc) 85%, #fff), var(--sc)); border: 2px solid rgba(255, 255, 255, .5); box-shadow: 0 4px 0 color-mix(in srgb, var(--sc) 55%, #000); color: #fff; }
 .pt-spot b { font: 900 26px/1 'Bebas Neue', Impact, sans-serif; text-shadow: 0 2px 0 rgba(0, 0, 0, .35); display: grid; place-items: center; min-height: 30px; }
@@ -6363,6 +6390,10 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
+    game: 'plateau', date: '2026-10-31', title: 'Zoom et nouveau plateau',
+    items: ['La caméra zoome sur la flèche pendant que la roue tourne', 'Le plateau du bonus remplace la roue seulement quand tu gagnes un bonus', 'Plateau relooké : cases en relief, grosses cases qui brillent, pion doré'],
+  },
+  {
     game: 'peche', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
     items: ['Une roue avec des cases ×2 et trois poissons à pêcher', '4 éclairs à chaque lancer multiplient des cases, poissons compris', 'Le pêcheur attrape un poisson : plus il est gros, plus il se débat', 'Poisson bleu jusqu’à ×100, orange ×500, rouge ×5 000 !'],
   },
@@ -8891,7 +8922,7 @@ const FILES = {
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', 'c401e351a3'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', '463c45c93a'],
-  plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '2f4a09a1d8'],
+  plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '8809dc3baa'],
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', '697b9e42cb'],
 };
 const loading = {};
