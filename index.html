@@ -1984,6 +1984,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .promos .app-promo > span:nth-child(2) { min-width: 0; }
 .promos .app-promo small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ms-promo .wp-ico { animation: none; }
+.defi-promo { background: linear-gradient(90deg, rgba(56, 189, 248, .18), rgba(124, 58, 237, .14)); border-color: rgba(56, 189, 248, .45); }
+.defi-promo .wp-ico { animation: none; }
 .wheel-promo { background: linear-gradient(90deg, rgba(251, 191, 36, .2), rgba(255, 35, 64, .12)); border-color: rgba(251, 191, 36, .45); }
 .wp-ico { font-size: 34px; line-height: 1; animation: chSpin 8s linear infinite; }
 .app-promo small { display: block; color: var(--muted); font-size: 12.5px; }
@@ -2199,6 +2201,26 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .ms-chest .btn { margin-left: auto; }
 @media (max-width: 560px) { .ms-row { flex-wrap: wrap; } .ms-row > .btn, .ms-row > .ms-ok { margin-left: 44px; } }
 
+/* ============ Parrainage & Défi ============ */
+.social-page h1 { margin: 6px 0 8px; font-size: clamp(26px, 4vw, 36px); }
+.ref-box { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+.ref-box input { flex: 1 1 260px; min-width: 0; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); color: inherit; font: 600 14px Inter, sans-serif; }
+.ref-stats { display: flex; gap: 12px; margin: 12px 0 16px; }
+.ref-stats > div { flex: 1; max-width: 200px; padding: 12px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); text-align: center; }
+.ref-stats b { display: block; font: 900 22px Orbitron, sans-serif; color: #fbbf24; }
+.ref-stats small { color: var(--muted); }
+.ref-need { padding: 12px 14px; border-radius: 12px; background: rgba(251, 191, 36, .1); border: 1px solid rgba(251, 191, 36, .4); }
+.defi-top { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 22px; align-items: start; }
+.defi-cover { display: block; border-radius: 22px; overflow: hidden; box-shadow: 0 14px 40px rgba(0, 0, 0, .5); }
+.defi-cover svg { width: 100%; height: auto; display: block; }
+.defi-boards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 20px; }
+.defi-list { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; }
+.defi-list li { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); }
+.defi-list li.me { border-color: #fbbf24; }
+.defi-list li span { width: 28px; text-align: center; font-weight: 800; }
+.defi-list li em { margin-left: auto; font: 900 14px Orbitron, sans-serif; font-style: normal; color: #fbbf24; }
+@media (max-width: 700px) { .defi-top { grid-template-columns: 1fr; } .defi-cover { width: 160px; } }
+
 /* ============ Rewarded ad popup (A-ADS) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
@@ -2241,6 +2263,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
       <a href="#lobby-slot" data-nav="slots"><span>🎰</span>Machines à sous</a>
       <a href="#roue" data-nav="wheel"><span>🎡</span>Roue du jour</a>
       <a href="#missions" data-nav="missions"><span>🎯</span>Missions du jour</a>
+      <a href="#defi" data-nav="defi"><span>🏁</span>Défi de la semaine</a>
+      <a href="#parrainage" data-nav="ref"><span>🤝</span>Parrainage</a>
       <a href="#lobby-hold"><span>🪙</span>Hold & Spin</a>
       <a href="#lobby-table"><span>🎡</span>Roues & tables</a>
       <a href="#lobby-quick"><span>⚡</span>Jeux rapides</a>
@@ -2488,6 +2512,18 @@ const cloud = {
   async saveBoard(uid, entry) { await (await init()).db.collection('leaderboard').doc(uid).set(entry); },
   async top(field, n) {
     const q = await (await init()).db.collection('leaderboard').orderBy(field, 'desc').limit(n).get();
+    return q.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  },
+  // Referral: referrals/{newUid} = { by, name, at }, written once by the new account.
+  async addReferral(uid, by, name) { await (await init()).db.collection('referrals').doc(uid).set({ by, name: String(name).slice(0, 16), at: Date.now() }); },
+  async referralsOf(uid) {
+    const q = await (await init()).db.collection('referrals').where('by', '==', uid).limit(60).get();
+    return q.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  },
+  // Weekly challenge: challenges/{week}/scores/{uid} = { name, best, game, updated }.
+  async saveChallenge(week, uid, entry) { await (await init()).db.collection('challenges').doc(week).collection('scores').doc(uid).set(entry); },
+  async topChallenge(week, n) {
+    const q = await (await init()).db.collection('challenges').doc(week).collection('scores').orderBy('best', 'desc').limit(n).get();
     return q.docs.map((d) => ({ uid: d.id, ...d.data() }));
   },
 };
@@ -3444,6 +3480,161 @@ function renderMissions(root) {
 }
 
 return { renderMissions, missionStatus: status };
+})();
+
+// ---- social.js ----
+__mods['social.js'] = (() => {
+// Referral (#parrainage) and the weekly challenge (#defi), both on Firestore (see firebase/firestore.rules).
+// Referral: a link ?ref=<uid>; a new account opened from it gets REF_KE and writes referrals/{newUid} = { by };
+// the referrer collects REF_KE per friend from the parrainage page or at login.
+// Challenge: one imposed game per week; the score is the biggest win in × the stake on that game (so every bet
+// size is on an equal footing), saved in challenges/{week}/scores/{uid}.
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { toast } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+
+const REF_KE = 200, REF_MAX = 50, REF_KEY = 'spinbet_ref';
+const SITE = 'https://estebanlarose11-source.github.io/bling-casino/';
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => (profiles.mode === 'cloud' ? profiles.store.current : null);
+
+/* ---------- referral ---------- */
+(() => {
+  const m = location.search.match(/[?&]ref=([\w-]{6,64})/) || location.hash.match(/^#parrain-([\w-]{6,64})$/);
+  if (m) try { localStorage.setItem(REF_KEY, m[1]); } catch { /* ignore */ }
+})();
+const pendingRef = () => { try { return localStorage.getItem(REF_KEY); } catch { return null; } };
+const refLink = () => (uid() ? `${SITE}?ref=${uid()}` : null);
+
+// Referrer side: pays REF_KE for every friend not paid yet.
+async function collectReferrals() {
+  const me = uid();
+  if (!me) return 0;
+  const list = await cloud.referralsOf(me).catch(() => []);
+  const paid = new Set(profiles.current?.refPaid || []);
+  const fresh = list.filter((r) => !paid.has(r.uid)).slice(0, Math.max(0, REF_MAX - paid.size));
+  if (!fresh.length) return 0;
+  profiles.update('refPaid', (p) => { p.refPaid = [...paid, ...fresh.map((r) => r.uid)]; });
+  wallet.grant(REF_KE * fresh.length);
+  toast(`🤝 ${fresh.length > 1 ? `${fresh.length} amis ont rejoint` : `${esc(fresh[0].name || 'Un ami')} a rejoint`} SpinBet grâce à toi : +${fmt(REF_KE * fresh.length)}`, 'ok');
+  return fresh.length;
+}
+
+profiles.addEventListener('change', async (e) => {
+  const me = uid();
+  if (!me) return;
+  const ref = pendingRef();
+  if (e.detail?.isNew && ref && ref !== me) {
+    try {
+      await cloud.addReferral(me, ref, profiles.current?.name || '');
+      wallet.grant(REF_KE);
+      toast(`🎁 Bonus de parrainage : +${fmt(REF_KE)} !`, 'ok');
+    } catch (err) { console.error(err); }
+  }
+  try { localStorage.removeItem(REF_KEY); } catch { /* ignore */ }
+  collectReferrals();
+});
+
+async function renderReferral(root) {
+  const link = refLink(), paid = profiles.current?.refPaid?.length || 0;
+  root.innerHTML = `
+    <section class="panel social-page">
+      <span class="eyebrow">🤝 Parrainage</span>
+      <h1>Invite tes amis</h1>
+      <p class="muted">Partage ton lien. Quand un ami crée son compte avec, <b>vous gagnez ${fmt(REF_KE)} chacun</b> (jusqu’à ${REF_MAX} amis).</p>
+      ${link ? `<div class="ref-box"><input readonly value="${link}" aria-label="Ton lien de parrainage"><button class="btn primary" data-copy>Copier</button>${navigator.share ? '<button class="btn ghost" data-share>Partager</button>' : ''}</div>
+        <div class="ref-stats"><div><b>${paid}</b><small>ami${paid > 1 ? 's' : ''} parrainé${paid > 1 ? 's' : ''}</small></div><div><b>${fmt(paid * REF_KE)}</b><small>gagnés</small></div></div>
+        <button class="btn ghost" data-check>🔄 Vérifier mes nouveaux filleuls</button>`
+      : '<p class="ref-need">Le parrainage demande un <b>compte</b> (e-mail et mot de passe) : déconnecte-toi du mode invité et crée ton compte depuis l’écran d’accueil.</p>'}
+      <h4>Comment ça marche ?</h4>
+      <ol class="app-list"><li>Copie ton lien et envoie-le (WhatsApp, Snap, Discord…).</li><li>Ton ami ouvre le lien et crée son compte : il reçoit ${fmt(REF_KE)} tout de suite.</li><li>Tu reçois aussi ${fmt(REF_KE)}, ici ou à ta prochaine connexion.</li></ol>
+    </section>`;
+  const input = root.querySelector('.ref-box input');
+  root.querySelector('[data-copy]')?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(link); } catch { input.select(); document.execCommand?.('copy'); }
+    toast('Lien copié ✅', 'ok');
+  });
+  root.querySelector('[data-share]')?.addEventListener('click', () => navigator.share({ title: 'SpinBet Casino', text: `Rejoins-moi sur SpinBet Casino : ${fmt(REF_KE)} offerts à l’inscription 🎰`, url: link }).catch(() => {}));
+  root.querySelector('[data-check]')?.addEventListener('click', async (e) => {
+    e.currentTarget.disabled = true;
+    const n = await collectReferrals();
+    if (!n) toast('Pas de nouveau filleul pour l’instant');
+    else { sfx.unlock(); sfx.bigWin(); fx.coins(40); }
+    renderReferral(root);
+  });
+}
+
+/* ---------- weekly challenge ---------- */
+const CH_GAMES = ['cosmic', 'taco', 'candy', 'zeus', 'huff', 'anubis', 'bling', 'pharaon'];
+function weekOf(t = Date.now()) {
+  const d = new Date(t); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const w1 = new Date(d.getFullYear(), 0, 4);
+  const n = 1 + Math.round(((d - w1) / 864e5 - 3 + ((w1.getDay() + 6) % 7)) / 7);
+  return { key: `${d.getFullYear()}-S${String(n).padStart(2, '0')}`, n, year: d.getFullYear() };
+}
+const challengeGame = (w = weekOf()) => CH_GAMES[(w.year * 53 + w.n) % CH_GAMES.length];
+const endOfWeek = () => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + (((8 - d.getDay()) % 7) || 7)); return d; }; // next Monday 00:00
+const myBest = () => { const c = profiles.current?.challenge; return c && c.week === weekOf().key ? c.best : 0; };
+
+let saving = null;
+wallet.addEventListener('payout', (e) => {
+  const meta = e.detail.meta, g = (location.hash.match(/^#game-([\w-]+)/) || [])[1];
+  if (!meta || !profiles.current || g !== challengeGame()) return;
+  const x = Math.round((meta.x || 0) * 100) / 100;
+  if (x <= myBest()) return;
+  const w = weekOf().key;
+  profiles.update('challenge', (p) => { p.challenge = { week: w, best: x, game: g }; });
+  toast(`🏁 Nouveau record du Défi : ×${String(x).replace('.', ',')} !`, 'ok');
+  const me = uid();
+  if (me) {
+    clearTimeout(saving);
+    saving = setTimeout(() => cloud.saveChallenge(w, me, { name: profiles.current.name, best: Math.min(x, 100000), game: g, updated: Date.now() }).catch((err) => console.error(err)), 1500);
+  }
+});
+
+async function renderChallenge(root) {
+  const { getGame } = __mods['games/index.js'], { coverSVG } = __mods['covers.js'];
+  const w = weekOf(), g = getGame(challengeGame(w)), best = myBest();
+  const prev = weekOf(Date.now() - 7 * 864e5);
+  const left = endOfWeek() - Date.now(), dd = Math.floor(left / 864e5), hh = Math.floor((left % 864e5) / 3600e3);
+  root.innerHTML = `
+    <section class="panel social-page defi-page">
+      <div class="defi-top">
+        <a class="defi-cover" href="#game-${g.id}">${coverSVG(g, { square: true })}</a>
+        <div>
+          <span class="eyebrow">🏁 Défi de la semaine · ${w.key.replace('-S', ' · semaine ')}</span>
+          <h1>${g.name}</h1>
+          <p class="muted">Cette semaine, tout le monde joue à <b>${g.name}</b>. Ton score = <b>ton plus gros gain en × la mise</b> sur ce jeu : petite ou grosse mise, tout le monde part à égalité. Le n°1 gagne le badge <b>🏆 Champion du Défi</b>.</p>
+          <div class="ref-stats"><div><b>${best ? `×${String(best).replace('.', ',')}` : '—'}</b><small>ton record</small></div><div><b>${dd} j ${hh} h</b><small>avant la fin</small></div></div>
+          <a class="btn primary lg" href="#game-${g.id}">Jouer au défi</a>
+          ${!uid() ? '<p class="muted small">En invité, ton record compte pour toi mais n’apparaît pas au classement : crée un compte pour y figurer.</p>' : ''}
+        </div>
+      </div>
+      <div class="defi-boards"><div><h4>Classement de la semaine</h4><ol class="defi-list" data-board><li class="muted">Chargement…</li></ol></div>
+        <div><h4>Podium de la semaine dernière</h4><ol class="defi-list" data-prev><li class="muted">Chargement…</li></ol></div></div>
+    </section>`;
+  const row = (e, k) => `<li class="${e.uid === uid() ? 'me' : ''}"><span>${k === 0 ? '🥇' : k === 1 ? '🥈' : k === 2 ? '🥉' : `${k + 1}.`}</span><b>${esc(e.name)}</b><em>×${String(e.best).replace('.', ',')}</em></li>`;
+  const fill = async (sel, week, n) => {
+    const ol = root.querySelector(sel);
+    try {
+      const list = await cloud.topChallenge(week, n);
+      if (!ol.isConnected) return;
+      ol.innerHTML = list.length ? list.map(row).join('') : '<li class="muted">Personne pour l’instant : sois le premier !</li>';
+      if (sel === '[data-prev]' && list[0]?.uid === uid() && uid()) {
+        const badge = `Champion du Défi ${week}`;
+        if (!(profiles.current.badges || []).includes(badge)) { profiles.update('badges', (p) => { p.badges = [...(p.badges || []), badge]; }); toast(`🏆 Tu es ${badge} !`, 'ok'); fx.confetti(100); }
+      }
+    } catch (err) { console.error(err); if (ol.isConnected) ol.innerHTML = '<li class="muted">Classement indisponible pour le moment.</li>'; }
+  };
+  fill('[data-board]', w.key, 20);
+  fill('[data-prev]', prev.key, 3);
+}
+
+return { renderReferral, renderChallenge, challengeGame };
 })();
 
 // ---- brand.js ----
@@ -5101,6 +5292,7 @@ const { UPDATES, latestFor, recent, fmtDate } = __mods['updates.js'];
 const { wheelReady } = __mods['wheel.js'];
 const { missionStatus } = __mods['missions.js'];
 const profilesReady = () => !!__mods['profile.js'].profiles.current;
+const { challengeGame } = __mods['social.js'];
 
 const VOL = ['', 'Très basse', 'Basse', 'Moyenne', 'Haute', 'Très haute'];
 const volLabel = (g) => (g.original ? VOL[g.vol] : g.volatility);
@@ -5201,6 +5393,7 @@ function renderLobby(root, params = {}) {
 
     <div class="promos">
     ${filter === 'all' && profilesReady() ? (() => { const m = missionStatus(), n = m.rows.filter((r) => r.claimed).length; return m.chest ? '' : `<a class="app-promo ms-promo" href="#missions"><span class="wp-ico">🎯</span><span><b>Missions du jour · ${n} / 3</b><small>${m.toClaim ? `${m.toClaim} récompense${m.toClaim > 1 ? 's' : ''} à récupérer !` : m.rows.map((r) => r.text).join(' · ')}</small></span><em>${m.toClaim ? 'Récupérer' : 'Voir'}</em></a>`; })() : ''}
+    ${filter === 'all' ? `<a class="app-promo defi-promo" href="#defi"><span class="wp-ico">🏁</span><span><b>Défi de la semaine : ${getGame(challengeGame()).name}</b><small>Ton plus gros gain en × la mise · badge Champion au n°1</small></span><em>Participer</em></a>` : ''}
     ${filter === 'all' && wheelReady() ? `<a class="app-promo wheel-promo" href="#roue"><span class="wp-ico">🎡</span><span><b>Ta Roue du jour est prête !</b><small>Un tour gratuit : KE, XP ou bonus offert</small></span><em>Tourner</em></a>` : ''}
     ${filter === 'all' && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone) ? `<a class="app-promo" href="#appli"><img src="assets/icon-192.png" alt="" width="44" height="44"><span><b>Installe l’appli SpinBet</b><small>Plein écran, sur ton écran d’accueil · iPhone et Android</small></span><em>Installer</em></a>` : ''}
     </div>
@@ -14113,6 +14306,7 @@ const { ALL_GAMES } = __mods['games/index.js'];
 const { renderApp, registerSW } = __mods['pages/app.js'];
 const { renderWheel } = __mods['wheel.js'];
 const { renderMissions } = __mods['missions.js'];
+const { renderReferral, renderChallenge } = __mods['social.js'];
 
 const view = document.getElementById('view');
 
@@ -14127,6 +14321,8 @@ const routes = [
   { re: /^(appli|application)$/, page: (r) => renderApp(r), nav: 'app' },
   { re: /^roue$/, page: (r) => renderWheel(r), nav: 'wheel' },
   { re: /^missions$/, page: (r) => renderMissions(r), nav: 'missions' },
+  { re: /^(parrainage|parrain-[\w-]+)$/, page: (r) => renderReferral(r), nav: 'ref' },
+  { re: /^defi$/, page: (r) => renderChallenge(r), nav: 'defi' },
 ];
 
 function route() {
