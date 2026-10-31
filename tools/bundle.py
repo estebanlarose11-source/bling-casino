@@ -41,6 +41,18 @@ for icon in ['apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maska
     if p.exists():
         html = html.replace(f'assets/{icon}', 'data:image/png;base64,' + base64.b64encode(p.read_bytes()).decode())
 
+# 4. painted game images (assets/games/<id>/*.webp): CSS url(...) become data: URLs, and the games find the others
+#    in window.__assets (see asset() in the game files)
+amap = {}
+for img in sorted((root / 'assets' / 'games').glob('*/*.webp')):
+    rel = img.relative_to(root).as_posix()
+    data = 'data:image/webp;base64,' + base64.b64encode(img.read_bytes()).decode()
+    amap[rel] = data
+    html = re.sub(r'url\(' + re.escape(rel) + r'(\?v=\d+)?\)', 'url(' + data + ')', html)
+if amap:
+    first = html.index('<script>')
+    html = html[:first] + '<script>window.__assets = ' + json.dumps(amap) + ';</script>\n' + html[first:]
+
 out = root / 'dist' / 'spinbet-casino.html'
 out.parent.mkdir(exist_ok=True)
 out.write_text(html, encoding='utf8')

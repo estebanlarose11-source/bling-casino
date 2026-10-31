@@ -51,7 +51,11 @@ function pickItem(cubes) {
 /* ===END ENGINE */
 
 const MUSIC = { sd: 0.3, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.02, dur: 2.2, map: { 0: [0, 3, 7], 8: [-4, 0, 3] } }, lead: { wave: 'triangle', vol: 0.06, dur: 0.5, pat: [null, null, null, null, 12, null, null, 15, null, null, null, null, 14, null, 12, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.9, pat: [-12, null, null, null, null, null, null, null, -16, null, null, null, null, null, null, null] }, kick: [0, 3, 8, 11], kv: 0.28 };
-const NAMES = ['Anubis', 'Ankh', 'Œil d’Horus', 'Scarabée', 'Gemme bleue', 'Gemme verte', 'Gemme violette', 'Gemme jaune', 'Gemme orange'];
+const NAMES = ['Anubis', 'Masque de pharaon', 'Œil d’Horus', 'Scarabée', 'Ankh', 'Vase canope', 'Pyramide', 'Gemme turquoise', 'Gemme orange'];
+// Painted symbols (assets/games/anubis/s0..s7.webp); the last gem, the joker and the scatter are still drawn in SVG.
+const IMG_V = 1, IMG_N = 8;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const imgSym = (v) => `<img class="an-img" src="${asset(`assets/games/anubis/s${v}.webp`)}" alt="" draggable="false" decoding="async">`;
 const BUYU = 100, BUYJ = 150;
 const fxv = (v) => (v >= 10000 ? Math.round(v / 1000) + 'k' : v >= 1000 ? (v / 1000).toFixed(1).replace('.', ',') + 'k' : String(v));
 const lab = (t) => `<b class="sg-lab">${t}</b>`;
@@ -74,6 +78,7 @@ const WORDS = ['DIVIN !', 'SACRÉ !', 'PHARAONIQUE !', 'ÉTERNEL !', 'IMMORTEL !
 const GOLD = ['#fde68a', '#f59e0b', '#fff', '#5eead4'];
 function symArt(v) {
   if (v >= 1000) return art('gk') + lab('×' + (v - 1000));
+  if (v >= 0 && v < IMG_N) return imgSym(v);
   return art(v === WILD ? 'w' : v === SC ? 'sc' : 's' + v);
 }
 
@@ -95,6 +100,9 @@ class AnubisGame extends BaseGame {
     this.jrow = this.q('.jrow');
     this.mrow.innerHTML = Array.from({ length: C }, () => '<div>×0</div>').join('');
     this.jrow.innerHTML = Array.from({ length: C }, () => '<div><b><i>×</i>1</b><i class="lbl"></i></div>').join('');
+    // load the painted symbols and the temple right away, so the first spin shows no empty cell
+    for (let i = 0; i < IMG_N; i++) { const im = new Image(); im.src = asset(`assets/games/anubis/s${i}.webp`); }
+    new Image().src = asset('assets/games/anubis/bg.webp');
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: C, rows: R, game: this, art: symArt,
       cls: (v) => (v === WILD ? 'wild' : v === SC ? 'scatter' : v >= 1000 ? 'gskull' : ''),
@@ -587,7 +595,7 @@ class AnubisGame extends BaseGame {
   }
 
   info() {
-    const rows = NAMES.map((n, s) => `<div class="pay-item"><div class="pay-sym svg">${art('s' + s)}</div><div class="pay-vals"><b>${n}</b><br><span>Valeur ${VAL[s]}</span></div></div>`).join('');
+    const rows = NAMES.map((n, s) => `<div class="pay-item"><div class="pay-sym svg">${symArt(s)}</div><div class="pay-vals"><b>${n}</b><br><span>Valeur ${VAL[s]}</span></div></div>`).join('');
     return this.rules(`<h4>Symboles</h4><div class="paytable">${rows}
       <div class="pay-item"><div class="pay-sym svg">${art('w')}</div><div class="pay-vals"><b>Orbe rouge (joker)</b><br><span>Remplace tout. Chaque orbe d’une grappe gagnante ajoute +1 au multiplicateur</span></div></div>
       <div class="pay-item"><div class="pay-sym svg">${art('sc')}</div><div class="pay-vals"><b>Scatter</b><br><span>3 = Monde souterrain · 4+ = Jugement</span></div></div></div>
