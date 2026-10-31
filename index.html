@@ -1129,6 +1129,50 @@ body.gated { overflow: hidden; }
 .g-anubis .jrow > div { background: linear-gradient(180deg, #3b2a12, #1c1408); border: 1px solid #b45309; box-shadow: inset 0 1px 0 rgba(253, 230, 138, .35), 0 4px 10px rgba(0, 0, 0, .5); border-radius: 10px; transition: transform .2s, box-shadow .2s; }
 .g-anubis .jrow > div.mod { border-color: #a855f7; box-shadow: inset 0 1px 0 rgba(245, 208, 254, .3), 0 0 14px rgba(168, 85, 247, .55); }
 .g-anubis .jrow > div b { color: #fde68a; text-shadow: 0 0 8px rgba(245, 158, 11, .7); }
+/* Judgment, carved-stone temple: column totals burn under the grid */
+.an-relief { position: absolute; left: 50%; top: 2%; width: 46%; max-width: 300px; transform: translateX(-50%); fill: rgba(0, 0, 0, .35); stroke: rgba(253, 230, 138, .12); stroke-width: 2; filter: drop-shadow(0 2px 0 rgba(255, 255, 255, .06)); opacity: 0; transition: opacity .6s; }
+.an-pillar { position: absolute; top: 0; bottom: 0; width: 9%; opacity: 0; transition: opacity .6s; background: linear-gradient(90deg, #120c08, #2a2018 40%, #3a2c20 55%, #140d08); box-shadow: inset 0 0 18px rgba(0, 0, 0, .8); }
+.an-pillar::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent 0 46px, rgba(0, 0, 0, .55) 46px 49px); }
+.an-pillar.l { left: 0; } .an-pillar.r { right: 0; }
+.an-embers { position: absolute; inset: 0; opacity: 0; transition: opacity .6s; background-image: radial-gradient(circle, #fdba74 1.3px, transparent 2px), radial-gradient(circle, #f97316 1px, transparent 1.8px), radial-gradient(circle, #fde047 1px, transparent 1.6px); background-size: 90px 140px, 130px 110px, 70px 170px; background-position: 10px 0, 50px 40px, 30px 80px; animation: anEmbers 4s linear infinite; mask-image: linear-gradient(0deg, #000 10%, transparent 75%); -webkit-mask-image: linear-gradient(0deg, #000 10%, transparent 75%); }
+@keyframes anEmbers { to { background-position: 30px -140px, 30px -70px, 50px -90px; } }
+.g-anubis.judge .an-bg { background: radial-gradient(ellipse at 50% 100%, rgba(234, 88, 12, .45), transparent 50%), radial-gradient(ellipse at 50% 30%, #3a2c22, #1a120c 60%, #0a0705); }
+.g-anubis.judge .an-relief, .g-anubis.judge .an-pillar, .g-anubis.judge .an-embers { opacity: 1; }
+.g-anubis.judge .an-sun, .g-anubis.judge .an-sand { opacity: 0; }
+.g-anubis.judge .an-torch { bottom: 26%; }
+.g-anubis.judge .slot-stage { display: flex; flex-direction: column; }
+.g-anubis.judge .grid-host { order: 2; }
+.g-anubis.judge .jrow { order: 3; }
+.g-anubis.judge .mrow { order: 4; }
+/* every cell is a carved stone block; empty ones are cracked, with lava glowing in the seams */
+.g-anubis.judge .sg { gap: 5px; }
+.g-anubis.judge .sg-cell { border-radius: 6px; background: linear-gradient(145deg, #4a3c30, #2a2019 55%, #1a130d); box-shadow: inset 2px 2px 0 rgba(255, 235, 200, .14), inset -3px -3px 0 rgba(0, 0, 0, .55), 0 4px 8px rgba(0, 0, 0, .6); }
+.g-anubis.judge .sg-cell.lava { background: #120804; box-shadow: inset 2px 2px 0 rgba(255, 235, 200, .1), inset -3px -3px 0 rgba(0, 0, 0, .6), 0 4px 8px rgba(0, 0, 0, .6); }
+.g-anubis.judge .sg-cell.lava::before { opacity: .8; }
+.g-anubis.judge .sg-cell.lava::after { opacity: 1; filter: drop-shadow(0 0 1px rgba(0, 0, 0, 1)) drop-shadow(0 0 4px rgba(249, 115, 22, .5)); background-color: transparent; }
+.g-anubis.judge .sg-cell.cube { background: radial-gradient(circle at 50% 40%, rgba(224, 242, 254, .4), rgba(14, 116, 144, .35) 65%), linear-gradient(145deg, #4a3c30, #1a130d); }
+/* smoke along the foot of the grid */
+.g-anubis.judge .grid-host { position: relative; }
+.g-anubis.judge .grid-host::after { content: ''; position: absolute; left: -4%; right: -4%; bottom: -18px; height: 60px; pointer-events: none; z-index: 5; background: radial-gradient(ellipse 30% 60% at 20% 60%, rgba(200, 190, 180, .22), transparent 70%), radial-gradient(ellipse 35% 60% at 60% 50%, rgba(200, 190, 180, .18), transparent 70%), radial-gradient(ellipse 25% 55% at 90% 60%, rgba(200, 190, 180, .2), transparent 70%); filter: blur(4px); animation: anSmoke 7s ease-in-out infinite alternate; }
+@keyframes anSmoke { to { transform: translateX(4%) scaleY(1.2); opacity: .7; } }
+/* burning column totals */
+.g-anubis.judge .jrow { gap: 6px; margin-top: 4px; }
+.g-anubis.judge .jrow > div { margin: 2px 0 6px; padding: 4px 2px 6px; border-radius: 4px; overflow: visible; border: 0; text-align: center; background: none; box-shadow: none; isolation: isolate; }
+.g-anubis.judge .jrow > div::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; clip-path: polygon(0 8%, 12% 0, 30% 6%, 50% 0, 70% 7%, 88% 0, 100% 8%, 100% 92%, 86% 100%, 64% 94%, 46% 100%, 24% 94%, 10% 100%, 0 92%);
+  background: radial-gradient(ellipse at 50% 120%, rgba(234, 88, 12, .5), transparent 70%), linear-gradient(180deg, #2b211a, #15100c); }
+.g-anubis.judge .jrow > div::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; clip-path: polygon(0 8%, 12% 0, 30% 6%, 50% 0, 70% 7%, 88% 0, 100% 8%, 100% 92%, 86% 100%, 64% 94%, 46% 100%, 24% 94%, 10% 100%, 0 92%); background: linear-gradient(115deg, transparent 0 30%, rgba(249, 115, 22, .55) 31%, transparent 33% 62%, rgba(249, 115, 22, .45) 63%, transparent 65%), linear-gradient(60deg, transparent 0 45%, rgba(253, 186, 116, .4) 46%, transparent 48%); opacity: .35; transition: opacity .4s; }
+.g-anubis.judge .jrow > div.lit::before { opacity: 1; animation: anCrack 1.6s ease-in-out infinite alternate; }
+@keyframes anCrack { to { filter: brightness(1.6); } }
+.g-anubis.judge .jrow > div b { position: relative; font: 400 clamp(26px, 5.2vw, 46px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px;
+  background: linear-gradient(180deg, #fff7d6 0%, #fde047 35%, #f97316 70%, #b91c1c 100%); -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none;
+  filter: drop-shadow(0 0 6px rgba(249, 115, 22, .9)) drop-shadow(0 2px 0 #3b0a02); }
+.g-anubis.judge .jrow > div:not(.lit) b { background: linear-gradient(180deg, #a8a29e, #57534e); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 2px 0 #000); }
+.g-anubis.judge .jrow > div small { position: relative; font: 700 10px Inter, sans-serif; color: #fdba74; letter-spacing: .3px; }
+.g-anubis.judge .jrow > div.mod small { color: #e9d5ff; }
+.g-anubis.judge .jrow > div.hit b { animation: anHit .5s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes anHit { 0% { transform: scale(1.5); filter: drop-shadow(0 0 16px #fde047) brightness(1.8); } }
+.g-anubis.judge .jrow .lbl { top: auto; bottom: 100%; }
+@media (prefers-reduced-motion: reduce) { .an-embers, .g-anubis.judge .grid-host::after { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .an-sand, .an-sun, .g-anubis .sg-cell.lava::before, .g-anubis .sg-cell.lava::after, .g-anubis .sg-cell.cube::after { animation: none; } }
 .sg-cell.wild svg { filter: drop-shadow(0 0 12px rgba(248, 113, 113, .95)); animation: orbPulse 1.6s ease-in-out infinite; }
 @keyframes orbPulse { 50% { scale: 1.08; } }
@@ -5511,7 +5555,7 @@ const UPDATES = [
   },
   {
     game: 'anubis', date: '2026-10-31', title: 'Temple et Jugement en lave',
-    items: ['Nouveau temple animé : torches, soleil et sable', 'Cascades plus vivantes : liens lumineux, explosions et rebonds', 'Jugement : la lave coule sous les colonnes qui défilent comme des rouleaux', 'Crânes en cubes noirs, cubes rouges qui font fondre la glace', 'Une colonne pleine fond en un seul cube et continue'],
+    items: ['Nouveau temple animé : torches, soleil et sable', 'Cascades plus vivantes : liens lumineux, explosions et rebonds', 'Jugement : temple de pierre, blocs fissurés où coule la lave, totaux en chiffres de feu sous les colonnes', 'Crânes en cubes noirs, cubes rouges qui font fondre la glace', 'Une colonne pleine fond en un seul cube et continue'],
   },
   {
     game: 'candy', date: '2026-10-31', title: 'Nouvelles règles',
@@ -7874,7 +7918,7 @@ const FILES = {
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'ec65ad09e6'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f7ff05ea7f'],
-  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '76da1b5445'],
+  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'c3b77a9831'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '9640e5a788'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],

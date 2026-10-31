@@ -76,7 +76,7 @@ class AnubisGame extends BaseGame {
     super(root, game, {
       defs: DEFS, music: MUSIC,
       head: '<div class="head-meters"><div class="meter gm-meter"><small>Multiplicateur</small><b>×1</b></div></div>',
-      stage: '<div class="an-bg"><i class="an-sun"></i><i class="an-torch l"></i><i class="an-torch r"></i><i class="an-sand"></i></div><div class="an-word"></div><div class="col-row jrow"></div><div class="grid-host"></div><div class="col-row mrow"></div>',
+      stage: '<div class="an-bg"><svg class="an-relief" viewBox="0 0 200 200" aria-hidden="true"><path d="M100 18c-22 0-34 18-34 36 0 20 16 38 26 46H56v18h36v66h16v-66h36v-18h-36c10-8 26-26 26-46 0-18-12-36-34-36zm0 16c12 0 18 10 18 20 0 14-10 28-18 36-8-8-18-22-18-36 0-10 6-20 18-20z"/></svg><i class="an-pillar l"></i><i class="an-pillar r"></i><i class="an-sun"></i><i class="an-torch l"></i><i class="an-torch r"></i><i class="an-sand"></i><i class="an-embers"></i></div><div class="an-word"></div><div class="col-row jrow"></div><div class="grid-host"></div><div class="col-row mrow"></div>',
       buys: [
         { id: 'U', icon: '💀', label: 'Monde souterrain · 3 scatters', desc: '10 tours, multiplicateurs par colonne et crânes dorés', cost: (b) => b * BUYU },
         { id: 'J', icon: '🧊', label: 'Jugement · 4 scatters', desc: 'Cubes de glace, crânes qui additionnent, crânes dorés jusqu’à ×100', cost: (b) => b * BUYJ },
@@ -88,7 +88,7 @@ class AnubisGame extends BaseGame {
     this.mrow = this.q('.mrow');
     this.jrow = this.q('.jrow');
     this.mrow.innerHTML = Array.from({ length: C }, () => '<div>×0</div>').join('');
-    this.jrow.innerHTML = Array.from({ length: C }, () => '<div><b>×1</b><small>= 0</small><i class="lbl"></i></div>').join('');
+    this.jrow.innerHTML = Array.from({ length: C }, () => '<div><b>0</b><small>+1 / cube</small><i class="lbl"></i></div>').join('');
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: C, rows: R, game: this, art: symArt,
       cls: (v) => (v === WILD ? 'wild' : v === SC ? 'scatter' : v >= 1000 ? 'gskull' : ''),
@@ -327,7 +327,13 @@ class AnubisGame extends BaseGame {
     let respins = 3, capHit = false, rounds = 0, maxWin = false;
     const cols = Array.from({ length: C }, () => ({ n: 0, m: 1, mod: false, T: 0 }));
     const total = () => cols.reduce((a, x) => a + x.T, 0);
-    const draw = () => cols.forEach((x, c) => { const d = this.jrow.children[c]; d.querySelector('b').textContent = '×' + fxv(x.m); d.querySelector('small').textContent = '= ' + fxv(x.T); d.classList.toggle('mod', x.mod); });
+    // Under every column: its total in burning digits, and the value of its next cube.
+    const draw = () => cols.forEach((x, c) => {
+      const d = this.jrow.children[c], b = d.querySelector('b'), t = fxv(x.T);
+      if (b.textContent !== t) { b.textContent = t; d.classList.remove('hit'); void d.offsetWidth; d.classList.add('hit'); }
+      d.querySelector('small').textContent = `+${fxv(x.m)} / cube`;
+      d.classList.toggle('mod', x.mod); d.classList.toggle('lit', x.T > 0);
+    });
     const info = () => { this.setBanner(`<b>JUGEMENT</b><span class="pill respins">${[0, 1, 2].map((k) => `<i class="dot${k < respins ? ' on' : ''}"></i>`).join('')} Relances</span><span class="pill gold">Total ×${fxv(total())} · ${fmtC(Math.min(cap, Math.round(bet * total())))}</span>`); };
 
     await this.featureIntro('JUGEMENT', 'Les cubes de glace tombent sur la lave · crânes noirs, crânes dorés et cubes rouges', art('cb'));
