@@ -1270,7 +1270,7 @@ body.gated { overflow: hidden; }
 .rt-c.rel { position: relative; height: clamp(32px, 7cqi, 40px); border-radius: 8px; font-size: clamp(9px, 2.5cqi, 14px); text-align: center; line-height: 1.1; padding: 0 2px; }
 /* narrow screens: taller number cells (positions are in %, so the layout just stretches) and smaller chips */
 @container (max-width: 600px) {
-  .rt { aspect-ratio: 530 / 200 !important; }
+  .rt-wrap > .rt { aspect-ratio: 530 / 200 !important; }
   .rt-chip { width: 18px; height: 18px; font-size: 7px; border-width: 1.5px; }
   .rt-h { width: 12px; height: 12px; margin: -6px 0 0 -6px; }
   .rt-h .rt-chip { left: -3px; top: -3px; }
@@ -2527,6 +2527,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .g-dragons .sg-cell:nth-child(n+13):nth-child(-n+15) { grid-column: 7; }
 .g-dragons .sg-cell:nth-child(n+16):nth-child(-n+18) { grid-column: 8; }
 .g-dragons .sg-cell { overflow: hidden; background: radial-gradient(ellipse at 50% 45%, rgba(90, 40, 16, .5), rgba(14, 6, 3, .55) 80%); box-shadow: inset 0 0 0 1px rgba(251, 191, 36, .12); transition: box-shadow .3s, background .3s; }
+/* every cell keeps the size of its grid slot (no other game's rule may squash it) */
+.g-dragons .sg-cell { aspect-ratio: auto !important; width: auto !important; height: auto !important; min-width: 0; }
 .g-dragons .sg-cell.dgL { border-radius: 12px 0 0 12px; }
 .g-dragons .sg-cell.dgR { border-radius: 0 12px 12px 0; }
 .g-dragons .sg-cell.dgL::after { content: ''; position: absolute; right: 0; top: 14%; bottom: 14%; width: 1px; background: rgba(253, 230, 138, .55); box-shadow: 0 0 5px #fbbf24; transition: opacity .3s; }
