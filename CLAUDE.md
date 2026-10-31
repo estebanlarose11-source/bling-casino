@@ -37,3 +37,10 @@ Toute modification qui touche aux gains doit être vérifiée par simulation ava
 ## Monnaie
 
 La monnaie du site est le KE (pas d'euro).
+
+## Codes cadeaux (page Recharger)
+
+Quand le propriétaire demande un code : `python3 tools/code.py` (5 000 KE ; `python3 tools/code.py 3 2500` = 3 codes
+à 2 500 KE). Le script ajoute le SHA-256 du code dans `CODES` (`pages/account.js`) et affiche le code : le donner au
+propriétaire, puis commit + push sur `main`. Ne jamais écrire un code en clair dans le dépôt. Chaque code ne sert
+qu'une fois, par un compte connecté (collection Firestore `codes`).

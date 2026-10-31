@@ -58,6 +58,18 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Codes cadeaux : codes/{sha256 du code} = { uid, code, at }. Créé une seule fois, par le compte qui
+    // utilise le code ; le document doit contenir le vrai code (son SHA-256 = l'id), donc impossible de
+    // « griller » un code sans le connaître. Une 2e utilisation serait une modification : refusée.
+    match /codes/{hash} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'code', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.code is string && request.resource.data.code.size() <= 32
+        && hashing.sha256(request.resource.data.code).toHexString().lower() == hash;
+      allow read, update, delete: if false;
+    }
+
     // Tout le reste est fermé.
     match /{document=**} {
       allow read, write: if false;

@@ -661,6 +661,11 @@ section { margin-bottom: 28px; }
 @media (max-width: 900px) { .crumbs { display: none; } .game-row { grid-auto-columns: 150px; gap: 12px; } }
 .refill-bal { padding: 14px 24px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--line); }
 .refill-bal small { display: block; color: var(--muted); font-size: 12px; }
+.gift-code { margin-top: 16px; text-align: center; }
+.gift-code h2 { margin: 0 0 6px; }
+.code-form { display: flex; gap: 8px; max-width: 420px; margin: 12px auto 0; }
+.code-form input { flex: 1; min-width: 0; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel-2); color: inherit; font: 800 16px Orbitron, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+.code-form input:focus { outline: 2px solid var(--purple); }
 .refill-bal b { font: 900 26px Orbitron, sans-serif; font-variant-numeric: tabular-nums; }
 .ad-btn { background: linear-gradient(180deg, #f59e0b, #d97706); color: #1a0f00; box-shadow: 0 0 0 1px rgba(245, 158, 11, .5), 0 6px 24px rgba(245, 158, 11, .3); }
 .ad-btn span { padding: 2px 10px; border-radius: 999px; background: rgba(0, 0, 0, .2); font-size: 14px; }
@@ -3087,6 +3092,9 @@ const cloud = {
   },
   // Referral: referrals/{newUid} = { by, name, at }, written once by the new account.
   async addReferral(uid, by, name) { await (await init()).db.collection('referrals').doc(uid).set({ by, name: String(name).slice(0, 16), at: Date.now() }); },
+  // Gift codes: codes/{sha256 of the code} = { uid, code, at }, created once (the rules check the hash).
+  // A second use is an update, refused by the rules: that is how a code is single-use.
+  async redeem(hash, code, uid) { await (await init()).db.collection('codes').doc(hash).set({ uid, code, at: Date.now() }); },
   async boardOf(uid) { const d = await (await init()).db.collection('leaderboard').doc(uid).get(); return d.exists ? d.data() : null; },
   async referralsOf(uid) {
     const q = await (await init()).db.collection('referrals').where('by', '==', uid).limit(60).get();
@@ -8790,10 +8798,41 @@ return { leaveGame, renderGame };
 __mods['pages/account.js'] = (() => {
 const { wallet, fmt, START, REFILL_BELOW } = __mods['wallet.js'];
 const { ads, PLACEMENTS } = __mods['ads.js'];
+const { profiles } = __mods['profile.js'];
+const { cloud } = __mods['cloud.js'];
 const { dailyStatus } = __mods['daily.js'];
 const { toast } = __mods['ui.js'];
 const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
+
+// Gift codes: only their SHA-256 is in the site (tools/code.py adds one per new code), so the list of hashes
+// does not reveal any code. Value in KE. Each code works once, for one account (Firestore codes/{hash}).
+const CODES = {
+  // CODES-START
+  'b21566f5aa31866752b6e40dbbcba9eceb8c9bb30ae63c0f4dcb07210aa82368': 5000, // 2026-10-31
+  // CODES-END
+};
+const normCode = (c) => String(c).toUpperCase().replace(/[^A-Z0-9]/g, '');
+async function sha256(t) {
+  const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
+  return [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+async function redeemCode(raw) {
+  const code = normCode(raw);
+  if (code.length < 6) return { ok: false, message: 'Entre un code valide' };
+  const hash = await sha256(code), amount = CODES[hash];
+  if (!amount) return { ok: false, message: 'Code invalide' };
+  if (!profiles.online) return { ok: false, message: 'Connecte-toi à ton compte pour utiliser un code (pas en mode invité)' };
+  try {
+    await cloud.redeem(hash, code, profiles.store.current);
+  } catch (e) {
+    console.error(e);
+    return { ok: false, message: e?.code === 'permission-denied' ? 'Ce code a déjà été utilisé' : 'Impossible de vérifier le code, réessaie' };
+  }
+  wallet.grant(amount);
+  profiles.flush?.();
+  return { ok: true, message: `Code validé : +${fmt(amount)} !` };
+}
 
 function renderRefill(root) {
   const ok = wallet.canRefill(), rf = ads.status('refill'), ad = ads.status('credits'), daily = dailyStatus();
@@ -8809,7 +8848,22 @@ function renderRefill(root) {
       <button class="btn lg ad-btn" data-ad ${ad.ok ? '' : 'disabled'}>▶ Regarder une pub de 15 s <span>${PLACEMENTS.credits.label}</span></button>
       <p class="muted small">${ad.ok ? `Encore ${ad.left} pub${ad.left > 1 ? 's' : ''} récompensée${ad.left > 1 ? 's' : ''} aujourd’hui, quel que soit ton solde.` : ad.reason}</p>
       <a class="btn ghost" href="#profil">${daily.ready ? '🎁 Ton bonus du jour est disponible' : '🎁 Bonus du jour et niveaux'}</a>
+    </section>
+    <section class="panel gift-code">
+      <h2>🎟️ Code cadeau</h2>
+      <p class="muted">Tu as un code ? Entre-le ici pour recevoir tes KE. Chaque code ne marche qu’une seule fois.</p>
+      <form class="code-form" autocomplete="off"><input type="text" name="code" placeholder="SPIN-XXXXX-XXXXX" maxlength="24" spellcheck="false" autocapitalize="characters" aria-label="Code cadeau"><button class="btn primary" type="submit">Valider</button></form>
     </section>`;
+  const form = root.querySelector('.code-form');
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('button'), inp = form.querySelector('input');
+    btn.disabled = true;
+    const r = await redeemCode(inp.value);
+    btn.disabled = false;
+    toast(r.message, r.ok ? 'ok' : 'warn');
+    if (r.ok) { sfx.unlock(); sfx.bigWin(); fx.coins(80, btn); inp.value = ''; renderRefill(root); }
+  };
   root.querySelector('[data-refill]').onclick = async (e) => {
     const btn = e.currentTarget;
     btn.disabled = true;
