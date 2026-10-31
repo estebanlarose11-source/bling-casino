@@ -9894,5 +9894,388 @@ return {  };
 })();
 
 </script>
+
+<!-- ================= SPINBET MOTION LAYER =================
+     Animations ajoutées par-dessus le site (interface + tous les jeux).
+     Se branche sur wallet ('wager' = mise, 'payout' = gain) sans toucher au code des jeux.
+     Bouton ✨ en haut à droite pour couper/activer. Respecte "réduire les animations". -->
+<style id="motion-layer-css">
+#ml-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+#ml-fx { position: fixed; inset: 0; z-index: 9998; pointer-events: none; }
+#ml-progress { position: fixed; top: 0; left: 0; height: 2px; width: 100%; z-index: 9999; pointer-events: none; transform-origin: 0 50%; transform: scaleX(0);
+  background: linear-gradient(90deg, #ff2340, #fbbf24, #ff2340); box-shadow: 0 0 10px #ff2340; }
+#ml-spot { position: fixed; left: 0; top: 0; width: 520px; height: 520px; margin: -260px 0 0 -260px; z-index: -1; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 35, 64, .13), rgba(251, 191, 36, .05) 40%, transparent 70%); opacity: 0; transition: opacity .4s; will-change: transform; }
+body.ml-hover-ok #ml-spot { opacity: 1; }
+.ml-toggle { margin-left: 8px; width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: #fde68a; font-size: 17px; cursor: pointer;
+  display: grid; place-items: center; transition: transform .2s, box-shadow .3s; }
+.ml-toggle:hover { transform: rotate(18deg) scale(1.08); box-shadow: 0 0 16px rgba(251, 191, 36, .45); }
+body.ml-off .ml-toggle { color: var(--muted); filter: grayscale(1); }
+body.ml-off #ml-bg, body.ml-off #ml-spot, body.ml-off #ml-progress, body.ml-off .ml-ring { display: none; }
+
+/* ---------- interface ---------- */
+body:not(.ml-off) .logo-mark { position: relative; animation: mlLogo 5s ease-in-out infinite; }
+body:not(.ml-off) .logo-mark::after { content: ''; position: absolute; inset: -3px; border-radius: 12px; z-index: -1;
+  background: conic-gradient(from var(--ml-a, 0deg), #ff2340, #fbbf24, #ff2340 40%, transparent 60%, #ff2340); animation: mlSpinVar 3s linear infinite; filter: blur(2px); }
+@property --ml-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes mlSpinVar { to { --ml-a: 360deg; } }
+@keyframes mlLogo { 0%, 86%, 100% { transform: none; } 90% { transform: rotate(-12deg) scale(1.12); } 95% { transform: rotate(8deg) scale(1.05); } }
+
+body:not(.ml-off) .side-nav a { transition: background .25s, color .25s, padding-left .25s; }
+body:not(.ml-off) .side-nav a:hover { padding-left: 16px; }
+body:not(.ml-off) .side-nav a:hover > span:first-child, body:not(.ml-off) .bottom-nav a:hover > span { display: inline-block; animation: mlWiggle .5s ease; }
+@keyframes mlWiggle { 30% { transform: rotate(-16deg) scale(1.25); } 60% { transform: rotate(10deg) scale(1.1); } }
+
+/* shine sweep on tiles, promos, chips and primary buttons */
+body:not(.ml-off) :is(.promo-tile, .app-promo, .btn.primary, .chip) { position: relative; overflow: hidden; }
+body:not(.ml-off) :is(.promo-tile, .app-promo, .btn.primary, .chip)::after { content: ''; position: absolute; top: -50%; bottom: -50%; left: -60%; width: 40%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .28), transparent); transform: translateX(-120%) skewX(-18deg); }
+body:not(.ml-off) :is(.promo-tile, .app-promo, .btn.primary, .chip):hover::after { transition: transform .75s cubic-bezier(.2, .8, .2, 1); transform: translateX(520%) skewX(-18deg); }
+body:not(.ml-off) .btn.primary.lg { animation: mlCta 2.6s ease-in-out infinite; }
+@keyframes mlCta { 50% { box-shadow: 0 0 0 4px rgba(255, 35, 64, .18), 0 0 30px rgba(255, 35, 64, .55); } }
+
+/* hero: floating poster + parallax (JS sets --mx/--my) */
+body:not(.ml-off) .hero-main { --mx: 0; --my: 0; }
+body:not(.ml-off) .hero-art { transform: translate3d(calc(var(--mx) * 18px), calc(var(--my) * 14px), 0); transition: transform .25s ease-out; }
+body:not(.ml-off) .hero-copy { transform: translate3d(calc(var(--mx) * -6px), calc(var(--my) * -4px), 0); transition: transform .25s ease-out; }
+body:not(.ml-off) .hero-copy h1 em { background: linear-gradient(90deg, currentColor 20%, #fff7c2 50%, currentColor 80%); background-size: 250% 100%;
+  -webkit-background-clip: text; background-clip: text; animation: mlTextShine 4s linear infinite; }
+@keyframes mlTextShine { from { background-position: 150% 0; } to { background-position: -100% 0; } }
+.ml-word { display: inline-block; opacity: 0; transform: translateY(.6em) rotate(4deg); filter: blur(6px); animation: mlWord .7s cubic-bezier(.2, .8, .2, 1) forwards; }
+@keyframes mlWord { to { opacity: 1; transform: none; filter: none; } }
+
+/* card -> game zoom transition */
+.ml-zoom { position: fixed; z-index: 9997; pointer-events: none; border-radius: 22px; overflow: hidden; box-shadow: 0 30px 90px rgba(0, 0, 0, .7), 0 0 0 2px var(--green); }
+.ml-zoom > * { width: 100%; height: 100%; display: block; }
+.ml-veil { position: fixed; inset: 0; z-index: 9996; pointer-events: none; background: radial-gradient(circle at var(--vx) var(--vy), rgba(255, 35, 64, .25), rgba(9, 9, 10, .92) 60%); }
+
+/* wallet bump when coins arrive */
+.top-wallet.ml-bump { animation: mlBump .45s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes mlBump { 40% { transform: scale(1.12); box-shadow: 0 0 0 2px #fbbf24, 0 0 30px rgba(251, 191, 36, .8); } }
+
+/* ---------- games ---------- */
+.game-host { position: relative; }
+.ml-ring { position: absolute; inset: -3px; border-radius: 22px; pointer-events: none; z-index: 0; padding: 2px; opacity: .55; transition: opacity .3s;
+  background: conic-gradient(from var(--ml-a, 0deg), transparent 0 70%, #ff2340 80%, #fbbf24 88%, transparent 95%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: mlSpinVar 6s linear infinite; }
+.game-host.is-full > .ml-ring { display: none; }
+.game-host > .slot { position: relative; z-index: 1; }
+.game-host.ml-busy > .ml-ring { opacity: 1; animation-duration: 1s; filter: drop-shadow(0 0 8px #ff2340); }
+.game-host.ml-busy .slot-frame, .game-host.ml-busy .reels { animation: mlCharge .5s ease-out; }
+@keyframes mlCharge { 0% { filter: brightness(1.35) saturate(1.2); } 100% { filter: none; } }
+body:not(.ml-off) .spin-btn { position: relative; }
+body:not(.ml-off) .spin-btn::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; pointer-events: none; border: 2px dashed rgba(255, 255, 255, .25); animation: mlSpinVarRot 12s linear infinite; }
+.game-host.ml-busy .spin-btn::before { border-color: #fbbf24; border-style: solid; border-top-color: transparent; animation-duration: .6s !important; }
+@keyframes mlSpinVarRot { to { transform: rotate(360deg); } }
+.ml-flash { position: absolute; inset: 0; z-index: 30; pointer-events: none; border-radius: inherit; mix-blend-mode: screen;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 247, 194, .9), rgba(251, 191, 36, .35) 35%, transparent 70%); animation: mlFlash .7s ease-out forwards; }
+@keyframes mlFlash { from { opacity: 1; } to { opacity: 0; } }
+.ml-rays { position: absolute; left: 50%; top: 45%; width: 160%; aspect-ratio: 1; z-index: 29; pointer-events: none; translate: -50% -50%; mix-blend-mode: screen;
+  background: repeating-conic-gradient(rgba(253, 224, 71, .28) 0 7deg, transparent 7deg 20deg); -webkit-mask: radial-gradient(circle, #000 10%, transparent 62%); mask: radial-gradient(circle, #000 10%, transparent 62%);
+  animation: mlRays 2.4s ease-out forwards; }
+@keyframes mlRays { 0% { opacity: 0; transform: scale(.3) rotate(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: scale(1.1) rotate(70deg); } }
+.ml-shock { position: absolute; left: 50%; top: 45%; width: 40px; height: 40px; margin: -20px 0 0 -20px; z-index: 31; border-radius: 50%; pointer-events: none;
+  border: 4px solid #fde68a; box-shadow: 0 0 30px #fbbf24, inset 0 0 20px #fbbf24; animation: mlShock .8s cubic-bezier(.2, .8, .2, 1) forwards; }
+@keyframes mlShock { to { transform: scale(18); opacity: 0; border-width: 1px; } }
+.ml-mult { position: absolute; left: 50%; top: 18%; z-index: 32; pointer-events: none; translate: -50% 0; font: 900 clamp(22px, 5vw, 44px) KeCoin, Orbitron, sans-serif; color: #fff7c2;
+  text-shadow: 0 0 18px #fbbf24, 0 3px 0 #b45309; animation: mlMult 1.6s cubic-bezier(.2, 1.4, .4, 1) forwards; white-space: nowrap; }
+@keyframes mlMult { 0% { opacity: 0; transform: scale(.2) rotate(-12deg); } 20% { opacity: 1; transform: scale(1.25) rotate(3deg); } 35% { transform: scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-30px) scale(.9); } }
+
+@media (prefers-reduced-motion: reduce) { #ml-bg, #ml-spot, .ml-ring { display: none; } }
+</style>
+
+<script>
+(() => {
+  'use strict';
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const KEY = 'spinbet_motion_off';
+  let off = REDUCED;
+  try { const v = localStorage.getItem(KEY); if (v !== null) off = v === '1'; } catch { /* ignore */ }
+  const on = () => !off;
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const $ = (s, r = document) => r.querySelector(s);
+
+  /* ---------- toggle button ---------- */
+  const tb = document.createElement('button');
+  tb.className = 'ml-toggle'; tb.type = 'button';
+  const label = () => { tb.title = off ? 'Activer les animations' : 'Couper les animations'; tb.setAttribute('aria-label', tb.title); tb.textContent = off ? '✦' : '✨'; };
+  tb.onclick = () => { off = !off; try { localStorage.setItem(KEY, off ? '1' : '0'); } catch { /* ignore */ } apply(); };
+  $('.top-right')?.appendChild(tb);
+  function apply() { document.body.classList.toggle('ml-off', off); label(); if (on()) startBg(); }
+
+  /* ---------- layers ---------- */
+  const bg = Object.assign(document.createElement('canvas'), { id: 'ml-bg' });
+  const fxc = Object.assign(document.createElement('canvas'), { id: 'ml-fx' });
+  const prog = Object.assign(document.createElement('div'), { id: 'ml-progress' });
+  const spot = Object.assign(document.createElement('div'), { id: 'ml-spot' });
+  document.body.prepend(bg, spot);
+  document.body.append(fxc, prog);
+  const bgx = bg.getContext('2d'), fx = fxc.getContext('2d');
+  let W = 0, H = 0, dpr = 1;
+  function resize() {
+    dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight;
+    for (const c of [bg, fxc]) { c.width = W * dpr; c.height = H * dpr; c.style.width = W + 'px'; c.style.height = H + 'px'; }
+  }
+  resize(); addEventListener('resize', resize);
+
+  /* ---------- ambient background: embers, stars, shooting stars, react to the mouse ---------- */
+  const mouse = { x: -999, y: -999 };
+  const N = Math.round(Math.min(90, (innerWidth * innerHeight) / 16000));
+  const embers = Array.from({ length: N }, () => newEmber(true));
+  function newEmber(any) {
+    const gold = Math.random() < 0.35;
+    return { x: rand(0, innerWidth), y: any ? rand(0, innerHeight) : innerHeight + 10, r: rand(0.6, 2.4), vy: rand(0.15, 0.6), vx: rand(-0.15, 0.15),
+      ph: rand(0, 6.28), c: gold ? '251,191,36' : Math.random() < 0.5 ? '255,35,64' : '255,255,255', a: rand(0.25, 0.8) };
+  }
+  let shooters = [], bgRun = false, lastShoot = 0;
+  function startBg() { if (!bgRun && on()) { bgRun = true; requestAnimationFrame(bgLoop); } }
+  function bgLoop(t) {
+    if (off || document.hidden) { bgRun = false; bgx.clearRect(0, 0, bg.width, bg.height); return; }
+    bgx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    bgx.clearRect(0, 0, W, H);
+    bgx.globalCompositeOperation = 'lighter';
+    for (const e of embers) {
+      e.ph += 0.02; e.y -= e.vy; e.x += e.vx + Math.sin(e.ph) * 0.25;
+      const dx = e.x - mouse.x, dy = e.y - mouse.y, d2 = dx * dx + dy * dy;
+      if (d2 < 14000) { const k = (14000 - d2) / 14000 * 2.2; const d = Math.sqrt(d2) || 1; e.x += dx / d * k; e.y += dy / d * k; }
+      if (e.y < -10 || e.x < -20 || e.x > W + 20) Object.assign(e, newEmber(false));
+      const tw = 0.6 + Math.sin(e.ph * 2) * 0.4;
+      bgx.fillStyle = `rgba(${e.c},${e.a * tw})`;
+      bgx.beginPath(); bgx.arc(e.x, e.y, e.r, 0, 6.283); bgx.fill();
+      if (e.r > 1.8) { bgx.fillStyle = `rgba(${e.c},${0.08 * tw})`; bgx.beginPath(); bgx.arc(e.x, e.y, e.r * 5, 0, 6.283); bgx.fill(); }
+    }
+    if (t - lastShoot > 3500 && Math.random() < 0.01) {
+      lastShoot = t; const a = rand(0.35, 0.6);
+      shooters.push({ x: rand(W * 0.2, W), y: rand(-20, H * 0.3), vx: -Math.cos(a) * 11, vy: Math.sin(a) * 11, life: 1 });
+    }
+    shooters = shooters.filter((s) => s.life > 0);
+    for (const s of shooters) {
+      s.x += s.vx; s.y += s.vy; s.life -= 0.018;
+      const g = bgx.createLinearGradient(s.x, s.y, s.x - s.vx * 9, s.y - s.vy * 9);
+      g.addColorStop(0, `rgba(255,247,194,${s.life})`); g.addColorStop(1, 'rgba(255,35,64,0)');
+      bgx.strokeStyle = g; bgx.lineWidth = 2; bgx.lineCap = 'round';
+      bgx.beginPath(); bgx.moveTo(s.x, s.y); bgx.lineTo(s.x - s.vx * 9, s.y - s.vy * 9); bgx.stroke();
+    }
+    bgx.globalCompositeOperation = 'source-over';
+    requestAnimationFrame(bgLoop);
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) startBg(); });
+
+  /* ---------- foreground particles (coins flying to the wallet, sparks, fireworks) ---------- */
+  let parts = [], fxRun = false;
+  function addP(p) { if (parts.length > 400) return; parts.push(p); if (!fxRun) { fxRun = true; requestAnimationFrame(fxLoop); } }
+  function fxLoop(now) {
+    fx.setTransform(dpr, 0, 0, dpr, 0, 0); fx.clearRect(0, 0, W, H);
+    parts = parts.filter((p) => !p.dead);
+    for (const p of parts) {
+      if (p.t0 === undefined) p.t0 = now + (p.delay || 0);
+      if (now < p.t0) continue;
+      const k = Math.min(1, (now - p.t0) / p.life);
+      fx.save();
+      if (p.kind === 'fly') {
+        // quadratic bezier from start to wallet, with a spinning coin
+        const e = k * k * (3 - 2 * k), u = 1 - e;
+        const x = u * u * p.x0 + 2 * u * e * p.cx + e * e * p.x1, y = u * u * p.y0 + 2 * u * e * p.cy + e * e * p.y1;
+        const s = 1 - k * 0.45, rot = now / 90 + p.ph;
+        fx.translate(x, y); fx.scale(Math.max(0.2, Math.abs(Math.cos(rot))) * s, s);
+        coin(p.r);
+        if (k >= 1) { p.dead = true; arrive(); }
+      } else if (p.kind === 'spark') {
+        p.vx *= 0.97; p.vy = p.vy * 0.97 + (p.g || 0.06); p.x += p.vx; p.y += p.vy;
+        fx.globalCompositeOperation = 'lighter'; fx.globalAlpha = 1 - k;
+        fx.fillStyle = p.c; fx.beginPath(); fx.arc(p.x, p.y, p.r * (1 - k * 0.5), 0, 6.283); fx.fill();
+        if (k >= 1) p.dead = true;
+      } else if (p.kind === 'rocket') {
+        p.y += p.vy; p.vy *= 0.975; p.x += p.vx;
+        fx.globalCompositeOperation = 'lighter'; fx.fillStyle = '#fff7c2'; fx.beginPath(); fx.arc(p.x, p.y, 2.5, 0, 6.283); fx.fill();
+        if (Math.random() < 0.7) addP({ kind: 'spark', x: p.x, y: p.y, vx: rand(-0.4, 0.4), vy: rand(0, 1), r: 1.6, c: '#fbbf24', life: 400, g: 0.02 });
+        if (k >= 1) { p.dead = true; burst(p.x, p.y, p.col, 70, 6); }
+      }
+      fx.restore();
+    }
+    if (parts.length) requestAnimationFrame(fxLoop); else { fxRun = false; fx.clearRect(0, 0, W, H); }
+  }
+  function coin(r) {
+    const g = fx.createRadialGradient(-r * 0.3, -r * 0.3, 1, 0, 0, r);
+    g.addColorStop(0, '#fff6c2'); g.addColorStop(0.5, '#fbbf24'); g.addColorStop(1, '#b45309');
+    fx.fillStyle = g; fx.beginPath(); fx.arc(0, 0, r, 0, 6.283); fx.fill();
+    fx.strokeStyle = '#92400e'; fx.lineWidth = 1.4; fx.stroke();
+    fx.fillStyle = 'rgba(255,255,255,.55)'; fx.beginPath(); fx.arc(-r * 0.35, -r * 0.35, r * 0.25, 0, 6.283); fx.fill();
+  }
+  function burst(x, y, cols, n = 40, sp = 5) {
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * 6.283 + rand(-0.1, 0.1), v = rand(sp * 0.4, sp);
+      addP({ kind: 'spark', x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, r: rand(1.5, 3.2), c: cols[i % cols.length], life: rand(700, 1300) });
+    }
+  }
+  function fireworks(n) {
+    const pal = [['#ff2340', '#fde68a'], ['#fbbf24', '#fff'], ['#22d3ee', '#a855f7'], ['#f43f9e', '#fbbf24'], ['#00e701', '#fde68a']];
+    for (let i = 0; i < n; i++) addP({ kind: 'rocket', x: rand(W * 0.15, W * 0.85), y: H + 10, vx: rand(-1, 1), vy: -rand(13, 17), life: rand(800, 1100), delay: i * 260, col: pal[i % pal.length] });
+  }
+  let bumpT = 0;
+  function arrive() {
+    const w = $('.top-wallet'); if (!w) return;
+    const now = performance.now(); if (now - bumpT < 120) return; bumpT = now;
+    w.classList.remove('ml-bump'); void w.offsetWidth; w.classList.add('ml-bump');
+    const r = w.getBoundingClientRect();
+    burst(r.left + r.width / 2, r.top + r.height / 2, ['#fde68a', '#fbbf24', '#fff'], 8, 3);
+  }
+  function coinsToWallet(from, n) {
+    const w = $('.top-wallet'); if (!w) return;
+    const t = w.getBoundingClientRect(), x1 = t.left + t.width / 2, y1 = t.top + t.height / 2;
+    for (let i = 0; i < n; i++) {
+      const x0 = rand(from.left + from.width * 0.25, from.right - from.width * 0.25), y0 = rand(from.top + from.height * 0.3, from.top + from.height * 0.6);
+      addP({ kind: 'fly', x0, y0, x1, y1, cx: (x0 + x1) / 2 + rand(-160, 160), cy: Math.min(y0, y1) - rand(40, 200), r: rand(8, 12), ph: rand(0, 6), life: rand(750, 1100), delay: i * 45 });
+    }
+  }
+
+  /* ---------- mouse: spotlight, hero parallax, magnetic buttons ---------- */
+  let spotRaf = 0, sx = 0, sy = 0;
+  addEventListener('pointermove', (e) => {
+    mouse.x = e.clientX; mouse.y = e.clientY;
+    if (!FINE || off) return;
+    document.body.classList.add('ml-hover-ok');
+    sx = e.clientX; sy = e.clientY;
+    if (!spotRaf) spotRaf = requestAnimationFrame(() => { spotRaf = 0; spot.style.transform = `translate3d(${sx}px,${sy}px,0)`; });
+    const hero = e.target.closest?.('.hero-main');
+    document.querySelectorAll('.hero-main').forEach((h) => {
+      if (h !== hero) { h.style.setProperty('--mx', 0); h.style.setProperty('--my', 0); return; }
+      const r = h.getBoundingClientRect();
+      h.style.setProperty('--mx', (((e.clientX - r.left) / r.width) - 0.5) * 2);
+      h.style.setProperty('--my', (((e.clientY - r.top) / r.height) - 0.5) * 2);
+    });
+    const b = e.target.closest?.('.btn.primary.lg, .spin-btn');
+    if (magnet && magnet !== b) { magnet.style.translate = ''; magnet = null; }
+    if (b) {
+      const r = b.getBoundingClientRect();
+      b.style.translate = `${((e.clientX - r.left) / r.width - 0.5) * 8}px ${((e.clientY - r.top) / r.height - 0.5) * 8}px`;
+      magnet = b;
+    }
+  }, { passive: true });
+  let magnet = null;
+  document.addEventListener('pointerleave', () => { mouse.x = mouse.y = -999; document.body.classList.remove('ml-hover-ok'); });
+
+  /* ---------- scroll progress ---------- */
+  addEventListener('scroll', () => {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    prog.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+  }, { passive: true });
+
+  /* ---------- hero titles: words rise in on every page change ---------- */
+  const view = document.getElementById('view');
+  function splitHero() {
+    if (off) return;
+    view.querySelectorAll('.hero-copy h1:not(.ml-split)').forEach((h) => {
+      h.classList.add('ml-split');
+      let i = 0;
+      const walk = (node) => {
+        [...node.childNodes].forEach((n) => {
+          if (n.nodeType === 3 && n.textContent.trim()) {
+            const frag = document.createDocumentFragment();
+            n.textContent.split(/(\s+)/).forEach((w) => {
+              if (!w.trim()) { frag.append(w); return; }
+              const s = document.createElement('span'); s.className = 'ml-word'; s.textContent = w; s.style.animationDelay = `${0.12 + i++ * 0.08}s`; frag.append(s);
+            });
+            n.replaceWith(frag);
+          } else if (n.nodeType === 1 && n.tagName !== 'BR') walk(n);
+        });
+      };
+      walk(h);
+    });
+  }
+
+  /* ---------- game cards: zoom transition into the game ---------- */
+  document.addEventListener('click', (e) => {
+    if (off || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    if (e.target.closest('button, [data-like], .like')) return;
+    const a = e.target.closest('a.game-card[href^="#game-"], a.promo-tile[href^="#game-"]');
+    if (!a) return;
+    const src = a.querySelector('.thumb .cover, .thumb svg, .tile-art svg, .thumb') ; if (!src) return;
+    e.preventDefault();
+    const r = (a.querySelector('.thumb') || a.querySelector('.tile-art') || a).getBoundingClientRect();
+    const veil = document.createElement('div'); veil.className = 'ml-veil';
+    veil.style.setProperty('--vx', `${r.left + r.width / 2}px`); veil.style.setProperty('--vy', `${r.top + r.height / 2}px`);
+    const z = document.createElement('div'); z.className = 'ml-zoom';
+    z.style.cssText = `left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px`;
+    z.appendChild(src.cloneNode(true));
+    document.body.append(veil, z);
+    const s = Math.min(W, H) * 0.42, tx = W / 2 - (r.left + r.width / 2), ty = H / 2 - (r.top + r.height / 2), k = s / r.width;
+    veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, fill: 'forwards' });
+    z.animate([
+      { transform: 'none', filter: 'brightness(1)' },
+      { transform: `translate(${tx}px,${ty}px) scale(${k}) rotate(-3deg)`, filter: 'brightness(1.25)', offset: 0.75 },
+      { transform: `translate(${tx}px,${ty}px) scale(${k * 1.05}) rotate(0deg)`, filter: 'brightness(1)' },
+    ], { duration: 460, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards' }).finished.then(() => {
+      burst(W / 2, H / 2, ['#ff2340', '#fbbf24', '#fff'], 36, 7);
+      location.hash = a.getAttribute('href');
+      z.animate([{ opacity: 1, transform: `translate(${tx}px,${ty}px) scale(${k * 1.05})` }, { opacity: 0, transform: `translate(${tx}px,${ty}px) scale(${k * 1.6})` }], { duration: 380, easing: 'ease-in', fill: 'forwards' });
+      veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 520, delay: 120, fill: 'forwards' }).finished.then(() => { z.remove(); veil.remove(); });
+    });
+  }, true);
+
+  /* ---------- games: ring of light, spin energy, wins ---------- */
+  function host() { return view.querySelector('.game-host'); }
+  function decorate() {
+    const h = host(); if (!h || h.querySelector(':scope > .ml-ring')) return;
+    const ring = document.createElement('div'); ring.className = 'ml-ring'; h.prepend(ring);
+  }
+  let moQ = false;
+  new MutationObserver(() => { if (moQ) return; moQ = true; requestAnimationFrame(() => { moQ = false; decorate(); splitHero(); }); }).observe(view, { childList: true, subtree: true });
+  decorate(); splitHero();
+
+  let lastBet = 0, busyT = 0;
+  function stage() {
+    const h = host(); if (!h) return null;
+    return h.querySelector('.slot-frame') || h.querySelector('.slot') || h;
+  }
+  function shake(el, power) {
+    el.animate(Array.from({ length: 9 }, (_, i) => {
+      const p = power * (1 - i / 9);
+      return { translate: i === 8 ? '0 0' : `${rand(-p, p)}px ${rand(-p, p)}px`, rotate: i === 8 ? '0deg' : `${rand(-p, p) * 0.08}deg` };
+    }), { duration: 520, easing: 'linear', composite: 'add' });
+  }
+  function overlay(el, cls, ms, text) {
+    if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+    const d = document.createElement('div'); d.className = cls; if (text) d.textContent = text;
+    el.appendChild(d); setTimeout(() => d.remove(), ms);
+  }
+
+  const W$ = typeof __mods !== 'undefined' ? __mods['wallet.js'] : null;
+  const wallet = W$ && W$.wallet;
+  if (wallet) {
+    wallet.addEventListener('wager', (e) => {
+      lastBet = e.detail?.amount || lastBet;
+      const h = host(); if (!h || off) return;
+      h.classList.remove('ml-busy'); void h.offsetWidth; h.classList.add('ml-busy');
+      clearTimeout(busyT); busyT = setTimeout(() => h.classList.remove('ml-busy'), 1600);
+    });
+    wallet.addEventListener('payout', (e) => {
+      if (off) return;
+      const amt = e.detail?.amount || 0; if (amt <= 0) return;
+      const ratio = lastBet > 0 ? amt / lastBet : 5;
+      const st = stage();
+      const from = st ? st.getBoundingClientRect() : { left: W * 0.3, right: W * 0.7, top: H * 0.3, height: H * 0.4, width: W * 0.4 };
+      const visible = from.bottom > 0 && from.top < H;
+      setTimeout(() => {
+        coinsToWallet(visible ? from : { left: W * 0.3, right: W * 0.7, top: H * 0.35, height: H * 0.3, width: W * 0.4 }, Math.round(Math.min(28, 4 + Math.log2(1 + ratio) * 4)));
+      }, 250);
+      if (!st || !visible) return;
+      overlay(st, 'ml-flash', 800);
+      if (ratio >= 3) {
+        overlay(st, 'ml-shock', 900);
+        overlay(st, 'ml-mult', 1700, `×${ratio >= 100 ? Math.round(ratio) : (Math.round(ratio * 10) / 10).toString().replace('.', ',')}`);
+        const r = st.getBoundingClientRect();
+        burst(r.left + r.width / 2, r.top + r.height * 0.45, ['#fde68a', '#fbbf24', '#ff2340', '#fff'], Math.min(90, 30 + ratio * 2), 6 + Math.min(6, ratio / 8));
+      }
+      if (ratio >= 8) { overlay(st, 'ml-rays', 2500); shake(host() || st, Math.min(10, 3 + ratio / 10)); }
+      if (ratio >= 25) fireworks(Math.min(8, 3 + Math.floor(ratio / 25)));
+    });
+  }
+
+  apply();
+})();
+</script>
+
 </body>
 </html>
