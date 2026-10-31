@@ -1014,7 +1014,39 @@ body.gated { overflow: hidden; }
 
 /* ============ Bling Tower ============ */
 .g-bling { --slot-bg: radial-gradient(500px 260px at 50% -5%, rgba(255, 45, 149, .3), transparent 70%), linear-gradient(180deg, #2a0b3d 0%, #12061f 100%); }
-.g-bling .sg-cell { background: linear-gradient(180deg, rgba(162, 43, 255, .14), rgba(255, 45, 149, .06)); }
+.g-bling .slot-stage { position: relative; overflow: hidden; }
+.g-bling .slot-stage > :not(.bt-bg) { position: relative; z-index: 1; }
+.g-bling .sg-cell { background: linear-gradient(160deg, rgba(255, 255, 255, .14), rgba(162, 43, 255, .18) 40%, rgba(255, 45, 149, .1)); box-shadow: inset 0 0 0 1px rgba(244, 114, 182, .28), inset 0 10px 18px -12px rgba(255, 255, 255, .5); backdrop-filter: none; }
+.g-bling .sg-cell::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, .22) 48%, transparent 60%); background-size: 260% 100%; animation: btSheen 5s ease-in-out infinite; }
+.g-bling .sg-cell:nth-child(2n)::after { animation-delay: -1.2s; } .g-bling .sg-cell:nth-child(3n)::after { animation-delay: -2.6s; }
+@keyframes btSheen { 0%, 70% { background-position: 130% 0; } 100% { background-position: -130% 0; } }
+.g-bling .sg-sym svg { width: 86%; height: 86%; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .55)) drop-shadow(0 0 6px rgba(244, 114, 182, .35)); }
+.g-bling .sg-cell.win { box-shadow: inset 0 0 0 2px #fde047, 0 0 24px rgba(253, 224, 71, .65), inset 0 0 22px rgba(244, 114, 182, .55); }
+.g-bling .sg-cell.scatter { background: radial-gradient(circle, rgba(74, 222, 128, .45), rgba(22, 101, 52, .3) 70%); box-shadow: inset 0 0 0 2px #4ade80, 0 0 16px rgba(74, 222, 128, .5); }
+.g-bling .sg-cell.scatter svg { animation: crownFloat 1.6s ease-in-out infinite; }
+.g-bling .sg-badge.on { box-shadow: 0 0 12px rgba(168, 85, 247, .9), 0 0 0 1.5px #fff; }
+/* neon city behind the tower */
+.bt-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 115%, rgba(255, 45, 149, .45), transparent 55%), radial-gradient(ellipse at 50% -10%, rgba(168, 85, 247, .4), transparent 55%), linear-gradient(180deg, #14052a, #22073a 60%, #3b0a3f); }
+.bt-city { position: absolute; left: 0; right: 0; bottom: 0; height: 38%; opacity: .75;
+  background:
+    linear-gradient(transparent 0 0) ,
+    repeating-linear-gradient(90deg, transparent 0 10px, rgba(253, 224, 71, .55) 10px 13px, transparent 13px 22px) 0 40% / 100% 4px no-repeat,
+    linear-gradient(90deg, #0d0220 0 6%, transparent 6% 8%, #12032a 8% 15%, transparent 15% 17%, #0d0220 17% 22%, transparent 22% 25%, #160433 25% 34%, transparent 34% 36%, #0d0220 36% 44%, transparent 44% 46%, #12032a 46% 54%, transparent 54% 57%, #0d0220 57% 66%, transparent 66% 68%, #160433 68% 77%, transparent 77% 79%, #0d0220 79% 88%, transparent 88% 90%, #12032a 90% 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0 6%, transparent 6% 8%, #000 8% 15%, transparent 15% 17%, #000 17% 22%, transparent 22% 25%, #000 25% 34%, transparent 34% 36%, #000 36% 44%, transparent 44% 46%, #000 46% 54%, transparent 54% 57%, #000 57% 66%, transparent 66% 68%, #000 68% 77%, transparent 77% 79%, #000 79% 88%, transparent 88% 90%, #000 90%);
+  clip-path: polygon(0 40%, 6% 40%, 6% 20%, 15% 20%, 15% 55%, 22% 55%, 22% 10%, 34% 10%, 34% 35%, 44% 35%, 44% 0, 54% 0, 54% 30%, 66% 30%, 66% 15%, 77% 15%, 77% 45%, 88% 45%, 88% 25%, 100% 25%, 100% 100%, 0 100%); }
+.bt-beam { position: absolute; bottom: -10%; width: 90px; height: 140%; transform-origin: 50% 100%; background: linear-gradient(0deg, rgba(253, 224, 71, .35), rgba(253, 224, 71, 0) 80%); filter: blur(6px); animation: btBeam 7s ease-in-out infinite alternate; }
+.bt-beam.b1 { left: 18%; } .bt-beam.b2 { right: 18%; background: linear-gradient(0deg, rgba(244, 114, 182, .35), rgba(244, 114, 182, 0) 80%); animation-delay: -3.5s; }
+@keyframes btBeam { from { transform: rotate(-28deg); } to { transform: rotate(28deg); } }
+.bt-glitter { position: absolute; inset: -30% 0 0; background-image: radial-gradient(circle, #fde047 1.2px, transparent 2px), radial-gradient(circle, #f9a8d4 1px, transparent 1.8px), radial-gradient(circle, #fff 1px, transparent 1.6px); background-size: 110px 130px, 80px 90px, 150px 170px; background-position: 0 0, 40px 30px, 70px 90px; opacity: .55; animation: btGlitter 9s linear infinite; }
+@keyframes btGlitter { to { transform: translateY(30%); } }
+.g-bling.in-free .bt-glitter { animation-duration: 3.5s; opacity: .85; }
+.g-bling.in-free .bt-beam { animation-duration: 2.5s; }
+.bt-word { position: absolute; left: 50%; top: 50%; z-index: 6 !important; pointer-events: none; opacity: 0; font: 900 clamp(32px, 6.5vw, 76px)/1 'Bebas Neue', Orbitron, sans-serif; letter-spacing: 3px; white-space: nowrap;
+  background: linear-gradient(180deg, #fff, #fde047 45%, #f59e0b 55%, #fff7c2); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #9d174d) drop-shadow(0 0 14px rgba(244, 114, 182, .8)); }
+.bt-combo { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); z-index: 6 !important; opacity: 0; padding: 4px 14px; border-radius: 99px; background: linear-gradient(90deg, #db2777, #7c3aed); box-shadow: 0 0 18px rgba(244, 114, 182, .7); font: 900 14px Orbitron, sans-serif; color: #fff; transition: opacity .2s; pointer-events: none; }
+.bt-combo.on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .bt-beam, .bt-glitter, .g-bling .sg-cell::after { animation: none; } }
 .sg-cell.scatter { background: radial-gradient(circle, rgba(52, 211, 153, .35), transparent 70%); }
 .sg-cell.scatter svg { filter: drop-shadow(0 0 12px rgba(52, 211, 153, .95)); }
 .slot.in-free .slot-bg { filter: hue-rotate(-20deg) saturate(1.4) brightness(1.15); }
@@ -5310,6 +5342,10 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
+    game: 'bling', date: '2026-10-31', title: 'Nouveau look néon',
+    items: ['Ville néon animée avec projecteurs et pluie de paillettes', 'Cases en verre qui brillent', 'Liens lumineux entre les gemmes gagnantes et explosions dorées', 'Compteur de cascades et grands mots de victoire'],
+  },
+  {
     game: 'anubis', date: '2026-10-31', title: 'Temple et Jugement en lave',
     items: ['Nouveau temple animé : torches, soleil et sable', 'Cascades plus vivantes : liens lumineux, explosions et rebonds', 'Jugement : la lave coule sous les colonnes qui défilent comme des rouleaux', 'Crânes en cubes noirs, cubes rouges qui font fondre la glace', 'Une colonne pleine fond en un seul cube et continue'],
   },
@@ -7659,7 +7695,7 @@ const FILES = {
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f7ff05ea7f'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '76da1b5445'],
-  bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'f2c0040660'],
+  bling: ['bling', 'games/impl/bling.js', 'BlingGame', '9640e5a788'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', 'c4d334ebb6'],

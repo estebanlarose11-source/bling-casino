@@ -33,13 +33,15 @@ function clusters(grid) {
 /* ===END ENGINE */
 
 const MUSIC = { sd: 0.2308, len: 16, root: 196, lead: { wave: 'square', vol: 0.035, dur: 0.16, pat: [12, null, 15, null, 19, null, 15, 12, 10, null, 12, null, 15, null, 10, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.28, pat: [-12, null, null, -12, null, null, -12, null, -14, null, null, -14, null, null, -17, null] }, kick: [0, 6, 8, 14], hat: [2, 4, 6, 10, 12, 14], kv: 0.22, hv: 0.025 };
+const BWORDS = ['BLING !', 'CASH !', 'SHINY !', 'MILLIONNAIRE !', 'JACKPOT VIBES !', 'TOWER OF GOLD !'];
+const BLING = ['#fde047', '#f472b6', '#fff', '#a855f7', '#fbbf24'];
 const NAMES = { '💎': 'Diamant', '👑': 'Couronne', '💰': 'Sac d’or', '💵': 'Billets', '🪙': 'Pièce', '🍾': 'Champagne', '💸': 'Billets volants', '💲': 'Scatter' };
 
 class BlingGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       defs: DEFS, music: MUSIC,
-      stage: '<div class="grid-host"></div>',
+      stage: '<div class="bt-bg"><i class="bt-beam b1"></i><i class="bt-beam b2"></i><i class="bt-city"></i><i class="bt-glitter"></i></div><div class="grid-host"></div><div class="bt-word"></div><div class="bt-combo"></div>',
       buys: [
         { id: 'normal', icon: '💲', label: 'Bonus 3 scatters · ×2', desc: '10 tours gratuits, toutes les cases démarrent à ×2', cost: (b) => b * BUYN },
         { id: 'bounty', icon: '💎', label: 'Bonus 4 scatters · ×5', desc: '15 tours gratuits, toutes les cases démarrent à ×5', cost: (b) => b * BUYB },
@@ -54,6 +56,22 @@ class BlingGame extends BaseGame {
       cls: (v) => (v === SC ? 'scatter' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => SYM[Math.floor(Math.random() * SYM.length)][0]));
+  }
+
+  word(k, text) {
+    const w = this.q('.bt-word');
+    w.textContent = text || BWORDS[Math.min(k, BWORDS.length - 1)];
+    w.className = `bt-word t${Math.min(k, 5)}`;
+    w.getAnimations().forEach((a) => a.cancel());
+    w.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.3) rotate(-6deg)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.12) rotate(2deg)', offset: 0.22 },
+      { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.7 }, { opacity: 0, transform: 'translate(-50%,-65%) scale(1.2)' }], { duration: this.turbo ? 650 : 1100, easing: 'ease-out' });
+  }
+
+  combo(n) {
+    const c = this.q('.bt-combo');
+    c.textContent = n > 1 ? `CASCADE ×${n}` : '';
+    c.classList.toggle('on', n > 1);
+    if (n > 1) c.animate([{ transform: 'translateX(-50%) scale(1.4)' }, { transform: 'translateX(-50%) scale(1)' }], { duration: 300, easing: 'ease-out' });
   }
 
   showBadge(i, pop) {
@@ -102,8 +120,9 @@ class BlingGame extends BaseGame {
       const cl = clusters(g);
       if (!cl.length) break;
       let paid = 0, best = 1;
-      const ups = [], rem = new Set();
+      const ups = [], rem = new Set(), groups = [];
       cl.forEach((c) => {
+        groups.push(c.cells);
         let mx = 1, sm = 0;
         c.cells.forEach((i) => { if (this.mm[i] > mx) mx = this.mm[i]; sm += this.mm[i]; ups.push(i); rem.add(i); });
         if (isFree) mx = Math.max(1, sm);
@@ -116,24 +135,30 @@ class BlingGame extends BaseGame {
       if (paid >= room) { paid = Math.max(0, room); capHit = true; }
       total += paid;
       this.grid.mark(ups);
+      this.grid.link(groups, ['#fde047', '#f472b6', '#22d3ee', '#a855f7']);
       this.setLast(total);
+      this.combo(round + 1);
       this.msg(`Connexion ! +${fmtC(paid)}${best > 1 ? ` <span class="pill hot">×${best}</span>` : ''}`);
+      if (round > 0 || paid >= bet * 5 || best > 1) this.word(round);
       sfx.win();
-      await this.wait(720);
+      await this.wait(760);
       ups.forEach((i) => { this.mm[i] += 2; this.showBadge(i, true); });
       this.grid.unmark();
-      await this.grid.explode(ups);
+      this.grid.unlink();
+      if (ups.length >= 10) this.shake();
+      await this.grid.shatter(ups, BLING);
       for (let c = 0; c < COLS; c++) {
         const keep = [];
         for (let r = 0; r < ROWS; r++) { const i = c * ROWS + r; if (!rem.has(i)) keep.push(g[i]); }
         const miss = ROWS - keep.length;
         for (let r = 0; r < ROWS; r++) g[c * ROWS + r] = r < miss ? rnd() : keep[r - miss];
       }
-      await this.grid.cascade(g, rem);
+      await this.grid.richCascade(g, rem, 'rgba(244,114,182,.6)');
       round++;
       await this.wait(200);
       if (capHit) break;
     }
+    this.combo(0);
     if (total > 0) {
       this.win(total, isFree ? 'Free Spins' : null);
       if (!isFree) await this.celebrate(total);
