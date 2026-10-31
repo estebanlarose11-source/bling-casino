@@ -2622,6 +2622,15 @@ body.fs-on .ad-bar { display: none; }
   body.ad-bar-on .foot { padding-bottom: 170px; }
 }
 
+.ad-bar[hidden] { display: none; }
+/* rewarded-ad offer when the player runs out of tokens */
+.ad-offer { position: fixed; z-index: 160; right: 16px; bottom: 16px; width: min(320px, calc(100% - 32px)); padding: 16px; border-radius: 16px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); display: grid; gap: 8px; animation: adOffer .35s cubic-bezier(.3, 1.4, .5, 1); }
+.ad-offer p { margin: 0; font-size: 14px; color: var(--muted); }
+.ad-offer div { display: flex; gap: 8px; }
+@keyframes adOffer { from { transform: translateY(30px); opacity: 0; } }
+@media (max-width: 900px) { .ad-offer { right: 16px; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
+.share-btn { margin-top: 12px; }
+
 /* ============ Rewarded ad popup (A-ADS) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
@@ -2666,6 +2675,7 @@ body.fs-on .ad-bar { display: none; }
       <a href="#missions" data-nav="missions"><span>🎯</span>Missions du jour</a>
       <a href="#defi" data-nav="defi"><span>🏁</span>Défi de la semaine</a>
       <a href="#parrainage" data-nav="ref"><span>🤝</span>Parrainage</a>
+      <a href="#" data-share-site><span>📤</span>Partager le site</a>
       <a href="#lobby-hold"><span>🪙</span>Hold & Spin</a>
       <a href="#lobby-table"><span>🎡</span>Roues & tables</a>
       <a href="#lobby-quick"><span>⚡</span>Jeux rapides</a>
@@ -2698,7 +2708,7 @@ body.fs-on .ad-bar { display: none; }
   </footer>
 
   <!-- Small A-ADS banner (unit 2460498): visible on load above everything (even the login window) so the A-ADS
-       robot can detect it; the cross hides it for the rest of the visit. -->
+       robot can detect it. Who sees it, and when, is decided by mountAdBar() at the end of the page script. -->
   <div class="ad-bar" id="ad-bar">
     <button type="button" class="ad-bar-x" aria-label="Fermer la publicité">✕</button>
     <!-- BEGIN AADS AD UNIT 2460498 -->
@@ -2708,19 +2718,6 @@ body.fs-on .ad-bar { display: none; }
     </div>
     <!-- END AADS AD UNIT 2460498 -->
   </div>
-  <script>
-    (() => {
-      const bar = document.getElementById('ad-bar');
-      let off = false;
-      try { off = sessionStorage.getItem('adbar_off') === '1'; } catch (e) {}
-      if (off) { bar.remove(); return; }
-      document.body.classList.add('ad-bar-on');
-      bar.querySelector('.ad-bar-x').onclick = () => {
-        bar.remove(); document.body.classList.remove('ad-bar-on');
-        try { sessionStorage.setItem('adbar_off', '1'); } catch (e) {}
-      };
-    })();
-  </script>
 
   <nav class="bottom-nav">
     <a href="#accueil" data-nav="home"><span>🏠</span>Accueil</a>
@@ -4175,7 +4172,24 @@ async function renderChallenge(root) {
   fill('[data-prev]', prev.key, 3);
 }
 
-return { renderReferral, renderChallenge, challengeGame };
+// Share the site, or one game, with the player's referral link when they have an account (their friends then
+// count as referrals). Native share sheet on phones, otherwise the link is copied.
+async function shareSite(game) {
+  const url = (uid() ? `${SITE}?ref=${uid()}` : SITE) + (game ? `#game-${game.id}` : '');
+  const text = game ? `Viens jouer à ${game.name} sur SpinBet Casino 🎰 C’est gratuit !` : 'Viens jouer sur SpinBet Casino 🎰 Machines à sous, roues et jackpots, gratuit !';
+  if (navigator.share) {
+    try { await navigator.share({ title: 'SpinBet Casino', text, url }); return; } catch (e) { if (e?.name === 'AbortError') return; }
+  }
+  try { await navigator.clipboard.writeText(`${text} ${url}`); toast('Lien copié : colle-le à tes amis !', 'ok'); } catch { prompt('Copie ce lien et envoie-le à tes amis :', url); }
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-share-site]');
+  if (!b) return;
+  e.preventDefault();
+  shareSite(b.dataset.shareSite ? { id: b.dataset.shareSite, name: b.dataset.shareName } : null);
+});
+
+return { renderReferral, renderChallenge, challengeGame, shareSite };
 })();
 
 // ---- brand.js ----
@@ -4453,6 +4467,45 @@ return { isLiked, likeCount, fmtLikes, toggleLike, likeButton, mountLikes };
 })();
 
 // ---- ads.js ----
+__mods['adpolicy.js'] = (() => {
+// Who sees ads. The site owner (recognised by the SHA-256 of their account e-mail, so the address is not written in
+// the page) and any device opened once with ?nopub never see ads: rewarded ads pay at once, without an ad.
+// ?pub on a device turns ads back on.
+const { profiles } = __mods['profile.js'];
+
+const OWNER_SHA = '39d6cea6c3bb76fab143a5e07722735415e4388dde4f88b4b3f12d49a75fcf4b';
+const NOPUB_KEY = 'spinbet_nopub';
+let owner = false;
+(() => {
+  try {
+    if (/[?&]nopub\b/.test(location.search)) localStorage.setItem(NOPUB_KEY, '1');
+    if (/[?&]pub\b/.test(location.search)) localStorage.removeItem(NOPUB_KEY);
+  } catch { /* ignore */ }
+})();
+const nopub = () => { try { return localStorage.getItem(NOPUB_KEY) === '1'; } catch { return false; } };
+
+async function sha256(t) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
+  return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, '0')).join('');
+}
+const policy = new EventTarget();
+async function checkOwner() {
+  const e = profiles.current?.email;
+  let o = false;
+  try { o = !!e && (await sha256(e.trim().toLowerCase())) === OWNER_SHA; } catch { o = false; }
+  if (o !== owner) { owner = o; policy.dispatchEvent(new Event('change')); }
+}
+profiles.addEventListener('change', checkOwner);
+checkOwner();
+
+const adPolicy = Object.assign(policy, {
+  noAds: () => owner || nopub(),
+  get owner() { return owner; },
+});
+
+return { adPolicy };
+})();
+
 __mods['ads.js'] = (() => {
 // Rewarded ads. Every ad goes through ads.watch(placement), which checks the daily cap and cooldown, asks the
 // provider to play the ad and, once it was watched to the end, records it and pays the reward.
@@ -4464,6 +4517,7 @@ const { wallet } = __mods['wallet.js'];
 const { profiles } = __mods['profile.js'];
 const { progress, today } = __mods['progress.js'];
 const { doubleDaily, dailyStatus } = __mods['daily.js'];
+const { adPolicy } = __mods['adpolicy.js'];
 
 const PLACEMENTS = {
   credits: { label: '+100 jetons', dailyCap: 20, cooldownMin: 0, reward: () => { wallet.grant(100); return '+100 jetons ajoutés'; } },
@@ -4535,7 +4589,8 @@ const ads = {
     const st = this.status(id);
     if (!st.ok) return { ok: false, message: st.reason };
     let res;
-    try { res = await provider.show(id); } catch { res = { completed: false }; }
+    if (adPolicy.noAds()) res = { completed: true }; // the owner (or a ?nopub device) gets the reward without an ad
+    else try { res = await provider.show(id); } catch { res = { completed: false }; }
     if (!res?.completed) return { ok: false, message: 'Pub interrompue : pas de récompense' };
     profiles.update('ads', (me) => {
       const a = record();
@@ -8391,7 +8446,8 @@ function renderRebuilt(root, game) {
     <div class="game-host"></div>
     <section class="game-about panel">
       <div><h2>${game.name} <small>${game.sub}</small></h2><p class="muted">${game.description}</p>
-        <div class="feat-chips">${game.features.map((f) => `<span>${f}</span>`).join('')}</div></div>
+        <div class="feat-chips">${game.features.map((f) => `<span>${f}</span>`).join('')}</div>
+        <button class="btn primary share-btn" data-share-site="${game.id}" data-share-name="${game.name}">📤 Partager ce jeu</button></div>
       <div class="side-stats about-stats">
         <div><small>Retour au joueur</small><b>${game.rtp}</b></div>
         <div><small>Volatilité</small><b>${volLabel(game)} ${dots(game.vol)}</b></div>
@@ -8430,7 +8486,8 @@ function renderGame(root, { id }) {
     <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-slot">Machines à sous</a><span>›</span><b>${game.name}</b></nav>
     <div class="game-host"></div>
     <section class="game-about panel">
-      <div><h2>${game.name} <small>${game.subtitle}</small></h2><p class="muted">${game.description}</p></div>
+      <div><h2>${game.name} <small>${game.subtitle}</small></h2><p class="muted">${game.description}</p>
+        <button class="btn primary share-btn" data-share-site="${game.id}" data-share-name="${game.name}">📤 Partager ce jeu</button></div>
       <div class="about-tags"><span>${game.reels}×${game.rows}</span><span>${game.lines} lignes</span><span>Volatilité ${game.volatility}</span>${game.buyBonus ? '<span>Bonus Buy</span>' : ''}</div>
     </section>
     <section><div class="sec-head"><h2>Autres jeux</h2></div>
@@ -8668,6 +8725,10 @@ const { renderWheel } = __mods['wheel.js'];
 const { renderMissions } = __mods['missions.js'];
 const { renderReferral, renderChallenge } = __mods['social.js'];
 const { prefetch } = __mods['games/impl/index.js'];
+const { adPolicy } = __mods['adpolicy.js'];
+const { ads } = __mods['ads.js'];
+const { progress } = __mods['progress.js'];
+const { toast } = __mods['ui.js'];
 
 const view = document.getElementById('view');
 
@@ -8699,6 +8760,55 @@ function route() {
   scrollTo({ top: 0, behavior: 'instant' });
 }
 
+/* ---------- ads: few, well placed, depending on the player ----------
+   Banner: always on the login screen (so A-ADS can check it), never while a game is open, never for players of
+   level AD_FREE_LEVEL or more, hidden 30 min after its cross is clicked. Nobody sees ads at all when
+   adPolicy.noAds() (the owner, or a ?nopub device). A player who runs out of tokens is offered a rewarded ad
+   (+100 tokens), at most once every 20 min. */
+function mountAdBar() {
+  const AD_FREE_LEVEL = 15, CLOSE_KEY = 'spinbet_adbar_closed', OFFER_KEY = 'spinbet_adoffer';
+  const bar = document.getElementById('ad-bar');
+  const get = (k) => { try { return +localStorage.getItem(k) || 0; } catch { return 0; } };
+  const put = (k, v) => { try { localStorage.setItem(k, String(v)); } catch { /* ignore */ } };
+  const allowed = () => {
+    if (adPolicy.noAds()) return false;
+    if (document.body.classList.contains('gated')) return true;
+    if (Date.now() - get(CLOSE_KEY) < 30 * 60000) return false;
+    if (/^#game-/.test(location.hash)) return false;
+    if (profiles.current && progress.info().level >= AD_FREE_LEVEL) return false;
+    return true;
+  };
+  const update = () => {
+    if (!bar) return;
+    const on = allowed();
+    bar.hidden = !on;
+    document.body.classList.toggle('ad-bar-on', on);
+  };
+  bar?.querySelector('.ad-bar-x').addEventListener('click', () => { put(CLOSE_KEY, Date.now()); update(); });
+  addEventListener('hashchange', update);
+  profiles.addEventListener('change', update);
+  adPolicy.addEventListener('change', update);
+  new MutationObserver(update).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  update();
+
+  // out of tokens: offer a rewarded ad
+  wallet.addEventListener('change', () => {
+    if (adPolicy.noAds() || !profiles.current || wallet.balance >= 0.1 || document.querySelector('.ad-offer')) return;
+    if (Date.now() - get(OFFER_KEY) < 20 * 60000 || !ads.status('credits').ok) return;
+    put(OFFER_KEY, Date.now());
+    const card = document.createElement('div');
+    card.className = 'ad-offer';
+    card.innerHTML = '<b>Plus de jetons ?</b><p>Regarde une courte pub et reçois <b>+100 jetons</b> tout de suite.</p><div><button class="btn primary" data-go>▶ Regarder</button><button class="btn ghost" data-no>Non merci</button></div>';
+    document.body.appendChild(card);
+    card.querySelector('[data-no]').onclick = () => card.remove();
+    card.querySelector('[data-go]').onclick = async () => {
+      card.remove();
+      const r = await ads.watch('credits');
+      toast(r.message, r.ok ? 'ok' : 'warn');
+    };
+  });
+}
+
 function updateWallet() {
   document.querySelectorAll('[data-balance]').forEach((n) => { n.textContent = fmt(wallet.balance); });
 }
@@ -8715,6 +8825,7 @@ updateWallet();
 route();
 mountHud();
 mountLikes();
+mountAdBar();
 registerSW();
 // Starts downloading a game as soon as the player points at (or touches) its card.
 const warm = (e) => { const a = e.target.closest?.('a[href^="#game-"]'); if (a) prefetch(a.getAttribute('href').slice(6)); };
