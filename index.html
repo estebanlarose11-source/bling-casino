@@ -2048,6 +2048,43 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .buy-item.gift { border-color: #4ade80; box-shadow: 0 0 0 1px rgba(74, 222, 128, .5), 0 0 18px rgba(74, 222, 128, .25); }
 @media (max-width: 760px) { .wheel-page { grid-template-columns: 1fr; } .wh-wrap { max-width: 340px; } }
 
+/* ============ Pile ou Face Turbo ============ */
+.g-pileface { --slot-bg: radial-gradient(600px 320px at 50% -10%, rgba(251, 191, 36, .3), transparent 70%), radial-gradient(500px 300px at 90% 100%, rgba(56, 189, 248, .22), transparent 70%), linear-gradient(180deg, #1c1404 0%, #07080d 100%); }
+.pf-arena { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 18px 12px 12px; border-radius: 16px; overflow: hidden; background: radial-gradient(ellipse at 50% 20%, rgba(251, 191, 36, .16), transparent 60%), linear-gradient(180deg, #121019, #0a0a10); }
+.pf-glow { position: absolute; left: 50%; top: 40px; width: 260px; height: 260px; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle, rgba(251, 191, 36, .35), transparent 65%); pointer-events: none; }
+.pf-ask .pf-glow { animation: pfGlow 1.4s ease-in-out infinite; }
+@keyframes pfGlow { 50% { opacity: .5; transform: translateX(-50%) scale(.9); } }
+.pf-toss { position: relative; z-index: 1; width: clamp(130px, 26vw, 190px); aspect-ratio: 1; perspective: 700px; will-change: transform; }
+.pf-coin { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+.pf-side { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 50%; box-shadow: 0 0 30px rgba(251, 191, 36, .45); }
+.pf-side.p { transform: rotateX(180deg); box-shadow: 0 0 30px rgba(148, 163, 184, .5); }
+.pf-side svg { width: 100%; height: 100%; display: block; }
+.pf-shadow { width: clamp(90px, 18vw, 140px); height: 14px; margin-top: -6px; border-radius: 50%; background: radial-gradient(ellipse, rgba(0, 0, 0, .7), transparent 70%); opacity: .6; }
+.pf-say { min-height: 24px; font-weight: 700; text-align: center; font-size: 15px; }
+.pf-lost .pf-say { color: #fca5a5; }
+.pf-won .pf-say { color: #fde68a; }
+.pf-pick { display: grid; grid-template-columns: 1fr minmax(120px, 1fr) 1fr; gap: 10px; width: min(100%, 560px); }
+.pf-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 8px; border-radius: 16px; border: 2px solid transparent; font: 900 18px Orbitron, sans-serif; color: #fff; cursor: pointer; transition: transform .12s, filter .12s; }
+.pf-btn svg { width: 52px; height: 52px; }
+.pf-btn.face { background: linear-gradient(180deg, #b45309, #78350f); border-color: #fbbf24; }
+.pf-btn.pile { background: linear-gradient(180deg, #475569, #1e293b); border-color: #cbd5e1; }
+.pf-btn.cash { background: linear-gradient(180deg, #16a34a, #14532d); border-color: #4ade80; font-size: 16px; }
+.pf-btn.cash small { font: 800 11px Inter, sans-serif; letter-spacing: 1.5px; }
+.pf-btn:not(:disabled):hover { transform: translateY(-2px); filter: brightness(1.15); }
+.pf-btn:disabled { filter: grayscale(.8) brightness(.55); cursor: default; }
+.pf-ask .pf-btn.face:not(:disabled), .pf-ask .pf-btn.pile:not(:disabled) { animation: pfPulse 1.2s ease-in-out infinite; }
+@keyframes pfPulse { 50% { box-shadow: 0 0 18px rgba(251, 191, 36, .55); } }
+.pf-ladder { display: flex; gap: 6px; width: 100%; overflow-x: auto; padding: 4px 2px 6px; scrollbar-width: thin; }
+.pf-ladder span { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; min-width: 64px; padding: 5px 8px; border-radius: 10px; background: #1a1825; border: 1px solid #2e2a40; font: 800 12px Orbitron, sans-serif; color: #94a3b8; }
+.pf-ladder span i { font: 700 10px Inter, sans-serif; font-style: normal; color: #64748b; }
+.pf-ladder span.done { background: linear-gradient(180deg, #a16207, #713f12); border-color: #fbbf24; color: #fff; }
+.pf-ladder span.next { border-color: #38bdf8; color: #e0f2fe; box-shadow: 0 0 10px rgba(56, 189, 248, .45); }
+.pf-hist { display: flex; gap: 5px; min-height: 22px; flex-wrap: wrap; justify-content: center; }
+.pf-hist i { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; font: 900 11px Orbitron, sans-serif; font-style: normal; color: #111; }
+.pf-hist i.face { background: #fbbf24; } .pf-hist i.pile { background: #cbd5e1; }
+.pf-hist i.ko { outline: 2px solid #ef4444; outline-offset: 1px; }
+@media (max-width: 520px) { .pf-btn svg { width: 40px; height: 40px; } .pf-btn { font-size: 15px; padding: 8px 4px; } .pf-pick { grid-template-columns: 1fr 1fr 1fr; } }
+
 /* ============ Rewarded ad popup (A-ADS) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
@@ -4226,6 +4263,7 @@ const ORIGINALS = [
   {"id": "plinko", "name": "Plinko", "cat": "quick", "tag": "Instantané", "sub": "Billes, clous et multiplicateurs", "colors": ["#38bdf8", "#4c1d95"], "description": "Lâche tes billes en haut de la pyramide : elles rebondissent de clou en clou et tombent dans une case multiplicateur. Choisis le risque, de 8 à 16 rangées, et lance jusqu’à 20 billes d’un coup.", "features": ["8 à 16 rangées", "3 niveaux de risque", "Jusqu’à 20 billes par lancer", "Multiplicateurs jusqu’à ×1 000"], "rtp": "≈ 94 %", "vol": 4, "max": "×1 000"},
   {"id": "vortex", "name": "Roue Rouge Noire", "cat": "quick", "tag": "Instantané", "sub": "Rouge, la bille tombe · noir, elle bloque", "colors": ["#ef4444", "#1f0a0a"], "description": "Une grande roue de 9 anneaux rouges et noirs qui tournent. Ta mise tombe du haut de la roue vers le centre : sur une case rouge elle passe à l’anneau suivant et le multiplicateur monte, sur une case noire elle est bloquée et tu encaisses. Au centre : ×1 000.", "features": ["9 anneaux qui tournent", "Cases bonus ×2 et ×4", "Relance à partir du 4e anneau", "×1 000 au centre"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
   {"id": "casse", "name": "Le Casse", "cat": "quick", "tag": "Instantané", "sub": "Perce les coffres, vends au receleur", "colors": ["#fbbf24", "#1e293b"], "description": "Une chambre forte, 9 coffres : des liasses de billets jusqu’à ×100, un coffre doré qui double ton butin et une alarme. Perce les coffres un par un et, après chacun, le receleur te fait une offre. Vendre ou continuer ? Si l’alarme sonne, tu fuis avec 25 % du butin.", "features": ["9 coffres à percer", "Offres du receleur", "Coffre doré : butin ×2", "Casse parfait"], "rtp": "≈ 93-96 %", "vol": 4, "max": "×2 000"},
+  {"id": "pileface", "name": "Pile ou Face Turbo", "cat": "quick", "tag": "Instantané", "sub": "Double ou rien, jusqu’à 20 fois", "colors": ["#fbbf24", "#1c1404"], "description": "Une pièce, deux faces, et ton gain qui double à chaque bonne prédiction. Lance la série, choisis Pile ou Face jusqu’à 20 fois d’affilée et encaisse quand tu veux : ×1,92 après un lancer, ×3,84 après deux… et plus d’un million de fois la mise après 20 !", "features": ["Jusqu’à 20 lancers", "Gain doublé à chaque fois", "Encaisse quand tu veux", "Vrai 50/50", "Raccourcis clavier P / F"], "rtp": "96 %", "vol": 4, "max": "×1 006 633"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -4538,6 +4576,17 @@ const SPECS = {
         <g transform="translate(86 222)"><path d="M-30 18 L-22 -4 H22 L30 18 Z" fill="url(#gold${u})" stroke="#78350f" stroke-width="2"/></g>`;
     },
   },
+  pileface: {
+    bg: ['#3b2a05', '#05060b'], light: '#fbbf24', title: ['PILE OU', 'FACE'], font: 'bebas', metal: ['#fff', '#fde68a', '#b45309'], tag: 'JUSQU’À 20 LANCERS',
+    art: (u) => `
+      <circle cx="150" cy="130" r="120" fill="#fbbf24" opacity=".12"/>
+      <g transform="translate(92 70) rotate(-14)" filter="url(#sh${u})"><ellipse cx="60" cy="66" rx="60" ry="60" fill="#78350f"/><circle cx="60" cy="60" r="60" fill="url(#gold${u})" stroke="#92400e" stroke-width="4"/>
+        <circle cx="60" cy="60" r="49" fill="none" stroke="#fef3c7" stroke-width="2" stroke-dasharray="3 4"/>
+        <path d="M36 44 L41 26 L51 38 L60 21 L69 38 L79 26 L84 44 Z" fill="#fde68a" stroke="#92400e" stroke-width="2.5" stroke-linejoin="round"/>
+        <circle cx="60" cy="68" r="21" fill="#fcd34d" stroke="#92400e" stroke-width="2.5"/><circle cx="53" cy="64" r="3" fill="#78350f"/><circle cx="67" cy="64" r="3" fill="#78350f"/><path d="M50 74 Q60 82 70 74" stroke="#78350f" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+      <g transform="translate(214 190) rotate(18)" filter="url(#sh${u})"><circle r="40" fill="#cbd5e1" stroke="#334155" stroke-width="3"/><text y="12" text-anchor="middle" font-family="Orbitron,sans-serif" font-weight="900" font-size="30" fill="#1e293b">×2</text></g>
+      <g fill="#fde047">${[[60, 60, 6], [250, 70, 8], [50, 200, 5], [180, 40, 4]].map(([x, y, s]) => `<path d="M${x} ${y - s} Q${x} ${y} ${x + s} ${y} Q${x} ${y} ${x} ${y + s} Q${x} ${y} ${x - s} ${y} Q${x} ${y} ${x} ${y - s}Z"/>`).join('')}</g>`,
+  },
 };
 
 // Bright card colours (top, bottom) for the square lobby posters.
@@ -4545,7 +4594,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], 'pileface': ["#f5b11c", "#8a4a06"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -4657,6 +4706,10 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  {
+    game: 'pileface', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
+    items: ["Pile ou Face jusqu’à 20 fois d’affilée", "Ton gain double à chaque bonne prédiction", "Encaisse quand tu veux", "Plus d’un million de fois la mise au bout de 20 lancers"],
+  },
   {
     game: 'cosmic', date: '2026-10-30', title: 'Nouveau jeu', isNew: true,
     items: ['Un casse néon dans l’espace avec K-0B, le robot cambrioleur', 'Chaque gain charge sa case : bleu, rose, puis doré', 'La supernova fait exploser le butin, jusqu’à ×10 000', '3 bonus : Orbite Basse, Ceinture d’Astéroïdes et Hyper-Espace'],
@@ -5460,6 +5513,7 @@ const EXTRA_THEMES = {
   plinko: { sd: 0.2, len: 16, root: 261.63, lead: { wave: 'triangle', vol: 0.045, dur: 0.16, pat: [12, null, 16, null, 19, null, 24, null, 19, null, 16, null, 14, null, 12, null] }, bass: { wave: 'sine', vol: 0.13, dur: 0.3, pat: [-12, null, null, null, -5, null, null, null, -8, null, null, null, -7, null, null, null] }, kick: [0, 8], hat: [4, 12], kv: 0.18, hv: 0.02 },
   vortex: { sd: 0.22, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.018, dur: 1.8, map: { 0: [0, 3, 7], 8: [-2, 3, 8] } }, bass: { wave: 'sine', vol: 0.15, dur: 0.5, pat: [-12, null, null, -12, null, null, -10, null, -12, null, null, -12, null, null, -9, null] }, kick: [0, 6, 8, 14], hat: [4, 12], kv: 0.24, hv: 0.02 },
   casse: { sd: 0.25, len: 16, root: 98, pad: { wave: 'sawtooth', vol: 0.016, dur: 2, map: { 0: [0, 3, 7], 8: [-1, 3, 6] } }, lead: { wave: 'triangle', vol: 0.04, dur: 0.18, pat: [12, null, null, 15, null, null, 14, null, 12, null, null, 11, null, null, 12, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.4, pat: [-12, null, -12, null, null, null, -13, null, -12, null, -12, null, null, null, -9, null] }, kick: [0, 8], hat: [4, 12], kv: 0.22, hv: 0.02 },
+  'pileface': { sd: 0.15, len: 16, root: 196, lead: { wave: 'square', vol: 0.025, dur: 0.1, pat: [12, null, 19, null, 24, 19, null, 16, 12, null, 19, null, 22, 19, 17, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.18, pat: [-12, null, -12, null, -5, null, -5, null, -8, null, -8, null, -7, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.022 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -12828,6 +12882,177 @@ class CosmicGame extends BaseGame {
 return { CosmicGame };
 })();
 
+// ---- games/impl/pileface.js ----
+__mods['games/impl/pileface.js'] = (() => {
+// Pile ou Face Turbo: bet, then call Pile or Face up to 20 times in a row. Each right call doubles the pot
+// (×1,92 after one, ×3,84 after two… ×0,96 × 2^k), cash out whenever you like; one wrong call loses the stake.
+// Every flip is a fair 50/50, so whatever the strategy the return is exactly 96 %.
+
+const { BaseGame, fmtC } = __mods['core/base.js'];
+const { EXTRA_THEMES } = __mods['core/music.js'];
+const { sfx } = __mods['audio.js'];
+const { fx, center } = __mods['fx.js'];
+
+/* ===ENGINE */
+const MAXF = 20, EDGE = 0.96;
+const mult = (k) => (k ? EDGE * 2 ** k : 0);
+const flip = () => (Math.random() < 0.5 ? 'pile' : 'face');
+/* ===END ENGINE */
+
+const xs = (m) => (m >= 1000 ? Math.round(m).toLocaleString('fr-FR') : m >= 100 ? String(Math.round(m)) : m.toFixed(2).replace('.', ','));
+const FACE_SVG = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="url(#pfGold)" stroke="#92400e" stroke-width="3"/><circle cx="50" cy="50" r="39" fill="none" stroke="#fef3c7" stroke-width="1.5" stroke-dasharray="2 3"/>
+  <path d="M31 36 L35 22 L43 31 L50 18 L57 31 L65 22 L69 36 Z" fill="#fde68a" stroke="#92400e" stroke-width="2" stroke-linejoin="round"/>
+  <circle cx="50" cy="55" r="17" fill="#fcd34d" stroke="#92400e" stroke-width="2"/><circle cx="44" cy="52" r="2.4" fill="#78350f"/><circle cx="56" cy="52" r="2.4" fill="#78350f"/>
+  <path d="M42 60 Q50 67 58 60" stroke="#78350f" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+  <text x="50" y="88" text-anchor="middle" font-family="Orbitron,sans-serif" font-weight="900" font-size="9" fill="#78350f">FACE</text></svg>`;
+const PILE_SVG = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="url(#pfSilver)" stroke="#334155" stroke-width="3"/><circle cx="50" cy="50" r="39" fill="none" stroke="#f1f5f9" stroke-width="1.5" stroke-dasharray="2 3"/>
+  <text x="50" y="62" text-anchor="middle" font-family="Orbitron,sans-serif" font-weight="900" font-size="34" fill="#1e293b">×2</text>
+  <path d="M26 30 l3 -6 l3 6 l-3 -2z M68 30 l3 -6 l3 6 l-3 -2z" fill="#1e293b"/>
+  <text x="50" y="88" text-anchor="middle" font-family="Orbitron,sans-serif" font-weight="900" font-size="9" fill="#1e293b">PILE</text></svg>`;
+const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <radialGradient id="pfGold" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fffbeb"/><stop offset=".45" stop-color="#fbbf24"/><stop offset="1" stop-color="#b45309"/></radialGradient>
+  <radialGradient id="pfSilver" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#cbd5e1"/><stop offset="1" stop-color="#64748b"/></radialGradient></defs></svg>`;
+
+class PileFaceGame extends BaseGame {
+  constructor(root, game) {
+    super(root, game, {
+      music: EXTRA_THEMES.pileface, autoplay: false, mainLabel: 'LANCER LA SÉRIE',
+      cls: 'table-game pileface',
+      head: '<div class="head-meters"><div class="meter pf-streak"><small>Série</small><b>0 / 20</b></div><div class="meter pf-pot"><small>Gain en jeu</small><b>—</b></div></div>',
+      stage: `${DEFS}<div class="pf-arena">
+          <div class="pf-glow"></div>
+          <div class="pf-toss"><div class="pf-coin"><div class="pf-side f">${FACE_SVG}</div><div class="pf-side p">${PILE_SVG}</div></div></div>
+          <div class="pf-shadow"></div>
+          <div class="pf-say">Mise, lance la série, puis choisis Pile ou Face.</div>
+          <div class="pf-pick">
+            <button type="button" class="pf-btn face" data-pick="face" disabled>${FACE_SVG}<b>FACE</b></button>
+            <button type="button" class="pf-btn cash" data-pick="cash" disabled><small>ENCAISSER</small><b>—</b></button>
+            <button type="button" class="pf-btn pile" data-pick="pile" disabled>${PILE_SVG}<b>PILE</b></button>
+          </div>
+          <div class="pf-ladder">${Array.from({ length: MAXF }, (_, k) => `<span data-k="${k + 1}"><i>${k + 1}</i>×${xs(mult(k + 1))}</span>`).join('')}</div>
+          <div class="pf-hist" aria-label="Derniers lancers"></div>
+        </div>`,
+      hello: 'Chaque bonne prédiction double ton gain. Encaisse quand tu veux !',
+    });
+    this.coin = this.q('.pf-coin');
+    this.turn = 0; // coin rotation in half turns
+    this.root.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-pick]');
+      if (!b || b.disabled || !this.answer) return;
+      const r = this.answer; this.answer = null; r(b.dataset.pick);
+    });
+    this.onKeyPick = (e) => {
+      if (!this.answer || e.target.closest('input, textarea')) return;
+      const k = { KeyF: 'face', KeyP: 'pile', Enter: 'cash' }[e.code];
+      if (!k || (k === 'cash' && this.q('[data-pick="cash"]').disabled)) return;
+      e.preventDefault(); const r = this.answer; this.answer = null; r(k);
+    };
+    addEventListener('keydown', this.onKeyPick);
+  }
+
+  destroy() { removeEventListener('keydown', this.onKeyPick); super.destroy(); }
+  onMeters() { if (this.mainBtn) this.mainBtn.disabled = this.busy; }
+  ask() { return new Promise((res) => { this.answer = res; }); }
+  say(t) { this.q('.pf-say').innerHTML = t; }
+
+  setState(k, bet) {
+    this.q('.pf-streak b').textContent = `${k} / ${MAXF}`;
+    this.q('.pf-pot b').textContent = k ? fmtC(Math.round(bet * mult(k))) : '—';
+    this.qa('.pf-ladder span').forEach((s) => { const n = +s.dataset.k; s.classList.toggle('done', n <= k); s.classList.toggle('next', n === k + 1); });
+    this.q('.pf-ladder .next')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    const cash = this.q('[data-pick="cash"]');
+    cash.querySelector('b').textContent = k ? fmtC(Math.round(bet * mult(k))) : '—';
+  }
+
+  enable(on, k) {
+    this.qa('[data-pick="face"],[data-pick="pile"]').forEach((b) => { b.disabled = !on; });
+    this.q('[data-pick="cash"]').disabled = !on || !k;
+    this.slotEl.classList.toggle('pf-ask', on);
+  }
+
+  hist(r, ok) {
+    const h = this.q('.pf-hist');
+    h.insertAdjacentHTML('afterbegin', `<i class="${r} ${ok ? 'ok' : 'ko'}">${r === 'face' ? 'F' : 'P'}</i>`);
+    while (h.children.length > 16) h.lastChild.remove();
+  }
+
+  // Tosses the coin and lands it on r (face = 0°, pile = 180°).
+  async toss(r) {
+    const T = this.turbo ? 650 : 1250, spins = this.turbo ? 6 : 10;
+    const from = this.turn * 180;
+    let to = from + spins * 180;
+    if ((to / 180) % 2 !== (r === 'pile' ? 1 : 0)) to += 180;
+    this.turn = to / 180;
+    sfx.click();
+    this.coin.animate([{ transform: `rotateX(${from}deg)` }, { transform: `rotateX(${to}deg)` }], { duration: T, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' });
+    this.q('.pf-toss').animate([{ transform: 'translateY(0) scale(1)' }, { transform: 'translateY(-46%) scale(1.15)', offset: 0.45 }, { transform: 'translateY(0) scale(1)' }], { duration: T, easing: 'ease-in-out' });
+    this.q('.pf-shadow').animate([{ transform: 'scale(1)', opacity: 0.6 }, { transform: 'scale(.55)', opacity: 0.25, offset: 0.45 }, { transform: 'scale(1)', opacity: 0.6 }], { duration: T, easing: 'ease-in-out' });
+    await this.wait(T / (this.turbo ? 0.45 : 1));
+    sfx.reelStop?.(1);
+  }
+
+  onMain() { this.round(() => this.series()); }
+
+  async series() {
+    const bet = this.bet;
+    if (!this.pay(bet)) return;
+    this.lastStake = bet;
+    this.setLast(0); this.winAmt.textContent = '';
+    this.slotEl.classList.remove('pf-lost', 'pf-won');
+    let k = 0;
+    this.setState(0, bet);
+    this.say('Pile ou Face ? Fais ton choix !');
+    this.msg(`Mise ${fmtC(bet)} · une bonne prédiction : ×${xs(mult(1))}`);
+    while (!this.dead) {
+      this.enable(true, k);
+      const pick = await this.ask();
+      this.enable(false, k);
+      if (pick === 'cash') break;
+      this.say(`Tu as dit <b>${pick === 'face' ? 'FACE' : 'PILE'}</b>…`);
+      const r = flip();
+      await this.toss(r);
+      if (this.dead) return;
+      const p = center(this.coin);
+      if (r !== pick) {
+        this.hist(r, false);
+        this.slotEl.classList.add('pf-lost');
+        this.shake();
+        sfx.lose?.();
+        this.say(`C’est <b>${r === 'face' ? 'FACE' : 'PILE'}</b>… perdu !${k ? ` Tu avais ${fmtC(Math.round(bet * mult(k)))} en jeu.` : ''}`);
+        this.msg('Série perdue');
+        this.setState(0, bet);
+        return;
+      }
+      k++;
+      this.hist(r, true);
+      sfx.win();
+      fx.burst(p.x, p.y, 14 + k * 2, ['#fde047', '#fbbf24', '#fff', '#38bdf8'], 6);
+      fx.floatText(p.x, p.y - 50, `×${xs(mult(k))}`, '#fde047', 26);
+      this.setState(k, bet);
+      if (k >= MAXF) { this.say('SÉRIE PARFAITE : 20 sur 20 !'); break; }
+      this.say(`Gagné ! <b>×${xs(mult(k))}</b> · encore ${MAXF - k} lancer${MAXF - k > 1 ? 's' : ''} possible${MAXF - k > 1 ? 's' : ''}. On continue ?`);
+    }
+    if (this.dead) return;
+    const won = Math.round(bet * mult(k));
+    this.win(won);
+    this.setLast(won);
+    this.slotEl.classList.add('pf-won');
+    this.say(`Encaissé : <b>${fmtC(won)}</b> après ${k} bonne${k > 1 ? 's' : ''} prédiction${k > 1 ? 's' : ''} !`);
+    this.msg(`Gain : ${fmtC(won)} (×${xs(mult(k))})`);
+    await this.celebrate(won);
+    this.setState(0, bet);
+  }
+
+  info() {
+    return this.rules(`<h4>Comment jouer</h4><p>Choisis ta mise et lance la série. À chaque lancer, prédis <b>Pile</b> ou <b>Face</b> (touches P et F au clavier). Bonne prédiction : ton gain double. Mauvaise : la série s’arrête et la mise est perdue. Tu peux <b>encaisser</b> après n’importe quel lancer gagné (touche Entrée), jusqu’à 20 lancers.</p>
+      <h4>Gains (× la mise)</h4><p>${Array.from({ length: MAXF }, (_, k) => `${k + 1} : ×${xs(mult(k + 1))}`).join(' · ')}</p>
+      <h4>Équité</h4><p>Chaque lancer est un vrai 50/50, indépendant des précédents et de ton choix. Quelle que soit ta façon de jouer, le retour au joueur est de 96 %.</p>`);
+  }
+}
+
+return { PileFaceGame };
+})();
+
 // ---- games/impl/index.js ----
 __mods['games/impl/index.js'] = (() => {
 // Every original Bling game, rebuilt on the shared cabinet (js/core/), keyed by catalogue id.
@@ -12851,6 +13076,8 @@ const { PlinkoGame } = __mods['games/impl/plinko.js'];
 const { VortexGame } = __mods['games/impl/vortex.js'];
 const { CasseGame } = __mods['games/impl/casse.js'];
 
+const { PileFaceGame } = __mods['games/impl/pileface.js'];
+
 const IMPL = {
   zeus: ZeusGame,
   huff: HuffGame,
@@ -12871,6 +13098,7 @@ const IMPL = {
   plinko: PlinkoGame,
   vortex: VortexGame,
   casse: CasseGame,
+  pileface: PileFaceGame,
 };
 
 return { IMPL };
