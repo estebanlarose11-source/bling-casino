@@ -230,6 +230,18 @@ class RoueOrGame extends BaseGame {
     // open the player's cube in any case
     const mv = vals[pick];
     await this.wait(400);
+    // then every cube still closed shows what it was hiding
+    if (others.length) {
+      this.say('Voici ce que cachaient les autres cubes…');
+      for (const i of others) {
+        const c = cubes[i], v = vals[i];
+        c.querySelector('b').textContent = `×${xs(v)}`;
+        c.classList.add('open', 'late', v >= 25 ? 'big' : v >= 5 ? 'mid' : 'low');
+        sfx.tick();
+        await this.wait(this.turbo ? 60 : 140);
+      }
+      await this.wait(500);
+    }
     cubes[pick].classList.remove('taken');
     cubes[pick].classList.add('open', 'mine-open');
     cubes[pick].querySelector('b').textContent = `×${xs(mv)}`;
