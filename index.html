@@ -2734,6 +2734,38 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .ro-deciding .ro-btns button { animation: roPick 1.1s ease-in-out infinite; }
 @media (max-width: 520px) { .ro-grid { gap: 6px; } .ro-btns button { min-width: 120px; font-size: 14px; } .ro-cube.mine { width: 52px; } }
 
+/* ============ La Descente (billes) ============ */
+.g-billes { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(56, 189, 248, .22), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(168, 85, 247, .22), transparent 70%), linear-gradient(180deg, #0b1023 0%, #06070b 100%); }
+.mb-view { position: relative; width: min(100%, 520px); margin: 0 auto; border-radius: 16px; overflow: hidden; box-shadow: inset 0 0 0 2px rgba(125, 211, 252, .35), 0 16px 40px rgba(0, 0, 0, .55); }
+.mb-cv { display: block; width: 100%; height: clamp(380px, 66vh, 640px); }
+.mb-rank { position: absolute; left: 8px; top: 8px; display: flex; flex-direction: column; gap: 4px; padding: 6px; border-radius: 12px; background: rgba(8, 10, 24, .72); backdrop-filter: blur(4px); }
+.mb-rank span { display: flex; align-items: center; gap: 6px; font: 900 12px KeCoin, Orbitron, sans-serif; color: #e2e8f0; transition: transform .25s; }
+.mb-rank span:first-child em { color: #fde047; }
+.mb-rank em { font-style: normal; width: 12px; text-align: right; }
+.mb-ball { display: inline-block; width: 16px; height: 16px; border-radius: 50%; box-shadow: 0 2px 3px rgba(0, 0, 0, .5); flex: none; }
+.mb-ball.big { width: 54px; height: 54px; }
+.mb-prog { position: absolute; right: 8px; top: 14px; bottom: 14px; width: 8px; border-radius: 8px; background: rgba(255, 255, 255, .12); }
+.mb-fin { position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); font-style: normal; font-size: 12px; }
+.mb-dot { position: absolute; left: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%; transition: top .15s linear; box-shadow: 0 0 6px rgba(0, 0, 0, .6); }
+.mb-time { position: absolute; right: 24px; top: 8px; padding: 3px 8px; border-radius: 8px; background: rgba(8, 10, 24, .72); font: 800 12px KeCoin, Orbitron, sans-serif; color: #bae6fd; }
+.mb-time:empty { display: none; }
+.mb-count { position: absolute; left: 50%; top: 40%; transform: translate(-50%, -50%); font: 900 clamp(60px, 16vw, 110px) 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 0 20px #38bdf8, 0 6px 0 #0c4a6e; pointer-events: none; }
+.mb-count[hidden], .mb-win[hidden] { display: none; }
+.mb-count.pop { animation: mbPop .6s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes mbPop { from { transform: translate(-50%, -50%) scale(2.2); opacity: 0; } }
+.mb-win { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 26px; border-radius: 18px; background: rgba(8, 10, 24, .88); box-shadow: 0 0 0 3px var(--bc), 0 0 40px var(--bc); text-align: center; animation: mbPop .6s cubic-bezier(.3, 1.6, .5, 1); }
+.mb-win b { font: 900 clamp(20px, 5vw, 30px) 'Bebas Neue', Impact, sans-serif; letter-spacing: 1.5px; color: #fff; }
+.mb-win small { font: 800 13px KeCoin, Orbitron, sans-serif; color: #fde68a; }
+.mb-spots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.mb-spot { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px 8px; border-radius: 14px; background: linear-gradient(180deg, color-mix(in srgb, var(--bc) 30%, #0f172a), #0b1023); border: 2px solid color-mix(in srgb, var(--bc) 70%, transparent); color: #fff; }
+.mb-spot .mb-ball { width: 30px; height: 30px; }
+.mb-spot b { font: 900 14px KeCoin, Orbitron, sans-serif; }
+.mb-spot small { font: 800 12px KeCoin, Orbitron, sans-serif; color: #fde68a; }
+.mb-form { display: block; width: 80%; height: 5px; border-radius: 4px; background: rgba(255, 255, 255, .15); overflow: hidden; }
+.mb-form i { display: block; height: 100%; border-radius: 4px; background: var(--bc); transition: width .4s; }
+.mb-spot.hit { animation: jpHit .9s cubic-bezier(.3, 1.8, .5, 1); box-shadow: 0 0 0 3px #fff, 0 0 24px var(--bc); }
+@media (max-width: 600px) { .mb-spots { grid-template-columns: repeat(3, 1fr); } }
+
 /* ============ Taco Fiesta ============ */
 .g-taco { --slot-bg: radial-gradient(600px 300px at 15% -5%, rgba(244, 63, 94, .35), transparent 70%), radial-gradient(500px 300px at 95% 10%, rgba(250, 204, 21, .28), transparent 70%), linear-gradient(180deg, #5b0f3a 0%, #2a0a2e 55%, #12041a 100%); }
 .g-taco .slot-title h2 { font-family: KeCoin, 'Bebas Neue', Orbitron, sans-serif; letter-spacing: 3px; color: #fde047; text-shadow: 0 3px 0 #be123c, 0 6px 0 #6b0f2a; }
@@ -6101,6 +6133,7 @@ const ORIGINALS = [
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Chaque cube posé multiplie ta mise, mais gare aux cubes ratés et aux coups de vent.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Bonus PARFAIT", "Encaisse quand tu veux"], "rtp": "96 % (visée parfaite)", "vol": 4, "max": "×125,8"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
+  {"id": "billes", "name": "La Descente", "cat": "quick", "tag": "Course", "sub": "Course de billes avec vraie physique", "colors": ["#38bdf8", "#0b1023"], "description": "Cinq billes dévalent un parcours plein de pièges : entonnoirs, plots rebondissants, moulins, bascules, zones turbo et boue. Mise sur une ou plusieurs billes : la première en bas gagne et ta mise est payée selon sa cote !", "features": ["5 billes, cotes qui changent", "Vraie physique, 40 s de suspense", "Mise sur plusieurs billes", "Remise et tours auto"], "rtp": "≈ 95 %", "vol": 3, "max": "×16,8"},
   {"id": "taco", "name": "La Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200\u00a0\uE1E0 tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200\u00a0\uE1E0", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
@@ -6542,6 +6575,17 @@ const SPECS = {
         ${cube(62, 222, -12, '×50')}${cube(150, 236, 4, '?')}${cube(238, 220, 12, '×1000')}`;
     },
   },
+  billes: {
+    bg: ['#0c4a6e', '#05070b'], light: '#7dd3fc', title: ['LA DESCENTE'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: 'COURSE DE BILLES',
+    art: (u) => {
+      const C = [['#ef4444', '#7f1d1d'], ['#3b82f6', '#1e3a8a'], ['#22c55e', '#14532d'], ['#facc15', '#854d0e'], ['#a855f7', '#581c87']];
+      const ball = (x, y, r, k) => `<g filter="url(#sh${u})"><circle cx="${x}" cy="${y}" r="${r}" fill="${C[k][0]}"/><circle cx="${x}" cy="${y}" r="${r}" fill="url(#bl${u}${k})"/><circle cx="${x - r * 0.35}" cy="${y - r * 0.4}" r="${r * 0.28}" fill="#fff" opacity=".85"/></g>`;
+      const defs = C.map((c, k) => `<radialGradient id="bl${u}${k}" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset=".5" stop-color="${c[0]}" stop-opacity="0"/><stop offset="1" stop-color="${c[1]}"/></radialGradient>`).join('');
+      return `<defs>${defs}</defs><g stroke="#7dd3fc" stroke-width="6" stroke-linecap="round" opacity=".85"><path d="M20 40 L130 90 M280 40 L170 90 M30 170 L230 200 M270 240 L80 270"/></g>
+        <g fill="#f97316">${[[60, 125], [150, 135], [240, 125], [105, 150], [195, 150]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7"/>`).join('')}</g>
+        ${ball(120, 60, 16, 0)}${ball(170, 100, 18, 1)}${ball(90, 205, 20, 2)}${ball(200, 225, 22, 3)}${ball(150, 172, 17, 4)}`;
+    },
+  },
 };
 
 // Bright card colours (top, bottom) for the square lobby posters.
@@ -6549,7 +6593,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -6661,6 +6705,10 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  {
+    game: 'billes', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
+    items: ['5 billes dévalent un parcours plein de pièges', 'Entonnoirs, plots, moulins, bascules, turbo et boue', 'Mise sur une ou plusieurs billes, la cote change à chaque course', 'Environ 40 secondes de suspense par course'],
+  },
   { game: 'roueor', date: '2026-10-31', title: 'Bouton Tours auto', items: ['Nouveau bouton ▶ Tours auto sous les niveaux : 10 à 250 tours d’affilée', 'Les tours s’arrêtent tout seuls quand le bonus tombe'] },
   { game: 'peche', date: '2026-10-31', title: 'Bouton Tours auto', items: ['Nouveau bouton ▶ Tours auto sous les jetons : 10 à 250 tours d’affilée', 'Le même bouton arrête les tours (■ Stop)'] },
   { game: 'plateau', date: '2026-10-31', title: 'Bouton Tours auto', items: ['Nouveau bouton ▶ Tours auto sous les jetons : 10 à 250 tours d’affilée', 'Le même bouton arrête les tours (■ Stop)'] },
@@ -7649,6 +7697,7 @@ const EXTRA_THEMES = {
   plateau: { sd: 0.17, len: 16, root: 196, lead: { wave: 'square', vol: 0.026, dur: 0.12, pat: [12, 16, 19, 16, 24, null, 19, 16, 14, 17, 21, 17, 26, null, 21, null] }, bass: { wave: 'triangle', vol: 0.13, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -7, null, -5, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.18, hv: 0.02 },
   peche: { sd: 0.2, len: 16, root: 174.61, pad: { wave: 'sawtooth', vol: 0.014, dur: 1.8, map: { 0: [0, 4, 7], 8: [-3, 0, 5] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.22, pat: [12, null, 14, 16, null, 19, null, 16, 14, null, 12, 9, null, 12, null, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.3, pat: [-12, null, null, -5, null, null, -10, null, -12, null, null, -7, null, null, -5, null] }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.018 },
   roueor: { sd: 0.22, len: 16, root: 146.83, pad: { wave: 'sawtooth', vol: 0.016, dur: 2, map: { 0: [0, 3, 7], 8: [-2, 2, 7] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.24, pat: [12, null, 15, null, 19, null, 17, 15, 12, null, 10, null, 12, null, null, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.4, pat: [-12, null, null, -12, null, null, -9, null, -12, null, null, -12, null, null, -7, null] }, kick: [0, 6, 8, 14], hat: [4, 12], kv: 0.2, hv: 0.02 },
+  billes: { sd: 0.15, len: 16, root: 220, lead: { wave: 'square', vol: 0.024, dur: 0.1, pat: [12, 16, 19, 24, 19, 16, 12, null, 14, 17, 21, 26, 21, 17, 14, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.16, pat: [-12, null, -12, -5, null, -5, -12, null, -10, null, -10, -3, null, -3, -10, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.18, hv: 0.02 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -9276,6 +9325,7 @@ const FILES = {
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '461b177bb0'],
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', '9f5b8073ff'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', 'a91ebf3389'],
+  billes: ['billes', 'games/impl/billes.js', 'BillesGame', '936f73d25c'],
 };
 const loading = {};
 
