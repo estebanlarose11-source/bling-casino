@@ -6,7 +6,7 @@ service cloud.firestore {
 
     function signedIn() { return request.auth != null; }
     function isMe(uid) { return signedIn() && request.auth.uid == uid; }
-    function isName(n) { return n is string && n.size() >= 1 && n.size() <= 16; }
+    function isName(n) { return n is string && n.size() >= 1 && n.size() <= 64; }
     function isNum(x, lo, hi) { return (x is int || x is float) && x >= lo && x <= hi; }
 
     // Profil complet du joueur : lu et écrit seulement par son propriétaire.
@@ -14,13 +14,11 @@ service cloud.firestore {
     match /users/{uid} {
       allow read, delete: if isMe(uid);
       allow create, update: if isMe(uid)
-        && request.resource.size() < 200 * 1024
         && (!('bal' in request.resource.data) || isNum(request.resource.data.bal, 0, 10000000000))
         && (!('name' in request.resource.data) || isName(request.resource.data.name));
     }
 
-    // Classement public : tout le monde lit, chacun n'écrit que sa ligne, avec des valeurs plausibles,
-    // et pas plus d'une mise à jour toutes les 2 secondes.
+    // Classement public : tout le monde lit, chacun n'écrit que sa ligne, avec des valeurs plausibles.
     match /leaderboard/{uid} {
       allow read: if true;
       allow delete: if isMe(uid);
@@ -31,8 +29,7 @@ service cloud.firestore {
         && isNum(request.resource.data.levelScore, 1, 51)
         && isNum(request.resource.data.bal, 0, 100000000)
         && isNum(request.resource.data.best, 0, 100000000)
-        && isNum(request.resource.data.bestBonus, 0, 100000000)
-        && (resource == null || request.time.toMillis() - resource.data.updated > 2000);
+        && isNum(request.resource.data.bestBonus, 0, 100000000);
     }
 
     // Parrainage : referrals/{nouveauCompte} = { by: parrain }. Créé une seule fois par le nouveau compte,
