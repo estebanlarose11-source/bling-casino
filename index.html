@@ -2363,6 +2363,15 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .defi-top { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 22px; align-items: start; }
 .defi-cover { display: block; border-radius: 22px; overflow: hidden; box-shadow: 0 14px 40px rgba(0, 0, 0, .5); }
 .defi-cover svg { width: 100%; height: auto; display: block; }
+.defi-prize { margin: 10px 0; padding: 10px 14px; border-radius: 12px; background: linear-gradient(90deg, rgba(251, 191, 36, .2), rgba(251, 191, 36, .05)); border: 1px solid rgba(251, 191, 36, .5); font-weight: 600; }
+.defi-prize b { color: #fbbf24; }
+.defi-live { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; padding: 9px 14px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); font-weight: 600; }
+.defi-live b { color: #fde68a; }
+.defi-live.me { border-color: #4ade80; box-shadow: 0 0 14px rgba(74, 222, 128, .3); }
+.live-dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 0 rgba(239, 68, 68, .7); animation: liveDot 1.4s infinite; }
+@keyframes liveDot { 70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+.defi-pill { margin-left: auto; padding: 4px 12px; border-radius: 99px; background: rgba(56, 189, 248, .14); border: 1px solid rgba(56, 189, 248, .45); color: inherit; text-decoration: none; font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%; }
+.defi-pill b { color: #fde68a; }
 .defi-boards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 20px; }
 .defi-list { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; }
 .defi-list li { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); }
@@ -2673,6 +2682,11 @@ const cloud = {
   },
   // Weekly challenge: challenges/{week}/scores/{uid} = { name, best, game, updated }.
   async saveChallenge(week, uid, entry) { await (await init()).db.collection('challenges').doc(week).collection('scores').doc(uid).set(entry); },
+  // Live top n of a week's challenge: cb(list) on every change; returns a function that stops listening.
+  async watchChallenge(week, n, cb) {
+    return (await init()).db.collection('challenges').doc(week).collection('scores').orderBy('best', 'desc').limit(n)
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ uid: d.id, ...d.data() }))), (e) => console.error(e));
+  },
   async topChallenge(week, n) {
     const q = await (await init()).db.collection('challenges').doc(week).collection('scores').orderBy('best', 'desc').limit(n).get();
     return q.docs.map((d) => ({ uid: d.id, ...d.data() }));
@@ -3682,7 +3696,8 @@ __mods['social.js'] = (() => {
 // once that friend reaches level REF_LEVEL (read from their public leaderboard entry), the referrer collects
 // REF_PARRAIN KE + REF_SPINS free spins on Huff la Puff, from the parrainage page or at login.
 // Challenge: one imposed game per week; the score is the biggest win in × the stake on that game (so every bet
-// size is on an equal footing), saved in challenges/{week}/scores/{uid}.
+// size is on an equal footing), saved in challenges/{week}/scores/{uid}. The leader is shown live everywhere a
+// [data-leader] element is on screen; last week's n°1 collects CHAMP_KE and the Champion badge.
 
 const { cloud } = __mods['cloud.js'];
 const { profiles } = __mods['profile.js'];
@@ -3770,15 +3785,17 @@ async function renderReferral(root) {
   };
   if (link) collectReferrals().then((r) => { if (root.isConnected) { showWaiting(r.waiting); if (r.paid) renderReferral(root); } });
   root.querySelector('[data-check]')?.addEventListener('click', async (e) => {
-    e.currentTarget.disabled = true;
+    const btn = e.currentTarget;
+    btn.disabled = true;
     const r = await collectReferrals();
     if (!r.paid) toast(r.waiting.length ? `Tes filleuls n’ont pas encore atteint le niveau ${REF_LEVEL}` : 'Pas de nouveau filleul pour l’instant');
     else { sfx.unlock(); sfx.bigWin(); fx.coins(60); fx.confetti(90); }
-    if (root.isConnected) { if (r.paid) renderReferral(root); else { showWaiting(r.waiting); e.currentTarget.disabled = false; } }
+    if (root.isConnected) { if (r.paid) renderReferral(root); else { showWaiting(r.waiting); btn.disabled = false; } }
   });
 }
 
 /* ---------- weekly challenge ---------- */
+const CHAMP_KE = 50000;
 const CH_GAMES = ['cosmic', 'taco', 'candy', 'zeus', 'huff', 'anubis', 'bling', 'pharaon'];
 function weekOf(t = Date.now()) {
   const d = new Date(t); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
@@ -3791,6 +3808,52 @@ const endOfWeek = () => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDat
 const myBest = () => { const c = profiles.current?.challenge; return c && c.week === weekOf().key ? c.best : 0; };
 
 let saving = null;
+
+/* live leader of the current week, shown in every [data-leader] element */
+let leader = null, unwatch = null, watchedWeek = null, answered = false;
+const leaderHTML = () => (leader ? `👑 En tête : <b>${esc(leader.name)}</b> · ×${String(leader.best).replace('.', ',')}${leader.uid === uid() ? ' (toi !)' : ''}` : '👑 Personne en tête pour l’instant : prends la place !');
+// Only touches elements whose text changed, so the MutationObserver below does not loop.
+function paintLeader() {
+  document.querySelectorAll('[data-leader]').forEach((n) => {
+    if (!answered) return; // keep the placeholder until Firestore answers
+    const html = (n.classList.contains('defi-live') ? '<span class="live-dot"></span>' : '') + leaderHTML();
+    if (n.dataset.v === html) return;
+    n.dataset.v = html; n.innerHTML = html; n.classList.toggle('me', !!leader && leader.uid === uid());
+  });
+}
+async function watchLeader() {
+  const w = weekOf().key;
+  if (watchedWeek === w || !cloud.enabled) return;
+  watchedWeek = w;
+  unwatch?.();
+  try {
+    unwatch = await cloud.watchChallenge(w, 1, (list) => {
+      const prev = leader?.uid;
+      leader = list[0] || null;
+      answered = true;
+      paintLeader();
+      if (leader && prev && prev !== leader.uid && leader.uid !== uid()) toast(`🏁 ${esc(leader.name)} prend la tête du Défi : ×${String(leader.best).replace('.', ',')} !`);
+    });
+  } catch (e) { console.error(e); watchedWeek = null; }
+}
+new MutationObserver(() => { if (document.querySelector('[data-leader]')) { watchLeader(); paintLeader(); } }).observe(document.body, { childList: true, subtree: true });
+
+/* last week's champion: CHAMP_KE + badge, once */
+async function claimChampion() {
+  const me = uid();
+  if (!me) return false;
+  const prev = weekOf(Date.now() - 7 * 864e5).key;
+  if ((profiles.current?.champPaid || []).includes(prev)) return false;
+  const top = await cloud.topChallenge(prev, 1).catch(() => []);
+  if (top[0]?.uid !== me) return false;
+  const badge = `Champion du Défi ${prev}`;
+  profiles.update('champPaid', (p) => { p.champPaid = [...(p.champPaid || []), prev]; p.badges = [...new Set([...(p.badges || []), badge])]; });
+  wallet.grant(CHAMP_KE);
+  sfx.bigWin(); fx.confetti(140); fx.coins(80);
+  toast(`🏆 Tu as gagné le Défi de la semaine dernière : +${fmt(CHAMP_KE)} et le badge Champion !`, 'ok');
+  return true;
+}
+profiles.addEventListener('change', () => { setTimeout(claimChampion, 2500); });
 wallet.addEventListener('payout', (e) => {
   const meta = e.detail.meta, g = (location.hash.match(/^#game-([\w-]+)/) || [])[1];
   if (!meta || !profiles.current || g !== challengeGame()) return;
@@ -3818,7 +3881,9 @@ async function renderChallenge(root) {
         <div>
           <span class="eyebrow">🏁 Défi de la semaine · ${w.key.replace('-S', ' · semaine ')}</span>
           <h1>${g.name}</h1>
-          <p class="muted">Cette semaine, tout le monde joue à <b>${g.name}</b>. Ton score = <b>ton plus gros gain en × la mise</b> sur ce jeu : petite ou grosse mise, tout le monde part à égalité. Le n°1 gagne le badge <b>🏆 Champion du Défi</b>.</p>
+          <p class="muted">Cette semaine, tout le monde joue à <b>${g.name}</b>. Ton score = <b>ton plus gros gain en × la mise</b> sur ce jeu : petite ou grosse mise, tout le monde part à égalité.</p>
+          <div class="defi-prize">🏆 Le n°1 à la fin de la semaine gagne <b>${fmt(CHAMP_KE)}</b> et le badge <b>Champion du Défi</b></div>
+          <div class="defi-live" data-leader><span class="live-dot"></span>Chargement du classement…</div>
           <div class="ref-stats"><div><b>${best ? `×${String(best).replace('.', ',')}` : '—'}</b><small>ton record</small></div><div><b>${dd} j ${hh} h</b><small>avant la fin</small></div></div>
           <a class="btn primary lg" href="#game-${g.id}">Jouer au défi</a>
           ${!uid() ? '<p class="muted small">En invité, ton record compte pour toi mais n’apparaît pas au classement : crée un compte pour y figurer.</p>' : ''}
@@ -3834,13 +3899,12 @@ async function renderChallenge(root) {
       const list = await cloud.topChallenge(week, n);
       if (!ol.isConnected) return;
       ol.innerHTML = list.length ? list.map(row).join('') : '<li class="muted">Personne pour l’instant : sois le premier !</li>';
-      if (sel === '[data-prev]' && list[0]?.uid === uid() && uid()) {
-        const badge = `Champion du Défi ${week}`;
-        if (!(profiles.current.badges || []).includes(badge)) { profiles.update('badges', (p) => { p.badges = [...(p.badges || []), badge]; }); toast(`🏆 Tu es ${badge} !`, 'ok'); fx.confetti(100); }
-      }
+      if (sel === '[data-prev]') claimChampion();
     } catch (err) { console.error(err); if (ol.isConnected) ol.innerHTML = '<li class="muted">Classement indisponible pour le moment.</li>'; }
   };
   fill('[data-board]', w.key, 20);
+  let lastTop = null;
+  const iv = setInterval(() => { if (!root.querySelector('[data-board]')) return clearInterval(iv); const t = leader ? `${leader.uid}:${leader.best}` : ''; if (t !== lastTop) { if (lastTop !== null) fill('[data-board]', w.key, 20); lastTop = t; } }, 1500);
   fill('[data-prev]', prev.key, 3);
 }
 
@@ -5611,7 +5675,7 @@ function renderLobby(root, params = {}) {
 
     <div class="promos">
     ${filter === 'all' && profilesReady() ? (() => { const m = missionStatus(), n = m.rows.filter((r) => r.claimed).length; return m.chest ? '' : `<a class="app-promo ms-promo" href="#missions"><span class="wp-ico">🎯</span><span><b>Missions du jour · ${n} / 3</b><small>${m.toClaim ? `${m.toClaim} récompense${m.toClaim > 1 ? 's' : ''} à récupérer !` : m.rows.map((r) => r.text).join(' · ')}</small></span><em>${m.toClaim ? 'Récupérer' : 'Voir'}</em></a>`; })() : ''}
-    ${filter === 'all' ? `<a class="app-promo defi-promo" href="#defi"><span class="wp-ico">🏁</span><span><b>Défi de la semaine : ${getGame(challengeGame()).name}</b><small>Ton plus gros gain en × la mise · badge Champion au n°1</small></span><em>Participer</em></a>` : ''}
+    ${filter === 'all' ? `<a class="app-promo defi-promo" href="#defi"><span class="wp-ico">🏁</span><span><b>Défi de la semaine : ${getGame(challengeGame()).name}</b><small data-leader>50 000 KE au n°1</small></span><em>Participer</em></a>` : ''}
     ${filter === 'all' && wheelReady() ? `<a class="app-promo wheel-promo" href="#roue"><span class="wp-ico">🎡</span><span><b>Ta Roue du jour est prête !</b><small>Un tour gratuit : KE, XP ou bonus offert</small></span><em>Tourner</em></a>` : ''}
     ${filter === 'all' && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone) ? `<a class="app-promo" href="#appli"><img src="assets/icon-192.png" alt="" width="44" height="44"><span><b>Installe l’appli SpinBet</b><small>Plein écran, sur ton écran d’accueil · iPhone et Android</small></span><em>Installer</em></a>` : ''}
     </div>
@@ -7864,6 +7928,7 @@ const { wallet } = __mods['wallet.js'];
 const { gameCard, volLabel } = __mods['pages/lobby.js'];
 const { hasImpl, loadImpl } = __mods['games/impl/index.js'];
 const { profiles } = __mods['profile.js'];
+const { challengeGame } = __mods['social.js'];
 
 let current = null;
 
@@ -7877,7 +7942,7 @@ const dots = (n) => `<span class="dots">${[1, 2, 3, 4, 5].map((i) => `<i class="
 
 function renderRebuilt(root, game) {
   root.innerHTML = `
-    <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-${game.cat}">${game.tag}</a><span>›</span><b>${game.name}</b></nav>
+    <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-${game.cat}">${game.tag}</a><span>›</span><b>${game.name}</b>${challengeGame() === game.id ? '<a class="defi-pill" href="#defi">🏁 Défi de la semaine · <span data-leader>50 000 KE au n°1</span></a>' : ''}</nav>
     <div class="game-host"></div>
     <section class="game-about panel">
       <div><h2>${game.name} <small>${game.sub}</small></h2><p class="muted">${game.description}</p>
