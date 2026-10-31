@@ -3140,6 +3140,67 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
   .view.enter > *, .slot:not(.busy) .spin-btn { animation: none !important; }
   .rv { opacity: 1; transform: none; }
 }
+
+/* ============ Le Cosmique · finition : nébuleuse vivante, étoiles filantes, cadre néon, gains en onde ============ */
+.ch-neb { position: absolute; inset: -30%; will-change: transform; opacity: .7; animation: chNeb 40s ease-in-out infinite alternate;
+  background: radial-gradient(30% 25% at 30% 35%, rgba(168, 85, 247, .45), transparent 70%), radial-gradient(28% 24% at 70% 60%, rgba(34, 211, 238, .35), transparent 70%), radial-gradient(22% 20% at 55% 25%, rgba(244, 114, 182, .32), transparent 70%); }
+@keyframes chNeb { to { transform: translate3d(6%, -4%, 0) rotate(8deg) scale(1.08); } }
+.ch-shoot { position: absolute; top: 0; left: 0; width: 120px; height: 2px; border-radius: 2px; opacity: 0; will-change: transform, opacity;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .95)); box-shadow: 0 0 8px #a5f3fc; animation: chShoot 7s linear infinite; }
+.ch-shoot.a { --sx: 10%; --sy: 8%; animation-delay: 1s; }
+.ch-shoot.b { --sx: 55%; --sy: 4%; animation-delay: 3.6s; animation-duration: 9s; }
+.ch-shoot.c { --sx: 30%; --sy: 30%; animation-delay: 6s; animation-duration: 11s; }
+@keyframes chShoot { 0% { transform: translate(calc(var(--sx) * 8), calc(var(--sy) * 8)) rotate(28deg) translateX(0); opacity: 0; } 2% { opacity: 1; } 10% { transform: translate(calc(var(--sx) * 8), calc(var(--sy) * 8)) rotate(28deg) translateX(420px); opacity: 0; } 100% { opacity: 0; } }
+.ch-planet { animation: chPlanet 9s ease-in-out infinite alternate; }
+.ch-planet::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-linear-gradient(170deg, transparent 0 14px, rgba(255, 255, 255, .12) 14px 20px); animation: chBands 20s linear infinite; }
+@keyframes chPlanet { to { transform: translateY(-8px) scale(1.03); box-shadow: 0 0 60px rgba(168, 85, 247, .85); } }
+@keyframes chBands { to { background-position: 0 120px; } }
+.ch-ring { animation: chRing 6s ease-in-out infinite alternate; }
+@keyframes chRing { to { border-color: rgba(250, 204, 21, .8); box-shadow: 0 0 16px rgba(250, 204, 21, .5); } }
+.ch-moon { position: absolute; left: 6%; top: 10%; width: 34px; aspect-ratio: 1; border-radius: 50%; opacity: .55; background: radial-gradient(circle at 35% 30%, #fff, #a5f3fc 50%, #0e7490); box-shadow: 0 0 16px rgba(34, 211, 238, .7); animation: chMoon 14s ease-in-out infinite alternate; }
+@keyframes chMoon { to { transform: translate(30px, 16px); } }
+.cosmic-frame { background-size: 300% 300%; animation: chFrame 9s linear infinite; }
+@keyframes chFrame { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.g-cosmic .sg-cell.win::after { content: ''; position: absolute; inset: 8%; border-radius: inherit; pointer-events: none; box-shadow: 0 0 0 2px #a5f3fc, 0 0 14px #22d3ee; animation: chWave .9s ease-out infinite; }
+@keyframes chWave { from { transform: scale(.8); opacity: 1; } to { transform: scale(1.25); opacity: 0; } }
+.g-cosmic .sg-cell.c3 { animation: chGold 1.6s ease-in-out infinite alternate; }
+@keyframes chGold { to { box-shadow: inset 0 0 0 2px #fde047, inset 0 0 26px rgba(250, 204, 21, .75), 0 0 10px rgba(250, 204, 21, .5); } }
+.ch-meter { position: relative; overflow: hidden; }
+.ch-meter::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 35%, rgba(165, 243, 252, .35) 50%, transparent 65%); transform: translateX(-120%); animation: proSweep 4s ease-in-out infinite; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .ch-neb, .ch-shoot, .ch-planet, .ch-planet::before, .ch-ring, .ch-moon, .cosmic-frame, .g-cosmic .sg-cell.win::after, .g-cosmic .sg-cell.c3, .ch-meter::after { animation: none !important; } }
+
+/* ============ Le Texas · finition : vrai tapis, cartes illustrées, jetons en relief, tour du joueur ============ */
+.g-poker .pk-table { background: radial-gradient(ellipse at 50% -10%, rgba(253, 230, 138, .14), transparent 55%), #050f0a; }
+.pk-oval { background: radial-gradient(ellipse at 50% 38%, #24a065, #117044 55%, #0a4229 85%), #0e5a37;
+  box-shadow: 0 0 0 3px #d4a72c, 0 0 0 10px #6b3d14, 0 0 0 11px #3a1e08, 0 0 0 14px #8a5a20, 0 16px 40px rgba(0, 0, 0, .7), inset 0 0 60px rgba(0, 0, 0, .5); }
+.pk-oval::before { content: ''; position: absolute; inset: 9%; border-radius: 50%; border: 2px solid rgba(253, 230, 138, .28); box-shadow: 0 0 0 6px rgba(0, 0, 0, .06); pointer-events: none; }
+.pk-oval::after { content: 'SPINBET · TEXAS'; position: absolute; left: 50%; top: 74%; transform: translateX(-50%); font: 900 clamp(10px, 2.4cqi, 18px) 'Bebas Neue', Impact, sans-serif; letter-spacing: 6px; color: rgba(253, 230, 138, .16); white-space: nowrap; pointer-events: none; }
+.pk-oval { background-image: radial-gradient(rgba(255, 255, 255, .025) 1px, transparent 1px), radial-gradient(ellipse at 50% 38%, #24a065, #117044 55%, #0a4229 85%); background-size: 4px 4px, 100% 100%; }
+.pk-card { background: linear-gradient(160deg, #ffffff, #f1f5f9 60%, #e2e8f0); border: 1px solid rgba(0, 0, 0, .12); box-shadow: 0 4px 10px rgba(0, 0, 0, .5), inset 0 0 0 2px rgba(255, 255, 255, .7); overflow: hidden; }
+.pk-card .r { display: flex; flex-direction: column; align-items: center; }
+.pk-card .r i { font-style: normal; font-size: .62em; line-height: 1; margin-top: 1px; }
+.pk-card .s { opacity: .9; transform: rotate(180deg); }
+.pk-card .c { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); font-size: calc(var(--cw) * .62); line-height: 1; opacity: .9; display: flex; flex-direction: column; align-items: center; }
+.pk-card .c em { font-style: normal; font: 900 calc(var(--cw) * .34) Georgia, serif; line-height: 1; margin-bottom: -2px; }
+.pk-seat .pk-card.mini .c { display: none; }
+.pk-card.back { background: radial-gradient(circle at 50% 50%, #9f1239 0 22%, transparent 23%), repeating-linear-gradient(45deg, #7c1d3a 0 4px, #5b1029 4px 8px); border: 2px solid #fde68a; box-shadow: 0 4px 10px rgba(0, 0, 0, .5), inset 0 0 0 3px #7c1d3a, inset 0 0 0 4px rgba(253, 230, 138, .6); }
+.pk-card.back::after { content: 'S'; position: absolute; inset: 0; display: grid; place-items: center; font: 900 calc(var(--cw) * .36) Orbitron, sans-serif; color: #fde68a; text-shadow: 0 0 6px rgba(253, 230, 138, .7); }
+.pk-seat.turn .pk-av::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; pointer-events: none;
+  background: conic-gradient(#fde047 0 25%, transparent 25% 100%); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px)); animation: proRing 1.2s linear infinite; }
+.pk-seat.win .pk-av::before { content: '👑'; position: absolute; left: 50%; top: -22px; transform: translateX(-50%); font-size: 20px; animation: pkCrown .6s cubic-bezier(.3, 1.6, .5, 1) both, pkFloat 1.6s ease-in-out .6s infinite alternate; }
+@keyframes pkCrown { from { transform: translate(-50%, 10px) scale(0); } }
+@keyframes pkFloat { to { transform: translate(-50%, -4px); } }
+.pk-seat.win .pk-plate { animation: pkWin 1s ease-in-out infinite alternate; }
+@keyframes pkWin { to { box-shadow: 0 0 26px rgba(253, 224, 71, 1), inset 0 0 10px rgba(253, 224, 71, .4); } }
+.pk-bet { background: linear-gradient(180deg, rgba(0, 0, 0, .65), rgba(0, 0, 0, .45)); box-shadow: 0 0 0 1px rgba(253, 230, 138, .25); }
+.pk-bet i { width: 18px; height: 18px; border: 0; background: repeating-conic-gradient(#d42a3c 0 30deg, #fff 30deg 45deg); box-shadow: 0 2px 0 #7f1d1d, 0 4px 0 #b91c1c, 0 5px 0 #7f1d1d, inset 0 0 0 3px #d42a3c; }
+.pk-pot { background: linear-gradient(180deg, rgba(0, 0, 0, .65), rgba(0, 0, 0, .45)); box-shadow: 0 0 0 1px rgba(253, 230, 138, .35), 0 0 16px rgba(253, 230, 138, .15); }
+.pk-av { box-shadow: 0 4px 10px rgba(0, 0, 0, .6); }
+.pk-go { position: relative; overflow: hidden; }
+.pk-go::after { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .45) 50%, transparent 70%); transform: translateX(-120%); animation: proSweep 4s ease-in-out infinite; pointer-events: none; }
+.pk-hero span { display: inline-block; animation: pkSuits 3s ease-in-out infinite; }
+@keyframes pkSuits { 50% { transform: translateY(-4px); text-shadow: 0 0 12px #fde68a; } }
+@media (prefers-reduced-motion: reduce) { .pk-seat.turn .pk-av::after, .pk-seat.win .pk-av::before, .pk-seat.win .pk-plate, .pk-go::after, .pk-hero span { animation: none !important; } }
 </style>
 </head>
 <body>
@@ -6592,6 +6653,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'cosmic', date: '2026-10-31', title: 'Nouveau décor spatial', items: ['Nébuleuse qui bouge, étoiles filantes et lune en orbite', 'Cadre néon animé, ondes lumineuses autour des gains', 'Cases dorées qui scintillent'] },
+  { game: 'poker', date: '2026-10-31', title: 'Table relookée', items: ['Tapis feutré avec liseré doré et bordure en bois', 'Cartes illustrées et retournement en 3D', 'Jetons en relief, chrono lumineux sur le joueur qui parle, couronne pour le gagnant'] },
   { game: 'roueor', date: '2026-10-31', title: '3 niveaux et mélange', items: ['Choisis Simple, Moyen ou Compliqué : moins d’or sur la roue = plus gros cubes (jusqu’à ×5 000)', 'Dans le bonus, les 24 multiplicateurs sont montrés, puis cachés et mélangés avant ton choix'] },
   { game: 'roueor', date: '2026-10-31', title: 'Tout est révélé', items: ['À la fin du bonus, tous les cubes encore fermés montrent leur multiplicateur'] },
   { game: 'roueor', date: '2026-10-31', title: '24 cubes', items: ['Le bonus passe à 24 cubes à ouvrir', 'Un quart des cubes restants s’ouvre à chaque étape'] },
@@ -9146,7 +9209,7 @@ const FILES = {
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', 'e5d34f1a35'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', '3a85f14671'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
-  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f7ff05ea7f'],
+  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'cad2eb2bf8'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '3a3d88c80e'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '9640e5a788'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
@@ -9156,7 +9219,7 @@ const FILES = {
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '7069fc4250'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'bdcfd7b479'],
-  poker: ['poker', 'games/impl/poker.js', 'PokerGame', '648f87164c'],
+  poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '99a0a088b7'],
   avion: ['avion', 'games/impl/avion.js', 'AvionGame', 'f1f28a9577'],
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '577a616908'],

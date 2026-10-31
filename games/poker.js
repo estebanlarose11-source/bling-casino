@@ -99,7 +99,8 @@ const SLOTS = { 2: [0, 3], 3: [0, 2, 4], 4: [0, 1, 3, 5], 5: [0, 1, 2, 4, 5], 6:
 // seat centres (%) on the wide oval and on the tall (phone) oval, clockwise from the player at the bottom
 const POS = [[50, 83, 50, 87], [9, 64, 13, 67], [15, 15, 13, 27], [50, 7, 50, 7], [85, 15, 87, 27], [91, 64, 87, 67]];
 const CEN = [50, 47];
-const FACE = (c) => `<span class="r">${c.v <= 10 ? c.v : 'JQKA'[c.v - 11]}</span><span class="s">${c.s}</span>`;
+const RANK = (c) => (c.v <= 10 ? c.v : 'JQKA'[c.v - 11]);
+const FACE = (c) => `<span class="r">${RANK(c)}<i>${c.s}</i></span><span class="c">${c.v > 10 && c.v < 14 ? `<em>${RANK(c)}</em>` : ''}${c.s}</span><span class="s">${c.s}</span>`;
 const RED = (c) => c.s === '♥' || c.s === '♦';
 const STREETS = ['Pré-flop', 'Flop', 'Turn', 'River'];
 
@@ -298,9 +299,9 @@ class PokerGame extends BaseGame {
 
   flip(node, c) {
     const d = this.turbo ? 90 : 150;
-    node.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: d, easing: 'ease-in' }).finished.then(() => {
+    node.animate([{ transform: 'perspective(500px) rotateY(0) translateY(0)' }, { transform: 'perspective(500px) rotateY(90deg) translateY(-6px) scale(1.08)' }], { duration: d, easing: 'ease-in' }).finished.then(() => {
       node.classList.remove('back'); node.innerHTML = FACE(c);
-      node.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: d, easing: 'ease-out' });
+      node.animate([{ transform: 'perspective(500px) rotateY(-90deg) translateY(-6px) scale(1.08)' }, { transform: 'perspective(500px) rotateY(0) translateY(0)' }], { duration: d * 1.4, easing: 'cubic-bezier(.3,1.5,.5,1)' });
     });
   }
 

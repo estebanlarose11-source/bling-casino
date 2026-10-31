@@ -119,7 +119,7 @@ class CosmicGame extends BaseGame {
       music: EXTRA_THEMES.cosmic,
       frameCls: 'cosmic-frame',
       stage: `<div class="ch-stage">
-        <div class="ch-space"><i class="ch-stars s1"></i><i class="ch-stars s2"></i><i class="ch-planet"></i><i class="ch-ring"></i></div>
+        <div class="ch-space"><i class="ch-neb"></i><i class="ch-stars s1"></i><i class="ch-stars s2"></i><i class="ch-shoot a"></i><i class="ch-shoot b"></i><i class="ch-shoot c"></i><i class="ch-planet"></i><i class="ch-ring"></i><i class="ch-moon"></i></div>
         <div class="ch-board">
           <div class="grid-host"></div>
           <div class="ch-word"></div>
