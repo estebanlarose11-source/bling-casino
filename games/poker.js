@@ -110,7 +110,7 @@ class PokerGame extends BaseGame {
       cls: 'table-game poker',
       stage: `<div class="pk">
         <div class="pk-setup">
-          <div class="pk-hero"><span>♠ ♥ ♦ ♣</span><h3>Texas Hold’em</h3><p>No Limit · table de 2 à 6 joueurs</p></div>
+          <div class="pk-hero"><span>♠ ♥ ♦ ♣</span><h3>Le Texas</h3><p>No Limit · table de 2 à 6 joueurs</p></div>
           <div class="pk-opt"><label>Adversaires</label><div class="pk-seg" data-o="bots">${[1, 2, 3, 4, 5].map((n) => `<button data-v="${n}">${n} bot${n > 1 ? 's' : ''}</button>`).join('')}</div><div class="pk-faces"></div></div>
           <div class="pk-opt"><label>Blindes (petite / grosse)</label><div class="pk-seg" data-o="blind">${BLINDS.map((b, i) => `<button data-v="${i}">${fmtC(b[0])} / ${fmtC(b[1])}</button>`).join('')}</div></div>
           <div class="pk-opt"><label>Tapis de départ (pour toi et chaque bot)</label><div class="pk-seg" data-o="depth"></div></div>
@@ -228,7 +228,7 @@ class PokerGame extends BaseGame {
     if (this.cashed || !this.me) return 0;
     this.cashed = true;
     const s = this.me.stack;
-    if (s > 0) wallet.credit(s / 100, s > this.buy ? { game: 'Texas Hold’em', x: s / this.buy } : undefined);
+    if (s > 0) wallet.credit(s / 100, s > this.buy ? { game: 'Le Texas', x: s / this.buy } : undefined);
     this.updateMeters();
     return s;
   }

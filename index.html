@@ -3692,8 +3692,8 @@ const { fx, sleep } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
 const GIFTS = [
-  { game: 'cosmic', buy: 'A', label: 'Orbite Basse offert sur Cosmic Heist' },
-  { game: 'candy', buy: 'fs', label: 'Bal de la Reine offert sur Candy Queen' },
+  { game: 'cosmic', buy: 'A', label: 'Orbite Basse offert sur Le Cosmique' },
+  { game: 'candy', buy: 'fs', label: 'Bal de la Reine offert sur La Sweety' },
 ];
 const SEGS = [
   { k: 'ke', v: 20, c: '#334155' }, { k: 'ke', v: 50, c: '#7c3aed' }, { k: 'xp', v: 60, c: '#0891b2' },
@@ -3845,7 +3845,7 @@ const { toast } = __mods['ui.js'];
 const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
-const GAMES = [['cosmic', 'Cosmic Heist'], ['taco', 'Taco Fiesta'], ['zeus', 'Zeus Thunder'], ['candy', 'Candy Queen'], ['pileface', 'Pile ou Face Turbo'], ['robots', 'Course de Robots'], ['huff', 'Huff la Puff XXTrem'], ['mines', 'Mines'], ['plinko', 'Plinko']];
+const GAMES = [['cosmic', 'Le Cosmique'], ['taco', 'La Fiesta'], ['zeus', 'L’Olympe'], ['candy', 'La Sweety'], ['pileface', 'La Pièce'], ['robots', 'La Course'], ['huff', 'Le Loup 2.0'], ['mines', 'Le Champ de Mines'], ['plinko', 'La Cascade']];
 const CHEST = { ke: 150, xp: 120 };
 
 const dayKey = (t = Date.now()) => { const d = new Date(t); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
@@ -3997,7 +3997,7 @@ async function collectReferrals() {
     profiles.update('refPaid', (p) => { p.refPaid = [...paid, ...ok.map((r) => r.uid)]; });
     wallet.grant(REF_PARRAIN * ok.length);
     giftsMod().addRounds(REF_GAME, REF_SPINS * ok.length);
-    toast(`🤝 ${ok.length > 1 ? `${ok.length} filleuls ont atteint` : `${esc(ok[0].name || 'Ton filleul')} a atteint`} le niveau ${REF_LEVEL} : +${fmt(REF_PARRAIN * ok.length)} et ${REF_SPINS * ok.length} tours offerts sur Huff la Puff !`, 'ok');
+    toast(`🤝 ${ok.length > 1 ? `${ok.length} filleuls ont atteint` : `${esc(ok[0].name || 'Ton filleul')} a atteint`} le niveau ${REF_LEVEL} : +${fmt(REF_PARRAIN * ok.length)} et ${REF_SPINS * ok.length} tours offerts sur Le Loup 2.0 !`, 'ok');
   }
   return { paid: ok.length, waiting };
 }
@@ -4025,7 +4025,7 @@ async function renderReferral(root) {
       <span class="eyebrow">🤝 Parrainage</span>
       <h1>Invite tes amis</h1>
       <div class="ref-offer">
-        <div class="ref-card you"><small>Pour toi</small><b>${fmt(REF_PARRAIN)}</b><span>+ ${REF_SPINS} tours offerts sur Huff la Puff</span></div>
+        <div class="ref-card you"><small>Pour toi</small><b>${fmt(REF_PARRAIN)}</b><span>+ ${REF_SPINS} tours offerts sur Le Loup 2.0</span></div>
         <div class="ref-card friend"><small>Pour ton ami</small><b>+${fmt(REF_KE)}</b><span>en plus de son solde de départ</span></div>
       </div>
       <p class="muted">Ta récompense arrive quand ton ami atteint le <b>niveau ${REF_LEVEL}</b> (jusqu’à ${REF_MAX} amis).</p>
@@ -4035,7 +4035,7 @@ async function renderReferral(root) {
         <button class="btn ghost" data-check>🔄 Vérifier mes filleuls</button>`
       : '<p class="ref-need">Le parrainage demande un <b>compte</b> (e-mail et mot de passe) : déconnecte-toi du mode invité et crée ton compte depuis l’écran d’accueil.</p>'}
       <h4>Comment ça marche ?</h4>
-      <ol class="app-list"><li>Copie ton lien et envoie-le (WhatsApp, Snap, Discord…).</li><li>Ton ami ouvre le lien et crée son compte : il reçoit <b>${fmt(REF_KE)} de plus</b> tout de suite.</li><li>Dès qu’il atteint le niveau ${REF_LEVEL}, tu reçois <b>${fmt(REF_PARRAIN)}</b> et <b>${REF_SPINS} tours offerts</b> sur Huff la Puff (à ${fmt(0.8)} la mise), ici ou à ta prochaine connexion.</li></ol>
+      <ol class="app-list"><li>Copie ton lien et envoie-le (WhatsApp, Snap, Discord…).</li><li>Ton ami ouvre le lien et crée son compte : il reçoit <b>${fmt(REF_KE)} de plus</b> tout de suite.</li><li>Dès qu’il atteint le niveau ${REF_LEVEL}, tu reçois <b>${fmt(REF_PARRAIN)}</b> et <b>${REF_SPINS} tours offerts</b> sur Le Loup 2.0 (à ${fmt(0.8)} la mise), ici ou à ta prochaine connexion.</li></ol>
     </section>`;
   const input = root.querySelector('.ref-box input');
   root.querySelector('[data-copy]')?.addEventListener('click', async () => {
@@ -5436,7 +5436,7 @@ const scalePays = (symbols, k) => symbols.map((s) => (s.pays && !s.scatter
 const GAMES = [
   {
     id: 'big-bad-wolf',
-    name: 'Big Bad Wolf',
+    name: 'Le Loup',
     subtitle: 'Huff & Spin',
     tags: ['hold', 'featured', 'buy'],
     theme: 'wolf',
@@ -5480,30 +5480,30 @@ const GAMES = [
 
 // The original Bling games: same rules and payouts, rebuilt on the shared cabinet (js/games/impl/).
 const ORIGINALS = [
-  {"id": "cosmic", "name": "Cosmic Heist", "cat": "slot", "tag": "Machine à sous", "sub": "Casse néon dans l’espace", "colors": ["#22d3ee", "#7c3aed"], "description": "K-0B, le robot cambrioleur, vide un astéroïde de ses cristaux. Les grappes de 5 symboles explosent en cascade et chargent leurs cases d’énergie : bleu, rose, puis doré. Quand une supernova éclate, toutes les cellules chargées livrent leur butin, avec des trous noirs qui multiplient leur ligne et leur colonne et des vaisseaux qui aspirent tout. 3 bonus avec les balises.", "features": ["Grappes de 5", "Cellules d’énergie à 3 niveaux", "Supernova et Surcharge", "Trous noirs ×2 à ×25", "Vaisseaux-aspirateurs", "3 bonus", "Radar à balises", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
-  {"id": "zeus", "name": "Zeus Thunder", "cat": "slot", "tag": "Machine à sous", "sub": "Pay Anywhere, multiplicateurs ×500", "colors": ["#3b82f6", "#1e1b4b"], "description": "Sur l’Olympe, Zeus fait pleuvoir les gemmes. 8 symboles identiques n’importe où sur la grille 6×5 paient, les gains tombent en cascade et Zeus lance des orbes multiplicateurs de ×2 à ×500. 4 scatters lancent 15 tours gratuits avec un multiplicateur global qui ne se réinitialise jamais.", "features": ["Grille 6×5 Pay Anywhere", "Cascades", "Orbes ×2 à ×500", "15 Free Spins", "Multiplicateur global", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
-  {"id": "huff", "name": "Huff la Puff XXTrem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Huff ’n’ Puff : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent XXTREM Puff avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. 5 scatters lancent le MEGA BONUS et sa roue du loup. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Huff ’n’ Puff", "4 scatters : roulette des maisons", "5 scatters : MEGA BONUS", "Cases ×2 à ×200", "Mini, Minor, Major, Jackpot ×5 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
-  {"id": "candy", "name": "Candy Queen", "cat": "slot", "tag": "Machine à sous", "sub": "Bonbons spéciaux et multiplicateur royal", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et chaque cascade fait grimper le multiplicateur jusqu’à ×20. Les grosses grappes créent des bonbons spéciaux : cœur explosif, bocal bombe et baguette magique. 4 couronnes ouvrent le Bal de la Reine, où le multiplicateur ne redescend jamais.", "features": ["Grappes de 5", "Multiplicateur de cascades ×1 à ×20", "Cœur explosif, bocal bombe, baguette", "Bal de la Reine : multiplicateur permanent", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
-  {"id": "anubis", "name": "Anubis Reborn", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
-  {"id": "bling", "name": "Bling Tower", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
-  {"id": "pharaon", "name": "Pharaon Gold", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
-  {"id": "bounty", "name": "Bounty Reef", "cat": "slot", "tag": "Machine à sous", "sub": "Free spins bounty", "colors": ["#0c93b8", "#0a2a58"], "description": "Gains en groupes sur une petite grille. 3 scatters lancent un bonus de 8 tours, 4 scatters le bonus Bounty de 12 tours avec multiplicateur plus fort.", "features": ["Gains n’importe où", "Bonus 8 et 12 tours", "Multiplicateur ×2 ou ×5", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
-  {"id": "madwheel", "name": "Mad Wheel", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Top Slot, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Top Slot et quatre jeux bonus animés : Pile ou Face, Chasse au Cash, Pachinko et Méga Folie.", "features": ["Top Slot ×2 à ×50", "Pile ou Face", "Chasse au Cash", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
-  {"id": "storm", "name": "Lightning Storm", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
-  {"id": "doublespin", "name": "Double Spin", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
-  {"id": "blackjack", "name": "Blackjack", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 6 pour 5", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 6 pour 5.", "features": ["Doubler", "Séparer une paire", "Blackjack 6 pour 5", "Animations de cartes"], "rtp": "≈ 98 %", "vol": 1, "max": "×2,2"},
-  {"id": "lightningbj", "name": "Lightning Blackjack", "cat": "table", "tag": "Cartes", "sub": "Multiplicateurs éclair jusqu’à ×1000", "colors": ["#3b82f6", "#0b0f3a"], "description": "Le blackjack frappé par la foudre : avant chaque distribution, les scores 17, 18, 19, 20 et 21 reçoivent un multiplicateur de ×1 à ×1000. Gagne ta main sur ce score et ton gain est multiplié tout de suite. Side bets Paires Parfaites, 21+3 et Bust It.", "features": ["Multiplicateurs ×1 à ×1000", "Gain multiplié dans la manche", "Paires Parfaites", "21+3", "Bust It", "Doubler et séparer"], "rtp": "≈ 97,5 %", "vol": 4, "max": "×1 500"},
-  {"id": "poker", "name": "Texas Hold’em", "cat": "table", "tag": "Poker", "sub": "No Limit contre 1 à 5 bots", "colors": ["#10b981", "#06301f"], "description": "Une vraie table de Texas Hold’em No Limit : choisis tes adversaires (1 à 5 bots aux caractères différents), les blindes et ton tapis, puis joue pré-flop, flop, turn et river jusqu’au showdown.", "features": ["1 à 5 bots", "Blindes au choix", "Pots secondaires", "Bots qui bluffent", "Raccourcis de mise", "Showdown animé"], "rtp": "Selon ton jeu", "vol": 3, "max": "Toute la table"},
-  {"id": "mines", "name": "Mines", "cat": "quick", "tag": "Instantané", "sub": "Évite les bombes", "colors": ["#ffa51f", "#8a2a0c"], "description": "Retourne des cases sans toucher une bombe. Choisis de 1 à 24 bombes : plus il y en a, plus le multiplicateur grimpe vite. Encaisse quand tu veux.", "features": ["1 à 24 bombes", "Encaisse quand tu veux", "Multiplicateur croissant"], "rtp": "≈ 96 %", "vol": 3, "max": "Selon les bombes"},
-  {"id": "avion", "name": "Avion", "cat": "quick", "tag": "Crash", "sub": "Encaisse avant l’explosion", "colors": ["#f0284f", "#4a0a1f"], "description": "L’avion décolle et le multiplicateur grimpe : encaisse avant qu’il explose. Tu peux régler un encaissement automatique.", "features": ["Courbe en direct", "Encaissement auto", "Historique des explosions"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
-  {"id": "plinko", "name": "Plinko", "cat": "quick", "tag": "Instantané", "sub": "Billes, clous et multiplicateurs", "colors": ["#38bdf8", "#4c1d95"], "description": "Lâche tes billes en haut de la pyramide : elles rebondissent de clou en clou et tombent dans une case multiplicateur. Choisis le risque, de 8 à 16 rangées, et lance jusqu’à 20 billes d’un coup.", "features": ["8 à 16 rangées", "3 niveaux de risque", "Jusqu’à 20 billes par lancer", "Multiplicateurs jusqu’à ×1 000"], "rtp": "≈ 94 %", "vol": 4, "max": "×1 000"},
-  {"id": "vortex", "name": "Roue Rouge Noire", "cat": "quick", "tag": "Instantané", "sub": "Rouge, la bille tombe · noir, elle bloque", "colors": ["#ef4444", "#1f0a0a"], "description": "Une grande roue de 9 anneaux rouges et noirs qui tournent. Ta mise tombe du haut de la roue vers le centre : sur une case rouge elle passe à l’anneau suivant et le multiplicateur monte, sur une case noire elle est bloquée et tu encaisses. Au centre : ×1 000.", "features": ["9 anneaux qui tournent", "Cases bonus ×2 et ×4", "Relance à partir du 4e anneau", "×1 000 au centre"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
+  {"id": "cosmic", "name": "Le Cosmique", "cat": "slot", "tag": "Machine à sous", "sub": "Casse néon dans l’espace", "colors": ["#22d3ee", "#7c3aed"], "description": "K-0B, le robot cambrioleur, vide un astéroïde de ses cristaux. Les grappes de 5 symboles explosent en cascade et chargent leurs cases d’énergie : bleu, rose, puis doré. Quand une supernova éclate, toutes les cellules chargées livrent leur butin, avec des trous noirs qui multiplient leur ligne et leur colonne et des vaisseaux qui aspirent tout. 3 bonus avec les balises.", "features": ["Grappes de 5", "Cellules d’énergie à 3 niveaux", "Supernova et Surcharge", "Trous noirs ×2 à ×25", "Vaisseaux-aspirateurs", "3 bonus", "Radar à balises", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
+  {"id": "zeus", "name": "L’Olympe", "cat": "slot", "tag": "Machine à sous", "sub": "Pay Anywhere, multiplicateurs ×500", "colors": ["#3b82f6", "#1e1b4b"], "description": "Sur l’Olympe, Zeus fait pleuvoir les gemmes. 8 symboles identiques n’importe où sur la grille 6×5 paient, les gains tombent en cascade et Zeus lance des orbes multiplicateurs de ×2 à ×500. 4 scatters lancent 15 tours gratuits avec un multiplicateur global qui ne se réinitialise jamais.", "features": ["Grille 6×5 Pay Anywhere", "Cascades", "Orbes ×2 à ×500", "15 Free Spins", "Multiplicateur global", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
+  {"id": "huff", "name": "Le Loup 2.0", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Huff ’n’ Puff : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent XXTREM Puff avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. 5 scatters lancent le MEGA BONUS et sa roue du loup. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Huff ’n’ Puff", "4 scatters : roulette des maisons", "5 scatters : MEGA BONUS", "Cases ×2 à ×200", "Mini, Minor, Major, Jackpot ×5 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
+  {"id": "candy", "name": "La Sweety", "cat": "slot", "tag": "Machine à sous", "sub": "Bonbons spéciaux et multiplicateur royal", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et chaque cascade fait grimper le multiplicateur jusqu’à ×20. Les grosses grappes créent des bonbons spéciaux : cœur explosif, bocal bombe et baguette magique. 4 couronnes ouvrent le Bal de la Reine, où le multiplicateur ne redescend jamais.", "features": ["Grappes de 5", "Multiplicateur de cascades ×1 à ×20", "Cœur explosif, bocal bombe, baguette", "Bal de la Reine : multiplicateur permanent", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
+  {"id": "anubis", "name": "L’Anubis", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
+  {"id": "bling", "name": "La Tour Bling", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
+  {"id": "pharaon", "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
+  {"id": "bounty", "name": "Le Récif", "cat": "slot", "tag": "Machine à sous", "sub": "Free spins bounty", "colors": ["#0c93b8", "#0a2a58"], "description": "Gains en groupes sur une petite grille. 3 scatters lancent un bonus de 8 tours, 4 scatters le bonus Bounty de 12 tours avec multiplicateur plus fort.", "features": ["Gains n’importe où", "Bonus 8 et 12 tours", "Multiplicateur ×2 ou ×5", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
+  {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Top Slot, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Top Slot et quatre jeux bonus animés : Pile ou Face, Chasse au Cash, Pachinko et Méga Folie.", "features": ["Top Slot ×2 à ×50", "Pile ou Face", "Chasse au Cash", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
+  {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
+  {"id": "doublespin", "name": "La Double Bille", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
+  {"id": "blackjack", "name": "Le 21", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 6 pour 5", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 6 pour 5.", "features": ["Doubler", "Séparer une paire", "Blackjack 6 pour 5", "Animations de cartes"], "rtp": "≈ 98 %", "vol": 1, "max": "×2,2"},
+  {"id": "lightningbj", "name": "Le 21 Électrique", "cat": "table", "tag": "Cartes", "sub": "Multiplicateurs éclair jusqu’à ×1000", "colors": ["#3b82f6", "#0b0f3a"], "description": "Le blackjack frappé par la foudre : avant chaque distribution, les scores 17, 18, 19, 20 et 21 reçoivent un multiplicateur de ×1 à ×1000. Gagne ta main sur ce score et ton gain est multiplié tout de suite. Side bets Paires Parfaites, 21+3 et Bust It.", "features": ["Multiplicateurs ×1 à ×1000", "Gain multiplié dans la manche", "Paires Parfaites", "21+3", "Bust It", "Doubler et séparer"], "rtp": "≈ 97,5 %", "vol": 4, "max": "×1 500"},
+  {"id": "poker", "name": "Le Texas", "cat": "table", "tag": "Poker", "sub": "No Limit contre 1 à 5 bots", "colors": ["#10b981", "#06301f"], "description": "Une vraie table de Texas Hold’em No Limit : choisis tes adversaires (1 à 5 bots aux caractères différents), les blindes et ton tapis, puis joue pré-flop, flop, turn et river jusqu’au showdown.", "features": ["1 à 5 bots", "Blindes au choix", "Pots secondaires", "Bots qui bluffent", "Raccourcis de mise", "Showdown animé"], "rtp": "Selon ton jeu", "vol": 3, "max": "Toute la table"},
+  {"id": "mines", "name": "Le Champ de Mines", "cat": "quick", "tag": "Instantané", "sub": "Évite les bombes", "colors": ["#ffa51f", "#8a2a0c"], "description": "Retourne des cases sans toucher une bombe. Choisis de 1 à 24 bombes : plus il y en a, plus le multiplicateur grimpe vite. Encaisse quand tu veux.", "features": ["1 à 24 bombes", "Encaisse quand tu veux", "Multiplicateur croissant"], "rtp": "≈ 96 %", "vol": 3, "max": "Selon les bombes"},
+  {"id": "avion", "name": "L’Avion", "cat": "quick", "tag": "Crash", "sub": "Encaisse avant l’explosion", "colors": ["#f0284f", "#4a0a1f"], "description": "L’avion décolle et le multiplicateur grimpe : encaisse avant qu’il explose. Tu peux régler un encaissement automatique.", "features": ["Courbe en direct", "Encaissement auto", "Historique des explosions"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
+  {"id": "plinko", "name": "La Cascade", "cat": "quick", "tag": "Instantané", "sub": "Billes, clous et multiplicateurs", "colors": ["#38bdf8", "#4c1d95"], "description": "Lâche tes billes en haut de la pyramide : elles rebondissent de clou en clou et tombent dans une case multiplicateur. Choisis le risque, de 8 à 16 rangées, et lance jusqu’à 20 billes d’un coup.", "features": ["8 à 16 rangées", "3 niveaux de risque", "Jusqu’à 20 billes par lancer", "Multiplicateurs jusqu’à ×1 000"], "rtp": "≈ 94 %", "vol": 4, "max": "×1 000"},
+  {"id": "vortex", "name": "Le Vortex", "cat": "quick", "tag": "Instantané", "sub": "Rouge, la bille tombe · noir, elle bloque", "colors": ["#ef4444", "#1f0a0a"], "description": "Une grande roue de 9 anneaux rouges et noirs qui tournent. Ta mise tombe du haut de la roue vers le centre : sur une case rouge elle passe à l’anneau suivant et le multiplicateur monte, sur une case noire elle est bloquée et tu encaisses. Au centre : ×1 000.", "features": ["9 anneaux qui tournent", "Cases bonus ×2 et ×4", "Relance à partir du 4e anneau", "×1 000 au centre"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
   {"id": "casse", "name": "Le Casse", "cat": "quick", "tag": "Instantané", "sub": "Perce les coffres, vends au receleur", "colors": ["#fbbf24", "#1e293b"], "description": "Une chambre forte, 9 coffres : des liasses de billets jusqu’à ×100, un coffre doré qui double ton butin et une alarme. Perce les coffres un par un et, après chacun, le receleur te fait une offre. Vendre ou continuer ? Si l’alarme sonne, tu fuis avec 25 % du butin.", "features": ["9 coffres à percer", "Offres du receleur", "Coffre doré : butin ×2", "Casse parfait"], "rtp": "≈ 93-96 %", "vol": 4, "max": "×2 000"},
-  {"id": "pileface", "name": "Pile ou Face Turbo", "cat": "quick", "tag": "Instantané", "sub": "Double ou rien, jusqu’à 20 fois", "colors": ["#fbbf24", "#1c1404"], "description": "Une pièce, deux faces, et ton gain qui double à chaque bonne prédiction. Lance la série, choisis Pile ou Face jusqu’à 20 fois d’affilée et encaisse quand tu veux : ×1,92 après un lancer, ×3,84 après deux… et plus d’un million de fois la mise après 20 !", "features": ["Jusqu’à 20 lancers", "Gain doublé à chaque fois", "Encaisse quand tu veux", "Vrai 50/50", "Raccourcis clavier P / F"], "rtp": "96 %", "vol": 4, "max": "×1 006 633"},
-  {"id": "robots", "name": "Course de Robots", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
-  {"id": "taco", "name": "Taco Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
-  {"id": "billets", "name": "Coffre aux Billets", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200 KE tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200 KE", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
-  {"id": "dragons", "name": "Têtes de Dragon", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
+  {"id": "pileface", "name": "La Pièce", "cat": "quick", "tag": "Instantané", "sub": "Double ou rien, jusqu’à 20 fois", "colors": ["#fbbf24", "#1c1404"], "description": "Une pièce, deux faces, et ton gain qui double à chaque bonne prédiction. Lance la série, choisis Pile ou Face jusqu’à 20 fois d’affilée et encaisse quand tu veux : ×1,92 après un lancer, ×3,84 après deux… et plus d’un million de fois la mise après 20 !", "features": ["Jusqu’à 20 lancers", "Gain doublé à chaque fois", "Encaisse quand tu veux", "Vrai 50/50", "Raccourcis clavier P / F"], "rtp": "96 %", "vol": 4, "max": "×1 006 633"},
+  {"id": "robots", "name": "La Course", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
+  {"id": "taco", "name": "La Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
+  {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200 KE tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200 KE", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
+  {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -5577,7 +5577,7 @@ function gem(x, y, s, u) {
 
 const SPECS = {
   'big-bad-wolf': {
-    bg: ['#24123f', '#05060d'], light: '#fde68a', title: ['BIG BAD', 'WOLF'], font: 'bebas', metal: ['#fff7d6', '#fbbf24', '#b45309'], tag: 'HOLD & SPIN',
+    bg: ['#24123f', '#05060d'], light: '#fde68a', title: ['LE LOUP'], font: 'bebas', metal: ['#fff7d6', '#fbbf24', '#b45309'], tag: 'HOLD & SPIN',
     hero: (u) => `
       <circle cx="226" cy="70" r="52" fill="url(#moon${u})" filter="url(#glow${u})"/>
       <g opacity=".7">${sym('hs', 40, 200, 70)}${sym('hw', 262, 196, 64)}</g>
@@ -5593,7 +5593,7 @@ const SPECS = {
       ${coin(70, 280, 16, u)}${coin(236, 284, 13, u)}${coin(110, 292, 10, u)}`,
   },
   zeus: {
-    bg: ['#1e3a8a', '#05051a'], light: '#93c5fd', title: ['ZEUS', 'THUNDER'], font: 'cinzel', metal: ['#fff', '#fde68a', '#b45309'], tag: '×500',
+    bg: ['#1e3a8a', '#05051a'], light: '#93c5fd', title: ['L’OLYMPE'], font: 'cinzel', metal: ['#fff', '#fde68a', '#b45309'], tag: '×500',
     hero: (u) => `
       <g stroke="#fff" fill="none" stroke-linejoin="round" filter="url(#glow${u})"><path d="M262 0 L236 60 L254 64 L222 132" stroke-width="3.5"/><path d="M36 6 L58 58 L42 62 L68 116" stroke-width="3"/></g>
       ${sym('zorb', 46, 176, 54, `filter="url(#glow${u})"`)}
@@ -5608,7 +5608,7 @@ const SPECS = {
       <g font-family="${FONTS.orb}" font-weight="900" text-anchor="middle" fill="#fff7d6" stroke="#78350f" stroke-width="1" paint-order="stroke"><text x="66" y="258" font-size="15">×500</text><text x="236" y="261" font-size="13">×50</text></g>`,
   },
   huff: {
-    bg: ['#0e3a63', '#06140c'], light: '#9be7ff', title: ['HUFF LA PUFF', 'XXTREM'], font: 'bebas', metal: ['#fff', '#ffb35c', '#d9480f'], tag: 'HOLD & SPIN',
+    bg: ['#0e3a63', '#06140c'], light: '#9be7ff', title: ['LE LOUP', '2.0'], font: 'bebas', metal: ['#fff', '#ffb35c', '#d9480f'], tag: 'HOLD & SPIN',
     hero: (u) => `
       <g opacity=".75">${sym('hs', 44, 196, 66)}${sym('hb', 258, 190, 74)}</g>
       <svg x="30" y="40" width="240" height="172" viewBox="0 2 64 46" filter="url(#sh${u})"><use href="#wf" width="64" height="64"/></svg>
@@ -5624,7 +5624,7 @@ const SPECS = {
       ${sym('jp', 60, 262, 46, `filter="url(#glow${u})"`)}`,
   },
   cosmic: {
-    bg: ['#2a0f6e', '#05021a'], light: '#22d3ee', title: ['COSMIC', 'HEIST'], font: 'orb', metal: ['#fff', '#a5f3fc', '#c026d3'], tag: '3 BONUS',
+    bg: ['#2a0f6e', '#05021a'], light: '#22d3ee', title: ['LE COSMIQUE'], font: 'orb', metal: ['#fff', '#a5f3fc', '#c026d3'], tag: '3 BONUS',
     hero: (u) => `
       <circle cx="250" cy="60" r="34" fill="url(#chPlanet)" opacity=".75"/><ellipse cx="250" cy="62" rx="56" ry="11" transform="rotate(-14 250 62)" fill="none" stroke="#facc15" stroke-width="3" opacity=".7"/>
       ${sym('chn', 60, 70, 70, `filter="url(#glow${u})"`)}
@@ -5639,7 +5639,7 @@ const SPECS = {
       ${sym('ch3', 50, 252, 66, `filter="url(#glow${u})"`)}${sym('ch7', 250, 250, 76, `filter="url(#sh${u})"`)}${sym('ch1', 196, 292, 40, `filter="url(#glow${u})"`)}`,
   },
   candy: {
-    bg: ['#8a0f74', '#14021f'], light: '#ff7ad9', title: ['CANDY', 'QUEEN'], font: 'bebas', metal: ['#fff', '#ffb3e6', '#d0219a'], tag: '3 BONUS',
+    bg: ['#8a0f74', '#14021f'], light: '#ff7ad9', title: ['LA SWEETY'], font: 'bebas', metal: ['#fff', '#ffb3e6', '#d0219a'], tag: '3 BONUS',
     hero: (u) => `
       ${sym('cq4', 42, 92, 52)}${sym('cq7', 262, 104, 50)}
       <use href="#cq-princess" x="44" y="-4" width="212" height="318" filter="url(#sh${u})"/>
@@ -5652,7 +5652,7 @@ const SPECS = {
       <g fill="#fff">${[[96, 84, 6], [220, 72, 8], [36, 190, 5], [268, 190, 6]].map(([x, y, s]) => `<path d="M${x} ${y - s} Q${x} ${y} ${x + s} ${y} Q${x} ${y} ${x} ${y + s} Q${x} ${y} ${x - s} ${y} Q${x} ${y} ${x} ${y - s}Z"/>`).join('')}</g>`,
   },
   anubis: {
-    bg: ['#0c3b44', '#03060f'], light: '#5eead4', title: ['ANUBIS', 'REBORN'], font: 'cinzel', metal: ['#fff', '#fde68a', '#b7791f'], tag: '2 BONUS',
+    bg: ['#0c3b44', '#03060f'], light: '#5eead4', title: ['L’ANUBIS'], font: 'cinzel', metal: ['#fff', '#fde68a', '#b7791f'], tag: '2 BONUS',
     hero: (u) => `
       <circle cx="232" cy="70" r="34" fill="none" stroke="#5eead4" stroke-opacity=".3" stroke-width="9"/>
       ${sym('s0', 150, 118, 236, `filter="url(#sh${u})"`)}
@@ -5665,7 +5665,7 @@ const SPECS = {
       ${sym('gk', 74, 262, 60, `filter="url(#glow${u})"`)}${sym('w', 230, 262, 52, `filter="url(#glow${u})"`)}`,
   },
   bling: {
-    bg: ['#3b0a5a', '#08020f'], light: '#f0abfc', title: ['BLING', 'TOWER'], font: 'bebas', metal: ['#fff', '#f0abfc', '#a21caf'], tag: 'CASCADES',
+    bg: ['#3b0a5a', '#08020f'], light: '#f0abfc', title: ['LA TOUR', 'BLING'], font: 'bebas', metal: ['#fff', '#f0abfc', '#a21caf'], tag: 'CASCADES',
     art: (u) => `
       <g opacity=".5" filter="url(#soft${u})">${sym('sy-bl1', 56, 110, 64)}${sym('sy-bl2', 252, 124, 58)}</g>
       ${sym('sy-bl0', 150, 170, 190, `filter="url(#glow${u})"`)}
@@ -5676,7 +5676,7 @@ const SPECS = {
       ${sym('sy-bl4', 84, 276, 50, `filter="url(#sh${u})"`)}`,
   },
   pharaon: {
-    bg: ['#5a3307', '#0a0602'], light: '#fde68a', title: ['PHARAON', 'GOLD'], font: 'cinzel', metal: ['#fffbe8', '#fbbf24', '#92400e'], tag: 'MULTIPLICATEUR',
+    bg: ['#5a3307', '#0a0602'], light: '#fde68a', title: ['LE TOTEM'], font: 'cinzel', metal: ['#fffbe8', '#fbbf24', '#92400e'], tag: 'MULTIPLICATEUR',
     art: (u) => `
       <circle cx="150" cy="104" r="70" fill="#fde68a" opacity=".18" filter="url(#glow${u})"/>
       <path d="M-10 300 L90 150 L190 300 Z" fill="#2a1704"/><path d="M130 300 L230 130 L330 300 Z" fill="#1f1103"/>
@@ -5686,7 +5686,7 @@ const SPECS = {
       ${sym('sy-ph4', 72, 270, 48, `filter="url(#sh${u})"`)}${sym('sy-ph6', 236, 270, 52, `filter="url(#glow${u})"`)}`,
   },
   bounty: {
-    bg: ['#063c5c', '#020a14'], light: '#7dd3fc', title: ['BOUNTY', 'REEF'], font: 'cinzel', metal: ['#fff', '#fcd34d', '#b45309'], tag: 'FREE SPINS ×5',
+    bg: ['#063c5c', '#020a14'], light: '#7dd3fc', title: ['LE RÉCIF'], font: 'cinzel', metal: ['#fff', '#fcd34d', '#b45309'], tag: 'FREE SPINS ×5',
     art: (u) => `
       <g opacity=".25">${[0, 1, 2, 3, 4].map((i) => `<path d="M${20 + i * 70} 0 L${-20 + i * 70} 300 L${10 + i * 70} 300 L${50 + i * 70} 0 Z" fill="#bae6fd"/>`).join('')}</g>
       <path d="M0 262 Q75 246 150 262 T300 258 V300 H0 Z" fill="#0b2c3f"/>
@@ -5696,7 +5696,7 @@ const SPECS = {
       ${[30, 60, 250, 280, 270].map((x, i) => `<circle cx="${x}" cy="${200 + i * 17}" r="${3 + (i % 3)}" fill="none" stroke="#e0f2fe" stroke-opacity=".6"/>`).join('')}`,
   },
   madwheel: {
-    bg: ['#4a0a6a', '#0a0214'], light: '#ff7ab6', title: ['MAD', 'WHEEL'], font: 'bebas', metal: ['#fff', '#fde047', '#db2777'], tag: '4 BONUS',
+    bg: ['#4a0a6a', '#0a0214'], light: '#ff7ab6', title: ['LA ROUE', 'FOLLE'], font: 'bebas', metal: ['#fff', '#fde047', '#db2777'], tag: '4 BONUS',
     art: (u) => {
       const cols = ['#f5c518', '#3aa0ff', '#ff5fa8', '#a259ff', '#1dd3b0', '#8bd93b', '#ff8a3d', '#ff3d54'];
       let s = '';
@@ -5713,7 +5713,7 @@ const SPECS = {
     },
   },
   storm: {
-    bg: ['#0b2a8a', '#02040f'], light: '#9fd4ff', title: ['LIGHTNING', 'STORM'], font: 'bebas', metal: ['#fff', '#bfe3ff', '#2563eb'], tag: '×50 000',
+    bg: ['#0b2a8a', '#02040f'], light: '#9fd4ff', title: ['L’ÉCLAIR'], font: 'bebas', metal: ['#fff', '#bfe3ff', '#2563eb'], tag: '×50 000',
     art: (u) => `
       <g stroke="#e0f2fe" fill="none" stroke-linejoin="round" filter="url(#glow${u})">
         <path d="M70 0 L94 64 L78 70 L110 140" stroke-width="4"/><path d="M240 0 L214 52 L232 58 L196 120" stroke-width="3"/></g>
@@ -5721,14 +5721,14 @@ const SPECS = {
       <path d="M168 60 L132 148 H158 L140 214 L196 120 H170 L190 60 Z" fill="#ffe14a" stroke="#fff" stroke-width="2" filter="url(#glow${u})"/>`,
   },
   doublespin: {
-    bg: ['#1b2a8a', '#04051a'], light: '#ffd23f', title: ['DOUBLE', 'SPIN'], font: 'bebas', metal: ['#fff', '#ffe58a', '#d97706'], tag: '×100 000',
+    bg: ['#1b2a8a', '#04051a'], light: '#ffd23f', title: ['LA DOUBLE', 'BILLE'], font: 'bebas', metal: ['#fff', '#ffe58a', '#d97706'], tag: '×100 000',
     art: (u) => `
       ${rouletteWheel(150, 196, 130, u)}
       <circle cx="104" cy="168" r="11" fill="url(#pearl${u})" filter="url(#sh${u})"/><circle cx="198" cy="210" r="11" fill="url(#gold${u})" stroke="#fff3c4" filter="url(#glow${u})"/>
       <text x="150" y="98" text-anchor="middle" font-family="${FONTS.orb}" font-weight="900" font-size="34" fill="url(#tit${u})" stroke="#3b2a00" stroke-width="1.5" paint-order="stroke" filter="url(#glow${u})">×100 000</text>`,
   },
   blackjack: {
-    bg: ['#0b4d31', '#020a06'], light: '#86efac', title: ['BLACK', 'JACK'], font: 'cinzel', metal: ['#fff', '#fde68a', '#a16207'], tag: '3 POUR 2',
+    bg: ['#0b4d31', '#020a06'], light: '#86efac', title: ['LE 21'], font: 'cinzel', metal: ['#fff', '#fde68a', '#a16207'], tag: '3 POUR 2',
     art: (u) => `
       <ellipse cx="150" cy="300" rx="190" ry="110" fill="#0e6b43" stroke="#fde68a" stroke-opacity=".35" stroke-width="3"/>
       ${card(118, 168, -14, 'A', '♠', false, u, 1.35)}${card(182, 172, 12, 'K', '♥', true, u, 1.35)}
@@ -5736,7 +5736,7 @@ const SPECS = {
       ${[0, 1, 2].map((k) => `<ellipse cx="240" cy="${276 - k * 7}" rx="24" ry="8" fill="${k % 2 ? '#fff' : '#1e3a8a'}" stroke="#0a1a3b" stroke-width="1"/>`).join('')}`,
   },
   lightningbj: {
-    bg: ['#1a2a8a', '#02040f'], light: '#9fd4ff', title: ['LIGHTNING', 'BLACKJACK'], font: 'bebas', metal: ['#fff', '#bfe3ff', '#2563eb'], tag: '×1000',
+    bg: ['#1a2a8a', '#02040f'], light: '#9fd4ff', title: ['LE 21', 'ÉLECTRIQUE'], font: 'bebas', metal: ['#fff', '#bfe3ff', '#2563eb'], tag: '×1000',
     art: (u) => `
       <ellipse cx="150" cy="300" rx="190" ry="110" fill="#123a7a" stroke="#9fd4ff" stroke-opacity=".35" stroke-width="3"/>
       <g stroke="#e0f2fe" fill="none" stroke-linejoin="round" filter="url(#glow${u})"><path d="M60 0 L84 60 L68 66 L98 132" stroke-width="3.5"/><path d="M250 0 L226 52 L244 58 L210 118" stroke-width="3"/></g>
@@ -5745,7 +5745,7 @@ const SPECS = {
       <text x="150" y="276" text-anchor="middle" font-family="${FONTS.orb}" font-weight="900" font-size="30" fill="url(#tit${u})" stroke="#0b1437" stroke-width="1.5" paint-order="stroke" filter="url(#glow${u})">×1000</text>`,
   },
   poker: {
-    bg: ['#0b4d31', '#020a06'], light: '#86efac', title: ['TEXAS', 'HOLD’EM'], font: 'bebas', metal: ['#fff', '#fde68a', '#a16207'], tag: 'POKER',
+    bg: ['#0b4d31', '#020a06'], light: '#86efac', title: ['LE TEXAS'], font: 'bebas', metal: ['#fff', '#fde68a', '#a16207'], tag: 'POKER',
     art: (u) => `
       <ellipse cx="150" cy="292" rx="200" ry="118" fill="#0e6b43" stroke="#5a3412" stroke-width="10"/>
       ${card(92, 170, -18, 'A', '♠', false, u, 1.1)}${card(150, 158, 0, 'A', '♥', true, u, 1.1)}${card(208, 170, 18, 'K', '♦', true, u, 1.1)}
@@ -5753,7 +5753,7 @@ const SPECS = {
       ${[0, 1, 2, 3].map((k) => `<ellipse cx="244" cy="${276 - k * 7}" rx="24" ry="8" fill="${k % 2 ? '#fff' : '#111827'}" stroke="#000" stroke-width="1"/>`).join('')}`,
   },
   mines: {
-    bg: ['#5a2a05', '#0b0502'], light: '#fdba74', title: ['MINES'], font: 'bebas', metal: ['#fff', '#fdba74', '#c2410c'], tag: 'JUSQU’À 24 BOMBES',
+    bg: ['#5a2a05', '#0b0502'], light: '#fdba74', title: ['LE CHAMP', 'DE MINES'], font: 'bebas', metal: ['#fff', '#fdba74', '#c2410c'], tag: 'JUSQU’À 24 BOMBES',
     art: (u) => {
       let t = '';
       for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) {
@@ -5766,7 +5766,7 @@ const SPECS = {
     },
   },
   avion: {
-    bg: ['#5a0a2a', '#08020a'], light: '#ff7aa0', title: ['AVION'], font: 'bebas', metal: ['#fff', '#ffb3c6', '#e11d48'], tag: 'CRASH',
+    bg: ['#5a0a2a', '#08020a'], light: '#ff7aa0', title: ['L’AVION'], font: 'bebas', metal: ['#fff', '#ffb3c6', '#e11d48'], tag: 'CRASH',
     art: (u) => `
       <g stroke="#fff" stroke-opacity=".08">${[60, 110, 160, 210, 260].map((y) => `<path d="M0 ${y} H300"/>`).join('')}</g>
       <path d="M10 280 C120 274 200 220 250 90 L250 280 Z" fill="#ff3b6b" opacity=".22"/>
@@ -5775,7 +5775,7 @@ const SPECS = {
       <text x="120" y="170" text-anchor="middle" font-family="${FONTS.orb}" font-weight="900" font-size="46" fill="url(#tit${u})" stroke="#4a0418" stroke-width="2" paint-order="stroke" filter="url(#glow${u})">×1000</text>`,
   },
   plinko: {
-    bg: ['#1e1b4b', '#05030f'], light: '#7dd3fc', title: ['PLINKO'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: 'JUSQU’À ×1 000',
+    bg: ['#1e1b4b', '#05030f'], light: '#7dd3fc', title: ['LA CASCADE'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: 'JUSQU’À ×1 000',
     art: (u) => {
       let pegs = '';
       for (let r = 0; r < 7; r++) for (let j = 0; j < r + 3; j++) pegs += `<circle cx="${150 + (j - (r + 2) / 2) * 30}" cy="${70 + r * 26}" r="4.2" fill="#e2e8f0"/>`;
@@ -5787,7 +5787,7 @@ const SPECS = {
     },
   },
   vortex: {
-    bg: ['#3a0a10', '#050203'], light: '#ff6b6b', title: ['ROUGE NOIRE'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'JUSQU’À ×1 000',
+    bg: ['#3a0a10', '#050203'], light: '#ff6b6b', title: ['LE VORTEX'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'JUSQU’À ×1 000',
     art: (u) => {
       let rings = '';
       for (let i = 0; i < 6; i++) {
@@ -5817,7 +5817,7 @@ const SPECS = {
     },
   },
   pileface: {
-    bg: ['#3b2a05', '#05060b'], light: '#fbbf24', title: ['PILE OU', 'FACE'], font: 'bebas', metal: ['#fff', '#fde68a', '#b45309'], tag: 'JUSQU’À 20 LANCERS',
+    bg: ['#3b2a05', '#05060b'], light: '#fbbf24', title: ['LA PIÈCE'], font: 'bebas', metal: ['#fff', '#fde68a', '#b45309'], tag: 'JUSQU’À 20 LANCERS',
     art: (u) => `
       <circle cx="150" cy="130" r="120" fill="#fbbf24" opacity=".12"/>
       <g transform="translate(92 70) rotate(-14)" filter="url(#sh${u})"><ellipse cx="60" cy="66" rx="60" ry="60" fill="#78350f"/><circle cx="60" cy="60" r="60" fill="url(#gold${u})" stroke="#92400e" stroke-width="4"/>
@@ -5828,7 +5828,7 @@ const SPECS = {
       <g fill="#fde047">${[[60, 60, 6], [250, 70, 8], [50, 200, 5], [180, 40, 4]].map(([x, y, s]) => `<path d="M${x} ${y - s} Q${x} ${y} ${x + s} ${y} Q${x} ${y} ${x} ${y + s} Q${x} ${y} ${x - s} ${y} Q${x} ${y} ${x} ${y - s}Z"/>`).join('')}</g>`,
   },
   robots: {
-    bg: ['#0b2440', '#04060c'], light: '#22d3ee', title: ['COURSE DE', 'ROBOTS'], font: 'bebas', metal: ['#fff', '#a5f3fc', '#0e7490'], tag: '6 ROBOTS',
+    bg: ['#0b2440', '#04060c'], light: '#22d3ee', title: ['LA COURSE'], font: 'bebas', metal: ['#fff', '#a5f3fc', '#0e7490'], tag: '6 ROBOTS',
     art: (u) => {
       const bot = (x, y, s, c, r) => `<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})" filter="url(#sh${u})"><path d="M-30 6 H-16 M-34 14 H-18 M-28 -2 H-18" stroke="${c}" stroke-width="3" stroke-linecap="round"/>
         <rect x="-16" y="-14" width="34" height="24" rx="8" fill="#e2e8f0" stroke="${c}" stroke-width="3"/><rect x="-10" y="-9" width="22" height="9" rx="4" fill="#0f172a"/><circle cx="-4" cy="-4.5" r="2.6" fill="${c}"/><circle cx="6" cy="-4.5" r="2.6" fill="${c}"/>
@@ -5840,14 +5840,14 @@ const SPECS = {
     },
   },
   taco: {
-    bg: ['#9f1239', '#1a0420'], light: '#fde047', title: ['TACO', 'FIESTA'], font: 'bebas', metal: ['#fff', '#fde047', '#dc2626'], tag: '¡ PIÑATAS !',
+    bg: ['#9f1239', '#1a0420'], light: '#fde047', title: ['LA FIESTA'], font: 'bebas', metal: ['#fff', '#fde047', '#dc2626'], tag: '¡ PIÑATAS !',
     art: (u) => `
       <g>${Array.from({ length: 9 }, (_, k) => `<path d="M${k * 34 + 2} 0 h30 v28 l-5 6 l-5 -5 l-5 6 l-5 -6 l-5 5 l-5 -6 z" fill="${['#f43f5e', '#fde047', '#22d3ee', '#4ade80', '#f97316', '#e879f9'][k % 6]}" opacity=".85"/>`).join('')}</g>
       ${sym('tfp', 150, 120, 150, `filter="url(#glow${u})"`)}
       ${sym('tfw', 70, 214, 100, `filter="url(#sh${u})"`)}${sym('tf3', 236, 210, 92, `filter="url(#sh${u})"`)}${sym('tf2', 250, 100, 56, `filter="url(#sh${u})"`)}${sym('tf4', 48, 110, 58, `filter="url(#sh${u})"`)}`,
   },
   billets: {
-    bg: ['#8a6420', '#1f1404'], light: '#fde047', title: ['COFFRE', 'AUX BILLETS'], font: 'bebas', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500',
+    bg: ['#8a6420', '#1f1404'], light: '#fde047', title: ['LE COFFRE', 'FORT'], font: 'bebas', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500',
     art: (u) => {
       const b = (id, x, y, w, r) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><use href="#${id}" x="${-w / 2}" y="${-w * 0.2857}" width="${w}" height="${w * 0.5714}"/></g>`;
       return `<g opacity=".5">${[0, 1, 2, 3, 4, 5, 6].map((k) => `<rect x="${k * 44}" y="0" width="40" height="120" fill="#a77a26" stroke="#5c3d0a"/>`).join('')}</g>
@@ -5856,7 +5856,7 @@ const SPECS = {
     },
   },
   dragons: {
-    bg: ['#7c2d12', '#0c0604'], light: '#f97316', title: ['TÊTES', 'DE DRAGON'], font: 'cinzel', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500',
+    bg: ['#7c2d12', '#0c0604'], light: '#f97316', title: ['L’HYDRE'], font: 'cinzel', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500',
     art: (u) => {
       const full = (id, x, y, w, r) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><use href="#${id}" x="${-w / 2}" y="${-w * 0.3}" width="${w}" height="${w * 0.594}"/></g>`;
       return `<ellipse cx="150" cy="260" rx="170" ry="70" fill="#f97316" opacity=".35"/>
@@ -5983,6 +5983,29 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'cosmic', date: '2026-10-31', title: 'Nouveau nom : Le Cosmique', items: ['Cosmic Heist s’appelle maintenant Le Cosmique', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'zeus', date: '2026-10-31', title: 'Nouveau nom : L’Olympe', items: ['Zeus Thunder s’appelle maintenant L’Olympe', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'huff', date: '2026-10-31', title: 'Nouveau nom : Le Loup 2.0', items: ['Huff la Puff XXTrem s’appelle maintenant Le Loup 2.0', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'candy', date: '2026-10-31', title: 'Nouveau nom : La Sweety', items: ['Candy Queen s’appelle maintenant La Sweety', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'anubis', date: '2026-10-31', title: 'Nouveau nom : L’Anubis', items: ['Anubis Reborn s’appelle maintenant L’Anubis', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'bling', date: '2026-10-31', title: 'Nouveau nom : La Tour Bling', items: ['Bling Tower s’appelle maintenant La Tour Bling', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'pharaon', date: '2026-10-31', title: 'Nouveau nom : Le Totem', items: ['Pharaon Gold s’appelle maintenant Le Totem', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'bounty', date: '2026-10-31', title: 'Nouveau nom : Le Récif', items: ['Bounty Reef s’appelle maintenant Le Récif', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'taco', date: '2026-10-31', title: 'Nouveau nom : La Fiesta', items: ['Taco Fiesta s’appelle maintenant La Fiesta', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'billets', date: '2026-10-31', title: 'Nouveau nom : Le Coffre-Fort', items: ['Coffre aux Billets s’appelle maintenant Le Coffre-Fort', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'dragons', date: '2026-10-31', title: 'Nouveau nom : L’Hydre', items: ['Têtes de Dragon s’appelle maintenant L’Hydre', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'madwheel', date: '2026-10-31', title: 'Nouveau nom : La Roue Folle', items: ['Mad Wheel s’appelle maintenant La Roue Folle', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'storm', date: '2026-10-31', title: 'Nouveau nom : L’Éclair', items: ['Lightning Storm s’appelle maintenant L’Éclair', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'doublespin', date: '2026-10-31', title: 'Nouveau nom : La Double Bille', items: ['Double Spin s’appelle maintenant La Double Bille', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'blackjack', date: '2026-10-31', title: 'Nouveau nom : Le 21', items: ['Blackjack s’appelle maintenant Le 21', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'lightningbj', date: '2026-10-31', title: 'Nouveau nom : Le 21 Électrique', items: ['Lightning Blackjack s’appelle maintenant Le 21 Électrique', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'poker', date: '2026-10-31', title: 'Nouveau nom : Le Texas', items: ['Texas Hold’em s’appelle maintenant Le Texas', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'mines', date: '2026-10-31', title: 'Nouveau nom : Le Champ de Mines', items: ['Mines s’appelle maintenant Le Champ de Mines', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'avion', date: '2026-10-31', title: 'Nouveau nom : L’Avion', items: ['Avion s’appelle maintenant L’Avion', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'plinko', date: '2026-10-31', title: 'Nouveau nom : La Cascade', items: ['Plinko s’appelle maintenant La Cascade', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'vortex', date: '2026-10-31', title: 'Nouveau nom : Le Vortex', items: ['Roue Rouge Noire s’appelle maintenant Le Vortex', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'pileface', date: '2026-10-31', title: 'Nouveau nom : La Pièce', items: ['Pile ou Face Turbo s’appelle maintenant La Pièce', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'robots', date: '2026-10-31', title: 'Nouveau nom : La Course', items: ['Course de Robots s’appelle maintenant La Course', 'Nouvelle affiche avec le nouveau nom'] },
   {
     game: 'billets', date: '2026-10-31', title: 'Cascades de billets', isNew: true,
     items: ['Les billets gagnants disparaissent et de nouveaux billets tombent', 'Les cascades continuent tant qu’il y a de nouveaux gains', 'Les billets cash restent : la mallette collecte tout à la fin', 'Gains ré-équilibrés (RTP ≈ 92 %)'],
@@ -6164,7 +6187,7 @@ function renderLobby(root, params = {}) {
       <div class="hero-main theme-wolf">
         <div class="hero-copy">
           <span class="eyebrow">Nouveau · ${BRAND.provider}</span>
-          <h1>Big Bad Wolf<br><em>Huff & Spin</em></h1>
+          <h1>Le Loup<br><em>Huff & Spin</em></h1>
           <p>Le loup souffle, les maisons montent en gamme : Paille → Bois → Brique → Château. Jusqu’à ×${wolf.holdSpin.jackpots.grand} au Grand Jackpot.</p>
           <div class="hero-cta"><a class="btn primary lg" href="#game-${wolf.id}">Jouer maintenant</a><a class="btn ghost lg" href="#lobby-all">Tous les jeux</a></div>
         </div>
@@ -8389,7 +8412,7 @@ const FILES = {
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', 'e70efd2787'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '7069fc4250'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'bdcfd7b479'],
-  poker: ['poker', 'games/impl/poker.js', 'PokerGame', '6945c1318b'],
+  poker: ['poker', 'games/impl/poker.js', 'PokerGame', '5a4680422e'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '09b2f9eed1'],
   avion: ['avion', 'games/impl/avion.js', 'AvionGame', 'f1f28a9577'],
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '577a616908'],
