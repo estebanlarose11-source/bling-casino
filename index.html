@@ -3233,6 +3233,14 @@ class Profiles extends EventTarget {
 
   get current() { return this.store.current ? this.store.users[this.store.current] : null; }
 
+  // Last games opened by this profile (most recent first, 12 max), shown on the profile page.
+  played(id) {
+    const me = this.current;
+    if (!me) return;
+    me.recent = [id, ...(Array.isArray(me.recent) ? me.recent : []).filter((x) => x !== id)].slice(0, 12);
+    this.save();
+  }
+
   list() { return Object.values(this.store.users).sort((a, b) => b.lastSeen - a.lastSeen); }
 
   save() {
@@ -4786,6 +4794,14 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
 const n0 = (n) => Math.floor(n).toLocaleString('fr-FR');
 let timer = null;
 
+// "Derniers jeux joués": the profile's recent games as lobby cards, to find a game again quickly.
+function recentHTML(me) {
+  const { gameCard } = __mods['pages/lobby.js'], { getGame } = __mods['games/index.js'];
+  const list = (Array.isArray(me.recent) ? me.recent : []).map(getGame).filter(Boolean);
+  return `<section class="recent-games"><div class="sec-head"><h2>🕹️ Derniers jeux joués</h2>${list.length ? '' : '<a class="more" href="#lobby-all">Voir tous les jeux</a>'}</div>
+    ${list.length ? `<div class="game-row">${list.map(gameCard).join('')}</div>` : '<p class="muted panel">Tu n’as encore joué à aucun jeu. Lance une machine et elle apparaîtra ici pour la retrouver facilement.</p>'}</section>`;
+}
+
 function renderProfile(root) {
   clearInterval(timer);
   const me = profiles.current;
@@ -4808,6 +4824,7 @@ function renderProfile(root) {
       </div>
       <button class="btn ghost me-switch" data-switch>${profiles.online ? 'Se déconnecter' : profiles.guest ? 'Créer un compte ou se connecter' : 'Changer de pseudo'}</button>
     </section>
+${recentHTML(me)}
 
     <section class="panel daily-card${d.ready ? ' ready' : ''}">
       <div class="dc-head"><div class="dc-gift">🎁</div><div><h2>Bonus du jour</h2>
@@ -8776,6 +8793,7 @@ function renderGame(root, { id }) {
     root.innerHTML = `<section class="panel locked-game"><h2>${game.name}</h2><p class="muted">Choisis ton pseudo pour lancer le jeu.</p></section>`;
     return;
   }
+  profiles.played(game.id);
   if (hasImpl(game.id)) return renderRebuilt(root, game);
   root.innerHTML = `
     <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-slot">Machines à sous</a><span>›</span><b>${game.name}</b></nav>
