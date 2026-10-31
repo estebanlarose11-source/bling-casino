@@ -2,8 +2,8 @@
 // ---- games/impl/anubis.js ----
 __mods['games/impl/anubis.js'] = (() => {
 // Anubis Reborn, rebuilt on the shared cabinet. Cascades, Underworld and Judgment (original math).
-// Visuals: animated temple, glowing cluster links, shattering wins; Judgment over flowing lava, black skull cubes
-// and red cubes that melt the ice below them.
+// Visuals: animated temple, glowing cluster links, shattering wins; Judgment: blue cubes fall and turn into black
+// cubes carrying their column's multiplier, black skulls raise it, lava cubes pile every cube onto the last one.
 
 const { BaseGame, fmtC, art } = __mods['core/base.js'];
 const { SymbolGrid } = __mods['core/grid.js'];
@@ -36,7 +36,7 @@ function clusters(grid) {
   }
   return out;
 }
-// A column that reaches the top melts into one cube and keeps going (JPC retuned: same bonus value, ≈ ×130).
+// A column that reaches the top piles onto its last cube and keeps going (JPC retuned: same bonus value, ≈ ×130).
 const JW = [['cube', 62], ['sk', 12], ['g', 0.2], ['red', 3]], JPC = 0.176;
 // Judgment skulls add +2 to +500 to the value of the next cubes; a very rare 10 000 skull is an instant max win.
 const SKV = [[2, 30], [3, 22], [4, 16], [5, 12], [6, 9], [8, 7], [10, 5], [15, 4], [20, 2.5], [25, 2], [40, 1.3], [60, 0.9], [100, 0.5], [150, 0.3], [250, 0.12], [500, 0.04], [10000, 0.0003]];
@@ -55,6 +55,8 @@ const NAMES = ['Anubis', 'Ankh', 'Œil d’Horus', 'Scarabée', 'Gemme bleue', '
 const BUYU = 100, BUYJ = 150;
 const fxv = (v) => (v >= 10000 ? Math.round(v / 1000) + 'k' : v >= 1000 ? (v / 1000).toFixed(1).replace('.', ',') + 'k' : String(v));
 const lab = (t) => `<b class="sg-lab">${t}</b>`;
+const VLAB = (v) => `<b class="sg-lab jv"><i>×</i>${fxv(v)}</b>`; // value written on a landed black cube
+const BLACK = (v) => art('cbx') + VLAB(v);
 const cubeSVG = (top, left, right, edge, inner) => `<path d="M32 4 L58 18 L58 46 L32 60 L6 46 L6 18 Z" fill="${left}" stroke="${edge}" stroke-width="2" stroke-linejoin="round"/>
   <path d="M32 4 L58 18 L32 32 L6 18 Z" fill="${top}"/><path d="M32 32 L58 18 L58 46 L32 60 Z" fill="${right}"/>
   <path d="M6 18 L32 32 L58 18 M32 32 V60" stroke="${edge}" stroke-width="1.4" fill="none" opacity=".8"/>${inner}`;
@@ -63,6 +65,8 @@ const SKULL = (c, eye) => `<g transform="translate(19 30) scale(.42)"><path d="M
 const EXTRA_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <symbol id="cbk" viewBox="0 0 64 64">${cubeSVG('#3f3f46', '#18181b', '#09090b', '#a855f7', SKULL('#e4e4e7', '#a855f7'))}</symbol>
   <symbol id="cbg" viewBox="0 0 64 64">${cubeSVG('#fde68a', '#d97706', '#92400e', '#fff7c2', SKULL('#fff7c2', '#92400e'))}</symbol>
+  <symbol id="cbb" viewBox="0 0 64 64">${cubeSVG('#bae6fd', '#0284c7', '#075985', '#e0f2fe', '')}</symbol>
+  <symbol id="cbx" viewBox="0 0 64 64">${cubeSVG('#3f3f46', '#18181b', '#09090b', '#b45309', '')}</symbol>
   <symbol id="cbn" viewBox="0 0 64 64">${cubeSVG('#3f3f46', '#1c1c1f', '#0c0c0e', '#52525b', '')}</symbol>
   <symbol id="cbr" viewBox="0 0 64 64">${cubeSVG('#fca5a5', '#dc2626', '#7f1d1d', '#fecaca', '<path d="M20 40 Q24 30 28 38 Q32 26 36 36 Q40 28 44 40" stroke="#fde047" stroke-width="3" fill="none" stroke-linecap="round"/>')}</symbol>
 </defs></svg>`;
@@ -81,7 +85,7 @@ class AnubisGame extends BaseGame {
       stage: '<div class="an-bg"><svg class="an-relief" viewBox="0 0 200 200" aria-hidden="true"><path d="M100 18c-22 0-34 18-34 36 0 20 16 38 26 46H56v18h36v66h16v-66h36v-18h-36c10-8 26-26 26-46 0-18-12-36-34-36zm0 16c12 0 18 10 18 20 0 14-10 28-18 36-8-8-18-22-18-36 0-10 6-20 18-20z"/></svg><i class="an-pillar l"></i><i class="an-pillar r"></i><i class="an-sun"></i><i class="an-torch l"></i><i class="an-torch r"></i><i class="an-sand"></i><i class="an-embers"></i></div><div class="an-word"></div><div class="col-row jrow"></div><div class="grid-host"></div><div class="jbars"><i></i><i></i><i></i></div><div class="col-row mrow"></div>',
       buys: [
         { id: 'U', icon: '💀', label: 'Monde souterrain · 3 scatters', desc: '10 tours, multiplicateurs par colonne et crânes dorés', cost: (b) => b * BUYU },
-        { id: 'J', icon: '🧊', label: 'Jugement · 4 scatters', desc: 'Cubes de glace, crânes qui additionnent, crânes dorés jusqu’à ×100', cost: (b) => b * BUYJ },
+        { id: 'J', icon: '🟦', label: 'Jugement · 4 scatters', desc: 'Cubes multiplicateurs, crânes qui additionnent, cubes de lave, crânes dorés jusqu’à ×100', cost: (b) => b * BUYJ },
       ],
       hello: 'Grappes de 5+ · les orbes rouges augmentent le multiplicateur',
     });
@@ -90,7 +94,7 @@ class AnubisGame extends BaseGame {
     this.mrow = this.q('.mrow');
     this.jrow = this.q('.jrow');
     this.mrow.innerHTML = Array.from({ length: C }, () => '<div>×0</div>').join('');
-    this.jrow.innerHTML = Array.from({ length: C }, () => '<div><b>0<i>x</i></b><small>+1 / cube</small><i class="lbl"></i></div>').join('');
+    this.jrow.innerHTML = Array.from({ length: C }, () => '<div><b><i>×</i>1</b><i class="lbl"></i></div>').join('');
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: C, rows: R, game: this, art: symArt,
       cls: (v) => (v === WILD ? 'wild' : v === SC ? 'scatter' : v >= 1000 ? 'gskull' : ''),
@@ -175,7 +179,7 @@ class AnubisGame extends BaseGame {
 
   resetBoard() {
     this.grid.unlink();
-    this.grid.cells.forEach((c) => c.classList.remove('dim', 'win', 'cube', 'rc', 'sks', 'gsk', 'lava', 'spin', 'heat', 'melting', 'golden', 'big'));
+    this.grid.cells.forEach((c) => c.classList.remove('dim', 'win', 'cube', 'rc', 'sks', 'gsk', 'lava', 'spin', 'heat', 'blue', 'merged', 'golden', 'big'));
     this.grid.setAll(Array.from({ length: N }, () => Math.floor(Math.random() * SYMN)));
     this.setG(1);
   }
@@ -295,38 +299,44 @@ class AnubisGame extends BaseGame {
     void l.offsetWidth; l.classList.add('go');
   }
 
-  // Melts every ice cube of column c into the bottom one (red cube, or a column that reached the top).
-  async melt(c, x, why) {
-    const S = x.T, cells = [];
-    for (let j = x.n - 1; j >= 1; j--) cells.push(this.cubeCell(c, j));
-    this.label(c, why === 'full' ? 'FUSION !' : '= ' + fxv(S), 'lr');
+  // Lava cube (or a column that reached the top): every cube of column c piles onto the last one, which takes the
+  // sum and drops to the bottom of the column, freeing the cells above it.
+  async pile(c, x, why) {
+    const S = x.T, last = this.cubeCell(c, x.n - 1);
+    this.label(c, why === 'full' ? 'FUSION !' : '= ×' + fxv(S), 'lr');
     for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.add('heat');
     sfx.feature();
     await this.wait(380);
-    for (const ci of cells) {
+    let run = x.vals[x.n - 1];
+    for (let j = 0; j < x.n - 1; j++) {
       if (this.dead) return;
-      const cell = this.grid.cells[ci], p = center(cell);
-      cell.classList.add('melting');
-      fx.burst(p.x, p.y - 10, 9, ['#e0f2fe', '#cbd5e1', '#fff'], 3);
-      fx.burst(p.x, p.y + 14, 5, ['#38bdf8', '#7dd3fc'], 2);
-      await this.grid.sym(ci).animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(30%) scaleY(.2)', opacity: 0.1 }], { duration: this.turbo ? 120 : 230, easing: 'ease-in', fill: 'forwards' }).finished;
+      const ci = this.cubeCell(c, j), cell = this.grid.cells[ci];
+      fx.trail(center(cell), center(this.grid.cells[last]), '#fbbf24', 8);
+      await this.grid.sym(ci).animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(-60%) scale(.4)', opacity: 0 }], { duration: this.turbo ? 120 : 230, easing: 'ease-in', fill: 'forwards' }).finished;
       this.lava(ci);
+      run += x.vals[j];
+      this.paint(last, BLACK(run), 'cube heat');
+      this.grid.sym(last).animate([{ transform: 'scale(1.18)', filter: 'brightness(1.6)' }, { transform: 'none', filter: 'none' }], { duration: 260, easing: 'ease-out' });
       sfx.tick();
     }
     const fi = this.cubeCell(c, 0);
-    this.paint(fi, art('cb') + lab(fxv(S)), 'cube merged');
-    this.grid.sym(fi).animate([{ transform: 'scale(.75)', filter: 'brightness(2)' }, { transform: 'scale(1.22)', filter: 'brightness(1.5)', offset: 0.55 }, { transform: 'none', filter: 'none' }], { duration: 520, easing: 'ease-out' });
+    if (last !== fi) {
+      this.lava(last);
+      await this.land(fi, BLACK(S), 'cube merged', R - x.n);
+    } else this.paint(fi, BLACK(S), 'cube merged');
+    this.grid.sym(fi).animate([{ transform: 'scale(.8)', filter: 'brightness(2)' }, { transform: 'scale(1.2)', filter: 'brightness(1.5)', offset: 0.55 }, { transform: 'none', filter: 'none' }], { duration: 520, easing: 'ease-out' });
     const p = center(this.grid.cells[fi]);
-    fx.burst(p.x, p.y, 30, ['#7dd3fc', '#fff', '#fb923c'], 7);
+    fx.burst(p.x, p.y, 30, ['#fde68a', '#fff', '#fb923c'], 7);
     sfx.coin();
-    x.n = 1; x.T = S;
+    x.n = 1; x.T = S; x.vals = [S];
     await this.wait(650);
     this.grid.cells[fi].classList.remove('merged', 'heat');
   }
 
   // Drops html into cell i: it falls from row fromRow (-1 = above the grid) through the empty cells, accelerating,
   // then hits the stack (squash, the cube below takes the blow, dust) and becomes the cell's content.
-  async land(i, html, cls, fromRow) {
+  // endHtml / endCls: what the cell becomes on impact (a blue cube turns into a black value cube).
+  async land(i, html, cls, fromRow, endHtml, endCls) {
     const c = Math.floor(i / R), row = i % R;
     const g = this.grid.el.getBoundingClientRect(), tr = this.grid.cells[i].getBoundingClientRect();
     const top0 = this.grid.cells[c * R].getBoundingClientRect(), pitch = this.grid.cells[c * R + 1].getBoundingClientRect().top - top0.top;
@@ -349,8 +359,9 @@ class AnubisGame extends BaseGame {
     fx.burst(b.left + b.width * 0.2, b.bottom - 2, 5, ['#e7e5e4', '#a8a29e', '#bae6fd'], 2.5);
     fx.burst(b.left + b.width * 0.8, b.bottom - 2, 5, ['#e7e5e4', '#a8a29e', '#bae6fd'], 2.5);
     await sleep(this.turbo ? 90 : 170);
-    this.paint(i, html, cls);
+    this.paint(i, endHtml || html, endCls || cls);
     fly.remove();
+    if (endHtml) this.grid.sym(i).animate([{ filter: 'brightness(2.2) saturate(0)' }, { filter: 'none' }], { duration: 320, easing: 'ease-out' });
   }
 
   // Respin of one column: a fluid cascade of black cubes runs through its empty cells. stop(item) slows it down
@@ -389,18 +400,17 @@ class AnubisGame extends BaseGame {
   async judgment(startCells) {
     const bet = this.bet, cap = bet * CAPX;
     let respins = 3, capHit = false, rounds = 0, maxWin = false;
-    const cols = Array.from({ length: C }, () => ({ n: 0, m: 1, mod: false, T: 0 }));
+    const cols = Array.from({ length: C }, () => ({ n: 0, m: 1, mod: false, T: 0, vals: [] }));
     const total = () => cols.reduce((a, x) => a + x.T, 0);
-    // Under every column: its total in burning digits, and the value of its next cube.
+    // Above every column: only its multiplier, the value the next cube will carry (each cube shows its own value).
     const draw = () => cols.forEach((x, c) => {
-      const d = this.jrow.children[c], b = d.querySelector('b'), t = fxv(x.T);
-      if (b.dataset.v !== t) { b.dataset.v = t; b.innerHTML = `${t}<i>x</i>`; d.classList.remove('hit'); void d.offsetWidth; d.classList.add('hit'); }
-      d.querySelector('small').textContent = `+${fxv(x.m)} / cube`;
-      d.classList.toggle('mod', x.mod); d.classList.toggle('lit', x.T > 0);
+      const d = this.jrow.children[c], b = d.querySelector('b'), t = fxv(x.m);
+      if (b.dataset.v !== t) { b.dataset.v = t; b.innerHTML = `<i>×</i>${t}`; d.classList.remove('hit'); void d.offsetWidth; d.classList.add('hit'); }
+      d.classList.toggle('mod', x.mod); d.classList.toggle('lit', x.n > 0 || x.mod);
     });
     const info = () => { this.qa('.jbars i').forEach((bar, k) => bar.classList.toggle('on', k < respins)); this.setBanner(`<b>JUGEMENT</b><span class="pill respins">${[0, 1, 2].map((k) => `<i class="dot${k < respins ? ' on' : ''}"></i>`).join('')} Relances</span><span class="pill gold">Total ×${fxv(total())} · ${fmtC(Math.min(cap, Math.round(bet * total())))}</span>`); };
 
-    await this.featureIntro('JUGEMENT', 'Les cubes de glace tombent sur la lave · crânes noirs, crânes dorés et cubes rouges', art('cb'));
+    await this.featureIntro('JUGEMENT', 'Les cubes bleus tombent et deviennent noirs avec le multiplicateur de leur colonne · crânes noirs, crânes dorés et cubes de lave', art('cbb'));
     this.slotEl.classList.add('in-free', 'judge');
     for (let i = 0; i < N; i++) this.lava(i);
     this.jrow.classList.add('on');
@@ -411,11 +421,11 @@ class AnubisGame extends BaseGame {
       const x = cols[c];
       if (x.n >= R) return;
       const v = x.m, i = this.cubeCell(c, x.n);
-      x.n++; x.T += v;
-      await this.land(i, art('cb') + lab(fxv(v)), 'cube', landed ? 0 : -1);
+      x.n++; x.T += v; x.vals.push(v); // the cube keeps the value it fell with, even if the column goes up later
+      await this.land(i, art('cbb'), 'cube blue', landed ? 0 : -1, BLACK(v), 'cube');
       draw();
-      const p = center(this.grid.cells[i]); fx.burst(p.x, p.y + 10, 10, ['#bae6fd', '#38bdf8', '#fff'], 3);
-      if (x.n >= R) await this.melt(c, x, 'full'); // the column reached the top: it melts and keeps going
+      const p = center(this.grid.cells[i]); fx.burst(p.x, p.y + 10, 10, ['#7dd3fc', '#fbbf24', '#fff'], 3);
+      if (x.n >= R) await this.pile(c, x, 'full'); // the column reached the top: everything piles onto the last cube
     };
     const showAt = async (c, x, id, txt, cls, landed) => {
       const i = this.cubeCell(c, x.n);
@@ -450,23 +460,23 @@ class AnubisGame extends BaseGame {
       } else if (k === 'g') {
         const kk = gkVal(), i4 = await showAt(c, x, 'cbg', '×' + kk, 'gsk', landed);
         await this.wait(420);
-        x.T *= kk; this.label(c, '×' + kk, 'lg'); draw();
+        x.T *= kk; x.vals = x.vals.map((v) => v * kk); this.label(c, '×' + kk, 'lg'); draw();
         this.flash('rgba(253,224,71,.6)'); sfx.jackpot();
-        for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.add('win', 'golden');
+        for (let j = 0; j < x.n; j++) { const gi = this.cubeCell(c, j); this.paint(gi, BLACK(x.vals[j]), 'cube'); this.grid.cells[gi].classList.add('win', 'golden'); }
         await this.grid.shatter([i4], ['#fde047', '#fff', '#f59e0b']);
         await this.wait(700);
         for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.remove('win', 'golden');
         this.lava(i4);
       } else if (k === 'red') {
         const ri = await showAt(c, x, 'cbr', '', 'rc', landed);
-        this.msg('Cube rouge : la glace fond !');
+        this.msg('Cube de lave : tous les cubes s’accumulent sur le dernier !');
         await this.wait(350);
         const p = center(this.grid.cells[ri]);
         fx.burst(p.x, p.y, 20, ['#f87171', '#fb923c', '#fde047'], 6);
         this.grid.sym(ri).animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(40%) scale(.6)', opacity: 0 }], { duration: 300, fill: 'forwards' });
         await this.wait(250);
         this.lava(ri);
-        await this.melt(c, x, 'red');
+        await this.pile(c, x, 'red');
       }
     };
 
@@ -482,7 +492,7 @@ class AnubisGame extends BaseGame {
       for (let c2 = 0; c2 < C && !capHit && !this.dead; c2++) {
         await this.wait(this.turbo ? 40 : 110);
         const hit = Math.random() < JPC, k = hit ? pickItem(cols[c2].n) : null;
-        const preview = k === 'cube' ? art('cb') + lab(fxv(cols[c2].m)) : k === 'sk' ? art('cbk') : k === 'g' ? art('cbg') : k === 'red' ? art('cbr') : null;
+        const preview = k === 'cube' ? art('cbb') : k === 'sk' ? art('cbk') : k === 'g' ? art('cbg') : k === 'red' ? art('cbr') : null;
         await strips[c2].stop(preview);
         sfx.reelStop?.(c2);
         if (k) { got = true; await apply(c2, k, true); info(); if (maxWin || total() >= CAPX) capHit = true; }
@@ -507,7 +517,7 @@ class AnubisGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym svg">${art('sc')}</div><div class="pay-vals"><b>Scatter</b><br><span>3 = Monde souterrain · 4+ = Jugement</span></div></div></div>
       <h4>Cascades</h4><p>Grille 5×6. Une grappe de <b>5 symboles ou plus</b> paie mise × valeur × 0,33 × (taille − 4) × multiplicateur, disparaît et les symboles tombent.</p>
       <h4>Monde souterrain</h4><p>10 tours. Chaque colonne a son multiplicateur, qui monte de +3 à chaque gain qui la touche. Un <b>crâne doré</b> multiplie sa colonne (×2 à ×100).</p>
-      <h4>Jugement</h4><p>Les cubes tombent dans les colonnes avec la valeur affichée en haut. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne noir</b> : ajoute de <b>+2 à +500</b> à la valeur des prochains cubes de sa colonne. Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie la colonne. <b>Cube rouge</b> : fait fondre toute la glace de sa colonne dans un seul cube (la somme est gardée) et libère de la place ; la valeur des prochains cubes ne change pas. <b>Fusion</b> : quand une colonne atteint le haut, elle fond toute seule en un cube et continue de se remplir.</p>
+      <h4>Jugement</h4><p>Chaque colonne a un multiplicateur, affiché tout en haut. Un <b>cube bleu</b> tombe dans la colonne et devient un <b>cube noir</b> marqué du multiplicateur de la colonne au moment où il tombe : il garde cette valeur, même si la colonne monte ensuite. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne noir</b> : ajoute de <b>+2 à +500</b> au multiplicateur de sa colonne (pour les prochains cubes). Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie tous les cubes de la colonne. <b>Cube de lave</b> : tous les cubes de sa colonne s’accumulent sur le dernier, qui garde la somme et redescend en bas pour libérer de la place. <b>Fusion</b> : quand une colonne atteint le haut, ses cubes s’accumulent de la même façon. À la fin, tu gagnes la somme de tous les cubes × la mise.</p>
       <h4>Achats</h4><p>Monde souterrain ×${BUYU} · Jugement ×${BUYJ}. Gain maximum ×10 000.</p>`);
   }
 }

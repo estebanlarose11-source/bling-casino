@@ -1108,14 +1108,14 @@ body.gated { overflow: hidden; }
 .g-anubis .sg-cell.lava.spin::after { opacity: .35; animation-duration: .5s; filter: blur(2px); }
 .g-anubis .sg-cell.lava.spin { box-shadow: inset 0 0 0 2px rgba(253, 224, 71, .5), inset 0 0 22px rgba(249, 115, 22, .6); }
 .judge .sg-cell.dim { opacity: .18; }
-/* ice, heat and melting */
-.g-anubis .sg-cell.cube { background: radial-gradient(circle at 50% 35%, rgba(224, 242, 254, .45), rgba(14, 116, 144, .4) 70%); box-shadow: inset 0 0 0 2px rgba(186, 230, 253, .9), inset 0 0 22px rgba(125, 211, 252, .55), 0 0 12px rgba(56, 189, 248, .35); }
-.g-anubis .sg-cell.cube::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .45) 45%, transparent 60%); background-size: 250% 100%; animation: iceShine 3.2s ease-in-out infinite; }
-@keyframes iceShine { 0%, 60% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
-.g-anubis .sg-cell.cube .sg-lab { color: #fff; text-shadow: 0 0 6px #0c4a6e, 0 0 12px #38bdf8; }
+/* value cubes: blue while they fall, black once landed, carrying the multiplier they fell with */
+.g-anubis .sg-cell.cube { background: radial-gradient(circle at 50% 40%, rgba(251, 191, 36, .16), rgba(9, 9, 11, .9) 70%); box-shadow: inset 0 0 0 2px rgba(180, 83, 9, .8), 0 0 10px rgba(0, 0, 0, .6); }
+.g-anubis .sg-cell.cube.blue { background: radial-gradient(circle at 50% 40%, rgba(125, 211, 252, .4), rgba(8, 47, 73, .85) 70%); box-shadow: inset 0 0 0 2px #7dd3fc, 0 0 14px rgba(56, 189, 248, .6); }
+.g-anubis .sg-cell.cube .sg-sym svg { width: 94%; height: 94%; }
+.sg-lab.jv { bottom: auto; top: 50%; transform: translate(-50%, -42%); font: 400 46cqh/1 'Bebas Neue', Impact, sans-serif; letter-spacing: .5px; color: #fde68a; text-shadow: 0 2px 0 #000, 0 0 8px #000, 0 0 16px rgba(245, 158, 11, .85); }
+.sg-lab.jv i { font-style: normal; font-size: .55em; margin-right: 1px; }
 .g-anubis .sg-cell.heat { box-shadow: inset 0 0 0 2px #fb923c, inset 0 0 26px rgba(249, 115, 22, .75), 0 0 16px rgba(249, 115, 22, .6); }
-.g-anubis .sg-cell.melting { background: radial-gradient(circle, rgba(251, 146, 60, .6), rgba(127, 29, 29, .6)); }
-.g-anubis .sg-cell.merged { box-shadow: inset 0 0 0 3px #fff, inset 0 0 30px rgba(125, 211, 252, .9), 0 0 24px rgba(56, 189, 248, .8); z-index: 2; }
+.g-anubis .sg-cell.merged { box-shadow: inset 0 0 0 3px #fde047, inset 0 0 30px rgba(251, 191, 36, .8), 0 0 24px rgba(251, 191, 36, .8); z-index: 2; }
 .g-anubis .sg-cell.golden { box-shadow: inset 0 0 0 3px #fde047, inset 0 0 26px rgba(253, 224, 71, .8), 0 0 18px rgba(253, 224, 71, .7); }
 /* black skull cubes, gold skull cubes, red cubes */
 .g-anubis .sg-cell.sks { background: radial-gradient(circle, rgba(168, 85, 247, .45), rgba(9, 9, 11, .9) 70%); box-shadow: inset 0 0 0 2px #a855f7, 0 0 16px rgba(168, 85, 247, .6); }
@@ -1168,14 +1168,15 @@ body.gated { overflow: hidden; }
 /* a cube falling through the column (land) */
 .sg-cell.jfly { position: absolute; z-index: 4; margin: 0; pointer-events: none; overflow: visible; will-change: transform; }
 .g-anubis.judge .sg-cell.target { box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .35), inset 0 0 16px rgba(186, 230, 253, .35); }
-.g-anubis.judge .sg-cell.cube { background: radial-gradient(circle at 50% 40%, rgba(224, 242, 254, .45), rgba(14, 116, 144, .4) 65%), linear-gradient(145deg, #4b4f4c, #252826); }
+.g-anubis.judge .sg-cell.cube { background: radial-gradient(circle at 50% 40%, rgba(251, 191, 36, .2), transparent 65%), linear-gradient(145deg, #2a2a2e, #0c0c0e); }
+.g-anubis.judge .sg-cell.cube.blue { background: radial-gradient(circle at 50% 40%, rgba(125, 211, 252, .45), transparent 65%), linear-gradient(145deg, #0c4a6e, #082f49); }
 /* column totals on top: big chiselled stone digits */
 .g-anubis.judge .jrow { gap: 6px; margin-bottom: 4px; }
 .g-anubis.judge .jrow > div { margin: 4px 0; padding: 2px; border: 0; background: none; box-shadow: none; text-align: center; overflow: visible; }
 .g-anubis.judge .jrow > div b { display: block; font: 400 clamp(30px, 6.4vw, 56px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px;
   background: linear-gradient(180deg, #ffffff 0%, #e7e5e4 45%, #a8a29e 55%, #f5f5f4 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
   filter: drop-shadow(0 2px 0 #1c1917) drop-shadow(0 0 1px #000) drop-shadow(0 4px 6px rgba(0, 0, 0, .7)); text-shadow: none; transform: skewX(-6deg); }
-.g-anubis.judge .jrow > div b i { font-style: normal; font-size: .55em; margin-left: 1px; }
+.g-anubis.judge .jrow > div b i { font-style: normal; font-size: .55em; margin-right: 1px; }
 .g-anubis.judge .jrow > div:not(.lit) b { opacity: .5; }
 .g-anubis.judge .jrow > div.mod b { background: linear-gradient(180deg, #fff, #f5d0fe 45%, #a855f7 55%, #faf5ff); -webkit-background-clip: text; background-clip: text; }
 .g-anubis.judge .jrow > div small { display: block; margin-top: 2px; font: 700 10px Inter, sans-serif; color: #d6d3d1; opacity: .8; }
@@ -1188,7 +1189,7 @@ body.gated { overflow: hidden; }
 .jbars i { height: 12px; border-radius: 3px; background: #1c1d1c; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .8), 0 0 0 1px #3a3d3b; transition: background .25s, box-shadow .25s; }
 .jbars i.on { background: linear-gradient(180deg, #fef08a, #facc15 50%, #a16207); box-shadow: 0 0 10px rgba(250, 204, 21, .55), 0 0 0 1px #fde68a; }
 @media (prefers-reduced-motion: reduce) { .an-embers { animation: none; } }
-@media (prefers-reduced-motion: reduce) { .an-sand, .an-sun, .g-anubis .sg-cell.lava::before, .g-anubis .sg-cell.lava::after, .g-anubis .sg-cell.cube::after { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .an-sand, .an-sun, .g-anubis .sg-cell.lava::before, .g-anubis .sg-cell.lava::after { animation: none; } }
 .sg-cell.wild svg { filter: drop-shadow(0 0 12px rgba(248, 113, 113, .95)); animation: orbPulse 1.6s ease-in-out infinite; }
 @keyframes orbPulse { 50% { scale: 1.08; } }
 .sg-cell.gskull { background: radial-gradient(circle, rgba(253, 224, 71, .4), transparent 70%); }
@@ -5864,6 +5865,10 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
+    game: 'anubis', date: '2026-10-31', title: 'Jugement : cubes multiplicateurs',
+    items: ['Plus de glaçons : le cube bleu tombe et devient un cube noir marqué du multiplicateur de sa colonne', 'Chaque cube garde sa valeur, même si la colonne monte ensuite', 'En haut de chaque colonne : seulement son multiplicateur', 'Cube de lave : tous les cubes s’accumulent sur le dernier'],
+  },
+  {
     game: 'dragons', date: '2026-10-31', title: 'Grille agrandie', isNew: true,
     items: ['Cases beaucoup plus grandes, sur toute la largeur', 'Plus de gros cadre : l’antre du dragon autour des têtes', 'Jackpots regroupés sur une seule ligne', 'Sur téléphone : cases plus hautes, têtes plus grandes'],
   },
@@ -8252,7 +8257,7 @@ const FILES = {
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'ec65ad09e6'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f7ff05ea7f'],
-  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'bc015043ce'],
+  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '8a359c54ec'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '9640e5a788'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],
