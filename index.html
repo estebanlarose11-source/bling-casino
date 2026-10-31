@@ -1970,6 +1970,12 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 /* ============ Application page ============ */
 .app-promo { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; padding: 10px 14px; border-radius: 14px; background: linear-gradient(90deg, rgba(255, 35, 64, .18), rgba(124, 58, 237, .14)); border: 1px solid rgba(255, 35, 64, .35); color: inherit; text-decoration: none; }
 .app-promo img { border-radius: 11px; flex: none; }
+.promos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin: 0 0 14px; }
+.promos:empty { display: none; }
+.promos .app-promo { margin: 0; min-width: 0; }
+.promos .app-promo > span:nth-child(2) { min-width: 0; }
+.promos .app-promo small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ms-promo .wp-ico { animation: none; }
 .wheel-promo { background: linear-gradient(90deg, rgba(251, 191, 36, .2), rgba(255, 35, 64, .12)); border-color: rgba(251, 191, 36, .45); }
 .wp-ico { font-size: 34px; line-height: 1; animation: chSpin 8s linear infinite; }
 .app-promo small { display: block; color: var(--muted); font-size: 12.5px; }
@@ -2163,6 +2169,28 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .g-taco.in-free .tf-stage { background: radial-gradient(ellipse at 50% 0%, rgba(244, 63, 94, .35), transparent 60%), linear-gradient(180deg, #5b0f3a, #2a0a2e); }
 @container (max-width: 520px) { .tf-stage { padding-top: 26px; } .tf-papel { height: 22px; } .tf-papel i { height: 18px; } .tf-meter { padding: 3px 10px; } .tf-meter small { font-size: 9px; letter-spacing: 1px; } }
 
+/* ============ Daily missions ============ */
+.missions-page h1 { margin: 6px 0 8px; font-size: clamp(26px, 4vw, 36px); }
+.ms-list { display: grid; gap: 10px; margin: 16px 0; }
+.ms-row { display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--line); }
+.ms-row.done { border-color: rgba(74, 222, 128, .55); box-shadow: 0 0 0 1px rgba(74, 222, 128, .25); }
+.ms-row.claimed { opacity: .65; }
+.ms-ico { font-size: 30px; flex: none; }
+.ms-body { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.ms-bar { position: relative; height: 18px; border-radius: 9px; background: #1f1f26; overflow: hidden; }
+.ms-bar i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #ff2340, #fbbf24); border-radius: 9px; }
+.ms-row.done .ms-bar i { background: linear-gradient(90deg, #16a34a, #4ade80); }
+.ms-bar small { position: relative; display: block; text-align: center; font: 800 11px/18px Inter, sans-serif; }
+.ms-rew { font-size: 12.5px; font-weight: 700; color: #fbbf24; }
+.ms-ok { font-weight: 800; color: #4ade80; white-space: nowrap; }
+.ms-chest { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 16px; border: 1px dashed #52525b; background: rgba(251, 191, 36, .06); }
+.ms-chest.ready { border: 1px solid #fbbf24; background: rgba(251, 191, 36, .14); box-shadow: 0 0 24px rgba(251, 191, 36, .25); }
+.ms-chest.ready .ms-chest-ico { animation: bumpIt 1s ease-in-out infinite; }
+.ms-chest-ico { font-size: 42px; }
+.ms-chest small { display: block; color: var(--muted); }
+.ms-chest .btn { margin-left: auto; }
+@media (max-width: 560px) { .ms-row { flex-wrap: wrap; } .ms-row > .btn, .ms-row > .ms-ok { margin-left: 44px; } }
+
 /* ============ Rewarded ad popup (A-ADS) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
@@ -2204,6 +2232,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
       <a href="#accueil" data-nav="home"><span>🏠</span>Accueil</a>
       <a href="#lobby-slot" data-nav="slots"><span>🎰</span>Machines à sous</a>
       <a href="#roue" data-nav="wheel"><span>🎡</span>Roue du jour</a>
+      <a href="#missions" data-nav="missions"><span>🎯</span>Missions du jour</a>
       <a href="#lobby-hold"><span>🪙</span>Hold & Spin</a>
       <a href="#lobby-table"><span>🎡</span>Roues & tables</a>
       <a href="#lobby-quick"><span>⚡</span>Jeux rapides</a>
@@ -3285,6 +3314,127 @@ function renderWheel(root) {
 }
 
 return { renderWheel, wheelReady, gifts };
+})();
+
+// ---- missions.js ----
+__mods['missions.js'] = (() => {
+// Daily missions (#missions): 3 missions a day (the same for everyone on a given day), tracked from the wallet's
+// 'wager' and 'payout' events, saved in profile.missions. Each mission pays KE + XP once claimed; claiming all
+// three opens the daily chest.
+
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { progress } = __mods['progress.js'];
+const { toast } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+
+const GAMES = [['cosmic', 'Cosmic Heist'], ['taco', 'Taco Fiesta'], ['zeus', 'Zeus Thunder'], ['candy', 'Candy Queen'], ['pileface', 'Pile ou Face Turbo'], ['robots', 'Course de Robots'], ['huff', 'Huff la Puff XXTrem'], ['mines', 'Mines'], ['plinko', 'Plinko']];
+const CHEST = { ke: 150, xp: 120 };
+
+const dayKey = (t = Date.now()) => { const d = new Date(t); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+const seedOf = (s) => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) / 4294967296); };
+
+// Today's three missions: always "play N rounds", plus two others picked from the day's seed.
+function todays(day = dayKey()) {
+  const rnd = seedOf(day), [gid, gname] = GAMES[Math.floor(rnd() * GAMES.length)];
+  const pool = [
+    { id: 'stake', icon: '🪙', text: 'Mise 25 KE au total', goal: 25, ke: 60, xp: 50 },
+    { id: 'big', icon: '🚀', text: 'Décroche un gain d’au moins ×10 la mise', goal: 1, ke: 80, xp: 60 },
+    { id: 'bonus', icon: '🎁', text: 'Gagne un bonus (tours gratuits ou fonctionnalité)', goal: 1, ke: 100, xp: 80 },
+    { id: 'variety', icon: '🎲', text: 'Joue à 3 jeux différents', goal: 3, ke: 50, xp: 40 },
+    { id: 'wins', icon: '✅', text: 'Gagne 10 fois', goal: 10, ke: 50, xp: 40 },
+    { id: 'game', icon: '⭐', text: `Joue 15 parties à ${gname}`, goal: 15, ke: 70, xp: 50, game: gid },
+  ];
+  const a = pool.splice(Math.floor(rnd() * pool.length), 1)[0], b = pool.splice(Math.floor(rnd() * pool.length), 1)[0];
+  return [{ id: 'spins', icon: '🎰', text: 'Joue 30 parties', goal: 30, ke: 40, xp: 40 }, a, b];
+}
+
+const state = () => {
+  const m = profiles.current?.missions;
+  return m && m.day === dayKey() ? m : { day: dayKey(), prog: {}, games: [], claimed: {}, chest: false };
+};
+const gameNow = () => (location.hash.match(/^#game-([\w-]+)/) || [])[1] || null;
+
+function bump(id, by = 1, set = null) {
+  if (!profiles.current) return;
+  const list = todays(), m = list.find((x) => x.id === id);
+  if (!m) return;
+  const before = state().prog[id] || 0;
+  if (before >= m.goal) return;
+  const now = Math.min(m.goal, set ?? before + by);
+  profiles.update('missions', (me) => { const s = state(); s.prog = { ...s.prog, [id]: now }; me.missions = s; });
+  if (now >= m.goal) { toast(`🎯 Mission accomplie : ${m.text} · récupère ta récompense !`, 'ok'); sfx.win(); }
+}
+
+wallet.addEventListener('wager', (e) => {
+  const g = gameNow();
+  bump('spins');
+  bump('stake', e.detail.amount);
+  if (g && todays().some((m) => m.game === g)) bump('game');
+  if (g && profiles.current) {
+    const s = state();
+    if (!s.games.includes(g)) { profiles.update('missions', (me) => { const t = state(); t.games = [...t.games, g]; me.missions = t; }); bump('variety', 0, state().games.length); }
+  }
+});
+wallet.addEventListener('payout', (e) => {
+  const meta = e.detail.meta;
+  if (!meta) return;
+  bump('wins');
+  if ((meta.x || 0) >= 10) bump('big');
+  if (/ · /.test(meta.game || '')) bump('bonus');
+});
+
+function status() {
+  const s = state(), list = todays();
+  const rows = list.map((m) => ({ ...m, have: s.prog[m.id] || 0, done: (s.prog[m.id] || 0) >= m.goal, claimed: !!s.claimed[m.id] }));
+  return { rows, toClaim: rows.filter((r) => r.done && !r.claimed).length, doneAll: rows.every((r) => r.claimed), chest: s.chest };
+}
+
+function claim(id) {
+  const st = status(), r = st.rows.find((x) => x.id === id);
+  if (!r || !r.done || r.claimed) return null;
+  profiles.update('missions', (me) => { const s = state(); s.claimed = { ...s.claimed, [id]: true }; me.missions = s; });
+  wallet.grant(r.ke); progress.gain(r.xp);
+  return r;
+}
+function openChest() {
+  const st = status();
+  if (!st.doneAll || st.chest) return false;
+  profiles.update('missions', (me) => { const s = state(); s.chest = true; me.missions = s; });
+  wallet.grant(CHEST.ke); progress.gain(CHEST.xp);
+  return true;
+}
+
+function renderMissions(root) {
+  const st = status();
+  const ms = (() => { const d = new Date(); d.setHours(24, 0, 0, 0); return d - Date.now(); })();
+  const h = Math.floor(ms / 3600e3), mn = Math.floor((ms % 3600e3) / 60e3);
+  root.innerHTML = `
+    <section class="panel missions-page">
+      <span class="eyebrow">🎯 Nouvelles missions chaque jour</span>
+      <h1>Missions du jour</h1>
+      <p class="muted">Termine les 3 missions pour ouvrir le <b>coffre du jour</b>. Nouvelles missions dans ${h} h ${String(mn).padStart(2, '0')}.</p>
+      ${!profiles.current ? '<p class="muted">Connecte-toi ou joue en invité pour suivre tes missions.</p>' : ''}
+      <div class="ms-list">${st.rows.map((r) => `
+        <div class="ms-row${r.done ? ' done' : ''}${r.claimed ? ' claimed' : ''}">
+          <span class="ms-ico">${r.icon}</span>
+          <div class="ms-body"><b>${r.text}</b>
+            <div class="ms-bar"><i style="width:${Math.round((r.have / r.goal) * 100)}%"></i><small>${r.id === 'stake' ? `${fmt(r.have)} / ${fmt(r.goal)}` : `${Math.floor(r.have)} / ${r.goal}`}</small></div>
+            <span class="ms-rew">+${fmt(r.ke)} · +${r.xp} XP</span></div>
+          ${r.claimed ? '<span class="ms-ok">✓ Récupéré</span>' : r.done ? `<button class="btn primary" data-claim="${r.id}">Récupérer</button>` : r.game ? `<a class="btn ghost" href="#game-${r.game}">Jouer</a>` : ''}
+        </div>`).join('')}</div>
+      <div class="ms-chest${st.doneAll ? ' ready' : ''}${st.chest ? ' open' : ''}">
+        <span class="ms-chest-ico">${st.chest ? '🎉' : '🧰'}</span>
+        <div><b>Coffre du jour</b><small>${st.chest ? 'Ouvert ! Reviens demain pour de nouvelles missions.' : `+${fmt(CHEST.ke)} · +${CHEST.xp} XP quand les 3 missions sont récupérées`}</small></div>
+        ${st.doneAll && !st.chest ? '<button class="btn primary lg" data-chest>Ouvrir</button>' : ''}
+      </div>
+    </section>`;
+  root.querySelectorAll('[data-claim]').forEach((b) => { b.onclick = () => { const r = claim(b.dataset.claim); if (r) { sfx.unlock(); sfx.coin(); fx.coins(30, b); toast(`+${fmt(r.ke)} et +${r.xp} XP`, 'ok'); } renderMissions(root); }; });
+  root.querySelector('[data-chest]')?.addEventListener('click', (e) => { if (openChest()) { sfx.unlock(); sfx.bigWin(); fx.confetti(100); fx.coins(60, e.currentTarget); toast(`Coffre ouvert : +${fmt(CHEST.ke)} et +${CHEST.xp} XP`, 'ok'); } renderMissions(root); });
+}
+
+return { renderMissions, missionStatus: status };
 })();
 
 // ---- brand.js ----
@@ -4936,6 +5086,8 @@ const { BRAND } = __mods['brand.js'];
 const { likeButton, isLiked } = __mods['likes.js'];
 const { UPDATES, latestFor, recent, fmtDate } = __mods['updates.js'];
 const { wheelReady } = __mods['wheel.js'];
+const { missionStatus } = __mods['missions.js'];
+const profilesReady = () => !!__mods['profile.js'].profiles.current;
 
 const VOL = ['', 'Très basse', 'Basse', 'Moyenne', 'Haute', 'Très haute'];
 const volLabel = (g) => (g.original ? VOL[g.vol] : g.volatility);
@@ -5034,8 +5186,11 @@ function renderLobby(root, params = {}) {
       </div>
     </section>`}
 
+    <div class="promos">
+    ${filter === 'all' && profilesReady() ? (() => { const m = missionStatus(), n = m.rows.filter((r) => r.claimed).length; return m.chest ? '' : `<a class="app-promo ms-promo" href="#missions"><span class="wp-ico">🎯</span><span><b>Missions du jour · ${n} / 3</b><small>${m.toClaim ? `${m.toClaim} récompense${m.toClaim > 1 ? 's' : ''} à récupérer !` : m.rows.map((r) => r.text).join(' · ')}</small></span><em>${m.toClaim ? 'Récupérer' : 'Voir'}</em></a>`; })() : ''}
     ${filter === 'all' && wheelReady() ? `<a class="app-promo wheel-promo" href="#roue"><span class="wp-ico">🎡</span><span><b>Ta Roue du jour est prête !</b><small>Un tour gratuit : KE, XP ou bonus offert</small></span><em>Tourner</em></a>` : ''}
     ${filter === 'all' && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone) ? `<a class="app-promo" href="#appli"><img src="assets/icon-192.png" alt="" width="44" height="44"><span><b>Installe l’appli SpinBet</b><small>Plein écran, sur ton écran d’accueil · iPhone et Android</small></span><em>Installer</em></a>` : ''}
+    </div>
 
     <div class="chips">${FILTERS.map((x) => `<a class="chip${x.id === filter ? ' on' : ''}" href="#${x.id === 'all' ? 'accueil' : `lobby-${x.id}`}">${x.icon} ${x.label}</a>`).join('')}</div>
 
@@ -14020,6 +14175,7 @@ const { renderLeaderboard } = __mods['pages/leaderboard.js'];
 const { ALL_GAMES } = __mods['games/index.js'];
 const { renderApp, registerSW } = __mods['pages/app.js'];
 const { renderWheel } = __mods['wheel.js'];
+const { renderMissions } = __mods['missions.js'];
 
 const view = document.getElementById('view');
 
@@ -14033,6 +14189,7 @@ const routes = [
   { re: /^responsable$/, page: (r) => renderResponsible(r), nav: 'resp' },
   { re: /^(appli|application)$/, page: (r) => renderApp(r), nav: 'app' },
   { re: /^roue$/, page: (r) => renderWheel(r), nav: 'wheel' },
+  { re: /^missions$/, page: (r) => renderMissions(r), nav: 'missions' },
 ];
 
 function route() {
