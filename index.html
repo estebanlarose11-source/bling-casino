@@ -894,6 +894,22 @@ body.gated { overflow: hidden; }
 .sg-badge.t3 { background: linear-gradient(180deg, #f472b6, #be185d); box-shadow: 0 0 12px rgba(244, 114, 182, .9); }
 .sg-badge.t4 { background: linear-gradient(180deg, #fde047, #ca8a04); color: #1a1200; box-shadow: 0 0 14px rgba(250, 204, 21, .95); }
 
+/* rich grid effects (link / shatter / richCascade) */
+.sg { position: relative; }
+.sg-links { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 4; pointer-events: none; overflow: visible; }
+.sg-links path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.sg-links .lk-glow { stroke: var(--lc); stroke-width: 14; opacity: .28; }
+.sg-links .lk-line { stroke: #fff; stroke-width: 3.5; stroke-dasharray: 10 8; animation: lkRun .5s linear infinite; filter: drop-shadow(0 0 4px var(--lc)); }
+.sg-links .lk-node { fill: #fff; stroke: var(--lc); stroke-width: 3; animation: lkPop .45s cubic-bezier(.3, 1.8, .5, 1) both; }
+@keyframes lkRun { to { stroke-dashoffset: -18; } }
+@keyframes lkPop { from { transform-box: fill-box; transform-origin: center; transform: scale(0); } to { transform-box: fill-box; transform-origin: center; transform: scale(1); } }
+.sg-shards { position: fixed; inset: 0; z-index: 80; pointer-events: none; }
+.sg-shard { position: absolute; border-radius: 2px; background: var(--c); box-shadow: 0 0 8px var(--c); transform: translate(-50%, -50%); animation: sgShard .6s cubic-bezier(.2, .7, .4, 1) forwards; }
+@keyframes sgShard { to { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--r)) scale(.2); opacity: 0; } }
+.sg-ring { position: absolute; border-radius: 50%; border: 3px solid var(--c); transform: translate(-50%, -50%) scale(.3); opacity: .9; animation: sgRing .5s ease-out forwards; box-shadow: 0 0 14px var(--c); }
+@keyframes sgRing { to { transform: translate(-50%, -50%) scale(1.5); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .sg-links .lk-line { animation: none; } }
+
 /* ============ Reel strips ============ */
 .rs { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 4px; aspect-ratio: calc(var(--cols) / var(--rows)); margin: 0 auto; width: min(100%, calc((100vh - var(--chrome)) * var(--cols) / var(--rows))); min-width: min(100%, 240px); }
 .rs-reel { position: relative; overflow: hidden; container-type: size; border-radius: 8px; background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .07) 50%, rgba(255, 255, 255, .03)); }
@@ -1025,6 +1041,63 @@ body.gated { overflow: hidden; }
 .g-anubis.under .slot-bg { filter: hue-rotate(160deg) saturate(1.3) brightness(.8); }
 .g-anubis.judge .slot-bg { filter: hue-rotate(-30deg) brightness(.7) saturate(1.6); }
 .g-anubis .sg-cell { background: linear-gradient(180deg, rgba(19, 168, 160, .12), rgba(14, 26, 56, .3)); }
+.g-anubis .slot-stage { position: relative; overflow: hidden; }
+.g-anubis .slot-stage > :not(.an-bg) { position: relative; z-index: 1; }
+/* animated temple behind the grid */
+.an-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  background: radial-gradient(ellipse at 50% 120%, rgba(217, 119, 6, .28), transparent 55%), linear-gradient(180deg, #071a26 0%, #0b1424 60%, #1a1208 100%); }
+.an-bg::before { content: ''; position: absolute; inset: 0; opacity: .22; background-image: linear-gradient(90deg, rgba(253, 230, 138, .35) 1px, transparent 1px), linear-gradient(rgba(253, 230, 138, .25) 1px, transparent 1px); background-size: 48px 24px; mask-image: linear-gradient(180deg, transparent, #000 40%, #000 80%, transparent); -webkit-mask-image: linear-gradient(180deg, transparent, #000 40%, #000 80%, transparent); }
+.an-sun { position: absolute; left: 50%; top: -110px; width: 260px; height: 260px; margin-left: -130px; border-radius: 50%; background: radial-gradient(circle, rgba(253, 224, 71, .55), rgba(245, 158, 11, .18) 45%, transparent 70%); animation: anSun 6s ease-in-out infinite; }
+@keyframes anSun { 50% { transform: scale(1.12); opacity: .8; } }
+.an-torch { position: absolute; bottom: 8%; width: 46px; height: 120px; }
+.an-torch.l { left: 1.5%; } .an-torch.r { right: 1.5%; }
+.an-torch::before { content: ''; position: absolute; left: 50%; bottom: 0; width: 10px; height: 64px; margin-left: -5px; border-radius: 3px; background: linear-gradient(90deg, #78350f, #d97706, #78350f); }
+.an-torch::after { content: ''; position: absolute; left: 50%; bottom: 56px; width: 40px; height: 58px; margin-left: -20px; border-radius: 50% 50% 45% 45% / 65% 65% 35% 35%; background: radial-gradient(ellipse at 50% 75%, #fff7c2 0 15%, #fbbf24 35%, #f97316 60%, transparent 72%); filter: blur(1px); transform-origin: 50% 100%; animation: anFlame .18s ease-in-out infinite alternate; box-shadow: 0 0 40px 18px rgba(249, 115, 22, .35); }
+@keyframes anFlame { to { transform: scale(1.08, .92) skewX(4deg); } }
+.an-sand { position: absolute; inset: -20% 0 0; background-image: radial-gradient(circle, rgba(253, 230, 138, .7) 1px, transparent 1.6px), radial-gradient(circle, rgba(253, 230, 138, .45) 1px, transparent 1.6px); background-size: 120px 90px, 70px 60px; animation: anSand 18s linear infinite; opacity: .5; }
+@keyframes anSand { to { transform: translate(-120px, 90px); } }
+.g-anubis.under .an-bg { filter: hue-rotate(150deg) saturate(1.2); }
+.g-anubis.judge .an-bg { background: radial-gradient(ellipse at 50% 110%, rgba(239, 68, 68, .45), transparent 60%), linear-gradient(180deg, #1a0606, #0c0505); }
+.an-word { position: absolute; left: 50%; top: 50%; z-index: 6 !important; pointer-events: none; opacity: 0; font: 900 clamp(30px, 6vw, 70px)/1 Cinzel, Orbitron, serif; letter-spacing: 2px; white-space: nowrap; color: #fef3c7; text-shadow: 0 0 12px #f59e0b, 0 3px 0 #92400e, 0 6px 0 #451a03; }
+.an-word.t3, .an-word.t4, .an-word.t5 { color: #fff; text-shadow: 0 0 16px #5eead4, 0 0 30px #f59e0b, 0 3px 0 #0f766e; }
+.g-anubis .sg-cell.win { box-shadow: inset 0 0 0 2px #fde68a, 0 0 22px rgba(253, 224, 71, .6), inset 0 0 20px rgba(245, 158, 11, .45); }
+/* Judgment: flowing lava under the empty cells */
+.g-anubis .sg-cell.lava { opacity: 1; background: #1a0400; box-shadow: inset 0 0 0 1px rgba(251, 146, 60, .25), inset 0 0 18px rgba(0, 0, 0, .8); }
+.g-anubis .sg-cell.lava::before { content: ''; position: absolute; left: 0; right: 0; top: -100%; height: 300%; pointer-events: none;
+  background: radial-gradient(ellipse 60% 30% at 30% 20%, rgba(253, 224, 71, .55), transparent 70%), radial-gradient(ellipse 50% 25% at 70% 55%, rgba(249, 115, 22, .7), transparent 70%), radial-gradient(ellipse 70% 30% at 40% 85%, rgba(239, 68, 68, .65), transparent 70%), linear-gradient(180deg, #7c2d12, #b91c1c 30%, #7c2d12 55%, #c2410c 80%, #7c2d12);
+  animation: lavaFlow 5s linear infinite; filter: saturate(1.15); }
+.g-anubis .sg-cell.lava::after { content: ''; position: absolute; left: 0; right: 0; top: -100%; height: 200%; pointer-events: none; opacity: .92;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><g fill='%23170603'><path d='M0 0 L38 0 L34 22 L12 30 L0 26Z'/><path d='M42 0 L100 0 L100 18 L70 26 L40 20Z'/><path d='M0 31 L14 34 L30 27 L36 50 L20 62 L0 58Z'/><path d='M39 25 L68 30 L74 52 L54 62 L40 52Z'/><path d='M72 29 L100 22 L100 60 L80 58 L77 50Z'/><path d='M0 62 L22 66 L28 88 L10 100 L0 100Z'/><path d='M25 64 L52 66 L60 86 L46 100 L30 100 L31 88Z'/><path d='M56 64 L78 62 L100 64 L100 100 L52 100 L64 87Z'/></g></svg>") 0 0 / 100% 50% repeat-y; filter: drop-shadow(0 0 2px rgba(0, 0, 0, .9));
+  animation: lavaCrust 14s linear infinite; }
+.g-anubis .sg-cell.lava:nth-child(3n)::before { animation-delay: -1.7s; } .g-anubis .sg-cell.lava:nth-child(3n+1)::before { animation-delay: -3.1s; }
+@keyframes lavaFlow { to { transform: translateY(33.33%); } }
+@keyframes lavaCrust { to { transform: translateY(50%); } }
+.g-anubis .sg-cell.lava.spin::before { animation-duration: .35s; filter: blur(3px) brightness(1.4); }
+.g-anubis .sg-cell.lava.spin::after { opacity: .35; animation-duration: .5s; filter: blur(2px); }
+.g-anubis .sg-cell.lava.spin { box-shadow: inset 0 0 0 2px rgba(253, 224, 71, .5), inset 0 0 22px rgba(249, 115, 22, .6); }
+.judge .sg-cell.dim { opacity: .18; }
+/* ice, heat and melting */
+.g-anubis .sg-cell.cube { background: radial-gradient(circle at 50% 35%, rgba(224, 242, 254, .45), rgba(14, 116, 144, .4) 70%); box-shadow: inset 0 0 0 2px rgba(186, 230, 253, .9), inset 0 0 22px rgba(125, 211, 252, .55), 0 0 12px rgba(56, 189, 248, .35); }
+.g-anubis .sg-cell.cube::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, .45) 45%, transparent 60%); background-size: 250% 100%; animation: iceShine 3.2s ease-in-out infinite; }
+@keyframes iceShine { 0%, 60% { background-position: 120% 0; } 100% { background-position: -120% 0; } }
+.g-anubis .sg-cell.cube .sg-lab { color: #fff; text-shadow: 0 0 6px #0c4a6e, 0 0 12px #38bdf8; }
+.g-anubis .sg-cell.heat { box-shadow: inset 0 0 0 2px #fb923c, inset 0 0 26px rgba(249, 115, 22, .75), 0 0 16px rgba(249, 115, 22, .6); }
+.g-anubis .sg-cell.melting { background: radial-gradient(circle, rgba(251, 146, 60, .6), rgba(127, 29, 29, .6)); }
+.g-anubis .sg-cell.merged { box-shadow: inset 0 0 0 3px #fff, inset 0 0 30px rgba(125, 211, 252, .9), 0 0 24px rgba(56, 189, 248, .8); z-index: 2; }
+.g-anubis .sg-cell.golden { box-shadow: inset 0 0 0 3px #fde047, inset 0 0 26px rgba(253, 224, 71, .8), 0 0 18px rgba(253, 224, 71, .7); }
+/* black skull cubes, gold skull cubes, red cubes */
+.g-anubis .sg-cell.sks { background: radial-gradient(circle, rgba(168, 85, 247, .45), rgba(9, 9, 11, .9) 70%); box-shadow: inset 0 0 0 2px #a855f7, 0 0 16px rgba(168, 85, 247, .6); }
+.g-anubis .sg-cell.sks svg { filter: drop-shadow(0 0 10px rgba(168, 85, 247, .9)); }
+.g-anubis .sg-cell.sks .sg-lab { color: #f5d0fe; text-shadow: 0 0 6px #000, 0 0 12px #a855f7; }
+.g-anubis .sg-cell.gsk { background: radial-gradient(circle, rgba(253, 224, 71, .55), rgba(120, 53, 15, .7) 70%); box-shadow: inset 0 0 0 2px #fde047, 0 0 20px rgba(253, 224, 71, .7); }
+.g-anubis .sg-cell.rc { background: radial-gradient(circle, rgba(248, 113, 113, .6), rgba(127, 29, 29, .8) 70%); box-shadow: inset 0 0 0 2px #fca5a5, 0 0 20px rgba(239, 68, 68, .8); }
+.g-anubis .sg-cell.rc svg { animation: rcGlow .4s ease-in-out infinite alternate; }
+@keyframes rcGlow { to { filter: drop-shadow(0 0 14px #f97316) brightness(1.3); } }
+/* column tablets */
+.g-anubis .jrow > div { background: linear-gradient(180deg, #3b2a12, #1c1408); border: 1px solid #b45309; box-shadow: inset 0 1px 0 rgba(253, 230, 138, .35), 0 4px 10px rgba(0, 0, 0, .5); border-radius: 10px; transition: transform .2s, box-shadow .2s; }
+.g-anubis .jrow > div.mod { border-color: #a855f7; box-shadow: inset 0 1px 0 rgba(245, 208, 254, .3), 0 0 14px rgba(168, 85, 247, .55); }
+.g-anubis .jrow > div b { color: #fde68a; text-shadow: 0 0 8px rgba(245, 158, 11, .7); }
+@media (prefers-reduced-motion: reduce) { .an-sand, .an-sun, .g-anubis .sg-cell.lava::before, .g-anubis .sg-cell.lava::after, .g-anubis .sg-cell.cube::after { animation: none; } }
 .sg-cell.wild svg { filter: drop-shadow(0 0 12px rgba(248, 113, 113, .95)); animation: orbPulse 1.6s ease-in-out infinite; }
 @keyframes orbPulse { 50% { scale: 1.08; } }
 .sg-cell.gskull { background: radial-gradient(circle, rgba(253, 224, 71, .4), transparent 70%); }
@@ -5237,6 +5310,10 @@ const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
   {
+    game: 'anubis', date: '2026-10-31', title: 'Temple et Jugement en lave',
+    items: ['Nouveau temple animé : torches, soleil et sable', 'Cascades plus vivantes : liens lumineux, explosions et rebonds', 'Jugement : la lave coule sous les colonnes qui défilent comme des rouleaux', 'Crânes en cubes noirs, cubes rouges qui font fondre la glace', 'Une colonne pleine fond en un seul cube et continue'],
+  },
+  {
     game: 'candy', date: '2026-10-31', title: 'Nouvelles règles',
     items: ['Chaque cascade fait grimper le multiplicateur jusqu’à ×20', 'Les grosses grappes créent des bonbons spéciaux : cœur explosif, bocal bombe, baguette magique', 'Bal de la Reine : le multiplicateur ne redescend jamais', 'Nouvel achat : bonbon spécial garanti'],
   },
@@ -7301,6 +7378,68 @@ class SymbolGrid {
     idxs.forEach((i) => { const p = center(this.cells[i]); x += p.x; y += p.y; });
     fx.floatText(x / idxs.length, y / idxs.length, text, color, 22);
   }
+
+  /* ---------- rich effects (opt-in: Anubis Reborn, Bling Tower) ---------- */
+
+  // Glowing animated links between the touching cells of each winning group (one colour per group).
+  link(groups, colors = ['#fde047', '#22d3ee', '#f472b6', '#4ade80']) {
+    this.unlink();
+    const R = this.rows, box = this.el.getBoundingClientRect();
+    const pos = this.cells.map((c) => { const r = c.getBoundingClientRect(); return [r.left - box.left + r.width / 2, r.top - box.top + r.height / 2, r.width]; });
+    let body = '';
+    groups.forEach((cells, g) => {
+      const set = new Set(cells), col = colors[g % colors.length];
+      let d = '';
+      cells.forEach((i) => {
+        for (const j of [i + R, i % R < R - 1 ? i + 1 : -1]) if (set.has(j)) d += `M${pos[i][0].toFixed(1)} ${pos[i][1].toFixed(1)}L${pos[j][0].toFixed(1)} ${pos[j][1].toFixed(1)}`;
+      });
+      const rr = (pos[0][2] * 0.12).toFixed(1);
+      body += `<g style="--lc:${col}"><path d="${d}" class="lk-glow"/><path d="${d}" class="lk-line"/>${cells.map((i) => `<circle cx="${pos[i][0].toFixed(1)}" cy="${pos[i][1].toFixed(1)}" r="${rr}" class="lk-node"/>`).join('')}</g>`;
+    });
+    this.el.insertAdjacentHTML('beforeend', `<svg class="sg-links" viewBox="0 0 ${box.width.toFixed(0)} ${box.height.toFixed(0)}" aria-hidden="true">${body}</svg>`);
+  }
+
+  unlink() { this.el.querySelectorAll('.sg-links').forEach((n) => n.remove()); }
+
+  // Explosion with flying shards and a shock ring on every cell (fewer shards on big wins to stay fluid).
+  async shatter(idxs, colors = ['#fde68a', '#fbbf24', '#fff', '#f0abfc']) {
+    const per = idxs.length > 14 ? 3 : idxs.length > 7 ? 4 : 6, T = this.turbo ? 260 : 460;
+    const host = document.createElement('div');
+    host.className = 'sg-shards';
+    let html = '';
+    idxs.forEach((i) => {
+      const r = this.cells[i].getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2, s = r.width;
+      html += `<i class="sg-ring" style="left:${x}px;top:${y}px;width:${s}px;height:${s}px;--c:${colors[0]}"></i>`;
+      for (let k = 0; k < per; k++) {
+        const a = (k / per) * Math.PI * 2 + Math.random() * 0.8, d = s * (0.5 + Math.random() * 0.6);
+        html += `<i class="sg-shard" style="left:${x}px;top:${y}px;--dx:${(Math.cos(a) * d).toFixed(0)}px;--dy:${(Math.sin(a) * d - s * 0.2).toFixed(0)}px;--r:${Math.round(Math.random() * 540 - 270)}deg;--c:${colors[k % colors.length]};width:${(s * 0.14).toFixed(0)}px;height:${(s * 0.14).toFixed(0)}px;animation-duration:${T + 160}ms"></i>`;
+      }
+      const sym = this.sym(i);
+      sym.animate([{ transform: 'scale(1)', filter: 'brightness(1)', opacity: 1 }, { transform: 'scale(1.3)', filter: 'brightness(2.6)', opacity: 1, offset: 0.35 }, { transform: 'scale(.1) rotate(25deg)', filter: 'brightness(3)', opacity: 0 }],
+        { duration: T, easing: 'ease-in', fill: 'forwards' });
+    });
+    host.innerHTML = html;
+    document.body.appendChild(host);
+    setTimeout(() => host.remove(), T + 400);
+    sfx.coin();
+    await sleep(T);
+  }
+
+  // Cascade, then a squash-and-stretch landing on every symbol that moved, with a puff of dust under the new ones.
+  async richCascade(after, removed, dust = 'rgba(255,255,255,.55)') {
+    await this.cascade(after, removed);
+    const R = this.rows;
+    for (let c = 0; c < this.cols; c++) {
+      let n = 0; for (let r = 0; r < R; r++) if (removed.has(c * R + r)) n++;
+      if (!n) continue;
+      for (let r = 0; r < R; r++) {
+        const i = c * R + r;
+        this.sym(i).animate([{ transform: 'scale(1.12, .84) translateY(6%)' }, { transform: 'scale(.95, 1.06)', offset: 0.5 }, { transform: 'none' }], { duration: this.turbo ? 160 : 260, easing: 'ease-out', delay: c * 12 });
+      }
+      const b = this.cells[c * R + R - 1].getBoundingClientRect();
+      fx.burst(b.left + b.width / 2, b.bottom - 4, 6, [dust], 3);
+    }
+  }
 }
 
 return { SymbolGrid };
@@ -7519,7 +7658,7 @@ const FILES = {
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'ec65ad09e6'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f7ff05ea7f'],
-  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'ddd5d2db6a'],
+  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '76da1b5445'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'f2c0040660'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],

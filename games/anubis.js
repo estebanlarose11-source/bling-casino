@@ -2,6 +2,8 @@
 // ---- games/impl/anubis.js ----
 __mods['games/impl/anubis.js'] = (() => {
 // Anubis Reborn, rebuilt on the shared cabinet. Cascades, Underworld and Judgment (original math).
+// Visuals: animated temple, glowing cluster links, shattering wins; Judgment over flowing lava, black skull cubes
+// and red cubes that melt the ice below them.
 
 const { BaseGame, fmtC, art } = __mods['core/base.js'];
 const { SymbolGrid } = __mods['core/grid.js'];
@@ -33,7 +35,8 @@ function clusters(grid) {
   }
   return out;
 }
-const JW = [['cube', 62], ['sk', 12], ['g', 0.2], ['red', 3]], JPC = 0.175;
+// A column that reaches the top melts into one cube and keeps going (JPC retuned: same bonus value, ≈ ×130).
+const JW = [['cube', 62], ['sk', 12], ['g', 0.2], ['red', 3]], JPC = 0.176;
 // Judgment skulls add +2 to +500 to the value of the next cubes; a very rare 10 000 skull is an instant max win.
 const SKV = [[2, 30], [3, 22], [4, 16], [5, 12], [6, 9], [8, 7], [10, 5], [15, 4], [20, 2.5], [25, 2], [40, 1.3], [60, 0.9], [100, 0.5], [150, 0.3], [250, 0.12], [500, 0.04], [10000, 0.0003]];
 const SK_MAX = 10000;
@@ -51,6 +54,18 @@ const NAMES = ['Anubis', 'Ankh', 'Œil d’Horus', 'Scarabée', 'Gemme bleue', '
 const BUYU = 100, BUYJ = 150;
 const fxv = (v) => (v >= 10000 ? Math.round(v / 1000) + 'k' : v >= 1000 ? (v / 1000).toFixed(1).replace('.', ',') + 'k' : String(v));
 const lab = (t) => `<b class="sg-lab">${t}</b>`;
+const cubeSVG = (top, left, right, edge, inner) => `<path d="M32 4 L58 18 L58 46 L32 60 L6 46 L6 18 Z" fill="${left}" stroke="${edge}" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M32 4 L58 18 L32 32 L6 18 Z" fill="${top}"/><path d="M32 32 L58 18 L58 46 L32 60 Z" fill="${right}"/>
+  <path d="M6 18 L32 32 L58 18 M32 32 V60" stroke="${edge}" stroke-width="1.4" fill="none" opacity=".8"/>${inner}`;
+const SKULL = (c, eye) => `<g transform="translate(19 30) scale(.42)"><path d="M32 4 C16 4 8 16 8 29 C8 37 12 42 18 45 L18 54 H46 L46 45 C52 42 56 37 56 29 C56 16 48 4 32 4Z" fill="${c}"/>
+  <circle cx="22" cy="29" r="7" fill="${eye}"/><circle cx="42" cy="29" r="7" fill="${eye}"/><path d="M28 41 L32 35 L36 41Z" fill="${eye}"/><path d="M24 54 V47 M32 54 V47 M40 54 V47" stroke="${eye}" stroke-width="3"/></g>`;
+const EXTRA_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="cbk" viewBox="0 0 64 64">${cubeSVG('#3f3f46', '#18181b', '#09090b', '#a855f7', SKULL('#e4e4e7', '#a855f7'))}</symbol>
+  <symbol id="cbg" viewBox="0 0 64 64">${cubeSVG('#fde68a', '#d97706', '#92400e', '#fff7c2', SKULL('#fff7c2', '#92400e'))}</symbol>
+  <symbol id="cbr" viewBox="0 0 64 64">${cubeSVG('#fca5a5', '#dc2626', '#7f1d1d', '#fecaca', '<path d="M20 40 Q24 30 28 38 Q32 26 36 36 Q40 28 44 40" stroke="#fde047" stroke-width="3" fill="none" stroke-linecap="round"/>')}</symbol>
+</defs></svg>`;
+const WORDS = ['DIVIN !', 'SACRÉ !', 'PHARAONIQUE !', 'ÉTERNEL !', 'IMMORTEL !', 'JUGEMENT DIVIN !'];
+const GOLD = ['#fde68a', '#f59e0b', '#fff', '#5eead4'];
 function symArt(v) {
   if (v >= 1000) return art('gk') + lab('×' + (v - 1000));
   return art(v === WILD ? 'w' : v === SC ? 'sc' : 's' + v);
@@ -61,13 +76,14 @@ class AnubisGame extends BaseGame {
     super(root, game, {
       defs: DEFS, music: MUSIC,
       head: '<div class="head-meters"><div class="meter gm-meter"><small>Multiplicateur</small><b>×1</b></div></div>',
-      stage: '<div class="col-row jrow"></div><div class="grid-host"></div><div class="col-row mrow"></div>',
+      stage: '<div class="an-bg"><i class="an-sun"></i><i class="an-torch l"></i><i class="an-torch r"></i><i class="an-sand"></i></div><div class="an-word"></div><div class="col-row jrow"></div><div class="grid-host"></div><div class="col-row mrow"></div>',
       buys: [
         { id: 'U', icon: '💀', label: 'Monde souterrain · 3 scatters', desc: '10 tours, multiplicateurs par colonne et crânes dorés', cost: (b) => b * BUYU },
         { id: 'J', icon: '🧊', label: 'Jugement · 4 scatters', desc: 'Cubes de glace, crânes qui additionnent, crânes dorés jusqu’à ×100', cost: (b) => b * BUYJ },
       ],
       hello: 'Grappes de 5+ · les orbes rouges augmentent le multiplicateur',
     });
+    if (!document.getElementById('an-extra')) { const d = document.createElement('div'); d.id = 'an-extra'; d.className = 'art-defs'; d.innerHTML = EXTRA_DEFS; document.body.appendChild(d); }
     this.gmEl = this.q('.gm-meter');
     this.mrow = this.q('.mrow');
     this.jrow = this.q('.jrow');
@@ -78,6 +94,15 @@ class AnubisGame extends BaseGame {
       cls: (v) => (v === WILD ? 'wild' : v === SC ? 'scatter' : v >= 1000 ? 'gskull' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => Math.floor(Math.random() * SYMN)));
+  }
+
+  word(k, text) {
+    const w = this.q('.an-word');
+    w.textContent = text || WORDS[Math.min(k, WORDS.length - 1)];
+    w.className = `an-word t${Math.min(k, 5)}`;
+    w.getAnimations().forEach((a) => a.cancel());
+    w.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.4)', filter: 'blur(6px)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.08)', filter: 'blur(0)', offset: 0.22 },
+      { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.7 }, { opacity: 0, transform: 'translate(-50%,-62%) scale(1.15)' }], { duration: this.turbo ? 650 : 1100, easing: 'ease-out' });
   }
 
   setG(v, bump) {
@@ -147,7 +172,8 @@ class AnubisGame extends BaseGame {
   }
 
   resetBoard() {
-    this.grid.cells.forEach((c) => c.classList.remove('dim', 'win', 'cube', 'rc', 'sks', 'gsk'));
+    this.grid.unlink();
+    this.grid.cells.forEach((c) => c.classList.remove('dim', 'win', 'cube', 'rc', 'sks', 'gsk', 'lava', 'spin', 'heat', 'melting', 'golden', 'big'));
     this.grid.setAll(Array.from({ length: N }, () => Math.floor(Math.random() * SYMN)));
     this.setG(1);
   }
@@ -163,7 +189,9 @@ class AnubisGame extends BaseGame {
       if (!cl.length) break;
       let paid = 0;
       const rem = new Set();
+      const groups = [];
       cl.forEach((cu) => {
+        groups.push(cu.cells);
         let mult = Gm;
         if (mode === 'under') { const cols = {}; let sm = 0; cu.cells.forEach((k) => { cols[Math.floor(k / R)] = 1; }); for (const cc in cols) sm += M[cc]; mult = Math.max(1, sm); }
         const p = Math.round(bet * VAL[cu.s] * F * (cu.cells.length - MINC + 1) * mult);
@@ -175,20 +203,25 @@ class AnubisGame extends BaseGame {
       total += paid;
       this.setLast(total);
       this.grid.mark([...rem]);
+      this.grid.link(groups, mode === 'under' ? ['#5eead4', '#a78bfa', '#fde047'] : ['#fde047', '#5eead4', '#f87171']);
       this.msg(`Connexion ! +${fmtC(paid)}${mode === 'base' && Gm > 1 ? ` <span class="pill hot">×${Gm}</span>` : ''}`);
+      if (rounds > 0 || paid >= bet * 5) this.word(rounds);
       sfx.win();
-      await this.wait(700);
+      await this.wait(760);
       if (mode === 'under') {
         const up = {};
         cl.forEach((cu) => { const cs = {}; cu.cells.forEach((k) => { cs[Math.floor(k / R)] = 1; }); for (const cc in cs) { M[cc] += UINC; up[cc] = 1; } });
         this.renderM(M, up);
       } else {
         let orbs = 0;
-        rem.forEach((k) => { if (grid[k] === WILD) orbs++; });
-        if (orbs) { Gm += orbs; this.setG(Gm, true); }
+        const to = center(this.gmEl);
+        rem.forEach((k) => { if (grid[k] === WILD) { orbs++; fx.trail(center(this.grid.cells[k]), to, '#f87171', 10); } });
+        if (orbs) { await this.wait(350); Gm += orbs; this.setG(Gm, true); this.word(5, `×${Gm}`); }
       }
       this.grid.unmark();
-      await this.grid.explode([...rem], ['#5eead4', '#fde68a', '#fff']);
+      this.grid.unlink();
+      if (rem.size >= 10) this.shake();
+      await this.grid.shatter([...rem], mode === 'under' ? ['#5eead4', '#a78bfa', '#fff'] : GOLD);
       const skUp = {};
       let skTxt = '';
       for (let c = 0; c < C; c++) {
@@ -201,7 +234,7 @@ class AnubisGame extends BaseGame {
           if (mode === 'under' && r2 < miss && nv >= 1000) { M[c] = Math.max(M[c], 1) * (nv - 1000); skUp[c] = 1; skTxt = `Crâne doré ×${nv - 1000} ! La colonne est multipliée`; }
         }
       }
-      await this.grid.cascade(grid, rem);
+      await this.grid.richCascade(grid, rem, 'rgba(253,230,138,.6)');
       rounds++;
       if (skTxt) { this.renderM(M, skUp); this.msg(skTxt); this.flash('rgba(253,224,71,.6)'); sfx.jackpot(); await this.wait(900); }
       if (capHit) break;
@@ -247,11 +280,11 @@ class AnubisGame extends BaseGame {
     cell.className = 'sg-cell ' + cls;
   }
 
-  hide(i) { if (i >= 0) this.paint(i, '', 'dim'); }
+  lava(i) { if (i >= 0) this.paint(i, '', 'lava'); }
 
   fall(i, row) {
-    return this.grid.sym(i).animate([{ transform: `translateY(${-(row + 1) * 110}%)` }, { transform: 'translateY(0)' }],
-      { duration: this.turbo ? 220 : 420, easing: 'cubic-bezier(.3,1.35,.55,1)' }).finished;
+    return this.grid.sym(i).animate([{ transform: `translateY(${-(row + 1) * 110}%)` }, { transform: 'translateY(0)', offset: 0.75 }, { transform: 'scale(1.12,.86) translateY(6%)', offset: 0.88 }, { transform: 'none' }],
+      { duration: this.turbo ? 260 : 480, easing: 'cubic-bezier(.45,0,.7,1)' }).finished;
   }
 
   label(c, t, cls) {
@@ -260,17 +293,46 @@ class AnubisGame extends BaseGame {
     void l.offsetWidth; l.classList.add('go');
   }
 
+  // Melts every ice cube of column c into the bottom one (red cube, or a column that reached the top).
+  async melt(c, x, why) {
+    const S = x.T, cells = [];
+    for (let j = x.n - 1; j >= 1; j--) cells.push(this.cubeCell(c, j));
+    this.label(c, why === 'full' ? 'FUSION !' : '= ' + fxv(S), 'lr');
+    for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.add('heat');
+    sfx.feature();
+    await this.wait(380);
+    for (const ci of cells) {
+      if (this.dead) return;
+      const cell = this.grid.cells[ci], p = center(cell);
+      cell.classList.add('melting');
+      fx.burst(p.x, p.y - 10, 9, ['#e0f2fe', '#cbd5e1', '#fff'], 3);
+      fx.burst(p.x, p.y + 14, 5, ['#38bdf8', '#7dd3fc'], 2);
+      await this.grid.sym(ci).animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(30%) scaleY(.2)', opacity: 0.1 }], { duration: this.turbo ? 120 : 230, easing: 'ease-in', fill: 'forwards' }).finished;
+      this.lava(ci);
+      sfx.tick();
+    }
+    const fi = this.cubeCell(c, 0);
+    this.paint(fi, art('cb') + lab(fxv(S)), 'cube merged');
+    this.grid.sym(fi).animate([{ transform: 'scale(.75)', filter: 'brightness(2)' }, { transform: 'scale(1.22)', filter: 'brightness(1.5)', offset: 0.55 }, { transform: 'none', filter: 'none' }], { duration: 520, easing: 'ease-out' });
+    const p = center(this.grid.cells[fi]);
+    fx.burst(p.x, p.y, 30, ['#7dd3fc', '#fff', '#fb923c'], 7);
+    sfx.coin();
+    x.n = 1; x.T = S;
+    await this.wait(650);
+    this.grid.cells[fi].classList.remove('merged', 'heat');
+  }
+
   async judgment(startCells) {
     const bet = this.bet, cap = bet * CAPX;
     let respins = 3, capHit = false, rounds = 0, maxWin = false;
     const cols = Array.from({ length: C }, () => ({ n: 0, m: 1, mod: false, T: 0 }));
     const total = () => cols.reduce((a, x) => a + x.T, 0);
-    const draw = () => cols.forEach((x, c) => { const d = this.jrow.children[c]; d.querySelector('b').textContent = '×' + fxv(x.m); d.querySelector('small').textContent = '= ' + fxv(x.T); });
+    const draw = () => cols.forEach((x, c) => { const d = this.jrow.children[c]; d.querySelector('b').textContent = '×' + fxv(x.m); d.querySelector('small').textContent = '= ' + fxv(x.T); d.classList.toggle('mod', x.mod); });
     const info = () => { this.setBanner(`<b>JUGEMENT</b><span class="pill respins">${[0, 1, 2].map((k) => `<i class="dot${k < respins ? ' on' : ''}"></i>`).join('')} Relances</span><span class="pill gold">Total ×${fxv(total())} · ${fmtC(Math.min(cap, Math.round(bet * total())))}</span>`); };
 
-    await this.featureIntro('JUGEMENT', 'Les cubes tombent · crânes, crânes dorés et cubes rouges', art('cb'));
+    await this.featureIntro('JUGEMENT', 'Les cubes de glace tombent sur la lave · crânes noirs, crânes dorés et cubes rouges', art('cb'));
     this.slotEl.classList.add('in-free', 'judge');
-    for (let i = 0; i < N; i++) this.paint(i, '', 'dim');
+    for (let i = 0; i < N; i++) this.lava(i);
     this.jrow.classList.add('on');
     draw(); info();
     await this.wait(400);
@@ -284,22 +346,24 @@ class AnubisGame extends BaseGame {
       draw();
       await this.fall(i, row);
       sfx.land();
-      const p = center(this.grid.cells[i]); fx.burst(p.x, p.y, 12, ['#bae6fd', '#38bdf8', '#fff'], 4);
+      const p = center(this.grid.cells[i]); fx.burst(p.x, p.y + 10, 14, ['#bae6fd', '#38bdf8', '#fff'], 4);
+      if (x.n >= R) await this.melt(c, x, 'full'); // the column reached the top: it melts and keeps going
     };
-    const showAt = (c, x, id, txt, cls) => {
-      if (x.n >= R) return -1;
+    const showAt = async (c, x, id, txt, cls) => {
       const i = this.cubeCell(c, x.n);
       this.paint(i, art(id) + (txt ? lab(txt) : ''), cls);
-      this.fall(i, R - 1 - x.n);
+      await this.fall(i, R - 1 - x.n);
+      sfx.land();
       return i;
     };
     const apply = async (c, k) => {
       const x = cols[c];
       if (k === 'cube') return addCube(c);
       if (k === 'sk') {
-        const n = skVal(), big = n >= 500, i3 = showAt(c, x, 'sk', '+' + fxv(n), 'sks' + (big ? ' big' : ''));
-        await this.wait(480);
-        const p = center(this.grid.cells[i3 >= 0 ? i3 : this.cubeCell(c, R - 1)]);
+        const n = skVal(), big = n >= 500;
+        const i3 = await showAt(c, x, 'cbk', '+' + fxv(n), 'sks' + (big ? ' big' : ''));
+        await this.wait(300);
+        const p = center(this.grid.cells[i3]);
         if (n >= SK_MAX) {
           maxWin = true;
           this.label(c, 'MAX WIN', 'lg');
@@ -310,38 +374,33 @@ class AnubisGame extends BaseGame {
           return;
         }
         if (!x.mod) { x.m = n; x.mod = true; } else x.m += n;
-        this.label(c, '+' + fxv(n), big ? 'lg' : 'ls'); draw();
-        fx.burst(p.x, p.y, big ? 40 : 16, big ? ['#fde047', '#fff', '#f59e0b'] : ['#e2e8f0', '#fff', '#94a3b8'], big ? 9 : 5);
+        fx.trail(p, center(this.jrow.children[c]), big ? '#fde047' : '#a855f7', 10);
+        this.label(c, '+' + fxv(n), big ? 'lg' : 'ls');
+        await this.grid.shatter([i3], big ? ['#fde047', '#fff', '#f59e0b'] : ['#a855f7', '#27272a', '#e4e4e7']);
+        draw();
+        this.grid.bump(this.jrow.children[c]);
         if (big) { this.flash('rgba(226,232,240,.6)'); sfx.jackpot(); } else sfx.upgrade();
-        await this.wait(600); this.hide(i3);
+        await this.wait(300); this.lava(i3);
       } else if (k === 'g') {
-        const kk = gkVal(), i4 = showAt(c, x, 'gk', '×' + kk, 'gsk');
-        await this.wait(480);
+        const kk = gkVal(), i4 = await showAt(c, x, 'cbg', '×' + kk, 'gsk');
+        await this.wait(420);
         x.T *= kk; this.label(c, '×' + kk, 'lg'); draw();
         this.flash('rgba(253,224,71,.6)'); sfx.jackpot();
-        for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.add('win');
-        await this.wait(800);
-        for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.remove('win');
-        this.hide(i4);
+        for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.add('win', 'golden');
+        await this.grid.shatter([i4], ['#fde047', '#fff', '#f59e0b']);
+        await this.wait(700);
+        for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.remove('win', 'golden');
+        this.lava(i4);
       } else if (k === 'red') {
-        const S = x.T, ri = showAt(c, x, 'rc', '', 'rc');
-        await this.wait(550);
-        const jobs = [];
-        for (let j = 1; j < x.n; j++) {
-          const ci = this.cubeCell(c, j);
-          jobs.push(this.grid.sym(ci).animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(${j * 105}%)`, opacity: 0 }], { duration: 450, easing: 'ease-in', fill: 'forwards' }).finished);
-        }
-        if (ri >= 0) jobs.push(this.grid.sym(ri).animate([{ transform: 'translateY(0)', opacity: 1 }, { transform: `translateY(${x.n * 105}%)`, opacity: 0 }], { duration: 450, easing: 'ease-in', fill: 'forwards' }).finished);
-        await Promise.all(jobs);
-        for (let j = 1; j < x.n; j++) this.hide(this.cubeCell(c, j));
-        this.hide(ri);
-        const fi = this.cubeCell(c, 0);
-        this.paint(fi, art('cb') + lab(fxv(S)), 'cube win');
-        x.n = 1; x.T = S;
-        this.label(c, '= ' + fxv(S), 'lr'); draw(); sfx.coin();
-        const p = center(this.grid.cells[fi]); fx.burst(p.x, p.y, 30, ['#f87171', '#ef4444', '#fff'], 7);
-        await this.wait(850);
-        this.grid.cells[fi].classList.remove('win');
+        const ri = await showAt(c, x, 'cbr', '', 'rc');
+        this.msg('Cube rouge : la glace fond !');
+        await this.wait(350);
+        const p = center(this.grid.cells[ri]);
+        fx.burst(p.x, p.y, 20, ['#f87171', '#fb923c', '#fde047'], 6);
+        this.grid.sym(ri).animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(40%) scale(.6)', opacity: 0 }], { duration: 300, fill: 'forwards' });
+        await this.wait(250);
+        this.lava(ri);
+        await this.melt(c, x, 'red');
       }
     };
 
@@ -350,13 +409,18 @@ class AnubisGame extends BaseGame {
     while (respins > 0 && !capHit && rounds < 120 && !this.dead) {
       rounds++;
       this.msg('Relance…');
-      this.jrow.classList.add('roll');
-      await this.wait(420);
-      this.jrow.classList.remove('roll');
+      // the lava under every column scrolls like a reel, then the columns stop one after the other
+      const spinning = cols.map((x, c) => { const cs = []; for (let j = x.n; j < R; j++) cs.push(this.grid.cells[this.cubeCell(c, j)]); cs.forEach((el) => el.classList.add('spin')); return cs; });
+      sfx.reelStop?.(0);
+      await this.wait(this.turbo ? 200 : 420);
       let got = false;
       for (let c2 = 0; c2 < C && !capHit; c2++) {
+        await this.wait(this.turbo ? 50 : 120);
+        spinning[c2].forEach((el) => el.classList.remove('spin'));
+        sfx.tick();
         if (Math.random() < JPC) { got = true; await apply(c2, pickItem(cols[c2].n)); info(); if (maxWin || total() >= CAPX) capHit = true; }
       }
+      spinning.flat().forEach((el) => el.classList.remove('spin'));
       respins = got ? 3 : respins - 1;
       info();
     }
@@ -376,7 +440,7 @@ class AnubisGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym svg">${art('sc')}</div><div class="pay-vals"><b>Scatter</b><br><span>3 = Monde souterrain · 4+ = Jugement</span></div></div></div>
       <h4>Cascades</h4><p>Grille 5×6. Une grappe de <b>5 symboles ou plus</b> paie mise × valeur × 0,33 × (taille − 4) × multiplicateur, disparaît et les symboles tombent.</p>
       <h4>Monde souterrain</h4><p>10 tours. Chaque colonne a son multiplicateur, qui monte de +3 à chaque gain qui la touche. Un <b>crâne doré</b> multiplie sa colonne (×2 à ×100).</p>
-      <h4>Jugement</h4><p>Les cubes tombent dans les colonnes avec la valeur affichée en haut. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne</b> : ajoute de <b>+2 à +500</b> à la valeur des prochains cubes de sa colonne. Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie la colonne. <b>Cube rouge</b> : additionne toute la colonne dans un seul cube et libère de la place ; la valeur des prochains cubes ne change pas.</p>
+      <h4>Jugement</h4><p>Les cubes tombent dans les colonnes avec la valeur affichée en haut. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne noir</b> : ajoute de <b>+2 à +500</b> à la valeur des prochains cubes de sa colonne. Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie la colonne. <b>Cube rouge</b> : fait fondre toute la glace de sa colonne dans un seul cube (la somme est gardée) et libère de la place ; la valeur des prochains cubes ne change pas. <b>Fusion</b> : quand une colonne atteint le haut, elle fond toute seule en un cube et continue de se remplir.</p>
       <h4>Achats</h4><p>Monde souterrain ×${BUYU} · Jugement ×${BUYJ}. Gain maximum ×10 000.</p>`);
   }
 }
