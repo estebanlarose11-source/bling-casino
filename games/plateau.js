@@ -48,7 +48,7 @@ const dieIcon = (n, sz, bg) => `<svg viewBox="-12 -12 24 24" width="${sz}" heigh
 const ICON = {
   b2: (sz) => dieIcon(2, sz, COL.b2),
   b4: (sz) => dieIcon(4, sz, COL.b4),
-  ch: (sz) => `<svg viewBox="-12 -12 24 24" width="${sz}" height="${sz}" aria-hidden="true"><circle r="10.5" fill="#fff" stroke="#7f1d1d" stroke-width="2"/><text y="5.5" text-anchor="middle" font-family="Georgia,serif" font-weight="900" font-size="16" fill="#e11d48">?</text></svg>`,
+  ch: (sz) => `<svg viewBox="-12 -12 24 24" width="${sz}" height="${sz}" aria-hidden="true"><circle r="10.5" fill="#fff" stroke="#7f1d1d" stroke-width="2"/><text y="5.5" text-anchor="middle" font-family="KeCoin,Georgia,serif" font-weight="900" font-size="16" fill="#e11d48">?</text></svg>`,
 };
 const label = (k, sz) => (ICON[k] ? ICON[k](sz) : k);
 const pt = (a, r) => { const t = ((a - 90) * Math.PI) / 180; return [150 + r * Math.cos(t), 150 + r * Math.sin(t)]; };
@@ -63,7 +63,7 @@ function wheelSVG() {
     if (ICON[k]) s += `<g transform="rotate(${ang} 150 150) translate(150 18) scale(.5)"><g transform="translate(-12 -12)">${ICON[k](24)}</g></g>`;
     else {
       const rs = k.length === 2 ? [[133, 12], [121, 12]] : [[128, 15]];
-      [...k].forEach((d, j) => { const [r, fs] = rs[j]; s += `<text x="150" y="${(150 - r + fs * 0.35).toFixed(1)}" text-anchor="middle" font-family="'Bebas Neue',Impact,sans-serif" font-size="${fs}" fill="#fff" stroke="#0b0716" stroke-width="2" stroke-linejoin="round" paint-order="stroke" transform="rotate(${ang} 150 150)">${d}</text>`; });
+      [...k].forEach((d, j) => { const [r, fs] = rs[j]; s += `<text x="150" y="${(150 - r + fs * 0.35).toFixed(1)}" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,sans-serif" font-size="${fs}" fill="#fff" stroke="#0b0716" stroke-width="2" stroke-linejoin="round" paint-order="stroke" transform="rotate(${ang} 150 150)">${d}</text>`; });
     }
   }
   s += '</g>';

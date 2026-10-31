@@ -119,9 +119,9 @@ class TicketGame extends BaseGame {
     // centre badge
     const cx = W / 2, cy = H / 2, r = Math.min(W, H) * 0.2;
     x.fillStyle = 'rgba(255,255,255,.55)'; x.beginPath(); x.roundRect?.(cx - W * 0.36, cy - r * 0.62, W * 0.72, r * 1.24, r * 0.6); x.fill();
-    x.fillStyle = '#4a044e'; x.font = `900 ${Math.max(15, W / 15)}px Orbitron, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.fillStyle = '#4a044e'; x.font = `900 ${Math.max(15, W / 15)}px KeCoin, Orbitron, sans-serif`; x.textAlign = 'center'; x.textBaseline = 'middle';
     x.fillText('GRATTEZ ICI', cx, cy - r * 0.12);
-    x.fillStyle = '#7c2d12'; x.font = `800 ${Math.max(10, W / 34)}px Inter, sans-serif`;
+    x.fillStyle = '#7c2d12'; x.font = `800 ${Math.max(10, W / 34)}px KeCoin, Inter, sans-serif`;
     x.fillText('3 montants identiques = gagné', cx, cy + r * 0.36);
     c.style.transition = 'none'; c.style.opacity = '1'; c.style.pointerEvents = '';
     this.strokes = 0;

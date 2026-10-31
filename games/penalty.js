@@ -22,7 +22,7 @@ const SPOTS = ['Haut gauche', 'Haut milieu', 'Haut droite', 'Bas gauche', 'Bas m
 const KEEPER = `<svg viewBox="0 0 80 100" aria-hidden="true">
   <path d="M10 34 Q4 20 8 10" stroke="#facc15" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M70 34 Q76 20 72 10" stroke="#facc15" stroke-width="9" stroke-linecap="round" fill="none"/>
   <circle cx="8" cy="9" r="7" fill="#22c55e"/><circle cx="72" cy="9" r="7" fill="#22c55e"/>
-  <rect x="22" y="30" width="36" height="38" rx="10" fill="#facc15" stroke="#a16207" stroke-width="2"/><text x="40" y="56" text-anchor="middle" font-family="Orbitron,sans-serif" font-weight="900" font-size="16" fill="#111">1</text>
+  <rect x="22" y="30" width="36" height="38" rx="10" fill="#facc15" stroke="#a16207" stroke-width="2"/><text x="40" y="56" text-anchor="middle" font-family="KeCoin,Orbitron,sans-serif" font-weight="900" font-size="16" fill="#111">1</text>
   <circle cx="40" cy="18" r="13" fill="#f2c39a" stroke="#7c4a24" stroke-width="2"/><path d="M27 15 Q30 3 40 4 Q51 3 53 15 Q46 9 40 10 Q33 9 27 15Z" fill="#3f2a14"/>
   <circle cx="35" cy="19" r="1.8" fill="#111"/><circle cx="45" cy="19" r="1.8" fill="#111"/><path d="M35 25 Q40 28 45 25" stroke="#7c4a24" stroke-width="1.8" fill="none" stroke-linecap="round"/>
   <rect x="24" y="66" width="32" height="10" rx="3" fill="#111827"/><path d="M30 76 L28 94 M50 76 L52 94" stroke="#f2c39a" stroke-width="8" stroke-linecap="round"/><path d="M22 96 H34 M46 96 H58" stroke="#111" stroke-width="6" stroke-linecap="round"/></svg>`;

@@ -53,7 +53,7 @@ const botSVG = (c, k) => `<svg viewBox="0 0 64 48" aria-hidden="true">
   <path d="M33 10 V4" stroke="#e2e8f0" stroke-width="2"/><circle cx="33" cy="3.5" r="2.5" fill="${c}"/>
   <rect x="50" y="18" width="8" height="6" rx="2" fill="${c}"/>
   <circle cx="24" cy="39" r="6.5" fill="#1e293b" stroke="${c}" stroke-width="2" class="rb-wheel"/><circle cx="43" cy="39" r="6.5" fill="#1e293b" stroke="${c}" stroke-width="2" class="rb-wheel"/>
-  <text x="33" y="31.5" text-anchor="middle" font-family="Orbitron,sans-serif" font-weight="900" font-size="7" fill="#0f172a">${k + 1}</text></svg>`;
+  <text x="33" y="31.5" text-anchor="middle" font-family="KeCoin,Orbitron,sans-serif" font-weight="900" font-size="7" fill="#0f172a">${k + 1}</text></svg>`;
 
 class RobotsGame extends BaseGame {
   constructor(root, game) {

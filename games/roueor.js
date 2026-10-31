@@ -44,7 +44,7 @@ function wheelSVG(m) {
   for (let i = 0; i < SL; i++) s += `<path d="${arc(i * SA, (i + 1) * SA, 30, 146)}" fill="url(#roMetal${i % 2})" stroke="#0a0a0f" stroke-width="1.2"/>`;
   // the golden quarter, one piece, with shine
   s += `<path d="${arc(0, G, 30, 146)}" fill="url(#roGold)" stroke="#7c5a0b" stroke-width="2"/><path class="ro-shine" d="${arc(0, G, 30, 146)}" fill="url(#roShine)"/>`;
-  s += `<text x="150" y="44" text-anchor="middle" font-family="'Bebas Neue',Impact,sans-serif" font-size="${G < 60 ? 16 : 22}" fill="#7c2d12" transform="rotate(${G / 2} 150 150)">BONUS</text>`;
+  s += `<text x="150" y="44" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,sans-serif" font-size="${G < 60 ? 16 : 22}" fill="#7c2d12" transform="rotate(${G / 2} 150 150)">BONUS</text>`;
   for (let i = 0; i < 3; i++) s += `<text x="150" y="${70 + i * 22}" text-anchor="middle" font-size="12" fill="#fff7d6" transform="rotate(${G / 2} 150 150)">★</text>`;
   s += '</g>';
   let bl = '';

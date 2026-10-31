@@ -242,7 +242,7 @@ class PlinkoGame extends BaseGame {
       c.fillStyle = 'rgba(0,0,0,.28)'; this.rr(x, y + sh - 4, sw, 4, 2); c.fill();
       const lab = fx2(tab.m[k]);
       c.fillStyle = '#1a0b06';
-      c.font = `800 ${Math.min(13, Math.max(6, sw / (lab.length * 0.62 + 0.5)))}px Inter, system-ui, sans-serif`;
+      c.font = `800 ${Math.min(13, Math.max(6, sw / (lab.length * 0.62 + 0.5)))}px KeCoin, Inter, system-ui, sans-serif`;
       c.textAlign = 'center'; c.textBaseline = 'middle';
       c.fillText(lab, x + sw / 2, y + sh / 2 - 1);
     }

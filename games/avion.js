@@ -71,7 +71,7 @@ class AvionGame extends BaseGame {
     g.clearRect(0, 0, W, H);
     const xmax = Math.max(8, this.t * 1.15), ymax = Math.max(2, this.m * 1.25);
     const X = (tt) => 34 + ((W - 60) * tt) / xmax, Y = (mm) => H - 30 - ((H - 70) * (mm - 1)) / (ymax - 1);
-    g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 1; g.fillStyle = 'rgba(255,255,255,.45)'; g.font = '600 11px Orbitron, sans-serif';
+    g.strokeStyle = 'rgba(255,255,255,.08)'; g.lineWidth = 1; g.fillStyle = 'rgba(255,255,255,.45)'; g.font = '600 11px KeCoin, Orbitron, sans-serif';
     const step = ymax > 40 ? 10 : ymax > 12 ? 5 : ymax > 6 ? 2 : 1;
     for (let k = 1 + step; k < ymax; k += step) { g.beginPath(); g.moveTo(34, Y(k)); g.lineTo(W - 10, Y(k)); g.stroke(); g.fillText('×' + Math.round(k), 4, Y(k) - 3); }
     g.strokeStyle = 'rgba(255,255,255,.25)'; g.beginPath(); g.moveTo(34, H - 30); g.lineTo(W - 10, H - 30); g.stroke();

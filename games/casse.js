@@ -57,7 +57,7 @@ const doorSVG = (n) => `<svg viewBox="0 0 120 120" aria-hidden="true">
   <circle cx="60" cy="60" r="50" fill="url(#csDoor)" stroke="#0f172a" stroke-width="2.5"/>
   <circle cx="60" cy="60" r="44" fill="none" stroke="rgba(15,23,42,.5)" stroke-width="1.5"/>${bolts}
   <g class="cs-wheel"><circle cx="60" cy="60" r="21" fill="none" stroke="#e2e8f0" stroke-width="2.5"/>${spokes}<circle cx="60" cy="60" r="6" fill="#475569" stroke="#e2e8f0" stroke-width="2"/></g>
-  <rect x="49" y="94" width="22" height="12" rx="3" fill="#0f172a" stroke="#fbbf24" stroke-width="1"/><text x="60" y="103.5" text-anchor="middle" font-family="Orbitron,Inter,sans-serif" font-weight="900" font-size="9" fill="#fbbf24">${n}</text>
+  <rect x="49" y="94" width="22" height="12" rx="3" fill="#0f172a" stroke="#fbbf24" stroke-width="1"/><text x="60" y="103.5" text-anchor="middle" font-family="KeCoin,Orbitron,Inter,sans-serif" font-weight="900" font-size="9" fill="#fbbf24">${n}</text>
 </svg>`;
 const CASH_SVG = `<svg viewBox="0 0 100 70" aria-hidden="true">${[0, 1, 2, 3].map((k) => `<g transform="translate(${14 + (k % 2) * 4} ${40 - k * 8})"><rect width="64" height="22" rx="3" fill="url(#csBill)" stroke="#14532d"/><rect x="26" y="0" width="12" height="22" fill="#fde68a" opacity=".85"/><circle cx="12" cy="11" r="5" fill="none" stroke="#dcfce7" stroke-width="1.2"/></g>`).join('')}</svg>`;
 const GOLD_SVG = `<svg viewBox="0 0 100 70" aria-hidden="true">${[[18, 44], [50, 44], [34, 26]].map(([x, y]) => `<path d="M${x} ${y + 18} L${x + 6} ${y} H${x + 30} L${x + 36} ${y + 18} Z" fill="url(#csGold)" stroke="#78350f"/><path d="M${x + 8} ${y + 3} H${x + 28}" stroke="#fffbeb" stroke-width="1.5" opacity=".8"/>`).join('')}</svg>`;

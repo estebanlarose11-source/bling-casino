@@ -62,7 +62,7 @@ function ctRun(ch) {
 /* ===END ENGINE */
 
 const ICON = {
-  cf: '<circle r="10" fill="#ffe27a" stroke="#7a5208" stroke-width="1.6"/><circle r="6.8" fill="none" stroke="#b8860b" stroke-width="1.2"/><text y="3.6" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="8" fill="#7a5208">KE</text>',
+  cf: '<circle r="10" fill="#ffe27a" stroke="#7a5208" stroke-width="1.6"/><circle r="6.8" fill="none" stroke="#b8860b" stroke-width="1.2"/><text y="3.6" text-anchor="middle" font-family="KeCoin,Georgia,serif" font-weight="700" font-size="8" fill="#7a5208">KE</text>',
   ch: '<circle r="10" fill="#fff" stroke="#10061f" stroke-width="1.4"/><circle r="7.4" fill="#e0283c"/><circle r="4.6" fill="#fff"/><circle r="2.2" fill="#10061f"/>',
   pa: '<circle r="9.4" fill="#fff" stroke="#10061f" stroke-width="1.4"/><circle cx="-3" cy="-3.2" r="3" fill="#ffd9ae"/><path d="M-6 6 Q0 10 6 6" stroke="#ff8a3d" stroke-width="2" fill="none" stroke-linecap="round"/>',
   ct: '<circle r="10" fill="#ffe27a" stroke="#10061f" stroke-width="1.4"/><circle cx="-3.4" cy="-2.6" r="1.8" fill="#10061f"/><circle cx="3.4" cy="-2.6" r="1.8" fill="#10061f"/><path d="M-6 1.4 Q0 10 6 1.4 Z" fill="#10061f"/><path d="M-2.6 5.4 Q0 8 2.6 5.4" fill="#ff5f7a"/>',
@@ -127,7 +127,7 @@ function bigWheelSVG() {
     else {
       // condensed digits stacked along the radius: upright under the pointer and as big as the slice allows
       const rs = k.length === 2 ? [[128, 23], [107, 23]] : [[121, 28]];
-      [...k].forEach((d, j) => { const [r, fs] = rs[j]; s += `<text x="150" y="${(150 - r + fs * 0.35).toFixed(1)}" text-anchor="middle" font-family="'Bebas Neue',Impact,'Arial Narrow',sans-serif" font-size="${fs}" fill="#fff" stroke="#10061f" stroke-width="2.6" stroke-linejoin="round" paint-order="stroke" transform="rotate(${ang} 150 150)">${d}</text>`; });
+      [...k].forEach((d, j) => { const [r, fs] = rs[j]; s += `<text x="150" y="${(150 - r + fs * 0.35).toFixed(1)}" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,'Arial Narrow',sans-serif" font-size="${fs}" fill="#fff" stroke="#10061f" stroke-width="2.6" stroke-linejoin="round" paint-order="stroke" transform="rotate(${ang} 150 150)">${d}</text>`; });
     }
   }
   s += '</g>';
@@ -397,7 +397,7 @@ class MadWheelGame extends BaseGame {
     for (let i = 0; i < 64; i++) {
       const t = CTSEQ[i], lab = t === 'D' ? '×2' : t === 'T' ? '×3' : String(t * mult);
       s += `<path d="${slicePath(i, CTA, 124)}" fill="${ctColor(t)}" stroke="#10061f" stroke-width=".7"/>`;
-      s += `<text class="mt" x="150" y="44" text-anchor="middle" dominant-baseline="middle" font-family="Orbitron,Impact,sans-serif" font-weight="900" font-size="${lab.length > 3 ? 6.4 : 7.6}" fill="#fff" stroke="#10061f" stroke-width=".35" paint-order="stroke" transform="rotate(${((i + 0.5) * CTA).toFixed(2)} 150 150) rotate(90 150 44)">${lab}</text>`;
+      s += `<text class="mt" x="150" y="44" text-anchor="middle" dominant-baseline="middle" font-family="KeCoin,Orbitron,Impact,sans-serif" font-weight="900" font-size="${lab.length > 3 ? 6.4 : 7.6}" fill="#fff" stroke="#10061f" stroke-width=".35" paint-order="stroke" transform="rotate(${((i + 0.5) * CTA).toFixed(2)} 150 150) rotate(90 150 44)">${lab}</text>`;
     }
     return s;
   }

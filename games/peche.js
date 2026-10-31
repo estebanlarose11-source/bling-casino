@@ -42,7 +42,7 @@ const SPOTS = ['w', 's', 'fb', 'fo', 'fr'];
 const fishSVG = (c, sz, txt = '') => `<svg viewBox="0 0 64 40" width="${sz}" height="${sz * 0.625}" aria-hidden="true"><path d="M50 20 L63 7 L60 20 L63 33 Z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1.5"/>
   <ellipse cx="28" cy="20" rx="25" ry="15" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1.5"/><path d="M22 6 Q30 0 36 7" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/>
   <ellipse cx="25" cy="25" rx="16" ry="6" fill="#fff" opacity=".25"/><circle cx="12" cy="16" r="3.6" fill="#fff"/><circle cx="11.2" cy="16" r="1.9" fill="#111"/>
-  <path d="M5 23 Q8 25 11 23" stroke="#111" stroke-width="1.3" fill="none" stroke-linecap="round"/>${txt ? `<text x="30" y="24.5" text-anchor="middle" font-family="'Bebas Neue',Impact,sans-serif" font-size="13" fill="#fff" stroke="rgba(0,0,0,.55)" stroke-width="2.2" paint-order="stroke">${txt}</text>` : ''}</svg>`;
+  <path d="M5 23 Q8 25 11 23" stroke="#111" stroke-width="1.3" fill="none" stroke-linecap="round"/>${txt ? `<text x="30" y="24.5" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,sans-serif" font-size="13" fill="#fff" stroke="rgba(0,0,0,.55)" stroke-width="2.2" paint-order="stroke">${txt}</text>` : ''}</svg>`;
 const label = (k, sz) => (k[0] === 'f' ? fishSVG(COL[k], sz) : '×2');
 const pt = (a, r) => { const t = ((a - 90) * Math.PI) / 180; return [150 + r * Math.cos(t), 150 + r * Math.sin(t)]; };
 const slicePath = (i, r = 146) => { const p0 = pt(i * A, r), p1 = pt((i + 1) * A, r); return `M150 150 L${p0[0].toFixed(2)} ${p0[1].toFixed(2)} A${r} ${r} 0 0 1 ${p1[0].toFixed(2)} ${p1[1].toFixed(2)} Z`; };
@@ -54,7 +54,7 @@ function wheelSVG() {
     const k = SEGS[i], ang = ((i + 0.5) * A).toFixed(2);
     s += `<path d="${slicePath(i)}" fill="${COL[k]}" stroke="#0b1626" stroke-width=".9"/>`;
     if (k[0] === 'f') s += `<g transform="rotate(${ang} 150 150) translate(150 30) rotate(90) scale(.42)"><g transform="translate(-32 -20)">${fishSVG(COL[k], 64)}</g></g>`;
-    else s += `<text x="150" y="32" text-anchor="middle" font-family="'Bebas Neue',Impact,sans-serif" font-size="15" fill="${k === 'w' ? '#0f172a' : '#0c4a6e'}" transform="rotate(${ang} 150 150)">×2</text>`;
+    else s += `<text x="150" y="32" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,sans-serif" font-size="15" fill="${k === 'w' ? '#0f172a' : '#0c4a6e'}" transform="rotate(${ang} 150 150)">×2</text>`;
   }
   s += '<g class="pe-bolts"></g></g>';
   let bl = '';
@@ -142,7 +142,7 @@ class PecheGame extends BaseGame {
     for (const { i, m } of list) {
       const ang = ((i + 0.5) * A).toFixed(2), fish = SEGS[i][0] === 'f';
       g.insertAdjacentHTML('beforeend', `<g class="pe-strike" transform="rotate(${ang} 150 150)"><path d="${slicePath(i)}" transform="rotate(${-ang} 150 150)" fill="#fde047" opacity=".55"/>
-        <circle cx="150" cy="${fish ? 74 : 62}" r="11" fill="#fde047" stroke="#713f12" stroke-width="2"/><text x="150" y="${fish ? 78.5 : 66.5}" text-anchor="middle" font-family="Orbitron,sans-serif" font-weight="900" font-size="10" fill="#713f12">×${m}</text></g>`);
+        <circle cx="150" cy="${fish ? 74 : 62}" r="11" fill="#fde047" stroke="#713f12" stroke-width="2"/><text x="150" y="${fish ? 78.5 : 66.5}" text-anchor="middle" font-family="KeCoin,Orbitron,sans-serif" font-weight="900" font-size="10" fill="#713f12">×${m}</text></g>`);
       fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
       sfx.tease?.() || sfx.click();
       const p = center(this.q('.pe-zone')); fx.burst(p.x, p.y - 60, 16, ['#fde047', '#fff', '#7dd3fc'], 6);

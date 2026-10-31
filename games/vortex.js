@@ -123,7 +123,7 @@ class VortexGame extends BaseGame {
         if (k === bk) { // bonus label, upright along the slot
           const mid = (a0 + a1) / 2, rm = (R0 + R1) / 2;
           c.save(); c.translate(o + Math.cos(mid) * rm, o + Math.sin(mid) * rm); c.rotate(mid + Math.PI / 2);
-          c.font = `900 ${Math.max(8, (R0 - R1) * 0.5)}px Orbitron, Inter, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+          c.font = `900 ${Math.max(8, (R0 - R1) * 0.5)}px KeCoin, Orbitron, Inter, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
           c.fillStyle = '#3b0a00'; c.fillText(`×${BONUS[i]}`, 0, 1); c.restore();
         }
       }
@@ -356,7 +356,7 @@ class VortexGame extends BaseGame {
     lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(0.5, 'rgba(255,255,255,.10)'); lg.addColorStop(1, 'rgba(255,255,255,0)');
     c.fillStyle = lg; c.fillRect(cx - laneW, top, laneW * 2, this.ringR(0) - hubR);
     const fs = Math.max(9, Math.min(12, this.geo.step * 0.4));
-    c.font = `700 ${fs}px Inter, system-ui, sans-serif`; c.textBaseline = 'middle'; c.textAlign = 'left';
+    c.font = `700 ${fs}px KeCoin, Inter, system-ui, sans-serif`; c.textBaseline = 'middle'; c.textAlign = 'left';
     c.save(); c.globalAlpha = Math.max(0, 1 - zt * 1.6); // the lane labels fade out in close-up (the ladder stays below)
     for (let i = 0; i < RINGS.length; i++) {
       const y = this.laneY(i), cur = this.ball && this.ball.lv === i, t = i ? `×${xs(RINGS[i].m)}` : '✕';
@@ -376,8 +376,8 @@ class VortexGame extends BaseGame {
     const hb = this.hub, mainSize = Math.min(hubR * (hb.big ? 0.42 : 0.5), (hubR * 1.7) / Math.max(3, hb.main.length * 0.62));
     c.textAlign = 'center'; c.fillStyle = hb.col;
     c.save(); if (hb.big) { c.shadowColor = hb.col; c.shadowBlur = 14 * pulse + 4; }
-    c.font = `900 ${mainSize}px Orbitron, Inter, sans-serif`; c.fillText(hb.main, cx, cy - hubR * 0.06); c.restore();
-    c.font = `700 ${Math.max(8, hubR * 0.15)}px Inter, sans-serif`; c.fillStyle = 'rgba(255,255,255,.6)';
+    c.font = `900 ${mainSize}px KeCoin, Orbitron, Inter, sans-serif`; c.fillText(hb.main, cx, cy - hubR * 0.06); c.restore();
+    c.font = `700 ${Math.max(8, hubR * 0.15)}px KeCoin, Inter, sans-serif`; c.fillStyle = 'rgba(255,255,255,.6)';
     c.fillText(hb.sub, cx, cy + hubR * 0.38);
     // drop marker
     c.fillStyle = '#fde047'; c.beginPath(); c.moveTo(cx - 8, cy - R - 2); c.lineTo(cx + 8, cy - R - 2); c.lineTo(cx, cy - R + 9); c.closePath(); c.fill();
@@ -397,7 +397,7 @@ class VortexGame extends BaseGame {
     const v = this.verdict;
     if (v && b) {
       const age = (now - v.t0) / 1000, k = Math.min(1, age * 6), fsz = Math.max(13, Math.min(18, w * 0.03));
-      c.font = `900 ${fsz}px Orbitron, Inter, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.font = `900 ${fsz}px KeCoin, Orbitron, Inter, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
       const tw = c.measureText(v.text).width + 26, x = sx + (b.x - cam.fx) * z, y = sy + (b.y - cam.fy) * z + Math.max(6, this.geo.step * 0.3) * z + fsz * 1.6;
       c.save(); c.globalAlpha = k; c.translate(x, y); c.scale(0.8 + 0.2 * k, 0.8 + 0.2 * k);
       c.shadowColor = v.kind === 'black' ? 'rgba(255,255,255,.6)' : v.kind === 'bonus' ? '#fde047' : '#ff2340'; c.shadowBlur = 18;
@@ -422,7 +422,7 @@ class VortexGame extends BaseGame {
       if (k === bk) {
         const mid = (a0 + a1) / 2, rm = (R0 + R1) / 2;
         c.save(); c.translate(Math.cos(mid) * rm, Math.sin(mid) * rm); c.rotate(mid + Math.PI / 2);
-        c.font = `900 ${Math.max(8, (R0 - R1) * 0.5)}px Orbitron, Inter, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.font = `900 ${Math.max(8, (R0 - R1) * 0.5)}px KeCoin, Orbitron, Inter, sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
         c.fillStyle = '#3b0a00'; c.fillText(`×${BONUS[i]}`, 0, 1); c.restore();
       }
     }
