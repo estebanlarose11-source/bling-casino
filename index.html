@@ -2126,6 +2126,43 @@ body.fs-on .view { animation: none !important; transform: none !important; }
   .rb-place { right: 32px; font-size: 14px; }
 }
 
+/* ============ Taco Fiesta ============ */
+.g-taco { --slot-bg: radial-gradient(600px 300px at 15% -5%, rgba(244, 63, 94, .35), transparent 70%), radial-gradient(500px 300px at 95% 10%, rgba(250, 204, 21, .28), transparent 70%), linear-gradient(180deg, #5b0f3a 0%, #2a0a2e 55%, #12041a 100%); }
+.g-taco .slot-title h2 { font-family: 'Bebas Neue', Orbitron, sans-serif; letter-spacing: 3px; color: #fde047; text-shadow: 0 3px 0 #be123c, 0 6px 0 #6b0f2a; }
+.taco-frame { padding: 6px; border-radius: 22px; background: repeating-linear-gradient(135deg, #f43f5e 0 18px, #fde047 18px 36px, #22d3ee 36px 54px, #4ade80 54px 72px); box-shadow: 0 0 24px rgba(244, 63, 94, .45), 0 16px 40px rgba(0, 0, 0, .5); }
+.taco-frame > .slot-stage { border-radius: 16px; background: #2a0a2e; }
+.tf-stage { position: relative; padding: 34px 8px 8px; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, rgba(250, 204, 21, .18), transparent 60%), linear-gradient(180deg, #3b0a3f, #22072a); }
+.tf-papel { position: absolute; left: 0; right: 0; top: 0; height: 30px; display: flex; justify-content: space-around; pointer-events: none; }
+.tf-papel::before { content: ''; position: absolute; left: 0; right: 0; top: 4px; height: 2px; background: #fde68a; opacity: .6; }
+.tf-papel i { width: 6.4%; height: 26px; margin-top: 4px; background: var(--c); clip-path: polygon(0 0, 100% 0, 100% 75%, 85% 100%, 70% 80%, 50% 100%, 30% 80%, 15% 100%, 0 75%); opacity: .9; transform-origin: top; animation: tfSway 3s ease-in-out infinite; }
+.tf-papel i:nth-child(2n) { animation-delay: -1.5s; }
+@keyframes tfSway { 50% { transform: rotate(4deg); } }
+.g-taco .rs-reel { background: linear-gradient(180deg, rgba(253, 224, 71, .06), rgba(244, 63, 94, .12) 50%, rgba(253, 224, 71, .06)); box-shadow: inset 0 0 0 1px rgba(253, 224, 71, .18); }
+.g-taco .rs-reel::before { background: linear-gradient(rgba(42, 10, 46, .85), transparent); }
+.g-taco .rs-reel::after { background: linear-gradient(transparent, rgba(42, 10, 46, .85)); }
+.g-taco .rs-cell.pin { background: radial-gradient(circle, rgba(236, 72, 153, .45), transparent 70%); }
+.g-taco .rs-cell.pin svg { animation: tfPin 1.6s ease-in-out infinite; transform-origin: 50% 0; }
+@keyframes tfPin { 25% { transform: rotate(-7deg); } 75% { transform: rotate(7deg); } }
+.g-taco .rs-cell.wild { background: radial-gradient(circle, rgba(250, 204, 21, .35), transparent 70%); }
+.g-taco .rs-cell.win { box-shadow: inset 0 0 0 3px #fde047, inset 0 0 18px rgba(250, 204, 21, .6); border-radius: 10px; }
+.g-taco .lbl.tfl { position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%); font: 900 3.6cqh Orbitron, sans-serif; font-style: normal; padding: .4cqh 1.2cqh; border-radius: 1cqh; background: linear-gradient(90deg, #dc2626, #f59e0b); color: #fff; }
+.tf-hit { position: absolute; inset: 6%; z-index: 4; display: grid; place-items: center; border: 3px dashed #fde047; border-radius: 14px; background: rgba(253, 224, 71, .12); cursor: pointer; font-size: 10cqh; animation: tfHit .7s ease-in-out infinite; }
+.tf-hit span { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); }
+@keyframes tfHit { 50% { transform: scale(1.06); background: rgba(253, 224, 71, .28); } }
+.g-taco .rs-cell.opened svg { opacity: .15; transform: scale(.7); }
+.tf-prize { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; text-align: center; animation: symPop .45s cubic-bezier(.3, 1.8, .5, 1); }
+.tf-prize b { font: 900 5.6cqh Orbitron, sans-serif; color: #fff; padding: 1.2cqh 2cqh; border-radius: 2cqh; background: #16a34a; box-shadow: 0 0 0 2px #fff, 0 0 18px rgba(74, 222, 128, .7); white-space: nowrap; }
+.tf-prize.m b { background: #7c3aed; box-shadow: 0 0 0 2px #fff, 0 0 18px rgba(167, 139, 250, .8); font-size: 8cqh; }
+.tf-prize.f b { background: linear-gradient(90deg, #f43f5e, #f59e0b); font-size: 5.2cqh; }
+.tf-prize small { margin-top: 4px; font: 800 3.4cqh Inter, sans-serif; color: #fde68a; }
+.tf-meter { margin-left: auto; display: flex; align-items: baseline; gap: 8px; padding: 6px 14px; border-radius: 14px; background: linear-gradient(180deg, #4c0f3f, #22072a); box-shadow: 0 0 0 2px #fde047; }
+.tf-meter small { font: 800 10px Inter, sans-serif; letter-spacing: 2px; text-transform: uppercase; color: #fde68a; }
+.tf-meter b { display: inline-block; font: 900 clamp(20px, 2.4vw, 28px)/1 'Bebas Neue', Orbitron, sans-serif; color: #fff; }
+.tf-meter.hot { box-shadow: 0 0 0 2px #f43f5e, 0 0 16px rgba(244, 63, 94, .6); }
+.tf-word { position: absolute; left: 50%; top: 55%; z-index: 6; pointer-events: none; opacity: 0; font: 900 clamp(40px, 8vw, 90px)/1 'Bebas Neue', Orbitron, sans-serif; color: #fde047; text-shadow: 0 4px 0 #be123c, 0 8px 0 #6b0f2a; white-space: nowrap; }
+.g-taco.in-free .tf-stage { background: radial-gradient(ellipse at 50% 0%, rgba(244, 63, 94, .35), transparent 60%), linear-gradient(180deg, #5b0f3a, #2a0a2e); }
+@container (max-width: 520px) { .tf-stage { padding-top: 26px; } .tf-papel { height: 22px; } .tf-papel i { height: 18px; } .tf-meter { padding: 3px 10px; } .tf-meter small { font-size: 9px; letter-spacing: 1px; } }
+
 /* ============ Rewarded ad popup (A-ADS) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
@@ -4197,6 +4234,81 @@ ${Object.entries(SYMS).map(([id, body]) => `<symbol id="${id}" viewBox="0 0 64 6
 return { DEFS };
 })();
 
+// ---- art/taco.js ----
+__mods['art/taco.js'] = (() => {
+// SVG art for Taco Fiesta: street-food and fiesta symbols, the sombrero wild and the piñata.
+
+const lg = (id, a, b, c, x2 = 0, y2 = 1) => `<linearGradient id="${id}" x1="0" y1="0" x2="${x2}" y2="${y2}"><stop offset="0" stop-color="${a}"/><stop offset=".5" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient>`;
+const shine = (x, y, rx, ry, rot = -30) => `<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" transform="rotate(${rot} ${x} ${y})" fill="#fff" opacity=".55"/>`;
+
+const SYMS = {
+  // 0 lime slice
+  tf0: `<circle cx="32" cy="32" r="27" fill="url(#tfLime)" stroke="#166534" stroke-width="3"/><circle cx="32" cy="32" r="21" fill="#d9f99d" stroke="#bef264" stroke-width="2"/>
+    ${[0, 1, 2, 3, 4, 5, 6, 7].map((k) => `<path d="M32 32 L${(32 + 19 * Math.cos(k * Math.PI / 4)).toFixed(1)} ${(32 + 19 * Math.sin(k * Math.PI / 4)).toFixed(1)}" stroke="#ecfccb" stroke-width="2.4"/>`).join('')}
+    <circle cx="32" cy="32" r="3" fill="#ecfccb"/>${shine(22, 20, 3, 6)}`,
+  // 1 avocado
+  tf1: `<path d="M32 4 C18 6 12 26 11 38 C10 52 20 60 32 60 C44 60 54 52 53 38 C52 26 46 6 32 4Z" fill="url(#tfAvo)" stroke="#14532d" stroke-width="2.5"/>
+    <path d="M32 12 C22 14 18 30 18 40 C18 50 24 54 32 54 C40 54 46 50 46 40 C46 30 42 14 32 12Z" fill="#d9f99d"/>
+    <circle cx="32" cy="40" r="10" fill="url(#tfPit)" stroke="#78350f" stroke-width="1.5"/>${shine(28, 36, 2.5, 4)}`,
+  // 2 chili
+  tf2: `<path d="M44 12 Q52 6 56 10" stroke="#15803d" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M38 14 Q46 10 50 16 Q46 20 40 20Z" fill="#16a34a"/>
+    <path d="M40 18 C52 24 50 44 36 54 C26 61 12 60 8 56 C20 54 28 46 32 36 C35 28 34 22 40 18Z" fill="url(#tfChili)" stroke="#7f1d1d" stroke-width="2"/>${shine(36, 30, 2.5, 8, 30)}`,
+  // 3 taco
+  tf3: `<path d="M6 46 A26 26 0 0 1 58 46 Z" fill="url(#tfShell)" stroke="#92400e" stroke-width="2.5"/>
+    <path d="M10 40 Q14 26 22 30 Q26 20 32 26 Q38 18 42 28 Q50 24 54 40" fill="#4ade80" stroke="#15803d" stroke-width="2"/>
+    ${[[18, 34, '#ef4444'], [28, 30, '#fbbf24'], [38, 31, '#ef4444'], [46, 35, '#fbbf24']].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="3.5" fill="${c}" stroke="#7c2d12" stroke-width=".8"/>`).join('')}
+    <path d="M10 46 A22 22 0 0 1 54 46" fill="none" stroke="#fde68a" stroke-width="2" opacity=".7"/>${shine(18, 42, 2, 4, 60)}`,
+  // 4 maracas
+  tf4: `<g transform="rotate(-20 24 34)"><rect x="21" y="34" width="6" height="24" rx="3" fill="#a16207" stroke="#713f12"/><ellipse cx="24" cy="24" rx="12" ry="15" fill="url(#tfRed)" stroke="#7f1d1d" stroke-width="2"/>
+    <path d="M13 20 Q24 26 35 20 M13 28 Q24 34 35 28" stroke="#fde047" stroke-width="2.4" fill="none"/></g>
+    <g transform="rotate(20 42 34)"><rect x="39" y="34" width="6" height="24" rx="3" fill="#a16207" stroke="#713f12"/><ellipse cx="42" cy="24" rx="12" ry="15" fill="url(#tfTeal)" stroke="#134e4a" stroke-width="2"/>
+    <path d="M31 20 Q42 26 53 20 M31 28 Q42 34 53 28" stroke="#f472b6" stroke-width="2.4" fill="none"/></g>`,
+  // 5 guitar
+  tf5: `<g transform="rotate(30 32 32)"><rect x="29" y="2" width="6" height="30" rx="2" fill="#78350f"/><rect x="27" y="0" width="10" height="7" rx="2" fill="#451a03"/>
+    <path d="M32 26 C20 26 18 36 22 40 C14 44 14 60 32 60 C50 60 50 44 42 40 C46 36 44 26 32 26Z" fill="url(#tfWood)" stroke="#78350f" stroke-width="2.5"/>
+    <circle cx="32" cy="44" r="5.5" fill="#451a03"/><rect x="26" y="52" width="12" height="3" rx="1" fill="#451a03"/>
+    <path d="M30.5 6 V52 M33.5 6 V52" stroke="#fef3c7" stroke-width=".8"/>
+    <path d="M22 34 Q32 30 42 34" stroke="#f472b6" stroke-width="2" fill="none"/></g>`,
+  // 6 sugar skull
+  tf6: `<path d="M32 5 C16 5 8 16 8 29 C8 38 13 43 18 46 L18 55 Q32 61 46 55 L46 46 C51 43 56 38 56 29 C56 16 48 5 32 5Z" fill="#f8fafc" stroke="#7c3aed" stroke-width="2.5"/>
+    <circle cx="22" cy="29" r="8" fill="#22d3ee" stroke="#0e7490" stroke-width="2"/><circle cx="42" cy="29" r="8" fill="#f472b6" stroke="#9d174d" stroke-width="2"/>
+    <circle cx="22" cy="29" r="3" fill="#0f172a"/><circle cx="42" cy="29" r="3" fill="#0f172a"/>
+    <path d="M29 39 L32 35 L35 39 Z" fill="#0f172a"/><path d="M22 49 H42 M26 46 V52 M32 46 V53 M38 46 V52" stroke="#0f172a" stroke-width="1.8"/>
+    ${[[32, 13, '#fbbf24'], [24, 16, '#4ade80'], [40, 16, '#4ade80']].map(([x, y, c]) => `<circle cx="${x}" cy="${y}" r="2.6" fill="${c}"/>`).join('')}
+    <path d="M14 22 Q18 18 22 20 M50 22 Q46 18 42 20" stroke="#7c3aed" stroke-width="1.6" fill="none"/>`,
+  // 7 luchador mask
+  tf7: `<path d="M32 4 C16 4 8 18 8 32 C8 48 18 60 32 60 C46 60 56 48 56 32 C56 18 48 4 32 4Z" fill="url(#tfMask)" stroke="#7f1d1d" stroke-width="2.5"/>
+    <path d="M32 4 L26 18 L32 30 L38 18 Z" fill="#fbbf24" stroke="#92400e" stroke-width="1.5"/>
+    <path d="M12 28 Q20 20 28 30 Q22 38 12 34Z M52 28 Q44 20 36 30 Q42 38 52 34Z" fill="#fff" stroke="#fbbf24" stroke-width="2"/>
+    <ellipse cx="21" cy="30" rx="4" ry="3" fill="#0f172a"/><ellipse cx="43" cy="30" rx="4" ry="3" fill="#0f172a"/>
+    <path d="M24 46 Q32 52 40 46 Q32 56 24 46Z" fill="#fff" stroke="#fbbf24" stroke-width="1.6"/>${shine(18, 16, 2.5, 6)}`,
+  // wild: sombrero
+  tfw: `<ellipse cx="32" cy="44" rx="30" ry="10" fill="url(#tfStraw)" stroke="#92400e" stroke-width="2.5"/>
+    <path d="M18 42 C18 20 24 10 32 10 C40 10 46 20 46 42 Z" fill="url(#tfStraw)" stroke="#92400e" stroke-width="2.5"/>
+    <path d="M18.5 34 Q32 40 45.5 34 L46 40 Q32 46 18 40 Z" fill="#dc2626"/>
+    ${[22, 28, 34, 40].map((x, k) => `<circle cx="${x}" cy="${38 + (k % 2) * 1.5}" r="1.6" fill="#fde047"/>`).join('')}
+    <path d="M6 46 Q32 58 58 46" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-dasharray="4 3"/>${shine(26, 20, 2.2, 6, -10)}`,
+  // piñata (star)
+  tfp: `<path d="M32 2 L36 18 L48 6 L44 22 L62 22 L48 32 L62 42 L44 42 L48 58 L36 46 L32 62 L28 46 L16 58 L20 42 L2 42 L16 32 L2 22 L20 22 L16 6 L28 18 Z" fill="url(#tfPin)" stroke="#9d174d" stroke-width="2" stroke-linejoin="round"/>
+    ${[['#22d3ee', 18], ['#fde047', 26], ['#4ade80', 34], ['#f97316', 42]].map(([c, y]) => `<path d="M12 ${y} H52" stroke="${c}" stroke-width="3" stroke-dasharray="2 2"/>`).join('')}
+    <circle cx="32" cy="32" r="9" fill="#fff" stroke="#9d174d" stroke-width="2"/><text x="32" y="36" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="11" fill="#db2777">?</text>
+    <path d="M32 2 V-2" stroke="#78350f" stroke-width="2"/>`,
+};
+
+const GRADS = [
+  lg('tfLime', '#bef264', '#65a30d', '#365314'), lg('tfAvo', '#4ade80', '#15803d', '#14532d'), lg('tfPit', '#d97706', '#92400e', '#451a03'),
+  lg('tfChili', '#fca5a5', '#dc2626', '#7f1d1d', 1, 1), lg('tfShell', '#fde68a', '#f59e0b', '#b45309'), lg('tfRed', '#fda4af', '#e11d48', '#881337'),
+  lg('tfTeal', '#99f6e4', '#14b8a6', '#115e59'), lg('tfWood', '#fcd34d', '#d97706', '#78350f'), lg('tfMask', '#f87171', '#dc2626', '#7f1d1d'),
+  lg('tfStraw', '#fef3c7', '#facc15', '#ca8a04'), lg('tfPin', '#f9a8d4', '#ec4899', '#9d174d', 1, 1),
+].join('');
+
+const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>${GRADS}
+${Object.entries(SYMS).map(([id, body]) => `<symbol id="${id}" viewBox="0 0 64 64">${body}</symbol>`).join('\n')}
+</defs></svg>`;
+
+return { DEFS };
+})();
+
 // ---- art/index.js ----
 __mods['art/index.js'] = (() => {
 // Every game's SVG art, mounted once so covers and games can <use> any symbol.
@@ -4208,13 +4320,14 @@ const { DEFS: ANUBIS } = __mods['art/anubis.js'];
 const { DEFS: CANDY } = __mods['art/candy.js'];
 const { DEFS: ZEUS } = __mods['art/zeus.js'];
 const { DEFS: COSMIC } = __mods['art/cosmic.js'];
+const { DEFS: TACO } = __mods['art/taco.js'];
 
 function mountAllArt() {
   if (document.getElementById('bling-art')) return;
   const host = document.createElement('div');
   host.id = 'bling-art';
   host.className = 'art-defs';
-  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC].join('');
+  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC, TACO].join('');
   document.body.prepend(host);
 }
 
@@ -4306,6 +4419,7 @@ const ORIGINALS = [
   {"id": "casse", "name": "Le Casse", "cat": "quick", "tag": "Instantané", "sub": "Perce les coffres, vends au receleur", "colors": ["#fbbf24", "#1e293b"], "description": "Une chambre forte, 9 coffres : des liasses de billets jusqu’à ×100, un coffre doré qui double ton butin et une alarme. Perce les coffres un par un et, après chacun, le receleur te fait une offre. Vendre ou continuer ? Si l’alarme sonne, tu fuis avec 25 % du butin.", "features": ["9 coffres à percer", "Offres du receleur", "Coffre doré : butin ×2", "Casse parfait"], "rtp": "≈ 93-96 %", "vol": 4, "max": "×2 000"},
   {"id": "pileface", "name": "Pile ou Face Turbo", "cat": "quick", "tag": "Instantané", "sub": "Double ou rien, jusqu’à 20 fois", "colors": ["#fbbf24", "#1c1404"], "description": "Une pièce, deux faces, et ton gain qui double à chaque bonne prédiction. Lance la série, choisis Pile ou Face jusqu’à 20 fois d’affilée et encaisse quand tu veux : ×1,92 après un lancer, ×3,84 après deux… et plus d’un million de fois la mise après 20 !", "features": ["Jusqu’à 20 lancers", "Gain doublé à chaque fois", "Encaisse quand tu veux", "Vrai 50/50", "Raccourcis clavier P / F"], "rtp": "96 %", "vol": 4, "max": "×1 006 633"},
   {"id": "robots", "name": "Course de Robots", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
+  {"id": "taco", "name": "Taco Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -4641,6 +4755,13 @@ const SPECS = {
         ${bot(80, 90, 1.5, '#facc15', -4)}${bot(170, 130, 2.6, '#22d3ee', -6)}${bot(70, 200, 1.7, '#f43f5e', 3)}`;
     },
   },
+  taco: {
+    bg: ['#9f1239', '#1a0420'], light: '#fde047', title: ['TACO', 'FIESTA'], font: 'bebas', metal: ['#fff', '#fde047', '#dc2626'], tag: '¡ PIÑATAS !',
+    art: (u) => `
+      <g>${Array.from({ length: 9 }, (_, k) => `<path d="M${k * 34 + 2} 0 h30 v28 l-5 6 l-5 -5 l-5 6 l-5 -6 l-5 5 l-5 -6 z" fill="${['#f43f5e', '#fde047', '#22d3ee', '#4ade80', '#f97316', '#e879f9'][k % 6]}" opacity=".85"/>`).join('')}</g>
+      ${sym('tfp', 150, 120, 150, `filter="url(#glow${u})"`)}
+      ${sym('tfw', 70, 214, 100, `filter="url(#sh${u})"`)}${sym('tf3', 236, 210, 92, `filter="url(#sh${u})"`)}${sym('tf2', 250, 100, 56, `filter="url(#sh${u})"`)}${sym('tf4', 48, 110, 58, `filter="url(#sh${u})"`)}`,
+  },
 };
 
 // Bright card colours (top, bottom) for the square lobby posters.
@@ -4648,7 +4769,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -4760,6 +4881,10 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  {
+    game: 'taco', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
+    items: ["243 façons de gagner et un sombrero WILD", "Frappe les piñatas : gains, multiplicateurs ou FIESTA", "Fiesta : 8 tours gratuits avec multiplicateur global", "Jusqu’à ×5 000 la mise"],
+  },
   {
     game: 'robots', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
     items: ["6 robots s’affrontent sur une piste néon", "Parie sur le vainqueur ou sur le podium", "La forme et les cotes changent à chaque course", "15 secondes de suspense jusqu’à la ligne d’arrivée"],
@@ -5573,6 +5698,7 @@ const EXTRA_THEMES = {
   casse: { sd: 0.25, len: 16, root: 98, pad: { wave: 'sawtooth', vol: 0.016, dur: 2, map: { 0: [0, 3, 7], 8: [-1, 3, 6] } }, lead: { wave: 'triangle', vol: 0.04, dur: 0.18, pat: [12, null, null, 15, null, null, 14, null, 12, null, null, 11, null, null, 12, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.4, pat: [-12, null, -12, null, null, null, -13, null, -12, null, -12, null, null, null, -9, null] }, kick: [0, 8], hat: [4, 12], kv: 0.22, hv: 0.02 },
   'pileface': { sd: 0.15, len: 16, root: 196, lead: { wave: 'square', vol: 0.025, dur: 0.1, pat: [12, null, 19, null, 24, 19, null, 16, 12, null, 19, null, 22, 19, 17, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.18, pat: [-12, null, -12, null, -5, null, -5, null, -8, null, -8, null, -7, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.022 },
   'robots': { sd: 0.14, len: 16, root: 164.81, lead: { wave: 'sawtooth', vol: 0.02, dur: 0.1, pat: [12, 12, 15, null, 12, 12, 17, null, 12, 12, 19, 17, 15, null, 14, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.15, pat: [-12, -12, null, -12, -12, null, -10, null, -12, -12, null, -12, -9, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.025 },
+  'taco': { sd: 0.16, len: 16, root: 220, lead: { wave: 'triangle', vol: 0.06, dur: 0.14, pat: [12, null, 16, 19, null, 16, 12, null, 14, null, 17, 21, null, 17, 14, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -10, null, -3, null] }, comp: { wave: 'square', vol: 0.016, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [2, 5, 9] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -13311,6 +13437,247 @@ class RobotsGame extends BaseGame {
 return { RobotsGame };
 })();
 
+// ---- games/impl/taco.js ----
+__mods['games/impl/taco.js'] = (() => {
+// Taco Fiesta: 5×3, 243 ways (left to right, a sombrero wild on reels 2 to 4). Piñatas can land anywhere: hit them
+// (or let them burst) to reveal cash, multipliers that add up and multiply the spin, or a FIESTA that starts
+// 8 free spins. In the free spins piñatas are far more common and every multiplier found raises a global
+// multiplier for the rest of the bonus. Tuned by simulation (RTP ≈ 92 %, buy ≈ 88 %).
+
+const { BaseGame, fmtC, art } = __mods['core/base.js'];
+const { Reels } = __mods['core/reels.js'];
+const { EXTRA_THEMES } = __mods['core/music.js'];
+const { sfx } = __mods['audio.js'];
+const { fx, sleep, center } = __mods['fx.js'];
+const { el } = __mods['ui.js'];
+
+/* ===ENGINE */
+const COLS = 5, ROWS = 3, N = 15, WILD = 8, PIN = 9, CAPX = 5000, FS_SPINS = 8;
+const P = {
+  w: [22, 20, 18, 16, 10, 8, 6, 4], wild: 3, // weights per cell; wild only on reels 2-4
+  pays: [[0.2, 0.5, 1.5], [0.2, 0.6, 1.8], [0.3, 0.8, 2], [0.4, 1, 2.5], [0.6, 1.5, 4], [0.8, 2, 6], [1, 3, 10], [1.5, 5, 20]], K: 0.45,
+  pin: 0.012, pinFS: 0.075,
+  prize: [['c', 72], ['m', 24], ['f', 2]],
+  cash: [[0.2, 32], [0.5, 28], [1, 18], [2, 11], [5, 7], [10, 3], [25, 1]],
+  mult: [[2, 60], [3, 28], [5, 12]],
+};
+function wpick(l) { let t = 0; for (const x of l) t += x[1]; let r = Math.random() * t; for (const x of l) { if (r < x[1]) return x[0]; r -= x[1]; } return l[l.length - 1][0]; }
+function cell(c, fs) {
+  if (Math.random() < (fs ? P.pinFS : P.pin)) return PIN;
+  const ws = c >= 1 && c <= 3 ? P.wild : 0;
+  let t = ws; for (const x of P.w) t += x;
+  let r = Math.random() * t;
+  if (r < ws) return WILD; r -= ws;
+  for (let i = 0; i < P.w.length; i++) { if (r < P.w[i]) return i; r -= P.w[i]; }
+  return 0;
+}
+// 243 ways: for each symbol, reels in a row from the left holding it (or a wild); ways = product of the counts.
+function ways(g) {
+  const wins = [];
+  for (let s = 0; s < 8; s++) {
+    let n = 0, w = 1; const cells = [];
+    for (let c = 0; c < COLS; c++) {
+      let k = 0;
+      for (let r = 0; r < ROWS; r++) { const v = g[c * ROWS + r]; if (v === s || v === WILD) { k++; cells.push(c * ROWS + r); } }
+      if (!k) break; n++; w *= k;
+    }
+    if (n >= 3) {
+      const keep = cells.filter((i) => Math.floor(i / ROWS) < n);
+      wins.push({ s, n, ways: w, x: P.pays[s][n - 3] * P.K * w, cells: keep });
+    }
+  }
+  return wins;
+}
+function spin(o) {
+  const g = []; for (let i = 0; i < N; i++) g.push(cell(Math.floor(i / ROWS), o.fs));
+  if (o.forcePin) { let has = false; for (const v of g) if (v === PIN) has = true; if (!has) g[Math.floor(Math.random() * N)] = PIN; }
+  const wins = ways(g);
+  let base = 0; wins.forEach((w) => { base += w.x; });
+  const pins = [];
+  let cash = 0, madd = 0, fs = 0;
+  for (let i = 0; i < N; i++) if (g[i] === PIN) {
+    const k = wpick(P.prize);
+    if (k === 'c') { const v = wpick(P.cash); cash += v; pins.push({ i, k, v }); }
+    else if (k === 'm') { const v = wpick(P.mult); madd += v; pins.push({ i, k, v }); }
+    else { fs++; pins.push({ i, k }); }
+  }
+  // spin multiplier: the piñata multipliers add up (×2 and ×3 → ×5); in free spins the global multiplier applies too
+  const m = (madd || 1) * (o.gm || 1);
+  const total = (base + cash) * m;
+  return { g, wins, base, cash, madd, m, pins, fs, total };
+}
+/* ===END ENGINE */
+
+const NAMES = ['Citron vert', 'Avocat', 'Piment', 'Taco', 'Maracas', 'Guitare', 'Calavera', 'Luchador'];
+const ART = ['tf0', 'tf1', 'tf2', 'tf3', 'tf4', 'tf5', 'tf6', 'tf7', 'tfw', 'tfp'];
+const BUYC = 84;
+const FIESTA = ['#f43f5e', '#fde047', '#22d3ee', '#4ade80', '#f97316', '#e879f9', '#fff'];
+const xs = (m) => (m >= 10 ? String(Math.round(m * 10) / 10).replace('.', ',') : m.toFixed(2).replace(/\.?0+$/, '').replace('.', ','));
+
+class TacoGame extends BaseGame {
+  constructor(root, game) {
+    super(root, game, {
+      music: EXTRA_THEMES.taco,
+      frameCls: 'taco-frame',
+      stage: `<div class="tf-stage"><div class="tf-papel">${Array.from({ length: 14 }, (_, k) => `<i style="--c:${FIESTA[k % 6]}"></i>`).join('')}</div><div class="reels-host"></div><div class="tf-word"></div></div>`,
+      head: '<div class="tf-meter"><small>Multiplicateur</small><b>×1</b></div>',
+      buys: [{ id: 'fs', icon: '🪅', label: 'Fiesta · 8 tours gratuits', desc: 'Piñatas fréquentes et multiplicateur global qui grimpe', cost: (b) => b * BUYC }],
+      hello: '243 façons de gagner · frappe les piñatas !',
+    });
+    this.gm = 1;
+    this.reels = new Reels(this.q('.reels-host'), {
+      cols: COLS, rows: ROWS, game: this, random: (c) => cell(c, this.inFree),
+      art: (v) => art(ART[v]) + (v === WILD ? '<i class="lbl tfl">WILD</i>' : ''),
+      cls: (v) => (v === PIN ? 'pin' : v === WILD ? 'wild' : v >= 6 ? 'hi' : ''),
+    });
+    this.reels.setAll(Array.from({ length: N }, (_, i) => cell(Math.floor(i / ROWS), false)));
+  }
+
+  setMeter(m, bump) {
+    const b = this.q('.tf-meter b');
+    b.textContent = `×${m}`;
+    this.q('.tf-meter').classList.toggle('hot', m > 1);
+    if (bump) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.5)', offset: 0.4 }, { transform: 'scale(1)' }], { duration: 500 });
+  }
+
+  word(t, cls = '') {
+    const w = this.q('.tf-word');
+    w.textContent = t; w.className = `tf-word ${cls}`;
+    w.getAnimations().forEach((a) => a.cancel());
+    w.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.3) rotate(-8deg)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.1) rotate(3deg)', offset: 0.25 },
+      { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.7 }, { opacity: 0, transform: 'translate(-50%,-60%) scale(1.2)' }], { duration: this.turbo ? 700 : 1100, easing: 'ease-out' });
+  }
+
+  onMain() { this.round(() => this.playRound(false)); }
+  async onBuy() { await this.playRound(true); }
+
+  async playRound(buy) {
+    const b = this.bet;
+    if (!buy && !this.pay(b)) return;
+    this.lastStake = b;
+    this.setLast(0); this.winAmt.textContent = ''; this.setBanner('');
+    let total = 0;
+    if (buy) total = await this.freeSpins();
+    else {
+      const res = spin({ fs: false });
+      total = Math.min(res.total * b, b * CAPX);
+      await this.show(res, b, total);
+      if (total > 0) { this.win(Math.round(total)); this.setLast(total); }
+      if (res.fs) {
+        this.stopAuto();
+        if (total > 0) await this.celebrate(Math.round(total));
+        total += await this.freeSpins();
+      } else if (total > 0) await this.celebrate(Math.round(total));
+    }
+    this.setLast(total);
+    this.msg(total >= b * CAPX ? `GAIN MAXIMUM ! ${fmtC(total)}` : total > 0 ? `Total du tour : ${fmtC(total)}` : 'Pas de gain');
+  }
+
+  // Spins the reels, shows the ways wins, then the piñatas. Returns once everything is on screen.
+  async show(res, b, capped) {
+    await this.reels.spin(res.g, {
+      tease: (c, vals) => { let n = 0; for (let j = 0; j < c * ROWS; j++) if (vals[j] === PIN) n++; return n >= 2; },
+      onStop: (c) => { for (let r = 0; r < ROWS; r++) if (res.g[c * ROWS + r] === PIN) { sfx.land(); const p = center(this.reels.cell(c * ROWS + r)); fx.burst(p.x, p.y, 10, FIESTA, 5); } },
+    });
+    if (this.dead) return;
+    if (res.wins.length) {
+      const cells = new Set(); res.wins.forEach((w) => w.cells.forEach((i) => cells.add(i)));
+      this.reels.mark([...cells]);
+      this.msg(res.wins.map((w) => `${w.n} × ${NAMES[w.s]}${w.ways > 1 ? ` (${w.ways} façons)` : ''} : +${fmtC(Math.round(w.x * b))}`).join(' · '));
+      sfx.win();
+      await this.wait(1100);
+      this.reels.unmark();
+    }
+    if (res.pins.length) await this.smash(res, b);
+    if (res.m > 1 && (res.base + res.cash) > 0) {
+      this.word(`×${res.m}`, 'mult');
+      this.msg(`(${fmtC(Math.round((res.base + res.cash) * b))}) × ${res.m} = ${fmtC(Math.round(capped))}`);
+      sfx.bigWin();
+      await this.wait(1000);
+    }
+  }
+
+  // The piñatas wait to be hit (tap them); they burst on their own after a moment, or straight away in autoplay.
+  async smash(res, b) {
+    this.msg(res.pins.length > 1 ? `${res.pins.length} piñatas ! Frappe-les !` : 'Une piñata ! Frappe-la !');
+    this.slotEl.classList.add('tf-smash');
+    const jobs = res.pins.map((pn) => new Promise((resolve) => {
+      const cellEl = this.reels.cell(pn.i);
+      const hit = el('button', 'tf-hit', '<span>👊</span>');
+      hit.type = 'button'; hit.setAttribute('aria-label', 'Frapper la piñata');
+      cellEl.appendChild(hit);
+      let done = false;
+      const burst = () => {
+        if (done) return; done = true;
+        hit.remove();
+        cellEl.classList.add('opened');
+        const p = center(cellEl);
+        fx.burst(p.x, p.y, 26, FIESTA, 8);
+        sfx.coin();
+        const prize = el('div', `tf-prize ${pn.k}`, pn.k === 'c' ? `<b>${fmtC(Math.round(pn.v * b))}</b>` : pn.k === 'm' ? `<b>×${pn.v}</b>` : '<b>FIESTA</b><small>8 tours</small>');
+        cellEl.appendChild(prize);
+        if (pn.k === 'f') { sfx.feature(); fx.confetti(60); }
+        resolve();
+      };
+      hit.addEventListener('click', burst, { once: true });
+      setTimeout(burst, this.auto || this.turbo ? 350 : 2600);
+    }));
+    await Promise.all(jobs);
+    this.slotEl.classList.remove('tf-smash');
+    const parts = [];
+    if (res.cash) parts.push(`gains ${fmtC(Math.round(res.cash * b))}`);
+    if (res.madd) parts.push(`multiplicateur ×${res.madd}`);
+    if (res.fs) parts.push(res.fs > 1 ? `${res.fs} FIESTAS` : 'FIESTA');
+    this.msg(`Piñatas : ${parts.join(' · ')}`);
+    await this.wait(1200);
+    this.reels.el.querySelectorAll('.tf-prize').forEach((n) => n.remove());
+    this.reels.el.querySelectorAll('.opened').forEach((n) => n.classList.remove('opened'));
+  }
+
+  // Same rules as the simulator: 8 spins, +3 per FIESTA, multipliers found raise the global multiplier.
+  async freeSpins() {
+    const b = this.bet, cap = b * CAPX;
+    let left = FS_SPINS, gm = 1, tot = 0, done = 0;
+    this.lastStake = b;
+    await this.featureIntro('¡ FIESTA !', `${FS_SPINS} tours gratuits · piñatas partout · chaque multiplicateur trouvé reste pour tout le bonus`, art('tfp'));
+    this.inFree = true;
+    this.slotEl.classList.add('in-free');
+    this.setMeter(1);
+    while (left > 0 && tot < cap && !this.dead) {
+      left--; done++;
+      this.setBanner(`<b>¡ FIESTA !</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill">Multiplicateur ×${gm}</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
+      const res = spin({ fs: true, gm });
+      const add = Math.min(res.total * b, cap - tot);
+      await this.show(res, b, add);
+      tot += add;
+      if (add > 0) this.win(Math.round(add), 'Fiesta');
+      this.setLast(Math.round(tot));
+      if (res.madd) { gm += res.madd; this.setMeter(gm, true); this.msg(`Le multiplicateur global passe à ×${gm} !`); await this.wait(700); }
+      if (res.fs) { left += 3 * res.fs; await this.featureIntro(`+${3 * res.fs} TOURS`, 'Encore une fiesta !', art('tfp'), 1300); }
+      await this.wait(250);
+    }
+    this.inFree = false;
+    this.slotEl.classList.remove('in-free');
+    this.setBanner('');
+    this.setMeter(1);
+    await this.celebrate(Math.round(tot), { summary: '¡ FIESTA !', stake: b });
+    return tot;
+  }
+
+  info() {
+    const rows = NAMES.map((n, s) => `<div class="pay-item"><div class="pay-sym svg">${art(ART[s])}</div><div class="pay-vals"><b>${n}</b><br><span>3 : ×${xs(P.pays[s][0] * P.K)} · 4 : ×${xs(P.pays[s][1] * P.K)} · 5 : ×${xs(P.pays[s][2] * P.K)}</span></div></div>`).join('');
+    return this.rules(`<h4>Symboles (× la mise, par façon)</h4><div class="paytable">${rows}
+      <div class="pay-item"><div class="pay-sym svg">${art('tfw')}</div><div class="pay-vals"><b>Sombrero WILD</b><br><span>Rouleaux 2 à 4, remplace tous les symboles sauf la piñata</span></div></div>
+      <div class="pay-item"><div class="pay-sym svg">${art('tfp')}</div><div class="pay-vals"><b>Piñata</b><br><span>Gains, multiplicateur ou FIESTA</span></div></div></div>
+      <h4>243 façons de gagner</h4><p>Un symbole paie dès qu’il apparaît sur 3 rouleaux d’affilée ou plus en partant de la gauche, à n’importe quelle hauteur. Le gain est multiplié par le nombre de façons (combinaisons de positions).</p>
+      <h4>Piñatas</h4><p>Frappe chaque piñata : elle révèle des <b>gains</b> (×0,2 à ×25 la mise), un <b>multiplicateur</b> (×2, ×3 ou ×5, ils s’additionnent et multiplient tout le tour) ou une <b>FIESTA</b>.</p>
+      <h4>Fiesta</h4><p>${FS_SPINS} tours gratuits, piñatas 6 fois plus fréquentes. Chaque multiplicateur trouvé s’ajoute à un <b>multiplicateur global</b> qui s’applique à tous les tours suivants du bonus. FIESTA en bonus : +3 tours. Achat : ×${BUYC} la mise. Gain maximum ×${CAPX.toLocaleString('fr-FR')}.</p>`);
+  }
+}
+
+return { TacoGame };
+})();
+
 // ---- games/impl/index.js ----
 __mods['games/impl/index.js'] = (() => {
 // Every original Bling game, rebuilt on the shared cabinet (js/core/), keyed by catalogue id.
@@ -13338,6 +13705,8 @@ const { PileFaceGame } = __mods['games/impl/pileface.js'];
 
 const { RobotsGame } = __mods['games/impl/robots.js'];
 
+const { TacoGame } = __mods['games/impl/taco.js'];
+
 const IMPL = {
   zeus: ZeusGame,
   huff: HuffGame,
@@ -13358,6 +13727,7 @@ const IMPL = {
   plinko: PlinkoGame,
   vortex: VortexGame,
   casse: CasseGame,
+  taco: TacoGame,
   robots: RobotsGame,
   pileface: PileFaceGame,
 };
