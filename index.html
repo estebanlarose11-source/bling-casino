@@ -2081,10 +2081,33 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .zeus-sky .col.l { left: 2%; } .zeus-sky .col.r { right: 2%; }
 .g-zeus .zeus-sky { background: linear-gradient(180deg, rgba(10, 20, 60, .15), rgba(10, 20, 60, .05) 50%, rgba(10, 20, 60, .45)), var(--z-bg) center / cover no-repeat; }
 .g-zeus .zeus-sky .cl, .g-zeus .zeus-sky .col { display: none; }
-.g-zeus .slot-bg { background: linear-gradient(180deg, rgba(8, 14, 40, .55), rgba(8, 14, 40, .35) 35%, rgba(6, 10, 30, .75)), var(--z-bg) center / cover no-repeat; filter: blur(2px) saturate(1.1); transform: scale(1.04); }
+.g-zeus .slot-bg { background: var(--z-bg) center / cover no-repeat; }
 .g-zeus .slot-bg::after { display: none; }
-.g-zeus { overflow: hidden; }
-.g-zeus .controls { background: rgba(6, 10, 30, .55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+/* clean layout: no title, no plaque, no inner frames — the picture everywhere, just the grid, Zeus and the buttons */
+.g-zeus .slot-head { display: none; }
+.g-zeus .zeus-plaque, .g-zeus .zm-sub { display: none; }
+.g-zeus .slot-frame.zeus-frame { padding: 0; background: none; box-shadow: none; border-radius: 0; }
+.g-zeus .zeus-frame > .slot-stage { background: none; border-radius: 0; overflow: visible; }
+.g-zeus .zeus-sky { display: none; }
+.g-zeus .zeus-stage { grid-template-columns: 34% 1fr; gap: 6px; padding: 4px 0 0; overflow: visible; }
+.g-zeus .zeus-board { position: static; }
+.g-zeus .zeus-top { position: absolute; left: 0; top: 4px; z-index: 4; display: block; width: calc(34% - 10px); }
+.g-zeus .zeus-mult { width: 100%; }
+.g-zeus .zeus-mult { min-width: 0; padding: 4px 12px; background: rgba(8, 12, 40, .6); }
+.g-zeus .zeus-mult b { font-size: clamp(24px, 3vw, 36px); }
+.g-zeus .zeus-fig.painted { padding-top: 54px; }
+.g-zeus .z-fig-img { width: 118%; max-width: none; max-height: none; margin-left: -10%; }
+.g-zeus .sg { width: 100%; padding: 4px; gap: 4px; background: rgba(6, 10, 34, .28); box-shadow: inset 0 0 0 1px rgba(253, 230, 138, .35); }
+.g-zeus .sg-cell { background: rgba(10, 16, 50, .32); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1); }
+.g-zeus .sg-cell.hi { background: rgba(10, 16, 50, .32); }
+.g-zeus .z-img { width: 100%; height: 100%; }
+.g-zeus .win-bar { margin: 6px 0 4px; text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.g-zeus .controls { background: rgba(6, 10, 30, .45); border-color: rgba(255, 255, 255, .12); }
+@container (max-width: 520px) { .g-zeus .zeus-stage { grid-template-columns: 30% 1fr; } .g-zeus .zeus-top { width: calc(30% - 8px); } .g-zeus .zeus-fig.painted { padding-top: 40px; } .g-zeus .zeus-mult { padding: 3px 4px; } .g-zeus .zeus-mult small { font-size: 6px; letter-spacing: 0; } .g-zeus .zeus-mult b { font-size: 20px; } }
+.g-zeus .controls { box-sizing: border-box; max-width: 100%; }
+.g-zeus .zeus-board .sg { width: 100% !important; }
+.game-host:not(.is-full):has(> .g-zeus) { max-width: max(420px, min(1040px, calc((100vh - var(--chrome) - 40px) * 6 / 5 / .66 + 40px))); }
+@container (min-width: 600px) { .g-zeus .controls { grid-template-columns: auto auto auto 1fr !important; } }
 .zeus-fig.painted { align-items: flex-end; }
 .z-fig-img { width: 100%; max-height: 100%; object-fit: contain; object-position: bottom; display: block; transform-origin: 40% 90%; transition: transform .35s cubic-bezier(.3, 1.4, .5, 1), filter .35s; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .55)); pointer-events: none; user-select: none; }
 .zeus-fig.painted.raise .z-fig-img { transform: translateY(-4%) scale(1.08) rotate(-3deg); filter: drop-shadow(0 0 16px #93c5fd) drop-shadow(0 0 30px #fde047) brightness(1.15); }
