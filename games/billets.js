@@ -90,10 +90,10 @@ function spin(o) {
 const NOTE_IDS = ['bv0', 'bv1', 'bv2', 'bv3', 'bv4', 'bv5'], NOTE_VALS = [5, 10, 20, 50, 100, 200];
 const JPID = { mini: 'bvm', major: 'bvj', grand: 'bvg' }, JPN = { mini: 'MINI', major: 'MAJEUR', grand: 'JACKPOT' };
 const BUY_FS = 70, BUY_CASE = 4.3;
-// Painted bills from the owner (assets/games/billets/b0..b3 = 5, 10, 20, 50 KE); the other bills keep their drawing.
+// Painted bills from the owner (assets/games/billets): b0..b5 = 5 to 200 KE, case (briefcase), fs (FREE SPINS), jackpot.
 const IMG_V = 1;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
-const PAINT = { bv0: 'b0', bv1: 'b1', bv2: 'b2', bv3: 'b3' };
+const PAINT = { bv0: 'b0', bv1: 'b1', bv2: 'b2', bv3: 'b3', bv4: 'b4', bv5: 'b5', bvk: 'case', bvf: 'fs', bvg: 'jackpot' };
 const bill = (id) => (PAINT[id] ? `<img class="bv-img" src="${asset(`assets/games/billets/${PAINT[id]}.webp`)}" alt="" draggable="false" decoding="async">` : `<svg viewBox="0 0 112 64" aria-hidden="true"><use href="#${id}" width="112" height="64"/></svg>`);
 const xv = (m) => (m >= 10 ? String(Math.round(m)) : String(m).replace('.', ','));
 const MONEY = ['#4caf6e', '#fde047', '#3b82c4', '#f08c2e', '#fff'];
