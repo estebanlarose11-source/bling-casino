@@ -149,7 +149,7 @@ class ZeusGame extends BaseGame {
       hello: '8 symboles identiques n’importe où pour gagner',
     });
     this.zeus = this.q('.zeus-fig');
-    this.q('.zeus-sky').style.setProperty('--z-bg', `url("${asset('assets/games/zeus/bg.webp')}")`);
+    this.slotEl.style.setProperty('--z-bg', `url("${asset('assets/games/zeus/bg.webp')}")`); // grid + whole machine
     Object.values(PAINT).forEach((n) => { new Image().src = asset(`assets/games/zeus/${n}.webp`); });
     this.meter = this.q('.zeus-mult');
     this.meterVal = 0;

@@ -2081,6 +2081,10 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .zeus-sky .col.l { left: 2%; } .zeus-sky .col.r { right: 2%; }
 .g-zeus .zeus-sky { background: linear-gradient(180deg, rgba(10, 20, 60, .15), rgba(10, 20, 60, .05) 50%, rgba(10, 20, 60, .45)), var(--z-bg) center / cover no-repeat; }
 .g-zeus .zeus-sky .cl, .g-zeus .zeus-sky .col { display: none; }
+.g-zeus .slot-bg { background: linear-gradient(180deg, rgba(8, 14, 40, .55), rgba(8, 14, 40, .35) 35%, rgba(6, 10, 30, .75)), var(--z-bg) center / cover no-repeat; filter: blur(2px) saturate(1.1); transform: scale(1.04); }
+.g-zeus .slot-bg::after { display: none; }
+.g-zeus { overflow: hidden; }
+.g-zeus .controls { background: rgba(6, 10, 30, .55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
 .zeus-fig.painted { align-items: flex-end; }
 .z-fig-img { width: 100%; max-height: 100%; object-fit: contain; object-position: bottom; display: block; transform-origin: 40% 90%; transition: transform .35s cubic-bezier(.3, 1.4, .5, 1), filter .35s; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .55)); pointer-events: none; user-select: none; }
 .zeus-fig.painted.raise .z-fig-img { transform: translateY(-4%) scale(1.08) rotate(-3deg); filter: drop-shadow(0 0 16px #93c5fd) drop-shadow(0 0 30px #fde047) brightness(1.15); }
@@ -9928,7 +9932,7 @@ __mods['games/impl/index.js'] = (() => {
 // tools/build.py: run `python3 tools/build.py` after changing a file in games/.
 
 const FILES = {
-  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '80e8346b32'],
+  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '7e6577831b'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a1fe33533c'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'cad2eb2bf8'],
