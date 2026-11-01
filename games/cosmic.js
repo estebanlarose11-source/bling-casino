@@ -5,7 +5,15 @@ __mods['games/impl/cosmic.js'] = (() => {
 // supernova cracks the charged cells open into loot worth more at higher charge, black holes that multiply their
 // whole row and column, and vacuum ships that collect all the loot once more. Tuned by simulation (RTP ≈ 92 %, buys ≈ 88 %).
 
-const { BaseGame, fmtC, art } = __mods['core/base.js'];
+const { BaseGame, fmtC } = __mods['core/base.js'];
+let { art } = __mods['core/base.js'];
+// Painted images from the owner (assets/games/cosmic): the 9 symbols, beacon (scatter), supernova, black hole, vacuum
+// ship, the warrior robot beside the grid, the background and the cover.
+const IMG_V = 1;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const PAINT = { ch0: 's0', ch1: 's1', ch2: 's2', ch3: 's3', ch4: 's4', ch5: 's5', ch6: 's6', ch7: 's7', ch8: 's8', chs: 'scatter', chn: 'nova', chh: 'hole', chv: 'ship' };
+const svgArt = art;
+art = (id) => (PAINT[id] ? `<img class="c-img" src="${asset(`assets/games/cosmic/${PAINT[id]}.webp`)}" alt="" draggable="false" decoding="async">` : svgArt(id));
 const { SymbolGrid } = __mods['core/grid.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
@@ -109,7 +117,7 @@ const WORDS = ['STELLAIRE !', 'COSMIQUE !', 'GALACTIQUE !', 'HYPERNOVA !', 'INTE
 const NEON = ['#22d3ee', '#f472b6', '#a855f7', '#facc15', '#4ade80', '#fff'];
 const LVN = ['', 'Cristal bleu', 'Cristal rose', 'Cristal doré'];
 const LVC = ['', '#22d3ee', '#f472b6', '#facc15'];
-const sym = (c) => (c < 9 ? art('ch' + c) : c === 9 ? art('chs') + '<i class="lbl chl">BALISE</i>' : art('chn') + '<i class="lbl chl n">SUPERNOVA</i>');
+const sym = (c) => (c < 9 ? art('ch' + c) : c === 9 ? art('chs') : art('chn')); // the beacon and the supernova carry their name on the picture
 const fxv = (v) => (v >= 10 ? String(Math.round(v)) : v.toFixed(2).replace(/\.?0+$/, '').replace('.', ','));
 const lootRange = (lv) => `×${fxv(P.loot[lv][0][0] * P.L)} à ×${fxv(P.loot[lv][P.loot[lv].length - 1][0] * P.L)}`;
 
@@ -120,6 +128,7 @@ class CosmicGame extends BaseGame {
       frameCls: 'cosmic-frame',
       stage: `<div class="ch-stage">
         <div class="ch-space"><i class="ch-neb"></i><i class="ch-stars s1"></i><i class="ch-stars s2"></i><i class="ch-shoot a"></i><i class="ch-shoot b"></i><i class="ch-shoot c"></i><i class="ch-planet"></i><i class="ch-ring"></i><i class="ch-moon"></i></div>
+        <div class="ch-fig"><img src="${asset('assets/games/cosmic/robot.webp')}" alt="" draggable="false"></div>
         <div class="ch-board">
           <div class="grid-host"></div>
           <div class="ch-word"></div>
@@ -135,6 +144,7 @@ class CosmicGame extends BaseGame {
       hello: 'Grappes de 5+ · chaque gain charge sa case · la supernova fait exploser le butin',
     });
     this.radar = false;
+    Object.values(PAINT).forEach((n) => { new Image().src = asset(`assets/games/cosmic/${n}.webp`); });
     this.charge = new Array(N).fill(0);
     this.meter = this.q('.ch-meter');
     this.meterVal = this.q('.ch-meter b');

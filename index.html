@@ -2060,6 +2060,36 @@ body.fs-on { overflow: hidden; }
 @media (orientation: landscape) and (max-height: 560px) { .game-host.is-full > .slot.theme-wolf > .slot-frame { max-width: none; } }
 .game-host.is-full:has(> .g-anubis, > .g-bling, > .g-candy, > .g-labo) { --chrome: 175px; }
 @media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .g-anubis, > .g-bling) { --chrome: 30px; } .game-host.is-full:has(> .g-candy, > .g-labo) { --chrome: 60px; } }
+.slot.g-cosmic > .slot-bg { background: url(assets/games/cosmic/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.g-cosmic > .slot-bg::after { display: none; }
+.g-cosmic .slot-title { display: none !important; }
+.g-cosmic .slot-head { margin-bottom: 6px; justify-content: center; }
+.g-cosmic > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.g-cosmic > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; overflow: visible; }
+.g-cosmic .ch-space { display: none; }
+.g-cosmic .ch-stage { display: grid; grid-template-columns: 30% 1fr; align-items: center; gap: 6px; padding: 0; overflow: visible; contain: none; }
+.ch-fig { position: relative; z-index: 1; align-self: stretch; display: flex; align-items: center; justify-content: center; }
+.ch-fig img { width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; user-select: none; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .5)); transition: transform .35s cubic-bezier(.3, 1.4, .5, 1), filter .35s; }
+.g-cosmic.ch-boom .ch-fig img, .g-cosmic.in-free .ch-fig img { transform: scale(1.05); filter: drop-shadow(0 0 18px #f472b6) brightness(1.15); }
+.g-cosmic .ch-board .sg { width: 100% !important; padding: 4px; gap: 4px; background: rgba(6, 4, 24, .3); box-shadow: inset 0 0 0 1px rgba(165, 243, 252, .35); }
+.g-cosmic .sg-cell { background: rgba(8, 6, 30, .3) !important; }
+.c-img { width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 50%; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .5)); }
+.g-cosmic .sg-cell.scatter .c-img, .g-cosmic .sg-cell.nova .c-img { border-radius: 18%; }
+.g-cosmic .sg-cell.win .c-img { animation: winBounce 1s ease-in-out infinite; }
+.clv .c-img { width: 70%; height: 70%; }
+.intro-glyph .c-img { width: 150px; height: 150px; }
+.pay-sym .c-img { width: 44px; height: 44px; }
+.g-cosmic .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.g-cosmic .controls { background: rgba(6, 10, 24, .5); border-color: rgba(255, 255, 255, .14); }
+.game-host:not(.is-full):has(> .g-cosmic) { max-width: max(420px, min(1040px, calc((100vh - var(--chrome) - 40px) * 6 / 5 / .7 + 40px))); }
+.game-host.is-full:has(> .g-cosmic) { padding: 0; background: #05060c; --chrome: 175px; }
+.game-host.is-full > .slot.g-cosmic { width: 100%; max-width: none !important; min-height: 100%; margin: 0; border-radius: 0; border: 0; display: flex; flex-direction: column; justify-content: center; padding: max(8px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px)); }
+.game-host.is-full > .slot.g-cosmic > .slot-bg { grid-column: auto !important; grid-row: auto !important; position: absolute; inset: 0; }
+.game-host.is-full > .slot.g-cosmic .controls { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+.game-host.is-full > .slot.g-cosmic > .slot-frame > .slot-stage { width: 100%; max-width: calc((100dvh - 200px) * 6 / 5 / .7); margin: 0 auto; }
+@container (max-width: 520px) { .g-cosmic .ch-stage { grid-template-columns: 26% 1fr; } }
+@media (orientation: portrait) { .game-host.is-full > .slot.g-cosmic > .slot-frame > .slot-stage { max-width: none; } .game-host.is-full > .slot.g-cosmic .ch-stage { grid-template-columns: 1fr; } .game-host.is-full > .slot.g-cosmic .ch-fig { height: min(26dvh, 230px); } .game-host.is-full > .slot.g-cosmic .ch-fig img { height: 100%; width: auto; } }
+@media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .g-cosmic) { --chrome: 60px; } .game-host.is-full > .slot.g-cosmic > .slot-frame > .slot-stage { max-width: calc((100dvh - 20px) * 6 / 5 / .7); } }
 /* phone held sideways: slots get the grid on the left and the controls in a side column */
 @media (orientation: landscape) and (max-height: 560px) {
   .game-host.is-full { --chrome: 96px; padding: 4px max(8px, env(safe-area-inset-right, 0px)) 4px max(8px, env(safe-area-inset-left, 0px)); }
@@ -6933,7 +6963,7 @@ const SPECS = {
       ${sym('jp', 60, 262, 46, `filter="url(#glow${u})"`)}`,
   },
   cosmic: {
-    bg: ['#2a0f6e', '#05021a'], light: '#22d3ee', title: ['LE COSMIQUE'], font: 'orb', metal: ['#fff', '#a5f3fc', '#c026d3'], tag: '3 BONUS',
+    bg: ['#2a0f6e', '#05021a'], light: '#22d3ee', title: ['LE COSMIQUE'], font: 'orb', metal: ['#fff', '#a5f3fc', '#c026d3'], tag: '3 BONUS', photo: 'assets/games/cosmic/cover.webp',
     hero: (u) => `
       <circle cx="250" cy="60" r="34" fill="url(#chPlanet)" opacity=".75"/><ellipse cx="250" cy="62" rx="56" ry="11" transform="rotate(-14 250 62)" fill="none" stroke="#facc15" stroke-width="3" opacity=".7"/>
       ${sym('chn', 60, 70, 70, `filter="url(#glow${u})"`)}
@@ -7391,6 +7421,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'cosmic', date: '2026-11-01', title: 'Le Cosmique peint', items: ['Nouveaux symboles : prisme vert, cube cyan, hexagone violet, diamant rose, météorite, satellite, fusée, OVNI et K-0B', 'Nouvelle balise, supernova, trou noir et vaisseau aspirateur', 'Le guerrier aux sabres à côté de la grille, nouveau décor spatial et nouvelle jaquette', 'Affichage épuré et plein écran sur tout l’écran'] },
   { game: 'anubis', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
   { game: 'dragons', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
   { game: 'bling', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
@@ -10028,7 +10059,7 @@ const FILES = {
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '7e6577831b'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a1fe33533c'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
-  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'cad2eb2bf8'],
+  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '0b6becec24'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
