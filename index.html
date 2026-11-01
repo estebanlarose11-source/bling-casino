@@ -7022,7 +7022,7 @@ const SPECS = {
     },
   },
   labo: {
-    bg: ['#86198f', '#1e0636'], light: '#f472b6', title: ['LE LABO'], font: 'bebas', metal: ['#fff', '#bef264', '#c026d3'], tag: 'JACKPOT ×1000',
+    bg: ['#86198f', '#1e0636'], light: '#f472b6', title: ['LE LABO'], font: 'bebas', metal: ['#fff', '#bef264', '#c026d3'], tag: 'JACKPOT ×1000', photo: 'assets/games/labo/cover.webp',
     art: (u) => `
       <g fill="none" stroke-width="9" opacity=".75">${['#f472b6', '#fde047', '#4ade80', '#22d3ee', '#a855f7'].map((c, k) => `<path d="M${10 + k * 12} 300 A${140 - k * 12} ${140 - k * 12} 0 0 1 ${290 - k * 12} 300" stroke="${c}"/>`).join('')}</g>
       <use href="#lbdemon" x="20" y="16" width="260" height="195" filter="url(#sh${u})"/>
@@ -7248,6 +7248,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'labo', date: '2026-11-01', title: 'Le Labo prend vie', items: ['Nouvelle jaquette et nouveau décor : le festival', 'Nouveaux symboles : feuille, cachet diamant, buvard LSD, cachet rose, poudre, cachet brique et le Boss', 'Nouveau WILD et nouveau SCATTER : les hippies', 'Nouvelle feuille et feuille d’or dans La Mallette'] },
   { game: 'labo', date: '2026-11-01', title: 'Nouveau bonus La Mallette', items: ['5 tours, remis à 5 à chaque nouvelle tasse : la fumée verte au milieu récolte les multiplicateurs', '3 tasses de pilules (verte, bleue, rose) de ×0,2 à ×20 la mise', 'Feuille : ×2 sur les tasses autour · Feuille d’or : ×2 sur toutes les tasses', 'Tasse magique : aspire toutes les tasses et garde leur valeur · écran plein = jackpot Le Cartel ×1000'] },
   { game: 'dragons', date: '2026-11-01', title: 'Plus de cases vides', items: ['Chaque moitié de dragon a toujours une autre moitié à côté, d’une autre couleur', 'La pierre runique est bien visible quand elle apparaît à côté d’une perle'] },
   {
@@ -9883,7 +9884,7 @@ const FILES = {
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '217f54e3fd'],
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', '3f3eaaaa3b'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'f3c9203150'],
-  labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'ecb0411b48'],
+  labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e739165592'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '67c9c0259d'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],

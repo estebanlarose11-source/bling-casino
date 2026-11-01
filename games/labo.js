@@ -130,7 +130,7 @@ function malletteBonus(startCells) {
 
 // Painted images from the owner (assets/games/labo/<name>.webp) replace the drawn art as soon as their name is
 // listed here: s0..s8 (symbols: leaf, joint, pills, mushroom, blotter, pink pill, powder bag, brick, boss), w (WILD), sc (rainbow spiral), case (briefcase), bg (lab background), demon (boss on his throne).
-const PAINTED = new Set([]); // + La Mallette: cup0, cup1, cup2 (green, blue, pink cups), leaf, gleaf (golden leaf), magic (magic cup)
+const PAINTED = new Set(['s0', 's2', 's4', 's5', 's6', 's7', 's8', 'w', 'sc', 'bg', 'leaf', 'gleaf']); // + La Mallette: cup0, cup1, cup2 (green, blue, pink cups), leaf, gleaf (golden leaf), magic (magic cup)
 const IMG_V = 1;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const FILE = (v) => (v === WILD ? 'w' : v === SC ? 'sc' : v === CASE ? 'case' : `s${v}`);
@@ -139,7 +139,7 @@ const painted = (name) => PAINTED.has(name);
 const img = (name, cls = 'lb-img') => `<img class="${cls}" src="${asset(`assets/games/labo/${name}.webp`)}" alt="" draggable="false" decoding="async">`;
 const symArt = (v) => (painted(FILE(v)) ? img(FILE(v)) : art(SVGID(v)));
 
-const NAMES = ['Feuille', 'Joint', 'Pilules', 'Champignon magique', 'Buvard', 'Cachet rose', 'Sachet de poudre', 'La Brique', 'Le Boss'];
+const NAMES = ['Feuille', 'Joint', 'Cachet diamant', 'Champignon magique', 'Buvard LSD', 'Cachet rose', 'Poudre', 'Cachet brique', 'Le Boss'];
 const BUY_FS = 50, BUY_CASE = 33;
 const CUPN = ['Tasse verte', 'Tasse bleue', 'Tasse rose'], CUPC = ['#4ade80', '#38bdf8', '#f472b6'];
 const bArt = (name, svg) => (painted(name) ? img(name) : art(svg));
