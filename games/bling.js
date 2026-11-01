@@ -35,13 +35,18 @@ function clusters(grid) {
 const MUSIC = { sd: 0.2308, len: 16, root: 196, lead: { wave: 'square', vol: 0.035, dur: 0.16, pat: [12, null, 15, null, 19, null, 15, 12, 10, null, 12, null, 15, null, 10, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.28, pat: [-12, null, null, -12, null, null, -12, null, -14, null, null, -14, null, null, -17, null] }, kick: [0, 6, 8, 14], hat: [2, 4, 6, 10, 12, 14], kv: 0.22, hv: 0.025 };
 const BWORDS = ['BLING !', 'CASH !', 'SHINY !', 'MILLIONNAIRE !', 'JACKPOT VIBES !', 'TOWER OF GOLD !'];
 const BLING = ['#fde047', '#f472b6', '#fff', '#a855f7', '#fbbf24'];
+// Painted symbols by the owner: assets/games/bling/s0..s6.webp + sc.webp (scatter), bg.webp (city), cover.webp (poster).
+const IMG_V = 1;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const IMG = { '💎': 's0', '👑': 's1', '💰': 's2', '💵': 's3', '🪙': 's4', '🍾': 's5', '💸': 's6', '💲': 'sc' };
+const symArt = (v) => (IMG[v] ? `<img class="bt-img" src="${asset(`assets/games/bling/${IMG[v]}.webp`)}" alt="" draggable="false" decoding="async">` : art(MAP[v]));
 const NAMES = { '💎': 'Diamant', '👑': 'Couronne', '💰': 'Sac d’or', '💵': 'Billets', '🪙': 'Pièce', '🍾': 'Champagne', '💸': 'Billets volants', '💲': 'Scatter' };
 
 class BlingGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       defs: DEFS, music: MUSIC,
-      stage: '<div class="bt-bg"><i class="bt-beam b1"></i><i class="bt-beam b2"></i><i class="bt-city"></i><i class="bt-glitter"></i></div><div class="grid-host"></div><div class="bt-word"></div><div class="bt-combo"></div>',
+      stage: '<div class="bt-bg"><i class="bt-photo"></i><i class="bt-beam b1"></i><i class="bt-beam b2"></i><i class="bt-city"></i><i class="bt-glitter"></i></div><div class="grid-host"></div><div class="bt-word"></div><div class="bt-combo"></div>',
       buys: [
         { id: 'normal', icon: '💲', label: 'Bonus 3 scatters · ×2', desc: '10 tours gratuits, toutes les cases démarrent à ×2', cost: (b) => b * BUYN },
         { id: 'bounty', icon: '💎', label: 'Bonus 4 scatters · ×5', desc: '15 tours gratuits, toutes les cases démarrent à ×5', cost: (b) => b * BUYB },
@@ -50,9 +55,12 @@ class BlingGame extends BaseGame {
     });
     this.mm = new Array(N).fill(0);
     this.startM = 0;
+    // load the painted coins and the city right away, so the first spin shows no empty cell
+    this.q('.bt-photo').style.backgroundImage = `url("${asset('assets/games/bling/bg.webp')}")`;
+    [...Object.values(IMG), 'bg'].forEach((n) => { new Image().src = asset(`assets/games/bling/${n}.webp`); });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: COLS, rows: ROWS, game: this,
-      art: (v) => art(MAP[v]),
+      art: symArt,
       cls: (v) => (v === SC ? 'scatter' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => SYM[Math.floor(Math.random() * SYM.length)][0]));
@@ -176,7 +184,7 @@ class BlingGame extends BaseGame {
     this.startM = bounty ? 5 : 2;
     this.resetMM();
     this.lastStake = this.bet;
-    await this.featureIntro(bounty ? 'BONUS ×5' : 'BONUS ×2', `${free} tours gratuits · toutes les cases à ×${this.startM}`, art(MAP[SC]));
+    await this.featureIntro(bounty ? 'BONUS ×5' : 'BONUS ×2', `${free} tours gratuits · toutes les cases à ×${this.startM}`, symArt(SC));
     this.slotEl.classList.add('in-free');
     const rain = setInterval(() => fx.coins(4), 900);
     while (free > 0 && !this.dead) {
@@ -184,7 +192,7 @@ class BlingGame extends BaseGame {
       this.setBanner(`<b>${bounty ? 'BONUS ×5' : 'BONUS ×2'}</b><span class="pill">Tour ${done} / ${totalSpins()}</span><span class="pill gold">Gain ${fmtC(fsWin)}</span>`);
       const r = await this.spinOnce(true, fsWin);
       fsWin += r.total;
-      if (r.scat >= 3) { free += 3; await this.featureIntro('+3 TOURS', 'Retrigger !', art(MAP[SC]), 1300); }
+      if (r.scat >= 3) { free += 3; await this.featureIntro('+3 TOURS', 'Retrigger !', symArt(SC), 1300); }
       if (r.capHit) { free = 0; this.msg(`MAX WIN ! ${fmtC(fsWin)}`); }
       await this.wait(500);
     }
@@ -199,10 +207,10 @@ class BlingGame extends BaseGame {
   }
 
   info() {
-    const rows = SYM.map(([s, v]) => `<div class="pay-item"><div class="pay-sym svg">${art(MAP[s])}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>Valeur ${v} · gain = mise × ${v} × 0,0786 × (taille − 3) × multiplicateur</span></div></div>`).join('');
+    const rows = SYM.map(([s, v]) => `<div class="pay-item"><div class="pay-sym svg">${symArt(s)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>Valeur ${v} · gain = mise × ${v} × 0,0786 × (taille − 3) × multiplicateur</span></div></div>`).join('');
     return this.rules(`<h4>Symboles</h4><div class="paytable">${rows}</div>
       <h4>Cascades et multiplicateurs</h4><p>Grille 6×7. Une grappe de <b>5 symboles identiques ou plus</b> (côte à côte) paie, disparaît et de nouveaux symboles tombent. Chaque case qui gagne <b>garde un multiplicateur qui monte de +2</b> à chaque connexion ; une grappe paie avec le plus grand multiplicateur de ses cases. En jeu de base, les multiplicateurs repartent à zéro après un tour gagnant.</p>
-      <h4>Bonus</h4><p>${art(MAP[SC]).replace('<svg', '<svg style="width:22px;height:22px;vertical-align:middle"')} 3 scatters : 10 tours, toutes les cases à ×2. 4 scatters : 15 tours à ×5. Pendant le bonus, les multiplicateurs restent et une grappe paie avec <b>la somme</b> des multiplicateurs de ses cases. 3 scatters de plus : +3 tours. Gain maximum ×10 000.</p>
+      <h4>Bonus</h4><p>${symArt(SC).replace('<img', '<img style="width:22px;height:22px;vertical-align:middle;display:inline;animation:none"')} 3 scatters : 10 tours, toutes les cases à ×2. 4 scatters : 15 tours à ×5. Pendant le bonus, les multiplicateurs restent et une grappe paie avec <b>la somme</b> des multiplicateurs de ses cases. 3 scatters de plus : +3 tours. Gain maximum ×10 000.</p>
       <h4>Achats</h4><p>Bonus ×2 : ×${BUYN} la mise · Bonus ×5 : ×${BUYB} la mise.</p>`);
   }
 }

@@ -1112,6 +1112,24 @@ body.gated { overflow: hidden; }
   background: linear-gradient(180deg, #fff, #fde047 45%, #f59e0b 55%, #fff7c2); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #9d174d) drop-shadow(0 0 14px rgba(244, 114, 182, .8)); }
 .bt-combo { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); z-index: 6 !important; opacity: 0; padding: 4px 14px; border-radius: 99px; background: linear-gradient(90deg, #db2777, #7c3aed); box-shadow: 0 0 18px rgba(244, 114, 182, .7); font: 900 14px KeCoin, Orbitron, sans-serif; color: #fff; transition: opacity .2s; pointer-events: none; }
 .bt-combo.on { opacity: 1; }
+/* painted night city (assets/games/bling/bg.webp) and painted coins */
+.bt-photo { position: absolute; inset: 0; background: center 60% / cover no-repeat; filter: saturate(1.15) brightness(.8); }
+.bt-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20, 5, 42, .55), rgba(20, 5, 42, .2) 40%, rgba(40, 8, 50, .6)), radial-gradient(ellipse at 50% 50%, rgba(8, 2, 16, .5), transparent 70%); }
+.g-bling .bt-city { display: none; }
+.g-bling .bt-beam { opacity: .55; }
+.g-bling .bt-glitter { opacity: .35; }
+.g-bling .sg-cell { background: radial-gradient(circle at 50% 42%, rgba(253, 224, 71, .12), rgba(20, 6, 36, .55) 72%); }
+.bt-img { width: 92%; height: 92%; object-fit: contain; display: block; margin: auto; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .55)); animation: btImgIdle 4s ease-in-out infinite; }
+.sg-cell:nth-child(3n) .bt-img { animation-delay: -1.3s; } .sg-cell:nth-child(3n+1) .bt-img { animation-delay: -2.6s; }
+@keyframes btImgIdle { 50% { transform: translateY(-2.5%) scale(1.02); } }
+.g-bling .sg-cell.win .bt-img { animation: btImgWin .5s ease-in-out infinite alternate; }
+@keyframes btImgWin { from { transform: scale(1); } to { transform: scale(1.12) rotate(-4deg); } }
+.g-bling .sg-cell.scatter .bt-img { animation: crownFloat 1.6s ease-in-out infinite; filter: drop-shadow(0 0 8px rgba(74, 222, 128, .8)); }
+/* coins only float while the machine waits (fewer layers during spins, cascades and bonuses) */
+.g-bling.busy .sg-cell:not(.win):not(.scatter) .bt-img, .g-bling.in-free .sg-cell:not(.win):not(.scatter) .bt-img { animation: none; }
+.pay-sym .bt-img { width: 44px; height: 44px; animation: none; }
+.intro-glyph .bt-img { width: 130px; height: 130px; animation: none; }
+@media (prefers-reduced-motion: reduce) { .bt-img, .g-bling .sg-cell.win .bt-img, .g-bling .sg-cell.scatter .bt-img { animation: none; } }
 @media (prefers-reduced-motion: reduce) { .bt-beam, .bt-glitter, .g-bling .sg-cell::after { animation: none; } }
 .sg-cell.scatter { background: radial-gradient(circle, rgba(52, 211, 153, .35), transparent 70%); }
 .sg-cell.scatter svg { filter: drop-shadow(0 0 12px rgba(52, 211, 153, .95)); }
@@ -6506,7 +6524,7 @@ const SPECS = {
       ${sym('gk', 74, 262, 60, `filter="url(#glow${u})"`)}${sym('w', 230, 262, 52, `filter="url(#glow${u})"`)}`,
   },
   bling: {
-    bg: ['#3b0a5a', '#08020f'], light: '#f0abfc', title: ['LA TOUR', 'BLING'], font: 'bebas', metal: ['#fff', '#f0abfc', '#a21caf'], tag: 'CASCADES',
+    bg: ['#3b0a5a', '#08020f'], light: '#f0abfc', title: ['LA TOUR', 'BLING'], font: 'bebas', metal: ['#fff', '#f0abfc', '#a21caf'], tag: 'CASCADES', photo: 'assets/games/bling/cover.webp',
     art: (u) => `
       <g opacity=".5" filter="url(#soft${u})">${sym('sy-bl1', 56, 110, 64)}${sym('sy-bl2', 252, 124, 58)}</g>
       ${sym('sy-bl0', 150, 170, 190, `filter="url(#glow${u})"`)}
@@ -6915,6 +6933,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'bling', date: '2026-11-01', title: 'La Tour Bling peinte', items: ['Nouveaux symboles peints en pièces d’or : diamant, couronne, sac d’or, billets, pièce, champagne et billets volants', 'Nouveau scatter : la pièce au dollar vert', 'Nouveau décor : la ville de nuit sous la pluie', 'Nouvelle affiche : la cathédrale néon'] },
   { game: 'dragons', date: '2026-11-01', title: 'L’Hydre peinte', items: ['Nouvelles têtes de dragon peintes : vert, bleu, rouge, violet, noir, blanc, bronze, diamant et or', 'Nouvelle perle magique, pierre runique, scatter, SUPER scatter et bébé dragon multiplicateur', 'Nouveau décor : l’antre au trésor du dragon'] },
   { game: 'anubis', date: '2026-11-01', title: 'Bonus plus fluides', items: ['Jugement et Monde souterrain environ 2 fois plus fluides, surtout sur téléphone', 'Les symboles restent immobiles pendant les tours et ne bougent qu’à l’arrêt'] },
   { game: 'anubis', date: '2026-11-01', title: 'Jugement peint', items: ['Nouveau décor : la salle du trône en lave', 'Nouveaux cubes dessinés : pierre, noir et or, crâne violet, crâne doré et lave', 'Le trône se voit à travers la grille'] },
@@ -9528,7 +9547,7 @@ const FILES = {
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'cad2eb2bf8'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
-  bling: ['bling', 'games/impl/bling.js', 'BlingGame', '9640e5a788'],
+  bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '97b955eb3b'],
