@@ -130,7 +130,7 @@ function malletteBonus(startCells) {
 
 // Painted images from the owner (assets/games/labo/<name>.webp) replace the drawn art as soon as their name is
 // listed here: s0..s8 (symbols: leaf, joint, pills, mushroom, blotter, pink pill, powder bag, brick, boss), w (WILD), sc (rainbow spiral), case (briefcase), bg (lab background), demon (boss on his throne).
-const PAINTED = new Set(['s0', 's2', 's4', 's5', 's6', 's7', 's8', 'w', 'sc', 'bg', 'leaf', 'gleaf']); // + La Mallette: cup0, cup1, cup2 (green, blue, pink cups), leaf, gleaf (golden leaf), magic (magic cup)
+const PAINTED = new Set(['s0', 's2', 's4', 's5', 's6', 's7', 's8', 'w', 'sc', 'bg', 'leaf', 'gleaf', 'magic']); // + La Mallette: the taz are the brick (s7, small), purple (s8, medium) and diamond (s2, big) pills; leaf, gleaf (golden leaf), magic (magic taz)
 const IMG_V = 1;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const FILE = (v) => (v === WILD ? 'w' : v === SC ? 'sc' : v === CASE ? 'case' : `s${v}`);
@@ -141,9 +141,10 @@ const symArt = (v) => (painted(FILE(v)) ? img(FILE(v)) : art(SVGID(v)));
 
 const NAMES = ['Feuille', 'Joint', 'Cachet diamant', 'Champignon magique', 'Buvard LSD', 'Cachet rose', 'Poudre', 'Cachet brique', 'Le Boss'];
 const BUY_FS = 50, BUY_CASE = 33;
-const CUPN = ['Tasse verte', 'Tasse bleue', 'Tasse rose'], CUPC = ['#4ade80', '#38bdf8', '#f472b6'];
+const CUPN = ['Taz brique', 'Taz violette', 'Taz diamant'], CUPC = ['#ef4444', '#a855f7', '#38bdf8'];
 const bArt = (name, svg) => (painted(name) ? img(name) : art(svg));
-const cupArt = (k) => bArt(`cup${k}`, `lbcup${k}`);
+const TAZ = ['s7', 's8', 's2']; // small, medium, big multipliers
+const cupArt = (k) => bArt(TAZ[k], `lbcup${k}`);
 const HELL = ['#f472b6', '#fde047', '#4ade80', '#22d3ee', '#a855f7', '#f97316'];
 const GOLD = ['#fde047', '#fbbf24', '#fff7c2', '#f59e0b'];
 const xv = (m) => (m >= 10 ? String(Math.round(m * 10) / 10).replace('.', ',') : String(Math.round(m * 100) / 100).replace('.', ','));
@@ -169,7 +170,7 @@ class LaboGame extends BaseGame {
         <div class="lb-meter"><small>TRIP</small><b>×1</b></div>
         <div class="reels-host"></div><div class="lb-word"></div>`,
       buys: [
-        { id: 'case', icon: '💼', label: 'La Mallette · 3 mallettes', desc: 'Un tour avec 3 mallettes garanties : tasses, feuilles et fumée verte, écran plein = jackpot Le Cartel', cost: (b) => b * BUY_CASE },
+        { id: 'case', icon: '💼', label: 'La Mallette · 3 mallettes', desc: 'Un tour avec 3 mallettes garanties : taz, feuilles et fumée verte, écran plein = jackpot Le Cartel', cost: (b) => b * BUY_CASE },
         { id: 'fs', icon: '🔥', label: 'La Descente · 3 spirales', desc: `${FS_N[3]} tours gratuits, le multiplicateur monte à chaque gain`, cost: (b) => b * BUY_FS },
       ],
       hello: '1024 façons de gagner · le Dealer peut poser des WILD à tout moment',
@@ -331,9 +332,9 @@ class LaboGame extends BaseGame {
 
   async mallette(startCells, b) {
     const m = malletteBonus(startCells);
-    await this.featureIntro('LA MALLETTE', 'La fumée verte récolte les tasses · 5 tours, remis à 5 à chaque tasse · écran plein = JACKPOT LE CARTEL', symArt(CASE));
+    await this.featureIntro('LA MALLETTE', 'La fumée verte récolte les taz · 5 tours, remis à 5 à chaque taz · écran plein = JACKPOT LE CARTEL', symArt(CASE));
     this.slotEl.classList.add('in-case');
-    this.msg('La Mallette est ouverte : la fumée verte récolte les tasses, remplis l’écran !');
+    this.msg('La Mallette est ouverte : la fumée verte récolte les taz, remplis l’écran !');
     // the briefcases open into the first cups
     let run = 0;
     this.bcells.forEach((n, i) => this.setCell(i, null));
@@ -369,7 +370,7 @@ class LaboGame extends BaseGame {
           run += c.v - this.cellAt(j).v;
           this.setCell(j, c, true); this.setSmoke(run, b, true); sfx.coin();
         }
-        if (!l.hit.length) this.msg('Une feuille… mais aucune tasse à côté');
+        if (!l.hit.length) this.msg('Une feuille… mais aucune taz à côté');
         this.setCell(l.i, null);
       }
       for (const g of st.golds) {
@@ -382,7 +383,7 @@ class LaboGame extends BaseGame {
       }
       for (const g of st.magics) {
         this.setCell(g.i, { t: 'magic', v: 0 }, true);
-        sfx.feature(); this.word('TASSE MAGIQUE !', 'dealer');
+        sfx.feature(); this.word('TAZ MAGIQUE !', 'dealer');
         await this.wait(this.turbo ? 200 : 450);
         for (const j of g.from) { fx.trail(center(this.bcells[j]), center(this.bcells[g.i]), '#e879f9', 10); this.setCell(j, null); }
         await this.wait(this.turbo ? 250 : 550);
@@ -395,7 +396,7 @@ class LaboGame extends BaseGame {
       this.setBanner(`<b>LA MALLETTE</b><span class="pill">Tour ${done}</span><span class="pill hot">Tours restants ${st.left}</span><span class="pill gold">${fmtC(Math.round(run * b))}</span>`);
       await this.wait(this.turbo ? 120 : 320);
     }
-    if (m.jp && !this.dead) { this.msg('ÉCRAN PLEIN DE TASSES !'); await this.cartel(b); }
+    if (m.jp && !this.dead) { this.msg('ÉCRAN PLEIN DE TAZ !'); await this.cartel(b); }
     await this.wait(this.turbo ? 300 : 700);
     this.slotEl.classList.remove('in-case');
     this.setBanner('');
@@ -476,12 +477,12 @@ class LaboGame extends BaseGame {
       <h4>1024 façons de gagner</h4><p>Un symbole paie dès qu’il apparaît sur 3 rouleaux d’affilée ou plus depuis la gauche, à n’importe quelle hauteur.</p>
       <h4>WILD – Le Dealer</h4><p>À n’importe quel tour, le démon peut se pencher sur la machine et transformer 3 à 6 symboles des rouleaux 2 à 5 en WILD.</p>
       <h4>Free spins – La Descente</h4><p>${symArt(SC).replace('<svg', '<svg style="width:22px;height:22px;vertical-align:middle"')} 3, 4 ou 5 spirales : ${FS_N[3]}, ${FS_N[4]} ou ${FS_N[5]} tours gratuits. Le trip commence, les flammes arc-en-ciel envahissent l’écran : chaque tour gagnant ajoute +1 au multiplicateur, qui ne redescend jamais. 3 spirales de plus : +${RETRIG} tours. Le Dealer passe deux fois plus souvent.</p>
-      <h4>Bonus – La Mallette</h4><p>3 mallettes ou plus : chaque mallette devient une tasse et le bonus démarre avec <b>${B.spins} tours</b>. Les tasses restent en place, et chaque nouvelle tasse remet les tours à ${B.spins}. Chaque tasse envoie son multiplicateur dans la <b>fumée verte</b> au milieu, qui fait le total.</p>
+      <h4>Bonus – La Mallette</h4><p>3 mallettes ou plus : chaque mallette devient une taz et le bonus démarre avec <b>${B.spins} tours</b>. Les taz restent en place, et chaque nouvelle taz remet les tours à ${B.spins}. Chaque taz envoie son multiplicateur dans la <b>fumée verte</b> au milieu, qui fait le total.</p>
       <div class="paytable">${[0, 1, 2].map((k) => `<div class="pay-item"><div class="pay-sym svg">${cupArt(k)}</div><div class="pay-vals"><b>${CUPN[k]}</b><br><span>×${B.cupV[k].map((v) => xv(v[0])).join(', ×')} la mise</span></div></div>`).join('')}
-      <div class="pay-item"><div class="pay-sym svg">${bArt('leaf', 'lbbill')}</div><div class="pay-vals"><b>Feuille</b><br><span>Multiplie par ${B.leafX} toutes les tasses qui la touchent</span></div></div>
-      <div class="pay-item"><div class="pay-sym svg">${bArt('gleaf', 'lbgleaf')}</div><div class="pay-vals"><b>Feuille d’or</b><br><span>Multiplie par ${B.goldX} toutes les tasses de l’écran</span></div></div>
-      <div class="pay-item"><div class="pay-sym svg">${bArt('magic', 'lbmagic')}</div><div class="pay-vals"><b>Tasse magique</b><br><span>Aspire toutes les tasses et garde leur valeur : ça libère de la place</span></div></div></div>
-      <h4>Jackpot – Le Cartel</h4><p>Remplis <b>tout l’écran de tasses</b> pendant La Mallette : le démon se lève de son trône et ajoute <b>×${JPX} la mise</b>.</p>
+      <div class="pay-item"><div class="pay-sym svg">${bArt('leaf', 'lbbill')}</div><div class="pay-vals"><b>Feuille</b><br><span>Multiplie par ${B.leafX} toutes les taz qui la touchent</span></div></div>
+      <div class="pay-item"><div class="pay-sym svg">${bArt('gleaf', 'lbgleaf')}</div><div class="pay-vals"><b>Feuille d’or</b><br><span>Multiplie par ${B.goldX} toutes les taz de l’écran</span></div></div>
+      <div class="pay-item"><div class="pay-sym svg">${bArt('magic', 'lbmagic')}</div><div class="pay-vals"><b>Taz magique</b><br><span>Aspire toutes les taz et garde leur valeur : ça libère de la place</span></div></div></div>
+      <h4>Jackpot – Le Cartel</h4><p>Remplis <b>tout l’écran de taz</b> pendant La Mallette : le démon se lève de son trône et ajoute <b>×${JPX} la mise</b>.</p>
       <h4>Achats</h4><p>La Mallette ×${BUY_CASE} · La Descente ×${BUY_FS}. Gain maximum ×${CAPX.toLocaleString('fr-FR')}.</p>`);
   }
 }
