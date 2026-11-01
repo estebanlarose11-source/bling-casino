@@ -6779,7 +6779,7 @@ function gem(x, y, s, u) {
 
 const SPECS = {
   'big-bad-wolf': {
-    bg: ['#24123f', '#05060d'], light: '#fde68a', title: ['LE LOUP'], font: 'bebas', metal: ['#fff7d6', '#fbbf24', '#b45309'], tag: 'HOLD & SPIN',
+    bg: ['#24123f', '#05060d'], light: '#fde68a', title: ['LE LOUP'], font: 'bebas', metal: ['#fff7d6', '#fbbf24', '#b45309'], tag: 'HOLD & SPIN', photo: 'assets/games/wolf/cover.webp',
     hero: (u) => `
       <circle cx="226" cy="70" r="52" fill="url(#moon${u})" filter="url(#glow${u})"/>
       <g opacity=".7">${sym('hs', 40, 200, 70)}${sym('hw', 262, 196, 64)}</g>
@@ -7284,7 +7284,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'big-bad-wolf', date: '2026-11-01', title: 'Le Loup peint', items: ['Les images du Loup 2.0 : le loup, le cochon, les maisons et la pièce', 'Nouveau décor : la forêt enchantée', 'Mêmes règles, même Hold & Spin'] },
+  { game: 'big-bad-wolf', date: '2026-11-01', title: 'Le Loup peint', items: ['Les images du Loup 2.0 : le loup, le cochon, les maisons et la pièce', 'Nouveau décor : la forêt enchantée', 'Nouvelle jaquette : le loup qui hurle à la lune', 'Mêmes règles, même Hold & Spin'] },
   { game: 'huff', date: '2026-11-01', title: 'Le Loup 2.0 peint', items: ['Nouveau loup WILD, nouveau cochon casqué et nouvelles maisons en paille, en bois et en briques', 'Nouveau scatter : la pièce d’or', 'Nouveau décor : la prairie au soleil', 'Nouvelle jaquette : les trois petits cochons'] },
   { game: 'labo', date: '2026-11-01', title: 'La Mallette plus lisible', items: ['Grille du bonus aux mêmes dimensions que les rouleaux, cases bien carrées', 'Taz plus grandes avec leur valeur bien visible', 'La fumée verte passe en grand bandeau au-dessus de la grille'] },
   { game: 'labo', date: '2026-11-01', title: 'Cachets retouchés', items: ['Nouveau cachet ourson orange avec une étoile', 'Nouvelle taz brique avec un éclair gravé'] },
