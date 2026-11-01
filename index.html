@@ -2166,6 +2166,14 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .g-candy .sg-cell { border-radius: 14px; transition: none; background: linear-gradient(180deg, rgba(192, 38, 211, .22), rgba(59, 7, 100, .5)); box-shadow: inset 0 0 0 1px rgba(255, 158, 224, .18); }
 .g-candy .sg-cell.hi { background: linear-gradient(180deg, rgba(255, 79, 184, .3), rgba(59, 7, 100, .5)); }
 .g-candy .sg-sym svg { width: 90%; height: 90%; filter: none; }
+.g-candy .cq-sky { background: linear-gradient(180deg, rgba(40, 6, 60, .15), rgba(40, 6, 60, .05) 50%, rgba(40, 6, 60, .35)), var(--cq-bg) center / cover no-repeat !important; }
+.g-candy .cq-sky .cq-lolli { display: none; }
+.cq-img { width: 92%; height: 92%; object-fit: contain; display: block; border-radius: 14%; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .4)); }
+.g-candy .sg-cell.win .cq-img { animation: cqWinSym .6s ease-in-out infinite; }
+.g-candy .sg-cell.scatter .cq-img { animation: crownFloat 1.8s ease-in-out infinite; }
+.intro-glyph .cq-img { width: 140px; height: 140px; }
+.pay-sym .cq-img { width: 44px; height: 44px; }
+.g-candy .sg-cell .lbl.cql { z-index: 2; }
 .g-candy .sg-cell.win { z-index: 1; box-shadow: inset 0 0 0 3px #fff, inset 0 0 18px rgba(255, 79, 184, .75); }
 .g-candy .sg-cell.win .sg-sym svg { animation: cqWinSym .6s ease-in-out infinite; }
 @keyframes cqWinSym { 50% { transform: scale(1.1); } }
@@ -6841,7 +6849,7 @@ const SPECS = {
       ${sym('ch3', 50, 252, 66, `filter="url(#glow${u})"`)}${sym('ch7', 250, 250, 76, `filter="url(#sh${u})"`)}${sym('ch1', 196, 292, 40, `filter="url(#glow${u})"`)}`,
   },
   candy: {
-    bg: ['#8a0f74', '#14021f'], light: '#ff7ad9', title: ['LA SWEETY'], font: 'bebas', metal: ['#fff', '#ffb3e6', '#d0219a'], tag: '3 BONUS',
+    bg: ['#8a0f74', '#14021f'], light: '#ff7ad9', title: ['LA SWEETY'], font: 'bebas', metal: ['#fff', '#ffb3e6', '#d0219a'], tag: '3 BONUS', photo: 'assets/games/candy/cover.webp',
     hero: (u) => `
       ${sym('cq4', 42, 92, 52)}${sym('cq7', 262, 104, 50)}
       <use href="#cq-princess" x="44" y="-4" width="212" height="318" filter="url(#sh${u})"/>
@@ -7284,6 +7292,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'candy', date: '2026-11-01', title: 'La Sweety peinte', items: ['10 nouveaux bonbons : boule arc-en-ciel, bille bleue, étoile, cœur, sucette, donut, cupcake, glace, potion d’amour et bague diamant', 'Nouvelle couronne, nouveau cœur explosif, bocal bombe et baguette magique', 'Nouveau décor : le monde des bonbons et sa rivière', 'Nouvelle jaquette : le château de bonbons'] },
   { game: 'big-bad-wolf', date: '2026-11-01', title: 'Le Loup peint', items: ['Les images du Loup 2.0 : le loup, le cochon, les maisons et la pièce', 'Nouveau décor : la forêt enchantée', 'Nouvelle jaquette : le loup qui hurle à la lune', 'Mêmes règles, même Hold & Spin'] },
   { game: 'huff', date: '2026-11-01', title: 'Le Loup 2.0 peint', items: ['Nouveau loup WILD, nouveau cochon casqué et nouvelles maisons en paille, en bois et en briques', 'Nouveau scatter : la pièce d’or', 'Nouveau décor : la prairie au soleil', 'Nouvelle jaquette : les trois petits cochons'] },
   { game: 'labo', date: '2026-11-01', title: 'La Mallette plus lisible', items: ['Grille du bonus aux mêmes dimensions que les rouleaux, cases bien carrées', 'Taz plus grandes avec leur valeur bien visible', 'La fumée verte passe en grand bandeau au-dessus de la grille'] },
@@ -9909,7 +9918,7 @@ __mods['games/impl/index.js'] = (() => {
 const FILES = {
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', 'e5d34f1a35'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a1fe33533c'],
-  candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
+  candy: ['candy', 'games/impl/candy.js', 'CandyGame', 'd8d44e04d8'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'cad2eb2bf8'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],

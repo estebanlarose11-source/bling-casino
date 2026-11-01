@@ -6,7 +6,13 @@ __mods['games/impl/candy.js'] = (() => {
 // 12+: magic wand, every candy of the most common kind). In the Queen's Ball free spins the multiplier never resets.
 // Tuned by simulation (RTP ≈ 92 %, buys ≈ 88 %).
 
-const { BaseGame, fmtC, art } = __mods['core/base.js'];
+const { BaseGame, fmtC, art: svgArt } = __mods['core/base.js'];
+// Painted images from the owner (assets/games/candy): the 10 sweets s0..s9, the crown (scatter), the exploding heart,
+// the candy-jar bomb and the magic wand. Background bg.webp, cover cover.webp.
+const IMG_V = 1;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const PAINT = { cq0: 's0', cq1: 's1', cq2: 's2', cq3: 's3', cq4: 's4', cq5: 's5', cq6: 's6', cq7: 's7', cq8: 's8', cq9: 's9', cqs: 'crown', cqh: 'heart', cqj: 'jar', cqw: 'wand' };
+const art = (id) => (PAINT[id] ? `<img class="cq-img" src="${asset(`assets/games/candy/${PAINT[id]}.webp`)}" alt="" draggable="false" decoding="async">` : svgArt(id));
 const { SymbolGrid } = __mods['core/grid.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
@@ -138,6 +144,8 @@ class CandyGame extends BaseGame {
     });
     this.hunt = false;
     this.meterVal = this.q('.cq-meter b');
+    this.q('.cq-sky').style.setProperty('--cq-bg', `url("${asset('assets/games/candy/bg.webp')}")`);
+    Object.values(PAINT).forEach((n) => { new Image().src = asset(`assets/games/candy/${n}.webp`); });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: C, rows: R, game: this, art: sym,
       cls: (v) => (v === CROWN ? 'scatter' : v >= HEART ? 'rainbow special' : v >= 7 ? 'hi' : ''),
