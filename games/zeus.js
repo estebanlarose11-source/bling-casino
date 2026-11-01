@@ -106,7 +106,8 @@ __mods['games/impl/zeus.js'] = (() => {
 // Zeus Thunder: 6×5 pays anywhere, tumbles, winged multiplier orbs and 15 free spins with a global multiplier.
 // Math lives in zeus-engine.js (checked with scripts/sim-zeus.mjs).
 
-const { BaseGame, fmtC, art } = __mods['core/base.js'];
+const { BaseGame, fmtC } = __mods['core/base.js'];
+let { art } = __mods['core/base.js'];
 const { SymbolGrid } = __mods['core/grid.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { ZEUS_FIG } = __mods['art/zeus.js'];
@@ -116,6 +117,13 @@ const { fx, sleep, center } = __mods['fx.js'];
 const { el, animateNumber } = __mods['ui.js'];
 
 const IDS = ['z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8'];
+// Painted images from the owner (assets/games/zeus): the 9 symbols, the scatter (Zeus head), the multiplier orb
+// (fist and lightning), Zeus beside the grid, the background and the cover.
+const IMG_V = 1;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const PAINT = { z0: 's0', z1: 's1', z2: 's2', z3: 's3', z4: 's4', z5: 's5', z6: 's6', z7: 's7', z8: 's8', zsc: 'scatter', zorb: 'orb' };
+const svgArt = art;
+art = (id) => (PAINT[id] ? `<img class="z-img" src="${asset(`assets/games/zeus/${PAINT[id]}.webp`)}" alt="" draggable="false" decoding="async">` : svgArt(id));
 const NAMES = ['Saphir', 'Émeraude', 'Topaze', 'Améthyste', 'Rubis', 'Calice', 'Anneau', 'Sablier', 'Couronne'];
 const lab = (t) => `<b class="sg-lab">${t}</b>`;
 const cellArt = (c) => (c.s === ORB ? art('zorb') + lab('×' + c.m) : c.s === SC ? art('zsc') + '<i class="lbl zl">SCATTER</i>' : art(IDS[c.s]));
@@ -128,7 +136,7 @@ class ZeusGame extends BaseGame {
       frameCls: 'zeus-frame',
       stage: `<div class="zeus-stage">
         <div class="zeus-sky"><i class="cl c1"></i><i class="cl c2"></i><i class="cl c3"></i><i class="col l"></i><i class="col r"></i></div>
-        <div class="zeus-fig">${ZEUS_FIG}<div class="zeus-say"></div></div>
+        <div class="zeus-fig painted"><img class="z-fig-img" src="${asset('assets/games/zeus/zeus.webp')}" alt="" draggable="false"><div class="zeus-say"></div></div>
         <div class="zeus-board">
           <div class="zeus-top">
             <div class="zeus-plaque"><span>⚡</span>MONT OLYMPE<span>⚡</span></div>
@@ -141,6 +149,8 @@ class ZeusGame extends BaseGame {
       hello: '8 symboles identiques n’importe où pour gagner',
     });
     this.zeus = this.q('.zeus-fig');
+    this.q('.zeus-sky').style.setProperty('--z-bg', `url("${asset('assets/games/zeus/bg.webp')}")`);
+    Object.values(PAINT).forEach((n) => { new Image().src = asset(`assets/games/zeus/${n}.webp`); });
     this.meter = this.q('.zeus-mult');
     this.meterVal = 0;
     this.grid = new SymbolGrid(this.q('.grid-host'), { cols: COLS, rows: ROWS, game: this, art: cellArt, cls: cellCls });
@@ -177,7 +187,9 @@ class ZeusGame extends BaseGame {
   }
 
   bolt(target) {
-    const from = center(this.q('.z-hand')), to = center(target);
+    // the bolt leaves from Zeus' raised fist (top left of the painted figure)
+    const fig = this.q('.z-fig-img') || this.q('.z-hand'), r = fig.getBoundingClientRect();
+    const from = this.q('.z-hand') ? center(this.q('.z-hand')) : { x: r.left + r.width * 0.12, y: r.top + r.height * 0.1 }, to = center(target);
     const o = el('div', 'g-bolt g-overlay');
     let d = `M ${from.x} ${from.y}`;
     for (let i = 1; i <= 8; i++) { const k = i / 8; d += ` L ${from.x + (to.x - from.x) * k + (i < 8 ? (Math.random() - 0.5) * 34 : 0)} ${from.y + (to.y - from.y) * k + (i < 8 ? (Math.random() - 0.5) * 34 : 0)}`; }

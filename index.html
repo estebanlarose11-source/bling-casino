@@ -2079,6 +2079,16 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 @keyframes cloudDrift { from { translate: -20% 0; } to { translate: 60% 0; } }
 .zeus-sky .col { position: absolute; bottom: 0; width: 26px; height: 88%; opacity: .22; background: repeating-linear-gradient(90deg, #e2e8f0 0 4px, #94a3b8 4px 6px); border-radius: 3px 3px 0 0; box-shadow: 0 -10px 0 -2px #e2e8f0; }
 .zeus-sky .col.l { left: 2%; } .zeus-sky .col.r { right: 2%; }
+.g-zeus .zeus-sky { background: linear-gradient(180deg, rgba(10, 20, 60, .15), rgba(10, 20, 60, .05) 50%, rgba(10, 20, 60, .45)), var(--z-bg) center / cover no-repeat; }
+.g-zeus .zeus-sky .cl, .g-zeus .zeus-sky .col { display: none; }
+.zeus-fig.painted { align-items: flex-end; }
+.z-fig-img { width: 100%; max-height: 100%; object-fit: contain; object-position: bottom; display: block; transform-origin: 40% 90%; transition: transform .35s cubic-bezier(.3, 1.4, .5, 1), filter .35s; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .55)); pointer-events: none; user-select: none; }
+.zeus-fig.painted.raise .z-fig-img { transform: translateY(-4%) scale(1.08) rotate(-3deg); filter: drop-shadow(0 0 16px #93c5fd) drop-shadow(0 0 30px #fde047) brightness(1.15); }
+.zeus-fig.painted.flick .z-fig-img { transform: rotate(2deg) scale(1.03); filter: drop-shadow(0 0 12px #fde047) brightness(1.1); }
+.z-img { width: 90%; height: 90%; object-fit: contain; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .5)); }
+.g-zeus .sg-cell.win .z-img { animation: winBounce 1s ease-in-out infinite; }
+.intro-glyph .z-img { width: 140px; height: 140px; }
+.pay-sym .z-img { width: 44px; height: 44px; }
 .zeus-fig { position: relative; z-index: 1; align-self: stretch; display: flex; align-items: flex-end; justify-content: center; }
 .zeus-svg { width: 118%; max-width: none; margin-left: -6%; max-height: calc(100vh - var(--chrome) + 40px); filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .6)); overflow: visible; }
 .zeus-svg .z-body { animation: zBreath 3.2s ease-in-out infinite; transform-origin: 100px 300px; }
@@ -6803,7 +6813,7 @@ const SPECS = {
       ${coin(70, 280, 16, u)}${coin(236, 284, 13, u)}${coin(110, 292, 10, u)}`,
   },
   zeus: {
-    bg: ['#1e3a8a', '#05051a'], light: '#93c5fd', title: ['L’OLYMPE'], font: 'cinzel', metal: ['#fff', '#fde68a', '#b45309'], tag: '×500',
+    bg: ['#1e3a8a', '#05051a'], light: '#93c5fd', title: ['L’OLYMPE'], font: 'cinzel', metal: ['#fff', '#fde68a', '#b45309'], tag: '×500', photo: 'assets/games/zeus/cover.webp',
     hero: (u) => `
       <g stroke="#fff" fill="none" stroke-linejoin="round" filter="url(#glow${u})"><path d="M262 0 L236 60 L254 64 L222 132" stroke-width="3.5"/><path d="M36 6 L58 58 L42 62 L68 116" stroke-width="3"/></g>
       ${sym('zorb', 46, 176, 54, `filter="url(#glow${u})"`)}
@@ -7292,6 +7302,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'zeus', date: '2026-11-01', title: 'L’Olympe peint', items: ['Nouveaux symboles : saphir, émeraude, topaze, améthyste, rubis, calice, anneau, sablier et couronne', 'Nouveau scatter : la tête de Zeus · nouvel orbe : le poing de foudre', 'Nouveau Zeus à côté de la grille', 'Nouveau décor : le temple de l’Olympe · nouvelle jaquette'] },
   { game: 'candy', date: '2026-11-01', title: 'Multiplicateurs sur les cases', items: ['Chaque case gagnante prend un multiplicateur : ×2, puis il double à chaque nouvelle connexion', 'Une grappe paie avec la somme des multiplicateurs de ses cases, remis à zéro à la fin du tour', 'Bal de la Reine : toutes les cases démarrent à ×5 et gardent leur multiplicateur'] },
   { game: 'candy', date: '2026-11-01', title: 'La Sweety peinte', items: ['10 nouveaux bonbons : boule arc-en-ciel, bille bleue, étoile, cœur, sucette, donut, cupcake, glace, potion d’amour et bague diamant', 'Nouvelle couronne, nouveau cœur explosif, bocal bombe et baguette magique', 'Nouveau décor : le monde des bonbons et sa rivière', 'Nouvelle jaquette : le château de bonbons'] },
   { game: 'big-bad-wolf', date: '2026-11-01', title: 'Le Loup peint', items: ['Les images du Loup 2.0 : le loup, le cochon, les maisons et la pièce', 'Nouveau décor : la forêt enchantée', 'Nouvelle jaquette : le loup qui hurle à la lune', 'Mêmes règles, même Hold & Spin'] },
@@ -9917,7 +9928,7 @@ __mods['games/impl/index.js'] = (() => {
 // tools/build.py: run `python3 tools/build.py` after changing a file in games/.
 
 const FILES = {
-  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', 'e5d34f1a35'],
+  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '80e8346b32'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a1fe33533c'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'cad2eb2bf8'],
