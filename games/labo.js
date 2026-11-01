@@ -15,7 +15,7 @@ const { el } = __mods['ui.js'];
 /* ===ENGINE */
 // 5×4, 1024 ways. 9 symbols pay by ways from the left; WILD (Le Dealer) on reels 2-5 replaces them.
 // LE DEALER: on some spins the demon turns 3 to 6 symbols of reels 2-5 into WILDs.
-// 3+ PENTACLES (scatter): LA DESCENTE, free spins where the flame multiplier climbs +1 after every winning spin.
+// 3+ RAINBOW SPIRALS (scatter): LA DESCENTE, free spins where the flame multiplier climbs +1 after every winning spin.
 // 3+ BRIEFCASES (base game): LA MALLETTE opens and pays gold piles; a CARTEL bar inside = JACKPOT ×1000.
 const COLS = 5, ROWS = 4, N = 20, WILD = 9, SC = 10, CASE = 11, CAPX = 5000, JPX = 1000;
 const FS_N = { 3: 10, 4: 12, 5: 15 }, RETRIG = 5, CASE_N = { 3: 4, 4: 5, 5: 7 };
@@ -83,7 +83,7 @@ function mallette(cases) {
 /* ===END ENGINE */
 
 // Painted images from the owner (assets/games/labo/<name>.webp) replace the drawn art as soon as their name is
-// listed here: s0..s8 (symbols), w (WILD), sc (pentacle), case (briefcase), bg (lab background), demon (boss on his throne).
+// listed here: s0..s8 (symbols: leaf, joint, pills, mushroom, blotter, pink pill, powder bag, brick, boss), w (WILD), sc (rainbow spiral), case (briefcase), bg (lab background), demon (boss on his throne).
 const PAINTED = new Set([]);
 const IMG_V = 1;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
@@ -93,9 +93,9 @@ const painted = (name) => PAINTED.has(name);
 const img = (name, cls = 'lb-img') => `<img class="${cls}" src="${asset(`assets/games/labo/${name}.webp`)}" alt="" draggable="false" decoding="async">`;
 const symArt = (v) => (painted(FILE(v)) ? img(FILE(v)) : art(SVGID(v)));
 
-const NAMES = ['Briquet tempête', 'Téléphone', 'Pilules', 'Joint', 'Sachet', 'Cachet rose', 'Tête de mort', 'Sac de billets', 'Le Boss'];
+const NAMES = ['Feuille', 'Joint', 'Pilules', 'Champignon magique', 'Buvard', 'Cachet rose', 'Sachet de poudre', 'La Brique', 'Le Boss'];
 const BUY_FS = 50, BUY_CASE = 36;
-const HELL = ['#f97316', '#fde047', '#ef4444', '#a855f7', '#22c55e'];
+const HELL = ['#f472b6', '#fde047', '#4ade80', '#22d3ee', '#a855f7', '#f97316'];
 const GOLD = ['#fde047', '#fbbf24', '#fff7c2', '#f59e0b'];
 const xv = (m) => (m >= 10 ? String(Math.round(m * 10) / 10).replace('.', ',') : String(Math.round(m * 100) / 100).replace('.', ','));
 
@@ -106,23 +106,22 @@ class LaboGame extends BaseGame {
       frameCls: 'lb-frame',
       stage: `<div class="lb-scene">
           <svg class="lb-room" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-            <g class="lb-neon"><circle cx="200" cy="120" r="96" fill="none" stroke="#a855f7" stroke-width="3"/><path d="M200 26 L256 196 L110 90 H290 L144 196 Z" fill="none" stroke="#22c55e" stroke-width="2.4" stroke-linejoin="round"/></g>
-            <g class="lb-shelf"><rect x="0" y="70" width="80" height="5" fill="#1f2937"/><rect x="320" y="70" width="80" height="5" fill="#1f2937"/><rect x="0" y="140" width="70" height="5" fill="#1f2937"/><rect x="330" y="140" width="70" height="5" fill="#1f2937"/>
-              <path d="M12 70 v-14 l-6 -12 h18 l-6 12 v14z" fill="#22c55e" opacity=".7"/><path d="M36 70 v-24 h10 v24z" fill="#a855f7" opacity=".7"/><circle cx="62" cy="62" r="8" fill="#ec4899" opacity=".7"/>
-              <path d="M340 70 v-20 l-7 -10 h20 l-7 10 v20z" fill="#a855f7" opacity=".7"/><path d="M366 70 v-26 h9 v26z" fill="#22c55e" opacity=".7"/><circle cx="388" cy="63" r="7" fill="#22c55e" opacity=".6"/>
-              <path d="M14 140 v-18 h12 v18z" fill="#ec4899" opacity=".6"/><circle cx="48" cy="132" r="8" fill="#22c55e" opacity=".6"/><path d="M344 140 v-14 l-6 -10 h16 l-6 10 v14z" fill="#ec4899" opacity=".6"/><path d="M372 140 v-22 h10 v22z" fill="#a855f7" opacity=".6"/></g>
-            <g class="lb-chains" fill="none" stroke="#9ca3af" stroke-width="3" opacity=".55">${Array.from({ length: 9 }, (_, k) => `<ellipse cx="96" cy="${8 + k * 14}" rx="${k % 2 ? 2 : 5}" ry="7"/><ellipse cx="304" cy="${8 + k * 14}" rx="${k % 2 ? 2 : 5}" ry="7"/>`).join('')}</g>
-            <g class="lb-skulls" fill="#e7e5e4" opacity=".55"><use href="#lb6" x="84" y="128" width="24" height="24"/><use href="#lb6" x="292" y="128" width="24" height="24"/></g>
+            <g class="lb-neon" fill="none" stroke-width="5" stroke-linecap="round">${['#f472b6', '#fde047', '#4ade80', '#22d3ee', '#a855f7'].map((c, k) => `<path d="M${40 + k * 12} 300 A${160 - k * 12} ${160 - k * 12} 0 0 1 ${360 - k * 12} 300" stroke="${c}"/>`).join('')}</g>
+            <g class="lb-shelf"><rect x="0" y="70" width="80" height="5" fill="#4c1d95"/><rect x="320" y="70" width="80" height="5" fill="#4c1d95"/><rect x="0" y="150" width="70" height="5" fill="#4c1d95"/><rect x="330" y="150" width="70" height="5" fill="#4c1d95"/>
+              <path d="M12 70 v-14 l-6 -12 h18 l-6 12 v14z" fill="#4ade80" opacity=".85"/><path d="M36 70 v-24 h10 v24z" fill="#f472b6" opacity=".85"/><circle cx="62" cy="62" r="8" fill="#22d3ee" opacity=".85"/>
+              <path d="M340 70 v-20 l-7 -10 h20 l-7 10 v20z" fill="#fde047" opacity=".85"/><path d="M366 70 v-26 h9 v26z" fill="#a855f7" opacity=".85"/><circle cx="388" cy="63" r="7" fill="#4ade80" opacity=".85"/>
+              <use href="#lb3" x="6" y="118" width="32" height="32"/><use href="#lb3" x="40" y="128" width="22" height="22"/><use href="#lb3" x="360" y="118" width="32" height="32"/><use href="#lb3" x="338" y="128" width="22" height="22"/></g>
+            <g class="lb-signs"><use href="#lb0" x="66" y="6" width="54" height="54"/><use href="#lb0" x="280" y="6" width="54" height="54"/></g>
           </svg>
           <i class="lb-flames"></i><i class="lb-flames b"></i>
-          <div class="lb-bills">${Array.from({ length: 7 }, (_, k) => `<svg viewBox="0 0 64 34" style="--k:${k}" aria-hidden="true"><use href="#lbbill" width="64" height="34"/></svg>`).join('')}</div>
+          <div class="lb-bills">${Array.from({ length: 7 }, (_, k) => `<svg viewBox="0 0 64 64" style="--k:${k}" aria-hidden="true"><use href="#${['lbbill', 'lb2', 'lb5', 'lbbill', 'lb4', 'lb2', 'lbbill'][k]}" width="64" height="64"/></svg>`).join('')}</div>
         </div>
         <div class="lb-throne">${painted('demon') ? img('demon', 'lb-demon-img') : '<svg viewBox="0 0 400 300" aria-hidden="true"><use href="#lbdemon" width="400" height="300"/></svg>'}</div>
-        <div class="lb-meter"><small>FLAMMES</small><b>×1</b></div>
+        <div class="lb-meter"><small>TRIP</small><b>×1</b></div>
         <div class="reels-host"></div><div class="lb-word"></div>`,
       buys: [
         { id: 'case', icon: '💼', label: 'La Mallette · 3 mallettes', desc: 'Un tour avec 3 mallettes garanties : la mallette s’ouvre (et peut cacher le jackpot Le Cartel)', cost: (b) => b * BUY_CASE },
-        { id: 'fs', icon: '🔥', label: 'La Descente · 3 pentagrammes', desc: `${FS_N[3]} tours gratuits, le multiplicateur de flammes monte à chaque gain`, cost: (b) => b * BUY_FS },
+        { id: 'fs', icon: '🔥', label: 'La Descente · 3 spirales', desc: `${FS_N[3]} tours gratuits, le multiplicateur monte à chaque gain`, cost: (b) => b * BUY_FS },
       ],
       hello: '1024 façons de gagner · le Dealer peut poser des WILD à tout moment',
     });
@@ -151,10 +150,10 @@ class LaboGame extends BaseGame {
     if (pop) this.meter.animate([{ transform: 'scale(1.5)' }, { transform: 'scale(1)' }], { duration: 400, easing: 'cubic-bezier(.3,1.6,.5,1)' });
   }
 
-  // Banknotes flying over the whole screen.
+  // Leaves, pills and blotters raining over the whole screen.
   rain(n = 18) {
     for (let k = 0; k < Math.min(n, 30); k++) {
-      const d = el('div', 'lb-rain', '<svg viewBox="0 0 64 34"><use href="#lbbill" width="64" height="34"/></svg>');
+      const d = el('div', 'lb-rain', `<svg viewBox="0 0 64 64"><use href="#${['lbbill', 'lb2', 'lb5', 'lb4'][k % 4]}" width="64" height="64"/></svg>`);
       d.style.cssText = `left:${Math.random() * 100}vw;--r:${Math.random() * 720 - 360}deg;--dx:${(Math.random() - 0.5) * 160}px;animation-duration:${1.8 + Math.random() * 1.4}s;animation-delay:${k * 60}ms`;
       document.body.appendChild(d);
       setTimeout(() => d.remove(), 3800 + k * 60);
@@ -187,7 +186,7 @@ class LaboGame extends BaseGame {
       }
     } else if (total > 0) { if (total >= b * 20) this.rain(20); await this.celebrate(total); }
     this.setLast(total);
-    this.msg(total >= cap ? `GAIN MAXIMUM ! ${fmtC(total)}` : total > 0 ? `Total du tour : ${fmtC(total)}` : res.sc === 2 ? 'Presque… 2 pentagrammes' : 'Pas de gain');
+    this.msg(total >= cap ? `GAIN MAXIMUM ! ${fmtC(total)}` : total > 0 ? `Total du tour : ${fmtC(total)}` : res.sc === 2 ? 'Presque… 2 spirales' : 'Pas de gain');
   }
 
   // Reels land, the Dealer may come, then the ways wins light up.
@@ -205,7 +204,7 @@ class LaboGame extends BaseGame {
     this.msg(res.wins.slice(0, 3).map((w) => `${w.n} × ${NAMES[w.s]}${w.ways > 1 ? ` (${w.ways} façons)` : ''}`).join(' · ') + (res.wins.length > 3 ? ` · +${res.wins.length - 3}` : '') + ` : +${fmtC(amt)}${mult > 1 ? ` <span class="pill hot">×${mult}</span>` : ''}`);
     this.winAmt.textContent = fmtC(amt);
     sfx.win();
-    if (res.x >= 5) { this.word(res.x * mult >= 20 ? 'LE CARTEL PAIE !' : 'BINGO !', 'big'); this.shake(); }
+    if (res.x >= 5) { this.word(res.x * mult >= 20 ? 'QUEL TRIP !' : 'PLANANT !', 'big'); this.shake(); }
     await this.wait(this.turbo ? 500 : 1000);
     this.reels.unmark();
   }
@@ -307,13 +306,13 @@ class LaboGame extends BaseGame {
     const b = this.bet;
     let left = n, tot = 0, done = 0, m = 1;
     this.lastStake = b;
-    await this.featureIntro('LA DESCENTE', `${n} tours gratuits · les flammes montent : +1 au multiplicateur à chaque gain`, symArt(SC));
+    await this.featureIntro('LA DESCENTE', `${n} tours gratuits · le trip monte : +1 au multiplicateur à chaque gain`, symArt(SC));
     this.inFree = true;
     this.slotEl.classList.add('in-free');
     this.setMult(1);
     while (left > 0 && tot < room && !this.dead) {
       left--; done++;
-      this.setBanner(`<b>LA DESCENTE</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill hot">Flammes ×${m}</span><span class="pill gold">Gain ${fmtC(tot)}</span>`);
+      this.setBanner(`<b>LA DESCENTE</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill hot">Trip ×${m}</span><span class="pill gold">Gain ${fmtC(tot)}</span>`);
       const res = spin({ fs: true });
       await this.show(res, b, m);
       if (this.dead) break;
@@ -321,7 +320,7 @@ class LaboGame extends BaseGame {
       tot += add;
       if (add > 0) { this.win(add, 'La Descente'); this.setLast(tot); }
       if (res.x > 0) { m++; this.setMult(m, true); this.flames(); }
-      if (res.sc >= 3) { left += RETRIG; await this.featureIntro(`+${RETRIG} TOURS`, 'Encore plus profond…', symArt(SC), 1300); }
+      if (res.sc >= 3) { left += RETRIG; await this.featureIntro(`+${RETRIG} TOURS`, 'Le trip continue…', symArt(SC), 1300); }
       await this.wait(this.turbo ? 120 : 300);
     }
     this.inFree = false;
@@ -343,7 +342,7 @@ class LaboGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym svg">${symArt(WILD)}</div><div class="pay-vals"><b>WILD · Le Dealer</b><br><span>Rouleaux 2 à 5, remplace tous les symboles</span></div></div></div>
       <h4>1024 façons de gagner</h4><p>Un symbole paie dès qu’il apparaît sur 3 rouleaux d’affilée ou plus depuis la gauche, à n’importe quelle hauteur.</p>
       <h4>WILD – Le Dealer</h4><p>À n’importe quel tour, le démon peut se pencher sur la machine et transformer 3 à 6 symboles des rouleaux 2 à 5 en WILD.</p>
-      <h4>Free spins – La Descente</h4><p>${symArt(SC).replace('<svg', '<svg style="width:22px;height:22px;vertical-align:middle"')} 3, 4 ou 5 pentagrammes : ${FS_N[3]}, ${FS_N[4]} ou ${FS_N[5]} tours gratuits. Les flammes envahissent l’écran : chaque tour gagnant ajoute +1 au multiplicateur de flammes, qui ne redescend jamais. 3 pentagrammes de plus : +${RETRIG} tours. Le Dealer passe deux fois plus souvent.</p>
+      <h4>Free spins – La Descente</h4><p>${symArt(SC).replace('<svg', '<svg style="width:22px;height:22px;vertical-align:middle"')} 3, 4 ou 5 spirales : ${FS_N[3]}, ${FS_N[4]} ou ${FS_N[5]} tours gratuits. Le trip commence, les flammes arc-en-ciel envahissent l’écran : chaque tour gagnant ajoute +1 au multiplicateur, qui ne redescend jamais. 3 spirales de plus : +${RETRIG} tours. Le Dealer passe deux fois plus souvent.</p>
       <h4>Bonus – La Mallette</h4><p>3, 4 ou 5 mallettes : la mallette s’ouvre sur ${CASE_N[3]}, ${CASE_N[4]} ou ${CASE_N[5]} tas d’or, de ×2 à ×75 la mise chacun.</p>
       <h4>Jackpot – Le Cartel</h4><p>Dans la mallette peut se cacher le <b>lingot du Cartel</b> : le démon se lève de son trône et paie <b>×${JPX} la mise</b>.</p>
       <h4>Achats</h4><p>La Mallette ×${BUY_CASE} · La Descente ×${BUY_FS}. Gain maximum ×${CAPX.toLocaleString('fr-FR')}.</p>`);
