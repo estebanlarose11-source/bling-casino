@@ -190,7 +190,7 @@ h1, h2, h3, h4 { margin: 0; line-height: 1.15; }
 .demo-tag { font-size: 11px; font-weight: 800; letter-spacing: 1px; padding: 6px 10px; border-radius: 8px; color: var(--gold); background: rgba(251, 191, 36, .1); border: 1px solid rgba(251, 191, 36, .3); }
 
 .view { margin-left: var(--side); padding: 24px; max-width: calc(1240px + var(--side)); min-height: calc(100vh - var(--top) - 60px); }
-.view.enter { animation: viewIn .35s ease both; }
+.view.enter { animation: viewIn .35s ease backwards; }
 @keyframes viewIn { from { opacity: 0; transform: translateY(8px); } }
 .foot { margin-left: var(--side); padding: 20px 24px 28px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); }
 .foot a { color: var(--text); text-decoration: underline; }
@@ -1082,7 +1082,7 @@ body.gated { overflow: hidden; }
 .g-bling { --slot-bg: radial-gradient(500px 260px at 50% -5%, rgba(255, 45, 149, .3), transparent 70%), linear-gradient(180deg, #2a0b3d 0%, #12061f 100%); }
 .g-bling .slot-stage { position: relative; overflow: hidden; }
 .g-bling .slot-stage > :not(.bt-bg) { position: relative; z-index: 1; }
-.g-bling .sg-cell { background: linear-gradient(160deg, rgba(255, 255, 255, .14), rgba(162, 43, 255, .18) 40%, rgba(255, 45, 149, .1)); box-shadow: inset 0 0 0 1px rgba(244, 114, 182, .28), inset 0 10px 18px -12px rgba(255, 255, 255, .5); backdrop-filter: none; }
+.g-bling .sg-cell { background: linear-gradient(160deg, rgba(255, 255, 255, .14), rgba(162, 43, 255, .18) 40%, rgba(255, 45, 149, .1)); box-shadow: inset 0 0 0 1px rgba(244, 114, 182, .28), inset 0 10px 18px -12px rgba(255, 255, 255, .5); }
 .g-bling .sg-cell::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, .22) 48%, transparent 60%); background-size: 260% 100%; animation: btSheen 5s ease-in-out infinite; }
 .g-bling .sg-cell:nth-child(2n)::after { animation-delay: -1.2s; } .g-bling .sg-cell:nth-child(3n)::after { animation-delay: -2.6s; }
 @keyframes btSheen { 0%, 70% { background-position: 130% 0; } 100% { background-position: -130% 0; } }
@@ -1136,8 +1136,8 @@ body.gated { overflow: hidden; }
 
 /* ============ Anubis Reborn ============ */
 .g-anubis { --slot-bg: radial-gradient(520px 260px at 50% -5%, rgba(19, 168, 160, .35), transparent 70%), linear-gradient(180deg, #0e2a3a 0%, #070d1c 100%); }
-.g-anubis.under .slot-bg { filter: hue-rotate(160deg) saturate(1.3) brightness(.8); }
-.g-anubis.judge .slot-bg { filter: hue-rotate(-30deg) brightness(.7) saturate(1.6); }
+.g-anubis.under .slot-bg { filter: none; }
+.g-anubis.judge .slot-bg { filter: none; }
 .g-anubis .sg-cell { background: linear-gradient(180deg, rgba(19, 168, 160, .12), rgba(14, 26, 56, .3)); }
 .g-anubis .slot-stage { position: relative; overflow: hidden; }
 .g-anubis .slot-stage > :not(.an-bg) { position: relative; z-index: 1; }
@@ -1158,19 +1158,20 @@ body.gated { overflow: hidden; }
 .g-anubis .an-bg { will-change: transform; background: linear-gradient(180deg, rgba(4, 10, 20, .35), rgba(4, 10, 20, .15) 40%, rgba(10, 6, 2, .55)), url(assets/games/anubis/bg.webp?v=1) center 42% / cover no-repeat, #0b1424; }
 .g-anubis .an-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, .45), transparent 70%); pointer-events: none; }
 .g-anubis .an-relief, .g-anubis .an-torch { display: none; }
-.g-anubis .grid-host .sg-cell { background: radial-gradient(circle at 50% 42%, rgba(253, 230, 138, .14), rgba(8, 16, 30, .55) 72%); box-shadow: inset 0 0 0 1px rgba(253, 230, 138, .22), inset 0 -6px 14px rgba(0, 0, 0, .35); backdrop-filter: blur(1.5px); }
-.an-img { width: 94%; height: 94%; object-fit: contain; display: block; margin: auto; pointer-events: none; user-select: none; -webkit-user-drag: none;
-  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, .65)); animation: anImgIdle 4s ease-in-out infinite; }
+.g-anubis .grid-host .sg-cell { background: radial-gradient(circle at 50% 42%, rgba(253, 230, 138, .14), rgba(8, 16, 30, .55) 72%); box-shadow: inset 0 0 0 1px rgba(253, 230, 138, .22), inset 0 -6px 14px rgba(0, 0, 0, .35); }
+.an-img { width: 94%; height: 94%; object-fit: contain; display: block; margin: auto; pointer-events: none; user-select: none; -webkit-user-drag: none; animation: anImgIdle 4s ease-in-out infinite; }
 .sg-cell:nth-child(3n) .an-img { animation-delay: -1.3s; } .sg-cell:nth-child(3n+1) .an-img { animation-delay: -2.6s; }
 @keyframes anImgIdle { 50% { transform: translateY(-2.5%) scale(1.02); } }
 .g-anubis .sg-cell.win .an-img { animation: anImgWin .5s ease-in-out infinite alternate; }
-@keyframes anImgWin { from { transform: scale(1); filter: drop-shadow(0 0 4px #fde68a) brightness(1.1); } to { transform: scale(1.14) rotate(-3deg); filter: drop-shadow(0 0 14px #fbbf24) drop-shadow(0 0 4px #fff) brightness(1.3); } }
+@keyframes anImgWin { from { transform: scale(1); } to { transform: scale(1.14) rotate(-3deg); } }
+/* symbols only float while the machine waits: during spins, cascades and bonuses they stay still (far fewer layers) */
+.g-anubis.busy .sg-cell:not(.win) .an-img, .g-anubis.in-free .sg-cell:not(.win) .an-img { animation: none; }
 .pay-sym .an-img { animation: none; }
 @media (prefers-reduced-motion: reduce) { .an-img, .g-anubis .sg-cell.win .an-img { animation: none; } }
 .g-anubis.under .an-bg { filter: none; background: linear-gradient(180deg, rgba(2, 10, 20, .35), rgba(2, 10, 20, .1) 40%, rgba(2, 8, 14, .55)), url(assets/games/anubis/bg-under.webp?v=1) center 45% / cover no-repeat, #06121c; }
 .g-anubis.under .an-bg::after { background: radial-gradient(ellipse at 50% 55%, rgba(94, 234, 212, .18), transparent 60%), radial-gradient(ellipse at 50% 50%, rgba(0, 0, 0, .35), transparent 75%); animation: anPortal 3s ease-in-out infinite alternate; }
 @keyframes anPortal { to { opacity: .55; } }
-.g-anubis.under .an-sand { filter: hue-rotate(140deg) brightness(1.3); }
+.g-anubis.under .an-sand { opacity: .5; }
 .an-img.gk { animation: anGk 1.6s ease-in-out infinite; }
 @keyframes anGk { 50% { transform: scale(1.08); } }
 .g-anubis.judge .an-bg { background: radial-gradient(ellipse at 50% 110%, rgba(239, 68, 68, .45), transparent 60%), linear-gradient(180deg, #1a0606, #0c0505); }
@@ -1300,6 +1301,9 @@ body.gated { overflow: hidden; }
 .jbars i { height: 12px; border-radius: 3px; background: #1c1d1c; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .8), 0 0 0 1px #3a3d3b; transition: background .25s, box-shadow .25s; }
 .jbars i.on { background: linear-gradient(180deg, #fef08a, #facc15 50%, #a16207); box-shadow: 0 0 10px rgba(250, 204, 21, .55), 0 0 0 1px #fde68a; }
 @media (prefers-reduced-motion: reduce) { .an-embers { animation: none; } }
+@media (max-width: 900px) {
+  .top, .bottom-nav { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; background: #110d0f !important; }
+}
 @media (prefers-reduced-motion: reduce) { .an-sand, .an-sun, .g-anubis .sg-cell.lava::before, .g-anubis .sg-cell.lava::after { animation: none; } }
 .sg-cell.wild svg { filter: drop-shadow(0 0 12px rgba(248, 113, 113, .95)); animation: orbPulse 1.6s ease-in-out infinite; }
 @keyframes orbPulse { 50% { scale: 1.08; } }
@@ -3181,7 +3185,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
 
 
 /* page change: a soft blur-in, then each block arrives one after the other */
-@keyframes viewIn { from { opacity: 0; transform: translateY(14px) scale(.99); filter: blur(6px); } }
+@keyframes viewIn { from { opacity: 0; transform: translateY(14px) scale(.99); } }
 .view.enter > * { animation: proRise .55s cubic-bezier(.2, .8, .2, 1) both; }
 .view.enter > *:nth-child(2) { animation-delay: .06s; } .view.enter > *:nth-child(3) { animation-delay: .12s; } .view.enter > *:nth-child(4) { animation-delay: .18s; }
 .view.enter > *:nth-child(5) { animation-delay: .24s; } .view.enter > *:nth-child(n+6) { animation-delay: .3s; }
@@ -6804,6 +6808,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'anubis', date: '2026-11-01', title: 'Bonus plus fluides', items: ['Jugement et Monde souterrain environ 2 fois plus fluides, surtout sur téléphone', 'Les symboles restent immobiles pendant les tours et ne bougent qu’à l’arrêt'] },
   { game: 'anubis', date: '2026-11-01', title: 'Jugement peint', items: ['Nouveau décor : la salle du trône en lave', 'Nouveaux cubes dessinés : pierre, noir et or, crâne violet, crâne doré et lave', 'Le trône se voit à travers la grille'] },
   { game: 'anubis', date: '2026-11-01', title: 'Monde souterrain peint', items: ['Nouveau décor : le temple souterrain et son portail lumineux', 'Nouveau crâne doré qui brille, avec son multiplicateur'] },
   { game: 'anubis', date: '2026-10-31', title: 'Tous les symboles peints', items: ['Nouveau WILD en orbe rouge et nouveau symbole BONUS au crâne doré', 'Nouvelle gemme orange : tous les symboles sont maintenant peints'] },
