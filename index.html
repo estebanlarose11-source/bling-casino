@@ -2027,6 +2027,39 @@ body.fs-on { overflow: hidden; }
   .game-host.is-full .mw-zone { --mwz: min(78%, calc(100vh - 160px)); margin-left: auto; margin-right: 6%; }
   .game-host.is-full .mw-host { left: -27%; width: 30%; }
 }
+/* ============ Clean painted slots (owner's backgrounds and symbols): the picture behind the whole machine, no title, no frames ============ */
+.slot.g-anubis > .slot-bg { background: url(assets/games/anubis/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.slot.g-dragons > .slot-bg { background: url(assets/games/dragons/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.slot.g-bling > .slot-bg { background: url(assets/games/bling/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.slot.g-labo > .slot-bg { background: url(assets/games/labo/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.slot.g-huff > .slot-bg { background: url(assets/games/huff/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.slot.g-candy > .slot-bg { background: url(assets/games/candy/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.slot.theme-wolf > .slot-bg { background: url(assets/games/wolf/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.slot.g-anubis.under > .slot-bg { background-image: url(assets/games/anubis/bg-under.webp?v=1) !important; }
+.slot.g-anubis.judge > .slot-bg { background-image: url(assets/games/anubis/bg-judge.webp?v=1) !important; }
+.g-anubis > .slot-bg::after, .g-dragons > .slot-bg::after, .g-bling > .slot-bg::after, .g-labo > .slot-bg::after, .g-huff > .slot-bg::after, .g-candy > .slot-bg::after, .slot.theme-wolf > .slot-bg::after { display: none; }
+.g-anubis .slot-title, .g-dragons .slot-title, .g-bling .slot-title, .g-labo .slot-title, .g-huff .slot-title, .g-candy .slot-title, .slot.theme-wolf .slot-title { display: none !important; }
+.g-anubis .slot-head, .g-dragons .slot-head, .g-bling .slot-head, .g-labo .slot-head, .g-huff .slot-head, .g-candy .slot-head, .slot.theme-wolf .slot-head { margin-bottom: 6px; justify-content: center; }
+.g-bling .slot-head, .g-labo .slot-head, .g-candy .slot-head, .g-dragons .slot-head { display: none; }
+.g-anubis > .slot-frame, .g-dragons > .slot-frame, .g-bling > .slot-frame, .g-labo > .slot-frame, .g-huff > .slot-frame, .g-candy > .slot-frame, .slot.theme-wolf > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.g-anubis > .slot-frame > .slot-stage, .g-dragons > .slot-frame > .slot-stage, .g-bling > .slot-frame > .slot-stage, .g-labo > .slot-frame > .slot-stage, .g-huff > .slot-frame > .slot-stage, .g-candy > .slot-frame > .slot-stage, .slot.theme-wolf > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; }
+.g-anubis .an-bg, .g-anubis.under .an-bg, .g-anubis.judge .an-bg { background: none !important; }
+.g-anubis .an-bg::after { display: none; }
+.g-dragons .dg-lair { background: none !important; }
+.g-bling .bt-bg { background: none !important; } .g-bling .bt-photo, .g-bling .bt-city { display: none !important; }
+.g-labo .lb-scene { background: none !important; } .g-labo .lb-scene.photo::before { display: none; }
+.g-candy .cq-stage .cq-sky { background: none !important; }
+.slot.g-huff .slot-stage, .slot.theme-wolf .slot-stage { background: none !important; }
+.g-anubis .win-bar, .g-dragons .win-bar, .g-bling .win-bar, .g-labo .win-bar, .g-huff .win-bar, .g-candy .win-bar, .slot.theme-wolf .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.g-anubis .controls, .g-dragons .controls, .g-bling .controls, .g-labo .controls, .g-huff .controls, .g-candy .controls, .slot.theme-wolf .controls { background: rgba(6, 10, 24, .5); border-color: rgba(255, 255, 255, .14); }
+.game-host.is-full:has(> .slot.g-anubis), .game-host.is-full:has(> .slot.g-dragons), .game-host.is-full:has(> .slot.g-bling), .game-host.is-full:has(> .slot.g-labo), .game-host.is-full:has(> .slot.g-huff), .game-host.is-full:has(> .slot.g-candy), .game-host.is-full:has(> .slot.theme-wolf) { padding: 0; background: #05060c; }
+.game-host.is-full > .slot.g-anubis, .game-host.is-full > .slot.g-dragons, .game-host.is-full > .slot.g-bling, .game-host.is-full > .slot.g-labo, .game-host.is-full > .slot.g-huff, .game-host.is-full > .slot.g-candy, .game-host.is-full > .slot.theme-wolf { width: 100%; max-width: none !important; min-height: 100%; margin: 0; border-radius: 0; border: 0; display: flex; flex-direction: column; justify-content: center; padding: max(8px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px)); }
+.game-host.is-full > .slot.g-anubis > .slot-bg, .game-host.is-full > .slot.g-dragons > .slot-bg, .game-host.is-full > .slot.g-bling > .slot-bg, .game-host.is-full > .slot.g-labo > .slot-bg, .game-host.is-full > .slot.g-huff > .slot-bg, .game-host.is-full > .slot.g-candy > .slot-bg, .game-host.is-full > .slot.theme-wolf > .slot-bg { grid-column: auto !important; grid-row: auto !important; position: absolute; inset: 0; }
+.game-host.is-full > .slot.g-anubis .controls, .game-host.is-full > .slot.g-dragons .controls, .game-host.is-full > .slot.g-bling .controls, .game-host.is-full > .slot.g-labo .controls, .game-host.is-full > .slot.g-huff .controls, .game-host.is-full > .slot.g-candy .controls, .game-host.is-full > .slot.theme-wolf .controls { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+.game-host.is-full > .slot.theme-wolf > .slot-frame { width: 100%; max-width: calc((100dvh - 250px) * 5 / 3); margin-left: auto; margin-right: auto; }
+@media (orientation: landscape) and (max-height: 560px) { .game-host.is-full > .slot.theme-wolf > .slot-frame { max-width: none; } }
+.game-host.is-full:has(> .g-anubis, > .g-bling, > .g-candy, > .g-labo) { --chrome: 175px; }
+@media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .g-anubis, > .g-bling) { --chrome: 30px; } .game-host.is-full:has(> .g-candy, > .g-labo) { --chrome: 60px; } }
 /* phone held sideways: slots get the grid on the left and the controls in a side column */
 @media (orientation: landscape) and (max-height: 560px) {
   .game-host.is-full { --chrome: 96px; padding: 4px max(8px, env(safe-area-inset-right, 0px)) 4px max(8px, env(safe-area-inset-left, 0px)); }
@@ -7358,6 +7391,14 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'anubis', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
+  { game: 'dragons', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
+  { game: 'bling', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
+  { game: 'labo', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
+  { game: 'huff', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
+  { game: 'big-bad-wolf', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
+  { game: 'candy', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
+  { game: 'zeus', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
   { game: 'zeus', date: '2026-11-01', title: 'L’Olympe peint', items: ['Nouveaux symboles : saphir, émeraude, topaze, améthyste, rubis, calice, anneau, sablier et couronne', 'Nouveau scatter : la tête de Zeus · nouvel orbe : le poing de foudre', 'Nouveau Zeus à côté de la grille', 'Nouveau décor : le temple de l’Olympe · nouvelle jaquette'] },
   { game: 'candy', date: '2026-11-01', title: 'Multiplicateurs sur les cases', items: ['Chaque case gagnante prend un multiplicateur : ×2, puis il double à chaque nouvelle connexion', 'Une grappe paie avec la somme des multiplicateurs de ses cases, remis à zéro à la fin du tour', 'Bal de la Reine : toutes les cases démarrent à ×5 et gardent leur multiplicateur'] },
   { game: 'candy', date: '2026-11-01', title: 'La Sweety peinte', items: ['10 nouveaux bonbons : boule arc-en-ciel, bille bleue, étoile, cœur, sucette, donut, cupcake, glace, potion d’amour et bague diamant', 'Nouvelle couronne, nouveau cœur explosif, bocal bombe et baguette magique', 'Nouveau décor : le monde des bonbons et sa rivière', 'Nouvelle jaquette : le château de bonbons'] },
