@@ -130,7 +130,7 @@ function malletteBonus(startCells) {
 
 // Painted images from the owner (assets/games/labo/<name>.webp) replace the drawn art as soon as their name is
 // listed here: s0..s8 (symbols: leaf, joint, pills, mushroom, blotter, pink pill, powder bag, brick, boss), w (WILD), sc (rainbow spiral), case (briefcase), bg (lab background), demon (boss on his throne).
-const PAINTED = new Set(['s0', 's2', 's4', 's5', 's6', 's7', 's8', 'w', 'sc', 'bg', 'leaf', 'gleaf', 'magic']); // + La Mallette: the taz are the brick (s7, small), purple (s8, medium) and diamond (s2, big) pills; leaf, gleaf (golden leaf), magic (magic taz)
+const PAINTED = new Set(['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 'w', 'sc', 'bg', 'leaf', 'gleaf', 'magic']); // + La Mallette: the taz are the brick (s7, small), purple (s8, medium) and diamond (s2, big) pills; leaf, gleaf (golden leaf), magic (magic taz)
 const IMG_V = 1;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const FILE = (v) => (v === WILD ? 'w' : v === SC ? 'sc' : v === CASE ? 'case' : `s${v}`);
