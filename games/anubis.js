@@ -52,10 +52,11 @@ function pickItem(cubes) {
 
 const MUSIC = { sd: 0.3, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.02, dur: 2.2, map: { 0: [0, 3, 7], 8: [-4, 0, 3] } }, lead: { wave: 'triangle', vol: 0.06, dur: 0.5, pat: [null, null, null, null, 12, null, null, 15, null, null, null, null, 14, null, 12, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.9, pat: [-12, null, null, null, null, null, null, null, -16, null, null, null, null, null, null, null] }, kick: [0, 3, 8, 11], kv: 0.28 };
 const NAMES = ['Anubis', 'Masque de pharaon', 'Œil d’Horus', 'Scarabée', 'Ankh', 'Vase canope', 'Pyramide', 'Gemme turquoise', 'Gemme orange'];
-// Painted symbols (assets/games/anubis/s0..s7.webp); the last gem, the joker and the scatter are still drawn in SVG.
-const IMG_V = 1, IMG_N = 8;
+// Painted symbols: assets/games/anubis/s0..s8.webp, w.webp (joker), sc.webp (scatter).
+const IMG_V = 2, IMG_N = 9;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
-const imgSym = (v) => `<img class="an-img" src="${asset(`assets/games/anubis/s${v}.webp`)}" alt="" draggable="false" decoding="async">`;
+const imgFile = (v) => (v === -2 ? 'w' : v === -1 ? 'sc' : `s${v}`); // WILD = -2, SC = -1 (see the engine)
+const imgSym = (v) => `<img class="an-img" src="${asset(`assets/games/anubis/${imgFile(v)}.webp`)}" alt="" draggable="false" decoding="async">`;
 const BUYU = 100, BUYJ = 150;
 const fxv = (v) => (v >= 10000 ? Math.round(v / 1000) + 'k' : v >= 1000 ? (v / 1000).toFixed(1).replace('.', ',') + 'k' : String(v));
 const lab = (t) => `<b class="sg-lab">${t}</b>`;
@@ -78,8 +79,8 @@ const WORDS = ['DIVIN !', 'SACRÉ !', 'PHARAONIQUE !', 'ÉTERNEL !', 'IMMORTEL !
 const GOLD = ['#fde68a', '#f59e0b', '#fff', '#5eead4'];
 function symArt(v) {
   if (v >= 1000) return art('gk') + lab('×' + (v - 1000));
-  if (v >= 0 && v < IMG_N) return imgSym(v);
-  return art(v === WILD ? 'w' : v === SC ? 'sc' : 's' + v);
+  if ((v >= 0 && v < IMG_N) || v === WILD || v === SC) return imgSym(v);
+  return art('s' + v);
 }
 
 class AnubisGame extends BaseGame {
@@ -101,7 +102,7 @@ class AnubisGame extends BaseGame {
     this.mrow.innerHTML = Array.from({ length: C }, () => '<div>×0</div>').join('');
     this.jrow.innerHTML = Array.from({ length: C }, () => '<div><b><i>×</i>1</b><i class="lbl"></i></div>').join('');
     // load the painted symbols and the temple right away, so the first spin shows no empty cell
-    for (let i = 0; i < IMG_N; i++) { const im = new Image(); im.src = asset(`assets/games/anubis/s${i}.webp`); }
+    [...Array(IMG_N).keys(), WILD, SC].forEach((v) => { new Image().src = asset(`assets/games/anubis/${imgFile(v)}.webp`); });
     new Image().src = asset('assets/games/anubis/bg.webp');
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: C, rows: R, game: this, art: symArt,
@@ -259,7 +260,7 @@ class AnubisGame extends BaseGame {
   async underworld() {
     const M = [0, 0, 0, 0, 0], cap = this.bet * CAPX;
     let sum = 0;
-    await this.featureIntro('MONDE SOUTERRAIN', '10 tours · chaque gain fait monter le multiplicateur de sa colonne', art('sc'));
+    await this.featureIntro('MONDE SOUTERRAIN', '10 tours · chaque gain fait monter le multiplicateur de sa colonne', symArt(SC));
     this.slotEl.classList.add('in-free', 'under');
     this.mrow.classList.add('on');
     this.renderM(M);
@@ -597,8 +598,8 @@ class AnubisGame extends BaseGame {
   info() {
     const rows = NAMES.map((n, s) => `<div class="pay-item"><div class="pay-sym svg">${symArt(s)}</div><div class="pay-vals"><b>${n}</b><br><span>Valeur ${VAL[s]}</span></div></div>`).join('');
     return this.rules(`<h4>Symboles</h4><div class="paytable">${rows}
-      <div class="pay-item"><div class="pay-sym svg">${art('w')}</div><div class="pay-vals"><b>Orbe rouge (joker)</b><br><span>Remplace tout. Chaque orbe d’une grappe gagnante ajoute +1 au multiplicateur</span></div></div>
-      <div class="pay-item"><div class="pay-sym svg">${art('sc')}</div><div class="pay-vals"><b>Scatter</b><br><span>3 = Monde souterrain · 4+ = Jugement</span></div></div></div>
+      <div class="pay-item"><div class="pay-sym svg">${symArt(WILD)}</div><div class="pay-vals"><b>Orbe rouge (joker)</b><br><span>Remplace tout. Chaque orbe d’une grappe gagnante ajoute +1 au multiplicateur</span></div></div>
+      <div class="pay-item"><div class="pay-sym svg">${symArt(SC)}</div><div class="pay-vals"><b>Scatter</b><br><span>3 = Monde souterrain · 4+ = Jugement</span></div></div></div>
       <h4>Cascades</h4><p>Grille 5×6. Une grappe de <b>5 symboles ou plus</b> paie mise × valeur × 0,33 × (taille − 4) × multiplicateur, disparaît et les symboles tombent.</p>
       <h4>Monde souterrain</h4><p>10 tours. Chaque colonne a son multiplicateur, qui monte de +3 à chaque gain qui la touche. Un <b>crâne doré</b> multiplie sa colonne (×2 à ×100).</p>
       <h4>Jugement</h4><p>Chaque colonne a un multiplicateur, affiché tout en haut. Un <b>cube bleu</b> tombe dans la colonne et devient un <b>cube noir</b> marqué du multiplicateur de la colonne au moment où il tombe : il garde cette valeur, même si la colonne monte ensuite. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne noir</b> : ajoute de <b>+2 à +500</b> au multiplicateur de sa colonne (pour les prochains cubes). Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie tous les cubes de la colonne. <b>Cube de lave</b> : tous les cubes de sa colonne s’accumulent sur le dernier, qui garde la somme et redescend en bas pour libérer de la place. <b>Fusion</b> : quand une colonne atteint le haut, ses cubes s’accumulent de la même façon. À la fin, tu gagnes la somme de tous les cubes × la mise.</p>
