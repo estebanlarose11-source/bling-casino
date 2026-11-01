@@ -3099,7 +3099,34 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .lb-jp h3 { background: linear-gradient(180deg, #fff7c2, #fde047 45%, #ef4444) !important; -webkit-background-clip: text !important; background-clip: text !important; }
 .pay-sym .lb-img { width: 44px; height: 44px; }
 .game-host:not(.is-full):has(> .g-labo) { max-width: max(420px, min(1000px, calc((100vh - var(--chrome) + 40px) * 5 / 4 + 60px))); }
-@media (prefers-reduced-motion: reduce) { .lb-flames, .lb-bills svg, .lb-neon, .g-labo .rs-cell.scat svg, .g-labo .rs-cell.case svg { animation: none; } }
+/* La Mallette: hold & spin board over the reels, green smoke in the middle */
+.g-labo .reels-host { position: relative; }
+.lb-bonus { position: absolute; inset: 0; z-index: 3; display: none; }
+.g-labo.in-case .lb-bonus { display: block; }
+.g-labo.in-case .reels-host .rs { visibility: hidden; }
+.lb-bgrid { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(4, 1fr); gap: 5px; }
+.lb-bc { position: relative; display: grid; place-items: center; overflow: hidden; container-type: size; border-radius: 10px; background: linear-gradient(180deg, rgba(40, 8, 70, .88), rgba(70, 16, 100, .76)); box-shadow: inset 0 0 0 2px rgba(244, 114, 182, .35); }
+.lb-bc svg, .lb-bc .lb-img { width: 82%; height: 82%; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .55)); }
+.lb-bc.cup.k0 { background: radial-gradient(circle, rgba(74, 222, 128, .45), rgba(40, 8, 70, .88) 72%); box-shadow: inset 0 0 0 2px #4ade80; }
+.lb-bc.cup.k1 { background: radial-gradient(circle, rgba(56, 189, 248, .45), rgba(40, 8, 70, .88) 72%); box-shadow: inset 0 0 0 2px #38bdf8; }
+.lb-bc.cup.k2 { background: radial-gradient(circle, rgba(244, 114, 182, .5), rgba(40, 8, 70, .88) 72%); box-shadow: inset 0 0 0 2px #f472b6, 0 0 12px rgba(244, 114, 182, .6); }
+.lb-bc.magic { background: radial-gradient(circle, rgba(253, 224, 71, .5), rgba(88, 28, 135, .9) 72%); box-shadow: inset 0 0 0 2px #fde047, 0 0 16px rgba(232, 121, 249, .8); }
+.lb-bc.leaf { background: radial-gradient(circle, rgba(190, 242, 100, .5), rgba(40, 8, 70, .88) 72%); }
+.lb-bc.gleaf { background: radial-gradient(circle, rgba(253, 224, 71, .7), rgba(40, 8, 70, .88) 72%); box-shadow: inset 0 0 0 2px #fde047, 0 0 22px #fde047; }
+.lb-glit { position: absolute; inset: 0; pointer-events: none; background-image: radial-gradient(circle, #fff 1px, transparent 1.6px), radial-gradient(circle, #fde047 1px, transparent 1.8px); background-size: 18px 22px, 26px 30px; background-position: 0 0, 9px 12px; animation: lbGlit 1.6s linear infinite; opacity: .9; }
+@keyframes lbGlit { to { background-position: 0 -44px, 9px -48px; } }
+.lb-bc.roll::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent, rgba(255, 255, 255, .28), transparent); animation: lbRoll .22s linear infinite; }
+@keyframes lbRoll { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+.lb-cv { position: absolute; left: 50%; bottom: 4%; transform: translateX(-50%); padding: 0 6px; border-radius: 99px; background: rgba(10, 2, 20, .7); font: 900 min(22cqh, 18cqw)/1.25 KeCoin, Orbitron, sans-serif; color: #fff; text-shadow: 0 0 6px rgba(0, 0, 0, .8); white-space: nowrap; }
+.lb-bc.magic .lb-cv { color: #fde047; background: rgba(59, 7, 100, .85); }
+.lb-smoke { position: absolute; left: 50%; top: 50%; z-index: 5; transform: translate(-50%, -50%); width: min(42%, 250px); aspect-ratio: 1.7; display: grid; place-items: center; align-content: center; gap: 2px; text-align: center; pointer-events: none; }
+.lb-smoke i { position: absolute; inset: -12%; border-radius: 50%; background: radial-gradient(ellipse at 50% 50%, rgba(134, 239, 172, .75), rgba(34, 197, 94, .45) 40%, rgba(22, 163, 74, .12) 62%, transparent 72%); filter: blur(9px); animation: lbSmoke 2.8s ease-in-out infinite alternate; }
+@keyframes lbSmoke { from { transform: scale(.9) rotate(-5deg); } to { transform: scale(1.1) rotate(5deg); } }
+.lb-smoke small { position: relative; font: 800 10px Orbitron, sans-serif; letter-spacing: 2px; color: #f0fdf4; text-shadow: 0 1px 2px #14532d; }
+.lb-smoke b { position: relative; font: 900 clamp(26px, 6vw, 52px)/1 KeCoin, Orbitron, sans-serif; color: #fff; text-shadow: 0 0 12px #22c55e, 0 3px 0 #14532d; }
+.lb-smoke em { position: relative; font: 800 13px Orbitron, sans-serif; font-style: normal; color: #fde047; text-shadow: 0 1px 2px #000; }
+.pay-sym .lb-img, .pay-sym svg { max-width: 44px; }
+@media (prefers-reduced-motion: reduce) { .lb-flames, .lb-bills svg, .lb-neon, .g-labo .rs-cell.scat svg, .g-labo .rs-cell.case svg, .lb-smoke i, .lb-glit, .lb-bc.roll::after { animation: none; } }
 
 /* ============ Têtes de Dragon ============ */
 .g-dragons { --slot-bg: radial-gradient(700px 360px at 50% 110%, rgba(234, 88, 12, .45), transparent 70%), radial-gradient(500px 300px at 50% -10%, rgba(127, 29, 29, .4), transparent 70%), linear-gradient(180deg, #1c0a05 0%, #0a0503 100%); }
@@ -6314,6 +6341,7 @@ __mods['art/labo.js'] = (() => {
 // Le Labo: drawn placeholder art (the owner's painted images replace it, see PAINTED in games/labo.js).
 // lb0..lb8 = the 9 symbols, lbw = WILD (Le Dealer), lbsc = rainbow spiral (La Descente), lbcase = briefcase (La Mallette),
 // lbdemon = the demon boss on his golden throne (behind the reels), lbbill = a floating cannabis leaf.
+// La Mallette bonus: lbcup0..2 (green, blue, pink cups of pills), lbgleaf (golden leaf), lbmagic (magic cup).
 const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <linearGradient id="lbChrome" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#64748b"/><stop offset=".25" stop-color="#f8fafc"/><stop offset=".5" stop-color="#94a3b8"/><stop offset=".8" stop-color="#e2e8f0"/><stop offset="1" stop-color="#475569"/></linearGradient>
 <linearGradient id="lbGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff4b8"/><stop offset=".5" stop-color="#f5c542"/><stop offset="1" stop-color="#a86a0c"/></linearGradient>
@@ -6450,6 +6478,55 @@ const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="t
 
 <symbol id="lbbill" viewBox="0 0 64 64"><g fill="url(#lbLeaf)" stroke="#14532d" stroke-width="1"><path d="M0 0 C-3.2 -4.5 -3.2 -10.8 0 -15 C3.2 -10.8 3.2 -4.5 0 0Z" transform="translate(32 44) rotate(-80)"/><path d="M0 0 C-4.2 -6.9 -4.2 -16.6 0 -23 C4.2 -16.6 4.2 -6.9 0 0Z" transform="translate(32 44) rotate(-54)"/><path d="M0 0 C-5 -9.0 -5 -21.6 0 -30 C5 -21.6 5 -9.0 0 0Z" transform="translate(32 44) rotate(-27)"/><path d="M0 0 C-5.6 -10.8 -5.6 -25.9 0 -36 C5.6 -25.9 5.6 -10.8 0 0Z" transform="translate(32 44) rotate(0)"/><path d="M0 0 C-5 -9.0 -5 -21.6 0 -30 C5 -21.6 5 -9.0 0 0Z" transform="translate(32 44) rotate(27)"/><path d="M0 0 C-4.2 -6.9 -4.2 -16.6 0 -23 C4.2 -16.6 4.2 -6.9 0 0Z" transform="translate(32 44) rotate(54)"/><path d="M0 0 C-3.2 -4.5 -3.2 -10.8 0 -15 C3.2 -10.8 3.2 -4.5 0 0Z" transform="translate(32 44) rotate(80)"/></g><path d="M32 44 Q31 54 26 60" stroke="#15803d" stroke-width="3" fill="none" stroke-linecap="round"/></symbol>
 
+<linearGradient id="lbCup0" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bbf7d0"/><stop offset=".5" stop-color="#22c55e"/><stop offset="1" stop-color="#14532d"/></linearGradient>
+<symbol id="lbcup0" viewBox="0 0 64 64">
+  <circle cx="30" cy="36" r="28" fill="#22c55e" opacity=".22"/>
+  <ellipse cx="30" cy="57" rx="24" ry="4.5" fill="#14532d" stroke="#bbf7d0" stroke-width="1"/>
+  <path d="M48 30 Q60 30 60 39 Q60 48 47 48" fill="none" stroke="#14532d" stroke-width="6" stroke-linecap="round"/><path d="M48 30 Q60 30 60 39 Q60 48 47 48" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
+  <path d="M10 26 H50 V42 Q50 56 36 56 H24 Q10 56 10 42Z" fill="url(#lbCup0)" stroke="#14532d" stroke-width="1.6"/>
+  <g transform="translate(0 -1)"><circle cx="20" cy="24" r="5" fill="#fde047"/><circle cx="30" cy="22" r="5.5" fill="#f472b6"/><circle cx="40" cy="24" r="5" fill="#22d3ee"/><circle cx="25" cy="18" r="4.5" fill="#a855f7"/><circle cx="35" cy="17" r="4.5" fill="#f97316"/>
+    <rect x="26" y="9" width="12" height="6" rx="3" fill="#ef4444" transform="rotate(-25 32 12)"/><circle cx="18.5" cy="22.5" r="1.5" fill="#fff" opacity=".7"/><circle cx="28.5" cy="20" r="1.6" fill="#fff" opacity=".7"/><circle cx="38.5" cy="22.5" r="1.5" fill="#fff" opacity=".7"/></g>
+  <ellipse cx="30" cy="26" rx="20" ry="3.4" fill="none" stroke="#fff" stroke-width="1.6" opacity=".7"/>
+  <rect x="15" y="31" width="4" height="18" rx="2" fill="#fff" opacity=".5"/>
+</symbol>
+<linearGradient id="lbCup1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#bae6fd"/><stop offset=".5" stop-color="#0ea5e9"/><stop offset="1" stop-color="#1e3a8a"/></linearGradient>
+<symbol id="lbcup1" viewBox="0 0 64 64">
+  <circle cx="30" cy="36" r="28" fill="#0ea5e9" opacity=".22"/>
+  <ellipse cx="30" cy="57" rx="24" ry="4.5" fill="#1e3a8a" stroke="#bae6fd" stroke-width="1"/>
+  <path d="M48 30 Q60 30 60 39 Q60 48 47 48" fill="none" stroke="#1e3a8a" stroke-width="6" stroke-linecap="round"/><path d="M48 30 Q60 30 60 39 Q60 48 47 48" fill="none" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round"/>
+  <path d="M10 26 H50 V42 Q50 56 36 56 H24 Q10 56 10 42Z" fill="url(#lbCup1)" stroke="#1e3a8a" stroke-width="1.6"/>
+  <g transform="translate(0 -1)"><circle cx="20" cy="24" r="5" fill="#fde047"/><circle cx="30" cy="22" r="5.5" fill="#f472b6"/><circle cx="40" cy="24" r="5" fill="#22d3ee"/><circle cx="25" cy="18" r="4.5" fill="#a855f7"/><circle cx="35" cy="17" r="4.5" fill="#f97316"/>
+    <rect x="26" y="9" width="12" height="6" rx="3" fill="#ef4444" transform="rotate(-25 32 12)"/><circle cx="18.5" cy="22.5" r="1.5" fill="#fff" opacity=".7"/><circle cx="28.5" cy="20" r="1.6" fill="#fff" opacity=".7"/><circle cx="38.5" cy="22.5" r="1.5" fill="#fff" opacity=".7"/></g>
+  <ellipse cx="30" cy="26" rx="20" ry="3.4" fill="none" stroke="#fff" stroke-width="1.6" opacity=".7"/>
+  <rect x="15" y="31" width="4" height="18" rx="2" fill="#fff" opacity=".5"/>
+</symbol>
+<linearGradient id="lbCup2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbcfe8"/><stop offset=".5" stop-color="#ec4899"/><stop offset="1" stop-color="#831843"/></linearGradient>
+<symbol id="lbcup2" viewBox="0 0 64 64">
+  <circle cx="30" cy="36" r="28" fill="#ec4899" opacity=".22"/>
+  <ellipse cx="30" cy="57" rx="24" ry="4.5" fill="#831843" stroke="#fbcfe8" stroke-width="1"/>
+  <path d="M48 30 Q60 30 60 39 Q60 48 47 48" fill="none" stroke="#831843" stroke-width="6" stroke-linecap="round"/><path d="M48 30 Q60 30 60 39 Q60 48 47 48" fill="none" stroke="#ec4899" stroke-width="3" stroke-linecap="round"/>
+  <path d="M10 26 H50 V42 Q50 56 36 56 H24 Q10 56 10 42Z" fill="url(#lbCup2)" stroke="#831843" stroke-width="1.6"/>
+  <g transform="translate(0 -1)"><circle cx="20" cy="24" r="5" fill="#fde047"/><circle cx="30" cy="22" r="5.5" fill="#f472b6"/><circle cx="40" cy="24" r="5" fill="#22d3ee"/><circle cx="25" cy="18" r="4.5" fill="#a855f7"/><circle cx="35" cy="17" r="4.5" fill="#f97316"/>
+    <rect x="26" y="9" width="12" height="6" rx="3" fill="#ef4444" transform="rotate(-25 32 12)"/><circle cx="18.5" cy="22.5" r="1.5" fill="#fff" opacity=".7"/><circle cx="28.5" cy="20" r="1.6" fill="#fff" opacity=".7"/><circle cx="38.5" cy="22.5" r="1.5" fill="#fff" opacity=".7"/></g>
+  <ellipse cx="30" cy="26" rx="20" ry="3.4" fill="none" stroke="#fff" stroke-width="1.6" opacity=".7"/>
+  <rect x="15" y="31" width="4" height="18" rx="2" fill="#fff" opacity=".5"/>
+</symbol>
+<symbol id="lbgleaf" viewBox="0 0 64 64">
+  <circle cx="32" cy="34" r="30" fill="#fde047" opacity=".3"/>
+  <path d="M32 44 Q31 54 26 60" stroke="#a16207" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <g fill="url(#lbGold)" stroke="#92400e" stroke-width="1"><path d="M0 0 C-3.2 -4.5 -3.2 -10.8 0 -15 C3.2 -10.8 3.2 -4.5 0 0Z" transform="translate(32 44) rotate(-80)"/><path d="M0 0 C-4.2 -6.9 -4.2 -16.6 0 -23 C4.2 -16.6 4.2 -6.9 0 0Z" transform="translate(32 44) rotate(-54)"/><path d="M0 0 C-5 -9.0 -5 -21.6 0 -30 C5 -21.6 5 -9.0 0 0Z" transform="translate(32 44) rotate(-27)"/><path d="M0 0 C-5.6 -10.8 -5.6 -25.9 0 -36 C5.6 -25.9 5.6 -10.8 0 0Z" transform="translate(32 44) rotate(0)"/><path d="M0 0 C-5 -9.0 -5 -21.6 0 -30 C5 -21.6 5 -9.0 0 0Z" transform="translate(32 44) rotate(27)"/><path d="M0 0 C-4.2 -6.9 -4.2 -16.6 0 -23 C4.2 -16.6 4.2 -6.9 0 0Z" transform="translate(32 44) rotate(54)"/><path d="M0 0 C-3.2 -4.5 -3.2 -10.8 0 -15 C3.2 -10.8 3.2 -4.5 0 0Z" transform="translate(32 44) rotate(80)"/></g>
+  <g fill="#fff"><path d="M12 12 l1.5 3.5 3.5 1.5 -3.5 1.5 -1.5 3.5 -1.5 -3.5 -3.5 -1.5 3.5 -1.5z"/><path d="M52 16 l1.2 2.8 2.8 1.2 -2.8 1.2 -1.2 2.8 -1.2 -2.8 -2.8 -1.2 2.8 -1.2z"/><path d="M50 50 l1 2.4 2.4 1 -2.4 1 -1 2.4 -1 -2.4 -2.4 -1 2.4 -1z"/></g>
+</symbol>
+<symbol id="lbmagic" viewBox="0 0 64 64">
+  <circle cx="30" cy="34" r="30" fill="url(#lbRainbow)" opacity=".4"/>
+  <ellipse cx="30" cy="57" rx="24" ry="4.5" fill="#78350f" stroke="#fde047" stroke-width="1.2"/>
+  <path d="M48 30 Q60 30 60 39 Q60 48 47 48" fill="none" stroke="url(#lbGold)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M10 26 H50 V42 Q50 56 36 56 H24 Q10 56 10 42Z" fill="url(#lbPurple)" stroke="url(#lbGold)" stroke-width="2.4"/>
+  <path d="M16 34 h28 M16 42 h28" stroke="url(#lbGold)" stroke-width="1.6" opacity=".8"/>
+  <path d="M30 37 l2 4.5 4.5 2 -4.5 2 -2 4.5 -2 -4.5 -4.5 -2 4.5 -2z" fill="#fde047"/>
+  <path d="M14 24 Q20 8 30 16 Q38 2 46 22" fill="none" stroke="url(#lbTrip)" stroke-width="3.4" stroke-linecap="round"/>
+  <g fill="#fff"><path d="M22 6 l1.4 3.2 3.2 1.4 -3.2 1.4 -1.4 3.2 -1.4 -3.2 -3.2 -1.4 3.2 -1.4z"/><path d="M42 4 l1 2.4 2.4 1 -2.4 1 -1 2.4 -1 -2.4 -2.4 -1 2.4 -1z"/><circle cx="34" cy="10" r="1.4"/><circle cx="12" cy="16" r="1.2"/><circle cx="52" cy="14" r="1.4"/></g>
+</symbol>
 <symbol id="lbdemon" viewBox="0 0 400 300">
   <path d="M90 300 V120 L110 60 L130 110 L150 40 L175 100 L200 20 L225 100 L250 40 L270 110 L290 60 L310 120 V300Z" fill="url(#lbGold)" stroke="#78350f" stroke-width="3"/>
   <path d="M110 300 V130 L130 120 L150 70 L175 118 L200 55 L225 118 L250 70 L270 120 L290 130 V300Z" fill="#7f1d1d" opacity=".9"/>
@@ -6592,7 +6669,7 @@ const ORIGINALS = [
   {"id": "taco", "name": "La Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200\u00a0\uE1E0 tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200\u00a0\uE1E0", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
-  {"id": "labo", "name": "Le Labo", "cat": "slot", "tag": "Machine à sous", "sub": "Le Dealer, La Descente, La Mallette", "colors": ["#a855f7", "#0d0415"], "description": "Un labo clandestin multicolore où tout plane : feuilles, joints, pilules arc-en-ciel, champignons magiques, buvards, cachets roses, sachets de poudre et la brique du cartel, sous le regard du Boss, un démon à lunettes néon assis sur son trône en or. 1024 façons de gagner. Le Dealer pose des WILD, La Descente lance un trip de tours gratuits où le multiplicateur monte à chaque gain, et La Mallette s’ouvre sur des tas d’or… et peut cacher le jackpot Le Cartel ×1000.", "features": ["5 rouleaux, 1024 façons", "WILD – Le Dealer", "Free spins – La Descente", "Multiplicateur qui monte", "Bonus – La Mallette", "Jackpot – Le Cartel ×1000", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
+  {"id": "labo", "name": "Le Labo", "cat": "slot", "tag": "Machine à sous", "sub": "Le Dealer, La Descente, La Mallette", "colors": ["#a855f7", "#0d0415"], "description": "Un labo clandestin multicolore où tout plane : feuilles, joints, pilules arc-en-ciel, champignons magiques, buvards, cachets roses, sachets de poudre et la brique du cartel, sous le regard du Boss, un démon à lunettes néon assis sur son trône en or. 1024 façons de gagner. Le Dealer pose des WILD, La Descente lance un trip de tours gratuits où le multiplicateur monte à chaque gain, et La Mallette lance un bonus de tasses de pilules : la fumée verte récolte leurs multiplicateurs, les feuilles les multiplient, la tasse magique aspire tout, et un écran plein de tasses déclenche le jackpot Le Cartel ×1000.", "features": ["5 rouleaux, 1024 façons", "WILD – Le Dealer", "Free spins – La Descente", "Multiplicateur qui monte", "Bonus – La Mallette", "Jackpot – Le Cartel ×1000", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -7171,6 +7248,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'labo', date: '2026-11-01', title: 'Nouveau bonus La Mallette', items: ['5 tours, remis à 5 à chaque nouvelle tasse : la fumée verte au milieu récolte les multiplicateurs', '3 tasses de pilules (verte, bleue, rose) de ×0,2 à ×20 la mise', 'Feuille : ×2 sur les tasses autour · Feuille d’or : ×2 sur toutes les tasses', 'Tasse magique : aspire toutes les tasses et garde leur valeur · écran plein = jackpot Le Cartel ×1000'] },
   { game: 'dragons', date: '2026-11-01', title: 'Plus de cases vides', items: ['Chaque moitié de dragon a toujours une autre moitié à côté, d’une autre couleur', 'La pierre runique est bien visible quand elle apparaît à côté d’une perle'] },
   {
     game: 'labo', date: '2026-11-01', title: 'Nouveau jeu', isNew: true,
@@ -9805,7 +9883,7 @@ const FILES = {
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '217f54e3fd'],
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', '3f3eaaaa3b'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'f3c9203150'],
-  labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'd384a1fc63'],
+  labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'ecb0411b48'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '67c9c0259d'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
