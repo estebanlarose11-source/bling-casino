@@ -1,5 +1,9 @@
 # SpinBet Casino
 
+**Méthode de travail voulue par le propriétaire :** chaque demande est mise en ligne directement (commit + push sur
+`main`, sans branche ni pull request), puis le fichier unique `python3 tools/bundle.py` → `dist/spinbet-casino.html`
+lui est envoyé pour qu'il le garde.
+
 Le site est publié avec GitHub Pages depuis `main`.
 
 - `index.html` : tout le site (modules `__mods['…']`, CSS, art SVG, catalogue `games/index.js`, lobby, pages).
