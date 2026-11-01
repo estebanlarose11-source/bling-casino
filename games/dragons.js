@@ -105,7 +105,28 @@ const src = (id) => asset(`assets/games/dragons/${FILE[id]}.webp`);
 const half = (id, side) => `<span class="dg-h ${side ? 'r' : 'l'}" style="background-image:url('${src(id)}')"></span>`;
 const full = (id) => `<span class="dg-card" style="background-image:url('${src(id)}')"></span>`;
 const one = (id, x = 50) => `<span class="dg-one" style="background-image:url('${src(id)}');background-position:${x}% 50%"></span>`;
-function cellArt(v, i) {
+// Stones never fuse, but a faded stone looked like an empty cell: each stone now shows the half of a dragon of ANOTHER
+// colour than its neighbour in the pair (or than the other stone), so every cell shows something and no fake pair
+// appears. Next to a pearl (which completes any half) it shows the rune stone itself. Display only: the maths are unchanged.
+const DECO_N = 6; // decoy colours: the 6 ordinary dragons (never the MINI / MAJEUR / JACKPOT ones)
+function decoFor(g, prev = []) {
+  const d = new Array(N).fill(-1);
+  const ok = (c, other) => c >= 0 && c !== other;
+  const pick = (i, other) => {
+    if (ok(prev[i], other)) return prev[i];
+    const cs = []; for (let c = 0; c < DECO_N; c++) if (c !== other) cs.push(c);
+    return cs[Math.floor(Math.random() * cs.length)];
+  };
+  for (let p = 0; p < PAIRS; p++) for (let r = 0; r < ROWS; r++) {
+    const li = (2 * p) * ROWS + r, ri = (2 * p + 1) * ROWS + r, a = g[li], b = g[ri];
+    if (a === STONE && b === STONE) { d[li] = pick(li, -1); d[ri] = pick(ri, d[li]); }
+    else if (a === STONE) d[li] = b === PEARL ? -1 : pick(li, b < PEARL ? b : -1);
+    else if (b === STONE) d[ri] = a === PEARL ? -1 : pick(ri, a < PEARL ? a : -1);
+  }
+  return d;
+}
+function cellArt(v, i, deco) {
+  if (v === STONE && deco >= 0) return half(DID[deco], Math.floor(i / ROWS) % 2);
   if (v >= JPCELL) return one(DID[6 + v - JPCELL], 72) + `<b class="dg-cv jp">${JPN[v - JPCELL]}</b>`;
   if (v >= MULT) return one('dgm', 62) + `<b class="dg-cv">×${v - MULT}</b>`;
   if (v === SCAT) return one('dgsc') + '<b class="dg-cv sc">SCATTER</b>';
@@ -128,12 +149,16 @@ class DragonsGame extends BaseGame {
       ],
       hello: 'Deux moitiés de la même tête côte à côte : elles fusionnent, paient, et ça retombe',
     });
+    this.deco = []; this.shown = [];
     this.grid = new SymbolGrid(this.q('.grid-host'), {
-      cols: COLS, rows: ROWS, game: this, art: cellArt,
-      cls: (v, i) => (Math.floor(i / ROWS) % 2 ? 'dgR ' : 'dgL ') + (v >= JPCELL ? 'full jpc' : v >= MULT ? 'full mult' : v === SCAT ? 'full scat' : v === SUPER ? 'full super' : v === STONE ? 'full stone' : v === PEARL ? 'pearl' : v >= 6 ? 'jp' : ''),
+      cols: COLS, rows: ROWS, game: this,
+      art: (v, i) => { const d = v === STONE ? this.deco[i] ?? -1 : -1; this.shown[i] = d; return cellArt(v, i, d); },
+      cls: (v, i) => (Math.floor(i / ROWS) % 2 ? 'dgR ' : 'dgL ') + (v >= JPCELL ? 'full jpc' : v >= MULT ? 'full mult' : v === SCAT ? 'full scat' : v === SUPER ? 'full super' : v === STONE ? ((this.deco[i] ?? -1) >= 0 ? 'deco' : 'full stone') : v === PEARL ? 'pearl' : v >= 6 ? 'jp' : ''),
     });
     Object.keys(FILE).forEach((id) => { new Image().src = src(id); });
-    this.grid.setAll(Array.from({ length: N }, () => draw({ fs: false })));
+    const g0 = Array.from({ length: N }, () => draw({ fs: false }));
+    this.deco = decoFor(g0);
+    this.grid.setAll(g0);
     this.onBetChange();
   }
 
@@ -198,6 +223,7 @@ class DragonsGame extends BaseGame {
     for (const st of res.steps) {
       if (this.dead) return;
       if (st.k === 'init') {
+        this.deco = decoFor(st.grid);
         await this.grid.dropIn(st.grid, {
           tease: (c) => { let n = 0; for (let j = 0; j < c * ROWS; j++) if (st.grid[j] === SCAT || st.grid[j] === SUPER) n++; return n >= 2; },
           onLand: (i, v) => {
@@ -217,7 +243,10 @@ class DragonsGame extends BaseGame {
         await sleep(this.turbo ? 220 : 380);
         bigs.forEach((n) => n.remove());
         st.rem.forEach((i) => this.grid.cells[i].classList.remove('hidden', 'fusing'));
+        this.deco = decoFor(st.after, this.deco.map((d, i) => (st.rem.includes(i) ? -1 : d)));
         await this.grid.cascade(st.after, new Set(st.rem));
+        // a stone that did not move but whose new neighbour now has its colour takes another colour
+        st.after.forEach((v, i) => { if (v === STONE && this.shown[i] !== this.deco[i]) { this.grid.set(i, v); this.grid.cells[i].firstChild.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 250 }); } });
         k++;
         await this.wait(160);
       }

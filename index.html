@@ -3147,8 +3147,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .dg-fused .dg-card { inset: 2px; }
 .dgp { position: relative; width: 74px !important; height: 59px !important; border-radius: 8px; overflow: hidden; }
 .dg-intro { width: min(46vw, 220px); aspect-ratio: 1.25; object-fit: cover; border-radius: 16px; box-shadow: 0 0 30px rgba(251, 146, 60, .7); }
-.g-dragons .sg-cell.stone .dg-one { opacity: .42; background-position: 30% 50%; }
-.g-dragons .sg-cell.stone { background: rgba(10, 5, 3, .35); }
+.g-dragons .sg-cell.stone .dg-one { background-position: 30% 50%; }
 .g-dragons .sg-cell.scat .dg-one, .g-dragons .sg-cell.super .dg-one { animation: dgImg 1.4s ease-in-out infinite; }
 @keyframes dgImg { 50% { transform: scale(1.05); } }
 .g-dragons .sg-cell.pulse .dg-one { animation: dgImg .5s ease-in-out infinite; }
@@ -3165,7 +3164,6 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .g-dragons .sg-cell.full .sg-sym { justify-items: center; }
 .g-dragons .sg-cell.full svg { width: 80%; height: 80%; }
 .g-dragons .sg-cell.stone svg { width: 70%; height: 70%; }
-.g-dragons .sg-cell.stone { opacity: .75; }
 .g-dragons .sg-cell.scat, .g-dragons .sg-cell.super { background: radial-gradient(circle, rgba(245, 158, 11, .45), #1a0c06 70%); }
 .g-dragons .sg-cell.super { box-shadow: inset 0 0 0 2px #fde047, inset 0 0 18px rgba(249, 115, 22, .8), 0 0 14px rgba(253, 224, 71, .6); }
 .g-dragons .sg-cell.scat svg, .g-dragons .sg-cell.super svg { animation: dgEgg 1.4s ease-in-out infinite; }
@@ -7173,6 +7171,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'dragons', date: '2026-11-01', title: 'Plus de cases vides', items: ['Chaque moitié de dragon a toujours une autre moitié à côté, d’une autre couleur', 'La pierre runique est bien visible quand elle apparaît à côté d’une perle'] },
   {
     game: 'labo', date: '2026-11-01', title: 'Nouveau jeu', isNew: true,
     items: ['Un labo clandestin multicolore : feuilles, joints, pilules, champignons, buvards, poudre et la brique', 'WILD – Le Dealer : le démon pose des WILD sur les rouleaux', 'Free spins – La Descente : 3 spirales arc-en-ciel, +1 au multiplicateur à chaque gain', 'Bonus – La Mallette et jackpot Le Cartel ×1000'],
@@ -9807,7 +9806,7 @@ const FILES = {
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', '3f3eaaaa3b'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'f3c9203150'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'd384a1fc63'],
-  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '453deb4a64'],
+  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '67c9c0259d'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '576f0f4127'],
