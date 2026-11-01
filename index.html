@@ -342,6 +342,18 @@ section { margin-bottom: 28px; }
 .slot-bg { position: absolute; inset: 0; z-index: -1; background: var(--slot-bg); transition: filter .6s; }
 .slot-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 120%, var(--accent-glow), transparent 60%); opacity: .5; }
 .theme-wolf .slot-bg, .slot.theme-wolf { --slot-bg: radial-gradient(400px 220px at 85% 0%, rgba(253, 224, 71, .25), transparent 70%), linear-gradient(180deg, #1b1030 0%, #0d1726 55%, #0c1e14 100%); }
+.slot.theme-wolf .slot-stage { background: linear-gradient(180deg, rgba(4, 18, 12, .2), rgba(4, 18, 12, .05) 45%, rgba(4, 18, 12, .45)), var(--wolf-bg) center / cover no-repeat; border-radius: 14px; }
+.slot.theme-wolf .reel { background: linear-gradient(180deg, rgba(6, 30, 20, .55), rgba(10, 40, 26, .4) 50%, rgba(6, 30, 20, .55)); box-shadow: inset 0 0 0 1px rgba(253, 224, 71, .35); border-radius: 8px; }
+.slot.theme-wolf .reel::before { background: linear-gradient(rgba(4, 18, 12, .7), transparent); }
+.slot.theme-wolf .reel::after { background: linear-gradient(transparent, rgba(4, 18, 12, .7)); }
+.w-img { display: block; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.cell .g:has(> .w-img) { width: 84%; height: 84%; font-size: 0; }
+.cell.coin .g:has(> .w-img) { width: 74%; height: 74%; }
+.hs-sym .g:has(> .w-img) { width: 56%; height: 46%; font-size: 0; }
+.hs-sym.h-castle .w-img { filter: sepia(1) saturate(4) hue-rotate(5deg) brightness(1.15) drop-shadow(0 0 8px #fde047); }
+.sticky-wild .g:has(> .w-img), .expand-col .g:has(> .w-img) { width: 80%; height: 80%; font-size: 0; }
+.intro-glyph:has(> .w-img) { width: 140px; height: 140px; }
+.pay-sym:has(> .w-img) { width: 46px; height: 46px; }
 .slot.theme-fruits { --slot-bg: radial-gradient(500px 260px at 50% 0%, rgba(244, 63, 158, .25), transparent 70%), linear-gradient(180deg, #1d0930 0%, #0a0f28 100%); }
 .slot.theme-pharaoh { --slot-bg: radial-gradient(500px 260px at 50% 0%, rgba(251, 191, 36, .22), transparent 70%), linear-gradient(180deg, #2a1a05 0%, #0f1424 100%); }
 .slot.in-free .slot-bg { filter: hue-rotate(-25deg) saturate(1.4) brightness(1.1); }
@@ -6610,6 +6622,10 @@ const scalePays = (symbols, k) => symbols.map((s) => (s.pays && !s.scatter
   ? { ...s, pays: Object.fromEntries(Object.entries(s.pays).map(([n, p]) => [n, Math.round(p * k * 100) / 100])) }
   : s));
 
+// Le Loup: painted images shared with Le Loup 2.0 (assets/games/huff) + its own forest and coin (assets/games/wolf).
+const wimg = (p) => `<img class="w-img" src="${window.__assets?.[`assets/games/${p}.webp`] || `assets/games/${p}.webp?v=1`}" alt="" draggable="false" decoding="async">`;
+const WOLF_IMG = { wolf: wimg('huff/wolfplain'), pig1: wimg('huff/pig'), pig2: wimg('huff/brick'), hammer: wimg('huff/wood'), basket: wimg('huff/straw'), moon: wimg('huff/scatter'), coin: wimg('wolf/coin') };
+
 const GAMES = [
   {
     id: 'big-bad-wolf',
@@ -6622,18 +6638,18 @@ const GAMES = [
     reels: 5, rows: 3, lines: 20,
     description: "Le loup souffle sur les maisons des trois petits cochons. 6 pièces déclenchent le Hold & Spin : chaque souffle du loup améliore les maisons Paille → Bois → Brique → Château.",
     symbols: scalePays([
-      { id: 'wolf', glyph: '🐺', label: 'WILD', wild: true, w: 3, wFree: 4, pays: { 3: 50, 4: 200, 5: 1000 } },
-      { id: 'pig1', glyph: '🐷', w: 5, pays: { 3: 25, 4: 100, 5: 400 } },
-      { id: 'pig2', glyph: '🐖', w: 6, pays: { 3: 20, 4: 75, 5: 250 } },
-      { id: 'hammer', glyph: '🔨', w: 8, pays: { 3: 15, 4: 50, 5: 150 } },
-      { id: 'basket', glyph: '🧺', w: 9, pays: { 3: 12, 4: 40, 5: 120 } },
+      { id: 'wolf', glyph: WOLF_IMG.wolf, label: 'WILD', wild: true, w: 3, wFree: 4, pays: { 3: 50, 4: 200, 5: 1000 } },
+      { id: 'pig1', glyph: WOLF_IMG.pig1, w: 5, pays: { 3: 25, 4: 100, 5: 400 } },
+      { id: 'pig2', glyph: WOLF_IMG.pig2, w: 6, pays: { 3: 20, 4: 75, 5: 250 } },
+      { id: 'hammer', glyph: WOLF_IMG.hammer, w: 8, pays: { 3: 15, 4: 50, 5: 150 } },
+      { id: 'basket', glyph: WOLF_IMG.basket, w: 9, pays: { 3: 12, 4: 40, 5: 120 } },
       ...cards(),
-      { id: 'moon', glyph: '🌕', label: 'SCATTER', scatter: true, w: 6, reels: [0, 2, 4], pays: { 3: 2 } },
-      { id: 'coin', glyph: '🪙', coin: true, w: 15, noFree: true },
+      { id: 'moon', glyph: WOLF_IMG.moon, scatter: true, w: 6, reels: [0, 2, 4], pays: { 3: 2 } },
+      { id: 'coin', glyph: WOLF_IMG.coin, coin: true, w: 15, noFree: true },
     ], 3.18),
     freeSpins: { scatter: 'moon', count: { 3: 8 }, type: 'sticky-wilds', title: 'Blow Down Free Spins', retrigger: 3 },
     holdSpin: {
-      coin: 'coin', trigger: 6, respins: 3, landChance: 0.08,
+      coin: 'coin', trigger: 6, respins: 3, landChance: 0.08, img: { coin: WOLF_IMG.coin, wolf: WOLF_IMG.wolf, pig: WOLF_IMG.pig1 },
       coinValues: [
         { m: 1, w: 30 }, { m: 2, w: 25 }, { m: 3, w: 15 }, { m: 5, w: 10 },
         { m: 8, w: 6 }, { m: 10, w: 4 }, { m: 15, w: 2 },
@@ -6643,10 +6659,10 @@ const GAMES = [
         { type: 'pig', w: 3 }, { type: 'mini', w: 4 }, { type: 'minor', w: 1.6 }, { type: 'major', w: 0.4 },
       ],
       houses: [
-        { name: 'Paille', glyph: '🛖', cls: 'h-straw', base: 2 },
-        { name: 'Bois', glyph: '🏡', cls: 'h-wood', factor: 2 },
-        { name: 'Brique', glyph: '🏠', cls: 'h-brick', factor: 2 },
-        { name: 'Château', glyph: '🏰', cls: 'h-castle', factor: 2.5 },
+        { name: 'Paille', glyph: wimg('huff/straw'), cls: 'h-straw', base: 2 },
+        { name: 'Bois', glyph: wimg('huff/wood'), cls: 'h-wood', factor: 2 },
+        { name: 'Brique', glyph: wimg('huff/brick'), cls: 'h-brick', factor: 2 },
+        { name: 'Château', glyph: wimg('huff/brick'), cls: 'h-castle', factor: 2.5 },
       ],
       jackpots: { mini: 10, minor: 25, major: 100, grand: 1000 },
     },
@@ -7268,6 +7284,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'big-bad-wolf', date: '2026-11-01', title: 'Le Loup peint', items: ['Les images du Loup 2.0 : le loup, le cochon, les maisons et la pièce', 'Nouveau décor : la forêt enchantée', 'Mêmes règles, même Hold & Spin'] },
   { game: 'huff', date: '2026-11-01', title: 'Le Loup 2.0 peint', items: ['Nouveau loup WILD, nouveau cochon casqué et nouvelles maisons en paille, en bois et en briques', 'Nouveau scatter : la pièce d’or', 'Nouveau décor : la prairie au soleil', 'Nouvelle jaquette : les trois petits cochons'] },
   { game: 'labo', date: '2026-11-01', title: 'La Mallette plus lisible', items: ['Grille du bonus aux mêmes dimensions que les rouleaux, cases bien carrées', 'Taz plus grandes avec leur valeur bien visible', 'La fumée verte passe en grand bandeau au-dessus de la grille'] },
   { game: 'labo', date: '2026-11-01', title: 'Cachets retouchés', items: ['Nouveau cachet ourson orange avec une étoile', 'Nouvelle taz brique avec un éclair gravé'] },
@@ -7785,13 +7802,13 @@ async function runHoldSpin(m, grid) {
     c.el.className = 'hs-cell';
     if (!d) { c.el.innerHTML = '<div class="hs-empty"></div>'; return; }
     let inner = '';
-    if (d.type === 'coin') inner = `<div class="hs-sym coin"><span class="g">🪙</span><b>${fmtShort(d.v * bet)}</b></div>`;
+    if (d.type === 'coin') inner = `<div class="hs-sym coin"><span class="g">${cfg.img?.coin || '🪙'}</span><b>${fmtShort(d.v * bet)}</b></div>`;
     if (d.type === 'house') {
       const t = cfg.houses[d.tier];
       inner = `<div class="hs-sym house ${t.cls}"><span class="g">${t.glyph}</span><small>${t.name}</small><b>${fmtShort(d.v * bet)}</b>${d.tier ? `<i class="stars">${'★'.repeat(d.tier)}</i>` : ''}</div>`;
     }
-    if (d.type === 'wolf') inner = `<div class="hs-sym wolf"><span class="g">🐺</span><small>LOUP</small><b>${d.v ? fmtShort(d.v * bet) : ''}</b></div>`;
-    if (d.type === 'pig') inner = `<div class="hs-sym pig"><span class="g">🐷</span><small>COLLECT</small><b>${fmtShort(d.v * bet)}</b></div>`;
+    if (d.type === 'wolf') inner = `<div class="hs-sym wolf"><span class="g">${cfg.img?.wolf || '🐺'}</span><small>LOUP</small><b>${d.v ? fmtShort(d.v * bet) : ''}</b></div>`;
+    if (d.type === 'pig') inner = `<div class="hs-sym pig"><span class="g">${cfg.img?.pig || '🐷'}</span><small>COLLECT</small><b>${fmtShort(d.v * bet)}</b></div>`;
     if (['mini', 'minor', 'major', 'grand'].includes(d.type)) inner = `<div class="hs-sym jp jp-${d.type}"><span class="g">💠</span><small>${d.type.toUpperCase()}</small><b>${fmtShort(d.v * bet)}</b></div>`;
     c.el.innerHTML = inner;
     c.el.classList.add('locked');
@@ -8346,7 +8363,7 @@ class SlotMachine {
     const g = this.game;
     const jp = g.holdSpin?.jackpots;
     this.root.innerHTML = `
-      <div class="slot theme-${g.theme}">
+      <div class="slot theme-${g.theme}"${g.id === 'big-bad-wolf' ? ` style="--wolf-bg:url('${window.__assets?.['assets/games/wolf/bg.webp'] || 'assets/games/wolf/bg.webp?v=1'}')"` : ''}>
         <div class="slot-bg"></div>
         <div class="slot-head">
           <div class="slot-title"><span class="art gart">${coverSVG(g, { square: true })}</span><div><h2>${g.name}</h2><small>${g.subtitle}</small><em class="prov">${BRAND.provider}</em></div></div>
@@ -8829,7 +8846,7 @@ class SlotMachine {
     const g = this.game;
     return [
       { id: 'hold', icon: '🪙', label: 'Hold & Spin · 6 pièces', desc: '6 pièces garanties, 3 respins, le loup améliore les maisons', cost: g.buyBonus.cost },
-      { id: 'free', icon: '🌕', label: `${g.freeSpins.title} · 3 lunes`, desc: `${g.freeSpins.count[3]} free spins, les loups WILD restent collés`, cost: g.freeBuyCost || 70 },
+      { id: 'free', icon: '🪙', label: `${g.freeSpins.title} · 3 scatters`, desc: `${g.freeSpins.count[3]} free spins, les loups WILD restent collés`, cost: g.freeBuyCost || 70 },
     ];
   }
 
@@ -10060,6 +10077,11 @@ const CODES = {
   '98b88398f9ddfd06d70183d9fe0dd0c22f76ecc86df0e0dcd48626062eaa96df': 5000, // 2026-11-01
   '6bd8e59fbf94b9d309681142d0b8851134c7e0b713f223a35560af646184c0b9': 5000, // 2026-11-01
   '60304822394b29db3d23e9e5735a4db9da951ba8dcd553e2b4e68fa48ea5c144': 5000, // 2026-11-01
+  '50a4594c91bed203c56163d9aee98f491c76b3884c2ecf3e92102e97a98ecf1f': 5000, // 2026-11-01
+  '6ad42d8f1776a996c3d7a3c3d00dbcc5ff9f963206c7104774171d993b2aae02': 5000, // 2026-11-01
+  'b71724ff8d6c2df66609f717ee0664e8be5c681b3aa8ea949a3efd8240c22820': 5000, // 2026-11-01
+  '28826e7e3c43454556c6dd5787188f8fffdd22dfa55cdb840b0705adb7eb6305': 5000, // 2026-11-01
+  '37cfd32dc3892ba41b6ffc1d26076b8f4e4ae51cd1390e128acc04ce6c0023f8': 5000, // 2026-11-01
   // CODES-END
 };
 const normCode = (c) => String(c).toUpperCase().replace(/[^A-Z0-9]/g, '');
