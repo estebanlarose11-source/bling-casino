@@ -139,7 +139,7 @@ const painted = (name) => PAINTED.has(name);
 const img = (name, cls = 'lb-img') => `<img class="${cls}" src="${asset(`assets/games/labo/${name}.webp`)}" alt="" draggable="false" decoding="async">`;
 const symArt = (v) => (painted(FILE(v)) ? img(FILE(v)) : art(SVGID(v)));
 
-const NAMES = ['Feuille', 'Joint', 'Cachet diamant', 'Champignon magique', 'Buvard LSD', 'Cachet rose', 'Poudre', 'Cachet brique', 'Le Boss'];
+const NAMES = ['Feuille', 'Joint', 'Cachet diamant', 'Champignon magique', 'Buvard LSD', 'Cachet ourson', 'Poudre', 'Cachet brique', 'Le Boss'];
 const BUY_FS = 50, BUY_CASE = 33;
 const CUPN = ['Taz brique', 'Taz violette', 'Taz diamant'], CUPC = ['#ef4444', '#a855f7', '#38bdf8'];
 const bArt = (name, svg) => (painted(name) ? img(name) : art(svg));
