@@ -6697,7 +6697,7 @@ const SPECS = {
     },
   },
   dragons: {
-    bg: ['#7c2d12', '#0c0604'], light: '#f97316', title: ['L’HYDRE'], font: 'cinzel', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500',
+    bg: ['#7c2d12', '#0c0604'], light: '#f97316', title: ['L’HYDRE'], font: 'cinzel', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500', photo: 'assets/games/dragons/cover.webp',
     art: (u) => {
       const full = (id, x, y, w, r) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><use href="#${id}" x="${-w / 2}" y="${-w * 0.3}" width="${w}" height="${w * 0.594}"/></g>`;
       return `<ellipse cx="150" cy="260" rx="170" ry="70" fill="#f97316" opacity=".35"/>
@@ -6835,7 +6835,7 @@ function squareSVG(game, sp, cls) {
     <rect width="300" height="300" fill="url(#bg${u})"/>
     <rect width="300" height="300" fill="url(#spot${u})"/>
     ${bokeh}
-    ${sp.hero ? sp.hero(u) : `<g transform="translate(-18 -50) scale(1.12)">${sp.art(u)}</g>`}
+    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="300" preserveAspectRatio="xMidYMid slice"/>` : sp.hero ? sp.hero(u) : `<g transform="translate(-18 -50) scale(1.12)">${sp.art(u)}</g>`}
     <rect y="170" width="300" height="130" fill="url(#fade${u})"/>
     <g font-family="KeCoin,${FONTS.bebas}" font-weight="900" text-anchor="middle" filter="url(#tsh${u})">
       ${lines.map((t, k) => `<text x="150" y="${(y0 + k * step).toFixed(1)}" font-size="${size.toFixed(0)}" fill="#fff" stroke="rgba(0,0,0,.25)" stroke-width="1.5" paint-order="stroke" letter-spacing="1">${t}</text>`).join('')}
@@ -6847,6 +6847,8 @@ function squareSVG(game, sp, cls) {
   </svg>`;
 }
 
+// Covers can be a painted picture from the owner (spec.photo); the single-file version inlines it (window.__assets).
+const photoSrc = (p) => window.__assets?.[p] || `${p}?v=1`;
 function coverSVG(game, { cls = 'cover', badge = true, square = false } = {}) {
   const sp = SPECS[game.id];
   if (!sp) return '';
@@ -6883,7 +6885,7 @@ function coverSVG(game, { cls = 'cover', badge = true, square = false } = {}) {
     <g fill="${sp.light}" opacity=".05">${rays}</g>
     <rect width="300" height="400" fill="url(#spot${u})"/>
     <g filter="url(#soft${u})">${bokeh}</g>
-    ${sp.art(u)}
+    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="400" preserveAspectRatio="xMidYMid slice"/>` : sp.art(u)}
     <rect width="300" height="400" fill="url(#vig${u})"/>
     <rect y="250" width="300" height="150" fill="url(#fade${u})"/>
     <g font-family="KeCoin,${FONTS[sp.font]}" font-weight="900" text-anchor="middle" filter="url(#tsh${u})">
