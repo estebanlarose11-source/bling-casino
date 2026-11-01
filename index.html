@@ -523,7 +523,7 @@ section { margin-bottom: 28px; }
 .hs-empty { position: absolute; inset: 0; overflow: hidden; background: repeating-linear-gradient(45deg, rgba(255, 255, 255, .015) 0 8px, transparent 8px 16px); }
 /* Huff bonus: empty cells spin like little reels while the scatters fall */
 .hc-strip { position: absolute; left: 50%; top: 0; width: 62cqh; margin-left: -31cqh; display: flex; flex-direction: column; opacity: 0; transition: opacity .2s; }
-.hc-strip svg { width: 62cqh; height: 62cqh; flex: none; margin: 10cqh 0; }
+.hc-strip svg, .hc-strip .hf-img { width: 62cqh; height: 62cqh; flex: none; margin: 10cqh 0; }
 .hc-board.spin .hcell:not(.locked) .hc-strip { opacity: .5; filter: blur(1.4px); animation: hcReel .26s linear infinite; }
 @keyframes hcReel { from { transform: translateY(-50%); } to { transform: translateY(0); } }
 .mega-wheel .mseg { stroke: #1a0f05; stroke-width: 1.2; }
@@ -1009,12 +1009,23 @@ body.gated { overflow: hidden; }
 
 /* ============ Huff la Puff ============ */
 .g-huff { --slot-bg: radial-gradient(420px 220px at 85% 0%, rgba(253, 224, 71, .22), transparent 70%), linear-gradient(180deg, #0d2a4a 0%, #12331f 60%, #0b1d10 100%); }
+.g-huff .slot-stage { background: linear-gradient(180deg, rgba(8, 20, 40, .25), rgba(8, 20, 40, .1) 45%, rgba(6, 24, 12, .45)), var(--hf-bg) center / cover no-repeat; border-radius: 14px; }
+.g-huff .rs-reel { background: linear-gradient(180deg, rgba(255, 255, 255, .78), rgba(240, 250, 255, .7) 50%, rgba(255, 255, 255, .78)); box-shadow: inset 0 0 0 2px rgba(255, 179, 92, .7), 0 4px 10px rgba(0, 0, 0, .25); }
+.g-huff .rs-reel::before { background: linear-gradient(rgba(255, 255, 255, .7), transparent); }
+.g-huff .rs-reel::after { background: linear-gradient(transparent, rgba(255, 255, 255, .7)); }
+.hf-img { width: 88%; height: 88%; object-fit: contain; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .35)); }
+.g-huff .rs-cell.win .hf-img { animation: winBounce 1s ease-in-out infinite; }
+.g-huff .rs-cell.scat .hf-img { animation: orbPulse 1.6s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(253, 224, 71, .95)); }
+.hr-hub .hf-img { width: 100%; height: 100%; object-fit: contain; }
+.intro-glyph .hf-img { width: 140px; height: 140px; }
+.pay-sym .hf-img { width: 44px; height: 44px; }
 .rs-cell.brick { background: radial-gradient(circle, rgba(240, 118, 90, .3), transparent 70%); }
 .rs-cell.brick svg { filter: drop-shadow(0 0 10px rgba(255, 120, 80, .8)); }
 .rs-cell.jpb svg { filter: drop-shadow(0 0 12px rgba(253, 224, 71, .95)); }
 .rs-cell .cv.jn { font-size: calc(11cqh / var(--rows) * 3); letter-spacing: .05em; }
 .wolf-face.svgwolf { transform: none; }
-.wolf-face.svgwolf svg { width: 78%; height: 78%; }
+.wolf-face.svgwolf svg, .wolf-face.svgwolf .hf-img { width: 78%; height: 78%; }
+.wolf-face.svgwolf .hf-img { transform: scaleX(-1); }
 .wolf-actor.inhale .wolf-face.svgwolf { transform: scale(1.16) translateY(-4%); }
 .wolf-actor.blow .wolf-face.svgwolf { transform: scale(1.05) rotate(8deg) translateX(6%); }
 .hs-board .hs-sym svg { width: 64%; height: 54%; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .6)); }
@@ -1029,15 +1040,15 @@ body.gated { overflow: hidden; }
 .hcell.c3 { --lc: #fbbf24; --lg: rgba(251, 191, 36, .75); animation: goldCell 1.8s ease-in-out infinite; }
 @keyframes goldCell { 50% { box-shadow: 0 0 26px var(--lg), inset 0 0 26px var(--lg); } }
 .hs-sym.hc { background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--lc) 35%, transparent), rgba(0, 0, 0, .55)); }
-.hs-sym.hc svg { width: 56%; height: 56%; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .6)); }
+.hs-sym.hc svg, .hs-sym.hc .hf-img { width: 64%; height: 64%; object-fit: contain; height: 56%; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .6)); }
 .hs-sym.hc .q { position: absolute; right: 7cqh; bottom: 4cqh; font-size: 22cqh; color: #fff; text-shadow: 0 0 10px var(--lc), 0 2px 0 rgba(0, 0, 0, .7); }
 .hcell.c3 .hs-sym.hc { background: radial-gradient(circle at 50% 40%, rgba(253, 224, 71, .45), rgba(120, 53, 15, .6)); }
 .hc-board.spin .hcell::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent, rgba(255, 255, 255, .22), transparent); animation: hcSweep .65s linear; pointer-events: none; }
 @keyframes hcSweep { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
 .hc-drop { position: absolute; inset: 8%; z-index: 3; display: grid; place-items: center; animation: hcDrop .34s cubic-bezier(.5, 0, .7, 1.4) both; }
-.hc-drop svg { width: 80%; height: 80%; filter: drop-shadow(0 0 14px #fde047); }
+.hc-drop svg, .hc-drop .hf-img { width: 80%; height: 80%; filter: drop-shadow(0 0 14px #fde047); }
 @keyframes hcDrop { from { transform: translateY(-140%) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
-.hcell.blown .hs-sym.hc svg { animation: houseFly .5s ease-in forwards; }
+.hcell.blown .hs-sym.hc svg, .hcell.blown .hs-sym.hc .hf-img { animation: houseFly .5s ease-in forwards; }
 .hcell.blown .hs-sym.hc .q { opacity: 0; transition: opacity .2s; }
 @keyframes houseFly { to { transform: translate(160%, -60%) rotate(70deg) scale(.5); opacity: 0; } }
 .hc-val { display: flex; flex-direction: column; align-items: center; animation: hsPop .55s cubic-bezier(.3, 1.8, .5, 1); }
@@ -6783,7 +6794,7 @@ const SPECS = {
       <g font-family="KeCoin,${FONTS.orb}" font-weight="900" text-anchor="middle" fill="#fff7d6" stroke="#78350f" stroke-width="1" paint-order="stroke"><text x="66" y="258" font-size="15">×500</text><text x="236" y="261" font-size="13">×50</text></g>`,
   },
   huff: {
-    bg: ['#0e3a63', '#06140c'], light: '#9be7ff', title: ['LE LOUP', '2.0'], font: 'bebas', metal: ['#fff', '#ffb35c', '#d9480f'], tag: 'HOLD & SPIN',
+    bg: ['#0e3a63', '#06140c'], light: '#9be7ff', title: ['LE LOUP', '2.0'], font: 'bebas', metal: ['#fff', '#ffb35c', '#d9480f'], tag: 'HOLD & SPIN', photo: 'assets/games/huff/cover.webp',
     hero: (u) => `
       <g opacity=".75">${sym('hs', 44, 196, 66)}${sym('hb', 258, 190, 74)}</g>
       <svg x="30" y="40" width="240" height="172" viewBox="0 2 64 46" filter="url(#sh${u})"><use href="#wf" width="64" height="64"/></svg>
@@ -7257,6 +7268,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'huff', date: '2026-11-01', title: 'Le Loup 2.0 peint', items: ['Nouveau loup WILD, nouveau cochon casqué et nouvelles maisons en paille, en bois et en briques', 'Nouveau scatter : la pièce d’or', 'Nouveau décor : la prairie au soleil', 'Nouvelle jaquette : les trois petits cochons'] },
   { game: 'labo', date: '2026-11-01', title: 'La Mallette plus lisible', items: ['Grille du bonus aux mêmes dimensions que les rouleaux, cases bien carrées', 'Taz plus grandes avec leur valeur bien visible', 'La fumée verte passe en grand bandeau au-dessus de la grille'] },
   { game: 'labo', date: '2026-11-01', title: 'Cachets retouchés', items: ['Nouveau cachet ourson orange avec une étoile', 'Nouvelle taz brique avec un éclair gravé'] },
   { game: 'labo', date: '2026-11-01', title: 'Le Boss et la mallette', items: ['Nouveau Boss en symbole premium : cheveux violets, lunettes arc-en-ciel et joint', 'Nouvelle mallette qui lance le bonus', 'Le démon au-dessus des rouleaux est retiré : le festival se voit mieux'] },
@@ -9879,7 +9891,7 @@ __mods['games/impl/index.js'] = (() => {
 
 const FILES = {
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', 'e5d34f1a35'],
-  huff: ['huff', 'games/impl/huff.js', 'HuffGame', '3a85f14671'],
+  huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a1fe33533c'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '34313e97cc'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'cad2eb2bf8'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],

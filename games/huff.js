@@ -146,7 +146,13 @@ const HOUSE_NAME = [null, 'MAISON ROUGE', 'MAISON BLEUE', 'MAISON OR'];
 const MWHEEL = ['five', 'gold', 'five', 'major', 'five', 'gold', 'five', 'grand', 'five', 'gold', 'five', 'major'];
 const MLAB = { five: ['5 TOURS', 'Bonus 5 tours'], gold: ['MAISONS OR', 'Bonus maisons en or'], major: ['MAJOR', 'MAJOR JACKPOT'], grand: ['JACKPOT', 'GRAND JACKPOT'] };
 const BONUS_NAME = { n: 'HUFF ’N’ PUFF', x: 'XXTREM PUFF', g: 'MAISONS EN OR', f: 'MEGA PUFF' };
-const art = (id) => `<svg viewBox="0 0 64 64" aria-hidden="true"><use href="#${id}" width="64" height="64"/></svg>`;
+// Painted images from the owner (assets/games/huff): the wolf, the 3 houses, the pig and the scatter coin.
+// The card symbols (A K Q J 10) keep their drawn art.
+const IMG_V = 1;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const PAINT = { wf: 'wolf', hb: 'brick', hw: 'wood', hs: 'straw', pg: 'pig', hsc: 'scatter', wolf: 'wolfplain' };
+const src = (id) => asset(`assets/games/huff/${PAINT[id]}.webp`);
+const art = (id) => (PAINT[id] ? `<img class="hf-img" src="${src(id)}" alt="" draggable="false" decoding="async">` : `<svg viewBox="0 0 64 64" aria-hidden="true"><use href="#${id}" width="64" height="64"/></svg>`);
 const MUSIC = { sd: 0.21, len: 16, root: 196, lead: { wave: 'square', vol: 0.03, dur: 0.18, pat: [12, null, 16, null, 19, null, 16, null, 14, null, 17, null, 21, null, 19, null] }, bass: { wave: 'triangle', vol: 0.11, dur: 0.26, pat: [-12, null, -5, null, -12, null, -5, null, -7, null, 0, null, -7, null, 0, null] }, comp: { wave: 'square', vol: 0.016, dur: 0.12, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [5, 9, 12], 14: [5, 9, 12] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 };
 const LINE_COLORS = ['#ff4a4a', '#4aa8ff', '#ffd23f', '#6aff7a', '#d27aff', '#ff9a3a', '#3affd2', '#ff6ac8'];
 const xs = (n) => String(n).replace('.', ',');
@@ -175,6 +181,8 @@ class HuffGame extends BaseGame {
     this.reels.setAll([1, 2, 4, 5, 0, 3, 6, SC, 7, 8, 2, 0, 9, 4, 3]);
     this.svg = this.q('.paylines');
     try { localStorage.removeItem('huff_state'); } catch { /* old Hold & Spin save */ }
+    Object.keys(PAINT).forEach((id) => { new Image().src = src(id); });
+    this.q('.slot-stage').style.setProperty('--hf-bg', `url("${asset('assets/games/huff/bg.webp')}")`);
     this.onBetChange();
     this.resume();
   }
@@ -239,7 +247,7 @@ class HuffGame extends BaseGame {
     if (sc.length >= 5) return this.megaBonus(sc, bet);
     let st;
     if (sc.length >= 4) {
-      await this.featureIntro('XXTREM PUFF', `${sc.length} scatters · la roulette des maisons décide de tes 6 cases`, art('wf'));
+      await this.featureIntro('XXTREM PUFF', `${sc.length} scatters · la roulette des maisons décide de tes 6 cases`, art('wolf'));
       const house = spinHouse();
       await this.houseRoulette(house);
       st = newBonus(sc, 'x', house);
@@ -269,11 +277,11 @@ class HuffGame extends BaseGame {
     const slices = WHEEL.map((lv, k) => {
       const a0 = k * seg, a1 = a0 + seg, mid = a0 + seg / 2, ic = pt(mid, 64).split(' ');
       return `<path class="wseg w${lv}" d="M${R} ${R} L${pt(a0, 96)} A96 96 0 0 1 ${pt(a1, 96)} Z"/>
-        <g transform="rotate(${mid} ${ic[0]} ${ic[1]})"><use href="#${LVHOUSE[lv]}" x="${ic[0] - 17}" y="${ic[1] - 17}" width="34" height="34"/></g>`;
+        <g transform="rotate(${mid} ${ic[0]} ${ic[1]})"><image href="${src(LVHOUSE[lv])}" x="${ic[0] - 19}" y="${ic[1] - 19}" width="38" height="38"/></g>`;
     }).join('');
     const ov = this.overlay(`<h3>ROULETTE DES MAISONS</h3>
       <div class="hr-wheel"><div class="hr-pointer"></div><svg class="hr-disc" viewBox="0 0 200 200">${slices}<circle cx="100" cy="100" r="96" class="hr-rim"/></svg>
-      <div class="hr-hub">${art('wf')}</div></div>
+      <div class="hr-hub">${art('wolf')}</div></div>
       <div class="hr-res">La roue tourne…</div>`, 'house-roulette');
     const disc = ov.querySelector('.hr-disc'), res = ov.querySelector('.hr-res');
     const opts = WHEEL.map((lv, k) => (lv === house ? k : -1)).filter((k) => k >= 0);
@@ -308,7 +316,7 @@ class HuffGame extends BaseGame {
 
   /* ---------- MEGA bonus (5 scatters) ---------- */
   async megaBonus(sc, bet) {
-    await this.featureIntro('MEGA BONUS', '5 scatters · la roue du loup choisit ton bonus', art('wf'));
+    await this.featureIntro('MEGA BONUS', '5 scatters · la roue du loup choisit ton bonus', art('wolf'));
     const o = spinMega();
     await this.megaWheel(o);
     if (this.dead) return;
@@ -335,7 +343,7 @@ class HuffGame extends BaseGame {
     }).join('');
     const ov = this.overlay(`<h3>MEGA BONUS</h3>
       <div class="hr-wheel"><div class="hr-pointer"></div><svg class="hr-disc" viewBox="0 0 200 200">${slices}<circle cx="100" cy="100" r="96" class="hr-rim"/></svg>
-      <div class="hr-hub">${art('wf')}</div></div>
+      <div class="hr-hub">${art('wolf')}</div></div>
       <div class="hr-res">La roue du loup tourne…</div>`, 'house-roulette mega-wheel');
     const disc = ov.querySelector('.hr-disc'), res = ov.querySelector('.hr-res');
     const opts = MWHEEL.map((o, k) => (o === outcome ? k : -1)).filter((k) => k >= 0);
@@ -518,7 +526,7 @@ class HuffGame extends BaseGame {
     this.setBanner('<b>LE LOUP SOUFFLE</b><span class="pill gold">Révélation</span>');
     this.msg('Le loup va souffler sur les maisons…');
     await this.wait(500);
-    const actor = el('div', 'wolf-actor', `<div class="wolf-wrap"><div class="wolf-glow"></div><div class="wolf-face svgwolf"><svg viewBox="0 2 64 46" aria-hidden="true"><use href="#wf" width="64" height="64"/></svg></div><div class="cheek l"></div><div class="cheek r"></div><div class="breath"></div></div><div class="huff-text"></div>`);
+    const actor = el('div', 'wolf-actor', `<div class="wolf-wrap"><div class="wolf-glow"></div><div class="wolf-face svgwolf">${art('wolf')}</div><div class="cheek l"></div><div class="cheek r"></div><div class="breath"></div></div><div class="huff-text"></div>`);
     this.slotEl.appendChild(actor);
     const txt = actor.querySelector('.huff-text');
     this.slotEl.classList.add('wolf-night');
