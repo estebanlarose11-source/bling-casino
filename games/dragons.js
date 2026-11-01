@@ -95,14 +95,22 @@ const BUY_FS = 40, BUY_SUPER = 155;
 const MODEN = { A: 'VOL DES DRAGONS', S: 'SUPER BONUS' };
 const JPN = ['MINI', 'MAJEUR', 'JACKPOT'];
 const WORDS = ['FUSION !', 'DOUBLE FUSION !', 'RUGISSEMENT !', 'TEMPÊTE DE FEU !', 'DRAGONS DÉCHAÎNÉS !'];
-const half = (id, side) => `<svg viewBox="${side ? 64 : 0} -8 64 76" preserveAspectRatio="${side ? 'xMinYMid' : 'xMaxYMid'} meet" aria-hidden="true"><use href="#${id}" width="128" height="76" y="-8"/></svg>`;
-const full = (id) => `<svg viewBox="0 -8 128 76" aria-hidden="true"><use href="#${id}" width="128" height="76" y="-8"/></svg>`;
+// Painted art (owner's images, assets/games/dragons): each dragon card is split in two, the left reel shows its left
+// half and the right reel its right half, so two halves side by side rebuild the card. Single-cell symbols show the
+// middle of their card.
+const IMG_V = 1;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const FILE = { dg0: 'd0', dg1: 'd1', dg2: 'd2', dg3: 'd3', dg4: 'd4', dg5: 'd5', dg6: 'd6', dg7: 'd7', dg8: 'd8', dgj: 'pearl', dgs: 'stone', dgsc: 'scat', dgsu: 'super', dgm: 'mult' };
+const src = (id) => asset(`assets/games/dragons/${FILE[id]}.webp`);
+const half = (id, side) => `<span class="dg-h ${side ? 'r' : 'l'}" style="background-image:url('${src(id)}')"></span>`;
+const full = (id) => `<span class="dg-card" style="background-image:url('${src(id)}')"></span>`;
+const one = (id, x = 50) => `<span class="dg-one" style="background-image:url('${src(id)}');background-position:${x}% 50%"></span>`;
 function cellArt(v, i) {
-  if (v >= JPCELL) return art('dgjc') + `<b class="dg-cv jp">${JPN[v - JPCELL]}</b>`;
-  if (v >= MULT) return art('dgm') + `<b class="dg-cv">×${v - MULT}</b>`;
-  if (v === SCAT) return art('dgsc') + '<b class="dg-cv sc">SCATTER</b>';
-  if (v === SUPER) return art('dgsu') + '<b class="dg-cv su">SUPER</b>';
-  if (v === STONE) return art('dgs');
+  if (v >= JPCELL) return one(DID[6 + v - JPCELL], 72) + `<b class="dg-cv jp">${JPN[v - JPCELL]}</b>`;
+  if (v >= MULT) return one('dgm', 62) + `<b class="dg-cv">×${v - MULT}</b>`;
+  if (v === SCAT) return one('dgsc') + '<b class="dg-cv sc">SCATTER</b>';
+  if (v === SUPER) return one('dgsu', 55) + '<b class="dg-cv su">SUPER</b>';
+  if (v === STONE) return one('dgs');
   return half(v === PEARL ? 'dgj' : DID[v], Math.floor(i / ROWS) % 2);
 }
 
@@ -124,6 +132,7 @@ class DragonsGame extends BaseGame {
       cols: COLS, rows: ROWS, game: this, art: cellArt,
       cls: (v, i) => (Math.floor(i / ROWS) % 2 ? 'dgR ' : 'dgL ') + (v >= JPCELL ? 'full jpc' : v >= MULT ? 'full mult' : v === SCAT ? 'full scat' : v === SUPER ? 'full super' : v === STONE ? 'full stone' : v === PEARL ? 'pearl' : v >= 6 ? 'jp' : ''),
     });
+    Object.keys(FILE).forEach((id) => { new Image().src = src(id); });
     this.grid.setAll(Array.from({ length: N }, () => draw({ fs: false })));
     this.onBetChange();
   }
@@ -252,7 +261,7 @@ class DragonsGame extends BaseGame {
     const b = this.bet, cap = b * CAPX;
     let left = FS_SPINS, tot = 0, done = 0;
     this.lastStake = b;
-    await this.featureIntro(MODEN[mode], mode === 'S' ? `${FS_SPINS} tours gratuits · dragons multiplicateurs ×2 à ×100 · cases MINI, MAJEUR et JACKPOT` : `${FS_SPINS} tours gratuits · des dragons multiplicateurs ×2 à ×10 peuvent tomber`, art(mode === 'S' ? 'dgsu' : 'dgsc'));
+    await this.featureIntro(MODEN[mode], mode === 'S' ? `${FS_SPINS} tours gratuits · dragons multiplicateurs ×2 à ×100 · cases MINI, MAJEUR et JACKPOT` : `${FS_SPINS} tours gratuits · des dragons multiplicateurs ×2 à ×10 peuvent tomber`, `<img class="dg-intro" src="${src(mode === 'S' ? 'dgsu' : 'dgsc')}" alt="">`);
     this.slotEl.classList.add('in-free', `fs-${mode}`);
     while (left > 0 && tot < cap && !this.dead) {
       left--; done++;
@@ -276,8 +285,8 @@ class DragonsGame extends BaseGame {
     const rows = DID.map((id, s) => `<div class="pay-item"><div class="pay-sym svg dgp">${full(id)}</div><div class="pay-vals"><b>${DNAME[s]}</b><br><span>${s < 6 ? `Puissance ${POWER[s]} : ×${String(Math.round(POWER[s] * P.K * 1000) / 1000).replace('.', ',')} la mise` : `Jackpot : ×${JP[s - 6]} la mise`}</span></div></div>`).join('');
     return this.rules(`<h4>Têtes de dragon (gain à chaque fusion)</h4><div class="paytable">${rows}
       <div class="pay-item"><div class="pay-sym svg dgp">${full('dgj')}</div><div class="pay-vals"><b>Perle du dragon</b><br><span>Une demi-perle complète n’importe quelle demi-tête. Deux demi-perles = Dragon blanc.</span></div></div>
-      <div class="pay-item"><div class="pay-sym svg">${art('dgsc')}</div><div class="pay-vals"><b>Dragon scatter</b><br><span>3 ou plus quand les cascades s’arrêtent : ${MODEN.A}</span></div></div>
-      <div class="pay-item"><div class="pay-sym svg">${art('dgsu')}</div><div class="pay-vals"><b>SUPER scatter dragon</b><br><span>Compte comme un scatter ; s’il fait partie des 3 : ${MODEN.S}</span></div></div></div>
+      <div class="pay-item"><div class="pay-sym svg dgp">${full('dgsc')}</div><div class="pay-vals"><b>Dragon scatter</b><br><span>3 ou plus quand les cascades s’arrêtent : ${MODEN.A}</span></div></div>
+      <div class="pay-item"><div class="pay-sym svg dgp">${full('dgsu')}</div><div class="pay-vals"><b>SUPER scatter dragon</b><br><span>Compte comme un scatter ; s’il fait partie des 3 : ${MODEN.S}</span></div></div></div>
       <h4>Fusion et cascades</h4><p>Les rouleaux vont par paires : à gauche des moitiés gauches de têtes, à droite des moitiés droites. Quand les deux moitiés de la même tête sont côte à côte sur une ligne d’une paire, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Il disparaît ensuite, les cases du dessus retombent, de nouvelles moitiés arrivent et chaque nouvelle tête complète paie à son tour. Les pierres ne fusionnent jamais.</p>
       <h4>${MODEN.A}</h4><p>${FS_SPINS} tours gratuits. Des <b>dragons multiplicateurs</b> (×2, ×3, ×5, ×10) peuvent tomber : à la fin du tour, ils s’additionnent et multiplient tous les gains de fusion du tour. 3 scatters de plus : +3 tours.</p>
       <h4>${MODEN.S}</h4><p>${FS_SPINS} tours gratuits avec des dragons multiplicateurs bien plus fréquents, de ×2 à <b>×100</b>, et des <b>cases jackpot</b> qui paient tout de suite : MINI ×${JP[0]}, MAJEUR ×${JP[1]} ou JACKPOT ×${JP[2]}.</p>

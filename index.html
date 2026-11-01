@@ -3035,8 +3035,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .dg-grand small { color: #fde047; } .dg-grand b { font-size: clamp(15px, 2.2vw, 20px); color: #fff7c2; }
 .dg-jp.flash, .dg-grand.flash { animation: bvFlash .3s ease-in-out 6 alternate; }
 /* grid: 3 pairs of reels, no frames: soft cells over the lair; inside a pair a thin glowing divider separates the halves */
-.game-host:not(.is-full):has(> .g-dragons) { max-width: max(420px, min(1180px, calc((100vh - var(--chrome) + var(--sgx, 10px)) * 6.5 / 3 + 60px))); }
-.g-dragons .sg { grid-template-columns: 1fr 1fr 10px 1fr 1fr 10px 1fr 1fr; grid-auto-flow: row; gap: 6px 0; aspect-ratio: calc(6.5 / 3); width: min(100%, calc((100vh - var(--chrome) + var(--sgx, 10px)) * 6.5 / 3)); padding: 0; background: none; }
+.game-host:not(.is-full):has(> .g-dragons) { max-width: max(420px, min(1180px, calc((100vh - var(--chrome) + var(--sgx, 10px)) * 3.9 / 3 + 60px))); }
+.g-dragons .sg { grid-template-columns: 1fr 1fr 10px 1fr 1fr 10px 1fr 1fr; grid-auto-flow: row; gap: 6px 0; aspect-ratio: calc(3.9 / 3); width: min(100%, calc((100vh - var(--chrome) + var(--sgx, 10px)) * 3.9 / 3)); padding: 0; background: none; }
 .g-dragons .sg-cell:nth-child(3n+1) { grid-row: 1; } .g-dragons .sg-cell:nth-child(3n+2) { grid-row: 2; } .g-dragons .sg-cell:nth-child(3n) { grid-row: 3; }
 .g-dragons .sg-cell:nth-child(-n+3) { grid-column: 1; }
 .g-dragons .sg-cell:nth-child(n+4):nth-child(-n+6) { grid-column: 2; }
@@ -3048,6 +3048,23 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 /* every cell keeps the size of its grid slot (no other game's rule may squash it) */
 .g-dragons .sg-cell { aspect-ratio: auto !important; width: auto !important; height: auto !important; min-width: 0; }
 .g-dragons .sg-cell.dgL { border-radius: 12px 0 0 12px; }
+/* painted cards (owner's images): halves, single-cell symbols, fused card, painted lair */
+.dg-h, .dg-one, .dg-card { position: absolute; inset: 3px; display: block; background-repeat: no-repeat; pointer-events: none; }
+.dg-h { background-size: 200% 100%; }
+.dg-h.l { right: 0; background-position: 0 50%; border-radius: 9px 0 0 9px; }
+.dg-h.r { left: 0; background-position: 100% 50%; border-radius: 0 9px 9px 0; }
+.dg-one { background-size: cover; border-radius: 9px; }
+.dg-card { inset: 0; background-size: cover; background-position: 50% 50%; border-radius: 6px; }
+.dg-fused .dg-card { inset: 2px; }
+.dgp { position: relative; width: 74px !important; height: 59px !important; border-radius: 8px; overflow: hidden; }
+.dg-intro { width: min(46vw, 220px); aspect-ratio: 1.25; object-fit: cover; border-radius: 16px; box-shadow: 0 0 30px rgba(251, 146, 60, .7); }
+.g-dragons .sg-cell.stone .dg-one { opacity: .42; background-position: 30% 50%; }
+.g-dragons .sg-cell.stone { background: rgba(10, 5, 3, .35); }
+.g-dragons .sg-cell.scat .dg-one, .g-dragons .sg-cell.super .dg-one { animation: dgImg 1.4s ease-in-out infinite; }
+@keyframes dgImg { 50% { transform: scale(1.05); } }
+.g-dragons .sg-cell.pulse .dg-one { animation: dgImg .5s ease-in-out infinite; }
+.g-dragons .dg-lair, .g-dragons.fs-A .dg-lair, .g-dragons .dg-glow, .g-dragons .dg-gold { display: none; }
+.g-dragons.busy .sg-cell.scat .dg-one, .g-dragons.in-free .sg-cell:not(.pulse) .dg-one { animation: none; }
 .g-dragons .sg-cell.dgR { border-radius: 0 12px 12px 0; }
 .g-dragons .sg-cell.dgL::after { content: ''; position: absolute; right: 0; top: 14%; bottom: 14%; width: 1px; background: rgba(253, 230, 138, .55); box-shadow: 0 0 5px #fbbf24; transition: opacity .3s; }
 .g-dragons .sg-cell.dgL .sg-sym { justify-items: end; } .g-dragons .sg-cell.dgR .sg-sym { justify-items: start; }
@@ -3083,7 +3100,6 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .dg-word { position: absolute; left: 50%; top: 58%; z-index: 6 !important; pointer-events: none; opacity: 0; font: 900 clamp(28px, 5.6vw, 64px)/1 KeCoin, Cinzel, Georgia, serif; letter-spacing: 2px; white-space: nowrap;
   background: linear-gradient(180deg, #fff7c2, #fbbf24 45%, #ea580c 60%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #3b0a02) drop-shadow(0 0 16px rgba(249, 115, 22, .9)); }
 .dg-word.jp { filter: drop-shadow(0 3px 0 #78350f) drop-shadow(0 0 22px #fde047); }
-.g-dragons.fs-A .dg-lair { background: radial-gradient(ellipse at 50% 120%, #b91c1c, #2a0a05 60%), linear-gradient(180deg, #2a0d08, #0c0604); }
 .g-dragons.fs-S .dg-lair { background: radial-gradient(ellipse at 50% 120%, #f59e0b, #7c2d12 45%, #1c0a05 75%); }
 .g-dragons.fs-S .dg-glow { opacity: 1; animation-duration: 1s; }
 .pay-sym.dgp { width: 84px; }
@@ -6894,6 +6910,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'dragons', date: '2026-11-01', title: 'L’Hydre peinte', items: ['Nouvelles têtes de dragon peintes : vert, bleu, rouge, violet, noir, blanc, bronze, diamant et or', 'Nouvelle perle magique, pierre runique, scatter, SUPER scatter et bébé dragon multiplicateur', 'Nouveau décor : l’antre au trésor du dragon'] },
   { game: 'anubis', date: '2026-11-01', title: 'Bonus plus fluides', items: ['Jugement et Monde souterrain environ 2 fois plus fluides, surtout sur téléphone', 'Les symboles restent immobiles pendant les tours et ne bougent qu’à l’arrêt'] },
   { game: 'anubis', date: '2026-11-01', title: 'Jugement peint', items: ['Nouveau décor : la salle du trône en lave', 'Nouveaux cubes dessinés : pierre, noir et or, crâne violet, crâne doré et lave', 'Le trône se voit à travers la grille'] },
   { game: 'anubis', date: '2026-11-01', title: 'Monde souterrain peint', items: ['Nouveau décor : le temple souterrain et son portail lumineux', 'Nouveau crâne doré qui brille, avec son multiplicateur'] },
@@ -9520,7 +9537,7 @@ const FILES = {
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '217f54e3fd'],
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', '3f3eaaaa3b'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'f3c9203150'],
-  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '0e1f2d5a5e'],
+  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '453deb4a64'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '67c9c0259d'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '576f0f4127'],
