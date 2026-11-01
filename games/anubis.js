@@ -78,7 +78,7 @@ const EXTRA_DEFS = `<svg width="0" height="0" style="position:absolute" aria-hid
 const WORDS = ['DIVIN !', 'SACRÉ !', 'PHARAONIQUE !', 'ÉTERNEL !', 'IMMORTEL !', 'JUGEMENT DIVIN !'];
 const GOLD = ['#fde68a', '#f59e0b', '#fff', '#5eead4'];
 function symArt(v) {
-  if (v >= 1000) return art('gk') + lab('×' + (v - 1000));
+  if (v >= 1000) return `<img class="an-img gk" src="${asset('assets/games/anubis/gk.webp')}" alt="" draggable="false">` + lab('×' + (v - 1000));
   if ((v >= 0 && v < IMG_N) || v === WILD || v === SC) return imgSym(v);
   return art('s' + v);
 }
@@ -103,7 +103,7 @@ class AnubisGame extends BaseGame {
     this.jrow.innerHTML = Array.from({ length: C }, () => '<div><b><i>×</i>1</b><i class="lbl"></i></div>').join('');
     // load the painted symbols and the temple right away, so the first spin shows no empty cell
     [...Array(IMG_N).keys(), WILD, SC].forEach((v) => { new Image().src = asset(`assets/games/anubis/${imgFile(v)}.webp`); });
-    new Image().src = asset('assets/games/anubis/bg.webp');
+    ['bg', 'bg-under', 'gk'].forEach((n) => { new Image().src = asset(`assets/games/anubis/${n}.webp`); });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: C, rows: R, game: this, art: symArt,
       cls: (v) => (v === WILD ? 'wild' : v === SC ? 'scatter' : v >= 1000 ? 'gskull' : ''),
