@@ -2238,6 +2238,20 @@ body.fs-on { overflow: hidden; }
 }
 /* normal page on a laptop screen: smaller croupière so the table, the chips and DISTRIBUER fit */
 @media (min-width: 900px) and (max-height: 920px) { .game-host:not(.is-full) .bjx { --cw: clamp(130px, 30cqw, 220px); } .game-host:not(.is-full) .bjx-felt.bj-table { aspect-ratio: 2.4 / 1; } }
+.slot.g-billets > .slot-bg { background: url(assets/games/billets/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.g-billets > .slot-bg::after { display: none; }
+.g-billets .slot-title { display: none !important; }
+.g-billets .slot-head { margin-bottom: 6px; justify-content: center; }
+.g-billets > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.g-billets > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; }
+.g-billets .bv-vault { display: none; }
+.g-billets .rs-reel { background: rgba(20, 8, 4, .35) !important; }
+.g-billets .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.g-billets .controls { background: rgba(6, 10, 24, .5); border-color: rgba(255, 255, 255, .14); }
+.game-host.is-full:has(> .g-billets) { padding: 0; background: #05060c; }
+.game-host.is-full > .slot.g-billets { width: 100%; max-width: none !important; min-height: 100%; margin: 0; border-radius: 0; border: 0; display: flex; flex-direction: column; justify-content: center; padding: max(8px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px)); }
+.game-host.is-full > .slot.g-billets > .slot-bg { grid-column: auto !important; grid-row: auto !important; position: absolute; inset: 0; }
+.game-host.is-full > .slot.g-billets .controls { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
 /* phone held sideways: slots get the grid on the left and the controls in a side column */
 @media (orientation: landscape) and (max-height: 560px) {
   .game-host.is-full { --chrome: 96px; padding: 4px max(8px, env(safe-area-inset-right, 0px)) 4px max(8px, env(safe-area-inset-left, 0px)); }
@@ -3315,9 +3329,12 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .g-billets .rs-reel::before { background: linear-gradient(rgba(20, 14, 4, .75), transparent); }
 .g-billets .rs-reel::after { background: linear-gradient(transparent, rgba(20, 14, 4, .75)); }
 .g-billets .rs-cell { padding: 2% 1.5%; }
-.g-billets .rs-cell svg { width: 100%; height: 100%; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .55)); }
+.g-billets .rs-cell svg, .g-billets .rs-cell .bv-img { width: 100%; height: 100%; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .55)); }
+.bv-img { display: block; object-fit: contain; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.bv-rain .bv-img, .bv-fly .bv-img { width: 100%; height: 100%; }
+.pay-sym .bv-img { width: 64px; height: 38px; }
 .g-billets .rs-cell.win { z-index: 2; }
-.g-billets .rs-cell.win svg { filter: drop-shadow(0 0 6px #fde047) drop-shadow(0 0 14px rgba(253, 224, 71, .8)); animation: bvWin .7s ease-in-out infinite; }
+.g-billets .rs-cell.win svg, .g-billets .rs-cell.win .bv-img { filter: drop-shadow(0 0 6px #fde047) drop-shadow(0 0 14px rgba(253, 224, 71, .8)); animation: bvWin .7s ease-in-out infinite; }
 @keyframes bvWin { 50% { transform: scale(1.06) rotate(-1deg); } }
 .g-billets .rs-cell.cash svg, .g-billets .rs-cell.fsb svg { animation: bvGlint 2.2s ease-in-out infinite; }
 @keyframes bvGlint { 50% { filter: drop-shadow(0 0 8px rgba(253, 224, 71, .9)); } }
@@ -3547,7 +3564,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 @media (max-width: 600px) and (orientation: portrait) {
   .g-billets .rs { aspect-ratio: calc(var(--cols) / 1.75 / var(--rows)); width: min(100%, calc((100vh - var(--chrome) + 75px) * var(--cols) / 1.75 / var(--rows))); gap: 4px; }
   .g-billets .rs-cell { padding: 0; }
-  .g-billets .rs-cell svg { position: absolute; left: 50%; top: 50%; width: calc(100cqh / var(--rows) - 6px); height: calc(100cqw - 6px); translate: -50% -50%; rotate: -90deg; }
+  .g-billets .rs-cell svg, .g-billets .rs-cell .bv-img { position: absolute; left: 50%; top: 50%; width: calc(100cqh / var(--rows) - 6px); height: calc(100cqw - 6px); translate: -50% -50%; rotate: -90deg; }
   .g-billets .bv-val { top: 50%; font-size: min(5.5cqh, 21cqw); padding: 1cqh 1.6cqh; border-radius: 1.4cqh; }
   .g-billets .bv-val.case { top: 32%; }
   .bv-fly svg { position: absolute; left: 50%; top: 50%; width: 100cqh; height: 100cqw; translate: -50% -50%; rotate: -90deg; }
@@ -7569,6 +7586,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'billets', date: '2026-11-01', title: 'Nouveaux billets', items: ['Nouveaux billets de 5, 10, 20 et 50 KE', 'Nouveau décor : la pluie de billets', 'Affichage épuré et plein écran sur tout l’écran'] },
   { game: 'blackjack', date: '2026-11-01', title: 'Nouvelle table', items: ['Salle de casino et croupière animée', 'Tapis vert en demi-cercle avec sabot et feu de statut', 'Nouvelle barre de jetons : pose tes jetons, annule, double ou répète ta mise'] },
   { game: 'cosmic', date: '2026-11-01', title: 'Le Cosmique peint', items: ['Nouveaux symboles : prisme vert, cube cyan, hexagone violet, diamant rose, météorite, satellite, fusée, OVNI et K-0B', 'Nouvelle balise, supernova, trou noir et vaisseau aspirateur', 'Le guerrier aux sabres à côté de la grille, nouveau décor spatial et nouvelle jaquette', 'Affichage épuré et plein écran sur tout l’écran'] },
   { game: 'anubis', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
@@ -10226,7 +10244,7 @@ const FILES = {
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'f3c9203150'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
-  billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '67c9c0259d'],
+  billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '4a1f43b85a'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '576f0f4127'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'b7a7e857ef'],
