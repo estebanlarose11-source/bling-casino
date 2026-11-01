@@ -2090,6 +2090,98 @@ body.fs-on { overflow: hidden; }
 @container (max-width: 520px) { .g-cosmic .ch-stage { grid-template-columns: 26% 1fr; } }
 @media (orientation: portrait) { .game-host.is-full > .slot.g-cosmic > .slot-frame > .slot-stage { max-width: none; } .game-host.is-full > .slot.g-cosmic .ch-stage { grid-template-columns: 1fr; } .game-host.is-full > .slot.g-cosmic .ch-fig { height: min(26dvh, 230px); } .game-host.is-full > .slot.g-cosmic .ch-fig img { height: 100%; width: auto; } }
 @media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .g-cosmic) { --chrome: 60px; } .game-host.is-full > .slot.g-cosmic > .slot-frame > .slot-stage { max-width: calc((100dvh - 20px) * 6 / 5 / .7); } }
+/* ============ Le 21 (blackjack): live-casino style room, drawn croupière, half-moon felt and a chip bar ============ */
+.g-blackjack { --slot-bg: radial-gradient(900px 420px at 50% 0%, rgba(190, 40, 40, .35), transparent 70%), linear-gradient(180deg, #2a0b0b 0%, #160606 60%, #0a0303 100%); }
+.g-blackjack .slot-title { display: none !important; }
+.g-blackjack > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; }
+.g-blackjack > .slot-frame > .slot-stage { background: none; overflow: hidden; border-radius: 16px; }
+.g-blackjack .ctl-bet { display: none !important; }
+.bjx { position: relative; container-type: inline-size; --cw: clamp(170px, 46cqw, 320px); padding-top: calc(var(--cw) * .74); }
+.bjx-room { position: absolute; inset: 0; z-index: 0; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, #6b1a1a, #2a0909 55%, #120404); }
+.bjx-room::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 55%; background: repeating-linear-gradient(115deg, rgba(120, 20, 20, .25) 0 14px, rgba(60, 8, 8, .25) 14px 28px); filter: blur(1px); }
+.bjx-room .lamp { position: absolute; top: -40px; width: 160px; height: 160px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 210, 140, .55), transparent 65%); filter: blur(6px); animation: bjxLamp 6s ease-in-out infinite alternate; }
+.bjx-room .lamp.a { left: 6%; } .bjx-room .lamp.b { left: 44%; animation-delay: -2s; } .bjx-room .lamp.c { right: 6%; animation-delay: -4s; }
+@keyframes bjxLamp { to { opacity: .55; transform: scale(1.1); } }
+.bjx-room .far { position: absolute; top: 16%; width: 26%; height: 16%; border-radius: 50%; background: radial-gradient(ellipse, #1d6b40, #0b3a20 70%); filter: blur(3px); opacity: .55; }
+.bjx-room .far.t1 { left: -4%; } .bjx-room .far.t2 { right: -4%; }
+.bjx-light { position: absolute; right: 10px; top: 10px; z-index: 3; padding: 6px 10px; border-radius: 10px; background: linear-gradient(180deg, #1c1c22, #0b0b0f); box-shadow: 0 0 0 1px rgba(255, 255, 255, .12), 0 6px 16px rgba(0, 0, 0, .5); text-align: center; min-width: 120px; }
+.bjx-light .bulbs { display: flex; justify-content: center; gap: 8px; margin-bottom: 4px; }
+.bjx-light .bulbs i { width: 16px; height: 16px; border-radius: 50%; background: #333; box-shadow: inset 0 -2px 4px rgba(0, 0, 0, .6); transition: background .3s, box-shadow .3s; }
+.bjx-light[data-s="g"] .g { background: #4ade80; box-shadow: 0 0 12px #4ade80; }
+.bjx-light[data-s="o"] .o { background: #fbbf24; box-shadow: 0 0 12px #fbbf24; }
+.bjx-light[data-s="r"] .r { background: #f87171; box-shadow: 0 0 12px #f87171; }
+.bjx-state { display: block; font: 800 11px KeCoin, Orbitron, sans-serif; letter-spacing: 1px; color: #fde68a; }
+.bjx-croup { position: absolute; left: 50%; top: 4px; z-index: 1; width: var(--cw); translate: -50% 0; pointer-events: none; }
+.bjx-dealer { width: 100%; height: auto; display: block; filter: drop-shadow(0 10px 18px rgba(0, 0, 0, .55)); }
+.bjx-body { transform-origin: 150px 260px; animation: bjxBreath 4s ease-in-out infinite; }
+@keyframes bjxBreath { 50% { transform: scale(1.012, 1.02); } }
+.bjx-head { transform-origin: 150px 150px; animation: bjxHead 7s ease-in-out infinite; }
+@keyframes bjxHead { 0%, 100% { transform: rotate(0); } 30% { transform: rotate(-2deg); } 60% { transform: rotate(1.5deg); } }
+.bjx-eyes ellipse { transform-box: fill-box; transform-origin: center; }
+.bjx-croup.blink .bjx-eyes ellipse { transform: scaleY(.1); }
+.bjx-arm { transform-box: fill-box; transition: transform .25s cubic-bezier(.3, 1.4, .5, 1); }
+.bjx-arm.r { transform-origin: 20% 0; } .bjx-arm.l { transform-origin: 80% 0; }
+.bjx-croup.deal .bjx-arm.r { transform: rotate(-14deg) translate(4px, -6px); }
+.bjx-croup.deal .bjx-head { animation: none; transform: rotate(4deg); }
+.bjx-croup.smile .bjx-mouth { d: path("M138 129 Q150 142 162 129 Q150 136 138 129 Z"); }
+.bjx-felt.bj-table { position: relative; z-index: 2; min-height: auto; aspect-ratio: 2.05 / 1; margin: 0 2% 14px; padding: 2.5% 6% 3%; gap: 2px; justify-content: flex-start; border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  background: radial-gradient(ellipse at 50% 0%, #2fa35f, #17773f 45%, #0d5a2e 80%); box-shadow: inset 0 0 0 3px rgba(253, 230, 138, .5), inset 0 18px 30px rgba(0, 0, 0, .35), 0 0 0 10px #2b1408, 0 0 0 12px #6b3a17, 0 18px 40px rgba(0, 0, 0, .6); }
+.bjx-felt .bj-shoe { right: 5%; top: 8%; }
+.bjx-tray { position: absolute; left: 5%; top: 8%; width: 46px; height: 58px; border-radius: 6px; background: linear-gradient(180deg, rgba(255, 255, 255, .25), rgba(255, 255, 255, .06)); border: 1px solid rgba(255, 255, 255, .35); }
+.bjx-plate { position: absolute; left: 14%; top: 10%; width: 22px; height: 16px; border-radius: 3px; background: #c81e1e; box-shadow: 0 2px 4px rgba(0, 0, 0, .5); }
+.bjx-felt .bj-label { color: #d1fae5; }
+.bjx-arc { width: min(92%, 520px); height: auto; margin: -2px auto -10px; overflow: visible; }
+.bjx-arc .t1 { font: 900 22px KeCoin, Cinzel, Georgia, serif; fill: #fde047; letter-spacing: 3px; paint-order: stroke; stroke: rgba(80, 30, 0, .55); stroke-width: 3px; }
+.bjx-arc .t2 { font: 600 13px Inter, sans-serif; fill: rgba(254, 243, 199, .85); letter-spacing: 1px; }
+.bjx-felt .bj-hands { min-height: 40px; }
+.bjx-spots { display: flex; align-items: flex-end; justify-content: center; gap: 4%; width: 100%; margin-top: auto; }
+.bjx-spots > i { width: 9%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(254, 243, 199, .4); }
+.bjx-spots > i:nth-child(1), .bjx-spots > i:nth-last-child(1) { margin-bottom: 8%; }
+.bjx-spot.main { width: clamp(70px, 14cqw, 110px); aspect-ratio: 1; border-radius: 50%; border: 3px solid #fde68a; box-shadow: 0 0 16px rgba(253, 230, 138, .45), inset 0 0 18px rgba(0, 0, 0, .3); display: grid; place-items: center; }
+.bjx-stack { position: relative; width: 62%; height: 62%; }
+.bjx-stack em { position: absolute; inset: 0; display: grid; place-items: center; font: 700 11px Inter, sans-serif; font-style: normal; color: rgba(254, 243, 199, .7); }
+.bjx-stack b { position: absolute; left: 50%; bottom: -26%; translate: -50% 0; white-space: nowrap; padding: 1px 8px; border-radius: 99px; background: rgba(0, 0, 0, .65); font: 800 12px KeCoin, Orbitron, sans-serif; color: #fff; }
+.bjx-disc { position: absolute; left: 0; right: 0; bottom: calc(var(--k) * 9%); height: 100%; border-radius: 50%; transform: scaleY(.55); transform-origin: 50% 100%; box-shadow: 0 2px 0 rgba(0, 0, 0, .45); }
+/* chips */
+.bjx-chip, .bjx-disc { --c: #e5e7eb; --d: #9ca3af; background: radial-gradient(circle, var(--c) 0 46%, transparent 47%), repeating-conic-gradient(var(--c) 0 20deg, #fff 20deg 30deg), var(--c); border: 2px solid var(--d); }
+.c1 { --c: #e5e7eb; --d: #6b7280; } .c5 { --c: #dc2626; --d: #7f1d1d; } .c25 { --c: #16a34a; --d: #14532d; } .c100 { --c: #1f2937; --d: #000; }
+.c500 { --c: #7c3aed; --d: #3b0764; } .c1K { --c: #eab308; --d: #713f12; } .c5K { --c: #0ea5e9; --d: #0c4a6e; }
+.bjx-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 10px; padding: 8px 12px; border-radius: 14px; background: linear-gradient(180deg, #1c1d24, #0d0e12); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1), 0 8px 20px rgba(0, 0, 0, .4); }
+.bjx-info { display: flex; gap: 8px; flex: 1; }
+.bjx-info > div { flex: 1; }
+.bjx-info > div { min-width: 92px; padding: 4px 10px; border-radius: 8px; background: #050608; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1); }
+.bjx-info small { display: block; font: 700 9px Inter, sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #94a3b8; }
+.bjx-info b { font: 800 15px KeCoin, Orbitron, sans-serif; color: #fde68a; white-space: nowrap; }
+.bjx-chips { order: 2; flex: 1 1 100%; display: flex; justify-content: center; gap: 8px; padding: 6px 10px; border-radius: 99px; background: #050608; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); overflow-x: auto; scrollbar-width: none; }
+.bjx-chip { flex: none; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; transition: transform .15s, box-shadow .2s, opacity .2s; box-shadow: 0 3px 0 rgba(0, 0, 0, .5); }
+.bjx-chip span { font: 900 12px KeCoin, Orbitron, sans-serif; color: #fff; text-shadow: 0 1px 2px #000; }
+.bjx-chip.c1 span { color: #111; text-shadow: none; }
+.bjx-chip:not(:disabled):hover { transform: translateY(-4px); box-shadow: 0 0 0 2px #fde68a, 0 8px 14px rgba(0, 0, 0, .5); }
+.bjx-chip:disabled { opacity: .3; cursor: default; }
+.bjx-fly { position: fixed; z-index: 120; pointer-events: none; }
+.bjx-tool { flex: none; display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 64px; padding: 6px 8px; border-radius: 10px; background: linear-gradient(180deg, #2a2b33, #16171c); border: 1px solid rgba(255, 255, 255, .14); color: #fff; font: 700 11px Inter, sans-serif; cursor: pointer; }
+.bjx-tool i { font-style: normal; font-size: 16px; font-weight: 900; }
+.bjx-tool:disabled { opacity: .35; cursor: default; }
+.g-blackjack .bj-actions { margin-top: 10px; }
+.g-blackjack .bj-btn { background: linear-gradient(180deg, #2a2b33, #16171c); }
+@container (max-width: 520px) {
+  .bjx-arc .t1 { font-size: 30px; } .bjx-arc .t2 { font-size: 19px; }
+  .bjx-felt.bj-table { aspect-ratio: 1.3 / 1; padding: 3% 5% 4%; }
+  .bjx-felt .bj-card { width: 52px; height: 74px; margin-left: -26px; } .bjx-felt .bj-cards { min-height: 76px; padding-left: 26px; }
+  .bjx-felt .bj-f .mid { font-size: 26px; } .bjx-felt .bj-f .tl, .bjx-felt .bj-f .br { font-size: 13px; }
+  .bjx-light { min-width: 0; padding: 4px 6px; } .bjx-light .bulbs i { width: 11px; height: 11px; } .bjx-state { font-size: 8px; }
+  .bjx-tray, .bjx-plate { display: none; } .bjx-felt .bj-shoe { width: 32px; height: 44px; }
+  .bjx-spots > i { display: none; }
+}
+@media (max-width: 600px) {
+  .bjx-bar { flex-wrap: wrap; gap: 6px; padding: 6px; }
+  .bjx-info { order: 0; flex: 1; } .bjx-info > div { flex: 1; min-width: 0; }
+  .bjx-chips { order: 2; flex-basis: 100%; justify-content: flex-start; gap: 6px; }
+  .bjx-chip { width: 42px; height: 42px; }
+  .bjx-tool { order: 1; min-width: 0; padding: 4px 8px; } .bjx-tool span { display: none; }
+}
+.game-host.is-full > .slot.g-blackjack { max-width: min(1100px, 100%) !important; }
+@media (orientation: landscape) and (max-height: 560px) { .game-host.is-full .bjx { --cw: 110px; } .game-host.is-full .bjx-felt.bj-table { aspect-ratio: 2.3 / 1; } .game-host.is-full .bjx-felt .bj-card { width: 44px; height: 62px; margin-left: -22px; } .game-host.is-full .bjx-felt .bj-cards { min-height: 64px; padding-left: 22px; } .game-host.is-full .bjx-felt .bj-f .mid { font-size: 22px; } }
 /* phone held sideways: slots get the grid on the left and the controls in a side column */
 @media (orientation: landscape) and (max-height: 560px) {
   .game-host.is-full { --chrome: 96px; padding: 4px max(8px, env(safe-area-inset-right, 0px)) 4px max(8px, env(safe-area-inset-left, 0px)); }
@@ -7421,6 +7513,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'blackjack', date: '2026-11-01', title: 'Nouvelle table', items: ['Salle de casino et croupière animée', 'Tapis vert en demi-cercle avec sabot et feu de statut', 'Nouvelle barre de jetons : pose tes jetons, annule, double ou répète ta mise'] },
   { game: 'cosmic', date: '2026-11-01', title: 'Le Cosmique peint', items: ['Nouveaux symboles : prisme vert, cube cyan, hexagone violet, diamant rose, météorite, satellite, fusée, OVNI et K-0B', 'Nouvelle balise, supernova, trou noir et vaisseau aspirateur', 'Le guerrier aux sabres à côté de la grille, nouveau décor spatial et nouvelle jaquette', 'Affichage épuré et plein écran sur tout l’écran'] },
   { game: 'anubis', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
   { game: 'dragons', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
@@ -10067,7 +10160,7 @@ const FILES = {
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '97b955eb3b'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
-  blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '7069fc4250'],
+  blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '8cbe1f47d4'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'bdcfd7b479'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '99a0a088b7'],

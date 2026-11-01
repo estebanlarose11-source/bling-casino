@@ -16,20 +16,63 @@ const isBJ = (h) => h.cards.length === 2 && !h.split && score(h.cards).t === 21;
 /* ===END ENGINE */
 
 let uid = 0;
+// Chips of the bottom bar, in cents (1 KE = 100). The stake is the sum of the chips placed on the spot.
+const CHIPS = [[100, '1'], [500, '5'], [2500, '25'], [10000, '100'], [50000, '500'], [100000, '1K'], [500000, '5K']];
+const MAXSTAKE = 1000000;
 
 class BlackjackGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
-      music: EXTRA_THEMES.blackjack, autoplay: false, turbo: true, mainLabel: 'DISTRIBUER',
+      music: EXTRA_THEMES.blackjack, autoplay: false, turbo: true, mainLabel: 'DISTRIBUER', stepper: false, betLabel: 'Mise',
       cls: 'table-game bj',
-      stage: `<div class="bj-table">
-        <div class="bj-shoe"></div>
-        <div class="bj-zone dealer"><div class="bj-label">Croupier <b class="dt"></b></div><div class="bj-cards dc"></div></div>
-        <div class="bj-arc">LE BLACKJACK PAIE 6 POUR 5 · LE CROUPIER RESTE À 17</div>
-        <div class="bj-hands"></div>
+      stage: `<div class="bjx">
+        <div class="bjx-room"><i class="lamp a"></i><i class="lamp b"></i><i class="lamp c"></i><i class="far t1"></i><i class="far t2"></i></div>
+        <div class="bjx-light"><div class="bulbs"><i class="g"></i><i class="o"></i><i class="r"></i></div><b class="bjx-state">FAITES VOS JEUX</b></div>
+        <div class="bjx-croup"><svg class="bjx-dealer" viewBox="0 0 300 260" aria-hidden="true">
+  <defs>
+    <linearGradient id="bjxSkin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6d3b8"/><stop offset="1" stop-color="#d9a383"/></linearGradient>
+    <linearGradient id="bjxHair" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a2418"/><stop offset="1" stop-color="#140a06"/></linearGradient>
+    <linearGradient id="bjxTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#262630"/><stop offset="1" stop-color="#0b0b10"/></linearGradient>
+  </defs>
+  <g class="bjx-body">
+    <path d="M70 260 C70 205 92 178 150 172 C208 178 230 205 230 260 Z" fill="url(#bjxTop)"/>
+    <path d="M120 176 Q150 214 180 176 L176 170 Q150 196 124 170 Z" fill="url(#bjxSkin)"/>
+    <path d="M96 196 C88 178 112 166 124 170 L118 206 Z M204 196 C212 178 188 166 176 170 L182 206 Z" fill="url(#bjxSkin)" opacity=".9"/>
+    <rect x="137" y="146" width="26" height="30" rx="10" fill="url(#bjxSkin)"/>
+    <g class="bjx-arm l"><path d="M84 205 C66 232 62 252 78 260 L104 260 C98 246 100 232 106 218 Z" fill="url(#bjxSkin)"/></g>
+    <g class="bjx-arm r"><path d="M216 205 C234 232 238 252 222 260 L196 260 C202 246 200 232 194 218 Z" fill="url(#bjxSkin)"/></g>
+  </g>
+  <g class="bjx-head">
+    <path d="M150 40 C112 40 98 70 100 104 C102 140 112 168 104 176 C126 176 132 150 132 132 L168 132 C168 150 174 176 196 176 C188 168 198 140 200 104 C202 70 188 40 150 40 Z" fill="url(#bjxHair)"/>
+    <ellipse cx="150" cy="106" rx="34" ry="42" fill="url(#bjxSkin)"/>
+    <path d="M114 96 C118 62 182 62 186 96 C176 80 160 72 150 72 C136 72 124 80 114 96 Z" fill="url(#bjxHair)"/>
+    <g class="bjx-eyes" fill="#2a1a12"><ellipse cx="137" cy="106" rx="4.2" ry="4.8"/><ellipse cx="163" cy="106" rx="4.2" ry="4.8"/></g>
+    <path d="M129 96 Q137 92 144 96 M156 96 Q163 92 171 96" stroke="#2a1a12" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M148 112 Q146 122 152 123" stroke="#b9805e" stroke-width="1.6" fill="none"/>
+    <path class="bjx-mouth" d="M139 131 Q150 138 161 131 Q150 134 139 131 Z" fill="#b5444f"/>
+    <ellipse cx="128" cy="122" rx="6" ry="3.5" fill="#f1a9a0" opacity=".45"/><ellipse cx="172" cy="122" rx="6" ry="3.5" fill="#f1a9a0" opacity=".45"/>
+  </g>
+</svg></div>
+        <div class="bj-table bjx-felt">
+          <div class="bj-shoe"></div><div class="bjx-tray"></div><div class="bjx-plate"></div>
+          <div class="bj-zone dealer"><div class="bj-label">Croupière <b class="dt"></b></div><div class="bj-cards dc"></div></div>
+          <svg class="bjx-arc" viewBox="0 0 600 140" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <path id="bjxA1" d="M40 20 Q300 150 560 20" fill="none"/><path id="bjxA2" d="M140 80 Q300 162 460 80" fill="none"/>
+            <text class="t1"><textPath href="#bjxA1" startOffset="50%" text-anchor="middle">LE BLACKJACK PAIE 6 POUR 5</textPath></text>
+            <text class="t2"><textPath href="#bjxA2" startOffset="50%" text-anchor="middle">La croupière reste à 17</textPath></text>
+          </svg>
+          <div class="bj-hands"></div>
+          <div class="bjx-spots"><i></i><i></i><div class="bjx-spot main"><div class="bjx-stack"></div></div><i></i><i></i></div>
+        </div>
       </div>`,
-      below: `<div class="bj-actions"><button class="bj-btn" data-bj="hit">Tirer <small>+1 carte</small></button><button class="bj-btn" data-bj="stand">Rester</button><button class="bj-btn" data-bj="dbl">Doubler <small>×2, 1 carte</small></button><button class="bj-btn" data-bj="spl">Séparer <small>2 mains</small></button></div>`,
-      hello: 'Choisis ta mise et distribue.',
+      below: `<div class="bj-actions"><button class="bj-btn" data-bj="hit">Tirer <small>+1 carte</small></button><button class="bj-btn" data-bj="stand">Rester</button><button class="bj-btn" data-bj="dbl">Doubler <small>×2, 1 carte</small></button><button class="bj-btn" data-bj="spl">Séparer <small>2 mains</small></button></div><div class="bjx-bar">
+        <div class="bjx-info"><div><small>Solde</small><b class="bjx-bal"></b></div><div><small>Mise</small><b class="bjx-bet"></b></div></div>
+        <button class="bjx-tool" data-bjx="undo"><i>↶</i><span>Annuler</span></button>
+        <div class="bjx-chips">${CHIPS.map(([v, t]) => `<button class="bjx-chip c${t}" data-chip="${v}" aria-label="Jeton ${t}"><span>${t}</span></button>`).join('')}</div>
+        <button class="bjx-tool" data-bjx="x2"><i>×2</i><span>Doubler</span></button>
+        <button class="bjx-tool" data-bjx="repeat"><i>⟳</i><span>Répéter</span></button>
+      </div>`,
+      hello: 'Pose tes jetons sur la table, puis distribue.',
     });
     this.shoe = [];
     this.newShoe();
@@ -38,9 +81,59 @@ class BlackjackGame extends BaseGame {
     this.root.addEventListener('click', (e) => {
       const a = e.target.closest('[data-bj]')?.dataset.bj;
       if (a && !e.target.closest('[data-bj]').disabled) this[a]();
+      const chip = e.target.closest('[data-chip]');
+      if (chip && !chip.disabled) this.addChip(+chip.dataset.chip, chip);
+      const t = e.target.closest('[data-bjx]');
+      if (t && !t.disabled) this.tool(t.dataset.bjx);
     });
+    this.croup = this.q('.bjx-croup');
+    this.blinkT = setInterval(() => { if (!document.hidden) this.croupDo('blink', 180); }, 3800);
     this.renderActions();
   }
+
+  // The stake replaces the usual −/+ ladder: it is the sum of the chips on the spot (kept between hands).
+  get bet() { return this.stake ?? this.loadStake(); }
+  loadStake() { let v = 100; try { v = Math.max(100, Math.min(MAXSTAKE, +localStorage.getItem('bjx_stake') || 100)); } catch { /* ignore */ } this.stake = v; this.chipsOn = [v]; return v; }
+  saveStake() { try { localStorage.setItem('bjx_stake', String(this.stake)); } catch { /* ignore */ } }
+  canBet() { return this.phase === 'bet' || this.phase === 'end'; }
+  setStake(v, chips) {
+    this.stake = Math.max(0, Math.min(MAXSTAKE, v)); this.chipsOn = chips || [this.stake];
+    if (this.stake) this.saveStake();
+    this.paintStake(); this.updateMeters(); this.renderActions();
+  }
+  addChip(v, node) {
+    if (!this.canBet()) return;
+    const room = Math.min(MAXSTAKE, this.balC()) - (this.stake || 0);
+    if (v > room) { this.msg('Solde insuffisant pour ce jeton'); return; }
+    if (this.phase === 'end') this.clearTable();
+    // the chip flies from the bar to the spot
+    const to = this.q('.bjx-stack').getBoundingClientRect(), from = node.getBoundingClientRect();
+    const fly = node.cloneNode(true); fly.classList.add('bjx-fly');
+    fly.style.cssText = `left:${from.left}px;top:${from.top}px;width:${from.width}px;height:${from.height}px`;
+    document.body.appendChild(fly);
+    fly.animate([{ transform: 'none' }, { transform: `translate(${to.left + to.width / 2 - from.left - from.width / 2}px, ${to.top - from.top - from.height / 3}px) scale(.7)` }], { duration: 320, easing: 'cubic-bezier(.3,.7,.4,1)' }).finished.then(() => fly.remove());
+    sfx.click();
+    setTimeout(() => this.setStake((this.stake || 0) + v, [...(this.chipsOn || []).filter(Boolean), v]), 300);
+  }
+  tool(k) {
+    if (!this.canBet()) return;
+    if (k === 'undo') { const c = (this.chipsOn || []).slice(); c.pop(); this.setStake(c.reduce((a, x) => a + x, 0), c); }
+    if (k === 'x2') { const v = Math.min(MAXSTAKE, (this.stake || 0) * 2, this.balC()); this.setStake(v, [...(this.chipsOn || []), v - (this.stake || 0)].filter((x) => x > 0)); }
+    if (k === 'repeat' && this.lastHand) this.setStake(Math.min(this.lastHand, this.balC()), [Math.min(this.lastHand, this.balC())]);
+    sfx.click();
+  }
+  // Chip stack drawn on the main spot: the stake split into the biggest chips (at most 8 discs).
+  paintStake() {
+    const st = this.q('.bjx-stack'); if (!st) return;
+    let v = this.stake || 0; const discs = [];
+    for (let k = CHIPS.length - 1; k >= 0 && discs.length < 8; k--) while (v >= CHIPS[k][0] && discs.length < 8) { discs.push(CHIPS[k][1]); v -= CHIPS[k][0]; }
+    st.innerHTML = discs.reverse().map((t, k) => `<i class="bjx-disc c${t}" style="--k:${k}"></i>`).join('') + (this.stake ? `<b>${fmtC(this.stake)}</b>` : '<em>Mise</em>');
+    const bb = this.q('.bjx-bet'); if (bb) bb.textContent = fmtC(this.stake || 0);
+    const bal = this.q('.bjx-bal'); if (bal) bal.textContent = fmtC(this.balC());
+  }
+  clearTable() { this.q('.dc').innerHTML = ''; this.q('.bj-hands').innerHTML = ''; this.hands = []; this.dealer = []; this.results = []; this.q('.dt').innerHTML = ''; this.phase = 'bet'; }
+  croupDo(cls, ms) { const c = this.croup; if (!c) return; c.classList.remove(cls); void c.offsetWidth; c.classList.add(cls); setTimeout(() => c.classList.remove(cls), ms); }
+  destroy() { clearInterval(this.blinkT); super.destroy(); }
 
   newShoe() {
     this.shoe = [];
@@ -66,6 +159,7 @@ class BlackjackGame extends BaseGame {
     node.animate([{ transform: `translate(${shoe.left - r.left}px, ${shoe.top - r.top}px) rotate(-25deg) scale(.7)`, opacity: 0.4 }, { transform: 'none', opacity: 1 }],
       { duration: this.turbo ? 180 : 360, easing: 'cubic-bezier(.2,.8,.25,1)' });
     sfx.click();
+    this.croupDo('deal', 360);
     await this.wait(300);
     return node;
   }
@@ -96,18 +190,24 @@ class BlackjackGame extends BaseGame {
     set('spl', can && this.hands.length === 1 && h.cards.length === 2 && cv(h.cards[0]) === cv(h.cards[1]) && this.balC() >= h.bet);
     const betting = this.phase === 'bet' || this.phase === 'end';
     this.mainBtn.disabled = !betting;
-    this.mainBtn.querySelector('.main-label').textContent = this.phase === 'end' ? 'NOUVELLE MAIN' : 'DISTRIBUER';
-    this.q('[data-act="bet-"]').disabled = !betting || this.bi === 0;
-    this.q('[data-act="bet+"]').disabled = !betting || this.bi === this.cfg.bets.length - 1;
+    this.mainBtn.disabled = !betting || !this.stake;
+    this.mainBtn.querySelector('.main-label').textContent = this.phase === 'end' ? 'REJOUER' : 'DISTRIBUER';
+    const room = Math.min(MAXSTAKE, this.balC()) - (this.stake || 0);
+    this.qa('[data-chip]').forEach((c) => { c.disabled = !betting || +c.dataset.chip > room; });
+    this.qa('[data-bjx]').forEach((t) => { t.disabled = !betting || (t.dataset.bjx === 'repeat' ? !this.lastHand : t.dataset.bjx === 'undo' ? !this.stake : !this.stake || room <= 0); });
+    const st = betting ? ['g', 'FAITES VOS JEUX'] : this.phase === 'play' ? ['r', 'À VOUS DE JOUER'] : ['o', 'DISTRIBUTION'];
+    const L = this.q('.bjx-light'); if (L) { L.dataset.s = st[0]; L.querySelector('.bjx-state').textContent = st[1]; }
+    this.paintStake();
   }
 
-  onMeters() { if (this.hands) this.renderActions(); }
+  onMeters() { if (this.hands) this.renderActions(); else this.paintStake?.(); }
 
   onMain() {
     if (!(this.phase === 'bet' || this.phase === 'end')) return;
-    const bet = this.bet;
+    const bet = this.stake || 0;
+    if (!bet) { this.msg('Pose au moins un jeton sur la table'); return; }
     if (!this.pay(bet)) return;
-    this.lastStake = bet;
+    this.lastStake = bet; this.lastHand = bet;
     this.busyHand = true;
     this.slotEl.classList.add('busy');
     this.startHand(bet);
@@ -247,7 +347,7 @@ class BlackjackGame extends BaseGame {
     if (payAll > 0) this.win(payAll, big ? 'Blackjack' : null);
     this.setLast(payAll);
     this.msg(net > 0 ? `Tu gagnes ${fmtC(net)}.` : net < 0 ? `Tu perds ${fmtC(-net)}.` : 'Égalité, mise récupérée.');
-    if (net > 0) { sfx.win(); if (big) { fx.confetti(60); sfx.bigWin(); } }
+    if (net > 0) { sfx.win(); this.croupDo('smile', 1600); if (big) { fx.confetti(60); sfx.bigWin(); } }
     else if (net < 0) sfx.reelStop(0);
     this.busyHand = false;
     this.slotEl.classList.remove('busy');
