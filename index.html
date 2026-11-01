@@ -3029,6 +3029,75 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pay-sym.bvp { width: 84px; }
 @container (max-width: 520px) { .bv-top { grid-template-columns: 1fr 1fr; gap: 4px; } .bv-grand { grid-column: 1 / -1; order: -1; } .bv-jp { padding: 3px 10px; } .bv-boxes, .bv-gold { display: none; } .bv-frame > .slot-stage { padding: 4px; border-radius: 12px; } .g-billets .rs { gap: 3px; } .g-billets .rs-reel { border-radius: 6px; } }
 @media (prefers-reduced-motion: reduce) { .bv-shine, .g-billets .rs-cell.cash svg, .g-billets .rs-cell.fsb svg { animation: none; } }
+/* ============ Le Labo ============ */
+.g-labo { --slot-bg: radial-gradient(600px 300px at 50% -5%, rgba(168, 85, 247, .35), transparent 70%), radial-gradient(500px 260px at 50% 110%, rgba(34, 197, 94, .18), transparent 70%), linear-gradient(180deg, #170528 0%, #08020f 100%); }
+.g-labo .slot-title h2 { font-family: 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; color: #f5e9ff; text-shadow: 0 0 8px #a855f7, 0 0 18px rgba(34, 197, 94, .6); }
+.lb-frame > .slot-stage { position: relative; overflow: hidden; padding-top: clamp(78px, 24%, 190px); border-radius: 16px; }
+.g-labo .slot-stage > :not(.lb-scene):not(.lb-throne) { position: relative; z-index: 2; }
+.lb-scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, rgba(168, 85, 247, .45), transparent 60%), radial-gradient(ellipse at 50% 112%, rgba(249, 115, 22, .55), transparent 55%), linear-gradient(180deg, #12041f, #0a0213 60%, #1a0508); background-size: cover; background-position: center; transition: filter .8s; }
+.lb-scene.photo .lb-room { display: none; }
+.lb-scene.photo::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(10, 2, 20, .35), rgba(10, 2, 20, .1) 40%, rgba(10, 2, 20, .55)); }
+.lb-room { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lb-neon { filter: drop-shadow(0 0 6px #a855f7) drop-shadow(0 0 10px #22c55e); opacity: .55; animation: lbNeon 4s linear infinite; }
+@keyframes lbNeon { 0%, 46%, 54%, 100% { opacity: .55; } 48% { opacity: .12; } 50% { opacity: .6; } 52% { opacity: .2; } }
+.lb-throne { position: absolute; left: 50%; top: 0; z-index: 1; width: min(66%, 560px); aspect-ratio: 4 / 3; translate: -50% -20%; pointer-events: none; transition: transform .9s cubic-bezier(.3, 1.4, .5, 1), filter .6s; filter: drop-shadow(0 0 18px rgba(168, 85, 247, .55)) brightness(.9); }
+.lb-throne svg, .lb-demon-img { width: 100%; height: 100%; object-fit: contain; object-position: top; display: block; }
+.g-labo.dealer .lb-throne { transform: translateY(5%) scale(1.1); filter: drop-shadow(0 0 30px #a855f7) brightness(1.35); }
+.g-labo.cartel .lb-throne { z-index: 5; transform: translateY(-4%) scale(1.35); filter: drop-shadow(0 0 30px #ef4444) drop-shadow(0 0 60px #fde047) brightness(1.5); }
+.lb-flames { position: absolute; left: -8%; right: -8%; bottom: -4%; height: 34%; transform-origin: 50% 100%; mix-blend-mode: screen; opacity: .85; filter: blur(3px);
+  background: radial-gradient(ellipse 26px 70% at 50% 100%, #fff7c2 0, #fde047 18%, #f97316 42%, rgba(220, 38, 38, .55) 62%, transparent 72%) 0 100% / 52px 100% repeat-x;
+  animation: lbFlame .38s ease-in-out infinite alternate; transition: height .9s ease; }
+.lb-flames.b { height: 24%; background-position: 26px 100%; opacity: .7; animation-duration: .52s; animation-delay: -.2s; }
+@keyframes lbFlame { from { transform: scaleY(.85) skewX(-3deg); } to { transform: scaleY(1.08) skewX(3deg); } }
+.g-labo.in-free .lb-flames { height: 78%; } .g-labo.in-free .lb-flames.b { height: 60%; }
+.g-labo.in-free .lb-scene { filter: hue-rotate(-40deg) saturate(1.4); }
+.lb-bills svg { position: absolute; top: -12%; left: calc(var(--k) * 14% + 2%); width: max(28px, 7%); height: auto; opacity: .75; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .5)); animation: lbBill calc(8s + var(--k) * 1.3s) linear infinite; animation-delay: calc(var(--k) * -1.9s); }
+@keyframes lbBill { 0% { top: -12%; transform: translateX(0) rotate(0); } 50% { transform: translateX(26px) rotate(190deg); } 100% { top: 110%; transform: translateX(-18px) rotate(380deg); } }
+.lb-meter { position: absolute !important; left: 10px; top: 10px; z-index: 6 !important; display: none; align-items: center; gap: 8px; padding: 4px 16px; border-radius: 99px; background: linear-gradient(90deg, #b91c1c, #f97316); box-shadow: 0 0 18px rgba(249, 115, 22, .8); color: #fff; }
+.lb-meter small { font: 800 11px Orbitron, sans-serif; letter-spacing: 1px; opacity: .9; } .lb-meter b { font: 900 22px KeCoin, Orbitron, sans-serif; }
+.g-labo.in-free .lb-meter { display: flex; }
+.g-labo .rs { gap: 5px; }
+.g-labo .rs-reel { background: linear-gradient(180deg, rgba(12, 3, 24, .86), rgba(30, 6, 50, .74) 50%, rgba(12, 3, 24, .86)); box-shadow: inset 0 0 0 1px rgba(168, 85, 247, .4), 0 0 12px rgba(34, 197, 94, .18); transition: box-shadow .3s; }
+.g-labo .rs-reel::before { background: linear-gradient(rgba(10, 2, 20, .85), transparent); }
+.g-labo .rs-reel::after { background: linear-gradient(transparent, rgba(10, 2, 20, .85)); }
+.lb-img { width: 88%; height: 88%; object-fit: contain; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6)); }
+.g-labo .rs-cell.win .lb-img { animation: winBounce 1s ease-in-out infinite; }
+.g-labo .rs-cell.win::before { border-color: #22c55e; box-shadow: 0 0 16px #22c55e, inset 0 0 16px rgba(168, 85, 247, .55); }
+.g-labo .rs-cell.wild { background: radial-gradient(circle, rgba(168, 85, 247, .45), transparent 70%); }
+.g-labo .rs-cell.wild svg, .g-labo .rs-cell.wild .lb-img { filter: drop-shadow(0 0 10px rgba(168, 85, 247, .95)); }
+.g-labo .rs-cell.scat { background: radial-gradient(circle, rgba(34, 197, 94, .35), transparent 70%); }
+.g-labo .rs-cell.scat svg, .g-labo .rs-cell.scat .lb-img { filter: drop-shadow(0 0 12px rgba(74, 222, 128, .95)); animation: orbPulse 1.6s ease-in-out infinite; }
+.g-labo .rs-cell.case { background: radial-gradient(circle, rgba(253, 224, 71, .3), transparent 70%); }
+.g-labo .rs-cell.case svg, .g-labo .rs-cell.case .lb-img { filter: drop-shadow(0 0 12px rgba(253, 224, 71, .9)); animation: orbPulse 1.8s ease-in-out infinite; }
+.g-labo .rs-cell.boss svg, .g-labo .rs-cell.boss .lb-img { filter: drop-shadow(0 0 10px rgba(239, 68, 68, .75)); }
+.g-labo.dealer .rs-reel { box-shadow: inset 0 0 0 2px #a855f7, inset 0 0 34px rgba(168, 85, 247, .65); }
+.g-labo.cartel .rs-reel { animation: lbBurst .22s ease-in-out infinite alternate; }
+@keyframes lbBurst { from { box-shadow: inset 0 0 30px #ef4444, 0 0 22px #ef4444; } to { box-shadow: inset 0 0 50px #fde047, 0 0 44px #fde047; } }
+.lb-word { position: absolute !important; left: 50%; top: 58%; z-index: 7 !important; pointer-events: none; opacity: 0; font: 400 clamp(34px, 7vw, 80px)/1 KeCoin, 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; white-space: nowrap;
+  background: linear-gradient(180deg, #fff, #86efac 45%, #16a34a 55%, #dcfce7); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #3b0764) drop-shadow(0 0 14px rgba(168, 85, 247, .9)); }
+.lb-word.dealer { background-image: linear-gradient(180deg, #fff, #e9d5ff 40%, #a855f7 60%, #fde047); }
+.lb-word.jp, .lb-word.big { background-image: linear-gradient(180deg, #fff7c2, #fde047 40%, #ef4444 62%, #fff); filter: drop-shadow(0 3px 0 #7f1d1d) drop-shadow(0 0 18px rgba(239, 68, 68, .9)); }
+.lb-rain { position: fixed; top: -60px; z-index: 95; width: 84px; height: 45px; pointer-events: none; animation: bvRain 2.4s cubic-bezier(.3, .2, .6, 1) forwards; }
+.lb-rain svg { width: 100%; height: 100%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .4)); }
+.lb-case-box { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.lb-case { position: relative; width: min(46vw, 210px); }
+.lb-case svg, .lb-case .lb-img { position: relative; z-index: 1; width: 100%; height: auto; aspect-ratio: 1; }
+.lb-case-glow { position: absolute; inset: -25%; background: radial-gradient(circle, rgba(253, 224, 71, .85), transparent 62%); opacity: 0; transition: opacity .6s; }
+.lb-case.open .lb-case-glow { opacity: 1; animation: orbPulse 1.4s ease-in-out infinite; }
+.lb-case.open svg, .lb-case.open .lb-img { animation: symPop .6s cubic-bezier(.3, 1.8, .5, 1); }
+.lb-gold { display: grid; grid-template-columns: repeat(auto-fit, minmax(68px, 1fr)); gap: 8px; width: min(92vw, 520px); }
+.lb-pile { aspect-ratio: 1; border-radius: 14px; display: grid; place-items: center; align-content: center; gap: 2px; background: linear-gradient(180deg, #2a0f3d, #12051d); border: 2px solid rgba(168, 85, 247, .5); color: #e9d5ff; }
+.lb-pile b { font: 900 22px KeCoin, Orbitron, sans-serif; } .lb-pile small { font-size: 11px; margin: 0; color: inherit; }
+.lb-pile.on { background: radial-gradient(circle at 50% 35%, #fff7c2, #f5c542 45%, #a86a0c); color: #3b1d02; border-color: #fde047; animation: symPop .5s cubic-bezier(.3, 1.8, .5, 1); }
+.lb-pile.jp { background: linear-gradient(135deg, #ef4444, #fde047); color: #fff; border-color: #fff; animation: lbBurst .25s ease-in-out infinite alternate; }
+.lb-pile.jp b { font-size: 15px; }
+.lb-case-total { font: 900 clamp(26px, 6vw, 44px) KeCoin, Orbitron, sans-serif; color: #fde047; text-shadow: 0 0 14px rgba(253, 224, 71, .7); }
+.intro-glyph .lb-img { width: 130px; height: 130px; }
+.g-overlay .intro-glyph .lb-img { width: 120px; height: 120px; }
+.lb-jp h3 { background: linear-gradient(180deg, #fff7c2, #fde047 45%, #ef4444) !important; -webkit-background-clip: text !important; background-clip: text !important; }
+.pay-sym .lb-img { width: 44px; height: 44px; }
+.game-host:not(.is-full):has(> .g-labo) { max-width: max(420px, min(1000px, calc((100vh - var(--chrome) + 40px) * 5 / 4 + 60px))); }
+@media (prefers-reduced-motion: reduce) { .lb-flames, .lb-bills svg, .lb-neon, .g-labo .rs-cell.scat svg, .g-labo .rs-cell.case svg { animation: none; } }
 
 /* ============ Têtes de Dragon ============ */
 .g-dragons { --slot-bg: radial-gradient(700px 360px at 50% 110%, rgba(234, 88, 12, .45), transparent 70%), radial-gradient(500px 300px at 50% -10%, rgba(127, 29, 29, .4), transparent 70%), linear-gradient(180deg, #1c0a05 0%, #0a0503 100%); }
@@ -6240,6 +6309,161 @@ const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="t
 return { DEFS };
 })();
 
+// ---- art/labo.js ----
+__mods['art/labo.js'] = (() => {
+// Le Labo: drawn placeholder art (the owner's painted images replace it, see PAINTED in games/labo.js).
+// lb0..lb8 = the 9 symbols, lbw = WILD (Le Dealer), lbsc = pentacle (La Descente), lbcase = briefcase (La Mallette),
+// lbdemon = the demon boss on his golden throne (behind the reels), lbbill = a flying banknote.
+const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<linearGradient id="lbChrome" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#64748b"/><stop offset=".25" stop-color="#f8fafc"/><stop offset=".5" stop-color="#94a3b8"/><stop offset=".8" stop-color="#e2e8f0"/><stop offset="1" stop-color="#475569"/></linearGradient>
+<linearGradient id="lbGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff4b8"/><stop offset=".5" stop-color="#f5c542"/><stop offset="1" stop-color="#a86a0c"/></linearGradient>
+<radialGradient id="lbPink" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#ffe0f2"/><stop offset=".45" stop-color="#f472b6"/><stop offset="1" stop-color="#9d174d"/></radialGradient>
+<radialGradient id="lbRed" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#fca5a5"/><stop offset=".45" stop-color="#dc2626"/><stop offset="1" stop-color="#450a0a"/></radialGradient>
+<linearGradient id="lbBone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#e7e5e4"/><stop offset="1" stop-color="#a8a29e"/></linearGradient>
+<linearGradient id="lbHorn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fef3c7"/><stop offset=".5" stop-color="#78716c"/><stop offset="1" stop-color="#1c1917"/></linearGradient>
+<linearGradient id="lbBag" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8bd72"/><stop offset=".6" stop-color="#a86f28"/><stop offset="1" stop-color="#5c3a10"/></linearGradient>
+<linearGradient id="lbPlastic" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e2e8f0" stop-opacity=".95"/><stop offset=".3" stop-color="#fff" stop-opacity=".98"/><stop offset="1" stop-color="#cbd5e1" stop-opacity=".9"/></linearGradient>
+<linearGradient id="lbPurple" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#581c87"/><stop offset="1" stop-color="#1e0636"/></linearGradient>
+<linearGradient id="lbCase" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f3f46"/><stop offset=".5" stop-color="#18181b"/><stop offset="1" stop-color="#09090b"/></linearGradient>
+<radialGradient id="lbFire" cx=".5" cy=".85" r=".8"><stop offset="0" stop-color="#fff7c2"/><stop offset=".3" stop-color="#fde047"/><stop offset=".6" stop-color="#f97316"/><stop offset="1" stop-color="#dc2626" stop-opacity="0"/></radialGradient>
+<radialGradient id="lbEye" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff"/><stop offset=".35" stop-color="#ff3b3b"/><stop offset="1" stop-color="#7f1d1d"/></radialGradient>
+<radialGradient id="lbAura" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#a855f7" stop-opacity=".55"/><stop offset="1" stop-color="#a855f7" stop-opacity="0"/></radialGradient>
+
+<symbol id="lb0" viewBox="0 0 64 64">
+  <path d="M33 4 C27 11 29 15 32 17 C29 12 35 10 34 5 Z" fill="#f97316"/><path d="M32 7 C29 12 30 15 32 16.5 C34 15 35 12 32 7Z" fill="#fde047"/>
+  <rect x="23" y="15" width="14" height="10" rx="1" fill="#475569"/><g fill="#1e293b"><circle cx="27" cy="18" r="1.1"/><circle cx="31" cy="18" r="1.1"/><circle cx="27" cy="22" r="1.1"/><circle cx="31" cy="22" r="1.1"/><circle cx="35" cy="20" r="1.1"/></g>
+  <rect x="37" y="5" width="13" height="18" rx="2.5" transform="rotate(28 39 23)" fill="url(#lbChrome)" stroke="#334155" stroke-width="1.2"/>
+  <rect x="17" y="25" width="30" height="34" rx="4" fill="url(#lbChrome)" stroke="#1e293b" stroke-width="1.5"/>
+  <path d="M17 31 h30" stroke="#334155" stroke-width="1.2"/><rect x="21" y="35" width="4" height="20" rx="2" fill="#fff" opacity=".7"/>
+  <path d="M30 41 l3 -4 3 4 -3 8z" fill="#a855f7" opacity=".85"/>
+</symbol>
+
+<symbol id="lb1" viewBox="0 0 64 64">
+  <rect x="17" y="4" width="30" height="56" rx="6" fill="#111827" stroke="#9ca3af" stroke-width="1.6"/>
+  <rect x="20" y="10" width="24" height="42" rx="2" fill="#0b1220"/><rect x="28" y="6.5" width="8" height="1.6" rx=".8" fill="#374151"/>
+  <rect x="22" y="13" width="15" height="7" rx="3" fill="#22c55e"/><path d="M24 16.5 h11" stroke="#052e16" stroke-width="1.4" stroke-dasharray="2 1.5"/>
+  <rect x="27" y="23" width="15" height="7" rx="3" fill="#a855f7"/><text x="34.5" y="29" font-size="6.5" text-anchor="middle" fill="#fff" font-family="Impact, sans-serif">???</text>
+  <rect x="22" y="33" width="13" height="7" rx="3" fill="#22c55e"/><path d="M25 36.5 l2 -2 2 2 2 -2 2 2" stroke="#052e16" stroke-width="1.2" fill="none"/>
+  <rect x="27" y="43" width="15" height="6" rx="3" fill="#ec4899"/><circle cx="31" cy="46" r="1" fill="#fff"/><circle cx="34.5" cy="46" r="1" fill="#fff"/><circle cx="38" cy="46" r="1" fill="#fff"/>
+  <circle cx="45" cy="7" r="5.5" fill="#ef4444" stroke="#fff" stroke-width="1.4"/><text x="45" y="9.6" font-size="7.5" text-anchor="middle" fill="#fff" font-family="Impact, sans-serif">3</text>
+</symbol>
+
+<symbol id="lb2" viewBox="0 0 64 64">
+  <g transform="rotate(-32 30 22)"><rect x="12" y="16" width="34" height="13" rx="6.5" fill="#3b82f6"/><path d="M18.5 16 h10.5 v13 h-10.5 a6.5 6.5 0 0 1 0 -13z" fill="#ef4444"/><rect x="15" y="18" width="26" height="3" rx="1.5" fill="#fff" opacity=".55"/></g>
+  <g transform="rotate(24 34 42)"><rect x="18" y="36" width="34" height="13" rx="6.5" fill="#22c55e"/><path d="M24.5 36 h10.5 v13 h-10.5 a6.5 6.5 0 0 1 0 -13z" fill="#facc15"/><rect x="21" y="38" width="26" height="3" rx="1.5" fill="#fff" opacity=".55"/></g>
+  <circle cx="48" cy="20" r="8" fill="#f472b6"/><path d="M41 20 h14" stroke="#9d174d" stroke-width="1.4"/><circle cx="45.5" cy="17" r="2.2" fill="#fff" opacity=".6"/>
+  <circle cx="14" cy="50" r="7" fill="#a855f7"/><path d="M8 50 h12" stroke="#581c87" stroke-width="1.3"/><circle cx="12" cy="47.5" r="1.8" fill="#fff" opacity=".6"/>
+  <circle cx="50" cy="54" r="5" fill="#f97316"/><circle cx="48.6" cy="52.4" r="1.4" fill="#fff" opacity=".6"/>
+</symbol>
+
+<symbol id="lb3" viewBox="0 0 64 64">
+  <g fill="none" stroke="#e5e7eb" stroke-linecap="round" opacity=".75"><path d="M51 15 C45 10 55 7 50 2" stroke-width="2.6"/><path d="M56 17 C61 12 54 9 59 4" stroke-width="2" opacity=".7"/></g>
+  <path d="M9 53 L44 19 Q50 15 54 20 Q56 25 50 28 L15 59 Z" fill="#f5f5f4" stroke="#a8a29e" stroke-width="1.2"/>
+  <path d="M9 53 L15 59 L19 55 L13 49 Z" fill="#d6a75a" stroke="#92400e" stroke-width="1"/>
+  <path d="M22 44 L40 27 M26 48 L45 31" stroke="#d6d3d1" stroke-width="1"/>
+  <ellipse cx="51" cy="23" rx="4" ry="6.5" transform="rotate(45 51 23)" fill="url(#lbFire)"/><ellipse cx="51" cy="23" rx="2" ry="4" transform="rotate(45 51 23)" fill="#ef4444"/>
+  <circle cx="53" cy="20" r="1.2" fill="#fde047"/><circle cx="49" cy="25" r="1" fill="#fde047"/>
+</symbol>
+
+<symbol id="lb4" viewBox="0 0 64 64">
+  <path d="M15 18 H49 V52 Q49 57 44 57 H20 Q15 57 15 52 Z" fill="url(#lbPlastic)" stroke="#94a3b8" stroke-width="1.4"/>
+  <path d="M17 38 Q24 33 32 36 Q40 39 47 34 V51 Q47 55 43 55 H21 Q17 55 17 51 Z" fill="#fff" stroke="#e2e8f0"/>
+  <g fill="#cbd5e1"><circle cx="24" cy="44" r="1"/><circle cx="31" cy="47" r="1.2"/><circle cx="39" cy="43" r="1"/><circle cx="35" cy="51" r=".9"/><circle cx="26" cy="51" r=".8"/></g>
+  <rect x="13" y="10" width="38" height="9" rx="2" fill="url(#lbGold)" stroke="#92400e" stroke-width="1.2"/>
+  <path d="M15 14.5 H49" stroke="#92400e" stroke-width="1" stroke-dasharray="2 1.4"/>
+  <rect x="19" y="22" width="4" height="26" rx="2" fill="#fff" opacity=".85"/>
+</symbol>
+
+<symbol id="lb5" viewBox="0 0 64 64">
+  <circle cx="32" cy="33" r="25" fill="#831843"/><circle cx="32" cy="31" r="25" fill="url(#lbPink)" stroke="#fbcfe8" stroke-width="1.4"/>
+  <g fill="#9d174d" opacity=".8"><path d="M19 22 Q17 12 23 9 Q21 16 26 20Z"/><path d="M45 22 Q47 12 41 9 Q43 16 38 20Z"/>
+    <path d="M20 26 Q32 20 44 26 Q46 38 32 46 Q18 38 20 26Z" fill="none" stroke="#9d174d" stroke-width="2.4"/>
+    <path d="M24 30 l6 2 -6 2z"/><path d="M40 30 l-6 2 6 2z"/><path d="M26 39 Q32 43 38 39 l-2 2 -1 -2 -1 2 -2 -2 -2 2 -1 -2 -1 2z"/></g>
+  <ellipse cx="24" cy="17" rx="7" ry="3.5" fill="#fff" opacity=".45" transform="rotate(-25 24 17)"/>
+</symbol>
+
+<symbol id="lb6" viewBox="0 0 64 64">
+  <path d="M32 5 C16 5 9 17 9 29 C9 37 13 42 19 45 L19 54 Q19 58 23 58 H41 Q45 58 45 54 L45 45 C51 42 55 37 55 29 C55 17 48 5 32 5Z" fill="url(#lbBone)" stroke="#57534e" stroke-width="1.4"/>
+  <ellipse cx="22.5" cy="30" rx="7.5" ry="8" fill="#1c1917"/><ellipse cx="41.5" cy="30" rx="7.5" ry="8" fill="#1c1917"/>
+  <circle cx="22.5" cy="31" r="4.6" fill="url(#lbEye)"/><circle cx="41.5" cy="31" r="4.6" fill="url(#lbEye)"/>
+  <path d="M32 37 L28 45 H36 Z" fill="#1c1917"/>
+  <path d="M23 50 V57 M28 50 V58 M32 50 V58 M36 50 V58 M41 50 V57" stroke="#57534e" stroke-width="1.6"/>
+  <path d="M14 18 Q20 9 30 8" stroke="#fff" stroke-width="2.4" fill="none" opacity=".8" stroke-linecap="round"/>
+</symbol>
+
+<symbol id="lb7" viewBox="0 0 64 64">
+  <g transform="rotate(-14 26 12)"><rect x="17" y="3" width="20" height="13" rx="1.5" fill="#4ade80" stroke="#14532d"/><circle cx="27" cy="9.5" r="3.2" fill="none" stroke="#14532d"/></g>
+  <g transform="rotate(16 40 12)"><rect x="30" y="4" width="20" height="13" rx="1.5" fill="#22c55e" stroke="#14532d"/><circle cx="40" cy="10.5" r="3.2" fill="none" stroke="#14532d"/></g>
+  <path d="M22 18 Q32 24 42 18 L40 24 Q56 32 54 46 Q52 59 32 59 Q12 59 10 46 Q8 32 24 24 Z" fill="url(#lbBag)" stroke="#5c3a10" stroke-width="1.4"/>
+  <path d="M22 23 Q32 28 42 23" stroke="url(#lbGold)" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+  <text x="32" y="51" font-size="22" text-anchor="middle" fill="url(#lbGold)" stroke="#5c3a10" stroke-width=".8" font-family="Impact, 'Arial Black', sans-serif">$</text>
+  <path d="M17 35 Q15 44 19 51" stroke="#fff" stroke-width="2.4" fill="none" opacity=".45" stroke-linecap="round"/>
+</symbol>
+
+<symbol id="lb8" viewBox="0 0 64 64">
+  <circle cx="32" cy="34" r="30" fill="url(#lbAura)"/>
+  <path d="M17 24 C8 20 4 10 8 2 C11 10 16 13 23 16Z" fill="url(#lbHorn)" stroke="#1c1917" stroke-width="1"/>
+  <path d="M47 24 C56 20 60 10 56 2 C53 10 48 13 41 16Z" fill="url(#lbHorn)" stroke="#1c1917" stroke-width="1"/>
+  <path d="M32 12 C19 12 14 22 14 32 C14 45 22 57 32 59 C42 57 50 45 50 32 C50 22 45 12 32 12Z" fill="url(#lbRed)" stroke="#450a0a" stroke-width="1.5"/>
+  <path d="M18 27 L28 31 M46 27 L36 31" stroke="#450a0a" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M20 33 Q24 29 29 33 Q24 36 20 33Z" fill="#fde047"/><path d="M44 33 Q40 29 35 33 Q40 36 44 33Z" fill="#fde047"/>
+  <ellipse cx="24.5" cy="33" rx="1.2" ry="2.2" fill="#1c1917"/><ellipse cx="39.5" cy="33" rx="1.2" ry="2.2" fill="#1c1917"/>
+  <path d="M30 38 L32 42 L34 38" stroke="#7f1d1d" stroke-width="1.4" fill="none"/>
+  <path d="M21 45 Q32 54 43 45 Q32 49 21 45Z" fill="#1c1917"/><path d="M24 46.5 l2 4 1.6 -3.4 M40 46.5 l-2 4 -1.6 -3.4" fill="#fff"/>
+  <path d="M25 58 Q32 62 39 58" stroke="url(#lbGold)" stroke-width="3" fill="none"/><circle cx="32" cy="60.5" r="3" fill="url(#lbGold)" stroke="#92400e"/>
+</symbol>
+
+<symbol id="lbw" viewBox="0 0 64 64">
+  <rect x="4" y="10" width="56" height="46" rx="9" fill="url(#lbPurple)" stroke="url(#lbGold)" stroke-width="3"/>
+  <path d="M14 14 C8 8 9 2 12 0 C13 6 17 8 22 10Z" fill="url(#lbHorn)"/><path d="M50 14 C56 8 55 2 52 0 C51 6 47 8 42 10Z" fill="url(#lbHorn)"/>
+  <rect x="8" y="14" width="48" height="38" rx="6" fill="none" stroke="#a855f7" stroke-width="1" opacity=".7"/>
+  <text x="32" y="40" font-size="21" text-anchor="middle" fill="url(#lbGold)" stroke="#3b0764" stroke-width=".8" font-family="'Bebas Neue', Impact, sans-serif" letter-spacing="1">WILD</text>
+  <text x="32" y="50" font-size="7" text-anchor="middle" fill="#e9d5ff" font-family="'Bebas Neue', Impact, sans-serif" letter-spacing="2">LE DEALER</text>
+  <path d="M22 22 l3 -5 3 5 M36 22 l3 -5 3 5" fill="none" stroke="#fde047" stroke-width="1.2" opacity=".8"/>
+</symbol>
+
+<symbol id="lbsc" viewBox="0 0 64 64">
+  <path d="M8 50 C6 38 14 34 12 24 C18 30 18 36 20 38 C20 28 26 22 26 12 C32 20 32 28 32 30 C34 22 40 16 42 8 C46 18 44 26 44 30 C48 26 52 24 54 18 C58 30 58 40 56 50 Z" fill="url(#lbFire)" opacity=".9"/>
+  <circle cx="32" cy="38" r="21" fill="#052e16" stroke="#4ade80" stroke-width="2.6"/>
+  <circle cx="32" cy="38" r="17" fill="none" stroke="#4ade80" stroke-width="1" opacity=".6"/>
+  <path d="M32 21 L42 52 L16 33 H48 L22 52 Z" fill="none" stroke="#86efac" stroke-width="2.2" stroke-linejoin="round"/>
+  <circle cx="32" cy="38" r="3" fill="#bbf7d0"/>
+</symbol>
+
+<symbol id="lbcase" viewBox="0 0 64 64">
+  <path d="M24 16 V11 Q24 8 27 8 H37 Q40 8 40 11 V16" fill="none" stroke="url(#lbGold)" stroke-width="3.4"/>
+  <ellipse cx="32" cy="20" rx="24" ry="6" fill="#fde047" opacity=".55"/>
+  <rect x="5" y="17" width="54" height="40" rx="5" fill="url(#lbCase)" stroke="url(#lbGold)" stroke-width="2.4"/>
+  <path d="M5 30 H59" stroke="url(#lbGold)" stroke-width="2"/>
+  <g fill="url(#lbGold)"><path d="M5 22 Q5 17 10 17 H14 V21 H9 V26 H5Z"/><path d="M59 22 Q59 17 54 17 H50 V21 H55 V26 H59Z"/><path d="M5 52 Q5 57 10 57 H14 V53 H9 V48 H5Z"/><path d="M59 52 Q59 57 54 57 H50 V53 H55 V48 H59Z"/></g>
+  <rect x="26" y="26" width="12" height="9" rx="2" fill="url(#lbGold)" stroke="#92400e"/><circle cx="32" cy="30.5" r="1.6" fill="#92400e"/>
+  <path d="M10 38 h10 M10 43 h7" stroke="#52525b" stroke-width="1.4"/>
+</symbol>
+
+<symbol id="lbbill" viewBox="0 0 64 34">
+  <rect x="1" y="1" width="62" height="32" rx="3" fill="#86efac" stroke="#14532d" stroke-width="1.5"/><rect x="5" y="5" width="54" height="24" rx="2" fill="none" stroke="#166534"/>
+  <ellipse cx="32" cy="17" rx="8" ry="9" fill="#bbf7d0" stroke="#166534"/><text x="32" y="21" font-size="11" text-anchor="middle" fill="#166534" font-family="Impact, sans-serif">$</text>
+  <text x="11" y="13" font-size="7" fill="#166534" font-family="Impact, sans-serif">100</text><text x="45" y="27" font-size="7" fill="#166534" font-family="Impact, sans-serif">100</text>
+</symbol>
+
+<symbol id="lbdemon" viewBox="0 0 400 300">
+  <path d="M90 300 V120 L110 60 L130 110 L150 40 L175 100 L200 20 L225 100 L250 40 L270 110 L290 60 L310 120 V300Z" fill="url(#lbGold)" stroke="#78350f" stroke-width="3"/>
+  <path d="M110 300 V130 L130 120 L150 70 L175 118 L200 55 L225 118 L250 70 L270 120 L290 130 V300Z" fill="#7f1d1d" opacity=".9"/>
+  <circle cx="200" cy="60" r="12" fill="#ef4444" stroke="#fde047" stroke-width="3"/>
+  <rect x="58" y="210" width="70" height="22" rx="8" fill="url(#lbGold)" stroke="#78350f" stroke-width="3"/><rect x="272" y="210" width="70" height="22" rx="8" fill="url(#lbGold)" stroke="#78350f" stroke-width="3"/>
+  <path d="M146 300 Q140 220 160 190 Q200 175 240 190 Q260 220 254 300Z" fill="#2a0707"/>
+  <path d="M160 192 Q120 200 100 214 Q96 222 106 224 Q130 214 160 212Z M240 192 Q280 200 300 214 Q304 222 294 224 Q270 214 240 212Z" fill="#3b0909"/>
+  <path d="M174 120 C150 112 136 86 146 62 C152 84 164 92 180 98Z M226 120 C250 112 264 86 254 62 C248 84 236 92 220 98Z" fill="url(#lbHorn)" stroke="#1c1917" stroke-width="2"/>
+  <path d="M200 96 C178 96 168 114 168 134 C168 160 182 182 200 186 C218 182 232 160 232 134 C232 114 222 96 200 96Z" fill="#5b0e0e" stroke="#1c0505" stroke-width="2"/>
+  <path class="lb-eyes" d="M178 138 Q186 131 194 138 Q186 143 178 138Z M222 138 Q214 131 206 138 Q214 143 222 138Z" fill="#fde047"/>
+  <path d="M182 160 Q200 174 218 160 Q200 166 182 160Z" fill="#1c0505"/><path d="M188 162 l3 6 2 -5 M212 162 l-3 6 -2 -5" fill="#fff"/>
+  <path d="M176 186 Q200 204 224 186" stroke="url(#lbGold)" stroke-width="6" fill="none"/><circle cx="200" cy="200" r="9" fill="url(#lbGold)" stroke="#78350f" stroke-width="2"/>
+</symbol>
+</defs></svg>`;
+
+return { DEFS };
+})();
+
 // ---- art/index.js ----
 __mods['art/index.js'] = (() => {
 // Every game's SVG art, mounted once so covers and games can <use> any symbol.
@@ -6254,13 +6478,14 @@ const { DEFS: COSMIC } = __mods['art/cosmic.js'];
 const { DEFS: TACO } = __mods['art/taco.js'];
 const { DEFS: BILLETS } = __mods['art/billets.js'];
 const { DEFS: DRAGONS } = __mods['art/dragons.js'];
+const { DEFS: LABO } = __mods['art/labo.js'];
 
 function mountAllArt() {
   if (document.getElementById('bling-art')) return;
   const host = document.createElement('div');
   host.id = 'bling-art';
   host.className = 'art-defs';
-  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC, TACO, BILLETS, DRAGONS].join('');
+  host.innerHTML = [HUFF, BLING, PHARAON, BOUNTY, ANUBIS, CANDY, ZEUS, COSMIC, TACO, BILLETS, DRAGONS, LABO].join('');
   document.body.prepend(host);
 }
 
@@ -6363,6 +6588,7 @@ const ORIGINALS = [
   {"id": "taco", "name": "La Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200\u00a0\uE1E0 tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200\u00a0\uE1E0", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
+  {"id": "labo", "name": "Le Labo", "cat": "slot", "tag": "Machine à sous", "sub": "Le Dealer, La Descente, La Mallette", "colors": ["#a855f7", "#0d0415"], "description": "Un laboratoire clandestin transformé en casino : néons violets et verts, flammes derrière les rouleaux, billets qui volent et un grand démon assis sur son trône en or. 1024 façons de gagner. Le Dealer pose des WILD, La Descente lance des tours gratuits où le multiplicateur de flammes monte à chaque gain, et La Mallette s’ouvre sur des tas d’or… et peut cacher le jackpot Le Cartel ×1000.", "features": ["5 rouleaux, 1024 façons", "WILD – Le Dealer", "Free spins – La Descente", "Multiplicateur de flammes", "Bonus – La Mallette", "Jackpot – Le Cartel ×1000", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -6714,6 +6940,15 @@ const SPECS = {
         ${b('bv1', 70, 120, 120, -18)}${b('bv4', 230, 110, 120, 16)}${b('bv5', 150, 90, 130, -4)}${b('bvg', 150, 175, 170, 3)}${b('bvf', 60, 230, 90, -10)}${b('bvj', 245, 225, 90, 12)}`;
     },
   },
+  labo: {
+    bg: ['#3b0764', '#05010a'], light: '#a855f7', title: ['LE LABO'], font: 'bebas', metal: ['#fff', '#86efac', '#7e22ce'], tag: 'JACKPOT ×1000',
+    art: (u) => `
+      <circle cx="150" cy="120" r="92" fill="none" stroke="#a855f7" stroke-width="4" opacity=".55"/><path d="M150 30 L204 194 L64 92 H236 L96 194 Z" fill="none" stroke="#22c55e" stroke-width="3" stroke-linejoin="round" opacity=".5"/>
+      <path d="M0 300 C20 240 40 250 50 210 C70 250 80 230 100 190 C120 240 140 220 150 180 C165 230 180 240 200 190 C220 240 235 230 250 205 C265 245 285 240 300 220 V300Z" fill="#f97316" opacity=".55" filter="url(#soft${u})"/>
+      <use href="#lbdemon" x="10" y="20" width="280" height="210" filter="url(#sh${u})"/>
+      ${sym('lbcase', 62, 236, 84, `filter="url(#glow${u})"`)}${sym('lb7', 240, 236, 80, `filter="url(#sh${u})"`)}${sym('lb5', 150, 262, 62, `filter="url(#sh${u})"`)}
+      <g opacity=".85">${[[40, 70, -20], [258, 60, 18], [30, 160, 12], [270, 150, -14]].map(([x, y, r]) => `<use href="#lbbill" x="${x - 26}" y="${y - 14}" width="52" height="28" transform="rotate(${r} ${x} ${y})"/>`).join('')}</g>`,
+  },
   dragons: {
     bg: ['#7c2d12', '#0c0604'], light: '#f97316', title: ['L’HYDRE'], font: 'cinzel', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500', photo: 'assets/games/dragons/cover.webp',
     art: (u) => {
@@ -6819,7 +7054,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"],
+  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -6933,6 +7168,10 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  {
+    game: 'labo', date: '2026-11-01', title: 'Nouveau jeu', isNew: true,
+    items: ['Un labo clandestin transformé en casino, un démon sur son trône en or', 'WILD – Le Dealer : le démon pose des WILD sur les rouleaux', 'Free spins – La Descente : les flammes montent, +1 au multiplicateur à chaque gain', 'Bonus – La Mallette et jackpot Le Cartel ×1000'],
+  },
   { game: 'bling', date: '2026-11-01', title: 'La Tour Bling peinte', items: ['Nouveaux symboles peints en pièces d’or : diamant, couronne, sac d’or, billets, pièce, champagne et billets volants', 'Nouveau scatter : la pièce au dollar vert', 'Nouveau décor : la ville de nuit sous la pluie', 'Nouvelle affiche : la cathédrale néon'] },
   { game: 'dragons', date: '2026-11-01', title: 'L’Hydre peinte', items: ['Nouvelles têtes de dragon peintes : vert, bleu, rouge, violet, noir, blanc, bronze, diamant et or', 'Nouvelle perle magique, pierre runique, scatter, SUPER scatter et bébé dragon multiplicateur', 'Nouveau décor : l’antre au trésor du dragon'] },
   { game: 'anubis', date: '2026-11-01', title: 'Bonus plus fluides', items: ['Jugement et Monde souterrain environ 2 fois plus fluides, surtout sur téléphone', 'Les symboles restent immobiles pendant les tours et ne bougent qu’à l’arrêt'] },
@@ -7924,6 +8163,7 @@ const EXTRA_THEMES = {
   'robots': { sd: 0.14, len: 16, root: 164.81, lead: { wave: 'sawtooth', vol: 0.02, dur: 0.1, pat: [12, 12, 15, null, 12, 12, 17, null, 12, 12, 19, 17, 15, null, 14, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.15, pat: [-12, -12, null, -12, -12, null, -10, null, -12, -12, null, -12, -9, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.025 },
   'taco': { sd: 0.16, len: 16, root: 220, lead: { wave: 'triangle', vol: 0.06, dur: 0.14, pat: [12, null, 16, 19, null, 16, 12, null, 14, null, 17, 21, null, 17, 14, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -10, null, -3, null] }, comp: { wave: 'square', vol: 0.016, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [2, 5, 9] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
   billets: { sd: 0.17, len: 16, root: 146.83, lead: { wave: 'square', vol: 0.028, dur: 0.12, pat: [12, null, 16, 19, null, 24, 19, 16, 14, null, 17, 21, null, 26, 21, 17] }, bass: { wave: 'triangle', vol: 0.13, dur: 0.2, pat: [-12, null, -12, null, -5, null, -5, null, -10, null, -10, null, -3, null, -5, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [-1, 2, 7] } }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.022 },
+  labo: { sd: 0.22, len: 16, root: 87.31, pad: { wave: 'sawtooth', vol: 0.018, dur: 2.4, map: { 0: [0, 3, 7], 8: [1, 5, 8] } }, lead: { wave: 'square', vol: 0.03, dur: 0.18, pat: [12, null, null, 13, null, 15, null, 12, null, null, 18, null, 17, null, 13, null] }, bass: { wave: 'sawtooth', vol: 0.1, dur: 0.22, pat: [-12, null, -12, -12, null, null, -11, null, -12, null, -12, -12, null, null, -9, null] }, kick: [0, 4, 8, 10, 12], hat: [2, 6, 10, 14], kv: 0.26, hv: 0.02 },
   dragons: { sd: 0.24, len: 16, root: 98, pad: { wave: 'sawtooth', vol: 0.02, dur: 2, map: { 0: [0, 3, 7], 8: [-2, 3, 8] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.3, pat: [12, null, 15, null, 19, null, 18, 15, null, 12, null, 10, 12, null, null, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.5, pat: [-12, null, null, -12, null, null, -9, null, -12, null, null, -12, null, null, -7, null] }, kick: [0, 3, 8, 11], hat: [4, 12], kv: 0.26, hv: 0.02 },
   poulet: { sd: 0.15, len: 16, root: 261.63, lead: { wave: 'square', vol: 0.024, dur: 0.1, pat: [12, null, 16, 12, 19, null, 16, null, 12, null, 16, 12, 21, 19, 16, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.16, pat: [-12, null, -5, null, -12, null, -5, null, -7, null, -3, null, -5, null, -8, null] }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
   gratteciel: { sd: 0.17, len: 16, root: 196, pad: { wave: 'sawtooth', vol: 0.014, dur: 1.6, map: { 0: [0, 4, 7], 8: [-3, 0, 4] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.16, pat: [12, 14, 16, 19, null, 16, 19, 24, 21, null, 19, 16, 14, null, 12, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.22, pat: [-12, null, -12, null, -12, null, -12, null, -15, null, -15, null, -10, null, -10, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.18, hv: 0.02 },
@@ -9561,6 +9801,7 @@ const FILES = {
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '217f54e3fd'],
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', '3f3eaaaa3b'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'f3c9203150'],
+  labo: ['labo', 'games/impl/labo.js', 'LaboGame', '4ca3e053a2'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '453deb4a64'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '67c9c0259d'],
   taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
@@ -10863,7 +11104,7 @@ addEventListener('DOMContentLoaded', () => {
   const THEME_OF = {
     cosmic: 'space', zeus: 'olympus', storm: 'olympus', lightningbj: 'olympus', candy: 'candy', ticket: 'candy',
     anubis: 'egypt', pharaon: 'egypt', bling: 'gems', mines: 'gems', bounty: 'ocean', peche: 'ocean', taco: 'fiesta', plateau: 'fiesta',
-    billets: 'money', casse: 'money', roueor: 'money', dragons: 'dragon', huff: 'wolf', 'big-bad-wolf': 'wolf', penalty: 'sport', poulet: 'sport',
+    billets: 'money', casse: 'money', roueor: 'money', dragons: 'dragon', labo: 'dragon', huff: 'wolf', 'big-bad-wolf': 'wolf', penalty: 'sport', poulet: 'sport',
     billes: 'marbles', plinko: 'marbles', robots: 'neon', vortex: 'neon', avion: 'neon', gratteciel: 'neon', pileface: 'casino',
   };
   const themeNow = () => { const m = location.hash.match(/^#game-([\w-]+)/); return (m && THEME_OF[m[1]]) || 'casino'; };
