@@ -2950,6 +2950,10 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .defi-list li { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); }
 .defi-list li.me { border-color: #fbbf24; }
 .defi-list li span { width: 28px; text-align: center; font-weight: 800; }
+.defi-tabs { margin-bottom: 18px; }
+.defi-list li.up { border-color: rgba(74, 222, 128, .6); }
+.defi-up { color: #4ade80; font-style: normal; font-size: 12px; }
+.defi-prz { width: 64px; text-align: right; color: var(--muted); font-size: 11px; }
 .defi-list li em { margin-left: auto; font: 900 14px KeCoin, Orbitron, sans-serif; font-style: normal; color: #fbbf24; }
 @media (max-width: 700px) { .defi-top { grid-template-columns: 1fr; } .defi-cover { width: 160px; } }
 
@@ -4775,120 +4779,202 @@ async function renderReferral(root) {
   });
 }
 
-/* ---------- weekly challenge ---------- */
-const CHAMP_KE = 100000;
-const PODIUM_KE = [CHAMP_KE, 50000, 25000]; // 1st, 2nd, 3rd of the week
-const CH_GAMES = ['cosmic', 'taco', 'candy', 'zeus', 'huff', 'anubis', 'bling', 'pharaon'];
+/* ---------- weekly challenges (3 per week) ----------
+   B · Machines à sous : only BOUGHT bonuses count; score = the bonus total in × the bet (sb:buyend from core/base.js).
+   T · Casino (roulettes, roues, 21 électrique) and R · Jeux rapides: score = the biggest single win in × the bet.
+   Scores: challenges/{week}-{B|T|R}/scores/{uid}. Every week the top 10 of each challenge is paid automatically the
+   next time the player opens the site. Players are told live when someone passes them (and when they pass someone). */
+const CATS = {
+  B: { label: 'Machines à sous', short: 'Machines à sous', icon: '🎰', rule: 'Uniquement les <b>bonus achetés</b> : ton score = le gain total de ton plus gros bonus acheté, en × la mise.',
+    games: ['cosmic', 'taco', 'candy', 'zeus', 'huff', 'anubis', 'bling', 'pharaon'], prizes: [100000, 50000, 25000, 10000, 10000, 5000, 5000, 5000, 5000, 5000], off: 0 },
+  T: { label: 'Jeux de casino', short: 'Casino', icon: '🎡', rule: 'Ton score = ton plus gros gain en un coup, en × ta mise totale.',
+    games: ['storm', 'madwheel', 'doublespin', 'lightningbj', 'roueor', 'plateau', 'peche'], prizes: [50000, 25000, 10000, 5000, 5000, 2500, 2500, 2500, 2500, 2500], off: 3 },
+  R: { label: 'Jeux rapides', short: 'Jeux rapides', icon: '⚡', rule: 'Ton score = ton plus gros gain en un coup, en × la mise.',
+    games: ['mines', 'avion', 'plinko', 'vortex', 'casse', 'poulet', 'gratteciel', 'penalty', 'ticket', 'billes'], prizes: [50000, 25000, 10000, 5000, 5000, 2500, 2500, 2500, 2500, 2500], off: 5 },
+};
+const CHAMP_KE = CATS.B.prizes[0];
+const NEW_FROM = '2026-S45'; // first week of the new rules; before it the slot challenge was "any win" under the bare week key
 function weekOf(t = Date.now()) {
   const d = new Date(t); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
   const w1 = new Date(d.getFullYear(), 0, 4);
   const n = 1 + Math.round(((d - w1) / 864e5 - 3 + ((w1.getDay() + 6) % 7)) / 7);
   return { key: `${d.getFullYear()}-S${String(n).padStart(2, '0')}`, n, year: d.getFullYear() };
 }
-const challengeGame = (w = weekOf()) => CH_GAMES[(w.year * 53 + w.n) % CH_GAMES.length];
+const legacy = (w, cat) => cat === 'B' && w.key < NEW_FROM;
+const keyOf = (cat, w = weekOf()) => (legacy(w, cat) ? w.key : `${w.key}-${cat}`);
+const gameOf = (cat, w = weekOf()) => { const l = CATS[cat].games; return l[(w.year * 53 + w.n + CATS[cat].off) % l.length]; };
+const challengeGame = (w = weekOf()) => gameOf('B', w);
+const challengeOf = (gid) => Object.keys(CATS).find((c) => gameOf(c) === gid) || null;
 const endOfWeek = () => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + (((8 - d.getDay()) % 7) || 7)); return d; }; // next Monday 00:00
-const myBest = () => { const c = profiles.current?.challenge; return c && c.week === weekOf().key ? c.best : 0; };
+const xs = (x) => `×${String(x).replace('.', ',')}`;
+const place = (r) => (r === 0 ? '1er' : `${r + 1}e`);
+function myBest(cat) {
+  const me = profiles.current; if (!me) return 0;
+  const k = keyOf(cat), c = me.challenges?.[cat];
+  if (c && c.week === k) return c.best;
+  if (cat === 'B' && me.challenge && me.challenge.week === k) return me.challenge.best; // legacy record
+  return 0;
+}
 
-let saving = null;
+const saving = {};
+function record(cat, gid, x) {
+  x = Math.min(100000, Math.round(x * 100) / 100);
+  if (!profiles.current || x <= 0 || x <= myBest(cat)) return;
+  const k = keyOf(cat);
+  profiles.update('challenges', (p) => { p.challenges = { ...(p.challenges || {}), [cat]: { week: k, best: x, game: gid } }; if (legacy(weekOf(), cat)) p.challenge = { week: k, best: x, game: gid }; });
+  toast(`🏁 Nouveau record du Défi ${CATS[cat].short} : ${xs(x)} !`, 'ok');
+  const me = uid();
+  if (me) {
+    clearTimeout(saving[cat]);
+    saving[cat] = setTimeout(() => cloud.saveChallenge(k, me, { name: profiles.current.name, best: x, game: gid, updated: Date.now() }).catch((err) => console.error(err)), 1200);
+  }
+  watchBoards();
+}
+const gameNow = () => (location.hash.match(/^#game-([\w-]+)/) || [])[1];
+wallet.addEventListener('payout', (e) => {
+  const meta = e.detail.meta, g = gameNow();
+  if (!meta || !g) return;
+  for (const cat of ['T', 'R']) if (g === gameOf(cat)) record(cat, g, meta.x || 0);
+  if (g === gameOf('B') && legacy(weekOf(), 'B')) record('B', g, meta.x || 0); // last days of the old rules
+});
+addEventListener('sb:buyend', (e) => {
+  const d = e.detail || {};
+  if (legacy(weekOf(), 'B') || d.game !== gameOf('B') || !(d.win > 0)) return;
+  record('B', d.game, d.x);
+});
 
-/* live leader of the current week, shown in every [data-leader] element */
-let leader = null, unwatch = null, watchedWeek = null, answered = false;
-const leaderHTML = () => (leader ? `👑 En tête : <b>${esc(leader.name)}</b> · ×${String(leader.best).replace('.', ',')}${leader.uid === uid() ? ' (toi !)' : ''}` : '👑 Personne en tête pour l’instant : prends la place !');
-// Only touches elements whose text changed, so the MutationObserver below does not loop.
+/* ---------- live boards: leader + who passes whom ---------- */
+const boards = {}; // cat -> { key, list, unwatch, rank }
+const sortB = (l) => l.slice().sort((a, b) => b.best - a.best || (a.updated || 0) - (b.updated || 0)); // tie: the first to reach it
+const listeners = new Set();
+let leader = null, answered = false;
+async function watchBoards() {
+  if (!cloud.enabled) return;
+  for (const cat of Object.keys(CATS)) {
+    const k = keyOf(cat), b = boards[cat];
+    const want = cat === 'B' || myBest(cat) > 0 || listeners.size > 0; // B: leader banner everywhere; others: when playing it or on the page
+    if (!want || (b && b.key === k)) continue;
+    b?.unwatch?.();
+    const nb = boards[cat] = { key: k, list: null, rank: -1, unwatch: null };
+    try {
+      nb.unwatch = await cloud.watchChallenge(k, 20, (raw) => onBoard(cat, nb, sortB(raw)));
+    } catch (e) { console.error(e); delete boards[cat]; }
+  }
+}
+function onBoard(cat, b, list) {
+  const me = uid(), prev = b.list, prevRank = b.rank;
+  b.list = list; b.rank = me ? list.findIndex((e) => e.uid === me) : -1;
+  if (prev && me && myBest(cat) > 0) {
+    const was = prevRank < 0 ? 99 : prevRank, now = b.rank < 0 ? 99 : b.rank;
+    if (now > was) {
+      const by = list.slice(0, now).find((e) => e.uid !== me && !prev.slice(0, was).some((x) => x.uid === e.uid));
+      toast(`⚠️ ${esc(by?.name || 'Un joueur')} t’a dépassé au Défi ${CATS[cat].short}${by ? ` (${xs(by.best)})` : ''} : tu es ${b.rank < 0 ? 'sorti du top 20' : place(b.rank)}. Reprends ta place !`, 'warn');
+    } else if (now < was && b.rank >= 0) {
+      const passed = prev.slice(0, was).filter((e) => e.uid !== me && list.findIndex((x) => x.uid === e.uid) > b.rank);
+      toast(`🔥 Tu as dépassé ${passed.length ? esc(passed[0].name) + (passed.length > 1 ? ` et ${passed.length - 1} autre${passed.length > 2 ? 's' : ''}` : '') : 'un joueur'} au Défi ${CATS[cat].short} : tu es ${place(b.rank)} !`, 'ok');
+    }
+  }
+  if (cat === 'B') {
+    const old = leader?.uid;
+    leader = list[0] || null; answered = true; paintLeader();
+    if (leader && old && old !== leader.uid && leader.uid !== me && b.rank !== 0) toast(`🏁 ${esc(leader.name)} prend la tête du Défi Machines à sous : ${xs(leader.best)} !`);
+  }
+  listeners.forEach((fn) => fn(cat, prev));
+}
+const leaderHTML = () => (leader ? `👑 En tête : <b>${esc(leader.name)}</b> · ${xs(leader.best)}${leader.uid === uid() ? ' (toi !)' : ''}` : '👑 Personne en tête pour l’instant : prends la place !');
 function paintLeader() {
   document.querySelectorAll('[data-leader]').forEach((n) => {
-    if (!answered) return; // keep the placeholder until Firestore answers
+    if (!answered) return;
     const html = (n.classList.contains('defi-live') ? '<span class="live-dot"></span>' : '') + leaderHTML();
     if (n.dataset.v === html) return;
     n.dataset.v = html; n.innerHTML = html; n.classList.toggle('me', !!leader && leader.uid === uid());
   });
 }
-async function watchLeader() {
-  const w = weekOf().key;
-  if (watchedWeek === w || !cloud.enabled) return;
-  watchedWeek = w;
-  unwatch?.();
-  try {
-    unwatch = await cloud.watchChallenge(w, 1, (list) => {
-      const prev = leader?.uid;
-      leader = list[0] || null;
-      answered = true;
-      paintLeader();
-      if (leader && prev && prev !== leader.uid && leader.uid !== uid()) toast(`🏁 ${esc(leader.name)} prend la tête du Défi : ×${String(leader.best).replace('.', ',')} !`);
-    });
-  } catch (e) { console.error(e); watchedWeek = null; }
-}
-new MutationObserver(() => { if (document.querySelector('[data-leader]')) { watchLeader(); paintLeader(); } }).observe(document.body, { childList: true, subtree: true });
+new MutationObserver(() => { if (document.querySelector('[data-leader]')) { watchBoards(); paintLeader(); } }).observe(document.body, { childList: true, subtree: true });
+profiles.addEventListener('change', () => { Object.values(boards).forEach((b) => b.unwatch?.()); for (const k in boards) delete boards[k]; setTimeout(watchBoards, 1500); });
 
-/* last week's champion: CHAMP_KE + badge, once */
+/* ---------- last week's top 10 of each challenge: paid automatically, once ---------- */
+let claiming = false;
 async function claimChampion() {
   const me = uid();
-  if (!me) return false;
-  const prev = weekOf(Date.now() - 7 * 864e5).key;
-  if ((profiles.current?.champPaid || []).includes(prev)) return false;
-  const top = await cloud.topChallenge(prev, 3).catch(() => []);
-  const rank = top.findIndex((x) => x.uid === me);
-  if (rank < 0) return false;
-  const badge = rank === 0 ? `Champion du Défi ${prev}` : `Podium du Défi ${prev}`;
-  profiles.update('champPaid', (p) => { p.champPaid = [...(p.champPaid || []), prev]; p.badges = [...new Set([...(p.badges || []), badge])]; });
-  wallet.grant(PODIUM_KE[rank]);
-  sfx.bigWin(); fx.confetti(rank ? 80 : 140); fx.coins(rank ? 50 : 80);
-  toast(rank === 0 ? `🏆 Tu as gagné le Défi de la semaine dernière : +${fmt(CHAMP_KE)} et le badge Champion !` : `🥈 Tu finis ${rank + 1}e du Défi de la semaine dernière : +${fmt(PODIUM_KE[rank])} !`, 'ok');
-  return true;
+  if (!me || claiming || !cloud.enabled) return false;
+  claiming = true;
+  let any = false;
+  try {
+    const pw = weekOf(Date.now() - 7 * 864e5);
+    for (const cat of Object.keys(CATS)) {
+      const k = keyOf(cat, pw);
+      if ((profiles.current?.champPaid || []).includes(k)) continue;
+      const top = sortB(await cloud.topChallenge(k, 10).catch(() => []));
+      const rank = top.findIndex((x) => x.uid === me);
+      if (rank < 0) continue;
+      const ke = CATS[cat].prizes[rank];
+      const badge = rank === 0 ? `Champion du Défi ${CATS[cat].short} ${pw.key}` : rank < 3 ? `Podium du Défi ${CATS[cat].short} ${pw.key}` : null;
+      profiles.update('champPaid', (p) => { p.champPaid = [...(p.champPaid || []), k]; if (badge) p.badges = [...new Set([...(p.badges || []), badge])]; });
+      wallet.grant(ke); any = true;
+      sfx.bigWin(); fx.confetti(rank ? 70 : 140); fx.coins(rank ? 40 : 80);
+      toast(`${rank === 0 ? '🏆' : rank < 3 ? '🥈' : '🏁'} Défi ${CATS[cat].short} de la semaine dernière : tu finis ${place(rank)} → +${fmt(ke)}${rank === 0 ? ' et le badge Champion' : ''} !`, 'ok');
+    }
+  } finally { claiming = false; }
+  return any;
 }
 profiles.addEventListener('change', () => { setTimeout(claimChampion, 2500); });
-wallet.addEventListener('payout', (e) => {
-  const meta = e.detail.meta, g = (location.hash.match(/^#game-([\w-]+)/) || [])[1];
-  if (!meta || !profiles.current || g !== challengeGame()) return;
-  const x = Math.round((meta.x || 0) * 100) / 100;
-  if (x <= myBest()) return;
-  const w = weekOf().key;
-  profiles.update('challenge', (p) => { p.challenge = { week: w, best: x, game: g }; });
-  toast(`🏁 Nouveau record du Défi : ×${String(x).replace('.', ',')} !`, 'ok');
-  const me = uid();
-  if (me) {
-    clearTimeout(saving);
-    saving = setTimeout(() => cloud.saveChallenge(w, me, { name: profiles.current.name, best: Math.min(x, 100000), game: g, updated: Date.now() }).catch((err) => console.error(err)), 1500);
-  }
-});
 
+/* ---------- page ---------- */
+let tab = 'B';
+try { tab = localStorage.getItem('defi_tab') || 'B'; } catch { /* ignore */ }
+if (!CATS[tab]) tab = 'B';
 async function renderChallenge(root) {
   const { getGame } = __mods['games/index.js'], { coverSVG } = __mods['covers.js'];
-  const w = weekOf(), g = getGame(challengeGame(w)), best = myBest();
-  const prev = weekOf(Date.now() - 7 * 864e5);
+  const w = weekOf(), cat = tab, C = CATS[cat], g = getGame(gameOf(cat, w)), best = myBest(cat), old = legacy(w, cat);
+  const prevW = weekOf(Date.now() - 7 * 864e5);
   const left = endOfWeek() - Date.now(), dd = Math.floor(left / 864e5), hh = Math.floor((left % 864e5) / 3600e3);
+  const rule = old ? 'Ton score = ton plus gros gain en × la mise sur ce jeu. <b>Nouveau dès lundi : seuls les bonus achetés compteront.</b>' : C.rule;
   root.innerHTML = `
     <section class="panel social-page defi-page">
+      <div class="lb-tabs defi-tabs" role="tablist">${Object.entries(CATS).map(([k, c]) => `<button type="button" data-cat="${k}" class="${k === cat ? 'on' : ''}"><span>${c.icon}</span>${c.short}</button>`).join('')}</div>
       <div class="defi-top">
         <a class="defi-cover" href="#game-${g.id}">${coverSVG(g, { square: true })}</a>
         <div>
-          <span class="eyebrow">🏁 Défi de la semaine · ${w.key.replace('-S', ' · semaine ')}</span>
+          <span class="eyebrow">🏁 Défi ${C.label} · ${w.key.replace('-S', ' · semaine ')}</span>
           <h1>${g.name}</h1>
-          <p class="muted">Cette semaine, tout le monde joue à <b>${g.name}</b>. Ton score = <b>ton plus gros gain en × la mise</b> sur ce jeu : petite ou grosse mise, tout le monde part à égalité.</p>
-          <div class="defi-prize">🏆 À la fin de la semaine : <b>n°1 ${fmt(PODIUM_KE[0])}</b> + le badge <b>Champion du Défi</b> · 🥈 n°2 ${fmt(PODIUM_KE[1])} · 🥉 n°3 ${fmt(PODIUM_KE[2])}</div>
-          <div class="defi-live" data-leader><span class="live-dot"></span>Chargement du classement…</div>
-          <div class="ref-stats"><div><b>${best ? `×${String(best).replace('.', ',')}` : '—'}</b><small>ton record</small></div><div><b>${dd} j ${hh} h</b><small>avant la fin</small></div></div>
-          <a class="btn primary lg" href="#game-${g.id}">Jouer au défi</a>
-          ${!uid() ? '<p class="muted small">En invité, ton record compte pour toi mais n’apparaît pas au classement : crée un compte pour y figurer.</p>' : ''}
+          <p class="muted">Cette semaine : <b>${g.name}</b>. ${rule} Petite ou grosse mise, tout le monde part à égalité. À égalité, le premier arrivé garde la place.</p>
+          <div class="defi-prize">🏆 Payé automatiquement lundi : <b>n°1 ${fmt(C.prizes[0])}</b> · 🥈 ${fmt(C.prizes[1])} · 🥉 ${fmt(C.prizes[2])} · 4e-5e ${fmt(C.prizes[3])} · 6e-10e ${fmt(C.prizes[5])}</div>
+          <div class="defi-live" data-me-live><span class="live-dot"></span>Chargement du classement…</div>
+          <div class="ref-stats"><div><b>${best ? xs(best) : '—'}</b><small>ton record</small></div><div><b data-my-rank>—</b><small>ta place</small></div><div><b>${dd} j ${hh} h</b><small>avant la fin</small></div></div>
+          <a class="btn primary lg" href="#game-${g.id}">${cat === 'B' && !old ? 'Acheter un bonus' : 'Jouer au défi'}</a>
+          ${!uid() ? '<p class="muted small">En invité, ton record compte pour toi mais n’apparaît pas au classement : crée un compte pour y figurer et être payé.</p>' : ''}
         </div>
       </div>
-      <div class="defi-boards"><div><h4>Classement de la semaine</h4><ol class="defi-list" data-board><li class="muted">Chargement…</li></ol></div>
-        <div><h4>Podium de la semaine dernière</h4><ol class="defi-list" data-prev><li class="muted">Chargement…</li></ol></div></div>
+      <div class="defi-boards"><div><h4>Classement en direct</h4><ol class="defi-list" data-board><li class="muted">Chargement…</li></ol></div>
+        <div><h4>Top 10 de la semaine dernière</h4><ol class="defi-list" data-prev><li class="muted">Chargement…</li></ol></div></div>
     </section>`;
-  const row = (e, k) => `<li class="${e.uid === uid() ? 'me' : ''}"><span>${k === 0 ? '🥇' : k === 1 ? '🥈' : k === 2 ? '🥉' : `${k + 1}.`}</span><b>${esc(e.name)}</b><em>×${String(e.best).replace('.', ',')}</em></li>`;
-  const fill = async (sel, week, n) => {
-    const ol = root.querySelector(sel);
-    try {
-      const list = await cloud.topChallenge(week, n);
-      if (!ol.isConnected) return;
-      ol.innerHTML = list.length ? list.map(row).join('') : '<li class="muted">Personne pour l’instant : sois le premier !</li>';
-      if (sel === '[data-prev]') claimChampion();
-    } catch (err) { console.error(err); if (ol.isConnected) ol.innerHTML = '<li class="muted">Classement indisponible pour le moment.</li>'; }
+  root.querySelectorAll('[data-cat]').forEach((b) => { b.onclick = () => { tab = b.dataset.cat; try { localStorage.setItem('defi_tab', tab); } catch { /* ignore */ } renderChallenge(root); }; });
+  const medal = (k) => (k === 0 ? '🥇' : k === 1 ? '🥈' : k === 2 ? '🥉' : `${k + 1}.`);
+  const row = (e, k, moved) => `<li class="${e.uid === uid() ? 'me' : ''}${moved ? ' up' : ''}"><span>${medal(k)}</span><b>${esc(e.name)}</b>${moved ? '<i class="defi-up">▲</i>' : ''}<em>${xs(e.best)}</em><small class="defi-prz">${k < 10 ? '+' + fmt(C.prizes[k]) : ''}</small></li>`;
+  const paint = (list, prev) => {
+    const ol = root.querySelector('[data-board]'); if (!ol) return;
+    ol.innerHTML = list.length ? list.map((e, k) => { const pk = prev ? prev.findIndex((x) => x.uid === e.uid) : k; return row(e, k, prev && (pk < 0 || pk > k)); }).join('') : '<li class="muted">Personne pour l’instant : sois le premier !</li>';
+    const r = uid() ? list.findIndex((e) => e.uid === uid()) : -1;
+    root.querySelector('[data-my-rank]').textContent = r >= 0 ? place(r) : best ? 'hors top 20' : '—';
+    const live = root.querySelector('[data-me-live]'), lead = list[0];
+    live.innerHTML = `<span class="live-dot"></span><span>${lead ? `👑 En tête : <b>${esc(lead.name)}</b> · ${xs(lead.best)}${lead.uid === uid() ? ' (toi !)' : r > 0 ? ` · il te manque ${xs(Math.round((list[r - 1].best - list[r].best) * 100) / 100)} pour passer ${place(r - 1)}` : ''}` : 'Personne en tête pour l’instant : prends la place !'}</span>`;
+    live.classList.toggle('me', !!lead && lead.uid === uid());
   };
-  fill('[data-board]', w.key, 20);
-  let lastTop = null;
-  const iv = setInterval(() => { if (!root.querySelector('[data-board]')) return clearInterval(iv); const t = leader ? `${leader.uid}:${leader.best}` : ''; if (t !== lastTop) { if (lastTop !== null) fill('[data-board]', w.key, 20); lastTop = t; } }, 1500);
-  fill('[data-prev]', prev.key, 3);
+  const onLive = (c, prev) => { if (c === cat && root.querySelector('[data-board]')) paint(boards[c].list, prev); };
+  listeners.clear(); listeners.add(onLive);
+  if (!cloud.enabled) { root.querySelector('[data-board]').innerHTML = '<li class="muted">Le classement s’active avec les comptes en ligne.</li>'; }
+  else {
+    await watchBoards();
+    if (boards[cat]?.list) paint(boards[cat].list, null);
+    const iv = setInterval(() => { if (!root.querySelector('[data-board]') || tab !== cat) { listeners.delete(onLive); clearInterval(iv); } }, 2000);
+  }
+  const ol = root.querySelector('[data-prev]');
+  try {
+    const list = sortB(await cloud.topChallenge(keyOf(cat, prevW), 10));
+    if (ol.isConnected) ol.innerHTML = list.length ? list.map((e, k) => row(e, k, false)).join('') : '<li class="muted">Pas de classement la semaine dernière.</li>';
+    claimChampion();
+  } catch (err) { console.error(err); if (ol.isConnected) ol.innerHTML = '<li class="muted">Classement indisponible pour le moment.</li>'; }
 }
 
 // Share the site, or one game, with the player's referral link when they have an account (their friends then
@@ -4908,7 +4994,7 @@ document.addEventListener('click', (e) => {
   shareSite(b.dataset.shareSite ? { id: b.dataset.shareSite, name: b.dataset.shareName } : null);
 });
 
-return { renderReferral, renderChallenge, challengeGame, shareSite };
+return { renderReferral, renderChallenge, challengeGame, challengeOf, gameOf, CHALLENGES: CATS, shareSite };
 })();
 
 // ---- brand.js ----
@@ -7112,7 +7198,7 @@ function renderLobby(root, params = {}) {
 
     <div class="promos">
     ${filter === 'all' && profilesReady() ? (() => { const m = missionStatus(), n = m.rows.filter((r) => r.claimed).length; return m.chest ? '' : `<a class="app-promo ms-promo" href="#missions"><span class="wp-ico">🎯</span><span><b>Missions du jour · ${n} / 3</b><small>${m.toClaim ? `${m.toClaim} récompense${m.toClaim > 1 ? 's' : ''} à récupérer !` : m.rows.map((r) => r.text).join(' · ')}</small></span><em>${m.toClaim ? 'Récupérer' : 'Voir'}</em></a>`; })() : ''}
-    ${filter === 'all' ? `<a class="app-promo defi-promo" href="#defi"><span class="wp-ico">🏁</span><span><b>Défi de la semaine : ${getGame(challengeGame()).name}</b><small data-leader>100 000\u00a0\uE1E0 au n°1</small></span><em>Participer</em></a>` : ''}
+    ${filter === 'all' ? `<a class="app-promo defi-promo" href="#defi"><span class="wp-ico">🏁</span><span><b>3 Défis de la semaine · machines à sous : ${getGame(challengeGame()).name}</b><small data-leader>100 000\u00a0\uE1E0 au n°1</small></span><em>Participer</em></a>` : ''}
     ${filter === 'all' && wheelReady() ? `<a class="app-promo wheel-promo" href="#roue"><span class="wp-ico">🎡</span><span><b>Ta Roue du jour est prête !</b><small>Un tour gratuit : KE, XP ou bonus offert</small></span><em>Tourner</em></a>` : ''}
     ${filter === 'all' && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone) ? `<a class="app-promo" href="#appli"><img src="assets/icon-192.png" alt="" width="44" height="44"><span><b>Installe l’appli SpinBet</b><small>Plein écran, sur ton écran d’accueil · iPhone et Android</small></span><em>Installer</em></a>` : ''}
     </div>
@@ -8550,6 +8636,7 @@ class BaseGame {
   win(c, label) {
     if (c <= 0) return;
     if (label) this.featWin += c;
+    this.roundWin = (this.roundWin || 0) + c;
     wallet.credit(c / 100, { game: label ? `${this.game.name} · ${label}` : this.game.name, x: c / Math.max(1, this.lastStake || this.bet) });
   }
 
@@ -8711,6 +8798,7 @@ class BaseGame {
     if (this.busy || this.dead) return;
     this.setBusy(true);
     this.featWin = 0;
+    this.roundWin = 0;
     try { await fn(); } catch (e) { console.error(e); }
     if (this.featWin > 0) wallet.bonusWin(this.featWin / 100);
     if (this.dead) return;
@@ -8765,7 +8853,10 @@ class BaseGame {
       if (!ok) return;
       this.lastStake = this.bet;
       this.buyRound = true;
+      const stake = this.bet;
       try { await this.onBuy(id); } finally { this.buyRound = false; }
+      // social.js (Défi des machines à sous): a bought bonus is over, with its total win in × the bet
+      dispatchEvent(new CustomEvent('sb:buyend', { detail: { game: this.game.id, buy: id, win: this.roundWin || 0, x: (this.roundWin || 0) / Math.max(1, stake) } }));
     });
   }
 
@@ -9478,7 +9569,7 @@ const { wallet } = __mods['wallet.js'];
 const { gameCard, volLabel } = __mods['pages/lobby.js'];
 const { hasImpl, loadImpl } = __mods['games/impl/index.js'];
 const { profiles } = __mods['profile.js'];
-const { challengeGame } = __mods['social.js'];
+const { challengeGame, challengeOf } = __mods['social.js'];
 
 let current = null;
 
@@ -9492,7 +9583,7 @@ const dots = (n) => `<span class="dots">${[1, 2, 3, 4, 5].map((i) => `<i class="
 
 function renderRebuilt(root, game) {
   root.innerHTML = `
-    <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-${game.cat}">${game.tag}</a><span>›</span><b>${game.name}</b>${challengeGame() === game.id ? '<a class="defi-pill" href="#defi">🏁 Défi de la semaine · <span data-leader>100 000\u00a0\uE1E0 au n°1</span></a>' : ''}</nav>
+    <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-${game.cat}">${game.tag}</a><span>›</span><b>${game.name}</b>${challengeOf(game.id) === 'B' ? '<a class="defi-pill" href="#defi">🏁 Défi de la semaine (bonus achetés) · <span data-leader>100 000\u00a0\uE1E0 au n°1</span></a>' : challengeOf(game.id) ? '<a class="defi-pill" href="#defi">🏁 Jeu du Défi de la semaine · 50 000\u00a0\uE1E0 au n°1</a>' : ''}</nav>
     <div class="game-host"></div>
     <section class="game-about panel">
       <div><h2>${game.name} <small>${game.sub}</small></h2><p class="muted">${game.description}</p>
