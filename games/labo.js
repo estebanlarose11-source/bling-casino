@@ -14,7 +14,7 @@ const { el } = __mods['ui.js'];
 
 /* ===ENGINE */
 // 5×4, 1024 ways. 9 symbols pay by ways from the left; WILD (Le Dealer) on reels 2-5 replaces them.
-// LE DEALER: on some spins the demon turns 3 to 6 symbols of reels 2-5 into WILDs.
+// LE DEALER: on some spins the Dealer turns 3 to 6 symbols of reels 2-5 into WILDs.
 // 3+ RAINBOW SPIRALS (scatter): LA DESCENTE, free spins where the flame multiplier climbs +1 after every winning spin.
 // 3+ BRIEFCASES (base game): LA MALLETTE, a hold & spin of cups and green smoke (see malletteBonus); full screen = JACKPOT ×1000.
 const COLS = 5, ROWS = 4, N = 20, WILD = 9, SC = 10, CASE = 11, CAPX = 5000, JPX = 1000;
@@ -130,7 +130,7 @@ function malletteBonus(startCells) {
 
 // Painted images from the owner (assets/games/labo/<name>.webp) replace the drawn art as soon as their name is
 // listed here: s0..s8 (symbols: leaf, joint, pills, mushroom, blotter, pink pill, powder bag, brick, boss), w (WILD), sc (rainbow spiral), case (briefcase), bg (lab background), demon (boss on his throne).
-const PAINTED = new Set(['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 'w', 'sc', 'bg', 'leaf', 'gleaf', 'magic']); // + La Mallette: the taz are the brick (s7, small), purple (s8, medium) and diamond (s2, big) pills; leaf, gleaf (golden leaf), magic (magic taz)
+const PAINTED = new Set(['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 'w', 'sc', 'case', 'bg', 'leaf', 'gleaf', 'magic', 'taz1']); // + La Mallette: the taz are the brick (s7, small), purple (s8, medium) and diamond (s2, big) pills; leaf, gleaf (golden leaf), magic (magic taz)
 const IMG_V = 1;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const FILE = (v) => (v === WILD ? 'w' : v === SC ? 'sc' : v === CASE ? 'case' : `s${v}`);
@@ -143,7 +143,7 @@ const NAMES = ['Feuille', 'Joint', 'Cachet diamant', 'Champignon magique', 'Buva
 const BUY_FS = 50, BUY_CASE = 33;
 const CUPN = ['Taz brique', 'Taz violette', 'Taz diamant'], CUPC = ['#ef4444', '#a855f7', '#38bdf8'];
 const bArt = (name, svg) => (painted(name) ? img(name) : art(svg));
-const TAZ = ['s7', 's8', 's2']; // small, medium, big multipliers
+const TAZ = ['s7', 'taz1', 's2']; // small (brick pill), medium (purple pill), big (diamond pill)
 const cupArt = (k) => bArt(TAZ[k], `lbcup${k}`);
 const HELL = ['#f472b6', '#fde047', '#4ade80', '#22d3ee', '#a855f7', '#f97316'];
 const GOLD = ['#fde047', '#fbbf24', '#fff7c2', '#f59e0b'];
@@ -166,7 +166,6 @@ class LaboGame extends BaseGame {
           <i class="lb-flames"></i><i class="lb-flames b"></i>
           <div class="lb-bills">${Array.from({ length: 7 }, (_, k) => `<svg viewBox="0 0 64 64" style="--k:${k}" aria-hidden="true"><use href="#${['lbbill', 'lb2', 'lb5', 'lbbill', 'lb4', 'lb2', 'lbbill'][k]}" width="64" height="64"/></svg>`).join('')}</div>
         </div>
-        <div class="lb-throne">${painted('demon') ? img('demon', 'lb-demon-img') : '<svg viewBox="0 0 400 300" aria-hidden="true"><use href="#lbdemon" width="400" height="300"/></svg>'}</div>
         <div class="lb-meter"><small>TRIP</small><b>×1</b></div>
         <div class="reels-host"></div><div class="lb-word"></div>`,
       buys: [
@@ -274,7 +273,7 @@ class LaboGame extends BaseGame {
     }
   }
 
-  // WILD – LE DEALER: the demon leans over the machine and turns some symbols into WILDs.
+  // WILD – LE DEALER: the Dealer passes by and turns some symbols into WILDs.
   async dealer(cells) {
     this.slotEl.classList.add('dealer');
     this.word('LE DEALER !', 'dealer');
@@ -413,7 +412,7 @@ class LaboGame extends BaseGame {
     return n._c ?? null;
   }
 
-  // JACKPOT – LE CARTEL: the demon rises from his throne, the reels burst in red and gold light.
+  // JACKPOT – LE CARTEL: the reels burst in red and gold light.
   async cartel(b) {
     this.slotEl.classList.add('cartel');
     sfx.jackpot();
@@ -475,14 +474,14 @@ class LaboGame extends BaseGame {
     return this.rules(`<h4>Symboles (× la mise, par façon)</h4><div class="paytable">${rows}
       <div class="pay-item"><div class="pay-sym svg">${symArt(WILD)}</div><div class="pay-vals"><b>WILD · Le Dealer</b><br><span>Rouleaux 2 à 5, remplace tous les symboles</span></div></div></div>
       <h4>1024 façons de gagner</h4><p>Un symbole paie dès qu’il apparaît sur 3 rouleaux d’affilée ou plus depuis la gauche, à n’importe quelle hauteur.</p>
-      <h4>WILD – Le Dealer</h4><p>À n’importe quel tour, le démon peut se pencher sur la machine et transformer 3 à 6 symboles des rouleaux 2 à 5 en WILD.</p>
+      <h4>WILD – Le Dealer</h4><p>À n’importe quel tour, le Dealer peut passer et transformer 3 à 6 symboles des rouleaux 2 à 5 en WILD.</p>
       <h4>Free spins – La Descente</h4><p>${symArt(SC).replace('<svg', '<svg style="width:22px;height:22px;vertical-align:middle"')} 3, 4 ou 5 spirales : ${FS_N[3]}, ${FS_N[4]} ou ${FS_N[5]} tours gratuits. Le trip commence, les flammes arc-en-ciel envahissent l’écran : chaque tour gagnant ajoute +1 au multiplicateur, qui ne redescend jamais. 3 spirales de plus : +${RETRIG} tours. Le Dealer passe deux fois plus souvent.</p>
       <h4>Bonus – La Mallette</h4><p>3 mallettes ou plus : chaque mallette devient une taz et le bonus démarre avec <b>${B.spins} tours</b>. Les taz restent en place, et chaque nouvelle taz remet les tours à ${B.spins}. Chaque taz envoie son multiplicateur dans la <b>fumée verte</b> au milieu, qui fait le total.</p>
       <div class="paytable">${[0, 1, 2].map((k) => `<div class="pay-item"><div class="pay-sym svg">${cupArt(k)}</div><div class="pay-vals"><b>${CUPN[k]}</b><br><span>×${B.cupV[k].map((v) => xv(v[0])).join(', ×')} la mise</span></div></div>`).join('')}
       <div class="pay-item"><div class="pay-sym svg">${bArt('leaf', 'lbbill')}</div><div class="pay-vals"><b>Feuille</b><br><span>Multiplie par ${B.leafX} toutes les taz qui la touchent</span></div></div>
       <div class="pay-item"><div class="pay-sym svg">${bArt('gleaf', 'lbgleaf')}</div><div class="pay-vals"><b>Feuille d’or</b><br><span>Multiplie par ${B.goldX} toutes les taz de l’écran</span></div></div>
       <div class="pay-item"><div class="pay-sym svg">${bArt('magic', 'lbmagic')}</div><div class="pay-vals"><b>Taz magique</b><br><span>Aspire toutes les taz et garde leur valeur : ça libère de la place</span></div></div></div>
-      <h4>Jackpot – Le Cartel</h4><p>Remplis <b>tout l’écran de taz</b> pendant La Mallette : le démon se lève de son trône et ajoute <b>×${JPX} la mise</b>.</p>
+      <h4>Jackpot – Le Cartel</h4><p>Remplis <b>tout l’écran de taz</b> pendant La Mallette : le Cartel paie et ajoute <b>×${JPX} la mise</b>.</p>
       <h4>Achats</h4><p>La Mallette ×${BUY_CASE} · La Descente ×${BUY_FS}. Gain maximum ×${CAPX.toLocaleString('fr-FR')}.</p>`);
   }
 }
