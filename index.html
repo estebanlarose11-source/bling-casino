@@ -123,6 +123,59 @@ h1, h2, h3, h4 { margin: 0; line-height: 1.15; }
 .side-vip small { color: var(--muted); display: block; font-size: 11px; }
 .side-foot { padding: 12px; color: var(--muted); font-size: 13px; }
 .side-scrim { display: none; }
+/* sidebar: four short sections, bigger and calmer */
+.side { gap: 2px; padding: 14px 12px 12px; }
+.side .logo { padding-bottom: 8px; }
+.side-label { margin: 14px 12px 4px; font-size: 10.5px; letter-spacing: 1.6px; color: #8b8f99; }
+.side-nav a { gap: 12px; padding: 9px 12px; font-size: 15px; font-weight: 600; color: #d4d8e0; }
+.side-nav a span { font-size: 17px; width: 24px; }
+.side-nav a.on { color: #fff; }
+.side-more a { font-size: 14px; color: #a9aeb8; padding: 7px 12px; }
+[data-ach-badge][hidden] { display: none !important; }
+.side-badge { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; display: grid; place-items: center; background: var(--green); color: #fff; font: 800 11px Inter, sans-serif; }
+.side-vip { margin-top: 14px; }
+.side-foot { padding: 10px 12px 4px; }
+
+/* ============ Succès (achievements) ============ */
+.bottom-nav a { position: relative; }
+.nav-badge { position: absolute; top: 2px; left: calc(50% + 6px); margin: 0; min-width: 16px; height: 16px; font-size: 10px; padding: 0 4px; }
+.ac-page h1 { margin: 6px 0 8px; font-size: clamp(26px, 4vw, 36px); }
+.ac-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0; }
+.ac-stats > div { padding: 12px 8px; border-radius: 14px; background: var(--panel-2); border: 1px solid var(--line); text-align: center; }
+.ac-stats b { display: block; font: 800 clamp(18px, 4vw, 24px) KeCoin, Inter, sans-serif; color: #fde68a; }
+.ac-stats b small { font-size: .6em; color: var(--muted); }
+.ac-stats span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.ac-all { width: 100%; margin-bottom: 12px; }
+.ac-list { display: grid; gap: 10px; }
+.ac-game { border-radius: 16px; background: var(--panel-2); border: 1px solid var(--line); overflow: hidden; }
+.ac-game.master { border-color: rgba(251, 191, 36, .6); box-shadow: 0 0 0 1px rgba(251, 191, 36, .25); }
+.ac-head { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; text-align: left; color: inherit; background: none; border: 0; cursor: pointer; }
+.ac-head .tile-art { width: 52px; height: 52px; border-radius: 12px; }
+.ac-title { flex: 1; min-width: 0; display: grid; gap: 4px; }
+.ac-title b { font-size: 16px; }
+.ac-title small { color: var(--muted); font-size: 12px; }
+.ac-bar { position: relative; display: block; height: 8px; border-radius: 4px; background: #1f1f26; overflow: hidden; }
+.ac-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 4px; background: linear-gradient(90deg, #ff2340, #fbbf24); }
+.ac-bar.sm { height: 6px; margin-top: 6px; }
+.ac-dot { min-width: 24px; height: 24px; padding: 0 7px; border-radius: 12px; display: grid; place-items: center; background: var(--green); color: #fff; font: 800 12px Inter, sans-serif; }
+.ac-chev { color: var(--muted); font-size: 14px; }
+.ac-tiers { list-style: none; margin: 0; padding: 0 12px 6px; display: grid; gap: 6px; }
+.ac-tier { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 12px; background: #141216; border: 1px solid var(--line); }
+.ac-tier.done { border-color: rgba(74, 222, 128, .55); }
+.ac-tier.claimed { opacity: .6; }
+.ac-ico { width: 34px; height: 34px; flex: none; display: grid; place-items: center; border-radius: 10px; background: #1f1c22; font-size: 18px; }
+.ac-tier.claimed .ac-ico { color: #4ade80; font-weight: 900; }
+.ac-body { flex: 1; min-width: 0; display: grid; }
+.ac-body b { font-size: 14px; }
+.ac-body small { color: var(--muted); font-size: 12px; }
+.ac-body .ac-prog { margin-top: 2px; font-size: 11px; }
+.ac-rew { flex: none; text-align: right; display: grid; justify-items: end; font-weight: 800; color: #fde68a; font-size: 14px; }
+.ac-rew small { color: var(--muted); font-weight: 600; font-size: 11px; }
+.ac-rew .btn { padding: 8px 12px; }
+.ac-ok { color: #4ade80; font-size: 12px; }
+.ac-master { background: linear-gradient(90deg, rgba(251, 191, 36, .12), #141216); }
+.ac-play { display: block; margin: 4px 12px 12px; text-align: center; }
+@media (max-width: 480px) { .ac-stats { grid-template-columns: repeat(2, 1fr); } .ac-tier { gap: 8px; padding: 8px; } }
 
 .top {
   position: sticky; top: 0; z-index: 30; height: var(--top); margin-left: var(--side);
@@ -145,7 +198,7 @@ h1, h2, h3, h4 { margin: 0; line-height: 1.15; }
 /* ============ Leaderboard ============ */
 .lb-head h1 { margin: 0 0 4px; }
 .lb-head p { margin: 0 0 16px; }
-.lb-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; padding: 4px; margin-bottom: 14px; border-radius: 14px; background: #0c0a0b; border: 1px solid var(--line); }
+.lb-tabs { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 4px; padding: 4px; margin-bottom: 14px; border-radius: 14px; background: #0c0a0b; border: 1px solid var(--line); }
 .lb-tabs button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 4px; border-radius: 10px; color: var(--muted); font: 700 12px KeCoin, Inter, sans-serif; transition: background .2s, color .2s; }
 .lb-tabs button span { font-size: 18px; }
 .lb-tabs button.on { background: var(--panel-3); color: var(--text); }
@@ -654,8 +707,6 @@ section { margin-bottom: 28px; }
 .tile-art .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
 .promo-tile:hover { border-color: var(--accent); box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 35%, transparent); }
 .promo-tile.p1, .promo-tile.p2, .promo-tile.p3 { --accent-glow: transparent; }
-.gdot { width: 14px !important; height: 14px; border-radius: 4px; flex: none; box-shadow: 0 0 8px rgba(255, 255, 255, .12); }
-.side-games a { font-size: 14px; padding: 8px 12px; }
 .table-scroll { overflow-x: auto; }
 
 /* ============ Original game page ============ */
@@ -3124,10 +3175,10 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
 /* side menu */
 .side { background: linear-gradient(180deg, rgba(20, 14, 17, .97), rgba(11, 9, 10, .97)); }
 .side-nav a { position: relative; transition: background .2s, color .2s, transform .2s var(--spring); }
-.side-nav a:hover { transform: translateX(4px); background: linear-gradient(90deg, rgba(255, 35, 64, .14), transparent); }
+.side-nav a:hover { background: rgba(255, 255, 255, .05); }
 .side-nav a.on { background: linear-gradient(90deg, rgba(255, 35, 64, .26), rgba(255, 35, 64, .04)); box-shadow: inset 3px 0 0 var(--green), 0 0 20px rgba(255, 35, 64, .12); }
 .side-nav a span { transition: transform .3s var(--spring); }
-.side-nav a:hover span, .side-nav a.on span { transform: scale(1.18) rotate(-6deg); }
+
 
 /* page change: a soft blur-in, then each block arrives one after the other */
 @keyframes viewIn { from { opacity: 0; transform: translateY(14px) scale(.99); filter: blur(6px); } }
@@ -3302,24 +3353,32 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
 </svg>
   <aside class="side">
     <a class="logo" href="#accueil"><span class="logo-mark">S</span><span>SPINBET<em>CASINO</em></span></a>
+    <div class="side-label">Jouer</div>
     <nav class="side-nav">
       <a href="#accueil" data-nav="home"><span>🏠</span>Accueil</a>
       <a href="#lobby-slot" data-nav="slots"><span>🎰</span>Machines à sous</a>
-      <a href="#roue" data-nav="wheel"><span>🎡</span>Roue du jour</a>
+      <a href="#lobby-table" data-nav="tables"><span>🎡</span>Roues & tables</a>
+      <a href="#lobby-quick" data-nav="quick"><span>⚡</span>Jeux rapides</a>
+    </nav>
+    <div class="side-label">Récompenses</div>
+    <nav class="side-nav">
+      <a href="#succes" data-nav="ach"><span>🏅</span>Succès<b class="side-badge" data-ach-badge hidden></b></a>
       <a href="#missions" data-nav="missions"><span>🎯</span>Missions du jour</a>
+      <a href="#roue" data-nav="wheel"><span>🎁</span>Roue du jour</a>
       <a href="#defi" data-nav="defi"><span>🏁</span>Défi de la semaine</a>
-      <a href="#parrainage" data-nav="ref"><span>🤝</span>Parrainage</a>
-      <a href="#" data-share-site><span>📤</span>Partager le site</a>
-      <a href="#lobby-hold"><span>🪙</span>Hold & Spin</a>
-      <a href="#lobby-table"><span>🎡</span>Roues & tables</a>
-      <a href="#lobby-quick"><span>⚡</span>Jeux rapides</a>
+    </nav>
+    <div class="side-label">Mon compte</div>
+    <nav class="side-nav">
       <a href="#profil" data-nav="vip"><span>👑</span>Profil & rangs</a>
       <a href="#classement" data-nav="top"><span>🏆</span>Classement</a>
       <a href="#recharger" data-nav="refill"><span>💰</span>Recharger</a>
+    </nav>
+    <div class="side-label">Plus</div>
+    <nav class="side-nav side-more">
+      <a href="#parrainage" data-nav="ref"><span>🤝</span>Parrainage</a>
+      <a href="#" data-share-site><span>📤</span>Partager le site</a>
       <a href="#appli" data-nav="app"><span>📲</span>Application</a>
     </nav>
-    <div class="side-label">Jeux</div>
-    <nav class="side-nav side-games"></nav>
     <div class="side-vip"></div>
     <a class="side-foot" href="#responsable" data-nav="resp">🛡️ Jeu responsable</a>
   </aside>
@@ -3357,6 +3416,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
     <a href="#accueil" data-nav="home"><span>🏠</span>Accueil</a>
     <a href="#lobby-slot" data-nav="slots"><span>🎰</span>Jeux</a>
     <a href="#profil" data-nav="vip"><span>👑</span>Profil</a>
+    <a href="#succes" data-nav="ach"><span>🏅</span>Succès<b class="side-badge nav-badge" data-ach-badge hidden></b></a>
     <a href="#classement" data-nav="top"><span>🏆</span>Top</a>
     <a href="#recharger" data-nav="refill"><span>💰</span>Recharger</a>
   </nav>
@@ -3756,7 +3816,14 @@ class Profiles extends EventTarget {
       bestBonus: me.stats?.bestBonus || 0,
       updated: Date.now(),
     };
-    cloud.saveBoard(this.store.current, entry).catch((e) => console.error(e));
+    // achievement points (needs the Firestore rules with 'ach'; older rules refuse the field, so retry without it)
+    const ach = __mods['achievements.js']?.achievementPoints?.() || 0;
+    if (!this.noAch) entry.ach = ach;
+    cloud.saveBoard(this.store.current, entry).catch((e) => {
+      if (!('ach' in entry)) return console.error(e);
+      this.noAch = true; delete entry.ach;
+      cloud.saveBoard(this.store.current, entry).catch((e2) => console.error(e2));
+    });
   }
 
   // Returns an error message, or null when the pseudo is valid.
@@ -8114,6 +8181,7 @@ class SlotMachine {
   async play({ buy = false } = {}) {
     if (this.busy || this.free || this.dead) return;
     const g = this.game, bet = this.bet;
+    this.buyRound = buy;
     if (!buy && !wallet.debit(bet)) {
       toast('Solde insuffisant : rechargez votre argent fictif', 'warn');
       this.stopAuto();
@@ -8230,6 +8298,7 @@ class SlotMachine {
   }
 
   featureIntro(title, sub, glyph, dur = 2200) {
+    dispatchEvent(new CustomEvent('sb:feature', { detail: { game: this.game.id, title, bought: !!this.buyRound, re: /^\+/.test(title) } }));
     sfx.feature();
     fx.confetti(70);
     const ov = el('div', 'slot-overlay intro', `<div class="intro-glyph">${glyph}</div><h3>${title}</h3><p>${sub}</p><small>Touchez pour continuer</small>`);
@@ -8315,7 +8384,10 @@ class SlotMachine {
     if (this.busy || this.free) return;
     const x = this.buyList().find((b) => b.id === id);
     const cost = round(x.cost * this.bet);
-    if (!wallet.debit(cost)) return toast('Solde insuffisant', 'warn');
+    window.__sbBuying = true;
+    const ok = wallet.debit(cost);
+    window.__sbBuying = false;
+    if (!ok) return toast('Solde insuffisant', 'warn');
     this.stopAuto();
     this.forced = this.forcedGrid(id);
     this.play({ buy: true });
@@ -8682,12 +8754,13 @@ class BaseGame {
     const x = this.cfg.buys.find((y) => y.id === id);
     this.stopAuto();
     this.round(async () => {
-      this.buying = true;
+      this.buying = true; window.__sbBuying = true;
       const ok = (this.bet <= GIFT_MAX_BET && gifts.use(this.game.id, id)) || this.pay(x.cost(this.bet));
-      this.buying = false;
+      this.buying = false; window.__sbBuying = false;
       if (!ok) return;
       this.lastStake = this.bet;
-      await this.onBuy(id);
+      this.buyRound = true;
+      try { await this.onBuy(id); } finally { this.buyRound = false; }
     });
   }
 
@@ -8702,6 +8775,8 @@ class BaseGame {
   }
 
   featureIntro(title, sub, glyph, dur = 2300) {
+    // achievements.js listens: a bonus started (bought or not; a title starting with + is a retrigger)
+    dispatchEvent(new CustomEvent('sb:feature', { detail: { game: this.game.id, title, bought: !!this.buyRound, re: /^\+/.test(title) } }));
     sfx.feature();
     fx.confetti(70);
     const ov = this.overlay(`<div class="intro-glyph">${glyph}</div><h3>${title}</h3><p>${sub}</p><small>Touchez pour continuer</small>`, 'intro');
@@ -9686,6 +9761,7 @@ const BOARDS = [
   { id: 'bal', field: 'bal', icon: '💰', label: 'Solde', value: (e) => fmt(e.bal) },
   { id: 'best', field: 'best', icon: '💥', label: 'Plus gros gain', value: (e) => fmt(e.best) },
   { id: 'bonus', field: 'bestBonus', icon: '🎁', label: 'Plus gros bonus', value: (e) => fmt(e.bestBonus) },
+  { id: 'ach', field: 'ach', icon: '🏅', label: 'Succès', value: (e) => `${e.ach} pts` },
 ];
 const TOP = 50;
 const MEDAL = ['🥇', '🥈', '🥉'];
@@ -9733,6 +9809,208 @@ function renderLeaderboard(root) {
 return { renderLeaderboard };
 })();
 
+// ---- achievements.js ----
+__mods['achievements.js'] = (() => {
+// Succès par machine à sous (#succes): 10 succès par machine, du plus simple au plus exigeant, avec des récompenses
+// de plus en plus grosses, puis un coffre de maîtrise quand les 10 sont récupérés. Suivi depuis les événements du
+// portefeuille ('wager' = un tour, 'payout' = un gain avec son ×) et 'sb:feature' (un bonus démarre, envoyé par
+// featureIntro des moteurs de jeu). Sauvé dans profile.ach ; les points de succès vont dans le classement public.
+
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { progress } = __mods['progress.js'];
+const { toast } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const { ALL_GAMES } = __mods['games/index.js'];
+const { coverSVG } = __mods['covers.js'];
+
+// k: n = tours joués, w = tours gagnants, x = meilleur gain (× la mise), b = bonus déclenchés en jeu,
+// a = bonus joués (déclenchés ou achetés). pts = points de succès (classement).
+const TIERS = [
+  { id: 1, k: 'n', goal: 20, icon: '🎰', name: 'Échauffement', text: 'Joue 20 tours', ke: 50, xp: 20, pts: 1 },
+  { id: 2, k: 'w', goal: 10, icon: '✅', name: 'Premiers gains', text: 'Gagne 10 tours', ke: 75, xp: 30, pts: 1 },
+  { id: 3, k: 'x', goal: 10, icon: '🚀', name: 'Joli coup', text: 'Décroche un gain d’au moins ×10 la mise', ke: 120, xp: 40, pts: 2 },
+  { id: 4, k: 'a', goal: 1, icon: '🎁', name: 'Premier bonus', text: 'Joue un bonus (déclenché ou acheté)', ke: 200, xp: 60, pts: 2 },
+  { id: 5, k: 'n', goal: 250, icon: '🔁', name: 'Habitué', text: 'Joue 250 tours', ke: 300, xp: 80, pts: 3 },
+  { id: 6, k: 'x', goal: 50, icon: '💥', name: 'Gros gain', text: 'Décroche un gain d’au moins ×50', ke: 500, xp: 120, pts: 3 },
+  { id: 7, k: 'b', goal: 2, icon: '🎯', name: 'Chasseur de bonus', text: 'Déclenche 2 bonus en jeu (sans les acheter)', ke: 800, xp: 160, pts: 4 },
+  { id: 8, k: 'n', goal: 1000, icon: '🏃', name: 'Marathon', text: 'Joue 1 000 tours', ke: 1200, xp: 220, pts: 5 },
+  { id: 9, k: 'x', goal: 200, icon: '🔥', name: 'Méga gain', text: 'Décroche un gain d’au moins ×200', ke: 2000, xp: 300, pts: 6 },
+  { id: 10, k: 'b', goal: 6, icon: '👑', name: 'Légende', text: 'Déclenche 6 bonus en jeu (sans les acheter)', ke: 5000, xp: 500, pts: 8 },
+];
+const MASTER = { ke: 3000, xp: 400, pts: 15 };
+const PER_GAME = TIERS.reduce((a, t) => a + t.pts, 0) + MASTER.pts;
+
+const SLOTS = ALL_GAMES.filter((g) => !g.original || g.cat === 'slot');
+const isSlot = (id) => SLOTS.some((g) => g.id === id);
+const gameNow = () => (location.hash.match(/^#game-([\w-]+)/) || [])[1] || null;
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+const data = () => {
+  const a = profiles.current?.ach;
+  return { s: a?.s || {}, c: a?.c || {}, m: a?.m || {}, ke: a?.ke || 0 };
+};
+const statsOf = (gid) => ({ n: 0, w: 0, x: 0, b: 0, a: 0, ...(data().s[gid] || {}) });
+const have = (st, t) => (t.k === 'x' ? (st.x >= t.goal ? 1 : 0) : st[t.k] || 0);
+const goalOf = (t) => (t.k === 'x' ? 1 : t.goal);
+const doneT = (st, t) => have(st, t) >= goalOf(t);
+
+function gameStatus(gid) {
+  const st = statsOf(gid), claimed = data().c[gid] || [];
+  const rows = TIERS.map((t) => ({ ...t, have: Math.min(have(st, t), goalOf(t)), max: goalOf(t), done: doneT(st, t), claimed: claimed.includes(t.id) }));
+  const nClaimed = rows.filter((r) => r.claimed).length;
+  return { gid, st, rows, nClaimed, toClaim: rows.filter((r) => r.done && !r.claimed).length, master: !!data().m[gid], masterReady: nClaimed === TIERS.length && !data().m[gid] };
+}
+function summary() {
+  const list = SLOTS.map((g) => gameStatus(g.id));
+  const d = data();
+  let pts = 0;
+  for (const s of list) { pts += s.rows.filter((r) => r.claimed).reduce((a, r) => a + r.pts, 0) + (s.master ? MASTER.pts : 0); }
+  return { list, pts, unlocked: list.reduce((a, s) => a + s.nClaimed, 0), total: SLOTS.length * TIERS.length, masters: list.filter((s) => s.master).length,
+    toClaim: list.reduce((a, s) => a + s.toClaim + (s.masterReady ? 1 : 0), 0), ke: d.ke };
+}
+const points = () => summary().pts;
+
+// --- tracking ---
+const nameOf = (gid) => SLOTS.find((g) => g.id === gid)?.name || gid;
+function bump(gid, fn) {
+  if (!profiles.current || !isSlot(gid)) return;
+  const before = gameStatus(gid).rows.filter((r) => r.done).map((r) => r.id);
+  profiles.update('ach', (me) => {
+    const a = me.ach || (me.ach = { s: {}, c: {}, m: {}, ke: 0 });
+    a.s = a.s || {};
+    const st = { n: 0, w: 0, x: 0, b: 0, a: 0, ...(a.s[gid] || {}) };
+    fn(st); a.s[gid] = st;
+  });
+  const fresh = gameStatus(gid).rows.filter((r) => r.done && !r.claimed && !before.includes(r.id));
+  fresh.forEach((r) => { toast(`🏅 Succès débloqué · ${r.name} (${nameOf(gid)}) : récupère +${fmt(r.ke)} dans Succès`, 'ok'); sfx.win(); });
+  if (fresh.length) refreshBadges();
+}
+wallet.addEventListener('wager', () => { const g = gameNow(); if (g && !window.__sbBuying) bump(g, (st) => { st.n++; }); });
+wallet.addEventListener('payout', (e) => {
+  const g = gameNow(), meta = e.detail.meta;
+  if (!g || !meta || !(e.detail.amount > 0)) return;
+  bump(g, (st) => { if (!/ · /.test(meta.game || '')) st.w++; st.x = Math.max(st.x, Math.round((meta.x || 0) * 10) / 10); });
+});
+addEventListener('sb:feature', (e) => {
+  const d = e.detail || {};
+  if (d.re) return;
+  bump(d.game, (st) => { st.a++; if (!d.bought) st.b++; });
+});
+
+// --- rewards ---
+function claim(gid, id) {
+  const r = gameStatus(gid).rows.find((x) => x.id === id);
+  if (!r || !r.done || r.claimed) return null;
+  profiles.update('ach', (me) => { const a = me.ach; a.c = a.c || {}; a.c[gid] = [...(a.c[gid] || []), id]; a.ke = (a.ke || 0) + r.ke; });
+  wallet.grant(r.ke); progress.gain(r.xp);
+  return r;
+}
+function claimMaster(gid) {
+  if (!gameStatus(gid).masterReady) return false;
+  profiles.update('ach', (me) => { const a = me.ach; a.m = { ...(a.m || {}), [gid]: Date.now() }; a.ke = (a.ke || 0) + MASTER.ke; });
+  wallet.grant(MASTER.ke); progress.gain(MASTER.xp);
+  return true;
+}
+
+// --- sidebar / menu badge: number of rewards waiting ---
+function refreshBadges() {
+  const n = profiles.current ? summary().toClaim : 0;
+  document.querySelectorAll('[data-ach-badge]').forEach((b) => { b.textContent = n; b.hidden = !n; });
+}
+profiles.addEventListener('change', refreshBadges);
+addEventListener('DOMContentLoaded', refreshBadges);
+
+// --- page ---
+let tab = 'mine', openGid = null;
+function renderAchievements(root) {
+  const me = profiles.current, sm = summary();
+  const pct = (a, b) => Math.round((Math.min(a, b) / b) * 100);
+  const card = (s) => {
+    const g = SLOTS.find((x) => x.id === s.gid), open = openGid === s.gid;
+    return `<article class="ac-game${open ? ' open' : ''}${s.master ? ' master' : ''}" data-gid="${s.gid}">
+      <button class="ac-head" data-open="${s.gid}" aria-expanded="${open}">
+        <span class="tile-art">${coverSVG(g, { square: true })}</span>
+        <span class="ac-title"><b>${esc(g.name)}</b><small>${s.master ? '👑 Machine maîtrisée' : `${s.nClaimed} / ${TIERS.length} succès`}</small>
+          <span class="ac-bar"><i style="width:${pct(s.nClaimed, TIERS.length)}%"></i></span></span>
+        ${s.toClaim || s.masterReady ? `<span class="ac-dot">${s.toClaim + (s.masterReady ? 1 : 0)}</span>` : ''}
+        <span class="ac-chev">${open ? '▴' : '▾'}</span>
+      </button>
+      ${open ? `<ol class="ac-tiers">${s.rows.map((r) => `
+        <li class="ac-tier${r.done ? ' done' : ''}${r.claimed ? ' claimed' : ''}">
+          <span class="ac-ico">${r.claimed ? '✓' : r.icon}</span>
+          <div class="ac-body"><b>${r.id}. ${r.name}</b><small>${r.text}</small>
+            ${r.claimed ? '' : `<span class="ac-bar sm"><i style="width:${pct(r.have, r.max)}%"></i></span><small class="ac-prog">${r.k === 'x' ? `meilleur : ×${s.st.x}` : `${r.have} / ${r.max}`}</small>`}</div>
+          <div class="ac-rew">${r.claimed ? '<span class="ac-ok">Récupéré</span>' : r.done ? `<button class="btn primary" data-claim="${s.gid}:${r.id}">+${fmt(r.ke)}</button>` : `<span>+${fmt(r.ke)}</span><small>+${r.xp} XP</small>`}</div>
+        </li>`).join('')}
+        <li class="ac-tier ac-master${s.master ? ' claimed' : s.masterReady ? ' done' : ''}">
+          <span class="ac-ico">👑</span>
+          <div class="ac-body"><b>Coffre de maîtrise</b><small>Récupère les 10 succès de ${esc(g.name)}</small></div>
+          <div class="ac-rew">${s.master ? '<span class="ac-ok">Ouvert</span>' : s.masterReady ? `<button class="btn primary" data-master="${s.gid}">+${fmt(MASTER.ke)}</button>` : `<span>+${fmt(MASTER.ke)}</span><small>+${MASTER.xp} XP</small>`}</div>
+        </li></ol>
+        <a class="btn ghost ac-play" href="#game-${s.gid}">Jouer à ${esc(g.name)}</a>` : ''}
+    </article>`;
+  };
+  root.innerHTML = `
+    <section class="panel ac-page">
+      <span class="eyebrow">🏅 10 succès par machine à sous</span>
+      <h1>Succès</h1>
+      <p class="muted">Chaque machine a ses propres succès, du plus simple au plus fou. Plus tu avances, plus les récompenses grossissent, et les 10 succès d’une machine ouvrent son <b>coffre de maîtrise</b> (+${fmt(MASTER.ke)}).</p>
+      ${me ? '' : '<p class="muted">Connecte-toi ou joue en invité pour suivre tes succès.</p>'}
+      <div class="ac-stats">
+        <div><b>${sm.unlocked}<small> / ${sm.total}</small></b><span>Succès</span></div>
+        <div><b>${sm.pts}</b><span>Points</span></div>
+        <div><b>${sm.masters}<small> / ${SLOTS.length}</small></b><span>Maîtrisées</span></div>
+        <div><b>${fmt(sm.ke)}</b><span>Gagnés</span></div>
+      </div>
+      <div class="lb-tabs ac-tabs" role="tablist">
+        <button type="button" data-tab="mine" class="${tab === 'mine' ? 'on' : ''}"><span>🎰</span>Mes machines</button>
+        <button type="button" data-tab="top" class="${tab === 'top' ? 'on' : ''}"><span>🏆</span>Classement</button>
+      </div>
+      ${tab === 'mine' ? `
+        ${sm.toClaim ? `<button class="btn primary lg ac-all" data-all>Tout récupérer (${sm.toClaim})</button>` : ''}
+        <div class="ac-list">${sm.list.slice().sort((a, b) => (b.toClaim + b.masterReady) - (a.toClaim + a.masterReady) || b.nClaimed - a.nClaimed).map(card).join('')}</div>`
+      : `<p class="muted small">Les ${50} joueurs inscrits avec le plus de points de succès (${PER_GAME} points par machine maîtrisée).</p><ol class="lb-list"><li class="lb-msg">Chargement…</li></ol>`}
+    </section>`;
+  root.querySelectorAll('[data-tab]').forEach((b) => { b.onclick = () => { tab = b.dataset.tab; renderAchievements(root); }; });
+  root.querySelectorAll('[data-open]').forEach((b) => { b.onclick = () => { openGid = openGid === b.dataset.open ? null : b.dataset.open; renderAchievements(root); }; });
+  root.querySelectorAll('[data-claim]').forEach((b) => {
+    b.onclick = () => { const [g, id] = b.dataset.claim.split(':'); const r = claim(g, +id); if (r) { sfx.unlock(); sfx.coin(); fx.coins(r.id >= 8 ? 60 : 30, b); if (r.id >= 9) fx.confetti(90); toast(`+${fmt(r.ke)} et +${r.xp} XP · ${r.name}`, 'ok'); } refreshBadges(); renderAchievements(root); };
+  });
+  root.querySelectorAll('[data-master]').forEach((b) => {
+    b.onclick = () => { if (claimMaster(b.dataset.master)) { sfx.unlock(); sfx.bigWin(); fx.confetti(140); fx.coins(80, b); toast(`👑 ${nameOf(b.dataset.master)} maîtrisée : +${fmt(MASTER.ke)}`, 'ok'); } refreshBadges(); renderAchievements(root); };
+  });
+  root.querySelector('[data-all]')?.addEventListener('click', (e) => {
+    let ke = 0;
+    for (const s of summary().list) { for (const r of s.rows) { const got = r.done && !r.claimed ? claim(s.gid, r.id) : null; if (got) ke += got.ke; } if (claimMaster(s.gid)) ke += MASTER.ke; }
+    if (ke) { sfx.unlock(); sfx.bigWin(); fx.confetti(100); fx.coins(60, e.currentTarget); toast(`Succès récupérés : +${fmt(ke)}`, 'ok'); }
+    refreshBadges(); renderAchievements(root);
+  });
+  if (tab === 'top') loadTop(root.querySelector('.lb-list'));
+}
+async function loadTop(list) {
+  const { cloud } = __mods['cloud.js'];
+  const { rankBadge, rankOf } = __mods['progress.js'];
+  if (!cloud.enabled) { list.innerHTML = '<li class="lb-msg">Le classement s’active avec les comptes en ligne.</li>'; return; }
+  profiles.flush();
+  try {
+    const me = profiles.online ? profiles.store.current : null;
+    const rows = (await cloud.top('ach', 50)).filter((e) => (e.ach || 0) > 0);
+    if (!list.isConnected) return;
+    list.innerHTML = rows.length ? rows.map((e, i) => `
+      <li class="lb-row${e.uid === me ? ' me' : ''}${i < 3 ? ' podium' : ''}">
+        <span class="lb-pos">${['🥇', '🥈', '🥉'][i] || i + 1}</span>
+        <span class="lb-badge">${rankBadge(rankOf(e.level || 1), 30)}</span>
+        <span class="lb-name"><b>${esc(e.name || 'Joueur')}</b><small>Niv. ${e.level || 1}</small></span>
+        <span class="lb-val">${e.ach} pts</span>
+      </li>`).join('') : '<li class="lb-msg">Personne pour l’instant : récupère tes premiers succès !</li>';
+  } catch (err) { console.error(err); if (list.isConnected) list.innerHTML = '<li class="lb-msg">Classement indisponible pour le moment.</li>'; }
+}
+
+return { renderAchievements, achievementPoints: points, achievementSummary: summary };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -9750,6 +10028,7 @@ const { ALL_GAMES } = __mods['games/index.js'];
 const { renderApp, registerSW } = __mods['pages/app.js'];
 const { renderWheel } = __mods['wheel.js'];
 const { renderMissions } = __mods['missions.js'];
+const { renderAchievements } = __mods['achievements.js'];
 const { renderReferral, renderChallenge } = __mods['social.js'];
 const { prefetch } = __mods['games/impl/index.js'];
 const { adPolicy } = __mods['adpolicy.js'];
@@ -9761,7 +10040,8 @@ const view = document.getElementById('view');
 
 const routes = [
   { re: /^(accueil)?$/, page: (r) => renderLobby(r), nav: 'home' },
-  { re: /^lobby-(\w+)$/, page: (r, m) => renderLobby(r, { filter: m[1] }), nav: 'slots' },
+  { re: /^lobby-(\w+)$/, page: (r, m) => renderLobby(r, { filter: m[1] }), nav: (m) => ({ table: 'tables', quick: 'quick' }[m[1]] || 'slots') },
+  { re: /^succes$/, page: (r) => renderAchievements(r), nav: 'ach' },
   { re: /^game-([\w-]+)$/, page: (r, m) => renderGame(r, { id: m[1] }), nav: 'slots' },
   { re: /^(profil|vip)$/, page: (r) => renderProfile(r), nav: 'vip' },
   { re: /^classement$/, page: (r) => renderLeaderboard(r), nav: 'top' },
@@ -9782,7 +10062,8 @@ function route() {
   hit.page(view, path.match(hit.re) || []);
   void view.offsetWidth;
   view.classList.add('enter');
-  document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('on', a.dataset.nav === hit.nav));
+  const nav = typeof hit.nav === 'function' ? hit.nav(path.match(hit.re) || []) : hit.nav;
+  document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('on', a.dataset.nav === nav));
   document.body.classList.remove('side-open');
   scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -9905,7 +10186,6 @@ function mountPro() {
   scan();
 }
 
-document.querySelector('.side-games').innerHTML = ALL_GAMES.map((g) => `<a href="#game-${g.id}" data-nav="g-${g.id}"><span class="gdot" style="background:${g.original ? `linear-gradient(135deg,${g.colors[0]},${g.colors[1]})` : 'linear-gradient(135deg,#f59e0b,#ef4444)'}"></span>${g.name}</a>`).join('');
 document.querySelector('[data-toggle-side]').onclick = () => document.body.classList.toggle('side-open');
 document.querySelector('.side-scrim').onclick = () => document.body.classList.remove('side-open');
 
@@ -9958,8 +10238,8 @@ body:not(.ml-off) .logo-mark::after { content: ''; position: absolute; inset: -3
 @keyframes mlLogo { 0%, 86%, 100% { transform: none; } 90% { transform: rotate(-12deg) scale(1.12); } 95% { transform: rotate(8deg) scale(1.05); } }
 
 body:not(.ml-off) .side-nav a { transition: background .25s, color .25s, padding-left .25s; }
-body:not(.ml-off) .side-nav a:hover { padding-left: 16px; }
-body:not(.ml-off) .side-nav a:hover > span:first-child, body:not(.ml-off) .bottom-nav a:hover > span { display: inline-block; animation: mlWiggle .5s ease; }
+
+
 @keyframes mlWiggle { 30% { transform: rotate(-16deg) scale(1.25); } 60% { transform: rotate(10deg) scale(1.1); } }
 
 /* shine sweep on tiles, promos, chips and primary buttons */

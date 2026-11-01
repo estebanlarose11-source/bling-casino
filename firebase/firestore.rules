@@ -23,7 +23,8 @@ service cloud.firestore {
       allow read: if true;
       allow delete: if isMe(uid);
       allow create, update: if isMe(uid)
-        && request.resource.data.keys().hasOnly(['name', 'level', 'levelScore', 'bal', 'best', 'bestBonus', 'updated'])
+        && request.resource.data.keys().hasOnly(['name', 'level', 'levelScore', 'bal', 'best', 'bestBonus', 'ach', 'updated'])
+        && (!('ach' in request.resource.data) || isNum(request.resource.data.ach, 0, 1000))
         && isName(request.resource.data.name)
         && isNum(request.resource.data.level, 1, 50)
         && isNum(request.resource.data.levelScore, 1, 51)
