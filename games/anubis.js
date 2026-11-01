@@ -53,15 +53,18 @@ function pickItem(cubes) {
 const MUSIC = { sd: 0.3, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.02, dur: 2.2, map: { 0: [0, 3, 7], 8: [-4, 0, 3] } }, lead: { wave: 'triangle', vol: 0.06, dur: 0.5, pat: [null, null, null, null, 12, null, null, 15, null, null, null, null, 14, null, 12, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.9, pat: [-12, null, null, null, null, null, null, null, -16, null, null, null, null, null, null, null] }, kick: [0, 3, 8, 11], kv: 0.28 };
 const NAMES = ['Anubis', 'Masque de pharaon', 'Œil d’Horus', 'Scarabée', 'Ankh', 'Vase canope', 'Pyramide', 'Gemme turquoise', 'Gemme orange'];
 // Painted symbols: assets/games/anubis/s0..s8.webp, w.webp (joker), sc.webp (scatter).
-const IMG_V = 2, IMG_N = 9;
+const IMG_V = 3, IMG_N = 9;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const imgFile = (v) => (v === -2 ? 'w' : v === -1 ? 'sc' : `s${v}`); // WILD = -2, SC = -1 (see the engine)
+// Judgment cubes painted by the owner: stone (falling cube), black-and-gold (value cube), purple skull, golden skull, lava.
+const JC = { cbb: 'jc-stone', cbx: 'jc-black', cbn: 'jc-black', cbk: 'jc-skull', cbg: 'jc-gold', cbr: 'jc-lava' };
+const cart = (id) => `<img class="an-img jc ${id}" src="${asset(`assets/games/anubis/${JC[id]}.webp`)}" alt="" draggable="false" decoding="async">`;
 const imgSym = (v) => `<img class="an-img" src="${asset(`assets/games/anubis/${imgFile(v)}.webp`)}" alt="" draggable="false" decoding="async">`;
 const BUYU = 100, BUYJ = 150;
 const fxv = (v) => (v >= 10000 ? Math.round(v / 1000) + 'k' : v >= 1000 ? (v / 1000).toFixed(1).replace('.', ',') + 'k' : String(v));
 const lab = (t) => `<b class="sg-lab">${t}</b>`;
 const VLAB = (v) => `<b class="sg-lab jv"><i>×</i>${fxv(v)}</b>`; // value written on a landed black cube
-const BLACK = (v) => art('cbx') + VLAB(v);
+const BLACK = (v) => cart('cbx') + VLAB(v);
 const cubeSVG = (top, left, right, edge, inner) => `<path d="M32 4 L58 18 L58 46 L32 60 L6 46 L6 18 Z" fill="${left}" stroke="${edge}" stroke-width="2" stroke-linejoin="round"/>
   <path d="M32 4 L58 18 L32 32 L6 18 Z" fill="${top}"/><path d="M32 32 L58 18 L58 46 L32 60 Z" fill="${right}"/>
   <path d="M6 18 L32 32 L58 18 M32 32 V60" stroke="${edge}" stroke-width="1.4" fill="none" opacity=".8"/>${inner}`;
@@ -103,7 +106,7 @@ class AnubisGame extends BaseGame {
     this.jrow.innerHTML = Array.from({ length: C }, () => '<div><b><i>×</i>1</b><i class="lbl"></i></div>').join('');
     // load the painted symbols and the temple right away, so the first spin shows no empty cell
     [...Array(IMG_N).keys(), WILD, SC].forEach((v) => { new Image().src = asset(`assets/games/anubis/${imgFile(v)}.webp`); });
-    ['bg', 'bg-under', 'gk'].forEach((n) => { new Image().src = asset(`assets/games/anubis/${n}.webp`); });
+    ['bg', 'bg-under', 'bg-judge', 'gk', ...new Set(Object.values(JC))].forEach((n) => { new Image().src = asset(`assets/games/anubis/${n}.webp`); });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: C, rows: R, game: this, art: symArt,
       cls: (v) => (v === WILD ? 'wild' : v === SC ? 'scatter' : v >= 1000 ? 'gskull' : ''),
@@ -455,7 +458,7 @@ class AnubisGame extends BaseGame {
     const box = el('div', 'jstrip spin');
     box.style.cssText = `left:${r0.left - g.left}px;top:${r0.top - g.top}px;width:${r0.width}px;height:${r1.bottom - r0.top}px;--h:${r0.height}px;--gap:${pitch - r0.height}px`;
     const reel = el('div', 'jreel');
-    const tile = (h, cls = '') => `<div class="jt ${cls}">${h || art('cbn')}</div>`;
+    const tile = (h, cls = '') => `<div class="jt ${cls}">${h || cart('cbn')}</div>`;
     const LOOP = 8;
     reel.innerHTML = Array.from({ length: free + LOOP }, () => tile()).join('');
     box.appendChild(reel);
@@ -491,7 +494,7 @@ class AnubisGame extends BaseGame {
     });
     const info = () => { this.qa('.jbars i').forEach((bar, k) => bar.classList.toggle('on', k < respins)); this.setBanner(`<b>JUGEMENT</b><span class="pill respins">${[0, 1, 2].map((k) => `<i class="dot${k < respins ? ' on' : ''}"></i>`).join('')} Relances</span><span class="pill gold">Total ×${fxv(total())} · ${fmtC(Math.min(cap, Math.round(bet * total())))}</span>`); };
 
-    await this.featureIntro('JUGEMENT', 'Les cubes bleus tombent et deviennent noirs avec le multiplicateur de leur colonne · crânes noirs, crânes dorés et cubes de lave', art('cbb'));
+    await this.featureIntro('JUGEMENT', 'Les cubes de pierre tombent et deviennent des cubes noir et or avec le multiplicateur de leur colonne · crânes noirs, crânes dorés et cubes de lave', cart('cbb'));
     this.slotEl.classList.add('in-free', 'judge');
     for (let i = 0; i < N; i++) this.lava(i);
     this.jrow.classList.add('on');
@@ -503,14 +506,14 @@ class AnubisGame extends BaseGame {
       if (x.n >= R) return;
       const v = x.m, i = this.cubeCell(c, x.n);
       x.n++; x.T += v; x.vals.push(v); // the cube keeps the value it fell with, even if the column goes up later
-      await this.land(i, art('cbb'), 'cube blue', landed ? 0 : -1, BLACK(v), 'cube');
+      await this.land(i, cart('cbb'), 'cube blue', landed ? 0 : -1, BLACK(v), 'cube');
       draw();
       const p = center(this.grid.cells[i]); fx.burst(p.x, p.y + 10, 10, ['#7dd3fc', '#fbbf24', '#fff'], 3);
       if (x.n >= R) await this.pile(c, x, 'full'); // the column reached the top: everything piles onto the last cube
     };
     const showAt = async (c, x, id, txt, cls, landed) => {
       const i = this.cubeCell(c, x.n);
-      await this.land(i, art(id) + (txt ? lab(txt) : ''), cls, landed ? 0 : -1);
+      await this.land(i, cart(id) + (txt ? lab(txt) : ''), cls, landed ? 0 : -1);
       return i;
     };
     const apply = async (c, k, landed) => {
@@ -575,7 +578,7 @@ class AnubisGame extends BaseGame {
       for (let c2 = 0; c2 < C && !capHit && !this.dead; c2++) {
         await this.wait(this.turbo ? 40 : 110);
         const hit = Math.random() < JPC, k = hit ? pickItem(cols[c2].n) : null;
-        const preview = k === 'cube' ? art('cbb') : k === 'sk' ? art('cbk') : k === 'g' ? art('cbg') : k === 'red' ? art('cbr') : null;
+        const preview = k === 'cube' ? cart('cbb') : k === 'sk' ? cart('cbk') : k === 'g' ? cart('cbg') : k === 'red' ? cart('cbr') : null;
         await strips[c2].stop(preview);
         sfx.reelStop?.(c2);
         if (k) { got = true; await apply(c2, k, true); info(); if (maxWin || total() >= CAPX) capHit = true; }
@@ -602,7 +605,7 @@ class AnubisGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym svg">${symArt(SC)}</div><div class="pay-vals"><b>Scatter</b><br><span>3 = Monde souterrain · 4+ = Jugement</span></div></div></div>
       <h4>Cascades</h4><p>Grille 5×6. Une grappe de <b>5 symboles ou plus</b> paie mise × valeur × 0,33 × (taille − 4) × multiplicateur, disparaît et les symboles tombent.</p>
       <h4>Monde souterrain</h4><p>10 tours. Chaque colonne a son multiplicateur, qui monte de +3 à chaque gain qui la touche. Un <b>crâne doré</b> multiplie sa colonne (×2 à ×100).</p>
-      <h4>Jugement</h4><p>Chaque colonne a un multiplicateur, affiché tout en haut. Un <b>cube bleu</b> tombe dans la colonne et devient un <b>cube noir</b> marqué du multiplicateur de la colonne au moment où il tombe : il garde cette valeur, même si la colonne monte ensuite. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne noir</b> : ajoute de <b>+2 à +500</b> au multiplicateur de sa colonne (pour les prochains cubes). Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie tous les cubes de la colonne. <b>Cube de lave</b> : tous les cubes de sa colonne s’accumulent sur le dernier, qui garde la somme et redescend en bas pour libérer de la place. <b>Fusion</b> : quand une colonne atteint le haut, ses cubes s’accumulent de la même façon. À la fin, tu gagnes la somme de tous les cubes × la mise.</p>
+      <h4>Jugement</h4><p>Chaque colonne a un multiplicateur, affiché tout en haut. Un <b>cube de pierre</b> tombe dans la colonne et devient un <b>cube noir et or</b> marqué du multiplicateur de la colonne au moment où il tombe : il garde cette valeur, même si la colonne monte ensuite. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne noir</b> : ajoute de <b>+2 à +500</b> au multiplicateur de sa colonne (pour les prochains cubes). Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie tous les cubes de la colonne. <b>Cube de lave</b> : tous les cubes de sa colonne s’accumulent sur le dernier, qui garde la somme et redescend en bas pour libérer de la place. <b>Fusion</b> : quand une colonne atteint le haut, ses cubes s’accumulent de la même façon. À la fin, tu gagnes la somme de tous les cubes × la mise.</p>
       <h4>Achats</h4><p>Monde souterrain ×${BUYU} · Jugement ×${BUYJ}. Gain maximum ×10 000.</p>`);
   }
 }
