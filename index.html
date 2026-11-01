@@ -7351,7 +7351,7 @@ const SPECS = {
       ${sym('tfw', 70, 214, 100, `filter="url(#sh${u})"`)}${sym('tf3', 236, 210, 92, `filter="url(#sh${u})"`)}${sym('tf2', 250, 100, 56, `filter="url(#sh${u})"`)}${sym('tf4', 48, 110, 58, `filter="url(#sh${u})"`)}`,
   },
   billets: {
-    bg: ['#8a6420', '#1f1404'], light: '#fde047', title: ['LE COFFRE', 'FORT'], font: 'bebas', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500',
+    bg: ['#8a6420', '#1f1404'], light: '#fde047', title: ['LE COFFRE', 'FORT'], font: 'bebas', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500', photo: 'assets/games/billets/cover.webp',
     art: (u) => {
       const b = (id, x, y, w, r) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><use href="#${id}" x="${-w / 2}" y="${-w * 0.2857}" width="${w}" height="${w * 0.5714}"/></g>`;
       return `<g opacity=".5">${[0, 1, 2, 3, 4, 5, 6].map((k) => `<rect x="${k * 44}" y="0" width="40" height="120" fill="#a77a26" stroke="#5c3d0a"/>`).join('')}</g>
@@ -7586,7 +7586,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'billets', date: '2026-11-01', title: 'Nouveaux billets', items: ['Nouveaux billets de 5 à 200 KE, nouvelle mallette, billet FREE SPINS et coffre JACKPOT', 'Nouveau décor : la pluie de billets', 'Affichage épuré et plein écran sur tout l’écran'] },
+  { game: 'billets', date: '2026-11-01', title: 'Nouveaux billets', items: ['Nouvelle jaquette : la montagne de billets', 'Nouveaux billets de 5 à 200 KE, nouvelle mallette, billet FREE SPINS et coffre JACKPOT', 'Nouveau décor : la pluie de billets', 'Affichage épuré et plein écran sur tout l’écran'] },
   { game: 'blackjack', date: '2026-11-01', title: 'Nouvelle table', items: ['Salle de casino et croupière animée', 'Tapis vert en demi-cercle avec sabot et feu de statut', 'Nouvelle barre de jetons : pose tes jetons, annule, double ou répète ta mise'] },
   { game: 'cosmic', date: '2026-11-01', title: 'Le Cosmique peint', items: ['Nouveaux symboles : prisme vert, cube cyan, hexagone violet, diamant rose, météorite, satellite, fusée, OVNI et K-0B', 'Nouvelle balise, supernova, trou noir et vaisseau aspirateur', 'Le guerrier aux sabres à côté de la grille, nouveau décor spatial et nouvelle jaquette', 'Affichage épuré et plein écran sur tout l’écran'] },
   { game: 'anubis', date: '2026-11-01', title: 'Nouvel affichage épuré', items: ['Le décor sur toute la machine, sans titre ni cadre', 'Plein écran sur tout l’écran, boutons toujours accessibles sur PC et téléphone'] },
