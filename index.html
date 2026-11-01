@@ -6493,7 +6493,7 @@ const SPECS = {
       <g fill="#fff">${[[96, 84, 6], [220, 72, 8], [36, 190, 5], [268, 190, 6]].map(([x, y, s]) => `<path d="M${x} ${y - s} Q${x} ${y} ${x + s} ${y} Q${x} ${y} ${x} ${y + s} Q${x} ${y} ${x - s} ${y} Q${x} ${y} ${x} ${y - s}Z"/>`).join('')}</g>`,
   },
   anubis: {
-    bg: ['#0c3b44', '#03060f'], light: '#5eead4', title: ['L’ANUBIS'], font: 'cinzel', metal: ['#fff', '#fde68a', '#b7791f'], tag: '2 BONUS',
+    bg: ['#0c3b44', '#03060f'], light: '#5eead4', title: ['L’ANUBIS'], font: 'cinzel', metal: ['#fff', '#fde68a', '#b7791f'], tag: '2 BONUS', photo: 'assets/games/anubis/cover.webp',
     hero: (u) => `
       <circle cx="232" cy="70" r="34" fill="none" stroke="#5eead4" stroke-opacity=".3" stroke-width="9"/>
       ${sym('s0', 150, 118, 236, `filter="url(#sh${u})"`)}
@@ -6835,7 +6835,7 @@ function squareSVG(game, sp, cls) {
     <rect width="300" height="300" fill="url(#bg${u})"/>
     <rect width="300" height="300" fill="url(#spot${u})"/>
     ${bokeh}
-    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="300" preserveAspectRatio="xMidYMid slice"/>` : sp.hero ? sp.hero(u) : `<g transform="translate(-18 -50) scale(1.12)">${sp.art(u)}</g>`}
+    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="300" preserveAspectRatio="xMidYMin slice"/>` : sp.hero ? sp.hero(u) : `<g transform="translate(-18 -50) scale(1.12)">${sp.art(u)}</g>`}
     <rect y="170" width="300" height="130" fill="url(#fade${u})"/>
     <g font-family="KeCoin,${FONTS.bebas}" font-weight="900" text-anchor="middle" filter="url(#tsh${u})">
       ${lines.map((t, k) => `<text x="150" y="${(y0 + k * step).toFixed(1)}" font-size="${size.toFixed(0)}" fill="#fff" stroke="rgba(0,0,0,.25)" stroke-width="1.5" paint-order="stroke" letter-spacing="1">${t}</text>`).join('')}
@@ -6885,7 +6885,7 @@ function coverSVG(game, { cls = 'cover', badge = true, square = false } = {}) {
     <g fill="${sp.light}" opacity=".05">${rays}</g>
     <rect width="300" height="400" fill="url(#spot${u})"/>
     <g filter="url(#soft${u})">${bokeh}</g>
-    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="400" preserveAspectRatio="xMidYMid slice"/>` : sp.art(u)}
+    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="400" preserveAspectRatio="xMidYMin slice"/>` : sp.art(u)}
     <rect width="300" height="400" fill="url(#vig${u})"/>
     <rect y="250" width="300" height="150" fill="url(#fade${u})"/>
     <g font-family="KeCoin,${FONTS[sp.font]}" font-weight="900" text-anchor="middle" filter="url(#tsh${u})">
