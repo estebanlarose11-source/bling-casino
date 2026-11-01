@@ -3063,7 +3063,11 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .g-dragons .sg-cell.scat .dg-one, .g-dragons .sg-cell.super .dg-one { animation: dgImg 1.4s ease-in-out infinite; }
 @keyframes dgImg { 50% { transform: scale(1.05); } }
 .g-dragons .sg-cell.pulse .dg-one { animation: dgImg .5s ease-in-out infinite; }
-.g-dragons .dg-lair, .g-dragons.fs-A .dg-lair, .g-dragons .dg-glow, .g-dragons .dg-gold { display: none; }
+.g-dragons .dg-lair, .g-dragons .dg-glow, .g-dragons .dg-gold { display: none; }
+/* painted lair (owner's image) behind the whole machine, the same in the base game and both bonuses */
+.g-dragons { --slot-bg: linear-gradient(180deg, rgba(10, 4, 2, .2), rgba(10, 4, 2, 0) 35%, rgba(10, 4, 2, .55)), url(assets/games/dragons/bg.webp?v=1) center 35% / cover no-repeat, #1c0a05; }
+.g-dragons .slot-bg, .g-dragons.in-free .slot-bg { filter: none; }
+.g-dragons.dg-frame > .slot-stage, .dg-frame > .slot-stage { background: rgba(10, 4, 2, .3); }
 .g-dragons.busy .sg-cell.scat .dg-one, .g-dragons.in-free .sg-cell:not(.pulse) .dg-one { animation: none; }
 .g-dragons .sg-cell.dgR { border-radius: 0 12px 12px 0; }
 .g-dragons .sg-cell.dgL::after { content: ''; position: absolute; right: 0; top: 14%; bottom: 14%; width: 1px; background: rgba(253, 230, 138, .55); box-shadow: 0 0 5px #fbbf24; transition: opacity .3s; }
@@ -3100,7 +3104,6 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .dg-word { position: absolute; left: 50%; top: 58%; z-index: 6 !important; pointer-events: none; opacity: 0; font: 900 clamp(28px, 5.6vw, 64px)/1 KeCoin, Cinzel, Georgia, serif; letter-spacing: 2px; white-space: nowrap;
   background: linear-gradient(180deg, #fff7c2, #fbbf24 45%, #ea580c 60%, #fde68a); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #3b0a02) drop-shadow(0 0 16px rgba(249, 115, 22, .9)); }
 .dg-word.jp { filter: drop-shadow(0 3px 0 #78350f) drop-shadow(0 0 22px #fde047); }
-.g-dragons.fs-S .dg-lair { background: radial-gradient(ellipse at 50% 120%, #f59e0b, #7c2d12 45%, #1c0a05 75%); }
 .g-dragons.fs-S .dg-glow { opacity: 1; animation-duration: 1s; }
 .pay-sym.dgp { width: 84px; }
 @container (max-width: 520px) { .dg-top { grid-template-columns: 1fr 1fr; gap: 4px; } .dg-grand { grid-column: 1 / -1; order: -1; } .dg-jp { padding: 3px 10px; } .dg-gold { display: none; } .dg-frame > .slot-stage { padding: 4px; border-radius: 12px; } .g-dragons .sg { grid-template-columns: 1fr 1fr 5px 1fr 1fr 5px 1fr 1fr; gap: 4px 0; } .g-dragons .sg-cell.dgL { border-radius: 8px 0 0 8px; } .g-dragons .sg-cell.dgR { border-radius: 0 8px 8px 0; } }
