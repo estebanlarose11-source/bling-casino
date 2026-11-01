@@ -1,9 +1,9 @@
 // SpinBet Casino · CandyGame — loaded on demand by games/impl/index.js (index.html).
 // ---- games/impl/candy.js ----
 __mods['games/impl/candy.js'] = (() => {
-// Candy Queen: 6×5 cluster pays with cascades. Every cascade raises the Queen's multiplier (×1, ×2, ×3, ×5, ×8, ×12,
-// ×20); big clusters leave a special candy behind (8+: exploding heart, row and column; 10+: candy-jar bomb, 3×3;
-// 12+: magic wand, every candy of the most common kind). In the Queen's Ball free spins the multiplier never resets.
+// Candy Queen: 6×5 cluster pays with cascades. Every cell of a winning cluster gets a multiplier (×2, then doubled at
+// each new connection on that cell); a cluster pays with the sum of its cells' multipliers. Big clusters leave a special candy behind (8+: exploding heart, row and column; 10+: candy-jar bomb, 3×3;
+// 12+: magic wand, every candy of the most common kind). In the Queen's Ball every cell starts at ×5 and keeps its multiplier.
 // Tuned by simulation (RTP ≈ 92 %, buys ≈ 88 %).
 
 const { BaseGame, fmtC, art: svgArt } = __mods['core/base.js'];
@@ -23,9 +23,9 @@ const { el, toast } = __mods['ui.js'];
 const C = 6, R = 5, N = 30, MINC = 5, CAPX = 10000, CROWN = 10, HEART = 12, JAR = 13, WAND = 14;
 const P = {
   w: [40, 34, 26, 18, 12, 8, 6, 4, 3, 2],
-  val: [0.06, 0.08, 0.1, 0.14, 0.2, 0.35, 0.5, 1, 2, 4], F: 4.25, piece: 0.25,
-  ps: 0.016, psFS: 0.018, huntF: 1.56, spFS: 0.01,
-  ladder: [1, 2, 3, 5, 8, 12, 20],
+  val: [0.06, 0.08, 0.1, 0.14, 0.2, 0.35, 0.5, 1, 2, 4], F: 4.0, piece: 0.25,
+  ps: 0.016, psFS: 0.018, huntF: 1.58, spFS: 0.01,
+  mcap: 128, mcapFS: 640, fsStart: 5, Ffs: 0.31,
 };
 function draw(o) {
   const r = Math.random(), ps = (o.fs ? P.psFS : P.ps) * (o.hunt ? P.huntF : 1);
@@ -67,45 +67,51 @@ function fall(g, rem, o) {
     for (let r = 0; r < R; r++) g[c * R + r] = r < miss ? draw(o) : keep[r - miss];
   }
 }
-// One spin. o.lv = multiplier ladder step to start from (free spins keep it), o.forceSp drops a special candy.
+// One spin. Cell multipliers: o.mm (array of N, 0 = none) carries the multipliers of the grid's cells. A winning
+// cluster pays with the SUM of the multipliers of its cells (×1 when none of them has one); then each of its cells
+// gets a multiplier (×2 at the first connection, doubled at each new one, up to P.mcap). In the base game the
+// multipliers start empty and are cleared after the spin; in the Queen's Ball every cell starts at ×P.fsStart and
+// keeps its multiplier for the whole bonus. o.forceSp drops a special candy.
+function upM(v, fs) { return Math.min(fs ? P.mcapFS : P.mcap, v ? v * 2 : 2); }
 function spin(o) {
-  const bet = o.bet, g = [], steps = [];
-  let lv = o.lv || 0, total = 0, rounds = 0;
+  const bet = o.bet, g = [], steps = [], mm = o.mm ? o.mm.slice() : new Array(N).fill(0), K = o.fs ? P.Ffs : 1;
+  let total = 0, rounds = 0;
   for (let i = 0; i < N; i++) g.push(draw(o));
   if (o.forceSp) g[Math.floor(Math.random() * N)] = [HEART, JAR, WAND][Math.floor(Math.random() * 3)];
-  steps.push({ k: 'init', grid: g.slice(), lv });
+  steps.push({ k: 'init', grid: g.slice(), mm: mm.slice() });
   while (rounds < 60) {
-    const m = P.ladder[Math.min(lv, P.ladder.length - 1)];
     const cl = clusters(g);
     if (cl.length) {
-      let paid = 0; const rem = {}, wins = [], made = [];
+      let paid = 0; const rem = {}, wins = [], made = [], ups = [];
       cl.forEach((c) => {
-        const p = bet * P.val[c.t] * P.F * (c.cells.length - MINC + 1) * m;
-        paid += p; wins.push({ t: c.t, n: c.cells.length, p, cells: c.cells });
-        c.cells.forEach((x) => { rem[x] = 1; });
+        let m = 0; c.cells.forEach((x) => { m += mm[x]; }); if (!m) m = 1;
+        const p = bet * P.val[c.t] * P.F * K * (c.cells.length - MINC + 1) * m;
+        paid += p; wins.push({ t: c.t, n: c.cells.length, p, m, cells: c.cells });
+        c.cells.forEach((x) => { rem[x] = 1; ups.push(x); });
         const sp = special(c.cells.length);
         if (sp) { const at = c.cells[Math.floor(Math.random() * c.cells.length)]; delete rem[at]; g[at] = sp; made.push({ i: at, sp }); }
       });
-      total += paid; fall(g, rem, o); lv++; rounds++;
-      steps.push({ k: 'win', wins, paid, m, made, rem: Object.keys(rem).map(Number), after: g.slice(), lv });
+      ups.forEach((x) => { mm[x] = upM(mm[x], o.fs); });
+      total += paid; fall(g, rem, o); rounds++;
+      steps.push({ k: 'win', wins, paid, made, rem: Object.keys(rem).map(Number), after: g.slice(), mm: mm.slice() });
       continue;
     }
-    // no cluster left: the special candies on the grid go off, one after the other
+    // no cluster left: the special candies on the grid go off, one after the other (each cleared candy pays a piece × its cell's multiplier)
     const sps = []; for (let k = 0; k < N; k++) if (g[k] >= HEART) sps.push(k);
     if (!sps.length) break;
     const rem = {}, fx = []; let paid = 0;
     for (const i of sps) {
       const cells = blast(g, i).filter((k) => !rem[k]);
-      let p = 0; cells.forEach((k) => { p += bet * P.val[g[k]] * P.F * P.piece * m; rem[k] = 1; });
+      let p = 0; cells.forEach((k) => { p += bet * P.val[g[k]] * P.F * K * P.piece * Math.max(1, mm[k]); rem[k] = 1; });
       rem[i] = 1; paid += p; fx.push({ i, sp: g[i], cells, p });
     }
-    total += paid; fall(g, rem, o); lv++; rounds++;
-    steps.push({ k: 'blast', fx, paid, m, rem: Object.keys(rem).map(Number), after: g.slice(), lv });
+    total += paid; fall(g, rem, o); rounds++;
+    steps.push({ k: 'blast', fx, paid, rem: Object.keys(rem).map(Number), after: g.slice(), mm: mm.slice() });
   }
   let scat = 0; for (const v of g) if (v === CROWN) scat++;
   let capped = false; if (total >= bet * CAPX) { total = bet * CAPX; capped = true; }
   steps.push({ k: 'end', scat });
-  return { steps, total, scat, lv, capped };
+  return { steps, total, scat, mm, capped };
 }
 const FS = { trig: 4, spins: 10, retrig: 3, extra: 5 };
 /* ===END ENGINE */
@@ -119,7 +125,7 @@ const HUNTC = 2, SPC = 4.3, PFS = 144;
 const WORDS = ['SWEET !', 'DÉLICIEUX !', 'SUGAR RUSH !', 'DIVIN !', 'ROYAL !', 'QUEEN !'];
 const NEON = ['#ff4fb8', '#ff9ee0', '#38bdf8', '#fde047', '#c084fc', '#a3e635', '#fff'];
 const sym = (c) => (c < 10 ? art('cq' + c) : c === CROWN ? art('cqs') + '<i class="lbl cql">COURONNE</i>' : art(SPART[c]) + `<i class="lbl cql w">${SPLBL[c]}</i>`);
-const mOf = (lv) => P.ladder[Math.min(lv, P.ladder.length - 1)];
+const mtier = (m) => (m >= 64 ? 't4' : m >= 16 ? 't3' : m >= 5 ? 't2' : '');
 
 class CandyGame extends BaseGame {
   constructor(root, game) {
@@ -129,21 +135,18 @@ class CandyGame extends BaseGame {
       stage: `<div class="cq-stage">
         <div class="cq-sky"><i class="cq-lolli l1"></i><i class="cq-lolli l2"></i></div>
         <div class="cq-board">
-          <div class="cq-ladder">${P.ladder.map((m, k) => `<span data-lv="${k}">×${m}</span>`).join('')}</div>
           <div class="grid-host"></div>
           <div class="cq-word"></div>
         </div>
       </div>`,
-      head: '<div class="cq-meter"><small>Multiplicateur</small><b>×1</b></div>',
-      opts: [{ id: 'hunt', icon: '👑', label: 'Chasse aux couronnes (mise ×2, couronnes ×1,56)' }],
+      opts: [{ id: 'hunt', icon: '👑', label: 'Chasse aux couronnes (mise ×2, couronnes ×1,58)' }],
       buys: [
         { id: 'sp', icon: '🍬', label: 'Bonbon spécial garanti', desc: 'Un tour avec un cœur, un bocal ou une baguette sur la grille', cost: (b) => Math.round(b * SPC) },
-        { id: 'fs', icon: '👑', label: `Bal de la Reine · ${FS.spins} tours`, desc: 'Le multiplicateur ne redescend jamais pendant le bonus', cost: (b) => b * PFS },
+        { id: 'fs', icon: '👑', label: `Bal de la Reine · ${FS.spins} tours`, desc: `Toutes les cases démarrent à ×${P.fsStart} et gardent leur multiplicateur`, cost: (b) => b * PFS },
       ],
-      hello: 'Grappes de 5+ · chaque cascade monte le multiplicateur · grosses grappes = bonbons spéciaux',
+      hello: 'Grappes de 5+ · chaque case gagnante prend un multiplicateur qui double à chaque connexion',
     });
     this.hunt = false;
-    this.meterVal = this.q('.cq-meter b');
     this.q('.cq-sky').style.setProperty('--cq-bg', `url("${asset('assets/games/candy/bg.webp')}")`);
     Object.values(PAINT).forEach((n) => { new Image().src = asset(`assets/games/candy/${n}.webp`); });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
@@ -151,15 +154,17 @@ class CandyGame extends BaseGame {
       cls: (v) => (v === CROWN ? 'scatter' : v >= HEART ? 'rainbow special' : v >= 7 ? 'hi' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => Math.floor(Math.random() * 10)));
-    this.setLv(0);
+    this.mm = new Array(N).fill(0);
   }
 
-  setLv(lv, bump) {
-    const m = mOf(lv);
-    this.meterVal.textContent = `×${m}`;
-    this.q('.cq-meter').classList.toggle('hot', m > 1);
-    this.qa('.cq-ladder span').forEach((s) => { const k = +s.dataset.lv; s.classList.toggle('on', k === Math.min(lv, P.ladder.length - 1)); s.classList.toggle('past', k < lv); });
-    if (bump) this.meterVal.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.4)', offset: 0.4 }, { transform: 'scale(1)' }], { duration: 400 });
+  // Cell multipliers shown as badges on the grid.
+  showMM(mm, pop) {
+    for (let i = 0; i < N; i++) {
+      const m = mm[i], was = this.mm[i];
+      this.grid.badge(i, m > 0 ? `×${m}` : '', mtier(m));
+      if (pop && m !== was && m > 0) this.grid.bump(this.grid.cells[i].lastChild);
+    }
+    this.mm = mm.slice();
   }
 
   word(k, text) {
@@ -184,7 +189,7 @@ class CandyGame extends BaseGame {
     if (id !== 'hunt' || this.busy) return;
     this.hunt = !this.hunt;
     this.slotEl.classList.toggle('hunting', this.hunt);
-    toast(this.hunt ? 'Chasse aux couronnes : mise ×2, couronnes 1,56 fois plus fréquentes' : 'Chasse aux couronnes désactivée');
+    toast(this.hunt ? 'Chasse aux couronnes : mise ×2, couronnes 1,58 fois plus fréquentes' : 'Chasse aux couronnes désactivée');
     this.updateMeters();
   }
 
@@ -209,7 +214,7 @@ class CandyGame extends BaseGame {
         if (total > 0) await this.celebrate(Math.round(total));
         total += await this.bonus();
       } else if (total > 0) await this.celebrate(Math.round(total));
-      this.setLv(0);
+      if (this.mm.some((m) => m)) { await this.wait(300); this.showMM(new Array(N).fill(0)); this.msg('Multiplicateurs remis à zéro'); await this.wait(350); }
     }
     this.setLast(total);
     this.msg(total >= b * CAPX ? `GAIN MAXIMUM ! ${fmtC(total)}` : total > 0 ? `Total du tour : ${fmtC(total)}` : 'Pas de gain');
@@ -220,7 +225,7 @@ class CandyGame extends BaseGame {
     for (const st of res.steps) {
       if (this.dead) return;
       if (st.k === 'init') {
-        this.setLv(st.lv);
+        this.showMM(st.mm);
         await this.grid.dropIn(st.grid, {
           tease: (c) => { let sc = 0; for (let j = 0; j < c * R; j++) if (st.grid[j] === CROWN) sc++; return sc >= 3; },
           onLand: (i, v) => {
@@ -233,7 +238,7 @@ class CandyGame extends BaseGame {
       } else if (st.k === 'win') {
         st.wins.forEach((w) => this.grid.floatOver(w.cells, `+${fmtC(Math.round(w.p))}`, '#ffe1f3'));
         this.grid.mark(st.wins.flatMap((w) => w.cells));
-        this.msg(`${st.wins.map((w) => `${w.n} × ${NAMES[w.t]}`).join(' · ')}${st.m > 1 ? ` · ×${st.m}` : ''} : +${fmtC(Math.round(st.paid))}`);
+        this.msg(`${st.wins.map((w) => `${w.n} × ${NAMES[w.t]}${w.m > 1 ? ` <span class="pill hot">×${w.m}</span>` : ''}`).join(' · ')} : +${fmtC(Math.round(st.paid))}`);
         this.word(k);
         sfx.win();
         await this.wait(750);
@@ -246,9 +251,9 @@ class CandyGame extends BaseGame {
           this.msg(`Grappe de ${st.wins.find((w) => w.cells.includes(mk.i))?.n || 8} : ${SPN[mk.sp]} créé !`);
           await this.wait(500);
         }
+        this.showMM(st.mm, true);
         await this.grid.cascade(st.after, new Set(st.rem));
         run += st.paid; k++;
-        this.setLv(st.lv, true);
         this.setLast(Math.round(run));
         await this.wait(180);
       } else if (st.k === 'blast') {
@@ -270,27 +275,26 @@ class CandyGame extends BaseGame {
         await this.grid.explode(st.rem, NEON);
         await this.grid.cascade(st.after, new Set(st.rem));
         run += st.paid; k++;
-        this.setLv(st.lv, true);
         this.setLast(Math.round(run));
         await this.wait(180);
       }
     }
   }
 
-  // Same rules as the simulator: the multiplier carries over from spin to spin, +5 spins for 3 crowns.
+  // Same rules as the simulator: every cell starts at ×P.fsStart and keeps its multiplier, +5 spins for 3 crowns.
   async bonus() {
-    let left = FS.spins, lv = 0, tot = 0, done = 0;
+    let left = FS.spins, mm = new Array(N).fill(P.fsStart), tot = 0, done = 0;
     const b = this.bet, cap = b * CAPX;
     this.lastStake = b;
-    await this.featureIntro('BAL DE LA REINE', `${FS.spins} tours gratuits · le multiplicateur ne redescend jamais`, art('cqs'));
+    await this.featureIntro('BAL DE LA REINE', `${FS.spins} tours gratuits · toutes les cases démarrent à ×${P.fsStart} et doublent à chaque connexion`, art('cqs'));
     this.slotEl.classList.add('in-free');
-    this.setLv(0);
+    this.showMM(mm, true);
     while (left > 0 && tot < cap && !this.dead) {
       left--; done++;
-      this.setBanner(`<b>BAL DE LA REINE</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill">Multiplicateur ×${mOf(lv)}</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
-      const res = spin({ bet: b, fs: true, lv });
+      this.setBanner(`<b>BAL DE LA REINE</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill">Cases ×${P.fsStart} et plus</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
+      const res = spin({ bet: b, fs: true, mm });
       await this.play(res);
-      lv = res.lv;
+      mm = res.mm;
       const add = Math.min(res.total, cap - tot);
       tot += add;
       if (add > 0) this.win(Math.round(add), 'Bal de la Reine');
@@ -300,7 +304,7 @@ class CandyGame extends BaseGame {
     }
     this.slotEl.classList.remove('in-free');
     this.setBanner('');
-    this.setLv(0);
+    this.showMM(new Array(N).fill(0));
     await this.celebrate(Math.round(tot), { summary: 'BAL DE LA REINE', stake: b });
     return tot;
   }
@@ -311,10 +315,10 @@ class CandyGame extends BaseGame {
     const sp = [HEART, JAR, WAND].map((s, k) => `<div class="pay-item"><div class="pay-sym svg">${art(SPART[s])}</div><div class="pay-vals"><b>${SPN[s]}</b><br><span>Grappe de ${[8, 10, 12][k]}+ · ${SPD[s]}</span></div></div>`).join('');
     return this.rules(`<h4>Symboles (× la mise)</h4><div class="paytable">${rows}
       <div class="pay-item"><div class="pay-sym svg">${art('cqs')}</div><div class="pay-vals"><b>Couronne</b><br><span>4 ou plus : Bal de la Reine</span></div></div></div>
-      <h4>Multiplicateur de cascades</h4><p>Grille 6×5, grappes de 5+ (horizontal ou vertical). Les bonbons gagnants disparaissent et d’autres tombent. Chaque cascade fait monter le multiplicateur du tour : ${P.ladder.map((m) => `×${m}`).join(', ')}.</p>
+      <h4>Multiplicateurs sur les cases</h4><p>Grille 6×5, grappes de 5+ (horizontal ou vertical). Les bonbons gagnants disparaissent et d’autres tombent. Chaque case qui fait partie d’une grappe gagnante prend un <b>multiplicateur</b> : ×2 à la première connexion, puis il <b>double</b> à chaque nouvelle connexion sur cette case (jusqu’à ×${P.mcap}). Une grappe paie avec la <b>somme</b> des multiplicateurs de ses cases. Dans le jeu de base, les multiplicateurs repartent à zéro à la fin du tour.</p>
       <h4>Bonbons spéciaux</h4><div class="paytable">${sp}</div><p>Une grande grappe laisse un bonbon spécial à sa place. Quand plus aucune grappe ne se forme, les bonbons spéciaux explosent : chaque bonbon effacé paie ${String(P.piece * 100)} % de sa valeur de grappe, multiplicateur compris, puis les cascades reprennent.</p>
-      <h4>Bal de la Reine</h4><p>4 couronnes ou plus : ${FS.spins} tours gratuits. Le multiplicateur <b>ne redescend jamais</b> pendant le bonus et des bonbons spéciaux tombent parfois du ciel. 3 couronnes : +${FS.extra} tours.</p>
-      <h4>Options</h4><p>Chasse aux couronnes : mise ×2, couronnes 1,56 fois plus fréquentes. Achats : bonbon spécial garanti ×${String(SPC).replace('.', ',')} · Bal de la Reine ×${PFS}. Gain maximum ×10 000.</p>`);
+      <h4>Bal de la Reine</h4><p>4 couronnes ou plus : ${FS.spins} tours gratuits. <b>Toutes les cases démarrent à ×${P.fsStart}</b>, doublent à chaque connexion (jusqu’à ×${P.mcapFS}) et gardent leur multiplicateur jusqu’à la fin du bonus. Des bonbons spéciaux tombent parfois du ciel. 3 couronnes : +${FS.extra} tours.</p>
+      <h4>Options</h4><p>Chasse aux couronnes : mise ×2, couronnes 1,58 fois plus fréquentes. Achats : bonbon spécial garanti ×${String(SPC).replace('.', ',')} · Bal de la Reine ×${PFS}. Gain maximum ×10 000.</p>`);
   }
 }
 
