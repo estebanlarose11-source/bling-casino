@@ -11842,16 +11842,15 @@ return { mountLive, TABLE_GAMES, online: () => players };
 __mods['hta.js'] = (() => {
 // HilltopAds banner 300 × 250 (zone « SpinBet - Banniere 300x250 », code hta-code-7588813). Every element
 // <div data-hta></div> on a page gets one banner. Same audience as the other banners: nobody when adPolicy.noAds()
-// (the owner, a ?nopub device) and no banner for players of level AD_FREE_LEVEL or more. A slot the network
+// (the owner, a ?nopub device); every other player gets it, whatever their level. A slot the network
 // leaves empty folds away after a few seconds.
 const { adPolicy } = __mods['adpolicy.js'];
 const { profiles } = __mods['profile.js'];
 const { progress } = __mods['progress.js'];
 
-const AD_FREE_LEVEL = 15;
 const SRC = '//narrowefficiency.com/b.XIV/sQdZGAlE0wYvWycN/IeNmu9/uoZ/U/l/kOPtTucT1/OMDbgz4HMaT/MytPNYzOU/4iOMDig/xYNfwC';
 
-const allowed = () => !adPolicy.noAds() && !(profiles.current && progress.info().level >= AD_FREE_LEVEL);
+const allowed = () => !adPolicy.noAds(); // every player, whatever their level (only the owner / ?nopub devices are left out)
 
 function fill(slot) {
   slot.dataset.hta = 'on';
@@ -11941,12 +11940,12 @@ function route() {
 }
 
 /* ---------- ads: few, well placed, depending on the player ----------
-   Banner: always on the login screen (so A-ADS can check it), never while a game is open, never for players of
-   level AD_FREE_LEVEL or more, hidden 30 min after its cross is clicked. Nobody sees ads at all when
+   Banner: always on the login screen (so A-ADS can check it), never while a game is open, for every level,
+   hidden 30 min after its cross is clicked. Nobody sees ads at all when
    adPolicy.noAds() (the owner, or a ?nopub device). A player under 150 KE in a game is offered a rewarded ad
    (+1 000\u00a0\uE1E0) or the 2-ad refill, at most once every 5 min. */
 function mountAdBar() {
-  const AD_FREE_LEVEL = 15, CLOSE_KEY = 'spinbet_adbar_closed', OFFER_KEY = 'spinbet_adoffer';
+  const CLOSE_KEY = 'spinbet_adbar_closed', OFFER_KEY = 'spinbet_adoffer';
   const bar = document.getElementById('ad-bar');
   const get = (k) => { try { return +localStorage.getItem(k) || 0; } catch { return 0; } };
   const put = (k, v) => { try { localStorage.setItem(k, String(v)); } catch { /* ignore */ } };
@@ -11955,7 +11954,6 @@ function mountAdBar() {
     if (document.body.classList.contains('gated')) return true;
     if (Date.now() - get(CLOSE_KEY) < 30 * 60000) return false;
     if (/^#game-/.test(location.hash)) return false;
-    if (profiles.current && progress.info().level >= AD_FREE_LEVEL) return false;
     return true;
   };
   const update = () => {
