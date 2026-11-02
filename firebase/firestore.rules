@@ -8,6 +8,9 @@ service cloud.firestore {
     function isMe(uid) { return signedIn() && request.auth.uid == uid; }
     function isName(n) { return n is string && n.size() >= 1 && n.size() <= 64; }
     function isNum(x, lo, hi) { return (x is int || x is float) && x >= lo && x <= hi; }
+    function isAdmin() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function today() { return int(request.time.toMillis() / 86400000); }
+    function isPseudo(n) { return n is string && n.size() >= 1 && n.size() <= 16; }
 
     // Profil complet du joueur : lu et écrit seulement par son propriétaire.
     // Le solde (bal, en centimes) est borné : impossible de s'écrire des milliards.
@@ -69,6 +72,84 @@ service cloud.firestore {
         && request.resource.data.code is string && request.resource.data.code.size() <= 32
         && hashing.sha256(request.resource.data.code).toHexString().lower() == hash;
       allow read, update, delete: if false;
+    }
+
+    // ---------- Chat général ----------
+    // chat/{id} = { uid, name, text, at } : tout le monde lit ; seul un compte connecté écrit, à son nom,
+    // 200 caractères max, un message toutes les 3 s (chatmeta/{uid}.last, écrit dans la même opération),
+    // et pas s'il a été rendu muet. L'auteur ou un admin peut supprimer un message.
+    match /chat/{id} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'text', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && isPseudo(request.resource.data.name)
+        && request.resource.data.text is string && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 200
+        && request.resource.data.at == request.time
+        && !exists(/databases/$(database)/documents/mutes/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/chatmeta/$(request.auth.uid)).data.last == request.time
+        && (!exists(/databases/$(database)/documents/chatmeta/$(request.auth.uid))
+            || get(/databases/$(database)/documents/chatmeta/$(request.auth.uid)).data.last < request.time - duration.value(3, 's'));
+      allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow update: if false;
+    }
+    // Heure du dernier message de chaque joueur (anti-spam) : seulement « maintenant », par lui-même.
+    match /chatmeta/{uid} {
+      allow read: if isMe(uid);
+      allow create, update: if isMe(uid) && request.resource.data.keys().hasOnly(['last']) && request.resource.data.last == request.time;
+      allow delete: if false;
+    }
+    // Joueurs rendus muets (par un admin) et admins (ajoutés à la main dans la console Firebase).
+    match /mutes/{uid} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /admins/{uid} {
+      allow read: if isMe(uid);
+      allow write: if false;
+    }
+
+    // ---------- Envoi de KE entre joueurs ----------
+    // gifts/{id} = { from, fromName, to, toName, amount (centimes), at, claimed }.
+    // Création par l'expéditeur seulement si, dans la même opération : son solde (users/{uid}.bal) baisse au moins
+    // du montant, et son compteur du jour (sends/{uid}) augmente exactement du montant. 1 à 5 000 KE par envoi,
+    // 5 000 KE par jour au total, vers un compte qui existe, jamais soi-même. Lu par l'expéditeur et le destinataire ;
+    // le destinataire le marque « récupéré » une seule fois (claimed false → true). Jamais supprimé.
+    match /gifts/{id} {
+      allow read: if signedIn() && (resource.data.to == request.auth.uid || resource.data.from == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['from', 'fromName', 'to', 'toName', 'amount', 'at', 'claimed'])
+        && request.resource.data.from == request.auth.uid
+        && request.resource.data.to is string && request.resource.data.to.size() > 5 && request.resource.data.to.size() < 128
+        && request.resource.data.to != request.auth.uid
+        && exists(/databases/$(database)/documents/users/$(request.resource.data.to))
+        && isPseudo(request.resource.data.fromName) && isPseudo(request.resource.data.toName)
+        && request.resource.data.amount is int && request.resource.data.amount >= 100 && request.resource.data.amount <= 500000
+        && request.resource.data.claimed == false
+        && request.resource.data.at == request.time
+        && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.bal
+            <= get(/databases/$(database)/documents/users/$(request.auth.uid)).data.bal - request.resource.data.amount
+        && getAfter(/databases/$(database)/documents/sends/$(request.auth.uid)).data.day == today()
+        && getAfter(/databases/$(database)/documents/sends/$(request.auth.uid)).data.total
+            == (exists(/databases/$(database)/documents/sends/$(request.auth.uid))
+                && get(/databases/$(database)/documents/sends/$(request.auth.uid)).data.day == today()
+                ? get(/databases/$(database)/documents/sends/$(request.auth.uid)).data.total : 0) + request.resource.data.amount;
+      allow update: if signedIn()
+        && resource.data.to == request.auth.uid && resource.data.claimed == false
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed'])
+        && request.resource.data.claimed == true;
+      allow delete: if false;
+    }
+    // Compteur des KE envoyés aujourd'hui : day = jour en cours, total en centimes (5 000 KE max), ne peut
+    // que monter dans la journée.
+    match /sends/{uid} {
+      allow read: if isMe(uid);
+      allow create, update: if isMe(uid)
+        && request.resource.data.keys().hasOnly(['day', 'total'])
+        && request.resource.data.day == today()
+        && request.resource.data.total is int && request.resource.data.total >= 0 && request.resource.data.total <= 500000
+        && (resource == null || resource.data.day != today() || request.resource.data.total >= resource.data.total);
+      allow delete: if false;
     }
 
     // Tout le reste est fermé.

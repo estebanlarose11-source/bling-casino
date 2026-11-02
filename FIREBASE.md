@@ -18,9 +18,37 @@ Ce que ça change :
 - le parrainage ne peut être déclaré qu'une fois, par le nouveau compte, et jamais soi-même ;
 - le score du Défi de la semaine ne peut que monter et reste plafonné ;
 - chaque code cadeau (page Recharger) ne peut être utilisé qu’une seule fois, par un seul compte ;
+- le chat et les envois de KE entre joueurs sont protégés (voir 1 bis) ;
 - tout le reste de la base est fermé.
 
-## 2. Domaine autorisé (si la connexion échoue sur le site)
+## 1 bis. Chat général et envoi de KE entre joueurs
+
+Rien à créer à la main pour que ça marche : il suffit d'avoir collé les règles ci-dessus (étape 1), elles
+contiennent déjà le chat (`chat`, `chatmeta`), les muets (`mutes`), les admins (`admins`) et les envois de KE
+(`gifts`, `sends`). Les collections se créent toutes seules au premier message et au premier envoi.
+
+**Te nommer modérateur (admin du chat)** : un admin peut supprimer n'importe quel message et rendre un joueur muet.
+
+1. Connecte-toi une fois sur le site avec ton compte.
+2. Console Firebase → **Build → Authentication** → onglet **Users** : copie l'**UID** de ton compte (colonne *User UID*).
+3. **Build → Firestore Database** → **Données** (*Data*) → **+ Commencer une collection** (*Start collection*) :
+   - ID de la collection : `admins`
+   - ID du document : colle ton **UID**
+   - ajoute un champ : nom `name`, type *string*, valeur ton pseudo → **Enregistrer**.
+4. Recharge le site : en touchant le pseudo d'un joueur dans le chat, tu vois « Supprimer ce message » et
+   « Rendre muet ». Fais pareil pour chaque modérateur que tu veux ajouter (un document par UID dans `admins`).
+
+Pour enlever un muet à la main : collection `mutes`, supprime le document du joueur.
+
+Ce que les règles imposent :
+
+- chat : lisible par tous, écrit seulement par un compte connecté, à son nom, 200 caractères max,
+  1 message toutes les 3 secondes, refusé si le joueur est muet ;
+- envoi de KE : 1 à 5 000 KE par envoi, 5 000 KE par jour au total, vers un compte existant, jamais à soi-même ;
+  l'envoi n'est accepté que si le solde de l'expéditeur baisse du montant dans la même opération ;
+  le destinataire ne peut récupérer un envoi qu'une seule fois.
+
+
 
 **Build → Authentication → Settings → Authorized domains** : vérifie que
 `estebanlarose11-source.github.io` est dans la liste. Sinon, **Add domain** et ajoute-le.

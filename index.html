@@ -1977,6 +1977,49 @@ body.gated { overflow: hidden; }
 .gm-stake b { min-width: 110px; text-align: center; font: 800 18px KeCoin, Orbitron, sans-serif; }
 @media (max-width: 420px) { .gm-toggles { grid-template-columns: 1fr; } }
 
+/* ============ General chat + KE between players ============ */
+.ct-fab { position: fixed; right: 16px; bottom: 16px; z-index: 60; width: 56px; height: 56px; border-radius: 50%; border: 0; font-size: 26px; cursor: pointer; background: linear-gradient(180deg, #ff2340, #a3001a); box-shadow: 0 8px 24px rgba(255, 35, 64, .45), 0 0 0 2px rgba(255, 255, 255, .15); transition: transform .2s; }
+.ct-fab:hover { transform: scale(1.06); } .ct-fab.on { transform: scale(.9); opacity: .8; }
+.ct-badge { position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 99px; background: #fde047; color: #111; font: 800 11px/20px Inter, sans-serif; }
+.ct-panel { position: fixed; right: 16px; bottom: 84px; z-index: 61; width: min(380px, calc(100vw - 32px)); height: min(560px, calc(100dvh - 120px)); display: flex; flex-direction: column; border-radius: 18px; overflow: hidden;
+  background: linear-gradient(180deg, #1b1316, #0f0b0d); border: 1px solid var(--line, rgba(255, 255, 255, .1)); box-shadow: 0 20px 60px rgba(0, 0, 0, .6); opacity: 0; transform: translateY(16px) scale(.98); pointer-events: none; transition: opacity .2s, transform .2s; }
+.ct-panel.open { opacity: 1; transform: none; pointer-events: auto; }
+body.ct-hide .ct-fab, body.ct-hide .ct-panel { display: none; }
+.ct-head { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 10px; border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.ct-tabs { flex: 1; display: flex; gap: 6px; } .ct-tabs button { flex: 1; padding: 8px; border-radius: 10px; border: 0; background: transparent; color: #cbd5e1; font: 700 13px Inter, sans-serif; cursor: pointer; }
+.ct-tabs button.on { background: rgba(255, 35, 64, .18); color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 35, 64, .5); }
+.ct-x { width: 34px; height: 34px; border-radius: 10px; border: 0; background: rgba(255, 255, 255, .06); color: #fff; cursor: pointer; }
+.ct-body { flex: 1; min-height: 0; display: flex; flex-direction: column; } .ct-body[hidden] { display: none; }
+.ct-body.send { overflow-y: auto; padding: 12px; }
+.ct-list { flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.ct-msg { align-self: flex-start; max-width: 86%; padding: 6px 10px 8px; border-radius: 12px 12px 12px 4px; background: rgba(255, 255, 255, .06); }
+.ct-msg.mine { align-self: flex-end; border-radius: 12px 12px 4px 12px; background: rgba(255, 35, 64, .16); }
+.ct-name { padding: 0; border: 0; background: none; color: #fde68a; font: 800 12px Inter, sans-serif; cursor: pointer; } .ct-msg.mine .ct-name { color: #fecaca; }
+.ct-time { margin-left: 6px; font: 600 10px Inter, sans-serif; color: #64748b; }
+.ct-msg p { margin: 2px 0 0; font: 500 14px/1.35 Inter, sans-serif; color: #f1f5f9; word-wrap: break-word; overflow-wrap: anywhere; }
+.ct-empty { margin: auto; padding: 20px; text-align: center; color: #94a3b8; font: 500 13px Inter, sans-serif; }
+.ct-form { display: flex; gap: 6px; padding: 8px; border-top: 1px solid rgba(255, 255, 255, .08); }
+.ct-form input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, .12); background: #0a0809; color: #fff; font: 500 14px Inter, sans-serif; }
+.ct-form button { padding: 0 14px; border-radius: 12px; border: 0; background: linear-gradient(180deg, #ff2340, #a3001a); color: #fff; font: 800 13px Inter, sans-serif; cursor: pointer; }
+.ct-form :disabled { opacity: .5; cursor: default; }
+.ct-gift { display: flex; flex-direction: column; gap: 10px; }
+.ct-gift label { display: flex; flex-direction: column; gap: 4px; font: 700 12px Inter, sans-serif; color: #cbd5e1; }
+.ct-gift input { padding: 10px 12px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .12); background: #0a0809; color: #fff; font: 600 15px Inter, sans-serif; }
+.ct-quick { display: flex; gap: 6px; } .ct-quick button { flex: 1; padding: 8px 0; border-radius: 10px; border: 1px solid rgba(253, 224, 71, .35); background: rgba(253, 224, 71, .08); color: #fde68a; font: 800 13px Inter, sans-serif; cursor: pointer; }
+.ct-info { margin: 0; font: 500 12px Inter, sans-serif; color: #94a3b8; } .ct-info b { color: #fde68a; }
+.ct-note { margin: 0; font: 500 11px Inter, sans-serif; color: #64748b; }
+.ct-h { margin: 16px 0 6px; font: 800 13px Inter, sans-serif; color: #e2e8f0; }
+.ct-hist > div { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, .06); font: 600 13px Inter, sans-serif; color: #cbd5e1; }
+.ct-hist .in b { color: #4ade80; } .ct-hist .out b { color: #f87171; }
+.ct-menu { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+/* above the ad bar when it is shown */
+body.ad-bar-on .ct-fab { bottom: 112px; } body.ad-bar-on .ct-panel { bottom: 180px; height: min(520px, calc(100dvh - 210px)); }
+@media (max-width: 900px) {
+  .ct-fab { bottom: calc(76px + env(safe-area-inset-bottom)); right: 12px; width: 50px; height: 50px; font-size: 22px; }
+  .ct-panel { right: 0; left: 0; bottom: 0; width: auto; height: min(78dvh, 640px); border-radius: 18px 18px 0 0; padding-bottom: env(safe-area-inset-bottom); z-index: 300; }
+  body.ad-bar-on .ct-fab { bottom: calc(138px + env(safe-area-inset-bottom)); }
+  body.ad-bar-on .ct-panel { bottom: 0; height: min(78dvh, 640px); }
+}
 /* ============ Full screen ============ */
 .game-host.is-full {
   position: fixed; inset: 0; z-index: 70; margin: 0; max-width: none;
@@ -4127,6 +4170,66 @@ const cloud = {
   async topChallenge(week, n) {
     const q = await (await init()).db.collection('challenges').doc(week).collection('scores').orderBy('best', 'desc').limit(n).get();
     return q.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  },
+
+  /* ---------- General chat: chat/{id} = { uid, name, text, at } (+ chatmeta/{uid} = { last } for the 3 s rate limit) ---------- */
+  // Live last n messages, oldest first: cb(list). Returns a function that stops listening.
+  async watchChat(n, cb) {
+    return (await init()).db.collection('chat').orderBy('at', 'desc').limit(n)
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() })).reverse()), (e) => console.error(e));
+  },
+  async sendChat(uid, name, text) {
+    const { db } = await init();
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    const b = db.batch();
+    b.set(db.collection('chatmeta').doc(uid), { last: now });
+    b.set(db.collection('chat').doc(), { uid, name, text, at: now });
+    await b.commit();
+  },
+  async deleteChat(id) { await (await init()).db.collection('chat').doc(id).delete(); },
+  async isAdmin(uid) { try { return (await (await init()).db.collection('admins').doc(uid).get()).exists; } catch { return false; } },
+  async isMuted(uid) { try { return (await (await init()).db.collection('mutes').doc(uid).get()).exists; } catch { return false; } },
+  async setMute(uid, on, by) {
+    const ref = (await init()).db.collection('mutes').doc(uid);
+    if (on) await ref.set({ by, at: Date.now() }); else await ref.delete();
+  },
+
+  /* ---------- KE between players: gifts/{id} = { from, fromName, to, toName, amount (cents), at, claimed } ---------- */
+  // The sender's balance drops by the amount in the same write (the rules check it) and sends/{uid} counts
+  // what was sent today (5 000 KE a day at most). The receiver claims the gift: claimed false → true.
+  async findPlayer(name) {
+    const q = await (await init()).db.collection('leaderboard').where('name', '==', name).limit(5).get();
+    return q.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  },
+  async sentToday(uid) {
+    const d = await (await init()).db.collection('sends').doc(uid).get();
+    const day = Math.floor(Date.now() / 864e5);
+    return d.exists && d.data().day === day ? d.data().total : 0;
+  },
+  async sendGift(me, profile, to, toName, cents) {
+    const { db } = await init();
+    const day = Math.floor(Date.now() / 864e5);
+    const sref = db.collection('sends').doc(me.uid);
+    const prev = await sref.get();
+    const before = prev.exists && prev.data().day === day ? prev.data().total : 0;
+    // 1) the server copy of the balance must be the one on screen, 2) then balance, counter and gift in one write
+    await db.collection('users').doc(me.uid).set(JSON.parse(JSON.stringify(profile)));
+    const b = db.batch();
+    b.set(db.collection('users').doc(me.uid), JSON.parse(JSON.stringify({ ...profile, bal: profile.bal - cents })));
+    b.set(sref, { day, total: before + cents });
+    b.set(db.collection('gifts').doc(), { from: me.uid, fromName: me.name, to, toName, amount: cents, claimed: false, at: firebase.firestore.FieldValue.serverTimestamp() });
+    await b.commit();
+  },
+  // Gifts waiting for this player: cb(list) on every change.
+  async watchGifts(uid, cb) {
+    return (await init()).db.collection('gifts').where('to', '==', uid).where('claimed', '==', false)
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() }))), (e) => console.error(e));
+  },
+  async claimGift(id) { await (await init()).db.collection('gifts').doc(id).update({ claimed: true }); },
+  async giftHistory(uid) {
+    const db = (await init()).db;
+    const [a, b] = await Promise.all([db.collection('gifts').where('from', '==', uid).limit(20).get(), db.collection('gifts').where('to', '==', uid).limit(20).get()]);
+    return [...a.docs, ...b.docs].map((d) => ({ id: d.id, ...d.data() })).sort((x, y) => (y.at?.toMillis?.() || 0) - (x.at?.toMillis?.() || 0)).slice(0, 25);
   },
 };
 
@@ -10840,6 +10943,176 @@ async function loadTop(list) {
 return { renderAchievements, achievementPoints: points, achievementSummary: summary };
 })();
 
+// ---- chat.js ----
+__mods['chat.js'] = (() => {
+// General chat + sending KE to another player (Firebase: chat, chatmeta, gifts, sends, mutes, admins — see
+// firebase/firestore.rules and FIREBASE.md). Everyone can read the chat; only signed-in accounts can write and
+// send KE. Gifts waiting for the player are claimed automatically and added to the balance.
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { el, toast, modal } = __mods['ui.js'];
+
+const MAX = 200, KEEP = 60, GIFT_MIN = 1, GIFT_MAX = 5000, DAY_MAX = 5000; // KE
+const BAD = ['connard', 'connasse', 'salope', 'pute', 'enculé', 'encule', 'fdp', 'ntm', 'nique ta', 'pd', 'batard', 'bâtard', 'negro', 'nègre', 'tg'];
+const clean = (t) => { let x = t; BAD.forEach((w) => { x = x.replace(new RegExp(`(^|[^\\p{L}])(${w})(?=$|[^\\p{L}])`, 'giu'), (m, a, b) => a + '•'.repeat(b.length)); }); return x; };
+const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const hhmm = (ts) => { const d = ts?.toDate ? ts.toDate() : null; return d ? d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''; };
+const me = () => (profiles.online && profiles.current ? { uid: profiles.store.current, name: String(profiles.current.name || 'Joueur').slice(0, 16) } : null);
+
+let root, list, stopChat, stopGifts, unread = 0, open = false, admin = false, muted = false, msgs = [], tab = 'chat';
+
+function mountChat() {
+  if (!cloud.enabled || document.querySelector('.ct-fab')) return;
+  const fab = el('button', 'ct-fab', '💬<b class="ct-badge" hidden></b>');
+  fab.setAttribute('aria-label', 'Chat');
+  root = el('div', 'ct-panel', `
+    <div class="ct-head"><div class="ct-tabs"><button data-tab="chat" class="on">💬 Chat</button><button data-tab="send">💸 Envoyer des KE</button></div><button class="ct-x" aria-label="Fermer">✕</button></div>
+    <div class="ct-body chat"><div class="ct-list"></div>
+      <form class="ct-form"><input maxlength="${MAX}" placeholder="Écris un message…" autocomplete="off"><button>Envoyer</button></form></div>
+    <div class="ct-body send" hidden></div>`);
+  document.body.append(fab, root);
+  list = root.querySelector('.ct-list');
+  fab.addEventListener('click', () => toggle(!open));
+  root.querySelector('.ct-x').addEventListener('click', () => toggle(false));
+  root.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  root.querySelector('.ct-form').addEventListener('submit', (e) => { e.preventDefault(); send(); });
+  list.addEventListener('click', (e) => { const n = e.target.closest('[data-uid]'); if (n) playerMenu(n.dataset.uid, n.dataset.name, n.dataset.id); });
+  profiles.addEventListener('change', () => setTimeout(onUser, 300));
+  profiles.ready?.then(onUser);
+  // the chat stays out of the way during full-screen play
+  new MutationObserver(() => document.body.classList.toggle('ct-hide', document.body.classList.contains('fs-on'))).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+}
+
+function toggle(v) {
+  open = v; root.classList.toggle('open', v); document.querySelector('.ct-fab').classList.toggle('on', v);
+  if (v) { unread = 0; badge(); if (!stopChat) watch(); requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; }); if (tab === 'send') renderSend(); }
+}
+function setTab(t) { tab = t; root.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === t)); root.querySelector('.ct-body.chat').hidden = t !== 'chat'; root.querySelector('.ct-body.send').hidden = t !== 'send'; if (t === 'send') renderSend(); }
+function badge() { const b = document.querySelector('.ct-badge'); b.hidden = !unread; b.textContent = unread > 9 ? '9+' : unread; }
+
+async function watch() {
+  stopChat = await cloud.watchChat(KEEP, (l) => {
+    const fresh = msgs.length && l.length ? l.filter((m) => !msgs.some((x) => x.id === m.id)).length : 0;
+    msgs = l; renderList();
+    if (!open && fresh) { unread += fresh; badge(); }
+  }).catch((e) => { console.error(e); list.innerHTML = '<p class="ct-empty">Le chat n’est pas disponible pour le moment.</p>'; return null; });
+}
+
+function renderList() {
+  const m = me();
+  const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+  list.innerHTML = msgs.length ? msgs.map((x) => `<div class="ct-msg${m && x.uid === m.uid ? ' mine' : ''}">
+      <button class="ct-name" data-uid="${esc(x.uid)}" data-name="${esc(x.name)}" data-id="${esc(x.id)}">${esc(x.name)}</button><span class="ct-time">${hhmm(x.at)}</span>
+      <p>${esc(clean(x.text))}</p></div>`).join('') : '<p class="ct-empty">Aucun message pour l’instant. Dis bonjour 👋</p>';
+  if (atBottom || m) list.scrollTop = list.scrollHeight;
+  const form = root.querySelector('.ct-form'), inp = form.querySelector('input');
+  inp.disabled = form.querySelector('button').disabled = !m || muted;
+  inp.placeholder = !m ? 'Crée un compte pour écrire dans le chat' : muted ? 'Tu as été rendu muet par un modérateur' : 'Écris un message…';
+}
+
+async function onUser() {
+  stopGifts?.(); stopGifts = null; admin = false; muted = false;
+  const m = me();
+  if (m) {
+    [admin, muted] = await Promise.all([cloud.isAdmin(m.uid), cloud.isMuted(m.uid)]);
+    stopGifts = await cloud.watchGifts(m.uid, claimAll).catch((e) => { console.error(e); return null; });
+  }
+  if (root) { renderList(); if (tab === 'send') renderSend(); }
+}
+
+let claiming = false;
+async function claimAll(gifts) {
+  if (claiming || !gifts.length) return;
+  claiming = true;
+  for (const g of gifts) {
+    try {
+      await cloud.claimGift(g.id); // refused if already claimed elsewhere: then nothing is added
+      wallet.cents += g.amount; wallet.save();
+      toast(`💸 ${esc(g.fromName)} t’a envoyé ${fmt(g.amount / 100)} !`, 'ok');
+    } catch (e) { console.error(e); }
+  }
+  claiming = false;
+}
+
+async function send() {
+  const m = me(); if (!m || muted) return;
+  const inp = root.querySelector('.ct-form input'), text = inp.value.trim().replace(/\s+/g, ' ').slice(0, MAX);
+  if (!text) return;
+  const btn = root.querySelector('.ct-form button'); btn.disabled = true;
+  try { await cloud.sendChat(m.uid, m.name, text); inp.value = ''; }
+  catch (e) { console.error(e); toast(/permission/i.test(e?.message || '') ? 'Doucement : un message toutes les 3 secondes' : 'Message non envoyé, réessaie', 'warn'); }
+  btn.disabled = false; inp.focus();
+}
+
+async function playerMenu(uid, name, id) {
+  const m = me(), self = m && uid === m.uid;
+  const btns = [];
+  if (m && !self) btns.push(`<button class="btn primary" data-value="gift">💸 Envoyer des KE à ${esc(name)}</button>`);
+  if (admin || self) btns.push('<button class="btn" data-value="del">🗑️ Supprimer ce message</button>');
+  if (admin && !self) btns.push(`<button class="btn" data-value="mute">🔇 Rendre muet</button><button class="btn" data-value="unmute">🔈 Enlever le muet</button>`);
+  if (!btns.length) return;
+  const r = await modal(`<h3>${esc(name)}</h3><div class="ct-menu">${btns.join('')}</div>`);
+  try {
+    if (r === 'gift') { setTab('send'); renderSend(uid, name); }
+    if (r === 'del') { await cloud.deleteChat(id); toast('Message supprimé'); }
+    if (r === 'mute') { await cloud.setMute(uid, true, m.uid); toast(`${esc(name)} ne peut plus écrire`); }
+    if (r === 'unmute') { await cloud.setMute(uid, false, m.uid); toast(`${esc(name)} peut de nouveau écrire`); }
+  } catch (e) { console.error(e); toast('Action impossible', 'warn'); }
+}
+
+async function renderSend(toUid, toName) {
+  const box = root.querySelector('.ct-body.send'), m = me();
+  if (!m) { box.innerHTML = '<p class="ct-empty">Crée un compte (ou connecte-toi) pour envoyer des KE à un autre joueur.</p>'; return; }
+  box.innerHTML = '<p class="ct-empty">Chargement…</p>';
+  const [sent, hist] = await Promise.all([cloud.sentToday(m.uid).catch(() => 0), cloud.giftHistory(m.uid).catch(() => [])]);
+  const left = Math.max(0, DAY_MAX - sent / 100);
+  box.innerHTML = `
+    <form class="ct-gift">
+      <label>Pseudo du joueur<input name="to" maxlength="16" placeholder="Pseudo exact" value="${toName ? esc(toName) : ''}" ${toUid ? `data-uid="${esc(toUid)}"` : ''} autocomplete="off"></label>
+      <label>Montant (KE)<input name="amt" type="number" inputmode="numeric" min="${GIFT_MIN}" max="${Math.min(GIFT_MAX, left)}" step="1" placeholder="ex. 100"></label>
+      <div class="ct-quick">${[50, 100, 500, 1000].map((v) => `<button type="button" data-q="${v}">${v}</button>`).join('')}</div>
+      <p class="ct-info">Ton solde : <b>${fmt(wallet.cents / 100)}</b> · Encore envoyable aujourd’hui : <b>${fmt(left)}</b></p>
+      <button class="btn primary" ${left < GIFT_MIN ? 'disabled' : ''}>💸 Envoyer</button>
+      <p class="ct-note">Les KE sont de l’argent fictif : les vendre ou les acheter contre de l’argent réel est interdit et entraîne le bannissement.</p>
+    </form>
+    <h4 class="ct-h">Historique</h4>
+    <div class="ct-hist">${hist.length ? hist.map((g) => `<div class="${g.from === m.uid ? 'out' : 'in'}"><span>${g.from === m.uid ? `→ ${esc(g.toName)}` : `← ${esc(g.fromName)}`}</span><b>${g.from === m.uid ? '−' : '+'}${fmt(g.amount / 100)}</b></div>`).join('') : '<p class="ct-empty">Aucun envoi pour l’instant.</p>'}</div>`;
+  const f = box.querySelector('.ct-gift');
+  f.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => { f.amt.value = b.dataset.q; }));
+  f.to.addEventListener('input', () => { delete f.to.dataset.uid; });
+  f.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const amt = Math.floor(+f.amt.value || 0), cents = amt * 100;
+    if (amt < GIFT_MIN) return toast('Choisis un montant', 'warn');
+    if (amt > GIFT_MAX || amt > left) return toast(`Maximum ${fmt(Math.min(GIFT_MAX, left))} aujourd’hui`, 'warn');
+    if (cents > wallet.cents) return toast('Solde insuffisant', 'warn');
+    let uid = f.to.dataset.uid, name = f.to.value.trim();
+    name = name.slice(0, 16);
+    if (!uid) {
+      const found = await cloud.findPlayer(name).catch(() => []);
+      if (!found.length) return toast('Aucun joueur avec ce pseudo (il doit avoir un compte)', 'warn');
+      ({ uid, name } = found[0]);
+    }
+    if (uid === m.uid) return toast('Tu ne peux pas t’envoyer des KE à toi-même', 'warn');
+    const ok = await modal(`<h3>Envoyer ${fmt(amt)} à ${esc(name)} ?</h3><p class="muted">Les KE quittent ton solde tout de suite et arrivent chez ${esc(name)} à sa prochaine connexion.</p><div class="ct-menu"><button class="btn primary" data-value="ok">Confirmer</button><button class="btn" data-value="">Annuler</button></div>`);
+    if (ok !== 'ok') return;
+    const btn = f.querySelector('.btn.primary'); btn.disabled = true;
+    try {
+      profiles.current.bal = wallet.cents;
+      await cloud.sendGift(m, profiles.current, uid, name, cents);
+      wallet.cents -= cents; wallet.save();
+      toast(`💸 ${fmt(amt)} envoyés à ${esc(name)}`, 'ok');
+      cloud.sendChat(m.uid, m.name, `💸 a dépanné ${name} de ${amt} KE`).catch(() => {});
+      renderSend();
+    } catch (err) { console.error(err); toast('Envoi refusé : réessaie dans un instant', 'warn'); btn.disabled = false; }
+  });
+}
+
+return { mountChat };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -11028,6 +11301,7 @@ route();
 mountHud();
 mountLikes();
 mountAdBar();
+__mods['chat.js'].mountChat();
 registerSW();
 // Starts downloading a game as soon as the player points at (or touches) its card.
 const warm = (e) => { const a = e.target.closest?.('a[href^="#game-"]'); if (a) prefetch(a.getAttribute('href').slice(6)); };
