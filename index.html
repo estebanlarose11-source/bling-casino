@@ -249,6 +249,11 @@ section { margin-bottom: 28px; }
 /* update poster on the category pages */
 .upd-hero { background: radial-gradient(520px 320px at 78% 35%, color-mix(in srgb, var(--ua) 40%, transparent), transparent 70%), linear-gradient(135deg, color-mix(in srgb, var(--ub) 70%, #000) 0%, #0b0a0b 75%);
   border-color: color-mix(in srgb, var(--ua) 55%, transparent); box-shadow: var(--shadow), inset 0 0 80px color-mix(in srgb, var(--ua) 18%, transparent); }
+.upd-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.upd-bg svg { position: absolute; inset: -4%; width: 108%; height: 108%; filter: blur(3px) brightness(.62) saturate(1.15); }
+.upd-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 8, 9, .94) 0%, rgba(10, 8, 9, .78) 38%, rgba(10, 8, 9, .25) 72%, rgba(10, 8, 9, .45) 100%), linear-gradient(0deg, rgba(10, 8, 9, .55), transparent 40%); }
+.upd-hero .hero-art { z-index: 1; }
+@media (max-width: 760px) { .upd-bg::after { background: linear-gradient(0deg, rgba(10, 8, 9, .92) 0%, rgba(10, 8, 9, .66) 55%, rgba(10, 8, 9, .3) 100%); } }
 .upd-hero .upd-eye { color: #fff; background: var(--ua); padding: 5px 10px; border-radius: 3px; letter-spacing: 1px; box-shadow: 0 0 18px color-mix(in srgb, var(--ua) 60%, transparent); }
 .upd-hero h1 em { background: linear-gradient(90deg, #fff, var(--ua)); -webkit-background-clip: text; background-clip: text; }
 .upd-list { list-style: none; margin: 14px 0 22px; padding: 0; display: grid; gap: 7px; color: #d6dbe6; font-size: 14px; }
@@ -8028,6 +8033,7 @@ function renderLobby(root, params = {}) {
   const hero = upd ? `
     <section class="hero">
       <div class="hero-main upd-hero" style="--ua:${ug.colors[0]};--ub:${ug.colors[1]}">
+        <div class="upd-bg" aria-hidden="true">${coverSVG(ug, { cls: 'cover upd-bg-art', badge: false }).replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ')}</div>
         <div class="hero-copy">
           <span class="eyebrow upd-eye">${upd.isNew ? '✨ Nouveau jeu' : '🆕 Mise à jour'} · ${fmtDate(upd.date)}</span>
           <h1>${ug.name}<br><em>${upd.title}</em></h1>
