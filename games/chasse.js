@@ -121,8 +121,10 @@ class ChasseGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.chasse, cls: 'ch-slot',
-      stage: `<div class="ch-logo"><b>THE HUNT</b><span><i>${SHELL}×3</i> la chasse<small> · 3 tirs</small> <em>✦</em> <i>${SHELL}×4</i> grande chasse<small> · 5 tirs</small></span></div>
+      // decor: ducks flying over the reels, a deer and the golden deer running under them
+      stage: `<div class="ch-sky" aria-hidden="true"><img class="ch-duck d1" src="${src('duck')}" alt="" draggable="false"><img class="ch-duck d2" src="${src('duck')}" alt="" draggable="false"><img class="ch-duck d3" src="${src('duck')}" alt="" draggable="false"></div>
         <div class="ch-reels"><i class="ch-corner tl"></i><i class="ch-corner tr"></i><i class="ch-corner bl"></i><i class="ch-corner br"></i><div class="reels-host"></div></div>
+        <div class="ch-ground" aria-hidden="true"><img class="ch-deer" src="${src('deer2')}" alt="" draggable="false"><img class="ch-golden" src="${src('gold')}" alt="" draggable="false"></div>
         <div class="ht-field" hidden>
           <div class="ht-hud"><span class="ht-shells"></span><span class="ht-time">20<small> s</small></span><span class="ht-sum">×0</span></div>
           <div class="ht-layer"></div><div class="ht-scope">${SCOPE}</div><div class="ht-banner"></div>
@@ -132,7 +134,7 @@ class ChasseGame extends BaseGame {
         { id: 'h3', icon: '🎯', label: 'La Chasse · 3 cartouches', desc: '3 tirs, chaque animal touché paie ×2 à ×250 la mise', cost: (b) => b * BUY3 },
         { id: 'h5', icon: '🦌', label: 'La Grande Chasse · 5 cartouches', desc: '5 tirs, et le cerf doré peut passer (×500)', cost: (b) => b * BUY5 },
       ],
-      hello: '243 façons de gagner · 3 cartouches = la chasse, 4 cartouches = la grande chasse',
+      hello: '\u00a0', // no text at rest: only the wins are written
     });
     this.reels = new Reels(this.q('.reels-host'), {
       cols: COLS, rows: ROWS, game: this, random: (c) => (Math.random() < P.scat / 3 ? SCAT : sym(c)),
@@ -200,7 +202,7 @@ class ChasseGame extends BaseGame {
     const big = shots === 5;
     await this.featureIntro(big ? 'LA GRANDE CHASSE' : 'LA CHASSE', `${shots} cartouches · ${HUNT_S[shots]} secondes · chaque animal touché paie ×2 à ×250 la mise${big ? ' · le cerf doré vaut ×500 !' : ''}`, SHELL);
     if (this.dead) return 0;
-    this.q('.ch-reels').hidden = true; this.q('.ch-logo').hidden = true; this.field.hidden = false;
+    this.qa('.ch-reels, .ch-sky, .ch-ground').forEach((n) => { n.hidden = true; }); this.field.hidden = false;
     this.slotEl.classList.add('in-free', 'ht-on');
     this.focusStage?.();
     this.setTod(Math.floor(Math.random() * 3));
@@ -220,7 +222,7 @@ class ChasseGame extends BaseGame {
     const won = Math.min(Math.round(sum * b), capLeft);
     await this.wait(2400);
     cancelAnimationFrame(this.raf);
-    this.field.hidden = true; this.q('.ch-reels').hidden = false; this.q('.ch-logo').hidden = false;
+    this.field.hidden = true; this.qa('.ch-reels, .ch-sky, .ch-ground').forEach((n) => { n.hidden = false; });
     this.slotEl.classList.remove('in-free', 'ht-on');
     if (won > 0) { this.win(won, big ? 'Grande chasse' : 'Chasse'); this.setLast(won); }
     await this.celebrate(won, { summary: big ? 'GRANDE CHASSE' : 'LA CHASSE', stake: b });
