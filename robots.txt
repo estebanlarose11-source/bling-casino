@@ -3,3 +3,4 @@ Allow: /
 Disallow: /dist/
 
 Sitemap: https://www.spinbetcaz.com/sitemap.xml
+Sitemap: https://www.spinbetcaz.com/sitemap.txt

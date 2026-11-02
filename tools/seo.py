@@ -122,5 +122,6 @@ urls = [(f'{SITE}/', '1.0', 'daily'), (f'{SITE}/jeux/', '0.9', 'weekly')] + [(f'
 xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + ''.join(
     f'  <url><loc>{u}</loc><lastmod>{today}</lastmod><changefreq>{f}</changefreq><priority>{p}</priority></url>\n' for u, p, f in urls) + '</urlset>\n'
 (root / 'sitemap.xml').write_text(xml, encoding='utf8')
-(root / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /dist/\n\nSitemap: {SITE}/sitemap.xml\n', encoding='utf8')
-print(f'SEO : {len(games)} pages de jeux, jeux/index.html, sitemap.xml ({len(urls)} adresses), robots.txt')
+(root / 'sitemap.txt').write_text(''.join(f'{u}\n' for u, _, _ in urls), encoding='utf8')  # the same list, one address per line
+(root / 'robots.txt').write_text(f'User-agent: *\nAllow: /\nDisallow: /dist/\n\nSitemap: {SITE}/sitemap.xml\nSitemap: {SITE}/sitemap.txt\n', encoding='utf8')
+print(f'SEO : {len(games)} pages de jeux, jeux/index.html, sitemap.xml + sitemap.txt ({len(urls)} adresses), robots.txt')
