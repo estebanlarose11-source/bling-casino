@@ -2016,10 +2016,10 @@ body.ct-hide .ct-fab, body.ct-hide .ct-panel { display: none; }
 .ct-gift label { display: flex; flex-direction: column; gap: 4px; font: 700 12px Inter, sans-serif; color: #cbd5e1; }
 .ct-gift input { padding: 10px 12px; border-radius: 3px; border: 1px solid rgba(255, 255, 255, .12); background: #0a0809; color: #fff; font: 600 15px Inter, sans-serif; }
 .ct-quick { display: flex; gap: 6px; } .ct-quick button { flex: 1; padding: 8px 0; border-radius: 3px; border: 1px solid rgba(253, 224, 71, .35); background: rgba(253, 224, 71, .08); color: #fde68a; font: 800 13px Inter, sans-serif; cursor: pointer; }
-.ct-info { margin: 0; font: 500 12px Inter, sans-serif; color: #94a3b8; } .ct-info b { color: #fde68a; }
+.ct-info { margin: 0; font: 500 12px KeCoin, Inter, sans-serif; color: #94a3b8; } .ct-info b { color: #fde68a; }
 .ct-note { margin: 0; font: 500 11px Inter, sans-serif; color: #64748b; }
 .ct-h { margin: 16px 0 6px; font: 800 13px Inter, sans-serif; color: #e2e8f0; }
-.ct-hist > div { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, .06); font: 600 13px Inter, sans-serif; color: #cbd5e1; }
+.ct-hist > div { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, .06); font: 600 13px KeCoin, Inter, sans-serif; color: #cbd5e1; }
 .ct-hist .in b { color: #4ade80; } .ct-hist .out b { color: #f87171; }
 .ct-menu { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 /* above the ad bar when it is shown */
@@ -3305,6 +3305,17 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .intro-glyph .pz-img { width: 130px; height: 130px; object-fit: contain; }
 @media (prefers-reduced-motion: reduce) { .pz-cell.win .pz-img, .pz-cell.scat .pz-img, .pz-cell.fire .pz-img { animation: none; } }
 
+/* ============ Fiche joueur (clic sur un pseudo) ============ */
+.pname { cursor: pointer; text-decoration: underline transparent; text-underline-offset: 3px; transition: color .15s, text-decoration-color .15s; }
+.pname:hover, .pname:focus-visible { color: #fde68a; text-decoration-color: currentColor; outline: none; }
+.pc-head { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; padding-right: 28px; }
+.pc-head h3 { margin: 0; font-size: 22px; overflow-wrap: anywhere; } .pc-rank { color: var(--muted); font-weight: 600; }
+.pc-badge { width: 56px; height: 56px; flex: none; }
+.pc-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+.pc-stats > div { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; padding: 10px 12px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 3px; }
+.pc-stats span { grid-row: span 2; font-size: 20px; } .pc-stats small { color: var(--muted); font-size: 11px; letter-spacing: .5px; text-transform: uppercase; font-weight: 700; } .pc-stats b { font-size: 16px; }
+.pc-stats p { grid-column: 1 / -1; margin: 0; }
+@media (max-width: 380px) { .pc-stats { grid-template-columns: 1fr; } }
 /* ============ Daily missions ============ */
 .missions-page h1 { margin: 6px 0 8px; font-size: clamp(26px, 4vw, 36px); }
 .ms-list { display: grid; gap: 10px; margin: 16px 0; }
@@ -5556,7 +5567,7 @@ async function renderChallenge(root) {
     </section>`;
   root.querySelectorAll('[data-cat]').forEach((b) => { b.onclick = () => { tab = b.dataset.cat; try { localStorage.setItem('defi_tab', tab); } catch { /* ignore */ } renderChallenge(root); }; });
   const medal = (k) => (k === 0 ? '🥇' : k === 1 ? '🥈' : k === 2 ? '🥉' : `${k + 1}.`);
-  const row = (e, k, moved) => `<li class="${e.uid === uid() ? 'me' : ''}${moved ? ' up' : ''}"><span>${medal(k)}</span><b>${esc(e.name)}</b>${moved ? '<i class="defi-up">▲</i>' : ''}<em>${xs(e.best)}</em><small class="defi-prz">${k < 10 ? '+' + fmt(C.prizes[k]) : ''}</small></li>`;
+  const row = (e, k, moved) => `<li class="${e.uid === uid() ? 'me' : ''}${moved ? ' up' : ''}"><span>${medal(k)}</span><b class="pname" data-player="${esc(e.uid || '')}" data-pname="${esc(e.name)}" role="button" tabindex="0">${esc(e.name)}</b>${moved ? '<i class="defi-up">▲</i>' : ''}<em>${xs(e.best)}</em><small class="defi-prz">${k < 10 ? '+' + fmt(C.prizes[k]) : ''}</small></li>`;
   const paint = (list, prev) => {
     const ol = root.querySelector('[data-board]'); if (!ol) return;
     ol.innerHTML = list.length ? list.map((e, k) => { const pk = prev ? prev.findIndex((x) => x.uid === e.uid) : k; return row(e, k, prev && (pk < 0 || pk > k)); }).join('') : '<li class="muted">Personne pour l’instant : sois le premier !</li>';
@@ -10751,7 +10762,7 @@ function renderLeaderboard(root) {
         <li class="lb-row${e.uid === me ? ' me' : ''}${i < 3 ? ' podium' : ''}">
           <span class="lb-pos">${MEDAL[i] || i + 1}</span>
           <span class="lb-badge">${rankBadge(rankOf(e.level || 1), 30)}</span>
-          <span class="lb-name"><b>${esc(e.name || 'Joueur')}</b><small>${rankOf(e.level || 1).name}${b.id === 'level' ? '' : ` · Niv. ${e.level || 1}`}</small></span>
+          <span class="lb-name"><b class="pname" data-player="${esc(e.uid || '')}" data-pname="${esc(e.name || 'Joueur')}" role="button" tabindex="0">${esc(e.name || 'Joueur')}</b><small>${rankOf(e.level || 1).name}${b.id === 'level' ? '' : ` · Niv. ${e.level || 1}`}</small></span>
           <span class="lb-val">${b.value(e)}</span>
         </li>`).join('') : '<li class="lb-msg">Personne pour l’instant : à toi de jouer !</li>';
     } catch (e) {
@@ -10962,7 +10973,7 @@ async function loadTop(list) {
       <li class="lb-row${e.uid === me ? ' me' : ''}${i < 3 ? ' podium' : ''}">
         <span class="lb-pos">${['🥇', '🥈', '🥉'][i] || i + 1}</span>
         <span class="lb-badge">${rankBadge(rankOf(e.level || 1), 30)}</span>
-        <span class="lb-name"><b>${esc(e.name || 'Joueur')}</b><small>Niv. ${e.level || 1}</small></span>
+        <span class="lb-name"><b class="pname" data-player="${esc(e.uid || '')}" data-pname="${esc(e.name || 'Joueur')}" role="button" tabindex="0">${esc(e.name || 'Joueur')}</b><small>Niv. ${e.level || 1}</small></span>
         <span class="lb-val">${e.ach} pts</span>
       </li>`).join('') : '<li class="lb-msg">Personne pour l’instant : récupère tes premiers succès !</li>';
   } catch (err) { console.error(err); if (list.isConnected) list.innerHTML = '<li class="lb-msg">Classement indisponible pour le moment.</li>'; }
@@ -11006,7 +11017,7 @@ function mountChat() {
   root.querySelector('.ct-x').addEventListener('click', () => toggle(false));
   root.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
   root.querySelector('.ct-form').addEventListener('submit', (e) => { e.preventDefault(); send(); });
-  list.addEventListener('click', (e) => { const n = e.target.closest('[data-uid]'); if (n) playerMenu(n.dataset.uid, n.dataset.name, n.dataset.id); });
+  list.addEventListener('click', (e) => { const n = e.target.closest('[data-uid]'); if (n) openPlayer(n.dataset.uid, n.dataset.name, { msgId: n.dataset.id }); });
   profiles.addEventListener('change', () => setTimeout(onUser, 300));
   profiles.ready?.then(onUser);
   // the chat stays out of the way during full-screen play
@@ -11074,21 +11085,50 @@ async function send() {
   btn.disabled = false; inp.focus();
 }
 
-async function playerMenu(uid, name, id) {
-  const m = me(), self = m && uid === m.uid;
-  const btns = [];
-  if (m && !self) btns.push(`<button class="btn primary" data-value="gift">💸 Envoyer des KE à ${esc(name)}</button>`);
-  if (admin || self) btns.push('<button class="btn" data-value="del">🗑️ Supprimer ce message</button>');
-  if (admin && !self) btns.push(`<button class="btn" data-value="mute">🔇 Rendre muet</button><button class="btn" data-value="unmute">🔈 Enlever le muet</button>`);
-  if (!btns.length) return;
-  const r = await modal(`<h3>${esc(name)}</h3><div class="ct-menu">${btns.join('')}</div>`);
+// Player card: opens from any pseudo on the site (chat, leaderboards, weekly challenge — any element with
+// data-player="<uid>" data-pname="<name>"): public profile from the leaderboard, send KE, answer in the chat,
+// and the moderator tools.
+async function openPlayer(uid, name, { msgId = null } = {}) {
+  if (!uid) return;
+  const m = me(), self = !!m && uid === m.uid;
+  const { rankBadge, rankOf } = __mods['progress.js'];
+  const acts = [];
+  if (self) acts.push('<button class="btn" data-value="me">👤 Voir mon profil</button>');
+  else if (m) acts.push('<button class="btn primary" data-value="gift">💸 Envoyer des KE</button><button class="btn" data-value="at">💬 Lui répondre dans le chat</button>');
+  else acts.push('<p class="muted small">Crée un compte (ou connecte-toi) pour envoyer des KE ou écrire dans le chat.</p>');
+  if (msgId && (admin || self)) acts.push('<button class="btn" data-value="del">🗑️ Supprimer ce message</button>');
+  if (admin && !self) acts.push('<button class="btn" data-value="mute">🔇 Rendre muet</button><button class="btn" data-value="unmute">🔈 Enlever le muet</button>');
+  const done = modal(`<div class="pc"><div class="pc-head"><span class="pc-badge"></span><div><h3>${esc(name || 'Joueur')}</h3><small class="pc-rank">Chargement du profil…</small></div></div>
+    <div class="pc-stats"></div><div class="ct-menu pc-acts">${acts.join('')}</div></div>`, { cls: 'pc-modal' });
+  const card = [...document.querySelectorAll('.pc-modal')].pop();
+  cloud.boardOf(uid).then((e) => {
+    if (!card?.isConnected) return;
+    const lv = e?.level || 1, rk = rankOf(lv);
+    card.querySelector('.pc-badge').innerHTML = rankBadge(rk, 56);
+    card.querySelector('.pc-rank').textContent = `${rk.name} · Niveau ${lv}`;
+    const st = (ico, label, v) => `<div><span>${ico}</span><small>${label}</small><b>${v}</b></div>`;
+    card.querySelector('.pc-stats').innerHTML = e ? [
+      st('💰', 'Solde', fmt(e.bal || 0)), st('💥', 'Plus gros gain', fmt(e.best || 0)),
+      st('🎁', 'Plus gros bonus', fmt(e.bestBonus || 0)), st('🏅', 'Succès', `${e.ach || 0} pts`),
+    ].join('') : '<p class="muted small">Ce joueur n’a pas encore de profil public.</p>';
+  }).catch(() => { if (card?.isConnected) card.querySelector('.pc-rank').textContent = 'Profil indisponible'; });
+  const r = await done;
   try {
-    if (r === 'gift') { setTab('send'); renderSend(uid, name); }
-    if (r === 'del') { await cloud.deleteChat(id); toast('Message supprimé'); }
+    if (r === 'me') location.hash = '#profil';
+    if (r === 'gift' || r === 'at') {
+      if (!root) return toast('Le chat n’est pas disponible pour le moment', 'warn');
+      toggle(true);
+      if (r === 'gift') { setTab('send'); renderSend(uid, name); }
+      else { setTab('chat'); const inp = root.querySelector('.ct-form input'); inp.value = `@${name} `; inp.focus(); }
+    }
+    if (r === 'del') { await cloud.deleteChat(msgId); toast('Message supprimé'); }
     if (r === 'mute') { await cloud.setMute(uid, true, m.uid); toast(`${esc(name)} ne peut plus écrire`); }
     if (r === 'unmute') { await cloud.setMute(uid, false, m.uid); toast(`${esc(name)} peut de nouveau écrire`); }
   } catch (e) { console.error(e); toast('Action impossible', 'warn'); }
 }
+const pick = (e) => { const n = e.target.closest('[data-player]'); if (!n || !n.dataset.player || !cloud.enabled) return; e.preventDefault(); openPlayer(n.dataset.player, n.dataset.pname); };
+document.addEventListener('click', pick);
+document.addEventListener('keydown', (e) => { if (e.key === 'Enter') pick(e); });
 
 async function renderSend(toUid, toName) {
   const box = root.querySelector('.ct-body.send'), m = me();
@@ -11138,7 +11178,7 @@ async function renderSend(toUid, toName) {
   });
 }
 
-return { mountChat };
+return { mountChat, openPlayer };
 })();
 
 // ---- main.js ----
