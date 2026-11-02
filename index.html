@@ -252,7 +252,16 @@ section { margin-bottom: 28px; }
 .upd-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 .upd-bg svg { position: absolute; inset: -4%; width: 108%; height: 108%; filter: blur(3px) brightness(.62) saturate(1.15); }
 .upd-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 8, 9, .94) 0%, rgba(10, 8, 9, .78) 38%, rgba(10, 8, 9, .25) 72%, rgba(10, 8, 9, .45) 100%), linear-gradient(0deg, rgba(10, 8, 9, .55), transparent 40%); }
-.upd-hero .hero-art { z-index: 1; }
+.upd-hero .hero-art, .hero-main.has-bg .hero-art { z-index: 1; }
+.hero-main.has-bg::before, .hero-main.has-bg::after { display: none; }
+.cv-bg { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; border-radius: inherit; }
+.cv-bg svg { position: absolute; inset: -6%; width: 112%; height: 112%; filter: blur(2px) brightness(.7) saturate(1.15); transition: transform .4s; }
+.cv-bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10, 8, 9, .82) 0%, rgba(10, 8, 9, .62) 45%, rgba(10, 8, 9, .35) 100%); }
+.promo-tile, .app-promo { position: relative; overflow: hidden; }
+.promo-tile > :not(.cv-bg), .app-promo > :not(.cv-bg) { position: relative; z-index: 1; }
+.promo-tile:hover .cv-bg svg, .app-promo:hover .cv-bg svg { transform: scale(1.05); }
+.promo-tile:has(.cv-bg) b, .app-promo:has(.cv-bg) b { text-shadow: 0 1px 3px rgba(0, 0, 0, .8); }
+.promo-tile:has(.cv-bg) small, .app-promo:has(.cv-bg) small { color: #d6d3d1; }
 @media (max-width: 760px) { .upd-bg::after { background: linear-gradient(0deg, rgba(10, 8, 9, .92) 0%, rgba(10, 8, 9, .66) 55%, rgba(10, 8, 9, .3) 100%); } }
 .upd-hero .upd-eye { color: #fff; background: var(--ua); padding: 5px 10px; border-radius: 3px; letter-spacing: 1px; box-shadow: 0 0 18px color-mix(in srgb, var(--ua) 60%, transparent); }
 .upd-hero h1 em { background: linear-gradient(90deg, #fff, var(--ua)); -webkit-background-clip: text; background-clip: text; }
@@ -2678,7 +2687,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .promos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 10px; margin: 0 0 14px; }
 .promos:empty { display: none; }
 .promos .app-promo { margin: 0; min-width: 0; }
-.promos .app-promo > span:nth-child(2) { min-width: 0; }
+.promos .app-promo > span:not(.wp-ico) { min-width: 0; }
+.app-promo .wp-ico { flex: none; }
 .promos .app-promo small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ms-promo .wp-ico { animation: none; }
 .defi-promo { background: linear-gradient(90deg, rgba(56, 189, 248, .18), rgba(124, 58, 237, .14)); border-color: rgba(56, 189, 248, .45); }
@@ -7999,6 +8009,9 @@ const row = (title, list, more) => `
     <div class="game-row">${list.map(gameCard).join('')}</div>
   </section>`;
 
+// A game's cover as the background of a promo block (blurred and darkened under the text).
+const bgArt = (g, cls = 'cv-bg') => (g ? `<i class="${cls}" aria-hidden="true">${coverSVG(g, { cls: 'cover', badge: false }).replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ')}</i>` : '');
+
 function renderLobby(root, params = {}) {
   const filter = params.filter || 'all';
   const wolf = GAMES[0];
@@ -8006,7 +8019,7 @@ function renderLobby(root, params = {}) {
   const h = wallet.state.history;
   const tile = (id, cls) => {
     const g = getGame(id);
-    return `<a class="promo-tile ${cls}" href="#game-${g.id}" style="--accent:${g.colors[0]}">
+    return `<a class="promo-tile ${cls}" href="#game-${g.id}" style="--accent:${g.colors[0]}">${bgArt(g)}
       <span class="tile-art">${thumbArt(g, { square: true })}</span>
       <div><b>${g.name}</b><small>${g.sub}</small></div></a>`;
   };
@@ -8026,7 +8039,7 @@ function renderLobby(root, params = {}) {
   const upd = ups[0], ug = upd && getGame(upd.game);
   const updTile = (u, k) => {
     const g = getGame(u.game);
-    return `<a class="promo-tile p${k + 1}" href="#game-${g.id}" style="--accent:${g.colors[0]}">
+    return `<a class="promo-tile p${k + 1}" href="#game-${g.id}" style="--accent:${g.colors[0]}">${bgArt(g)}
       <span class="tile-art">${thumbArt(g, { square: true })}</span>
       <div><b>${g.name}</b><small>${u.isNew ? 'Nouveau' : 'Mise à jour'} · ${fmtDate(u.date)}</small><small class="upd-sub">${u.title}</small></div></a>`;
   };
@@ -8049,7 +8062,7 @@ function renderLobby(root, params = {}) {
 
   root.innerHTML = `
     ${hero || `<section class="hero">
-      <div class="hero-main theme-wolf">
+      <div class="hero-main theme-wolf has-bg">${bgArt(wolf, 'upd-bg')}
         <div class="hero-copy">
           <span class="eyebrow">Nouveau · ${BRAND.provider}</span>
           <h1>Le Loup<br><em>Huff & Spin</em></h1>
@@ -8066,9 +8079,9 @@ function renderLobby(root, params = {}) {
     </section>`}
 
     <div class="promos">
-    ${filter === 'all' && profilesReady() ? (() => { const m = missionStatus(), n = m.rows.filter((r) => r.claimed).length; return m.chest ? '' : `<a class="app-promo ms-promo" href="#missions"><span class="wp-ico">🎯</span><span><b>Missions du jour · ${n} / 3</b><small>${m.toClaim ? `${m.toClaim} récompense${m.toClaim > 1 ? 's' : ''} à récupérer !` : m.rows.map((r) => r.text).join(' · ')}</small></span><em>${m.toClaim ? 'Récupérer' : 'Voir'}</em></a>`; })() : ''}
-    ${filter === 'all' ? `<a class="app-promo defi-promo" href="#defi"><span class="wp-ico">🏁</span><span><b>3 Défis de la semaine · machines à sous : ${getGame(challengeGame()).name}</b><small data-leader>100 000\u00a0\uE1E0 au n°1</small></span><em>Participer</em></a>` : ''}
-    ${filter === 'all' && wheelReady() ? `<a class="app-promo wheel-promo" href="#roue"><span class="wp-ico">🎡</span><span><b>Ta Roue du jour est prête !</b><small>Un tour gratuit : KE, XP ou bonus offert</small></span><em>Tourner</em></a>` : ''}
+    ${filter === 'all' && profilesReady() ? (() => { const m = missionStatus(), n = m.rows.filter((r) => r.claimed).length; return m.chest ? '' : `<a class="app-promo ms-promo" href="#missions">${bgArt(getGame((m.rows.find((r) => !r.claimed && r.game) || UPDATES[0] || {}).game))}<span class="wp-ico">🎯</span><span><b>Missions du jour · ${n} / 3</b><small>${m.toClaim ? `${m.toClaim} récompense${m.toClaim > 1 ? 's' : ''} à récupérer !` : m.rows.map((r) => r.text).join(' · ')}</small></span><em>${m.toClaim ? 'Récupérer' : 'Voir'}</em></a>`; })() : ''}
+    ${filter === 'all' ? `<a class="app-promo defi-promo" href="#defi">${bgArt(getGame(challengeGame()))}<span class="wp-ico">🏁</span><span><b>3 Défis de la semaine · machines à sous : ${getGame(challengeGame()).name}</b><small data-leader>100 000\u00a0\uE1E0 au n°1</small></span><em>Participer</em></a>` : ''}
+    ${filter === 'all' && wheelReady() ? `<a class="app-promo wheel-promo" href="#roue">${bgArt(getGame('roueor'))}<span class="wp-ico">🎡</span><span><b>Ta Roue du jour est prête !</b><small>Un tour gratuit : KE, XP ou bonus offert</small></span><em>Tourner</em></a>` : ''}
     ${filter === 'all' && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone) ? `<a class="app-promo" href="#appli"><img src="assets/icon-192.png" alt="" width="44" height="44"><span><b>Installe l’appli SpinBet</b><small>Plein écran, sur ton écran d’accueil · iPhone et Android</small></span><em>Installer</em></a>` : ''}
     </div>
 
