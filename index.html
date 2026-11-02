@@ -3263,6 +3263,68 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .mb-spot.hit { animation: jpHit .9s cubic-bezier(.3, 1.8, .5, 1); box-shadow: 0 0 0 3px #fff, 0 0 24px var(--bc); }
 @media (max-width: 600px) { .mb-spots { grid-template-columns: repeat(3, 1fr); } }
 
+/* ============ La Chasse ============ */
+.g-chasse { --slot-bg: radial-gradient(600px 300px at 50% -10%, rgba(190, 242, 100, .22), transparent 70%), linear-gradient(180deg, #16260a 0%, #070c04 100%); }
+.ht-field { position: relative; width: min(100%, calc((100dvh - 520px) * 16 / 9)); min-width: min(100%, 260px); aspect-ratio: 16 / 9; margin: 0 auto; overflow: hidden; border-radius: 3px; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+  background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 70%); --sky1: #60a5fa; --sky2: #dbeafe; --hill2: #4d7c0f; --hill1: #3f6212; --pine: #1a3a0c; --grass: #4d7c0f; --blade: #65a30d; --sun: #fde047; transition: --sky1 .6s; }
+.ht-field.t1 { --sky1: #7c2d12; --sky2: #fdba74; --hill2: #3f4a14; --hill1: #2f3a0c; --pine: #14200a; --grass: #3f5a0c; --blade: #4d7c0f; --sun: #fb923c; }
+.ht-field.t2 { --sky1: #020617; --sky2: #1e3a5f; --hill2: #142414; --hill1: #0f1d0c; --pine: #050c04; --grass: #1a3a0c; --blade: #23490f; }
+.ht-field.ht-on, .slot.ht-on .ht-field { cursor: crosshair; }
+@media (max-width: 600px) { .ht-field { aspect-ratio: 4 / 3; } }
+.ht-scene { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.ht-sun { fill: var(--sun); } .ht-moon { fill: #f1f5f9; opacity: 0; } .ht-stars { fill: #fff; opacity: 0; }
+.t2 .ht-sun { opacity: 0; } .t2 .ht-moon { opacity: .9; } .t2 .ht-stars { opacity: .8; }
+.ht-hill2 { fill: var(--hill2); } .ht-hill1 { fill: var(--hill1); } .ht-pines { fill: var(--pine); } .ht-grass { fill: var(--grass); } .ht-blades { fill: var(--blade); }
+.ht-o { position: absolute; z-index: 3; pointer-events: none; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .35)); }
+.ht-o svg { width: 100%; height: 100%; display: block; }
+.t2 .ht-o, .t2 .ht-animal:not(.gold) { filter: brightness(.75) drop-shadow(0 3px 3px rgba(0, 0, 0, .35)); }
+.ht-animal { position: absolute; z-index: 2; translate: -50% -50%; pointer-events: none; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .35)); }
+.ht-animal svg { width: 100%; height: auto; display: block; overflow: visible; }
+.ht-animal.gold svg { filter: sepia(1) saturate(4) hue-rotate(-8deg) brightness(1.25) drop-shadow(0 0 8px #fde047); }
+.ht-wing { transform-box: fill-box; transform-origin: 30% 90%; animation: htFlap .22s ease-in-out infinite alternate; }
+@keyframes htFlap { to { transform: scaleY(-.55); } }
+.ht-legs { animation: htTrot .18s steps(2) infinite; }
+@keyframes htTrot { 50% { transform: translateY(-1.5px); } }
+.ht-animal.down { animation: htDown .9s ease-in forwards; }
+.ht-animal.sky.down { animation: htFall 1s ease-in forwards; }
+@keyframes htDown { 30% { rotate: -14deg; } 100% { rotate: 80deg; opacity: 0; translate: -50% -10%; } }
+@keyframes htFall { 20% { rotate: 30deg; } 100% { rotate: 160deg; top: 92%; opacity: 0; } }
+.ht-animal.down .ht-wing, .ht-animal.down .ht-legs { animation: none; }
+.ht-animal.dodge { animation: htDodge .7s ease-in forwards; }
+.ht-animal.sky.dodge { animation: htDodgeUp .7s ease-in forwards; }
+@keyframes htDodge { 25% { translate: -50% -80%; } 100% { translate: 400% -60%; opacity: 0; } }
+@keyframes htDodgeUp { 100% { translate: 80% -500%; opacity: 0; } }
+.ht-animal.flee { animation: htFlee .8s ease-in forwards; }
+@keyframes htFlee { 100% { translate: 500% -50%; opacity: 0; } }
+.ht-scope { position: absolute; z-index: 5; width: 13%; max-width: 74px; aspect-ratio: 1; translate: -50% -50%; pointer-events: none; opacity: 0; transition: opacity .15s; }
+.ht-scope.on { opacity: 1; }
+.ht-scope svg { width: 100%; height: 100%; filter: drop-shadow(0 0 2px rgba(0, 0, 0, .6)); }
+.ht-shot { position: absolute; z-index: 6; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, #fff 0 10%, #fde047 18%, rgba(251, 146, 60, .7) 34%, rgba(148, 163, 184, .5) 52%, transparent 70%); animation: htShot .8s ease-out forwards; }
+@keyframes htShot { 0% { transform: scale(.3); } 20% { transform: scale(1.1); } 100% { transform: scale(2.4); opacity: 0; filter: grayscale(1); } }
+.ht-field.recoil { animation: htRecoil .18s ease-out; }
+@keyframes htRecoil { 40% { transform: translate(1px, 2px); } }
+.ht-banner { position: absolute; left: 50%; top: 42%; z-index: 7; translate: -50% -50%; display: grid; justify-items: center; gap: 2px; padding: 10px 22px; background: rgba(5, 10, 3, .78); border: 1px solid rgba(190, 242, 100, .45); border-radius: 3px; opacity: 0; pointer-events: none; text-align: center; }
+.ht-banner.on { animation: htBanner 1.3s ease-out both; }
+.ht-banner small { font: 800 11px KeCoin, Inter, sans-serif; letter-spacing: 2px; text-transform: uppercase; color: #bef264; }
+.ht-banner b { font: 900 clamp(22px, 4vw, 36px)/1.1 KeCoin, 'Bebas Neue', Archivo, sans-serif; letter-spacing: 1.5px; color: #fff; }
+.ht-banner span { font: 700 13px KeCoin, Inter, sans-serif; color: #fde68a; }
+@keyframes htBanner { 0% { opacity: 0; scale: .8; } 15% { opacity: 1; scale: 1.04; } 25%, 80% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
+.ht-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 8px 4px 2px; }
+.ht-say { font: 600 14px KeCoin, Inter, sans-serif; color: #e7e5e4; }
+.ht-go { padding: 9px 16px; border-radius: 2px; background: #65a30d; color: #fff; font: 900 13px KeCoin, Archivo, sans-serif; letter-spacing: .5px; }
+.ht-go:disabled { opacity: .35; cursor: default; }
+.ht-ladder { display: grid; grid-template-columns: repeat(10, 1fr); gap: 4px; padding: 8px 4px 2px; }
+.ht-ladder > div { display: grid; justify-items: center; gap: 1px; padding: 5px 2px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(255, 255, 255, .08); border-radius: 2px; min-width: 0; }
+.ht-ladder i { width: 70%; max-width: 34px; } .ht-ladder i svg { width: 100%; height: auto; display: block; }
+.ht-ladder b { font: 800 12px KeCoin, Inter, sans-serif; color: #fff; white-space: nowrap; } .ht-ladder small { font: 600 10px KeCoin, Inter, sans-serif; color: var(--muted); }
+.ht-ladder .done { background: rgba(101, 163, 13, .3); border-color: #84cc16; }
+.ht-ladder .next { border-color: #fde047; box-shadow: inset 0 0 0 1px #fde047; }
+.ht-ladder > div:last-child i svg { filter: sepia(1) saturate(4) brightness(1.2); }
+@media (max-width: 600px) { .ht-ladder { display: flex; overflow-x: auto; scrollbar-width: none; } .ht-ladder > div { flex: 0 0 58px; } .ht-ladder i { width: 26px; } .ht-say { font-size: 12.5px; } .ht-go { padding: 8px 12px; font-size: 12px; } }
+.ht-rules { width: 100%; border-collapse: collapse; margin: 6px 0 10px; font-size: 13px; } .ht-rules th, .ht-rules td { padding: 4px 6px; border-bottom: 1px solid var(--line); text-align: left; }
+.slot.ht-lost .ht-field { box-shadow: inset 0 0 0 3px rgba(248, 113, 113, .6); } .slot.ht-won .ht-field { box-shadow: inset 0 0 0 3px rgba(190, 242, 100, .7); }
+
 /* ============ La Pizza Yo-Yo (id taco) : pizza ronde qui tourne, parts qui s'écartent ============ */
 .g-taco { --slot-bg: radial-gradient(600px 300px at 50% 0%, rgba(251, 146, 60, .3), transparent 70%), linear-gradient(180deg, #3a1608 0%, #120703 100%); }
 .slot.g-taco > .slot-bg { background: linear-gradient(180deg, rgba(20, 8, 2, .55), rgba(20, 8, 2, .35) 40%, rgba(20, 8, 2, .75)), url(assets/games/pizza/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
@@ -7164,6 +7226,7 @@ const ORIGINALS = [
   {"id": "pileface", "name": "La Pièce", "cat": "quick", "tag": "Instantané", "sub": "Double ou rien, jusqu’à 20 fois", "colors": ["#fbbf24", "#1c1404"], "description": "Une pièce, deux faces, et ton gain qui double à chaque bonne prédiction. Lance la série, choisis Pile ou Face jusqu’à 20 fois d’affilée et encaisse quand tu veux : ×1,92 après un lancer, ×3,84 après deux… et plus d’un million de fois la mise après 20 !", "features": ["Jusqu’à 20 lancers", "Gain doublé à chaque fois", "Encaisse quand tu veux", "Vrai 50/50", "Raccourcis clavier P / F"], "rtp": "96 %", "vol": 4, "max": "×1 006 633"},
   {"id": "robots", "name": "La Course", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
   {"id": "poulet", "name": "Le Poulet", "cat": "quick", "tag": "Instantané", "sub": "Traverse la route, voie après voie", "colors": ["#facc15", "#14200c"], "description": "Aide le poulet à traverser la route ! Chaque voie franchie fait grimper le multiplicateur, mais si une voiture arrive, c’est perdu. Choisis ta difficulté et encaisse quand tu veux.", "features": ["4 difficultés", "Jusqu’à 24 voies", "Encaisse quand tu veux", "Multiplicateur à chaque voie"], "rtp": "96 %", "vol": 4, "max": "×2 041"},
+  {"id": "chasse", "name": "La Chasse", "cat": "quick", "tag": "Instantané", "sub": "Vise, tire, encaisse", "colors": ["#84cc16", "#1a2e05"], "description": "Ouvre la saison de chasse ! Canards, lapins, sangliers et cerfs traversent le terrain : clique dessus pour tirer. Chaque tir réussi multiplie ta mise, mais le gibier va de plus en plus vite et se cache derrière les buissons, les murets et les arbres. Encaisse quand tu veux, jusqu’au cerf doré.", "features": ["10 niveaux", "Jusqu’à ×335", "Adresse + chance", "Buissons et obstacles", "Du jour à la nuit", "Encaisser à tout moment"], "rtp": "≈ 95 %", "vol": 4, "max": "×335"},
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Chaque cube posé multiplie ta mise, mais gare aux cubes ratés et aux coups de vent.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Bonus PARFAIT", "Encaisse quand tu veux"], "rtp": "96 % (visée parfaite)", "vol": 4, "max": "×125,8"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
@@ -7543,6 +7606,20 @@ const SPECS = {
         <g fill="#fdba74">${[[40, 60], [260, 50], [90, 30], [220, 150], [30, 170]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.5" opacity=".8"/>`).join('')}</g>`;
     },
   },
+  chasse: {
+    bg: ['#2f4a12', '#071006'], light: '#bef264', title: ['LA CHASSE'], font: 'bebas', metal: ['#fff', '#fde68a', '#65a30d'], tag: 'JUSQU’À ×335',
+    art: (u) => `
+      <circle cx="232" cy="64" r="26" fill="#fde68a" opacity=".85"/>
+      <path d="M-10 230 Q60 196 130 214 Q210 186 310 210 V300 H-10Z" fill="#1f3d10"/>
+      ${[0, 1, 2, 3, 4, 5, 6, 7, 8].map((k) => `<path d="M${k * 38 - 6} 236 L${k * 38 + 8} ${196 - (k % 3) * 10} L${k * 38 + 22} 236Z" fill="#14290a"/>`).join('')}
+      <path d="M-10 250 H310 V300 H-10Z" fill="#2f5a14"/>
+      <g transform="translate(70 70) scale(2.1)" filter="url(#sh${u})">
+        <ellipse cx="34" cy="34" rx="24" ry="13" fill="#8b5a2b"/><ellipse cx="32" cy="38" rx="20" ry="8" fill="#c9a27a"/>
+        <rect x="50" y="18" width="7" height="12" rx="3" fill="#fff"/><circle cx="60" cy="16" r="10" fill="#15803d"/><circle cx="63" cy="13" r="2.2" fill="#111"/>
+        <path d="M68 16 L79 18 L68 21Z" fill="#f59e0b"/><path d="M24 30 Q32 2 48 8 Q44 24 34 32Z" fill="#6b4423" stroke="#3f2810" stroke-width="1.2"/></g>
+      <g transform="translate(150 132)" fill="none" stroke="#fff" stroke-width="4"><circle r="48" stroke-opacity=".9"/><path d="M0 -62 V-20 M0 20 V62 M-62 0 H-20 M20 0 H62"/><circle r="4" fill="#ef4444" stroke="none"/></g>
+      <g transform="translate(40 214) scale(1.5)" filter="url(#sh${u})"><path d="M10 30 Q14 12 40 12 Q66 10 76 20 L90 26 Q98 30 96 36 Q92 42 84 42 Q66 48 40 48 Q14 48 10 30Z" fill="#4a3324"/><path d="M86 38 Q90 30 92 26" stroke="#fffbeb" stroke-width="3" stroke-linecap="round" fill="none"/><circle cx="80" cy="24" r="2.4" fill="#111"/></g>`,
+  },
   poulet: {
     bg: ['#3a3a0a', '#06070a'], light: '#facc15', title: ['LE POULET'], font: 'bebas', metal: ['#fff', '#fde047', '#ca8a04'], tag: 'JUSQU’À ×2 041',
     art: (u) => `
@@ -7641,7 +7718,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
+  chasse: ['#65a30d', '#14532d'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
 };
 
 // Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
@@ -7757,6 +7834,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'chasse', date: '2026-11-02', title: 'Nouveau jeu : La Chasse', isNew: true, items: ['Clique sur le gibier pour tirer : canards, lapins, sangliers, cerfs', 'Chaque tir réussi multiplie ta mise, encaisse quand tu veux', 'Attention aux buissons, murets et arbres : le gibier s’y cache', '10 niveaux du jour à la nuit, jusqu’au cerf doré ×335'] },
   { game: 'taco', date: '2026-11-02', title: 'Nouveau jeu : La Pizza Yo-Yo', isNew: true, items: ['La Fiesta devient La Pizza Yo-Yo : une pizza ronde qui tourne', '4 symboles qui se touchent gagnent, les grosses connexions écartent une part', 'Food trucks multiplicateurs jusqu’à ×50', 'Bonus Le Four : 4 pepperonis = une part de plus et +2 tours'] },
   { game: 'pharaon', date: '2026-11-02', title: 'Le Totem illustré', items: ['Nouveaux symboles peints : masque du pharaon, faucon, ankh d’or, cobra, scarabée, amphore', 'Nouveau soleil scatter', 'Nouveau décor : le pharaon à l’orbe (et le pharaon sur son trône sur téléphone)', 'Nouvelle jaquette']},
   { game: 'billets', date: '2026-11-01', title: 'Nouveaux billets', items: ['Nouvelle jaquette : la montagne de billets', 'Nouveaux billets de 5 à 200 KE, nouvelle mallette, billet FREE SPINS et coffre JACKPOT', 'Nouveau décor : la pluie de billets', 'Affichage épuré et plein écran sur tout l’écran'] },
@@ -8758,6 +8836,7 @@ class Music {
 
 // Themes for the games that had no music of their own.
 const EXTRA_THEMES = {
+  chasse: { sd: 0.18, len: 16, root: 196, lead: { wave: 'triangle', vol: 0.05, dur: 0.22, pat: [12, null, 14, 16, null, 19, null, 16, 14, null, 12, null, 9, null, 12, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.3, pat: [-12, null, null, -5, null, null, -12, null, -7, null, null, -5, null, null, -7, null] }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.018 },
   zeus: { sd: 0.24, len: 16, root: 130.81, pad: { wave: 'sawtooth', vol: 0.018, dur: 1.8, map: { 0: [0, 7, 12], 8: [-2, 5, 10] } }, lead: { wave: 'triangle', vol: 0.055, dur: 0.3, pat: [12, null, 15, 19, null, 17, 15, null, 14, null, 17, 22, null, 19, 17, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.5, pat: [-12, null, null, -12, null, null, -5, null, -14, null, null, -14, null, null, -7, null] }, kick: [0, 3, 8, 11], hat: [4, 12], kv: 0.26, hv: 0.02 },
   candy: { sd: 0.16, len: 16, root: 293.66, lead: { wave: 'triangle', vol: 0.06, dur: 0.2, pat: [12, 16, 19, 24, null, 19, 21, null, 17, 21, 24, 29, null, 24, 19, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.28, pat: [-12, null, -5, null, -12, null, -5, null, -7, null, 0, null, -7, null, -3, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.1, map: { 2: [0, 4, 7], 6: [0, 4, 9], 10: [-3, 0, 5], 14: [-5, -1, 2] } }, kick: [0, 8], hat: [2, 6, 10, 14], kv: 0.15, hv: 0.018 },
   cosmic: { sd: 0.18, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.016, dur: 1.6, map: { 0: [0, 7, 15], 8: [-4, 3, 10] } }, lead: { wave: 'square', vol: 0.022, dur: 0.12, pat: [12, 19, 24, 19, 15, 19, 22, 19, 12, 19, 24, 27, 22, 19, 15, 10] }, bass: { wave: 'sawtooth', vol: 0.045, dur: 0.2, pat: [-12, null, -12, -12, null, -12, null, -12, -16, null, -16, -16, null, -14, null, -14] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.022 },
@@ -10419,6 +10498,7 @@ const FILES = {
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '171e756bb8'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '200ec4fe09'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'ee4862aacf'],
+  chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', '13b575d2c8'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', '4b91b43686'],
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
@@ -11986,7 +12066,7 @@ addEventListener('DOMContentLoaded', () => {
   const THEME_OF = {
     cosmic: 'space', zeus: 'olympus', storm: 'olympus', lightningbj: 'olympus', candy: 'candy', ticket: 'candy',
     anubis: 'egypt', pharaon: 'egypt', bling: 'gems', mines: 'gems', bounty: 'ocean', peche: 'ocean', taco: 'fiesta', plateau: 'fiesta',
-    billets: 'money', casse: 'money', roueor: 'money', dragons: 'dragon', labo: 'dragon', huff: 'wolf', 'big-bad-wolf': 'wolf', penalty: 'sport', poulet: 'sport',
+    billets: 'money', casse: 'money', roueor: 'money', dragons: 'dragon', labo: 'dragon', huff: 'wolf', 'big-bad-wolf': 'wolf', penalty: 'sport', chasse: 'sport', poulet: 'sport',
     billes: 'marbles', plinko: 'marbles', robots: 'neon', vortex: 'neon', avion: 'neon', gratteciel: 'neon', pileface: 'casino',
   };
   const themeNow = () => { const m = location.hash.match(/^#game-([\w-]+)/); return (m && THEME_OF[m[1]]) || 'casino'; };
