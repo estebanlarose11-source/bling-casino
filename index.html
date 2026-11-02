@@ -5295,7 +5295,9 @@ const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
 const REF_KE = 1000, REF_PARRAIN = 50000, REF_SPINS = 50, REF_GAME = 'huff', REF_LEVEL = 2, REF_MAX = 50, REF_KEY = 'spinbet_ref';
-const SITE = 'https://estebanlarose11-source.github.io/bling-casino/';
+// The site's own address, wherever it is hosted (the old GitHub Pages address gave a 404); the fixed address is
+// only a fallback for a copy opened as a local file.
+const SITE = /^https?:$/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html?$/, '') : 'https://estebanlarose11-source.github.io/bling-casino/';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const uid = () => (profiles.mode === 'cloud' ? profiles.store.current : null);
 
