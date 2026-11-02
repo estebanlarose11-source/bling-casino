@@ -11248,7 +11248,7 @@ function updateWallet() {
   nodes.forEach((n) => { n.textContent = fmt(to); });
 }
 
-// Premium touches shared by every page: ripples on buttons, tilting game cards, cards revealed as they scroll in.
+// Premium touches shared by every page: ripples on buttons.
 function mountPro() {
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.addEventListener('pointerdown', (e) => {
@@ -11261,32 +11261,7 @@ function mountPro() {
     d.className = 'rip'; d.style.left = `${e.clientX - r.left}px`; d.style.top = `${e.clientY - r.top}px`;
     w.appendChild(d); setTimeout(() => d.remove(), 650);
   }, { passive: true });
-  if (matchMedia('(hover: hover) and (pointer: fine)').matches && !calm) {
-    let cur = null;
-    document.addEventListener('pointermove', (e) => {
-      const c = e.target.closest?.('.game-card');
-      if (cur && cur !== c) { cur.classList.remove('tilting'); cur.querySelector('.thumb')?.style.removeProperty('--rx'); cur.querySelector('.thumb')?.style.removeProperty('--ry'); cur = null; }
-      if (!c) return;
-      const th = c.querySelector('.thumb'); if (!th) return;
-      if (!th.querySelector('.glare')) th.insertAdjacentHTML('beforeend', '<i class="glare"></i>');
-      const r = th.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
-      th.style.setProperty('--ry', `${((x - 0.5) * 16).toFixed(2)}deg`); th.style.setProperty('--rx', `${((0.5 - y) * 14).toFixed(2)}deg`);
-      th.style.setProperty('--gx', `${(x * 100).toFixed(1)}%`); th.style.setProperty('--gy', `${(y * 100).toFixed(1)}%`);
-      c.classList.add('tilting'); cur = c;
-    }, { passive: true });
-  }
-  if (calm || !('IntersectionObserver' in window)) return;
-  const io = new IntersectionObserver((list) => list.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('rv-in'); io.unobserve(en.target); } }), { rootMargin: '0px 0px -6% 0px' });
-  let queued = false;
-  const scan = () => {
-    queued = false;
-    let k = 0;
-    view.querySelectorAll('.game-card:not(.rv)').forEach((c) => {
-      c.classList.add('rv'); c.style.setProperty('--rd', `${Math.min(k++, 10) * 0.045}s`); io.observe(c);
-    });
-  };
-  new MutationObserver(() => { if (!queued) { queued = true; requestAnimationFrame(scan); } }).observe(view, { childList: true, subtree: true });
-  scan();
+  // Game cards stay still: no tilt and no scroll-in reveal, so rows only slide sideways.
 }
 
 document.querySelector('[data-toggle-side]').onclick = () => document.body.classList.toggle('side-open');
@@ -11802,6 +11777,12 @@ h1, h2, h3 { letter-spacing: -.01em; }
 .slot:not(.busy) .spin-btn:not(:disabled) { animation: none; }
 .view.enter > * { animation-duration: .35s; }
 @keyframes proRise { from { opacity: 0; transform: translateY(8px); } }
+/* game rows: cards stay still, rows only slide sideways */
+.game-card, .game-card:hover, .game-card .thumb, .game-card.tilting .thumb { transform: none !important; }
+.game-card.rv { opacity: 1; transform: none; }
+.game-card:hover .scene { transform: scale(1.04); }
+.game-row { overflow-y: hidden; overscroll-behavior-x: contain; touch-action: pan-x pan-y; scroll-snap-type: none; -webkit-overflow-scrolling: touch; padding-top: 2px; }
+@media (hover: none) { .game-card:hover .scene, .game-card:hover .thumb .cover, .game-card:hover .a0 { transform: none; } .game-card:hover .thumb::before { transform: none; } }
 </style>
 
 <script>
