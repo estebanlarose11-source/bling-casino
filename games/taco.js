@@ -1,241 +1,389 @@
-// SpinBet Casino · TacoGame — loaded on demand by games/impl/index.js (index.html).
+// SpinBet Casino · PizzaGame (La Pizza Yo-Yo) — loaded on demand by games/impl/index.js (index.html).
 // ---- games/impl/taco.js ----
 __mods['games/impl/taco.js'] = (() => {
-// Taco Fiesta: 5×3, 243 ways (left to right, a sombrero wild on reels 2 to 4). Piñatas can land anywhere: hit them
-// (or let them burst) to reveal cash, multipliers that add up and multiply the spin, or a FIESTA that starts
-// 8 free spins. In the free spins piñatas are far more common and every multiplier found raises a global
-// multiplier for the rest of the bonus. Tuned by simulation (RTP ≈ 92 %, buy ≈ 88 %).
+// La Pizza Yo-Yo (replaces La Fiesta, same id 'taco'). The board is a round pizza cut in 8 slices of 4 cells; it
+// spins clockwise and stops with a quarter open, where the symbols land. Painted symbols by the owner in
+// assets/games/pizza/. Tuned by simulation (RTP ≈ 92 %, buys ≈ 88 %).
 
-const { BaseGame, fmtC, art } = __mods['core/base.js'];
-const { Reels } = __mods['core/reels.js'];
-const { EXTRA_THEMES } = __mods['core/music.js'];
+const { BaseGame, fmtC } = __mods['core/base.js'];
 const { sfx } = __mods['audio.js'];
-const { fx, sleep, center } = __mods['fx.js'];
+const { fx, center } = __mods['fx.js'];
 const { el } = __mods['ui.js'];
 
-/* ===ENGINE */
-const COLS = 5, ROWS = 3, N = 15, WILD = 8, PIN = 9, CAPX = 5000, FS_SPINS = 8;
-const P = {
-  w: [22, 20, 18, 16, 10, 8, 6, 4], wild: 3, // weights per cell; wild only on reels 2-4
-  pays: [[0.2, 0.5, 1.5], [0.2, 0.6, 1.8], [0.3, 0.8, 2], [0.4, 1, 2.5], [0.6, 1.5, 4], [0.8, 2, 6], [1, 3, 10], [1.5, 5, 20]], K: 0.45,
-  pin: 0.012, pinFS: 0.075,
-  prize: [['c', 72], ['m', 24], ['f', 2]],
-  cash: [[0.2, 32], [0.5, 28], [1, 18], [2, 11], [5, 7], [10, 3], [25, 1]],
-  mult: [[2, 60], [3, 28], [5, 12]],
-};
-function wpick(l) { let t = 0; for (const x of l) t += x[1]; let r = Math.random() * t; for (const x of l) { if (r < x[1]) return x[0]; r -= x[1]; } return l[l.length - 1][0]; }
-function cell(c, fs) {
-  if (Math.random() < (fs ? P.pinFS : P.pin)) return PIN;
-  const ws = c >= 1 && c <= 3 ? P.wild : 0;
-  let t = ws; for (const x of P.w) t += x;
-  let r = Math.random() * t;
-  if (r < ws) return WILD; r -= ws;
-  for (let i = 0; i < P.w.length; i++) { if (r < P.w[i]) return i; r -= P.w[i]; }
-  return 0;
+/* ===ENGINE (original) */
+// Round board: 8 slices × 4 rings (ring 0 = centre, ring 3 = crust). Cell = slice * 4 + ring. Only open slices play;
+// slices open from 0 upwards. Cells touch along their slice (ring ± 1) and round the pizza (same ring, slice ± 1,
+// wrapping once the whole pizza is open). 4+ identical symbols that touch (wild = any) pay, vanish, and the symbols
+// fall toward the centre. A big connection (6+) pulls out a new slice. Trucks carry a multiplier, added up and
+// applied to the spin. In the bonus, pepperonis are collected: every 4 open a slice for good and give 2 more spins.
+const NS = 8, NR = 4, N = NS * NR;
+const WILD = 8, SCAT = 9, TRUCK = 10, PEP = 11;
+const PAY = [10, 6, 4.5, 3, 2.4, 2, 1.6, 1.2];           // × bet for a 4-cluster, chef → basilic
+const SIZE = [0, 0, 0, 0, 1, 1.6, 2.6, 4, 6, 9, 13, 18]; // size factor by cluster size (≥ 11 → 18)
+let K = 0.5735;                                            // global scale, tuned by simulation (RTP ≈ 92 %)
+const SPREAD = 6, FULL = 20;                              // cluster size that pulls a slice; full pizza in the base game: × bet
+const W_BASE = [1.6, 2.4, 3.2, 4.4, 6, 8, 10.5, 13, 4.2, 2.5, 1.4, 0];
+const W_FREE = [1.6, 2.4, 3.2, 4.4, 6, 8, 10.5, 13, 2.5, 0, 1.6, 2.5];
+const M_BASE = [[2, 50], [3, 25], [5, 15], [10, 7], [25, 3]];
+const M_FREE = [[2, 40], [3, 28], [5, 18], [10, 10], [25, 3], [50, 1]];
+const pick = (w, rng) => { let t = 0; for (const x of w) t += x; let r = rng() * t; for (let i = 0; i < w.length; i++) { if (r < w[i]) return i; r -= w[i]; } return 0; };
+const pickM = (l, rng) => l[pick(l.map((x) => x[1]), rng)][0];
+let SEQ = 0;
+function draw(free, rng) { const s = pick(free ? W_FREE : W_BASE, rng); return { s, m: s === TRUCK ? pickM(free ? M_FREE : M_BASE, rng) : 0, id: ++SEQ }; }
+function neighbours(i, open) {
+  const k = Math.floor(i / NR), r = i % NR, out = [];
+  if (r > 0) out.push(i - 1); if (r < NR - 1) out.push(i + 1);
+  const full = open >= NS;
+  if (k > 0) out.push(i - NR); else if (full) out.push((NS - 1) * NR + r);
+  if (k < open - 1) out.push(i + NR); else if (full) out.push(r);
+  return out;
 }
-// 243 ways: for each symbol, reels in a row from the left holding it (or a wild); ways = product of the counts.
-function ways(g) {
-  const wins = [];
-  for (let s = 0; s < 8; s++) {
-    let n = 0, w = 1; const cells = [];
-    for (let c = 0; c < COLS; c++) {
-      let k = 0;
-      for (let r = 0; r < ROWS; r++) { const v = g[c * ROWS + r]; if (v === s || v === WILD) { k++; cells.push(c * ROWS + r); } }
-      if (!k) break; n++; w *= k;
-    }
-    if (n >= 3) {
-      const keep = cells.filter((i) => Math.floor(i / ROWS) < n);
-      wins.push({ s, n, ways: w, x: P.pays[s][n - 3] * P.K * w, cells: keep });
+function clusters(b, open) {
+  const out = [], n = open * NR;
+  for (let sym = 0; sym < 8; sym++) {
+    const seen = new Uint8Array(N);
+    for (let i = 0; i < n; i++) {
+      if (seen[i] || b[i].s !== sym) continue;
+      const st = [i], cs = []; seen[i] = 1;
+      while (st.length) {
+        const c = st.pop(); cs.push(c);
+        for (const nb of neighbours(c, open)) if (!seen[nb] && (b[nb].s === sym || b[nb].s === WILD)) { seen[nb] = 1; st.push(nb); }
+      }
+      if (cs.length >= 4) out.push({ s: sym, cells: cs });
     }
   }
-  return wins;
+  return out;
 }
-function spin(o) {
-  const g = []; for (let i = 0; i < N; i++) g.push(cell(Math.floor(i / ROWS), o.fs));
-  if (o.forcePin) { let has = false; for (const v of g) if (v === PIN) has = true; if (!has) g[Math.floor(Math.random() * N)] = PIN; }
-  const wins = ways(g);
-  let base = 0; wins.forEach((w) => { base += w.x; });
-  const pins = [];
-  let cash = 0, madd = 0, fs = 0;
-  for (let i = 0; i < N; i++) if (g[i] === PIN) {
-    const k = wpick(P.prize);
-    if (k === 'c') { const v = wpick(P.cash); cash += v; pins.push({ i, k, v }); }
-    else if (k === 'm') { const v = wpick(P.mult); madd += v; pins.push({ i, k, v }); }
-    else { fs++; pins.push({ i, k }); }
+const pay = (c) => PAY[c.s] * SIZE[Math.min(c.cells.length, SIZE.length - 1)] * K;
+// Symbols in a slice fall toward the centre, new ones come in at the crust. Returns the indexes of new cells.
+function collapse(b, gone, open, free, rng) {
+  const fresh = [];
+  for (let k = 0; k < open; k++) {
+    const keep = [];
+    for (let r = 0; r < NR; r++) { const i = k * NR + r; if (!gone.has(i)) keep.push(b[i]); }
+    for (let r = 0; r < NR; r++) {
+      const i = k * NR + r;
+      if (r < keep.length) b[i] = keep[r]; else { b[i] = draw(free, rng); fresh.push(i); }
+    }
   }
-  // spin multiplier: the piñata multipliers add up (×2 and ×3 → ×5); in free spins the global multiplier applies too
-  const m = (madd || 1) * (o.gm || 1);
-  const total = (base + cash) * m;
-  return { g, wins, base, cash, madd, m, pins, fs, total };
+  return fresh;
+}
+// One spin. `open` slices at the start; returns frames for the animation and the totals (× bet).
+function play({ open, free = false, rng = Math.random }) {
+  const b = Array.from({ length: N }, (_, i) => (i < open * NR ? draw(free, rng) : null));
+  const frames = [{ t: 'land', b: b.map((x) => x && { ...x }), open }];
+  let win = 0, peps = 0, full = false;
+  for (let step = 0; step < 40; step++) {
+    if (free) {
+      const got = [];
+      for (let i = 0; i < open * NR; i++) if (b[i].s === PEP) got.push(i);
+      if (got.length) {
+        peps += got.length;
+        const fresh = collapse(b, new Set(got), open, free, rng);
+        frames.push({ t: 'peps', cells: got, n: peps, b: b.map((x) => x && { ...x }), fresh, open });
+        continue;
+      }
+    }
+    const cl = clusters(b, open);
+    if (!cl.length) break;
+    const gone = new Set(), p = cl.reduce((a, c) => a + pay(c), 0);
+    cl.forEach((c) => c.cells.forEach((i) => gone.add(i)));
+    win += p;
+    frames.push({ t: 'win', clusters: cl.map((c) => ({ s: c.s, cells: c.cells, x: pay(c) })), x: p, open });
+    let opened = -1;
+    if (open < NS && cl.some((c) => c.cells.length >= SPREAD)) {
+      opened = open; open++;
+      for (let r = 0; r < NR; r++) b[opened * NR + r] = draw(free, rng);
+      if (open === NS && !free) { full = true; win += FULL; }
+    }
+    const fresh = collapse(b, gone, opened >= 0 ? opened : open, free, rng);
+    if (opened >= 0) for (let r = 0; r < NR; r++) fresh.push(opened * NR + r);
+    frames.push({ t: 'drop', b: b.map((x) => x && { ...x }), fresh, open, opened, full: full && opened === NS - 1 });
+  }
+  let mult = 0; const trucks = [];
+  for (let i = 0; i < open * NR; i++) if (b[i].s === TRUCK) { mult += b[i].m; trucks.push(i); }
+  const scat = b.reduce((a, x) => a + (x && x.s === SCAT ? 1 : 0), 0);
+  const total = win > 0 && mult > 0 ? win * mult : win;
+  return { frames, win, mult: win > 0 ? mult : 0, trucks, total, open, peps, scat, full };
+}
+// A whole bonus (for the simulation; the game plays the same steps one by one with the animation).
+const FS = { normal: { open: 2, spins: 8 }, super: { open: 2, spins: 14 } }, PEP_STEP = 4, PEP_SPINS = 2, MAX_SPINS = 40;
+function bonus(kind, rng = Math.random) {
+  let { open, spins } = FS[kind], cnt = 0, tot = 0, done = 0;
+  while (done < spins && done < MAX_SPINS) {
+    done++;
+    const r = play({ open, free: true, rng });
+    tot += r.total; open = r.open; cnt += r.peps;
+    while (cnt >= PEP_STEP) { cnt -= PEP_STEP; spins += PEP_SPINS; if (open < NS) open++; }
+  }
+  return tot;
 }
 /* ===END ENGINE */
 
-const NAMES = ['Citron vert', 'Avocat', 'Piment', 'Taco', 'Maracas', 'Guitare', 'Calavera', 'Luchador'];
-const ART = ['tf0', 'tf1', 'tf2', 'tf3', 'tf4', 'tf5', 'tf6', 'tf7', 'tfw', 'tfp'];
-const BUYC = 84;
-const FIESTA = ['#f43f5e', '#fde047', '#22d3ee', '#4ade80', '#f97316', '#e879f9', '#fff'];
-const xs = (m) => (m >= 10 ? String(Math.round(m * 10) / 10).replace('.', ',') : m.toFixed(2).replace(/\.?0+$/, '').replace('.', ','));
+const BUYN = 70, BUYS = 350;
+const IMG_V = 1;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const IMG = ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 'wild', 'sc', 'truck', 'pep'];
+const NAMES = ['Le Chef', 'Huile d’olive', 'Mozzarella', 'Tomate', 'Champignon', 'Poivron', 'Olive', 'Basilic', 'Pelle à pizza (WILD)', 'Roulette (bonus)', 'Food truck (multiplicateur)', 'Pepperoni'];
+const src = (s) => asset(`assets/games/pizza/${IMG[s]}.webp`);
+const symImg = (s) => `<img class="pz-img" src="${src(s)}" alt="" draggable="false" decoding="async">`;
+const MUSIC = { sd: 0.2, len: 12, root: 220, lead: { wave: 'triangle', vol: 0.06, dur: 0.16, pat: [12, 15, 19, 17, 15, 14, 12, 15, 19, 24, 19, 15] }, bass: { wave: 'sine', vol: 0.14, dur: 0.22, pat: [-12, null, null, -5, null, null, -12, null, null, -7, null, null] }, kick: [0, 6], hat: [2, 4, 8, 10], kv: 0.18, hv: 0.02 };
 
-class TacoGame extends BaseGame {
+// geometry (in % of the board): ring limits from the centre to the crust
+const RING = [0.08, 0.29, 0.5, 0.71, 0.92];
+const pol = (rad, deg) => ({ x: 50 + 50 * rad * Math.cos(deg * Math.PI / 180), y: 50 + 50 * rad * Math.sin(deg * Math.PI / 180) });
+const sliceA = (k) => -90 + k * 45;
+function cellPos(i) {
+  const k = Math.floor(i / NR), r = i % NR, a = sliceA(k) + 22.5, mid = (RING[r] + RING[r + 1]) / 2;
+  const p = pol(mid, a), arc = mid * Math.PI / 4, w = Math.min((RING[r + 1] - RING[r]) * 1.12, arc * 1.02);
+  return { x: p.x, y: p.y, size: w * 50, a, mid };
+}
+function sectorPath(r0, r1, a0, a1) {
+  const p = (r, a) => { const q = pol(r, a); return `${q.x.toFixed(2)} ${q.y.toFixed(2)}`; };
+  return r0 <= 0.001 ? `M50 50 L${p(r1, a0)} A${50 * r1} ${50 * r1} 0 0 1 ${p(r1, a1)} Z`
+    : `M${p(r1, a0)} A${50 * r1} ${50 * r1} 0 0 1 ${p(r1, a1)} L${p(r0, a1)} A${50 * r0} ${50 * r0} 0 0 0 ${p(r0, a0)} Z`;
+}
+
+function boardSVG() {
+  const pz = asset('assets/games/pizza/pizza.webp');
+  let defs = '', plate = '', pieces = '';
+  for (let k = 0; k < NS; k++) {
+    const a0 = sliceA(k), a1 = a0 + 45;
+    defs += `<clipPath id="pzc${k}"><path d="${sectorPath(0, 1.002, a0 - 0.15, a1 + 0.15)}"/></clipPath>`;
+    let rings = '';
+    for (let r = 0; r < NR; r++) rings += `<path d="${sectorPath(RING[r] + 0.006, RING[r + 1] - 0.006, a0 + 0.9, a1 - 0.9)}" class="pz-hole"/>`;
+    plate += `<g class="pz-tray" data-k="${k}">${rings}</g>`;
+    const m = pol(0.55, a0 + 22.5);
+    pieces += `<g class="pz-piece" data-k="${k}" style="--ox:${(m.x - 50) * 0.55}%;--oy:${(m.y - 50) * 0.55}%"><image href="${pz}" x="0" y="0" width="100" height="100" clip-path="url(#pzc${k})" preserveAspectRatio="none"/><path d="${sectorPath(0, 1, a0, a1)}" class="pz-cut"/></g>`;
+  }
+  return `<svg class="pz-svg" viewBox="0 0 100 100" aria-hidden="true"><defs>${defs}<radialGradient id="pzPlate"><stop offset="0" stop-color="#5b3416"/><stop offset=".9" stop-color="#2f1a0b"/><stop offset="1" stop-color="#1c0f06"/></radialGradient></defs>
+    <circle cx="50" cy="50" r="50" fill="url(#pzPlate)"/><g class="pz-trays">${plate}</g><g class="pz-pieces">${pieces}</g></svg>`;
+}
+
+class PizzaGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
-      music: EXTRA_THEMES.taco,
-      frameCls: 'taco-frame',
-      stage: `<div class="tf-stage"><div class="tf-papel">${Array.from({ length: 14 }, (_, k) => `<i style="--c:${FIESTA[k % 6]}"></i>`).join('')}</div><div class="reels-host"></div><div class="tf-word"></div></div>`,
-      head: '<div class="tf-meter"><small>Multiplicateur</small><b>×1</b></div>',
-      buys: [{ id: 'fs', icon: '🪅', label: 'Fiesta · 8 tours gratuits', desc: 'Piñatas fréquentes et multiplicateur global qui grimpe', cost: (b) => b * BUYC }],
-      hello: '243 façons de gagner · frappe les piñatas !',
+      music: MUSIC,
+      head: '<div class="head-meters"><div class="meter pz-mult"><small>Food trucks</small><b>×0</b></div></div>',
+      stage: `<div class="pz-scene"><div class="pz-hud"><div class="pz-peps"><small>Pepperonis</small><span class="pz-dots">${'<i></i>'.repeat(4)}</span></div><div class="pz-spins"><small>Tours</small><b>0</b></div><div class="pz-parts"><small>Parts</small><b>2 / 8</b></div></div>
+        <div class="pz-board"><div class="pz-rot">${boardSVG()}<div class="pz-cells"></div></div><i class="pz-pin"></i></div><div class="pz-word"></div></div>`,
+      buys: [
+        { id: 'normal', icon: '🍕', label: 'Bonus Le Four · 3 roulettes', desc: '8 tours, un quart de pizza ; 4 pepperonis = une part de plus et +2 tours', cost: (b) => b * BUYN },
+        { id: 'super', icon: '🔥', label: 'Super Four · 4 roulettes', desc: '14 tours, un quart de pizza ; 4 pepperonis = une part de plus et +2 tours', cost: (b) => b * BUYS },
+      ],
+      hello: 'La pizza tourne : 4 symboles qui se touchent gagnent',
     });
-    this.gm = 1;
-    this.reels = new Reels(this.q('.reels-host'), {
-      cols: COLS, rows: ROWS, game: this, random: (c) => cell(c, this.inFree),
-      art: (v) => art(ART[v]) + (v === WILD ? '<i class="lbl tfl">WILD</i>' : ''),
-      cls: (v) => (v === PIN ? 'pin' : v === WILD ? 'wild' : v >= 6 ? 'hi' : ''),
+    this.rot = this.q('.pz-rot');
+    this.cellsEl = this.q('.pz-cells');
+    this.multEl = this.q('.pz-mult');
+    this.els = new Map(); // symbol id -> element
+    this.angle = 0;
+    this.open = 2;
+    this.setOpen(2, false);
+    IMG.forEach((n) => { new Image().src = asset(`assets/games/pizza/${n}.webp`); });
+    new Image().src = asset('assets/games/pizza/pizza.webp');
+    // a first, still pizza
+    const b = Array.from({ length: N }, (_, i) => (i < 2 * NR ? { s: Math.floor(Math.random() * 8), m: 0, id: `i${i}` } : null));
+    this.showBoard(b, [], false);
+  }
+
+  // Open slices show the tray with the symbols, closed slices show the pizza.
+  setOpen(n, anim = true) {
+    this.open = n;
+    this.qa('.pz-piece').forEach((p) => {
+      const k = +p.dataset.k, out = k < n;
+      if (out && !p.classList.contains('out') && anim) { p.classList.add('pulling'); setTimeout(() => p.classList.remove('pulling'), 900); }
+      p.classList.toggle('out', out);
     });
-    this.reels.setAll(Array.from({ length: N }, (_, i) => cell(Math.floor(i / ROWS), false)));
+    this.qa('.pz-tray').forEach((t) => t.classList.toggle('on', +t.dataset.k < n));
+    this.q('.pz-parts b').textContent = `${n} / ${NS}`;
   }
 
-  setMeter(m, bump) {
-    const b = this.q('.tf-meter b');
-    b.textContent = `×${m}`;
-    this.q('.tf-meter').classList.toggle('hot', m > 1);
-    if (bump) b.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.5)', offset: 0.4 }, { transform: 'scale(1)' }], { duration: 500 });
-  }
-
-  word(t, cls = '') {
-    const w = this.q('.tf-word');
-    w.textContent = t; w.className = `tf-word ${cls}`;
-    w.getAnimations().forEach((a) => a.cancel());
-    w.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.3) rotate(-8deg)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.1) rotate(3deg)', offset: 0.25 },
-      { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.7 }, { opacity: 0, transform: 'translate(-50%,-60%) scale(1.2)' }], { duration: this.turbo ? 700 : 1100, easing: 'ease-out' });
-  }
-
-  onMain() { this.round(() => this.playRound(false)); }
-  async onBuy() { await this.playRound(true); }
-
-  async playRound(buy) {
-    const b = this.bet;
-    if (!buy && !this.pay(b)) return;
-    this.lastStake = b;
-    this.setLast(0); this.winAmt.textContent = ''; this.setBanner('');
-    let total = 0;
-    if (buy) total = await this.freeSpins();
-    else {
-      const res = spin({ fs: false });
-      total = Math.min(res.total * b, b * CAPX);
-      await this.show(res, b, total);
-      if (total > 0) { this.win(Math.round(total)); this.setLast(total); }
-      if (res.fs) {
-        this.stopAuto();
-        if (total > 0) await this.celebrate(Math.round(total));
-        total += await this.freeSpins();
-      } else if (total > 0) await this.celebrate(Math.round(total));
+  cellEl(x, i) {
+    let e = this.els.get(x.id);
+    if (!e) {
+      e = el('div', `pz-cell s${x.s}`, `${symImg(x.s)}${x.s === TRUCK ? `<b class="pz-m">×${x.m}</b>` : ''}`);
+      this.cellsEl.appendChild(e); this.els.set(x.id, e);
     }
-    this.setLast(total);
-    this.msg(total >= b * CAPX ? `GAIN MAXIMUM ! ${fmtC(total)}` : total > 0 ? `Total du tour : ${fmtC(total)}` : 'Pas de gain');
+    const p = cellPos(i);
+    e.style.left = `${p.x}%`; e.style.top = `${p.y}%`; e.style.width = e.style.height = `${p.size}%`;
+    const c = pol(0.99, p.a); e.style.setProperty('--dx', `${((c.x - p.x) / p.size) * 100}%`); e.style.setProperty('--dy', `${((c.y - p.y) / p.size) * 100}%`);
+    return e;
   }
 
-  // Spins the reels, shows the ways wins, then the piñatas. Returns once everything is on screen.
-  async show(res, b, capped) {
-    await this.reels.spin(res.g, {
-      tease: (c, vals) => { let n = 0; for (let j = 0; j < c * ROWS; j++) if (vals[j] === PIN) n++; return n >= 2; },
-      onStop: (c) => { for (let r = 0; r < ROWS; r++) if (res.g[c * ROWS + r] === PIN) { sfx.land(); const p = center(this.reels.cell(c * ROWS + r)); fx.burst(p.x, p.y, 10, FIESTA, 5); } },
+  // Place the board; `fresh` cells come in from the crust.
+  showBoard(b, fresh, anim = true) {
+    const live = new Set();
+    this.at = [];
+    b.forEach((x, i) => { if (!x) return; live.add(x.id); const e = this.cellEl(x, i); this.at[i] = e; if (anim && fresh.includes(i)) { e.classList.remove('in'); void e.offsetWidth; e.classList.add('in'); } });
+    for (const [id, e] of this.els) if (!live.has(id)) { e.remove(); this.els.delete(id); }
+  }
+
+  clearCells() {
+    for (const e of this.els.values()) { e.classList.add('gone'); setTimeout(() => e.remove(), 260); }
+    this.els.clear();
+    this.at = [];
+  }
+
+  // The pizza turns clockwise for a while and stops on a slice boundary (the symbols stay upright).
+  spinTo(turns) {
+    const from = this.angle, to = from + 360 * turns + 45 * Math.floor(Math.random() * 8);
+    const dur = this.turbo ? 700 : 1500, t0 = performance.now();
+    this.angle = to % 360;
+    return new Promise((res) => {
+      const step = (t) => {
+        if (this.dead) return res();
+        const u = Math.min(1, (t - t0) / dur);
+        const e = 1 - Math.pow(1 - u, 3) + Math.sin(u * Math.PI) * 0.015 * (1 - u);
+        const a = from + (to - from) * e;
+        this.rot.style.setProperty('--a', `${a}deg`);
+        if (u < 1) requestAnimationFrame(step); else { this.rot.style.setProperty('--a', `${this.angle}deg`); res(); }
+      };
+      requestAnimationFrame(step);
     });
-    if (this.dead) return;
-    if (res.wins.length) {
-      const cells = new Set(); res.wins.forEach((w) => w.cells.forEach((i) => cells.add(i)));
-      this.reels.mark([...cells]);
-      this.msg(res.wins.map((w) => `${w.n} × ${NAMES[w.s]}${w.ways > 1 ? ` (${w.ways} façons)` : ''} : +${fmtC(Math.round(w.x * b))}`).join(' · '));
-      sfx.win();
-      await this.wait(1100);
-      this.reels.unmark();
+  }
+
+  word(text, cls = '') {
+    const w = this.q('.pz-word');
+    w.className = `pz-word ${cls}`; w.textContent = text; void w.offsetWidth; w.classList.add('on');
+  }
+
+  setMult(m, hot) { this.multEl.querySelector('b').textContent = `×${m}`; this.multEl.classList.toggle('hot', !!hot); }
+
+  setPeps(n, spins) {
+    this.qa('.pz-dots i').forEach((d, k) => d.classList.toggle('on', k < n));
+    if (spins != null) this.q('.pz-spins b').textContent = spins;
+  }
+
+  onMain() {
+    this.round(async () => {
+      if (!this.pay(this.bet)) return;
+      this.lastStake = this.bet;
+      const r = await this.spinOnce(false, 2);
+      if (r.scat >= 3) { this.stopAuto(); await this.freeSpins(r.scat >= 4 ? 'super' : 'normal'); }
+    });
+  }
+
+  async onBuy(kind) { await this.freeSpins(kind); }
+
+  async spinOnce(free, open) {
+    const bet = this.bet;
+    const r = play({ open, free });
+    this.winAmt.textContent = '';
+    if (!free) this.setLast(0);
+    this.setMult(0);
+    this.msg(free ? 'Le four tourne…' : 'La pizza tourne…');
+    this.clearCells();
+    if (!free) this.setOpen(open, false);
+    sfx.click?.();
+    await this.spinTo(free ? 1 : 2);
+    sfx.reelStop?.();
+    let shown = 0;
+    for (const f of r.frames) {
+      if (this.dead) break;
+      if (f.t === 'land') {
+        this.showBoard(f.b, f.b.map((x, i) => (x ? i : -1)).filter((i) => i >= 0));
+        f.b.forEach((x, i) => { if (x && x.s === SCAT) { sfx.land(); const e = this.els.get(x.id); e?.classList.add('scat'); } });
+        await this.wait(520);
+      } else if (f.t === 'win') {
+        const ids = []; f.clusters.forEach((c) => c.cells.forEach((i) => ids.push(this.cellAt(i))));
+        ids.forEach((e) => e?.classList.add('win'));
+        shown += f.x;
+        const amt = Math.round(shown * bet);
+        this.setLast(amt);
+        this.msg(`Connexion ! +${fmtC(Math.round(f.x * bet))}`);
+        ids.forEach((e) => { if (e) { const p = center(e); fx.burst(p.x, p.y, 5, ['#fde68a', '#f97316', '#fff'], 3); } });
+        sfx.win();
+        await this.wait(750);
+        ids.forEach((e) => e?.classList.add('pop'));
+        await this.wait(230);
+      } else if (f.t === 'peps') {
+        const es = f.cells.map((i) => this.cellAt(i));
+        es.forEach((e) => e?.classList.add('collect'));
+        sfx.upgrade?.();
+        this.onPep?.(f.cells.length);
+        await this.wait(520);
+        es.forEach((e) => e?.classList.add('pop'));
+        await this.wait(160);
+        this.showBoard(f.b, f.fresh);
+        await this.wait(380);
+      } else if (f.t === 'drop') {
+        if (f.opened >= 0) {
+          this.setOpen(f.open);
+          this.word(f.full ? 'PIZZA COMPLÈTE !' : 'UNE PART DE PLUS !', f.full ? 'full' : '');
+          sfx.feature?.();
+          this.shake();
+          await this.wait(900);
+          if (f.full) { this.msg(`Pizza complète ! +${fmtC(FULL * bet)}`); fx.confetti(60); await this.wait(700); }
+        }
+        this.showBoard(f.b, f.fresh);
+        await this.wait(420);
+      }
     }
-    if (res.pins.length) await this.smash(res, b);
-    if (res.m > 1 && (res.base + res.cash) > 0) {
-      this.word(`×${res.m}`, 'mult');
-      this.msg(`(${fmtC(Math.round((res.base + res.cash) * b))}) × ${res.m} = ${fmtC(Math.round(capped))}`);
-      sfx.bigWin();
+    let total = Math.round(r.total * bet);
+    if (r.mult > 0) {
+      r.trucks.forEach((i) => this.cellAt(i)?.classList.add('fire'));
+      this.setMult(r.mult, true);
+      this.word(`×${r.mult}`, 'mult');
+      sfx.upgrade?.();
+      this.msg(`Food trucks ×${r.mult} !`);
       await this.wait(1000);
     }
-  }
-
-  // The piñatas wait to be hit (tap them); they burst on their own after a moment, or straight away in autoplay.
-  async smash(res, b) {
-    this.msg(res.pins.length > 1 ? `${res.pins.length} piñatas ! Frappe-les !` : 'Une piñata ! Frappe-la !');
-    this.slotEl.classList.add('tf-smash');
-    const jobs = res.pins.map((pn) => new Promise((resolve) => {
-      const cellEl = this.reels.cell(pn.i);
-      const hit = el('button', 'tf-hit', '<span>👊</span>');
-      hit.type = 'button'; hit.setAttribute('aria-label', 'Frapper la piñata');
-      cellEl.appendChild(hit);
-      let done = false;
-      const burst = () => {
-        if (done) return; done = true;
-        hit.remove();
-        cellEl.classList.add('opened');
-        const p = center(cellEl);
-        fx.burst(p.x, p.y, 26, FIESTA, 8);
-        sfx.coin();
-        const prize = el('div', `tf-prize ${pn.k}`, pn.k === 'c' ? `<b>${fmtC(Math.round(pn.v * b))}</b>` : pn.k === 'm' ? `<b>×${pn.v}</b>` : '<b>FIESTA</b><small>8 tours</small>');
-        cellEl.appendChild(prize);
-        if (pn.k === 'f') { sfx.feature(); fx.confetti(60); }
-        resolve();
-      };
-      hit.addEventListener('click', burst, { once: true });
-      setTimeout(burst, this.auto || this.turbo ? 350 : 2600);
-    }));
-    await Promise.all(jobs);
-    this.slotEl.classList.remove('tf-smash');
-    const parts = [];
-    if (res.cash) parts.push(`gains ${fmtC(Math.round(res.cash * b))}`);
-    if (res.madd) parts.push(`multiplicateur ×${res.madd}`);
-    if (res.fs) parts.push(res.fs > 1 ? `${res.fs} FIESTAS` : 'FIESTA');
-    this.msg(`Piñatas : ${parts.join(' · ')}`);
-    await this.wait(1200);
-    this.reels.el.querySelectorAll('.tf-prize').forEach((n) => n.remove());
-    this.reels.el.querySelectorAll('.opened').forEach((n) => n.classList.remove('opened'));
-  }
-
-  // Same rules as the simulator: 8 spins, +3 per FIESTA, multipliers found raise the global multiplier.
-  async freeSpins() {
-    const b = this.bet, cap = b * CAPX;
-    let left = FS_SPINS, gm = 1, tot = 0, done = 0;
-    this.lastStake = b;
-    await this.featureIntro('¡ FIESTA !', `${FS_SPINS} tours gratuits · piñatas partout · chaque multiplicateur trouvé reste pour tout le bonus`, art('tfp'));
-    this.inFree = true;
-    this.slotEl.classList.add('in-free');
-    this.setMeter(1);
-    while (left > 0 && tot < cap && !this.dead) {
-      left--; done++;
-      this.setBanner(`<b>¡ FIESTA !</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill">Multiplicateur ×${gm}</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
-      const res = spin({ fs: true, gm });
-      const add = Math.min(res.total * b, cap - tot);
-      await this.show(res, b, add);
-      tot += add;
-      if (add > 0) this.win(Math.round(add), 'Fiesta');
-      this.setLast(Math.round(tot));
-      if (res.madd) { gm += res.madd; this.setMeter(gm, true); this.msg(`Le multiplicateur global passe à ×${gm} !`); await this.wait(700); }
-      if (res.fs) { left += 3 * res.fs; await this.featureIntro(`+${3 * res.fs} TOURS`, 'Encore une fiesta !', art('tfp'), 1300); }
-      await this.wait(250);
+    if (total > 0) {
+      this.setLast(total);
+      this.win(total, free ? 'Le Four' : null);
+      if (!free) await this.celebrate(total); else this.winAmt.textContent = fmtC(total);
     }
-    this.inFree = false;
+    if (!free) this.msg(total > 0 ? `Total du tour : ${fmtC(total)}` : r.scat === 2 ? 'Presque… 2 roulettes' : 'Pas de gain');
+    return { ...r, totalC: total };
+  }
+
+  cellAt(i) { return this.at[i] || null; }
+
+  async freeSpins(kind) {
+    const conf = FS[kind];
+    let spins = conf.spins, done = 0, open = conf.open, cnt = 0, fsWin = 0;
+    this.lastStake = this.bet;
+    await this.featureIntro(kind === 'super' ? 'SUPER FOUR' : 'LE FOUR', `${spins} tours · chaque 4ᵉ pepperoni ouvre une part et donne +2 tours`, symImg(SCAT));
+    this.slotEl.classList.add('in-free');
+    this.setOpen(open, false);
+    this.setPeps(0, spins);
+    this.onPep = (n) => { cnt += n; this.setPeps(Math.min(cnt, PEP_STEP)); };
+    while (done < spins && done < MAX_SPINS && !this.dead) {
+      done++;
+      this.setPeps(cnt, spins - done);
+      this.setBanner(`<b>${kind === 'super' ? 'SUPER FOUR' : 'LE FOUR'}</b><span class="pill">Tour ${done} / ${spins}</span><span class="pill gold">Gain ${fmtC(fsWin)}</span>`);
+      const r = await this.spinOnce(true, open);
+      fsWin += r.totalC; open = r.open;
+      while (cnt >= PEP_STEP && !this.dead) {
+        cnt -= PEP_STEP; spins += PEP_SPINS;
+        if (open < NS) { open++; this.setOpen(open); this.word('+1 PART · +2 TOURS'); } else this.word('+2 TOURS');
+        sfx.feature?.(); fx.confetti(40);
+        this.setPeps(cnt, spins - done);
+        await this.wait(1100);
+      }
+      this.setPeps(cnt, spins - done);
+      await this.wait(400);
+    }
+    this.onPep = null;
     this.slotEl.classList.remove('in-free');
     this.setBanner('');
-    this.setMeter(1);
-    await this.celebrate(Math.round(tot), { summary: '¡ FIESTA !', stake: b });
-    return tot;
+    this.setOpen(2, false);
+    this.setLast(fsWin);
+    await this.celebrate(fsWin, { summary: kind === 'super' ? 'SUPER FOUR' : 'BONUS LE FOUR' });
+    this.msg(`Bonus terminé : ${fmtC(fsWin)} gagnés`);
   }
 
   info() {
-    const rows = NAMES.map((n, s) => `<div class="pay-item"><div class="pay-sym svg">${art(ART[s])}</div><div class="pay-vals"><b>${n}</b><br><span>3 : ×${xs(P.pays[s][0] * P.K)} · 4 : ×${xs(P.pays[s][1] * P.K)} · 5 : ×${xs(P.pays[s][2] * P.K)}</span></div></div>`).join('');
-    return this.rules(`<h4>Symboles (× la mise, par façon)</h4><div class="paytable">${rows}
-      <div class="pay-item"><div class="pay-sym svg">${art('tfw')}</div><div class="pay-vals"><b>Sombrero WILD</b><br><span>Rouleaux 2 à 4, remplace tous les symboles sauf la piñata</span></div></div>
-      <div class="pay-item"><div class="pay-sym svg">${art('tfp')}</div><div class="pay-vals"><b>Piñata</b><br><span>Gains, multiplicateur ou FIESTA</span></div></div></div>
-      <h4>243 façons de gagner</h4><p>Un symbole paie dès qu’il apparaît sur 3 rouleaux d’affilée ou plus en partant de la gauche, à n’importe quelle hauteur. Le gain est multiplié par le nombre de façons (combinaisons de positions).</p>
-      <h4>Piñatas</h4><p>Frappe chaque piñata : elle révèle des <b>gains</b> (×0,2 à ×25 la mise), un <b>multiplicateur</b> (×2, ×3 ou ×5, ils s’additionnent et multiplient tout le tour) ou une <b>FIESTA</b>.</p>
-      <h4>Fiesta</h4><p>${FS_SPINS} tours gratuits, piñatas 6 fois plus fréquentes. Chaque multiplicateur trouvé s’ajoute à un <b>multiplicateur global</b> qui s’applique à tous les tours suivants du bonus. FIESTA en bonus : +3 tours. Achat : ×${BUYC} la mise. Gain maximum ×${CAPX.toLocaleString('fr-FR')}.</p>`);
+    const v = (s, n) => (PAY[s] * SIZE[n] * K).toFixed(2).replace('.', ',').replace(/,00$/, '');
+    const rows = [0, 1, 2, 3, 4, 5, 6, 7].map((s) => `<div class="pay-item"><div class="pay-sym">${symImg(s)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>4 : ×${v(s, 4)} · 6 : ×${v(s, 6)} · 8 : ×${v(s, 8)} · 11+ : ×${v(s, 11)}</span></div></div>`).join('')
+      + [WILD, SCAT, TRUCK, PEP].map((s) => `<div class="pay-item"><div class="pay-sym">${symImg(s)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>${['Remplace tous les symboles normaux', '3 = Le Four · 4 = Super Four', 'Porte ×2 à ×50 ; les camions s’additionnent et multiplient le gain du tour', 'Dans le bonus : 4 pepperonis = une part de plus et +2 tours'][s - WILD]}</span></div></div>`).join('');
+    return this.rules(`<h4>Symboles (gains × la mise)</h4><div class="paytable">${rows}</div>
+      <h4>La pizza</h4><p>La pizza est coupée en <b>8 parts de 4 cases</b>. Elle tourne et s’arrête avec <b>un quart ouvert</b> (2 parts) où tombent les symboles. <b>4 symboles identiques ou plus qui se touchent</b> (dans la même part, ou d’une part à la voisine sur le même anneau) gagnent, disparaissent, et les autres glissent vers le centre. Une connexion de <b>6 symboles ou plus</b> fait sortir une part de plus pour le reste du tour. Les 8 parts ouvertes : <b>Pizza complète, +×${FULL} la mise</b>.</p>
+      <h4>Food trucks</h4><p>Chaque camion porte un multiplicateur. À la fin du tour, s’il y a un gain, les multiplicateurs des camions s’additionnent et multiplient le gain.</p>
+      <h4>Bonus</h4><p>3 roulettes : <b>Le Four</b>, 8 tours. 4 roulettes : <b>Super Four</b>, 14 tours. On commence avec un quart de pizza ; chaque fois que <b>4 pepperonis</b> sont réunis, une part s’ouvre pour tout le bonus et on gagne <b>+2 tours</b>, jusqu’à la pizza entière.</p>
+      <h4>Achats</h4><p>Le Four ×${BUYN} la mise · Super Four ×${BUYS} la mise.</p>`);
   }
 }
-
-return { TacoGame };
+return { PizzaGame };
 })();

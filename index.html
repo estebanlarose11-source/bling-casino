@@ -3248,42 +3248,60 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .mb-spot.hit { animation: jpHit .9s cubic-bezier(.3, 1.8, .5, 1); box-shadow: 0 0 0 3px #fff, 0 0 24px var(--bc); }
 @media (max-width: 600px) { .mb-spots { grid-template-columns: repeat(3, 1fr); } }
 
-/* ============ Taco Fiesta ============ */
-.g-taco { --slot-bg: radial-gradient(600px 300px at 15% -5%, rgba(244, 63, 94, .35), transparent 70%), radial-gradient(500px 300px at 95% 10%, rgba(250, 204, 21, .28), transparent 70%), linear-gradient(180deg, #5b0f3a 0%, #2a0a2e 55%, #12041a 100%); }
-.g-taco .slot-title h2 { font-family: KeCoin, 'Bebas Neue', Archivo, sans-serif; letter-spacing: 3px; color: #fde047; text-shadow: 0 3px 0 #be123c, 0 6px 0 #6b0f2a; }
-.taco-frame { padding: 6px; border-radius: 4px; background: repeating-linear-gradient(135deg, #f43f5e 0 18px, #fde047 18px 36px, #22d3ee 36px 54px, #4ade80 54px 72px); box-shadow: 0 0 24px rgba(244, 63, 94, .45), 0 16px 40px rgba(0, 0, 0, .5); }
-.taco-frame > .slot-stage { border-radius: 4px; background: #2a0a2e; }
-.tf-stage { position: relative; padding: 34px 8px 8px; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, rgba(250, 204, 21, .18), transparent 60%), linear-gradient(180deg, #3b0a3f, #22072a); }
-.tf-papel { position: absolute; left: 0; right: 0; top: 0; height: 30px; display: flex; justify-content: space-around; pointer-events: none; }
-.tf-papel::before { content: ''; position: absolute; left: 0; right: 0; top: 4px; height: 2px; background: #fde68a; opacity: .6; }
-.tf-papel i { width: 6.4%; height: 26px; margin-top: 4px; background: var(--c); clip-path: polygon(0 0, 100% 0, 100% 75%, 85% 100%, 70% 80%, 50% 100%, 30% 80%, 15% 100%, 0 75%); opacity: .9; transform-origin: top; animation: tfSway 3s ease-in-out infinite; }
-.tf-papel i:nth-child(2n) { animation-delay: -1.5s; }
-@keyframes tfSway { 50% { transform: rotate(4deg); } }
-.g-taco .rs-reel { background: linear-gradient(180deg, rgba(253, 224, 71, .06), rgba(244, 63, 94, .12) 50%, rgba(253, 224, 71, .06)); box-shadow: inset 0 0 0 1px rgba(253, 224, 71, .18); }
-.g-taco .rs-reel::before { background: linear-gradient(rgba(42, 10, 46, .85), transparent); }
-.g-taco .rs-reel::after { background: linear-gradient(transparent, rgba(42, 10, 46, .85)); }
-.g-taco .rs-cell.pin { background: radial-gradient(circle, rgba(236, 72, 153, .45), transparent 70%); }
-.g-taco .rs-cell.pin svg { animation: tfPin 1.6s ease-in-out infinite; transform-origin: 50% 0; }
-@keyframes tfPin { 25% { transform: rotate(-7deg); } 75% { transform: rotate(7deg); } }
-.g-taco .rs-cell.wild { background: radial-gradient(circle, rgba(250, 204, 21, .35), transparent 70%); }
-.g-taco .rs-cell.win { box-shadow: inset 0 0 0 3px #fde047, inset 0 0 18px rgba(250, 204, 21, .6); border-radius: 3px; }
-.g-taco .lbl.tfl { position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%); font: 900 3.6cqh Archivo, sans-serif; font-style: normal; padding: .4cqh 1.2cqh; border-radius: 0.4cqh; background: linear-gradient(90deg, #dc2626, #f59e0b); color: #fff; }
-.tf-hit { position: absolute; inset: 6%; z-index: 4; display: grid; place-items: center; border: 3px dashed #fde047; border-radius: 4px; background: rgba(253, 224, 71, .12); cursor: pointer; font-size: 10cqh; animation: tfHit .7s ease-in-out infinite; }
-.tf-hit span { filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); }
-@keyframes tfHit { 50% { transform: scale(1.06); background: rgba(253, 224, 71, .28); } }
-.g-taco .rs-cell.opened svg { opacity: .15; transform: scale(.7); }
-.tf-prize { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; text-align: center; animation: symPop .45s cubic-bezier(.3, 1.8, .5, 1); }
-.tf-prize b { font: 900 5.6cqh Archivo, sans-serif; color: #fff; padding: 1.2cqh 2cqh; border-radius: 0.6cqh; background: #16a34a; box-shadow: 0 0 0 2px #fff, 0 0 18px rgba(74, 222, 128, .7); white-space: nowrap; }
-.tf-prize.m b { background: #7c3aed; box-shadow: 0 0 0 2px #fff, 0 0 18px rgba(167, 139, 250, .8); font-size: 8cqh; }
-.tf-prize.f b { background: linear-gradient(90deg, #f43f5e, #f59e0b); font-size: 5.2cqh; }
-.tf-prize small { margin-top: 4px; font: 800 3.4cqh Inter, sans-serif; color: #fde68a; }
-.tf-meter { margin-left: auto; display: flex; align-items: baseline; gap: 8px; padding: 6px 14px; border-radius: 4px; background: linear-gradient(180deg, #4c0f3f, #22072a); box-shadow: 0 0 0 2px #fde047; }
-.tf-meter small { font: 800 10px KeCoin, Inter, sans-serif; letter-spacing: 2px; text-transform: uppercase; color: #fde68a; }
-.tf-meter b { display: inline-block; font: 900 clamp(20px, 2.4vw, 28px)/1 KeCoin, 'Bebas Neue', Archivo, sans-serif; color: #fff; }
-.tf-meter.hot { box-shadow: 0 0 0 2px #f43f5e, 0 0 16px rgba(244, 63, 94, .6); }
-.tf-word { position: absolute; left: 50%; top: 55%; z-index: 6; pointer-events: none; opacity: 0; font: 900 clamp(40px, 8vw, 90px)/1 KeCoin, 'Bebas Neue', Archivo, sans-serif; color: #fde047; text-shadow: 0 4px 0 #be123c, 0 8px 0 #6b0f2a; white-space: nowrap; }
-.g-taco.in-free .tf-stage { background: radial-gradient(ellipse at 50% 0%, rgba(244, 63, 94, .35), transparent 60%), linear-gradient(180deg, #5b0f3a, #2a0a2e); }
-@container (max-width: 520px) { .tf-stage { padding-top: 26px; } .tf-papel { height: 22px; } .tf-papel i { height: 18px; } .tf-meter { padding: 3px 10px; } .tf-meter small { font-size: 9px; letter-spacing: 1px; } }
+/* ============ La Pizza Yo-Yo (id taco) : pizza ronde qui tourne, parts qui s'écartent ============ */
+.g-taco { --slot-bg: radial-gradient(600px 300px at 50% 0%, rgba(251, 146, 60, .3), transparent 70%), linear-gradient(180deg, #3a1608 0%, #120703 100%); }
+.slot.g-taco > .slot-bg { background: linear-gradient(180deg, rgba(20, 8, 2, .55), rgba(20, 8, 2, .35) 40%, rgba(20, 8, 2, .75)), url(assets/games/pizza/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.slot.g-taco.in-free > .slot-bg { filter: sepia(.35) saturate(1.6) hue-rotate(-12deg) brightness(.8); }
+.g-taco > .slot-bg::after { display: none; }
+.g-taco .slot-title { display: none !important; }
+.g-taco .slot-head { margin-bottom: 4px; justify-content: center; }
+.g-taco > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.g-taco > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; }
+.g-taco .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.g-taco .controls { background: rgba(20, 8, 2, .55); border-color: rgba(255, 255, 255, .14); }
+.g-taco .meter.pz-mult.hot { box-shadow: 0 0 0 2px #fbbf24, 0 0 18px rgba(251, 191, 36, .7); }
+.pz-scene { position: relative; padding: 4px 0 8px; }
+.pz-hud { display: none; justify-content: center; gap: 8px; margin: 0 auto 8px; flex-wrap: wrap; }
+.g-taco.in-free .pz-hud { display: flex; }
+.pz-hud > div { display: flex; align-items: center; gap: 8px; padding: 5px 12px; background: rgba(20, 8, 2, .72); border: 1px solid rgba(251, 191, 36, .35); border-radius: 2px; }
+.pz-hud small { font: 800 10px KeCoin, Inter, sans-serif; letter-spacing: 1.6px; text-transform: uppercase; color: #fde68a; }
+.pz-hud b { font: 900 18px/1 KeCoin, Archivo, sans-serif; color: #fff; }
+.pz-dots { display: flex; gap: 5px; }
+.pz-dots i { width: 16px; height: 16px; border-radius: 50%; background: rgba(255, 255, 255, .12); border: 1px solid rgba(255, 255, 255, .25); transition: background .25s, box-shadow .25s, transform .25s; }
+.pz-dots i.on { background: radial-gradient(circle at 40% 35%, #f87171, #b91c1c 70%); border-color: #fecaca; box-shadow: 0 0 10px rgba(248, 113, 113, .8); transform: scale(1.12); }
+.pz-board { position: relative; width: min(100%, calc(100vh - var(--chrome) + 70px)); min-width: min(100%, 260px); aspect-ratio: 1; margin: 0 auto; }
+.pz-rot { position: absolute; inset: 0; transform: rotate(var(--a, 0deg)); will-change: transform; }
+.pz-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .65)); }
+.pz-hole { fill: rgba(0, 0, 0, .28); stroke: rgba(253, 230, 138, .16); stroke-width: .25; }
+.pz-tray { opacity: 0; transition: opacity .3s; } .pz-tray.on { opacity: 1; }
+.pz-piece { transition: transform .8s cubic-bezier(.3, .7, .3, 1), opacity .6s .2s; transform-box: view-box; }
+.pz-piece.out { transform: translate(var(--ox), var(--oy)) scale(.9); opacity: 0; pointer-events: none; }
+.pz-piece.pulling { animation: pzPull .9s cubic-bezier(.3, .7, .3, 1) both; }
+@keyframes pzPull { 0% { transform: none; opacity: 1; } 35% { transform: translate(calc(var(--ox) * .25), calc(var(--oy) * .25)) scale(1.05); opacity: 1; filter: drop-shadow(0 0 2px #fde68a); } 100% { transform: translate(var(--ox), var(--oy)) scale(.9); opacity: 0; } }
+.pz-cut { fill: none; stroke: rgba(60, 25, 5, .55); stroke-width: .35; }
+.pz-pin { position: absolute; left: 50%; top: -2.5%; width: 7%; aspect-ratio: 1; translate: -50% 0; z-index: 3; background: #e3132f; clip-path: polygon(0 0, 100% 0, 50% 100%); filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .6)); }
+.pz-cells { position: absolute; inset: 0; }
+.pz-cell { position: absolute; translate: -50% -50%; display: grid; place-items: center; transition: left .32s ease-in, top .32s ease-in, opacity .25s, transform .25s; }
+.pz-cell .pz-img { width: 100%; height: 100%; object-fit: contain; transform: rotate(calc(-1 * var(--a, 0deg))); filter: drop-shadow(0 0 1px rgba(255, 255, 255, .9)) drop-shadow(0 3px 4px rgba(0, 0, 0, .65)); pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.pz-cell.in { animation: pzIn .42s cubic-bezier(.3, .8, .4, 1.1) both; }
+@keyframes pzIn { from { transform: translate(var(--dx), var(--dy)) scale(.6); opacity: 0; } }
+.pz-cell.gone { opacity: 0; transform: scale(.4); }
+.pz-cell.win .pz-img { animation: pzWin .45s ease-in-out infinite alternate; filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 10px #fbbf24); }
+@keyframes pzWin { to { scale: 1.18; } }
+.pz-cell.pop { transform: scale(0) rotate(40deg); opacity: 0; transition: transform .22s ease-in, opacity .22s; }
+.pz-cell.scat .pz-img { filter: drop-shadow(0 0 10px #f87171) drop-shadow(0 3px 4px rgba(0, 0, 0, .6)); animation: pzBob 1.4s ease-in-out infinite; }
+@keyframes pzBob { 50% { scale: 1.1; } }
+.pz-cell.collect { transform: scale(1.35); filter: drop-shadow(0 0 12px #f87171); transition: transform .3s; }
+.pz-m { position: absolute; left: 50%; bottom: -4%; translate: -50% 0; transform: rotate(calc(-1 * var(--a, 0deg))); padding: 0 .3em; font: 900 clamp(10px, 2.4cqi, 18px)/1.3 KeCoin, Archivo, sans-serif; color: #fff; background: #e3132f; border: 1px solid #fde68a; border-radius: 2px; box-shadow: 0 2px 6px rgba(0, 0, 0, .6); }
+.pz-cell.fire .pz-img { animation: pzWin .3s ease-in-out infinite alternate; filter: drop-shadow(0 0 12px #fbbf24); }
+.pz-word { position: absolute; left: 50%; top: 50%; z-index: 6; pointer-events: none; opacity: 0; white-space: nowrap; translate: -50% -50%; font: 900 clamp(26px, 6vw, 64px)/1 KeCoin, Archivo, sans-serif; letter-spacing: 1px; color: #fff7c2; text-shadow: 0 3px 0 #9a3412, 0 0 18px rgba(251, 146, 60, .9); }
+.pz-word.on { animation: pzWord 1.3s ease-out both; }
+.pz-word.mult { color: #fde047; font-size: clamp(48px, 11vw, 120px); }
+.pz-word.full { color: #fde047; }
+@keyframes pzWord { 0% { opacity: 0; transform: scale(.5); } 20% { opacity: 1; transform: scale(1.08); } 75% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.05) translateY(-10px); } }
+.g-taco .pay-sym .pz-img, .pay-sym .pz-img { width: 46px; height: 46px; object-fit: contain; }
+.intro-glyph .pz-img { width: 130px; height: 130px; object-fit: contain; }
+@media (prefers-reduced-motion: reduce) { .pz-cell.win .pz-img, .pz-cell.scat .pz-img, .pz-cell.fire .pz-img { animation: none; } }
 
 /* ============ Daily missions ============ */
 .missions-page h1 { margin: 6px 0 8px; font-size: clamp(26px, 4vw, 36px); }
@@ -5149,7 +5167,7 @@ const { toast } = __mods['ui.js'];
 const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
-const GAMES = [['cosmic', 'Le Cosmique'], ['taco', 'La Fiesta'], ['zeus', 'L’Olympe'], ['candy', 'La Sweety'], ['pileface', 'La Pièce'], ['robots', 'La Course'], ['huff', 'Le Loup 2.0'], ['mines', 'Le Champ de Mines'], ['plinko', 'La Cascade']];
+const GAMES = [['cosmic', 'Le Cosmique'], ['taco', 'La Pizza Yo-Yo'], ['zeus', 'L’Olympe'], ['candy', 'La Sweety'], ['pileface', 'La Pièce'], ['robots', 'La Course'], ['huff', 'Le Loup 2.0'], ['mines', 'Le Champ de Mines'], ['plinko', 'La Cascade']];
 const CHEST = { ke: 150, xp: 120 };
 
 const dayKey = (t = Date.now()) => { const d = new Date(t); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
@@ -7120,7 +7138,7 @@ const ORIGINALS = [
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
   {"id": "billes", "name": "La Descente", "cat": "quick", "tag": "Course", "sub": "Course de billes avec vraie physique", "colors": ["#38bdf8", "#0b1023"], "description": "Cinq billes dévalent un parcours plein de pièges : entonnoirs, plots rebondissants, moulins, bascules, zones turbo et boue. Mise sur une ou plusieurs billes : la première en bas gagne et ta mise est payée selon sa cote !", "features": ["5 billes, cotes qui changent", "Vraie physique, 40 s de suspense", "Mise sur plusieurs billes", "Remise et tours auto"], "rtp": "≈ 95 %", "vol": 3, "max": "×16,8"},
-  {"id": "taco", "name": "La Fiesta", "cat": "slot", "tag": "Machine à sous", "sub": "Frappe les piñatas !", "colors": ["#f43f5e", "#5b0f3a"], "description": "C’est la fiesta ! Tacos, maracas, calaveras et luchadors sur 5 rouleaux et 243 façons de gagner. Quand une piñata tombe, frappe-la : elle révèle des gains, des multiplicateurs qui s’additionnent, ou la FIESTA et ses tours gratuits avec un multiplicateur global qui grimpe sans arrêt.", "features": ["243 façons de gagner", "Sombrero WILD", "Piñatas à frapper", "Multiplicateurs ×2 à ×5 cumulables", "Fiesta : 8 tours gratuits", "Multiplicateur global", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
+  {"id": "taco", "name": "La Pizza Yo-Yo", "cat": "slot", "tag": "Machine à sous", "sub": "La pizza qui tourne", "colors": ["#f97316", "#7c2d12"], "description": "Une pizza ronde qui tourne ! Elle s’arrête avec un quart ouvert où tombent les symboles : 4 identiques qui se touchent gagnent, les autres glissent vers le centre, et les grosses connexions écartent une part de plus. Les food trucks multiplient le gain. Bonus Le Four : chaque 4ᵉ pepperoni ouvre une part et donne +2 tours, jusqu’à la pizza entière.", "features": ["Pizza ronde qui tourne", "Connexions de 4 symboles", "Parts qui s’écartent", "Food trucks multiplicateurs ×2 à ×50", "Bonus Le Four et Super Four", "Pepperonis à collectionner", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
   {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200\u00a0\uE1E0 tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200\u00a0\uE1E0", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "labo", "name": "Le Labo", "cat": "slot", "tag": "Machine à sous", "sub": "Le Dealer, La Descente, La Mallette", "colors": ["#a855f7", "#0d0415"], "description": "Un labo clandestin multicolore où tout plane : feuilles, joints, pilules arc-en-ciel, champignons magiques, buvards, cachets roses, sachets de poudre et la brique du cartel, en plein festival, avec le Boss en symbole premium. 1024 façons de gagner. Le Dealer pose des WILD, La Descente lance un trip de tours gratuits où le multiplicateur monte à chaque gain, et La Mallette lance un bonus de taz : la fumée verte récolte leurs multiplicateurs, les feuilles les multiplient, la taz magique aspire tout, et un écran plein de taz déclenche le jackpot Le Cartel ×1000.", "features": ["5 rouleaux, 1024 façons", "WILD – Le Dealer", "Free spins – La Descente", "Multiplicateur qui monte", "Bonus – La Mallette", "Jackpot – Le Cartel ×1000", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
@@ -7460,11 +7478,8 @@ const SPECS = {
     },
   },
   taco: {
-    bg: ['#9f1239', '#1a0420'], light: '#fde047', title: ['LA FIESTA'], font: 'bebas', metal: ['#fff', '#fde047', '#dc2626'], tag: '¡ PIÑATAS !',
-    art: (u) => `
-      <g>${Array.from({ length: 9 }, (_, k) => `<path d="M${k * 34 + 2} 0 h30 v28 l-5 6 l-5 -5 l-5 6 l-5 -6 l-5 5 l-5 -6 z" fill="${['#f43f5e', '#fde047', '#22d3ee', '#4ade80', '#f97316', '#e879f9'][k % 6]}" opacity=".85"/>`).join('')}</g>
-      ${sym('tfp', 150, 120, 150, `filter="url(#glow${u})"`)}
-      ${sym('tfw', 70, 214, 100, `filter="url(#sh${u})"`)}${sym('tf3', 236, 210, 92, `filter="url(#sh${u})"`)}${sym('tf2', 250, 100, 56, `filter="url(#sh${u})"`)}${sym('tf4', 48, 110, 58, `filter="url(#sh${u})"`)}`,
+    bg: ['#7c2d12', '#1c0a03'], light: '#fdba74', title: ['LA PIZZA', 'YO-YO'], font: 'bebas', metal: ['#fff', '#fde68a', '#ea580c'], tag: 'LE FOUR', photo: 'assets/games/pizza/cover.webp',
+    art: () => '',
   },
   billets: {
     bg: ['#8a6420', '#1f1404'], light: '#fde047', title: ['LE COFFRE', 'FORT'], font: 'bebas', metal: ['#fff', '#fde047', '#b45309'], tag: 'JACKPOT ×500', photo: 'assets/games/billets/cover.webp',
@@ -7702,6 +7717,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'taco', date: '2026-11-02', title: 'Nouveau jeu : La Pizza Yo-Yo', isNew: true, items: ['La Fiesta devient La Pizza Yo-Yo : une pizza ronde qui tourne', '4 symboles qui se touchent gagnent, les grosses connexions écartent une part', 'Food trucks multiplicateurs jusqu’à ×50', 'Bonus Le Four : 4 pepperonis = une part de plus et +2 tours'] },
   { game: 'pharaon', date: '2026-11-02', title: 'Le Totem illustré', items: ['Nouveaux symboles peints : masque du pharaon, faucon, ankh d’or, cobra, scarabée, amphore', 'Nouveau soleil scatter', 'Nouveau décor : le pharaon à l’orbe (et le pharaon sur son trône sur téléphone)', 'Nouvelle jaquette']},
   { game: 'billets', date: '2026-11-01', title: 'Nouveaux billets', items: ['Nouvelle jaquette : la montagne de billets', 'Nouveaux billets de 5 à 200 KE, nouvelle mallette, billet FREE SPINS et coffre JACKPOT', 'Nouveau décor : la pluie de billets', 'Affichage épuré et plein écran sur tout l’écran'] },
   { game: 'blackjack', date: '2026-11-01', title: 'Nouvelle table', items: ['Salle de casino et croupière animée', 'Tapis vert en demi-cercle avec sabot et feu de statut', 'Nouvelle barre de jetons : pose tes jetons, annule, double ou répète ta mise'] },
@@ -7802,7 +7818,6 @@ const UPDATES = [
   { game: 'bling', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   { game: 'pharaon', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   { game: 'bounty', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
-  { game: 'taco', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   { game: 'billets', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   { game: 'dragons', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   {
@@ -7825,7 +7840,6 @@ const UPDATES = [
   { game: 'bling', date: '2026-10-31', title: 'Nouveau nom : La Tour Bling', items: ['Bling Tower s’appelle maintenant La Tour Bling', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'pharaon', date: '2026-10-31', title: 'Nouveau nom : Le Totem', items: ['Pharaon Gold s’appelle maintenant Le Totem', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'bounty', date: '2026-10-31', title: 'Nouveau nom : Le Récif', items: ['Bounty Reef s’appelle maintenant Le Récif', 'Nouvelle affiche avec le nouveau nom'] },
-  { game: 'taco', date: '2026-10-31', title: 'Nouveau nom : La Fiesta', items: ['Taco Fiesta s’appelle maintenant La Fiesta', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'billets', date: '2026-10-31', title: 'Nouveau nom : Le Coffre-Fort', items: ['Coffre aux Billets s’appelle maintenant Le Coffre-Fort', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'dragons', date: '2026-10-31', title: 'Nouveau nom : L’Hydre', items: ['Têtes de Dragon s’appelle maintenant L’Hydre', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'madwheel', date: '2026-10-31', title: 'Nouveau nom : La Roue Folle', items: ['Mad Wheel s’appelle maintenant La Roue Folle', 'Nouvelle affiche avec le nouveau nom'] },
@@ -7877,10 +7891,6 @@ const UPDATES = [
   {
     game: 'candy', date: '2026-10-31', title: 'Nouvelles règles',
     items: ['Chaque cascade fait grimper le multiplicateur jusqu’à ×20', 'Les grosses grappes créent des bonbons spéciaux : cœur explosif, bocal bombe, baguette magique', 'Bal de la Reine : le multiplicateur ne redescend jamais', 'Nouvel achat : bonbon spécial garanti'],
-  },
-  {
-    game: 'taco', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
-    items: ["243 façons de gagner et un sombrero WILD", "Frappe les piñatas : gains, multiplicateurs ou FIESTA", "Fiesta : 8 tours gratuits avec multiplicateur global", "Jusqu’à ×5 000 la mise"],
   },
   {
     game: 'robots', date: '2026-10-31', title: 'Nouveau jeu', isNew: true,
@@ -10362,7 +10372,7 @@ const FILES = {
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
-  taco: ['taco', 'games/impl/taco.js', 'TacoGame', 'f909ad5846'],
+  taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '0dec5bf935'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '200ec4fe09'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'ee4862aacf'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', '4b91b43686'],
