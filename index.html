@@ -618,7 +618,7 @@ section { margin-bottom: 28px; }
 .huff-text.small { font-size: clamp(16px, 2.6vw, 26px); }
 
 /* ============ Modals & toasts ============ */
-.modal-back { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 16px; background: rgba(3, 5, 10, .7); backdrop-filter: blur(6px); opacity: 0; transition: opacity .2s; }
+.modal-back { position: fixed; inset: 0; z-index: 400; display: grid; place-items: center; padding: 16px; background: rgba(3, 5, 10, .7); backdrop-filter: blur(6px); opacity: 0; transition: opacity .2s; }
 .modal-back.show { opacity: 1; }
 .modal { position: relative; width: min(420px, 100%); max-height: 88vh; overflow-y: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 24px; box-shadow: var(--shadow); transform: translateY(12px) scale(.97); transition: transform .25s cubic-bezier(.2, .8, .2, 1); }
 .modal.wide { width: min(720px, 100%); }
@@ -643,7 +643,7 @@ section { margin-bottom: 28px; }
 .rules { padding-left: 18px; margin: 6px 0; }
 .rules li { margin: 6px 0; }
 
-.toasts { position: fixed; top: 76px; right: 16px; z-index: 120; display: flex; flex-direction: column; gap: 8px; }
+.toasts { position: fixed; top: 76px; right: 16px; z-index: 450; display: flex; flex-direction: column; gap: 8px; }
 .toast { padding: 12px 16px; border-radius: 3px; background: var(--panel-2); border: 1px solid var(--line); box-shadow: var(--shadow); font-weight: 600; transform: translateX(120%); transition: transform .3s cubic-bezier(.2, .8, .2, 1); }
 .toast.show { transform: none; }
 .toast.warn { border-color: var(--gold); }
@@ -11012,7 +11012,7 @@ const { profiles } = __mods['profile.js'];
 const { wallet, fmt } = __mods['wallet.js'];
 const { el, toast, modal } = __mods['ui.js'];
 
-const MAX = 200, KEEP = 60, GIFT_MIN = 1, GIFT_MAX = 5000, DAY_MAX = 5000; // KE
+const MAX = 200, KEEP = 60, GIFT_MIN = 1, GIFT_MAX = 70; // KE par envoi ; autant d’envois qu’on veut, à qui on veut
 const BAD = ['connard', 'connasse', 'salope', 'pute', 'enculé', 'encule', 'fdp', 'ntm', 'nique ta', 'pd', 'batard', 'bâtard', 'negro', 'nègre', 'tg'];
 const clean = (t) => { let x = t; BAD.forEach((w) => { x = x.replace(new RegExp(`(^|[^\\p{L}])(${w})(?=$|[^\\p{L}])`, 'giu'), (m, a, b) => a + '•'.repeat(b.length)); }); return x; };
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -11153,15 +11153,14 @@ async function renderSend(toUid, toName) {
   const box = root.querySelector('.ct-body.send'), m = me();
   if (!m) { box.innerHTML = '<p class="ct-empty">Crée un compte (ou connecte-toi) pour envoyer des KE à un autre joueur.</p>'; return; }
   box.innerHTML = '<p class="ct-empty">Chargement…</p>';
-  const [sent, hist] = await Promise.all([cloud.sentToday(m.uid).catch(() => 0), cloud.giftHistory(m.uid).catch(() => [])]);
-  const left = Math.max(0, DAY_MAX - sent / 100);
+  const hist = await cloud.giftHistory(m.uid).catch(() => []);
   box.innerHTML = `
     <form class="ct-gift">
       <label>Pseudo du joueur<input name="to" maxlength="16" placeholder="Pseudo exact" value="${toName ? esc(toName) : ''}" ${toUid ? `data-uid="${esc(toUid)}"` : ''} autocomplete="off"></label>
-      <label>Montant (KE)<input name="amt" type="number" inputmode="numeric" min="${GIFT_MIN}" max="${Math.min(GIFT_MAX, left)}" step="1" placeholder="ex. 100"></label>
-      <div class="ct-quick">${[50, 100, 500, 1000].map((v) => `<button type="button" data-q="${v}">${v}</button>`).join('')}</div>
-      <p class="ct-info">Ton solde : <b>${fmt(wallet.cents / 100)}</b> · Encore envoyable aujourd’hui : <b>${fmt(left)}</b></p>
-      <button class="btn primary" ${left < GIFT_MIN ? 'disabled' : ''}>💸 Envoyer</button>
+      <label>Montant (KE)<input name="amt" type="number" inputmode="numeric" min="${GIFT_MIN}" max="${GIFT_MAX}" step="1" placeholder="1 à ${GIFT_MAX}"></label>
+      <div class="ct-quick">${[10, 20, 50, GIFT_MAX].map((v) => `<button type="button" data-q="${v}">${v}</button>`).join('')}</div>
+      <p class="ct-info">Ton solde : <b>${fmt(wallet.cents / 100)}</b> · Maximum <b>${fmt(GIFT_MAX)}</b> par envoi, autant d’envois que tu veux</p>
+      <button class="btn primary">💸 Envoyer</button>
       <p class="ct-note">Les KE sont de l’argent fictif : les vendre ou les acheter contre de l’argent réel est interdit et entraîne le bannissement.</p>
     </form>
     <h4 class="ct-h">Historique</h4>
@@ -11173,7 +11172,7 @@ async function renderSend(toUid, toName) {
     e.preventDefault();
     const amt = Math.floor(+f.amt.value || 0), cents = amt * 100;
     if (amt < GIFT_MIN) return toast('Choisis un montant', 'warn');
-    if (amt > GIFT_MAX || amt > left) return toast(`Maximum ${fmt(Math.min(GIFT_MAX, left))} aujourd’hui`, 'warn');
+    if (amt > GIFT_MAX) return toast(`Maximum ${fmt(GIFT_MAX)} par envoi`, 'warn');
     if (cents > wallet.cents) return toast('Solde insuffisant', 'warn');
     let uid = f.to.dataset.uid, name = f.to.value.trim();
     name = name.slice(0, 16);
