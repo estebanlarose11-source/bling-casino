@@ -1,41 +1,104 @@
 // SpinBet Casino · ChasseGame — loaded on demand by games/impl/index.js (index.html).
 // ---- games/impl/chasse.js ----
 __mods['games/impl/chasse.js'] = (() => {
-// La Chasse: one stake buys 5 cartridges (each worth a fifth of the stake). For 30 seconds game crosses the field:
-// ducks and pheasants in the sky, rabbits, boars and deer on the ground, behind or in front of trees, bushes and
-// logs. Every animal hit reveals a random multiplier of its cartridge (×0 to ×100, the same odds for every
-// animal); the rare golden deer pays ×1 000 if the shot lands (it is fast and often dodges). The round pays the
-// sum. A missed shot, or a shot into a tree / bush / log in front of the animal, is lost. Painted art by the owner
-// in assets/games/chasse/. Tuned so that a perfect shooter gets ≈ 95 % back; any missed shot only lowers it.
+// La Chasse: 5×3 slot, 243 ways, with the owner's painted animals (lapin, canard, faisan, sanglier, cerf), card
+// symbols 10 J Q K A, the golden deer WILD and the shotgun cartridge SCATTER. 3 cartridges open the hunt (the
+// field of the old La Chasse) with 3 shots, 4 or 5 cartridges the big hunt with 5 shots, where the golden deer may
+// cross (×500). Every animal hit reveals a multiplier × the bet (×2 to ×250). Tuned by simulation: ≈ 92,6 % for a
+// perfect shooter (≈ 90 % when 15 % of the shots miss); hunt buys ≈ 89 % (3 shots) and ≈ 87,5 % (5 shots).
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
+const { Reels } = __mods['core/reels.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, isMuted, audioContext } = __mods['audio.js'];
-const { fx } = __mods['fx.js'];
+const { fx, center } = __mods['fx.js'];
 
 /* ===ENGINE */
-const SHOTS = 5, ROUND_S = 30;
-// multiplier of the cartridge for any animal hit (expected value 0,90)
-const MULTS = [[0, 0.409], [0.5, 0.2], [1, 0.25], [2, 0.1], [5, 0.03], [10, 0.01], [100, 0.001]];
-const GOLD = { x: 1000, appear: 1 / 250, success: 1 / 16 }; // ≈ +0,05 of the stake for a perfect shooter
-const drawMult = () => { let r = Math.random(); for (const [m, p] of MULTS) { if (r < p) return m; r -= p; } return 0; };
-const goldRound = () => Math.random() < GOLD.appear;
-const goldHit = () => Math.random() < GOLD.success;
-const payout = (bet, sum) => Math.floor((bet * sum) / SHOTS); // cents
+// 5×3, 243 ways. Low cards 10 J Q K A (0-4), animals (5-9: lapin, canard, faisan, sanglier, cerf), golden deer WILD
+// (10, reels 2-4) and the cartridge SCATTER (11, any reel, one per reel at most). 3 cartridges: the hunt with 3 shots;
+// 4 or 5: the big hunt with 5 shots (and the golden deer may cross). Each animal hit pays a multiplier × the bet.
+const COLS = 5, ROWS = 3, N = 15, WILD = 10, SCAT = 11, CAPX = 5000;
+const P = {
+  w: [30, 28, 26, 24, 22, 13, 11, 9, 7, 5], wild: 3.2, scat: 0.095,
+  pays: [[0.25, 0.5, 1], [0.25, 0.5, 1.2], [0.3, 0.6, 1.5], [0.4, 0.8, 2], [0.5, 1, 2.5], [0.8, 2, 5], [1, 2.5, 6], [1.2, 3, 8], [1.5, 4, 12], [2, 6, 20]],
+  K: 1.96,
+};
+// hunt: multiplier × the bet for every animal hit (same odds for every animal)
+const HUNT = [[2, 30], [3, 24], [5, 18], [8, 12], [10, 8], [15, 4], [25, 2.5], [50, 1.1], [100, 0.35], [250, 0.05]];
+const GOLD = { x: 500, appear: 1 / 12, success: 1 / 8 }; // big hunt only
+const SHOTS = { 3: 3, 4: 5, 5: 5 };
+function wpick(l) { let t = 0; for (const x of l) t += x[1]; let r = Math.random() * t; for (const x of l) { if (r < x[1]) return x[0]; r -= x[1]; } return l[l.length - 1][0]; }
+function sym(c) {
+  const ws = c >= 1 && c <= 3 ? P.wild : 0;
+  let t = ws; for (const x of P.w) t += x;
+  let q = Math.random() * t;
+  if (q < ws) return WILD; q -= ws;
+  for (let i = 0; i < P.w.length; i++) { if (q < P.w[i]) return i; q -= P.w[i]; }
+  return 0;
+}
+function reel(c) {
+  const col = [sym(c), sym(c), sym(c)];
+  if (Math.random() < P.scat) col[Math.floor(Math.random() * ROWS)] = SCAT;
+  return col;
+}
+function ways(g) {
+  const wins = [];
+  for (let s = 0; s < P.w.length; s++) {
+    let n = 0, w = 1; const cells = [];
+    for (let c = 0; c < COLS; c++) {
+      let k = 0;
+      for (let r = 0; r < ROWS; r++) { const v = g[c * ROWS + r]; if (v === s || v === WILD) { k++; cells.push(c * ROWS + r); } }
+      if (!k) break; n++; w *= k;
+    }
+    if (n >= 3) wins.push({ s, n, ways: w, x: P.pays[s][n - 3] * P.K * w, cells: cells.filter((i) => Math.floor(i / ROWS) < n) });
+  }
+  return wins;
+}
+function spin() {
+  const g = [];
+  for (let c = 0; c < COLS; c++) g.push(...reel(c));
+  const wins = ways(g);
+  const scat = g.filter((v) => v === SCAT).length;
+  return { g, wins, x: wins.reduce((a, w) => a + w.x, 0), scat, shots: scat >= 3 ? SHOTS[Math.min(5, scat)] : 0 };
+}
+const huntMult = () => wpick(HUNT);
 /* ===END ENGINE */
+
+const BUY3 = 21, BUY5 = 41;
+const HUNT_S = { 3: 20, 5: 30 }; // seconds of hunt for 3 and 5 shots
 
 const IMG_V = 3;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const src = (n) => asset(`assets/games/chasse/${n}.webp`);
 const xs = (m) => (m >= 100 ? Math.round(m).toLocaleString('fr-FR') : String(m).replace('.', ','));
-// sprites: image, natural facing (1 right, -1 left), width (% of the field), sky or ground, crossing time (s), weight
+const CARDS = ['10', 'J', 'Q', 'K', 'A'];
+const ANIMALS = ['rabbit', 'duck', 'pheasant', 'boar', 'deer'];
+const NAMES = ['10', 'Valet', 'Dame', 'Roi', 'As', 'Lapin', 'Canard', 'Faisan', 'Sanglier', 'Cerf'];
+// the shotgun cartridge (scatter): red ribbed shell, brass head
+const SHELL = `<svg class="ch-shell" viewBox="0 0 44 100" aria-hidden="true"><defs>
+  <linearGradient id="chRed" x1="0" x2="1"><stop offset="0" stop-color="#6b0f0f"/><stop offset=".3" stop-color="#f05252"/><stop offset=".55" stop-color="#d61f1f"/><stop offset="1" stop-color="#5c0b0b"/></linearGradient>
+  <linearGradient id="chBrass" x1="0" x2="1"><stop offset="0" stop-color="#7c4a03"/><stop offset=".32" stop-color="#fff2b8"/><stop offset=".55" stop-color="#f2b632"/><stop offset="1" stop-color="#6b3d02"/></linearGradient></defs>
+  <path d="M9 14 Q22 4 35 14 V66 H9 Z" fill="url(#chRed)" stroke="#3f0606" stroke-width="1.2"/>
+  <path d="M13 12 L22 6 L31 12 M15 14 L22 9 L29 14" fill="none" stroke="#3f0606" stroke-opacity=".6" stroke-width="1.2"/>
+  <g stroke="#ffffff" stroke-opacity=".18" stroke-width="1.4"><path d="M14 20 V64 M19 18 V64 M24 18 V64 M29 20 V64"/></g>
+  <path d="M12 18 Q14 16 15 18 V62 H12 Z" fill="#fff" fill-opacity=".3"/>
+  <rect x="7" y="64" width="30" height="24" rx="2" fill="url(#chBrass)" stroke="#5b3402" stroke-width="1.2"/>
+  <rect x="4" y="86" width="36" height="8" rx="2.5" fill="url(#chBrass)" stroke="#5b3402" stroke-width="1.2"/>
+  <circle cx="22" cy="76" r="4.2" fill="#b7791f" stroke="#5b3402" stroke-width="1"/><circle cx="22" cy="76" r="1.6" fill="#fde68a"/>
+</svg>`;
+const symArt = (v) => (v === SCAT ? SHELL
+  : v === WILD ? `<img class="ch-img gold" src="${src('gold')}" alt="" draggable="false"><b class="ch-wild">WILD</b>`
+  : v >= 5 ? `<img class="ch-img" src="${src(ANIMALS[v - 5])}" alt="" draggable="false">`
+  : `<b class="ch-card c${v}">${CARDS[v]}</b>`);
+
+// the hunt field (sprites of the old La Chasse)
 const KINDS = {
-  duck: { img: 'duck', face: 1, w: 14, sky: true, t: 4.6, wgt: 3, name: 'Canard' },
-  pheasant: { img: 'pheasant', face: 1, w: 15, sky: true, t: 3.9, wgt: 2, name: 'Faisan' },
-  rabbit: { img: 'rabbit', face: 1, w: 9, t: 3.6, wgt: 3, hop: true, name: 'Lapin' },
-  boar: { img: 'boar', face: 1, w: 15, t: 4.3, wgt: 2, name: 'Sanglier' },
-  deer: { img: 'deer', face: 1, w: 21, t: 3.4, wgt: 1, name: 'Cerf' },
-  deer2: { img: 'deer2', face: -1, w: 19, t: 3.2, wgt: 1, hop: true, name: 'Cerf' },
+  duck: { img: 'duck', face: 1, w: 14, sky: true, t: 4.6, wgt: 3 },
+  pheasant: { img: 'pheasant', face: 1, w: 15, sky: true, t: 3.9, wgt: 2 },
+  rabbit: { img: 'rabbit', face: 1, w: 9, t: 3.6, wgt: 3, hop: true },
+  boar: { img: 'boar', face: 1, w: 15, t: 4.3, wgt: 2 },
+  deer: { img: 'deer', face: 1, w: 21, t: 3.4, wgt: 1 },
+  deer2: { img: 'deer2', face: -1, w: 19, t: 3.2, wgt: 1, hop: true },
 };
 const RATIO = { duck: 304 / 900, pheasant: 361 / 900, rabbit: 462 / 900, boar: 451 / 900, deer: 610 / 900, deer2: 724 / 900, gold: 610 / 900, tree: 519 / 800, log: 152 / 900 };
 const TOD = ['day', 'dusk', 'night'];
@@ -46,43 +109,114 @@ const SCOPE = '<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="non
 class ChasseGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
-      music: EXTRA_THEMES.chasse, autoplay: false, mainLabel: 'JOUER', turbo: false,
-      cls: 'table-game chasse',
-      head: '<div class="head-meters"><div class="meter ht-m-shots"><small>Cartouches</small><b>5</b></div><div class="meter ht-m-sum"><small>Total</small><b>×0</b></div><div class="meter ht-m-win"><small>Gain</small><b>—</b></div></div>',
-      stage: `<div class="ht-field">
-          <div class="ht-hud"><span class="ht-shells">${'<i></i>'.repeat(SHOTS)}</span><span class="ht-time">${ROUND_S}<small> s</small></span><span class="ht-sum">×0</span></div>
+      music: EXTRA_THEMES.chasse, cls: 'ch-slot',
+      stage: `<div class="ch-reels"><div class="reels-host"></div></div>
+        <div class="ht-field" hidden>
+          <div class="ht-hud"><span class="ht-shells"></span><span class="ht-time">20<small> s</small></span><span class="ht-sum">×0</span></div>
           <div class="ht-layer"></div><div class="ht-scope">${SCOPE}</div><div class="ht-banner"></div>
-          <div class="ht-start"><b>5 cartouches · 30 secondes</b><span>Chaque animal touché révèle un multiplicateur.<br>Le cerf doré vaut ×1 000 !</span><small>Choisis ta mise puis JOUER</small></div>
-          <div class="ht-rotate"><b>↻</b><span>Tourne ton téléphone pour jouer en grand</span></div>
-        </div>`,
-      hello: 'Vise les animaux : chaque tir réussi révèle un multiplicateur !',
+          <div class="ht-rotate"><b>↻</b><span>Tourne ton téléphone pour chasser en grand</span></div>
+        </div><div class="ch-word"></div>`,
+      buys: [
+        { id: 'h3', icon: '🎯', label: 'La Chasse · 3 cartouches', desc: '3 tirs, chaque animal touché paie ×2 à ×250 la mise', cost: (b) => b * BUY3 },
+        { id: 'h5', icon: '🦌', label: 'La Grande Chasse · 5 cartouches', desc: '5 tirs, et le cerf doré peut passer (×500)', cost: (b) => b * BUY5 },
+      ],
+      hello: '243 façons de gagner · 3 cartouches = la chasse, 4 cartouches = la grande chasse',
     });
+    this.reels = new Reels(this.q('.reels-host'), {
+      cols: COLS, rows: ROWS, game: this, random: (c) => (Math.random() < P.scat / 3 ? SCAT : sym(c)),
+      art: (v) => symArt(v), cls: (v) => (v === SCAT ? 'scat' : v === WILD ? 'wild' : v >= 5 ? `an a${v}` : `card c${v}`),
+    });
+    this.reels.setAll(Array.from({ length: N }, (_, i) => sym(Math.floor(i / ROWS))));
     this.field = this.q('.ht-field'); this.layer = this.q('.ht-layer'); this.scope = this.q('.ht-scope');
     this.playing = false; this.animals = []; this.obst = [];
-    this.setTod(Math.floor(Math.random() * 3));
     this.field.addEventListener('pointerdown', (e) => this.shoot(e));
     this.field.addEventListener('pointermove', (e) => this.aim(e));
     this.field.addEventListener('pointerleave', () => this.scope.classList.remove('on'));
-    this.onFs = () => this.lockLandscape();
-    document.addEventListener('fullscreenchange', this.onFs);
-    ['duck', 'pheasant', 'rabbit', 'boar', 'deer', 'deer2', 'gold', 'tree', 'log', 'bg-day', 'bg-dusk', 'bg-night'].forEach((n) => { new Image().src = src(n); });
-    this.paint();
+    [...ANIMALS, 'gold'].forEach((n) => { new Image().src = src(n); });
   }
 
-  destroy() {
-    cancelAnimationFrame(this.raf); clearTimeout(this.goldT);
-    document.removeEventListener('fullscreenchange', this.onFs);
-    try { screen.orientation?.unlock?.(); } catch { /* ignore */ }
-    super.destroy();
+  destroy() { cancelAnimationFrame(this.raf); clearTimeout(this.goldT); this.huntDone?.(0); super.destroy(); }
+
+  word(t, cls = '') {
+    const w = this.q('.ch-word');
+    w.textContent = t; w.className = `ch-word ${cls}`;
+    w.getAnimations().forEach((a) => a.cancel());
+    w.animate([{ opacity: 0, transform: 'translate(-50%,-50%) scale(.3)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.1)', offset: 0.25 },
+      { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.7 }, { opacity: 0, transform: 'translate(-50%,-62%) scale(1.15)' }], { duration: this.turbo ? 700 : 1300, easing: 'ease-out' });
   }
 
-  // phones: in full screen, hold the landscape orientation (Android; iPhone shows the "turn your phone" hint)
-  lockLandscape() {
-    if (!matchMedia('(pointer: coarse)').matches) return;
-    try { if (document.fullscreenElement) screen.orientation?.lock?.('landscape').catch(() => {}); else screen.orientation?.unlock?.(); } catch { /* ignore */ }
+  onMain() { this.round(() => this.playRound(null)); }
+  async onBuy(kind) { await this.playRound(kind); }
+
+  async playRound(buy) {
+    const b = this.bet, cap = b * CAPX;
+    if (!buy && !this.pay(b)) return;
+    this.lastStake = b;
+    this.setLast(0); this.winAmt.textContent = ''; this.setBanner('');
+    let total = 0;
+    if (buy) total = await this.hunt(buy === 'h3' ? 3 : 5, b, true);
+    else {
+      const res = spin();
+      await this.reels.spin(res.g, {
+        tease: (c, vals) => { let k = 0; for (let j = 0; j < c * ROWS; j++) if (vals[j] === SCAT) k++; return k >= 2; },
+        onStop: (c) => { for (let r = 0; r < ROWS; r++) if (res.g[c * ROWS + r] === SCAT) { sfx.land(); const p = center(this.reels.cell(c * ROWS + r)); fx.burst(p.x, p.y, 10, ['#ef4444', '#fde68a', '#fff'], 4); } },
+      });
+      if (this.dead) return;
+      total = Math.min(Math.round(res.x * b), cap);
+      if (res.wins.length) {
+        this.reels.mark([...new Set(res.wins.flatMap((w) => w.cells))]);
+        this.msg(res.wins.map((w) => `${w.n} × ${NAMES[w.s]}${w.ways > 1 ? ` (${w.ways} façons)` : ''} : +${fmtC(Math.round(w.x * b))}`).join(' · '));
+        this.win(total); this.setLast(total);
+      } else this.msg(res.scat === 2 ? 'Deux cartouches… il en fallait une de plus !' : 'Pas de gain');
+      if (res.shots) {
+        this.stopAuto();
+        if (total > 0) await this.celebrate(total);
+        this.reels.mark(res.g.map((v, i) => (v === SCAT ? i : -1)).filter((i) => i >= 0), 'win');
+        this.word(res.shots === 5 ? 'GRANDE CHASSE !' : 'LA CHASSE !', 'hunt');
+        sfx.feature(); await this.wait(1200);
+        this.reels.unmark();
+        total += await this.hunt(res.shots, b, false, cap - total);
+      } else if (total > 0) await this.celebrate(total);
+      this.reels.unmark();
+    }
+    this.setLast(total);
+    if (total >= cap) this.msg(`GAIN MAXIMUM ! ${fmtC(total)}`);
   }
 
-  setTod(i) { this.tod = i; this.field.style.backgroundImage = `url("${src(`bg-${TOD[i]}`)}")`; this.field.dataset.tod = TOD[i]; }
+  /* ---------- the hunt (bonus) ---------- */
+  async hunt(shots, b, bought, capLeft = b * CAPX) {
+    const big = shots === 5;
+    await this.featureIntro(big ? 'LA GRANDE CHASSE' : 'LA CHASSE', `${shots} cartouches · ${HUNT_S[shots]} secondes · chaque animal touché paie ×2 à ×250 la mise${big ? ' · le cerf doré vaut ×500 !' : ''}`, SHELL);
+    if (this.dead) return 0;
+    this.q('.ch-reels').hidden = true; this.field.hidden = false;
+    this.slotEl.classList.add('in-free', 'ht-on');
+    this.focusStage?.();
+    this.setTod(Math.floor(Math.random() * 3));
+    this.animals.forEach((a) => a.el.remove()); this.animals = [];
+    this.layout();
+    this.maxShots = shots; this.shots = shots; this.sum = 0; this.left = HUNT_S[shots]; this.nextSpawn = 0.3; this.stake = b;
+    this.q('.ht-shells').innerHTML = '<i></i>'.repeat(shots);
+    this.paintHud();
+    this.msg(`À toi de tirer : ${shots} cartouches, touche les animaux !`);
+    const sum = await new Promise((resolve) => {
+      this.huntDone = (v) => { this.huntDone = null; resolve(v); };
+      this.playing = true;
+      if (big && (window.__htGold || Math.random() < GOLD.appear)) this.goldT = setTimeout(() => { if (this.playing) { this.spawn('deer', true); this.flashGold(); } }, rand(3, HUNT_S[shots] - 8) * 1000);
+      this.last = 0; cancelAnimationFrame(this.raf); this.raf = requestAnimationFrame((n) => this.loop(n));
+    });
+    if (this.dead) return 0;
+    const won = Math.min(Math.round(sum * b), capLeft);
+    await this.wait(2400);
+    cancelAnimationFrame(this.raf);
+    this.field.hidden = true; this.q('.ch-reels').hidden = false;
+    this.slotEl.classList.remove('in-free', 'ht-on');
+    if (won > 0) { this.win(won, big ? 'Grande chasse' : 'Chasse'); this.setLast(won); }
+    await this.celebrate(won, { summary: big ? 'GRANDE CHASSE' : 'LA CHASSE', stake: b });
+    this.msg(won > 0 ? `Chasse : total ×${xs(sum)} → ${fmtC(won)}` : 'La chasse est finie : pas de gain cette fois');
+    return won;
+  }
+
+  setTod(i) { this.field.style.backgroundImage = `url("${src(`bg-${TOD[i]}`)}")`; this.field.dataset.tod = TOD[i]; }
 
   aim(e) {
     if (e.pointerType !== 'mouse') return;
@@ -91,26 +225,13 @@ class ChasseGame extends BaseGame {
     this.scope.classList.toggle('on', this.playing);
   }
 
-  paint() {
-    const left = this.playing ? this.shots : SHOTS;
-    this.q('.ht-m-shots b').textContent = left;
-    this.q('.ht-m-sum b').textContent = `×${xs(this.sum || 0)}`;
-    this.q('.ht-m-win b').textContent = this.playing || this.sum ? fmtC(payout(this.lastStake || this.bet, this.sum || 0)) : '—';
-    this.qa('.ht-shells i').forEach((s, k) => s.classList.toggle('used', k >= left));
+  paintHud() {
+    this.qa('.ht-shells i').forEach((s, k) => s.classList.toggle('used', k >= this.shots));
     this.q('.ht-sum').textContent = `×${xs(this.sum || 0)}`;
-    const lab = this.mainBtn.querySelector('.main-label');
-    lab.textContent = this.playing ? 'EN CHASSE…' : 'JOUER';
-    this.mainBtn.disabled = this.playing;
-    this.q('[data-act="bet-"]').disabled = this.playing || this.bi === 0;
-    this.q('[data-act="bet+"]').disabled = this.playing || this.bi === this.cfg.bets.length - 1;
-    this.slotEl.classList.toggle('ht-on', this.playing);
+    this.setBanner(`<b>${this.maxShots === 5 ? 'GRANDE CHASSE' : 'LA CHASSE'}</b><span class="pill">Cartouches ${this.shots} / ${this.maxShots}</span><span class="pill gold">Total ×${xs(this.sum || 0)} · ${fmtC(Math.round((this.sum || 0) * this.stake))}</span>`);
   }
 
-  onMeters() { if (this.field) this.paint(); }
-  onBetChange() { this.paint(); }
-
-  /* ---------- the field ---------- */
-  // 3 to 4 obstacles: trees (they hide low birds too), bushes and logs, each at a depth (bottom line, %)
+  // 3 to 4 obstacles: trees, bushes and logs, each at a depth (bottom line, %)
   layout() {
     this.obst.forEach((o) => o.el.remove());
     const types = ['tree', 'tree', 'bush', 'bush', 'log', 'log'].sort(() => Math.random() - 0.5).slice(0, 3 + (Math.random() < 0.5 ? 1 : 0));
@@ -127,13 +248,13 @@ class ChasseGame extends BaseGame {
   }
 
   spawn(kind, gold = false) {
-    const k = gold ? { img: 'gold', face: 1, w: 21, t: 1.7, name: 'Cerf doré' } : KINDS[kind];
+    const k = gold ? { img: 'gold', face: 1, w: 21, t: 1.7 } : KINDS[kind];
     const dir = Math.random() < 0.5 ? 1 : -1, fw = this.field.clientWidth || 800, fh = this.field.clientHeight || 450;
-    const depth = k.sky ? 1 : rand(0, 1); // 0 far, 1 near
+    const depth = k.sky ? 1 : rand(0, 1);
     const sc = k.sky ? rand(0.8, 1.15) : 0.7 + depth * 0.5;
     const w = k.w * sc * (fw < 520 ? 1.3 : 1);
     const hPct = (w / 100) * fw * RATIO[k.img] / fh * 100;
-    const bottom = k.sky ? rand(30, 52) : 74 + depth * 22; // % from the top of the field
+    const bottom = k.sky ? rand(30, 52) : 74 + depth * 22;
     const el = document.createElement('img');
     el.className = `ht-a${gold ? ' gold' : ''}`; el.src = src(k.img); el.alt = ''; el.draggable = false;
     el.style.width = `${w}%`;
@@ -153,7 +274,7 @@ class ChasseGame extends BaseGame {
       this.left -= dt;
       this.q('.ht-time').firstChild.textContent = Math.max(0, Math.ceil(this.left));
       this.field.classList.toggle('hurry', this.left < 6);
-      if (this.left <= 0) { this.endRound('time'); }
+      if (this.left <= 0) this.endHunt('time');
       this.nextSpawn -= dt;
       if (this.nextSpawn <= 0 && this.animals.filter((a) => a.alive).length < 4) { this.spawn(pickKind()); this.nextSpawn = rand(0.55, 1.3); }
     }
@@ -170,23 +291,7 @@ class ChasseGame extends BaseGame {
     this.raf = requestAnimationFrame((n) => this.loop(n));
   }
 
-  onMain() {
-    if (this.playing || !this.pay(this.bet)) return;
-    this.lastStake = this.bet;
-    this.animals.forEach((a) => a.el.remove()); this.animals = [];
-    this.setTod(Math.floor(Math.random() * 3));
-    this.layout();
-    this.playing = true; this.shots = SHOTS; this.sum = 0; this.left = ROUND_S; this.nextSpawn = 0.3;
-    this.q('.ht-start').classList.add('hide');
-    this.setLast(0); this.winAmt.textContent = '';
-    this.msg(`Mise ${fmtC(this.bet)} · 5 cartouches à ${fmtC(this.bet / SHOTS)}`);
-    sfx.spin();
-    if (window.__htGold || goldRound()) this.goldT = setTimeout(() => { if (this.playing) { this.spawn('deer', true); this.flashGold(); } }, rand(4, 20) * 1000 * (window.__htGold ? 0.1 : 1));
-    this.last = 0; cancelAnimationFrame(this.raf); this.raf = requestAnimationFrame((n) => this.loop(n));
-    this.paint();
-  }
-
-  flashGold() { const b = this.q('.ht-banner'); b.innerHTML = '<b>✨ CERF DORÉ ! ✨</b><span>×1 000 si tu le touches</span>'; b.className = 'ht-banner gold on'; setTimeout(() => b.classList.remove('on'), 1600); }
+  flashGold() { const b = this.q('.ht-banner'); b.innerHTML = `<b>✨ CERF DORÉ ! ✨</b><span>×${GOLD.x} la mise si tu le touches</span>`; b.className = 'ht-banner gold on'; setTimeout(() => b.classList.remove('on'), 1600); }
 
   bang() {
     if (isMuted()) return;
@@ -198,8 +303,6 @@ class ChasseGame extends BaseGame {
       const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(3200, t); f.frequency.exponentialRampToValueAtTime(300, t + 0.3);
       const g = c.createGain(); g.gain.setValueAtTime(0.9, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
       s.connect(f).connect(g).connect(c.destination); s.start(t);
-      const o = c.createOscillator(), og = c.createGain(); o.frequency.setValueAtTime(140, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.18);
-      og.gain.setValueAtTime(0.7, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.2); o.connect(og).connect(c.destination); o.start(t); o.stop(t + 0.22);
     } catch { /* no audio */ }
   }
 
@@ -221,32 +324,28 @@ class ChasseGame extends BaseGame {
     if (!top) this.pop('💨 Raté !', fr, px, py, 'miss');
     else if (top.o) this.pop(top.o.t === 'tree' ? '🌳 Dans l’arbre !' : top.o.t === 'log' ? '🪵 Dans le tronc !' : '🌿 Dans le buisson !', fr, px, py, 'miss');
     else this.hit(top.a, fr, px, py);
-    this.paint();
-    if (this.shots <= 0) setTimeout(() => this.endRound('shots'), 900);
+    this.paintHud();
+    if (this.shots <= 0) setTimeout(() => this.endHunt('shots'), 900);
   }
 
   hit(a, fr, px, py) {
     if (a.gold) {
-      if (!(window.__htGold || goldHit())) { a.flee = true; this.pop('😮 Le cerf doré a esquivé !', fr, px, py, 'miss'); return; }
+      if (!(window.__htGold || Math.random() < GOLD.success)) { a.flee = true; this.pop('😮 Le cerf doré a esquivé !', fr, px, py, 'miss'); return; }
       this.sum += GOLD.x;
       this.fall(a);
       this.pop(`×${xs(GOLD.x)}`, fr, px, py, 'jack');
       this.flash('rgba(253,224,71,.6)'); fx.confetti(120); sfx.jackpot?.();
       return;
     }
-    const m = drawMult();
-    this.sum = Math.round((this.sum + m) * 10) / 10;
+    const m = huntMult();
+    this.sum += m;
     this.fall(a);
-    this.pop(`×${xs(m)}`, fr, px, py, m === 0 ? 'zero' : m >= 100 ? 'jack' : m >= 5 ? 'big' : m >= 1 ? 'ok' : 'low');
+    this.pop(`×${xs(m)}`, fr, px, py, m >= 100 ? 'jack' : m >= 10 ? 'big' : 'ok');
     fx.burst(px, py, a.k.sky ? 26 : 14, a.k.sky ? ['#fff', '#e7d3b5', '#8b5a2b'] : ['#fde68a', '#fbbf24', '#fff'], a.k.sky ? 7 : 5);
-    if (m >= 5) sfx.bigWin?.(); else if (m > 0) sfx.coin(); else sfx.tick?.();
+    if (m >= 10) sfx.bigWin?.(); else sfx.coin();
   }
 
-  fall(a) {
-    a.alive = false; a.falling = true;
-    a.el.classList.add(a.k.sky ? 'fall-sky' : 'fall');
-    setTimeout(() => { a.el.remove(); a.falling = false; }, 1100);
-  }
+  fall(a) { a.alive = false; a.falling = true; a.el.classList.add(a.k.sky ? 'fall-sky' : 'fall'); setTimeout(() => { a.el.remove(); a.falling = false; }, 1100); }
 
   pop(text, fr, px, py, cls) {
     const p = document.createElement('b');
@@ -255,37 +354,36 @@ class ChasseGame extends BaseGame {
     this.field.appendChild(p); setTimeout(() => p.remove(), 1500);
   }
 
-  mark(x, y) {
-    const m = document.createElement('i');
-    m.className = 'ht-shot'; m.style.left = `${x}px`; m.style.top = `${y}px`;
-    this.field.appendChild(m); setTimeout(() => m.remove(), 800);
-  }
+  mark(x, y) { const m = document.createElement('i'); m.className = 'ht-shot'; m.style.left = `${x}px`; m.style.top = `${y}px`; this.field.appendChild(m); setTimeout(() => m.remove(), 800); }
 
-  endRound(why) {
+  endHunt(why) {
     if (!this.playing) return;
     this.playing = false;
     clearTimeout(this.goldT);
     this.animals.forEach((a) => { if (a.alive) a.flee = true; });
     this.field.classList.remove('hurry');
     this.scope.classList.remove('on');
-    const won = payout(this.lastStake, this.sum);
+    const won = Math.round(this.sum * this.stake);
     const b = this.q('.ht-banner');
     b.innerHTML = `<small>${why === 'time' ? 'Temps écoulé' : 'Fin de la chasse'}</small><b>Total ×${xs(this.sum)}</b><span>${won > 0 ? `+${fmtC(won)}` : 'Pas de gain cette fois'}</span>`;
     b.className = 'ht-banner on end';
-    setTimeout(() => { b.classList.remove('on'); this.q('.ht-start').classList.remove('hide'); }, 2600);
-    if (won > 0) { this.win(won); this.setLast(won); this.celebrate(won); }
-    this.msg(won > 0 ? `Gain : ${fmtC(won)} (total ×${xs(this.sum)} sur 5 cartouches)` : 'Pas de gain : retente ta chance !');
-    this.paint();
+    setTimeout(() => b.classList.remove('on'), 2300);
+    this.huntDone?.(this.sum);
   }
 
   info() {
-    const rows = MULTS.map(([m, p]) => `<tr><td>×${xs(m)}</td><td>${(p * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %</td></tr>`).join('');
-    return this.rules(`<h4>Comment jouer</h4><p>Choisis ta mise et appuie sur JOUER : tu as <b>5 cartouches</b> (chacune vaut un cinquième de la mise) et <b>30 secondes</b>. Canards, faisans, lapins, sangliers et cerfs traversent le terrain : <b>clique (ou touche) un animal pour tirer</b>.</p>
-      <h4>Le tir</h4><p>Un tir à côté, ou dans un arbre, un buisson ou un tronc placé devant l’animal, est perdu. Chaque animal touché révèle un multiplicateur de sa cartouche, tiré au hasard (les mêmes chances pour tous les animaux) :</p>
-      <table class="ht-rules"><tr><th>Multiplicateur</th><th>Chance</th></tr>${rows}</table>
-      <h4>Le cerf doré</h4><p>Il passe rarement et très vite. S’il est touché et qu’il n’esquive pas : <b>×1 000</b> la cartouche.</p>
-      <h4>Le gain</h4><p>À la fin (5 tirs ou 30 secondes), les multiplicateurs s’additionnent : gain = mise × total ÷ 5. Retour au joueur pour un tireur parfait : environ 95 % ; chaque tir raté le diminue.</p>
-      <h4>Plein écran</h4><p>Le bouton Plein écran agrandit le terrain sur tout l’écran ; sur téléphone, tourne-le à l’horizontale.</p>`);
+    const pay = (s) => `3 : ×${xs(Math.round(P.pays[s][0] * P.K * 100) / 100)} · 4 : ×${xs(Math.round(P.pays[s][1] * P.K * 100) / 100)} · 5 : ×${xs(Math.round(P.pays[s][2] * P.K * 100) / 100)}`;
+    const rows = [9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((s) => `<div class="pay-item"><div class="pay-sym ch-pay">${symArt(s)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>${pay(s)}</span></div></div>`).join('');
+    const tot = HUNT.reduce((a, x) => a + x[1], 0);
+    const hunt = HUNT.map(([m, w]) => `<tr><td>×${xs(m)}</td><td>${(w / tot * 100).toLocaleString('fr-FR', { maximumFractionDigits: 2 })} %</td></tr>`).join('');
+    return this.rules(`<h4>Symboles (× la mise, par façon)</h4><div class="paytable">${rows}
+      <div class="pay-item"><div class="pay-sym ch-pay">${symArt(WILD)}</div><div class="pay-vals"><b>Cerf doré WILD</b><br><span>Rouleaux 2 à 4, remplace tous les symboles sauf la cartouche</span></div></div>
+      <div class="pay-item"><div class="pay-sym ch-pay">${SHELL}</div><div class="pay-vals"><b>Cartouche</b><br><span>3 : la chasse (3 tirs) · 4 ou 5 : la grande chasse (5 tirs)</span></div></div></div>
+      <h4>243 façons de gagner</h4><p>Un symbole paie dès qu’il apparaît sur 3 rouleaux d’affilée ou plus depuis la gauche, à n’importe quelle hauteur.</p>
+      <h4>La chasse</h4><p>3 cartouches : <b>3 tirs</b> et ${HUNT_S[3]} secondes. 4 ou 5 cartouches : <b>la grande chasse</b>, <b>5 tirs</b> et ${HUNT_S[5]} secondes. Touche (ou clique) les animaux qui traversent le terrain : chaque animal touché révèle un multiplicateur de <b>la mise</b>. Un tir à côté, ou dans un arbre, un buisson ou un tronc devant l’animal, est perdu.</p>
+      <table class="ht-rules"><tr><th>Multiplicateur</th><th>Chance</th></tr>${hunt}</table>
+      <h4>Le cerf doré</h4><p>Pendant la grande chasse, il peut traverser le terrain très vite. S’il est touché et qu’il n’esquive pas : <b>×${GOLD.x}</b> la mise.</p>
+      <h4>Achats</h4><p>La chasse ×${BUY3} la mise · la grande chasse ×${BUY5}. Gain maximum ×${CAPX.toLocaleString('fr-FR')}. Retour au joueur ≈ 92,6 % pour un tireur parfait ; chaque tir raté le diminue.</p>`);
   }
 }
 

@@ -30,7 +30,7 @@ service cloud.firestore {
       allow delete: if isMe(uid);
       allow create, update: if isMe(uid)
         && request.resource.data.keys().hasOnly(['name', 'level', 'levelScore', 'bal', 'best', 'bestBonus', 'ach', 'updated', 'bestGame', 'bestBonusGame', 'look'])
-        && (!('ach' in request.resource.data) || isNum(request.resource.data.ach, 0, 1000))
+        && (!('ach' in request.resource.data) || isNum(request.resource.data.ach, 0, 100000))
         && (!('bestGame' in request.resource.data) || isGameId(request.resource.data.bestGame))
         && (!('bestBonusGame' in request.resource.data) || isGameId(request.resource.data.bestBonusGame))
         && (!('look' in request.resource.data) || isLook(request.resource.data.look))
@@ -176,6 +176,36 @@ service cloud.firestore {
             && isNum(request.resource.data.win.a, 0, 100000000)
             && isNum(request.resource.data.win.x, 0, 1000000)));
       allow delete: if isMe(uid);
+    }
+
+    // ---------- Amis ----------
+    // friendreqs/{from}_{to} = { from, fromName, to, toName, status, at } : demande d'ami ('pending'), ou avis de
+    // retrait ('removed'), écrite par l'expéditeur ; le destinataire peut seulement l'accepter (pending → accepted).
+    // Lue et supprimée par l'un ou l'autre des deux joueurs.
+    function isFriendReq(id) {
+      return request.resource.data.keys().hasOnly(['from', 'fromName', 'to', 'toName', 'status', 'at'])
+        && request.resource.data.from == request.auth.uid
+        && request.resource.data.to is string && request.resource.data.to.size() > 5 && request.resource.data.to.size() < 128
+        && request.resource.data.to != request.auth.uid
+        && id == request.auth.uid + '_' + request.resource.data.to
+        && request.resource.data.status in ['pending', 'removed']
+        && isPseudo(request.resource.data.fromName) && isPseudo(request.resource.data.toName)
+        && request.resource.data.at == request.time;
+    }
+    match /friendreqs/{id} {
+      allow read, delete: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow create: if signedIn() && isFriendReq(id);
+      allow update: if signedIn() && (
+        (resource.data.from == request.auth.uid && isFriendReq(id))
+        || (resource.data.to == request.auth.uid && resource.data.status == 'pending'
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+            && request.resource.data.status == 'accepted'));
+    }
+    // friends/{uid} = { list: { uid: pseudo } } : la liste d'amis, lue et écrite seulement par son propriétaire.
+    match /friends/{uid} {
+      allow read, delete: if isMe(uid);
+      allow create, update: if isMe(uid) && request.resource.data.keys().hasOnly(['list'])
+        && request.resource.data.list is map && request.resource.data.list.size() <= 500;
     }
 
     // Tout le reste est fermé.

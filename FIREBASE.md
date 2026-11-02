@@ -21,6 +21,8 @@ Ce que ça change :
 - le chat et les envois de KE entre joueurs sont protégés (voir 1 bis) ;
 - la liste des joueurs en ligne (`presence` : qui joue à quoi en direct, tables multijoueur) : chacun n’écrit que sa ligne ;
 - le classement accepte la machine du plus gros gain / bonus et le look acheté dans la Boutique ;
+- les amis (`friendreqs` : demandes d’ami, `friends` : la liste de chacun) : chacun ne gère que ses demandes et sa liste ;
+- les points de succès du classement montent jusqu’à 100 000 (prestiges) ;
 - tout le reste de la base est fermé.
 
 ## 1 bis. Chat général et envoi de KE entre joueurs

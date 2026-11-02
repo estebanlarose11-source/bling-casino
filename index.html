@@ -4368,6 +4368,19 @@ const cloud = {
     b.set(db.collection('chat').doc(), look ? { uid, name, text, at: now, look } : { uid, name, text, at: now });
     await b.commit();
   },
+  /* ---------- Friends: friends/{uid} = { list: { uid: pseudo } }, friendreqs/{from}_{to} ---------- */
+  async loadFriends(uid) { const d = await (await init()).db.collection('friends').doc(uid).get(); return d.exists ? d.data().list || {} : {}; },
+  async saveFriends(uid, list) { await (await init()).db.collection('friends').doc(uid).set({ list: JSON.parse(JSON.stringify(list)) }); },
+  async watchFriendReqs(field, uid, cb) {
+    return (await init()).db.collection('friendreqs').where(field, '==', uid)
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() }))), (e) => console.error(e));
+  },
+  async sendFriendReq(from, fromName, to, toName, status) {
+    await (await init()).db.collection('friendreqs').doc(`${from}_${to}`).set({ from, fromName, to, toName, status, at: firebase.firestore.FieldValue.serverTimestamp() });
+  },
+  async acceptFriendReq(id) { await (await init()).db.collection('friendreqs').doc(id).update({ status: 'accepted' }); },
+  async deleteFriendReq(id) { await (await init()).db.collection('friendreqs').doc(id).delete(); },
+
   /* ---------- Live presence: presence/{uid} = { name, game, level, look, win, at } ---------- */
   async setPresence(uid, data) {
     await (await init()).db.collection('presence').doc(uid).set({ ...JSON.parse(JSON.stringify(data)), at: firebase.firestore.FieldValue.serverTimestamp() });
@@ -6287,6 +6300,7 @@ function renderProfile(root) {
       <button class="btn ghost me-switch" data-switch>${profiles.online ? 'Se déconnecter' : profiles.guest ? 'Créer un compte ou se connecter' : 'Changer de pseudo'}</button>
     </section>
 ${recentHTML(me)}
+${__mods['achievements.js']?.trophiesHTML?.() || ''}
 
     <section class="panel daily-card${d.ready ? ' ready' : ''}">
       <div class="dc-head"><div class="dc-gift">🎁</div><div><h2>Bonus du jour</h2>
@@ -7353,7 +7367,7 @@ const ORIGINALS = [
   {"id": "pileface", "name": "La Pièce", "cat": "quick", "tag": "Instantané", "sub": "Double ou rien, jusqu’à 20 fois", "colors": ["#fbbf24", "#1c1404"], "description": "Une pièce, deux faces, et ton gain qui double à chaque bonne prédiction. Lance la série, choisis Pile ou Face jusqu’à 20 fois d’affilée et encaisse quand tu veux : ×1,92 après un lancer, ×3,84 après deux… et plus d’un million de fois la mise après 20 !", "features": ["Jusqu’à 20 lancers", "Gain doublé à chaque fois", "Encaisse quand tu veux", "Vrai 50/50", "Raccourcis clavier P / F"], "rtp": "96 %", "vol": 4, "max": "×1 006 633"},
   {"id": "robots", "name": "La Course", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
   {"id": "poulet", "name": "Le Poulet", "cat": "quick", "tag": "Instantané", "sub": "Traverse la route, voie après voie", "colors": ["#facc15", "#14200c"], "description": "Aide le poulet à traverser la route ! Chaque voie franchie fait grimper le multiplicateur, mais si une voiture arrive, c’est perdu. Choisis ta difficulté et encaisse quand tu veux.", "features": ["4 difficultés", "Jusqu’à 24 voies", "Encaisse quand tu veux", "Multiplicateur à chaque voie"], "rtp": "96 %", "vol": 4, "max": "×2 041"},
-  {"id": "chasse", "name": "La Chasse", "cat": "quick", "tag": "Instantané", "sub": "5 cartouches, 30 secondes", "colors": ["#84cc16", "#1a2e05"], "description": "Ouvre la saison de chasse ! Pour ta mise, tu as 5 cartouches et 30 secondes. Canards, faisans, lapins, sangliers et cerfs traversent la prairie : chaque animal touché révèle un multiplicateur, de ×0 à ×100. Attention aux arbres, buissons et troncs qui les cachent. Et si le cerf doré passe… ×1 000 !", "features": ["5 cartouches par partie", "Multiplicateurs ×0 à ×100", "Cerf doré ×1 000", "Jour, coucher du soleil, nuit", "Plein écran paysage"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
+  {"id": "chasse", "name": "La Chasse", "cat": "slot", "tag": "Machine à sous", "sub": "Cartouches, chasse et cerf doré", "colors": ["#84cc16", "#1a2e05"], "description": "La saison de chasse est ouverte sur 5 rouleaux et 243 façons de gagner ! Lapins, canards, faisans, sangliers et cerfs paient en ligne, le cerf doré est WILD. 3 cartouches de fusil ouvrent la chasse avec 3 tirs, 4 cartouches la grande chasse avec 5 tirs : chaque animal touché paie ×2 à ×250 la mise, et le cerf doré vaut ×500.", "features": ["5 rouleaux · 243 façons", "3 cartouches : la chasse, 3 tirs", "4 cartouches : la grande chasse, 5 tirs", "Animaux ×2 à ×250, cerf doré ×500", "Achat de la chasse"], "rtp": "≈ 92,6 %", "vol": 4, "max": "×5 000"},
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Chaque cube posé multiplie ta mise, mais gare aux cubes ratés et aux coups de vent.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Bonus PARFAIT", "Encaisse quand tu veux"], "rtp": "96 % (visée parfaite)", "vol": 4, "max": "×125,8"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
@@ -7951,6 +7965,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'chasse', date: '2026-11-02', title: 'La Chasse devient une machine à sous', items: ['5 rouleaux, 243 façons de gagner, avec tes animaux peints', 'Nouveau symbole : la cartouche de fusil', '3 cartouches : la chasse avec 3 tirs', '4 cartouches : la grande chasse avec 5 tirs et le cerf doré ×500', 'Multiplicateurs des animaux augmentés : ×2 à ×250 la mise'] },
   { game: 'peche', date: '2026-11-02', title: 'L’étang remis en ordre', items: ['Le pêcheur se tient dans l’eau, à la bonne taille', 'Chaque poisson attend dans un des cercles lumineux de l’étang', 'Toute l’image de l’étang est visible, sur ordinateur comme sur téléphone'] },
   { game: 'peche', date: '2026-11-02', title: 'La Pêche en vraies images', items: ['Nouvelle roue : cadre en bois verni, moyeu en engrenage doré, flotteur en guise de pointeur', 'Une salle de casino en fond', 'L’étang peint, de vrais poissons bleu, orange et rouge', 'Le pêcheur attend, puis tire sur sa canne quand ça mord', 'Les plus gros poissons (×100 et plus) sont en or massif !'] },
   { game: 'chasse', date: '2026-11-02', title: 'La Chasse en vraies images', isNew: true, items: ['Nouveaux décors peints : jour, coucher du soleil et nuit', 'Vrais animaux : canards et lapins de profil, faisans, sangliers, cerfs', '5 cartouches et 30 secondes : chaque animal touché révèle un multiplicateur de ×0 à ×100', 'Le cerf doré, rare et très rapide : ×1 000 !', 'Plein écran à l’horizontale sur téléphone et sur ordinateur'] },
@@ -10616,7 +10631,7 @@ const FILES = {
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '171e756bb8'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '200ec4fe09'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'ee4862aacf'],
-  chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', '688ad69977'],
+  chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', 'ca0a9763cf'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', '4b91b43686'],
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
@@ -11055,6 +11070,25 @@ const TIERS = [
 ];
 const MASTER = { ke: 3000, xp: 400, pts: 15 };
 const PER_GAME = TIERS.reduce((a, t) => a + t.pts, 0) + MASTER.pts;
+// Prestiges: once the mastery chest of a machine is open, the player can go up a prestige (7 at most). Its 10
+// succès start again, harder (more spins, bigger ×) and better paid, and the prestige leaves a trophy on the
+// profile under the machine's cover.
+const MAX_PRESTIGE = 7;
+const P_COUNT = [1, 2, 3, 5, 8, 12, 18, 25]; // × the goals in spins / wins / bonus
+const P_X = [1, 1.5, 2, 3, 4, 6, 8, 10]; // × the goals in « gain d’au moins ×… »
+const P_REW = (p) => 1 + p * 0.5; // × the KE and XP of the succès
+const PRESTIGE = { ke: (p) => 10000 * p, xp: (p) => 500 * p, pts: 20 };
+const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+const tierText = (k, g) => ({ n: `Joue ${g.toLocaleString('fr-FR')} tours`, w: `Gagne ${g.toLocaleString('fr-FR')} tours`, x: `Décroche un gain d’au moins ×${g.toLocaleString('fr-FR')}`,
+  a: `Joue ${g} bonus (déclenchés ou achetés)`, b: `Déclenche ${g} bonus en jeu (sans les acheter)` }[k]);
+function tiersFor(p) {
+  if (!p) return TIERS;
+  return TIERS.map((t) => {
+    const goal = t.k === 'x' ? Math.round(t.goal * P_X[p]) : Math.round(t.goal * P_COUNT[p]);
+    return { ...t, goal, text: tierText(t.k, goal), ke: Math.round(t.ke * P_REW(p)), xp: Math.round(t.xp * P_REW(p)) };
+  });
+}
+const masterFor = (p) => ({ ...MASTER, ke: Math.round(MASTER.ke * P_REW(p)), xp: Math.round(MASTER.xp * P_REW(p)) });
 
 const SLOTS = ALL_GAMES.filter((g) => !g.original || g.cat === 'slot');
 const isSlot = (id) => SLOTS.some((g) => g.id === id);
@@ -11063,26 +11097,28 @@ const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`)
 
 const data = () => {
   const a = profiles.current?.ach;
-  return { s: a?.s || {}, c: a?.c || {}, m: a?.m || {}, ke: a?.ke || 0 };
+  return { s: a?.s || {}, c: a?.c || {}, m: a?.m || {}, ke: a?.ke || 0, p: a?.p || {}, t: a?.t || {} };
 };
+const prestigeOf = (gid) => data().p[gid] || 0;
 const statsOf = (gid) => ({ n: 0, w: 0, x: 0, b: 0, a: 0, ...(data().s[gid] || {}) });
 const have = (st, t) => (t.k === 'x' ? (st.x >= t.goal ? 1 : 0) : st[t.k] || 0);
 const goalOf = (t) => (t.k === 'x' ? 1 : t.goal);
 const doneT = (st, t) => have(st, t) >= goalOf(t);
 
 function gameStatus(gid) {
-  const st = statsOf(gid), claimed = data().c[gid] || [];
-  const rows = TIERS.map((t) => ({ ...t, have: Math.min(have(st, t), goalOf(t)), max: goalOf(t), done: doneT(st, t), claimed: claimed.includes(t.id) }));
-  const nClaimed = rows.filter((r) => r.claimed).length;
-  return { gid, st, rows, nClaimed, toClaim: rows.filter((r) => r.done && !r.claimed).length, master: !!data().m[gid], masterReady: nClaimed === TIERS.length && !data().m[gid] };
+  const st = statsOf(gid), claimed = data().c[gid] || [], p = prestigeOf(gid);
+  const rows = tiersFor(p).map((t) => ({ ...t, have: Math.min(have(st, t), goalOf(t)), max: goalOf(t), done: doneT(st, t), claimed: claimed.includes(t.id) }));
+  const nClaimed = rows.filter((r) => r.claimed).length, master = !!data().m[gid];
+  return { gid, st, rows, nClaimed, toClaim: rows.filter((r) => r.done && !r.claimed).length, master, masterReady: nClaimed === TIERS.length && !master,
+    prestige: p, M: masterFor(p), prestigeReady: master && p < MAX_PRESTIGE };
 }
 function summary() {
   const list = SLOTS.map((g) => gameStatus(g.id));
   const d = data();
   let pts = 0;
-  for (const s of list) { pts += s.rows.filter((r) => r.claimed).reduce((a, r) => a + r.pts, 0) + (s.master ? MASTER.pts : 0); }
+  for (const s of list) { pts += s.rows.filter((r) => r.claimed).reduce((a, r) => a + r.pts, 0) + (s.master ? MASTER.pts : 0) + s.prestige * (PER_GAME + PRESTIGE.pts); }
   return { list, pts, unlocked: list.reduce((a, s) => a + s.nClaimed, 0), total: SLOTS.length * TIERS.length, masters: list.filter((s) => s.master).length,
-    toClaim: list.reduce((a, s) => a + s.toClaim + (s.masterReady ? 1 : 0), 0), ke: d.ke };
+    toClaim: list.reduce((a, s) => a + s.toClaim + (s.masterReady ? 1 : 0), 0), ke: d.ke, trophies: list.reduce((a, s) => a + s.prestige, 0) };
 }
 const points = () => summary().pts;
 
@@ -11122,10 +11158,39 @@ function claim(gid, id) {
   return r;
 }
 function claimMaster(gid) {
-  if (!gameStatus(gid).masterReady) return false;
-  profiles.update('ach', (me) => { const a = me.ach; a.m = { ...(a.m || {}), [gid]: Date.now() }; a.ke = (a.ke || 0) + MASTER.ke; });
-  wallet.grant(MASTER.ke); progress.gain(MASTER.xp);
-  return true;
+  const s = gameStatus(gid);
+  if (!s.masterReady) return false;
+  profiles.update('ach', (me) => { const a = me.ach; a.m = { ...(a.m || {}), [gid]: Date.now() }; a.ke = (a.ke || 0) + s.M.ke; });
+  wallet.grant(s.M.ke); progress.gain(s.M.xp);
+  return s.M.ke;
+}
+// Next prestige: trophy + reward, then the 10 succès of the machine start again, harder.
+function goPrestige(gid) {
+  const s = gameStatus(gid);
+  if (!s.prestigeReady) return 0;
+  const p = s.prestige + 1, ke = PRESTIGE.ke(p);
+  profiles.update('ach', (me) => {
+    const a = me.ach;
+    a.p = { ...(a.p || {}), [gid]: p };
+    a.t = { ...(a.t || {}), [gid]: [...(a.t?.[gid] || []), Date.now()] };
+    a.s = { ...(a.s || {}), [gid]: { n: 0, w: 0, x: 0, b: 0, a: 0 } };
+    a.c = { ...(a.c || {}), [gid]: [] };
+    const m = { ...(a.m || {}) }; delete m[gid]; a.m = m;
+    a.ke = (a.ke || 0) + ke;
+  });
+  wallet.grant(ke); progress.gain(PRESTIGE.xp(p));
+  profiles.publish?.();
+  return p;
+}
+
+// Trophies on the profile: one per machine with at least one prestige, its cover under the trophy.
+function trophiesHTML() {
+  const list = SLOTS.map((g) => ({ g, p: prestigeOf(g.id) })).filter((x) => x.p > 0).sort((a, b) => b.p - a.p);
+  return `<section class="panel trophies"><div class="sec-head"><h2>🏆 Mes trophées de prestige</h2><a class="more" href="#succes">Succès</a></div>
+    ${list.length ? `<div class="tr-grid">${list.map(({ g, p }) => `<a class="tr-item p${p}" href="#game-${g.id}" title="${esc(g.name)} · prestige ${p} / ${MAX_PRESTIGE}">
+      <span class="tr-cup">🏆<b>${ROMAN[p]}</b></span><span class="tr-stars">${'★'.repeat(p)}${'☆'.repeat(MAX_PRESTIGE - p)}</span>
+      <span class="tr-cover">${coverSVG(g, { square: true, badge: false })}</span><small>${esc(g.name)}</small></a>`).join('')}</div>`
+      : '<p class="muted small">Maîtrise les 10 succès d’une machine, ouvre son coffre puis passe <b>prestige</b> : tu gagnes un trophée à son nom. 7 prestiges par machine, de plus en plus durs.</p>'}</section>`;
 }
 
 // --- sidebar / menu badge: number of rewards waiting ---
@@ -11146,7 +11211,7 @@ function renderAchievements(root) {
     return `<article class="ac-game${open ? ' open' : ''}${s.master ? ' master' : ''}" data-gid="${s.gid}">
       <button class="ac-head" data-open="${s.gid}" aria-expanded="${open}">
         <span class="tile-art">${coverSVG(g, { square: true })}</span>
-        <span class="ac-title"><b>${esc(g.name)}</b><small>${s.master ? '👑 Machine maîtrisée' : `${s.nClaimed} / ${TIERS.length} succès`}</small>
+        <span class="ac-title"><b>${esc(g.name)}${s.prestige ? ` <em class="ac-pr">⭐ Prestige ${ROMAN[s.prestige]}</em>` : ''}</b><small>${s.master ? (s.prestige >= MAX_PRESTIGE ? '🏆 Prestige maximum' : '👑 Machine maîtrisée · prestige disponible') : `${s.nClaimed} / ${TIERS.length} succès`}</small>
           <span class="ac-bar"><i style="width:${pct(s.nClaimed, TIERS.length)}%"></i></span></span>
         ${s.toClaim || s.masterReady ? `<span class="ac-dot">${s.toClaim + (s.masterReady ? 1 : 0)}</span>` : ''}
         <span class="ac-chev">${open ? '▴' : '▾'}</span>
@@ -11161,21 +11226,27 @@ function renderAchievements(root) {
         <li class="ac-tier ac-master${s.master ? ' claimed' : s.masterReady ? ' done' : ''}">
           <span class="ac-ico">👑</span>
           <div class="ac-body"><b>Coffre de maîtrise</b><small>Récupère les 10 succès de ${esc(g.name)}</small></div>
-          <div class="ac-rew">${s.master ? '<span class="ac-ok">Ouvert</span>' : s.masterReady ? `<button class="btn primary" data-master="${s.gid}">+${fmt(MASTER.ke)}</button>` : `<span>+${fmt(MASTER.ke)}</span><small>+${MASTER.xp} XP</small>`}</div>
+          <div class="ac-rew">${s.master ? '<span class="ac-ok">Ouvert</span>' : s.masterReady ? `<button class="btn primary" data-master="${s.gid}">+${fmt(s.M.ke)}</button>` : `<span>+${fmt(s.M.ke)}</span><small>+${s.M.xp} XP</small>`}</div>
+        </li>
+        <li class="ac-tier ac-prestige${s.prestigeReady ? ' done' : ''}">
+          <span class="ac-ico">⭐</span>
+          <div class="ac-body"><b>${s.prestige >= MAX_PRESTIGE ? 'Prestige maximum atteint' : `Prestige ${ROMAN[s.prestige + 1]} / ${ROMAN[MAX_PRESTIGE]}`}</b><small>${s.prestige >= MAX_PRESTIGE ? `Les 7 trophées de ${esc(g.name)} sont à toi. Respect !` : `Ouvre le coffre de maîtrise puis passe prestige : un trophée ${esc(g.name)} sur ton profil, +${fmt(PRESTIGE.ke(s.prestige + 1))}, et les 10 succès recommencent, plus durs et mieux payés.`}</small></div>
+          <div class="ac-rew">${s.prestigeReady ? `<button class="btn primary" data-prestige="${s.gid}">⭐ Passer prestige</button>` : s.prestige >= MAX_PRESTIGE ? '<span class="ac-ok">🏆 ×7</span>' : `<span>🏆 +${fmt(PRESTIGE.ke(s.prestige + 1))}</span>`}</div>
         </li></ol>
         <a class="btn ghost ac-play" href="#game-${s.gid}">Jouer à ${esc(g.name)}</a>` : ''}
     </article>`;
   };
   root.innerHTML = `
     <section class="panel ac-page">
-      <span class="eyebrow">🏅 10 succès par machine à sous</span>
+      <span class="eyebrow">🏅 10 succès par machine à sous · 7 prestiges</span>
       <h1>Succès</h1>
-      <p class="muted">Chaque machine a ses propres succès, du plus simple au plus fou. Plus tu avances, plus les récompenses grossissent, et les 10 succès d’une machine ouvrent son <b>coffre de maîtrise</b> (+${fmt(MASTER.ke)}).</p>
+      <p class="muted">Chaque machine a ses propres succès, du plus simple au plus fou. Plus tu avances, plus les récompenses grossissent, et les 10 succès d’une machine ouvrent son <b>coffre de maîtrise</b> (+${fmt(MASTER.ke)}). Ensuite, passe <b>prestige</b> : un trophée sur ton profil et les succès recommencent, plus durs (7 prestiges par machine).</p>
       ${me ? '' : '<p class="muted">Connecte-toi ou joue en invité pour suivre tes succès.</p>'}
       <div class="ac-stats">
         <div><b>${sm.unlocked}<small> / ${sm.total}</small></b><span>Succès</span></div>
         <div><b>${sm.pts}</b><span>Points</span></div>
         <div><b>${sm.masters}<small> / ${SLOTS.length}</small></b><span>Maîtrisées</span></div>
+        <div><b>${sm.trophies}<small> / ${SLOTS.length * MAX_PRESTIGE}</small></b><span>Trophées</span></div>
         <div><b>${fmt(sm.ke)}</b><span>Gagnés</span></div>
       </div>
       <div class="lb-tabs ac-tabs" role="tablist">
@@ -11193,11 +11264,21 @@ function renderAchievements(root) {
     b.onclick = () => { const [g, id] = b.dataset.claim.split(':'); const r = claim(g, +id); if (r) { sfx.unlock(); sfx.coin(); fx.coins(r.id >= 8 ? 60 : 30, b); if (r.id >= 9) fx.confetti(90); toast(`+${fmt(r.ke)} et +${r.xp} XP · ${r.name}`, 'ok'); } refreshBadges(); renderAchievements(root); };
   });
   root.querySelectorAll('[data-master]').forEach((b) => {
-    b.onclick = () => { if (claimMaster(b.dataset.master)) { sfx.unlock(); sfx.bigWin(); fx.confetti(140); fx.coins(80, b); toast(`👑 ${nameOf(b.dataset.master)} maîtrisée : +${fmt(MASTER.ke)}`, 'ok'); } refreshBadges(); renderAchievements(root); };
+    b.onclick = () => { const ke = claimMaster(b.dataset.master); if (ke) { sfx.unlock(); sfx.bigWin(); fx.confetti(140); fx.coins(80, b); toast(`👑 ${nameOf(b.dataset.master)} maîtrisée : +${fmt(ke)}`, 'ok'); } refreshBadges(); renderAchievements(root); };
+  });
+  root.querySelectorAll('[data-prestige]').forEach((b) => {
+    b.onclick = async () => {
+      const gid = b.dataset.prestige, s = gameStatus(gid), n = s.prestige + 1;
+      const ok = await __mods['ui.js'].modal(`<h3>⭐ Passer prestige ${ROMAN[n]} sur ${esc(nameOf(gid))} ?</h3><p class="muted">Tu gagnes le trophée <b>Prestige ${ROMAN[n]}</b> et <b>+${fmt(PRESTIGE.ke(n))}</b>. Les 10 succès de cette machine repartent de zéro, avec des objectifs plus durs et des récompenses plus grosses.</p><div class="ct-menu"><button class="btn primary" data-value="ok">Passer prestige</button><button class="btn" data-value="">Plus tard</button></div>`);
+      if (ok !== 'ok') return;
+      const p = goPrestige(gid);
+      if (p) { sfx.unlock(); sfx.bigWin(); fx.confetti(180); fx.coins(90); toast(`🏆 Trophée Prestige ${ROMAN[p]} · ${nameOf(gid)} : +${fmt(PRESTIGE.ke(p))}`, 'ok'); }
+      refreshBadges(); renderAchievements(root);
+    };
   });
   root.querySelector('[data-all]')?.addEventListener('click', (e) => {
     let ke = 0;
-    for (const s of summary().list) { for (const r of s.rows) { const got = r.done && !r.claimed ? claim(s.gid, r.id) : null; if (got) ke += got.ke; } if (claimMaster(s.gid)) ke += MASTER.ke; }
+    for (const s of summary().list) { for (const r of s.rows) { const got = r.done && !r.claimed ? claim(s.gid, r.id) : null; if (got) ke += got.ke; } ke += claimMaster(s.gid) || 0; }
     if (ke) { sfx.unlock(); sfx.bigWin(); fx.confetti(100); fx.coins(60, e.currentTarget); toast(`Succès récupérés : +${fmt(ke)}`, 'ok'); }
     refreshBadges(); renderAchievements(root);
   });
@@ -11222,7 +11303,7 @@ async function loadTop(list) {
   } catch (err) { console.error(err); if (list.isConnected) list.innerHTML = '<li class="lb-msg">Classement indisponible pour le moment.</li>'; }
 }
 
-return { renderAchievements, achievementPoints: points, achievementSummary: summary };
+return { renderAchievements, achievementPoints: points, achievementSummary: summary, trophiesHTML };
 })();
 
 // ---- chat.js ----
@@ -11251,9 +11332,10 @@ function mountChat() {
   const fab = el('button', 'ct-fab', '<svg class="ico"><use href="#ui-chat"/></svg><b class="ct-badge" hidden></b>');
   fab.setAttribute('aria-label', 'Chat');
   root = el('div', 'ct-panel', `
-    <div class="ct-head"><div class="ct-tabs"><button data-tab="chat" class="on">💬 Chat</button><button data-tab="online">🟢 En ligne <b data-online-count>0</b></button><button data-tab="send">💸 Envoyer</button></div><button class="ct-x" aria-label="Fermer">✕</button></div>
+    <div class="ct-head"><div class="ct-tabs"><button data-tab="chat" class="on">💬 Chat</button><button data-tab="friends">👥 Amis <b class="fr-badge" data-fr-count hidden>0</b></button><button data-tab="online">🟢 En ligne <b data-online-count>0</b></button><button data-tab="send">💸 KE</button></div><button class="ct-x" aria-label="Fermer">✕</button></div>
     <div class="ct-body chat"><div class="ct-list"></div>
       <form class="ct-form"><input maxlength="${MAX}" placeholder="Écris un message…" autocomplete="off"><button>Envoyer</button></form></div>
+    <div class="ct-body friends" hidden><div class="ct-online" data-friends></div></div>
     <div class="ct-body online" hidden><div class="ct-online" data-online-list></div></div>
     <div class="ct-body send" hidden></div>`);
   document.body.append(fab, root);
@@ -11273,8 +11355,9 @@ function toggle(v) {
   open = v; root.classList.toggle('open', v); document.querySelector('.ct-fab').classList.toggle('on', v);
   if (v) { unread = 0; badge(); if (!stopChat) watch(); requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; }); if (tab === 'send') renderSend(); }
 }
-function setTab(t) { tab = t; root.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === t)); root.querySelector('.ct-body.chat').hidden = t !== 'chat'; root.querySelector('.ct-body.online').hidden = t !== 'online'; root.querySelector('.ct-body.send').hidden = t !== 'send'; if (t === 'send') renderSend(); }
-function badge() { const b = document.querySelector('.ct-badge'); b.hidden = !unread; b.textContent = unread > 9 ? '9+' : unread; }
+function setTab(t) { tab = t; root.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === t)); root.querySelector('.ct-body.chat').hidden = t !== 'chat'; root.querySelector('.ct-body.online').hidden = t !== 'online'; root.querySelector('.ct-body.friends').hidden = t !== 'friends'; if (t === 'friends') __mods['friends.js']?.paint(); root.querySelector('.ct-body.send').hidden = t !== 'send'; if (t === 'send') renderSend(); }
+function badge() { const b = document.querySelector('.ct-badge'), n = unread + (__mods['friends.js']?.pendingCount?.() || 0); b.hidden = !n; b.textContent = n > 9 ? '9+' : n; }
+setTimeout(() => __mods['friends.js']?.bus.addEventListener('change', () => { if (document.querySelector('.ct-badge')) badge(); }), 0);
 
 async function watch() {
   stopChat = await cloud.watchChat(KEEP, (l) => {
@@ -11348,7 +11431,14 @@ async function openPlayer(uid, name, { msgId = null } = {}) {
   const { rankBadge, rankOf } = __mods['progress.js'];
   const acts = [];
   if (self) acts.push('<button class="btn" data-value="me">👤 Voir mon profil</button>');
-  else if (m) acts.push('<button class="btn primary" data-value="gift">💸 Envoyer des KE</button><button class="btn" data-value="at">💬 Lui répondre dans le chat</button>');
+  else if (m) {
+    const F = __mods['friends.js'];
+    acts.push(F?.isFriend(uid) ? '<button class="btn" data-value="unfriend">👥 Ami · retirer des amis</button>'
+      : F?.pendingIn(uid) ? '<button class="btn primary" data-value="friend">👥 Accepter sa demande d’ami</button>'
+      : F?.pendingOut(uid) ? '<button class="btn" disabled>👥 Demande d’ami envoyée</button>'
+      : '<button class="btn primary" data-value="friend">➕ Ajouter en ami</button>');
+    acts.push('<button class="btn primary" data-value="gift">💸 Envoyer des KE</button><button class="btn" data-value="at">💬 Lui répondre dans le chat</button>');
+  }
   else acts.push('<p class="muted small">Crée un compte (ou connecte-toi) pour envoyer des KE ou écrire dans le chat.</p>');
   if (msgId && (admin || self)) acts.push('<button class="btn" data-value="del">🗑️ Supprimer ce message</button>');
   if (admin && !self) acts.push('<button class="btn" data-value="mute">🔇 Rendre muet</button><button class="btn" data-value="unmute">🔈 Enlever le muet</button>');
@@ -11369,6 +11459,8 @@ async function openPlayer(uid, name, { msgId = null } = {}) {
   const r = await done;
   try {
     if (r === 'me') location.hash = '#profil';
+    if (r === 'friend') await __mods['friends.js'].request(uid, name);
+    if (r === 'unfriend') await __mods['friends.js'].remove(uid);
     if (r === 'gift' || r === 'at') {
       if (!root) return toast('Le chat n’est pas disponible pour le moment', 'warn');
       toggle(true);
@@ -11432,6 +11524,135 @@ async function renderSend(toUid, toName) {
 }
 
 return { mountChat, openPlayer };
+})();
+
+// ---- friends.js ----
+__mods['friends.js'] = (() => {
+// Amis. Firestore: friendreqs/{from}_{to} = { from, fromName, to, toName, status, at } (status 'pending' = demande,
+// 'accepted' = acceptée par le destinataire, 'removed' = l'autre t'a retiré) and friends/{uid} = { list: { uid: pseudo } }
+// (each player writes only their own list). Accepting adds the friend to my list and marks the request accepted;
+// the sender sees it and adds me to theirs, then deletes the request. Only friends' games are shown in the online
+// list and the « X joue à … » ticker (live.js); the chat stays open to everyone.
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { toast, el } = __mods['ui.js'];
+const { sfx } = __mods['audio.js'];
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const me = () => (profiles.online && profiles.current ? { uid: profiles.store.current, name: String(profiles.current.name || 'Joueur').slice(0, 16) } : null);
+
+let list = {}, incoming = [], outgoing = [], stops = [], loadedFor = null;
+const bus = new EventTarget();
+const changed = () => { bus.dispatchEvent(new Event('change')); paint(); };
+
+const isFriend = (uid) => !!list[uid];
+const pendingOut = (uid) => outgoing.some((r) => r.to === uid && r.status === 'pending');
+const pendingIn = (uid) => incoming.find((r) => r.from === uid && r.status === 'pending');
+
+async function saveList() { const m = me(); if (m) await cloud.saveFriends(m.uid, list); }
+
+async function start() {
+  const m = me();
+  stops.forEach((f) => f?.()); stops = []; list = {}; incoming = []; outgoing = []; loadedFor = m?.uid || null;
+  changed();
+  if (!m || !cloud.enabled) return;
+  try { list = (await cloud.loadFriends(m.uid)) || {}; } catch (e) { console.warn('Amis indisponibles (règles Firestore à jour ?)', e); return; }
+  changed();
+  const first = { in: true };
+  stops.push(await cloud.watchFriendReqs('to', m.uid, async (reqs) => {
+    const before = new Set(incoming.map((r) => r.id));
+    incoming = reqs;
+    for (const r of reqs) {
+      if (r.status === 'removed') { delete list[r.from]; await saveList().catch(() => {}); cloud.deleteFriendReq(r.id).catch(() => {}); continue; }
+      if (r.status === 'pending' && !before.has(r.id) && !first.in) { toast(`👥 ${esc(r.fromName)} veut être ton ami : ouvre le chat › Amis`, 'info'); sfx.win?.(); }
+    }
+    first.in = false;
+    changed();
+  }).catch((e) => { console.error(e); return null; }));
+  stops.push(await cloud.watchFriendReqs('from', m.uid, async (reqs) => {
+    outgoing = reqs;
+    for (const r of reqs) {
+      if (r.status === 'accepted') {
+        if (!list[r.to]) { list[r.to] = r.toName; await saveList().catch(() => {}); toast(`👥 ${esc(r.toName)} a accepté ta demande d’ami !`, 'ok'); }
+        cloud.deleteFriendReq(r.id).catch(() => {});
+      }
+    }
+    changed();
+  }).catch((e) => { console.error(e); return null; }));
+}
+
+async function request(uid, name) {
+  const m = me();
+  if (!m) return toast('Crée un compte (ou connecte-toi) pour ajouter des amis', 'warn');
+  if (uid === m.uid) return toast('C’est toi !', 'warn');
+  if (isFriend(uid)) return toast(`${esc(name)} est déjà ton ami`);
+  const back = pendingIn(uid);
+  if (back) return accept(back);
+  try { await cloud.sendFriendReq(m.uid, m.name, uid, String(name).slice(0, 16), 'pending'); toast(`Demande d’ami envoyée à ${esc(name)}`, 'ok'); }
+  catch (e) { console.error(e); toast('Demande impossible pour le moment', 'warn'); }
+}
+async function accept(r) {
+  list[r.from] = r.fromName;
+  try { await saveList(); await cloud.acceptFriendReq(r.id); toast(`👥 ${esc(r.fromName)} est maintenant ton ami`, 'ok'); sfx.win?.(); }
+  catch (e) { console.error(e); delete list[r.from]; toast('Impossible pour le moment, réessaie', 'warn'); }
+  changed();
+}
+async function refuse(r) { try { await cloud.deleteFriendReq(r.id); } catch (e) { console.error(e); } incoming = incoming.filter((x) => x.id !== r.id); changed(); }
+async function remove(uid) {
+  const m = me(); if (!m || !list[uid]) return;
+  const name = list[uid];
+  delete list[uid];
+  try { await saveList(); await cloud.sendFriendReq(m.uid, m.name, uid, String(name).slice(0, 16), 'removed'); } catch (e) { console.error(e); }
+  toast(`${esc(name)} n’est plus dans tes amis`);
+  changed();
+}
+async function addByName(name) {
+  const found = await cloud.findPlayer(String(name).trim().slice(0, 16)).catch(() => []);
+  if (!found.length) return toast('Aucun joueur avec ce pseudo (il doit avoir un compte)', 'warn');
+  return request(found[0].uid, found[0].name);
+}
+
+/* ---------- the « Amis » tab of the chat panel ([data-friends]) ---------- */
+function panelHTML() {
+  const m = me();
+  if (!m) return '<p class="ct-empty">Crée un compte (ou connecte-toi) pour ajouter des amis et voir à quoi ils jouent.</p>';
+  const online = __mods['live.js']?.online?.() || [];
+  const game = (id) => __mods['games/index.js'].getGame(id);
+  const ins = incoming.filter((r) => r.status === 'pending');
+  const outs = outgoing.filter((r) => r.status === 'pending');
+  const fr = Object.entries(list).map(([uid, name]) => ({ uid, name, p: online.find((x) => x.uid === uid) })).sort((a, b) => (!!b.p - !!a.p) || a.name.localeCompare(b.name));
+  return `<form class="fr-add"><input maxlength="16" placeholder="Pseudo d’un joueur" autocomplete="off"><button class="btn primary">➕ Ajouter</button></form>
+    ${ins.length ? `<h4 class="ct-h">Demandes reçues</h4>${ins.map((r) => `<div class="fr-row req"><b>${esc(r.fromName)}</b><span><button class="btn primary" data-acc="${esc(r.id)}">Accepter</button><button class="btn" data-ref="${esc(r.id)}">Refuser</button></span></div>`).join('')}` : ''}
+    <h4 class="ct-h">Mes amis (${fr.length})</h4>
+    ${fr.length ? fr.map(({ uid, name, p }) => `<div class="fr-row${p ? ' on' : ''}"><span class="fr-dot"></span><span class="fr-n"><b class="pname" data-player="${esc(uid)}" data-pname="${esc(name)}" role="button" tabindex="0">${esc(name)}</b>
+      <small>${p ? (p.game && game(p.game) ? `joue à <a href="#game-${p.game}">${esc(game(p.game).name)}</a>` : 'en ligne, dans le lobby') : 'hors ligne'}</small></span></div>`).join('')
+      : '<p class="ct-empty">Pas encore d’amis. Ajoute un joueur avec son pseudo, ou touche son pseudo dans le chat.</p>'}
+    ${outs.length ? `<h4 class="ct-h">Demandes envoyées</h4>${outs.map((r) => `<div class="fr-row"><b>${esc(r.toName)}</b><small>en attente…</small></div>`).join('')}` : ''}`;
+}
+function paint() {
+  document.querySelectorAll('[data-friends]').forEach((box) => {
+    const inp = box.querySelector('.fr-add input'), keep = inp?.value || '', focus = document.activeElement === inp;
+    box.innerHTML = panelHTML();
+    const f = box.querySelector('.fr-add');
+    if (f) {
+      const i = f.querySelector('input'); i.value = keep; if (focus) i.focus();
+      f.onsubmit = (e) => { e.preventDefault(); if (i.value.trim()) { addByName(i.value); i.value = ''; } };
+    }
+    box.querySelectorAll('[data-acc]').forEach((b) => { b.onclick = () => accept(incoming.find((r) => r.id === b.dataset.acc)); });
+    box.querySelectorAll('[data-ref]').forEach((b) => { b.onclick = () => refuse(incoming.find((r) => r.id === b.dataset.ref)); });
+  });
+  const n = incoming.filter((r) => r.status === 'pending').length;
+  document.querySelectorAll('[data-fr-count]').forEach((b) => { b.textContent = n; b.hidden = !n; });
+}
+
+function mountFriends() {
+  profiles.addEventListener('change', () => setTimeout(() => { if ((me()?.uid || null) !== loadedFor) start(); }, 500));
+  profiles.ready.then(start);
+  setInterval(paint, 30000);
+}
+
+return { mountFriends, isFriend, request, remove, accept, pendingOut, pendingIn, friends: () => ({ ...list }), bus, paint, pendingCount: () => incoming.filter((r) => r.status === 'pending').length };
 })();
 
 // ---- shop.js ----
@@ -11674,6 +11895,8 @@ const game = (id) => __mods['games/index.js'].getGame(id);
 const gameNow = () => (location.hash.match(/^#game-([\w-]+)/) || [])[1] || '';
 const uid = () => (profiles.online && profiles.current ? profiles.store.current : null);
 const ms = (t) => (t?.toMillis ? t.toMillis() : +t || 0);
+// only friends (and me) show what they are playing; everyone else is just « en ligne »
+const isFriend = (u) => u === uid() || !!__mods['friends.js']?.isFriend(u);
 
 let players = [], stop = null, since = 0, lastWin = null, lastSent = '', lastBeat = 0, winT = 0, refused = false, first = true;
 const prev = new Map(); // uid -> { game, winT } of the previous snapshot
@@ -11710,7 +11933,7 @@ function onList(list) {
   for (const p of players) {
     const was = prev.get(p.uid);
     if (!first && p.uid !== me) {
-      if (p.game && (!was || was.game !== p.game)) tick(`${shop()?.badgeIcon?.(p.look) || '🟢'} <b>${esc(p.name)}</b> joue à <a href="#game-${p.game}">${esc(game(p.game)?.name || 'un jeu')}</a> actuellement`);
+      if (p.game && (!was || was.game !== p.game) && isFriend(p.uid)) tick(`${shop()?.badgeIcon?.(p.look) || '🟢'} <b>${esc(p.name)}</b> joue à <a href="#game-${p.game}">${esc(game(p.game)?.name || 'un jeu')}</a> actuellement`);
       if (p.win && p.game && p.game === gameNow() && ms(p.win.t) !== was?.winT && now - p.win.t < 30000) tick(`💰 <b>${esc(p.name)}</b> gagne ${fmt(p.win.a)}${p.win.x >= 2 ? ` (×${String(p.win.x).replace('.', ',')})` : ''} à ta table !`, true);
     }
     prev.set(p.uid, { game: p.game, winT: p.win ? ms(p.win.t) : 0 });
@@ -11742,10 +11965,11 @@ const avatar = (p, size = 'sm') => shop()?.lookHTML?.(p.look, size) || `<span cl
 const pname = (p) => `<b class="pname" data-player="${esc(p.uid)}" data-pname="${esc(p.name)}" role="button" tabindex="0" ${shop()?.nameStyle?.(p.look) || ''}>${esc(p.name)}</b>${shop()?.badgeIcon?.(p.look) || ''}`;
 
 function nowHTML() {
-  const list = players.slice(0, 14);
-  const playing = players.filter((p) => p.game).length;
-  return `<div class="ln-head"><span class="live-dot"></span><b>${players.length} joueur${players.length > 1 ? 's' : ''} en ligne</b><small>${playing} en train de jouer</small></div>
-    <div class="ln-list">${list.length ? list.map((p) => `<div class="ln-p">${avatar(p)}<span>${pname(p)}<small>${p.game && game(p.game) ? `joue à <a href="#game-${p.game}">${esc(game(p.game).name)}</a>` : 'dans le lobby'}</small></span></div>`).join('')
+  const list = players.slice().sort((a, b) => isFriend(b.uid) - isFriend(a.uid)).slice(0, 20);
+  const fr = players.filter((p) => p.uid !== uid() && isFriend(p.uid)).length;
+  const what = (p) => (!isFriend(p.uid) ? 'en ligne' : p.game && game(p.game) ? `joue à <a href="#game-${p.game}">${esc(game(p.game).name)}</a>` : 'dans le lobby');
+  return `<div class="ln-head"><span class="live-dot"></span><b>${players.length} joueur${players.length > 1 ? 's' : ''} en ligne</b><small>${fr ? `dont ${fr} ami${fr > 1 ? 's' : ''}` : 'ajoute des amis pour voir à quoi ils jouent'}</small></div>
+    <div class="ln-list">${list.length ? list.map((p) => `<div class="ln-p${isFriend(p.uid) && p.uid !== uid() ? ' friend' : ''}">${avatar(p)}<span>${pname(p)}${isFriend(p.uid) && p.uid !== uid() ? ' <i class="ln-fr">👥</i>' : ''}<small>${what(p)}</small></span></div>`).join('')
       : `<p class="muted small">${cloud.enabled ? 'Personne d’autre pour l’instant : invite tes amis !' : 'Le direct s’active avec les comptes en ligne.'}</p>`}</div>`;
 }
 
@@ -11753,8 +11977,10 @@ function tableHTML(id) {
   const g = game(id), me = uid(), here = players.filter((p) => p.game === id);
   const mine = here.find((p) => p.uid === me), others = here.filter((p) => p.uid !== me);
   if (!TABLE_GAMES.includes(id)) {
-    return `<div class="lt-head"><span class="live-dot"></span><b>${here.length ? `${here.length} joueur${here.length > 1 ? 's' : ''} sur ${esc(g.name)} en ce moment` : `Personne d’autre sur ${esc(g.name)} pour l’instant`}</b></div>
-      ${others.length ? `<div class="ln-list">${others.slice(0, 10).map((p) => `<div class="ln-p">${avatar(p)}<span>${pname(p)}<small>${winTxt(p) || 'en train de jouer'}</small></span></div>`).join('')}</div>` : ''}`;
+    // outside the multiplayer tables, only friends are shown on a game
+    const fr = others.filter((p) => isFriend(p.uid));
+    return `<div class="lt-head"><span class="live-dot"></span><b>${fr.length ? `${fr.length} ami${fr.length > 1 ? 's' : ''} sur ${esc(g.name)} en ce moment` : `Aucun ami sur ${esc(g.name)} pour l’instant`}</b></div>
+      ${fr.length ? `<div class="ln-list">${fr.slice(0, 10).map((p) => `<div class="ln-p friend">${avatar(p)}<span>${pname(p)}<small>${winTxt(p) || 'en train de jouer'}</small></span></div>`).join('')}</div>` : ''}`;
   }
   const seats = [mine || (me ? { uid: me, name: profiles.current?.name, level: progress.info().level, look: shop()?.publicLook?.(), self: true } : null), ...others].filter(Boolean).slice(0, SEATS);
   while (seats.length < SEATS) seats.push(null);
@@ -11806,6 +12032,7 @@ function mountLive() {
   document.addEventListener('visibilitychange', () => { if (!document.hidden) beat(true); });
   addEventListener('pagehide', () => { const me = uid(); if (me && !refused) cloud.clearPresence(me).catch(() => {}); });
   profiles.ready.then(() => { watch(); beat(true); });
+  __mods['friends.js']?.bus.addEventListener('change', paint);
 }
 
 return { mountLive, TABLE_GAMES, online: () => players };
@@ -12007,6 +12234,7 @@ mountHud();
 mountLikes();
 mountAdBar();
 __mods['chat.js'].mountChat();
+__mods['friends.js'].mountFriends();
 __mods['live.js'].mountLive();
 __mods['hta.js'].mountHta();
 registerSW();
@@ -12517,6 +12745,55 @@ h1, h2, h3 { letter-spacing: -.01em; }
 @media (hover: none) { .game-card:hover .scene, .game-card:hover .thumb .cover, .game-card:hover .a0 { transform: none; } .game-card:hover .thumb::before { transform: none; } }
 </style>
 <style id="round-accents">
+/* ============ La Chasse (machine à sous) ============ */
+.slot.g-chasse.ch-slot > .slot-bg { background: linear-gradient(180deg, rgba(8, 14, 4, .45), rgba(8, 14, 4, .25) 40%, rgba(8, 14, 4, .75)), url(assets/games/chasse/bg-day.webp?v=3) center / cover no-repeat !important; filter: none; }
+.slot.g-chasse.ch-slot.in-free > .slot-bg { filter: brightness(.6) saturate(.8); }
+.g-chasse.ch-slot .slot-stage { position: relative; }
+.ch-reels[hidden], .g-chasse .ht-field[hidden] { display: none !important; }
+.ch-reels { padding: 8px; border-radius: 14px; background: linear-gradient(180deg, rgba(60, 38, 14, .85), rgba(30, 18, 6, .9)); box-shadow: inset 0 0 0 3px #8b5a2b, inset 0 0 0 6px rgba(253, 230, 138, .25), 0 18px 40px rgba(0, 0, 0, .55); }
+.g-chasse .rs-reel { background: linear-gradient(180deg, rgba(254, 243, 199, .1), rgba(120, 80, 30, .18)); border-radius: 8px; }
+.g-chasse .rs-cell { position: relative; display: grid; place-items: center; }
+.ch-img { width: 92%; height: 86%; object-fit: contain; filter: drop-shadow(0 4px 5px rgba(0, 0, 0, .55)); pointer-events: none; user-select: none; }
+.ch-img.gold { filter: drop-shadow(0 0 10px rgba(253, 224, 71, .9)); }
+.ch-wild { position: absolute; bottom: 6%; left: 50%; translate: -50% 0; padding: 0 8px; border-radius: 6px; background: linear-gradient(180deg, #fde047, #ca8a04); color: #3b2503; font: 900 clamp(10px, 2.2vw, 16px)/1.3 Archivo, sans-serif; letter-spacing: 1px; box-shadow: 0 2px 6px rgba(0, 0, 0, .5); }
+.ch-shell { width: 46%; height: 88%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6)); }
+.g-chasse .rs-cell.scat .ch-shell { animation: chShell 1.6s ease-in-out infinite; }
+@keyframes chShell { 50% { transform: rotate(-8deg) scale(1.06); } }
+.ch-card { font: 900 clamp(26px, 6vw, 52px)/1 'Bebas Neue', Archivo, sans-serif; letter-spacing: 1px; -webkit-text-stroke: 1.5px #3b2503; paint-order: stroke; text-shadow: 0 3px 0 #3b2503, 0 6px 10px rgba(0, 0, 0, .5); }
+.ch-card.c0 { color: #93c5fd; } .ch-card.c1 { color: #86efac; } .ch-card.c2 { color: #f9a8d4; } .ch-card.c3 { color: #fdba74; } .ch-card.c4 { color: #fde047; }
+.ch-word { position: absolute; left: 50%; top: 45%; z-index: 20; pointer-events: none; opacity: 0; white-space: nowrap; transform: translate(-50%, -50%); font: 900 clamp(30px, 7vw, 72px)/1 'Bebas Neue', Archivo, sans-serif; letter-spacing: 2px; color: #fde68a; text-shadow: 0 4px 0 #7c2d12, 0 0 24px rgba(239, 68, 68, .8); }
+.g-chasse .rs-cell.win { animation: pzWin .45s ease-in-out infinite alternate; }
+.ch-pay { width: 56px; height: 56px; display: grid; place-items: center; position: relative; }
+.ch-pay .ch-img { width: 100%; height: 100%; } .ch-pay .ch-card { font-size: 34px; } .ch-pay .ch-shell { width: 60%; height: 100%; } .ch-pay .ch-wild { font-size: 9px; }
+/* friends */
+.fr-add { display: flex; gap: 8px; margin-bottom: 10px; }
+.fr-add input { flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-2); color: var(--text); font: inherit; }
+.fr-add .btn { height: 38px; border-radius: 999px; padding: 0 14px; }
+.fr-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--panel-2); margin-bottom: 6px; }
+.fr-row.req { justify-content: space-between; border: 1px solid rgba(255, 35, 64, .45); }
+.fr-row.req span { display: flex; gap: 6px; } .fr-row.req .btn { height: 30px; padding: 0 10px; font-size: 12px; border-radius: 999px; }
+.fr-dot { width: 9px; height: 9px; border-radius: 50%; background: #52525b; flex: none; }
+.fr-row.on .fr-dot { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.fr-n { display: flex; flex-direction: column; min-width: 0; } .fr-n small { color: var(--muted); font-size: 12px; } .fr-n small a { color: #ff6b7d; font-weight: 700; }
+.fr-badge { min-width: 16px; padding: 0 4px; border-radius: 999px; background: #ff2340; color: #fff; font-size: 10px; }
+.fr-badge[hidden] { display: none; }
+.ln-p.friend { border-color: rgba(34, 197, 94, .5); }
+.ln-fr { font-style: normal; font-size: 11px; }
+.ct-tabs button { font-size: 12.5px; padding-left: 8px; padding-right: 8px; }
+/* prestiges & trophies */
+.ac-pr { font-style: normal; font-size: 11px; padding: 1px 7px; margin-left: 4px; border-radius: 999px; background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #1a1205; vertical-align: middle; }
+.ac-prestige { border-top: 1px dashed rgba(251, 191, 36, .35); }
+.ac-prestige.done { background: rgba(251, 191, 36, .08); }
+.tr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.tr-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 8px 10px; border-radius: 14px; text-align: center;
+  background: radial-gradient(circle at 50% 0, rgba(251, 191, 36, .22), transparent 70%), var(--panel-2); border: 1px solid rgba(251, 191, 36, .35); }
+.tr-cup { position: relative; font-size: 40px; line-height: 1; filter: drop-shadow(0 4px 10px rgba(251, 191, 36, .45)); }
+.tr-cup b { position: absolute; left: 50%; top: 38%; translate: -50% -50%; font: 900 11px Archivo, sans-serif; color: #7c2d12; }
+.tr-stars { font-size: 11px; letter-spacing: 1px; color: #fbbf24; }
+.tr-cover { width: 64px; height: 64px; border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 2px rgba(251, 191, 36, .5); }
+.tr-cover > * { width: 100%; height: 100%; display: block; object-fit: cover; }
+.tr-item small { font-size: 12px; font-weight: 700; }
+.tr-item.p7 { border-color: #fde047; box-shadow: 0 0 22px rgba(253, 224, 71, .35); }
 /* HilltopAds 300 × 250 */
 .hta-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 18px auto; max-width: 100%; }
 .hta-slot[hidden] { display: none; }
