@@ -3804,22 +3804,6 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 @media (max-width: 600px) { .game-host:not(.is-full):has(> .g-dragons), .game-host:not(.is-full):has(> .g-billets) { margin-left: -12px; margin-right: -12px; } .slot.g-dragons, .slot.g-billets { padding-left: 4px; padding-right: 4px; } }
 @media (prefers-reduced-motion: reduce) { .dg-embers, .dg-glow, .g-dragons .sg-cell.egg svg { animation: none; } }
 
-/* ============ Small A-ADS banner, closable ============ */
-.ad-bar { position: fixed; z-index: 250; left: var(--side, 0px); right: 0; margin: 0 auto; bottom: 10px; width: min(728px, calc(100% - var(--side, 0px) - 24px)); height: 90px;
-  display: flex; align-items: flex-start; gap: 4px; padding: 4px; border-radius: 3px; background: #111; border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(0, 0, 0, .6); }
-/* the ad takes the space left of the cross: nothing may overlap it, not even the cross (A-ADS "partly hidden") */
-.ad-bar > #frame { flex: 1; min-width: 0; }
-.ad-bar-x { flex: none; order: 2; width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--line); background: #222; color: #fff; font-size: 13px; line-height: 1; cursor: pointer; display: grid; place-items: center; box-shadow: 0 2px 8px rgba(0, 0, 0, .6); }
-.ad-bar-x:hover { background: #f0284f; }
-body.ad-bar-on .foot { padding-bottom: 120px; }
-body.ad-bar-on .gate { padding-bottom: 120px; }
-body.fs-on .ad-bar { display: none; }
-@media (max-width: 900px) {
-  .ad-bar { left: 0; width: calc(100% - 16px); height: 60px; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
-  body.ad-bar-on .foot { padding-bottom: 170px; }
-}
-
-.ad-bar[hidden] { display: none; }
 /* rewarded-ad offer when the player runs out of tokens */
 .ad-offer { position: fixed; z-index: 160; right: 16px; bottom: 16px; width: min(320px, calc(100% - 32px)); padding: 16px; border-radius: 4px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); display: grid; gap: 8px; animation: adOffer .35s cubic-bezier(.3, 1.4, .5, 1); }
 .ad-offer p { margin: 0; font-size: 14px; color: var(--muted); }
@@ -3828,12 +3812,12 @@ body.fs-on .ad-bar { display: none; }
 @media (max-width: 900px) { .ad-offer { right: 16px; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
 .share-btn { margin-top: 12px; }
 
-/* ============ Rewarded ad popup (A-ADS) ============ */
+/* ============ Rewarded ad popup (HilltopAds) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
 .aads-head { display: flex; justify-content: space-between; align-items: center; }
 .aads-x { background: none; border: 0; color: var(--muted); font-size: 18px; cursor: pointer; }
-.aads-card iframe { min-height: 250px; }
+.aads-card .rw-box { margin: 12px auto; }
 
 /* ============ Premium layer: ambiance, motion and polish shared by every page ============ */
 :root { --gold-grad: linear-gradient(135deg, #fff3c4, #fbbf24 45%, #d97706); --spring: cubic-bezier(.3, 1.5, .5, 1); --glass: rgba(18, 14, 16, .72); }
@@ -4106,18 +4090,6 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
   <footer class="foot">
     <div><b>SPINBET CASINO</b> · Jeu de divertissement, argent fictif, aucun gain réel. 18+ · <a href="#responsable">Jeu responsable</a> · <a href="ads/">Nos partenaires</a></div>
   </footer>
-
-  <!-- Small A-ADS banner (unit 2460587): visible on load above everything (even the login window) so the A-ADS
-       robot can detect it. Who sees it, and when, is decided by mountAdBar() at the end of the page script. -->
-  <div class="ad-bar" id="ad-bar">
-    <button type="button" class="ad-bar-x" aria-label="Fermer la publicité">✕</button>
-    <!-- BEGIN AADS AD UNIT 2460587 -->
-    <div id="frame" style="width: 100%;height: 100%;margin: auto;position: relative;">
-      <iframe data-aa='2460587' src='//acceptable.a-ads.com/2460587/?size=Adaptive'
-              style='border:0; padding:0; width:100%; height:100%; overflow:hidden;display: block;margin: auto'></iframe>
-    </div>
-    <!-- END AADS AD UNIT 2460587 -->
-  </div>
 
   <nav class="bottom-nav">
     <a href="#accueil" data-nav="home"><span><svg class="ico"><use href="#ui-home"/></svg></span>Accueil</a>
@@ -6180,28 +6152,24 @@ const PLACEMENTS = {
 };
 
 const demoProvider = { name: 'demo', show: async () => ({ completed: true }) };
-// A-ADS (unit 2460587, same unit as the bottom banner): the rewarded ad opens in a popup only when the player asks for it.
+// HilltopAds (300 × 250 zone, same code as the banners of hta.js): the rewarded ad opens in a popup only when the player asks for it.
 // The reward is paid once the countdown is over; closing the popup earlier cancels it.
-const AADS_SECONDS = 15;
-const aadsProvider = {
-  name: 'a-ads',
+const AD_SECONDS = 15;
+const htaProvider = {
+  name: 'hilltopads',
   show: (id, o = {}) => new Promise((resolve) => {
     const box = document.createElement('div');
     box.className = 'aads-modal';
     box.innerHTML = `
       <div class="aads-card">
         <div class="aads-head"><b>Publicité${o.of > 1 ? ` ${o.step} / ${o.of}` : ''}</b><button class="aads-x" aria-label="Fermer">✕</button></div>
-        <!-- BEGIN AADS AD UNIT 2460587 -->
-        <div id="frame" style="width: 100%;margin: auto;position: relative; z-index: 99998;">
-          <iframe data-aa='2460587' src='//acceptable.a-ads.com/2460587/?size=Adaptive'
-                  style='border:0; padding:0; width:70%; height:auto; overflow:hidden;display: block;margin: auto'></iframe>
-        </div>
-        <!-- END AADS AD UNIT 2460587 -->
-        <button class="btn primary lg aads-done" disabled>Récompense dans <span>${AADS_SECONDS}</span> s</button>
+        <div class="hta-box rw-box"></div>
+        <button class="btn primary lg aads-done" disabled>Récompense dans <span>${AD_SECONDS}</span> s</button>
       </div>`;
     document.body.appendChild(box);
+    __mods['hta.js']?.inject(box.querySelector('.rw-box'));
     const done = box.querySelector('.aads-done');
-    let left = AADS_SECONDS;
+    let left = AD_SECONDS;
     const tick = setInterval(() => {
       left -= 1;
       if (left > 0) { done.querySelector('span').textContent = left; return; }
@@ -6214,7 +6182,7 @@ const aadsProvider = {
     box.querySelector('.aads-x').onclick = () => close(false);
   }),
 };
-let provider = aadsProvider;
+let provider = htaProvider;
 
 const record = () => {
   const a = { day: '', counts: {}, last: {}, ...profiles.current?.ads };
@@ -11858,16 +11826,20 @@ function fill(slot) {
   slot.hidden = false;
   slot.innerHTML = '<small>Publicité</small><div class="hta-box"></div>';
   const box = slot.querySelector('.hta-box');
-  // the network's loader, unchanged: it puts the banner script right before itself
-  const loader = document.createElement('script');
-  loader.text = `(function(sdbhdr){var d=document,s=d.createElement('script'),l=d.currentScript||d.scripts[d.scripts.length-1];s.settings=sdbhdr||{};s.src=${JSON.stringify(SRC)};s.async=true;s.referrerPolicy='no-referrer-when-downgrade';l.parentNode.insertBefore(s,l);})({})`;
-  box.appendChild(loader);
+  inject(box);
   // no banner served (ad blocker, no ad for this visitor): fold the empty slot
   setTimeout(() => {
     if (!slot.isConnected) return;
     const shown = [...box.children].some((n) => n.tagName !== 'SCRIPT' && n.offsetHeight > 20);
     if (!shown) slot.classList.add('hta-empty');
   }, 8000);
+}
+
+// the network's loader, unchanged: it puts the banner script right before itself, inside box
+function inject(box) {
+  const loader = document.createElement('script');
+  loader.text = `(function(sdbhdr){var d=document,s=d.createElement('script'),l=d.currentScript||d.scripts[d.scripts.length-1];s.settings=sdbhdr||{};s.src=${JSON.stringify(SRC)};s.async=true;s.referrerPolicy='no-referrer-when-downgrade';l.parentNode.insertBefore(s,l);})({})`;
+  box.appendChild(loader);
 }
 
 function scan() { document.querySelectorAll('[data-hta=""]').forEach(fill); }
@@ -11878,7 +11850,7 @@ function mountHta() {
 }
 const slotHTML = (cls = '') => `<div class="hta-slot ${cls}" data-hta=""></div>`;
 
-return { mountHta, slotHTML };
+return { mountHta, slotHTML, inject };
 })();
 
 // ---- main.js ----
@@ -11939,36 +11911,14 @@ function route() {
   scrollTo({ top: 0, behavior: 'instant' });
 }
 
-/* ---------- ads: few, well placed, depending on the player ----------
-   Banner: always on the login screen (so A-ADS can check it), never while a game is open, for every level,
-   hidden 30 min after its cross is clicked. Nobody sees ads at all when
-   adPolicy.noAds() (the owner, or a ?nopub device). A player under 150 KE in a game is offered a rewarded ad
-   (+1 000\u00a0\uE1E0) or the 2-ad refill, at most once every 5 min. */
+/* ---------- ads ----------
+   The only ad network is HilltopAds (banners: hta.js; rewarded ads: ads.js). Nobody sees ads when adPolicy.noAds()
+   (the owner, or a ?nopub device). A player under 150 KE in a game is offered a rewarded ad (+1 000\u00a0\uE1E0)
+   or the 2-ad refill, at most once every 5 min. */
 function mountAdBar() {
-  const CLOSE_KEY = 'spinbet_adbar_closed', OFFER_KEY = 'spinbet_adoffer';
-  const bar = document.getElementById('ad-bar');
+  const OFFER_KEY = 'spinbet_adoffer';
   const get = (k) => { try { return +localStorage.getItem(k) || 0; } catch { return 0; } };
   const put = (k, v) => { try { localStorage.setItem(k, String(v)); } catch { /* ignore */ } };
-  const allowed = () => {
-    if (adPolicy.noAds()) return false;
-    if (document.body.classList.contains('gated')) return true;
-    if (Date.now() - get(CLOSE_KEY) < 30 * 60000) return false;
-    if (/^#game-/.test(location.hash)) return false;
-    return true;
-  };
-  const update = () => {
-    if (!bar) return;
-    const on = allowed();
-    bar.hidden = !on;
-    document.body.classList.toggle('ad-bar-on', on);
-  };
-  bar?.querySelector('.ad-bar-x').addEventListener('click', () => { put(CLOSE_KEY, Date.now()); update(); });
-  addEventListener('hashchange', update);
-  profiles.addEventListener('change', update);
-  adPolicy.addEventListener('change', update);
-  new MutationObserver(update).observe(document.body, { attributes: true, attributeFilter: ['class'] });
-  update();
-
   // low balance inside a game (under 150 KE): offer one ad for +1 000 KE (at most once every 5 min)
   wallet.addEventListener('change', () => {
     if (!profiles.current || wallet.balance >= 150 || !/^#game-/.test(location.hash) || document.querySelector('.ad-offer')) return;
