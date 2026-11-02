@@ -71,7 +71,7 @@ class BjOnlineGame extends BaseGame {
   onMeters() { if (this.mainBtn) this.mainBtn.disabled = !!this.myBet || this.phase !== 'bet' || !this.table?.me; }
 
   newRound(r) {
-    this.round0 = r; this.myBet = 0; this.acts = ''; this.A = null; this.B = null; this.done = false; this.paid = false; this.phase = 'bet';
+    this.round0 = r; this.myBet = 0; this.acts = ''; this.A = null; this.B = null; this.done = false; this.paid = false; this.phase = 'bet'; this.busy = false; // the bet can be changed again
     this.q('.dc').innerHTML = ''; this.q('.pc').innerHTML = ''; this.q('.dt').textContent = ''; this.q('.pt').textContent = '';
     this.paint([]); this.updateMeters(); this.paintActs();
   }

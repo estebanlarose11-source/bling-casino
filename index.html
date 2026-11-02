@@ -10666,8 +10666,8 @@ __mods['games/impl/index.js'] = (() => {
 
 const FILES = {
   'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', '2a48f294b6'],
-  'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', 'c02f98394e'],
-  'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '0cf35817bb'],
+  'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '206aea3b6f'],
+  'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '7e6577831b'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a1fe33533c'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
@@ -11697,6 +11697,20 @@ const chatHTML = () => `<div class="on-chat"><div class="on-chat-h">💬 Chat de
   <form class="on-chat-f"><input maxlength="200" placeholder="Écris à la table…" autocomplete="off"><button class="btn primary">Envoyer</button></form></div>`;
 async function mountChat(root, game) {
   const list = root.querySelector('.on-chat-list'), f = root.querySelector('.on-chat-f'), inp = f.querySelector('input');
+  // full screen (phones): the players and the chat live behind a floating 💬 button, so the game and all its
+  // buttons keep the whole screen; the button counts the messages received while it is closed
+  const slot = root.querySelector('.slot'), side = root.querySelector('.on-side');
+  let fab = null, unread = 0, seen = -1;
+  if (slot && side) {
+    fab = document.createElement('button');
+    fab.className = 'on-fab'; fab.type = 'button'; fab.setAttribute('aria-label', 'Chat de la table');
+    fab.innerHTML = '💬<b hidden>0</b>';
+    slot.appendChild(fab);
+    side.insertAdjacentHTML('afterbegin', '<button type="button" class="on-side-x" aria-label="Fermer le chat">✕</button>');
+    const toggle = (v) => { slot.classList.toggle('on-chat-open', v); if (v) { unread = 0; fab.querySelector('b').hidden = true; list.scrollTop = list.scrollHeight; } };
+    fab.onclick = () => toggle(!slot.classList.contains('on-chat-open'));
+    side.querySelector('.on-side-x').onclick = () => toggle(false);
+  }
   const me = uid();
   if (!me) { inp.disabled = true; f.querySelector('button').disabled = true; inp.placeholder = 'Crée un compte pour parler à la table'; }
   let stop = null;
@@ -11704,6 +11718,8 @@ async function mountChat(root, game) {
     stop = await cloud.watchTableChat(game, 40, (msgs) => {
       if (!list.isConnected) return stop?.();
       const end = list.scrollHeight - list.scrollTop - list.clientHeight < 40;
+      if (fab && seen >= 0 && msgs.length > seen && !slot.classList.contains('on-chat-open')) { unread += msgs.length - seen; const b = fab.querySelector('b'); b.hidden = false; b.textContent = unread > 9 ? '9+' : unread; }
+      seen = msgs.length;
       list.innerHTML = msgs.length ? msgs.map((m) => `<div class="on-msg${m.uid === me ? ' mine' : ''}">${__mods['shop.js']?.lookHTML?.(m.look, 'xs') || ''}<b class="pname" data-player="${esc(m.uid)}" data-pname="${esc(m.name)}" ${__mods['shop.js']?.nameStyle?.(m.look) || ''}>${esc(m.name)}</b> ${esc(m.text)}</div>`).join('')
         : '<p class="muted small">Personne n’a encore parlé à cette table. Dis bonjour 👋</p>';
       if (end) list.scrollTop = list.scrollHeight;
@@ -12971,6 +12987,36 @@ h1, h2, h3 { letter-spacing: -.01em; }
 @media (hover: none) { .game-card:hover .scene, .game-card:hover .thumb .cover, .game-card:hover .a0 { transform: none; } .game-card:hover .thumb::before { transform: none; } }
 </style>
 <style id="round-accents">
+.bjo-table .bj-label b:empty { display: none; }
+/* online tables in full screen: the game and its buttons take the screen, the chat opens from a 💬 button */
+.on-fab, .on-side-x { display: none; }
+.game-host.is-full > .slot.online-game { overflow: visible; }
+.game-host.is-full > .slot.online-game .controls { position: sticky; bottom: 0; z-index: 40; background: rgba(8, 12, 10, .94); }
+.game-host.is-full > .slot.online-game .on-side { display: none; }
+.game-host.is-full > .slot.online-game.on-chat-open .on-side { display: grid; grid-template-columns: 1fr; align-content: start; gap: 10px; position: fixed; z-index: 1500;
+  left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); top: max(10%, env(safe-area-inset-top)); bottom: max(8px, env(safe-area-inset-bottom));
+  margin: 0; padding: 40px 10px 10px; overflow-y: auto; border-radius: 16px; background: rgba(6, 9, 8, .97); border: 1px solid rgba(255, 255, 255, .14); box-shadow: 0 20px 60px rgba(0, 0, 0, .7); }
+.game-host.is-full > .slot.online-game.on-chat-open .on-side-x { display: grid; place-items: center; position: absolute; right: 8px; top: 6px; width: 30px; height: 30px; border-radius: 50%; background: rgba(255, 255, 255, .1); color: #fff; font-size: 14px; }
+.game-host.is-full > .slot.online-game.on-chat-open .on-chat-list { max-height: none; min-height: 120px; }
+@media (orientation: landscape) and (max-height: 560px) { .game-host.is-full > .slot.online-game.on-chat-open .on-side { top: 8px; left: auto; width: min(420px, 60vw); } }
+.game-host.is-full .on-fab { display: grid; place-items: center; position: fixed; z-index: 1450; right: max(10px, env(safe-area-inset-right)); top: calc(max(8px, env(safe-area-inset-top)) + 34px);
+  width: 48px; height: 48px; border-radius: 50%; font-size: 21px; background: radial-gradient(circle at 35% 30%, #ff6b7d, #e3132f 55%, #8f0014); box-shadow: 0 0 0 3px rgba(255, 35, 64, .25), 0 10px 28px rgba(0, 0, 0, .55); }
+.on-fab b { position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: #22c55e; color: #fff; font: 800 11px/20px Inter, sans-serif; text-align: center; }
+.on-fab b[hidden] { display: none; }
+@media (orientation: landscape) and (max-height: 560px) { .game-host.is-full .on-fab { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); right: auto; left: max(12px, env(safe-area-inset-left)); width: 46px; height: 46px; font-size: 20px; } }
+/* full screen on phones: no title block, smaller table, so everything fits */
+@media (max-width: 900px) {
+  .game-host.is-full > .slot.online-game .wheel-zone { --rw: min(54vw, 210px, calc(100vh - 560px)) !important; --rw: max(150px, min(54vw, 210px)) !important; padding-top: 4px; }
+  .game-host.is-full > .slot.online-game .bolt-bar { font-size: 11px; padding: 4px 8px; }
+  .game-host.is-full > .slot.online-game .on-timer { margin-bottom: 4px; }
+  .game-host.is-full > .slot.online-game .slot-head .slot-title { display: none; }
+  .game-host.is-full > .slot.online-game .bj-cards { min-height: 80px; }
+  .game-host.is-full > .slot.online-game .bj-card { width: 58px; height: 82px; }
+  .game-host.is-full > .slot.online-game .bj-f .mid { font-size: 26px; }
+  .game-host.is-full > .slot.online-game .bjo-table { padding: 8px; gap: 4px; }
+  .game-host.is-full > .slot.online-game .bj-arc { font-size: 9px; padding: 3px 8px; }
+  .game-host.is-full > .slot.online-game .bj-actions .bj-btn { padding-top: 8px; padding-bottom: 8px; }
+}
 /* ============ Online tables ============ */
 .online-game .rt-autoplay, .online-game .rt-autopick { display: none !important; }
 .on-timer { position: relative; margin: 0 auto 10px; max-width: 520px; text-align: center; }

@@ -98,7 +98,7 @@ class HoldemOnlineGame extends BaseGame {
   onMeters() { if (this.mainBtn) this.mainBtn.disabled = !!this.ante || this.phase !== 'bet' || !this.table?.me; }
 
   newRound(r) {
-    this.round0 = r; this.ante = 0; this.choice = null; this.A = null; this.B = null; this.players = []; this.paid = false; this.phase = 'bet';
+    this.round0 = r; this.ante = 0; this.choice = null; this.A = null; this.B = null; this.players = []; this.paid = false; this.phase = 'bet'; this.busy = false; // the bet can be changed again
     ['.dc', '.bc', '.pc', '.dh', '.ph'].forEach((s) => { this.q(s).innerHTML = ''; });
     this.q('.bc').innerHTML = [0, 1, 2, 3, 4].map(() => cardHTML(null, true)).join('');
     this.paint([]); this.updateMeters(); this.paintActs();
