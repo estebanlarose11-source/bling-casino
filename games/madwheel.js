@@ -118,23 +118,36 @@ function spinWheel(el, from, to, o = {}) {
   });
 }
 
+// Rainbow show wheel (owner's reference photo): bright glossy slices, the value in a white oval near the rim, a ring of
+// silver beads around the rim and around the hub, a coloured swirl turning in the hub, and a glass glare on top.
 function bigWheelSVG() {
+  const f = (v) => v.toFixed(2);
   let s = '<g class="mw-wheel">';
   for (let i = 0; i < NS; i++) {
     const k = SEGS[i], ang = ((i + 0.5) * A).toFixed(2);
-    s += `<path d="${slicePath(i)}" fill="${COL[k]}" stroke="#10061f" stroke-width="1"/>`;
-    if (isNaN(+k)) s += `<g transform="rotate(${ang} 150 150) translate(150 26) scale(.74)">${ICON[k]}</g>`;
-    else {
-      // condensed digits stacked along the radius: upright under the pointer and as big as the slice allows
-      const rs = k.length === 2 ? [[128, 23], [107, 23]] : [[121, 28]];
-      [...k].forEach((d, j) => { const [r, fs] = rs[j]; s += `<text x="150" y="${(150 - r + fs * 0.35).toFixed(1)}" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,'Arial Narrow',sans-serif" font-size="${fs}" fill="#fff" stroke="#10061f" stroke-width="2.6" stroke-linejoin="round" paint-order="stroke" transform="rotate(${ang} 150 150)">${d}</text>`; });
-    }
+    s += `<path d="${slicePath(i, A, 141)}" fill="${COL[k]}" stroke="#10061f" stroke-width="1.2"/>`;
+    if (isNaN(+k)) s += `<g transform="rotate(${ang} 150 150) translate(150 27) scale(.7)">${ICON[k]}</g>`;
+    else s += `<g transform="rotate(${ang} 150 150)"><ellipse cx="150" cy="28" rx="${k.length === 2 ? 8 : 7}" ry="11.5" fill="#fff" stroke="#10061f" stroke-width="1.1"/><text x="150" y="${k.length === 2 ? 32 : 33}" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,sans-serif" font-size="${k.length === 2 ? 11.5 : 14}" fill="#10061f">${k}</text></g>`;
   }
+  s += '<circle cx="150" cy="150" r="141" fill="url(#mwShade)"/>';
+  for (let b = 0; b < NS; b++) { const p = pt(b * A, 145.5); s += `<circle cx="${f(p[0])}" cy="${f(p[1])}" r="3.3" fill="url(#mwBead)"/>`; }
   s += '</g>';
-  let bl = '';
-  for (let b = 0; b < NS * 2; b++) { const p = pt((b * A) / 2, 148); bl += `<circle class="bulb" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="1.6" fill="${b % 2 ? '#fff' : '#ffd23f'}" style="animation-delay:${b % 2 ? '.5' : '0'}s"/>`; }
-  return `<svg class="mw-svg" viewBox="0 0 300 300"><circle cx="150" cy="150" r="149" fill="#10061f"/>${s}<g>${bl}</g><circle cx="150" cy="150" r="27" fill="url(#mwHub)" stroke="#ffd23f" stroke-width="3"/>
-    <defs><radialGradient id="mwHub"><stop offset="0" stop-color="#3b1060"/><stop offset="1" stop-color="#10061f"/></radialGradient></defs></svg>`;
+  // hub: silver beads, a swirl that keeps turning, a dark glass centre for the texts
+  let hub = '<circle cx="150" cy="150" r="42" fill="#10061f"/>';
+  for (let b = 0; b < 22; b++) { const p = pt((b * 360) / 22, 38); hub += `<circle cx="${f(p[0])}" cy="${f(p[1])}" r="3.6" fill="url(#mwBead)"/>`; }
+  hub += '<circle cx="150" cy="150" r="33" fill="#0b0418"/><g class="mw-swirl">';
+  const SW = ['#ff3d54', '#ff8a3d', '#ffd23f', '#8bd93b', '#1dd3b0', '#3aa0ff', '#a259ff', '#ff5fa8'];
+  for (let k = 0; k < 16; k++) {
+    const a0 = k * 22.5, e = pt(a0, 31), c = pt(a0 + 55, 22);
+    hub += `<path d="M150 150 Q${f(c[0])} ${f(c[1])} ${f(e[0])} ${f(e[1])}" stroke="${SW[k % 8]}" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".9"/>`;
+  }
+  hub += '</g><circle cx="150" cy="150" r="20" fill="url(#mwHub)" stroke="#ffd23f" stroke-width="1.5"/>';
+  const glare = '<path d="M40 92 A125 125 0 0 1 128 22 L132 34 A113 113 0 0 0 52 98 Z" fill="#fff" opacity=".16"/><path d="M228 268 A125 125 0 0 0 270 214 L262 210 A116 116 0 0 1 222 260 Z" fill="#fff" opacity=".1"/>';
+  return `<svg class="mw-svg" viewBox="0 0 300 300"><defs>
+    <radialGradient id="mwHub"><stop offset="0" stop-color="#3b1060"/><stop offset="1" stop-color="#10061f"/></radialGradient>
+    <radialGradient id="mwBead" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#c9ced9"/><stop offset="1" stop-color="#5d6475"/></radialGradient>
+    <radialGradient id="mwShade" cx="150" cy="150" r="141" gradientUnits="userSpaceOnUse"><stop offset=".28" stop-color="#000" stop-opacity=".35"/><stop offset=".55" stop-color="#fff" stop-opacity=".08"/><stop offset=".9" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".3"/></radialGradient></defs>
+    <circle cx="150" cy="150" r="149.5" fill="#10061f" stroke="#c9ced9" stroke-width="1"/>${s}${hub}${glare}</svg>`;
 }
 
 // The showman next to the wheel: idles, grabs the rim and throws the wheel, then cheers or shrugs.
@@ -175,7 +188,7 @@ class MadWheelGame extends BaseGame {
       cls: 'table-game',
       head: '<div class="hist mw-hist"></div>',
       stage: `<div class="mw-top"><small>TOP SLOT</small><b class="tsv">—</b></div>
-        <div class="mw-view"><div class="mw-zone"><div class="mw-ptr"></div>${bigWheelSVG()}<div class="mw-hub">MAD<br>WHEEL</div><div class="mw-host">${HOST}</div></div></div>`,
+        <div class="mw-view"><div class="mw-zone"><div class="mw-ptr"></div>${bigWheelSVG()}<div class="mw-hub">ROUE<br>FOLLE</div><div class="mw-host">${HOST}</div></div></div>`,
       below: `<div class="felt mw-felt"><div class="mw-spots">${SPOTS.map((k) => `<button class="mw-spot" data-k="${k}" style="--sc:${COL[k]}"><b>${isNaN(+k) ? iconSVG(k, 30) : k}</b><small>${HINT[k]}</small></button>`).join('')}</div>${BetBoard.chipsHTML()}</div>`,
       hello: 'Pose tes jetons sur les cases puis lance la roue.',
     });
@@ -250,7 +263,7 @@ class MadWheelGame extends BaseGame {
       topBox.classList.remove('hit');
       this.histAdd(seg);
       this.q('.mw-hub').innerHTML = isNaN(+seg) ? iconSVG(seg, 34) : `<b class="big">${seg}</b>`;
-      this.wheel.insertAdjacentHTML('beforeend', `<path class="mw-hl" d="${slicePath(idx)}" fill="#fff"/>`);
+      this.wheel.insertAdjacentHTML('beforeend', `<path class="mw-hl" d="${slicePath(idx, A, 141)}" fill="#fff"/>`);
       await this.zoomOnResult(seg);
       this.q(`.mw-spot[data-k="${seg}"]`)?.classList.add('hit');
       const p = center(this.q('.mw-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);

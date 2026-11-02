@@ -1414,6 +1414,10 @@ body.gated { overflow: hidden; }
 .g-storm { --slot-bg: radial-gradient(520px 260px at 50% -5%, rgba(31, 86, 255, .45), transparent 70%), linear-gradient(180deg, #0b1a5a 0%, #050a24 100%); }
 .g-doublespin { --slot-bg: radial-gradient(520px 260px at 50% -5%, rgba(232, 154, 0, .35), transparent 70%), linear-gradient(180deg, #15205e 0%, #070a22 100%); }
 .g-storm.storming .slot-bg { animation: stormBg .25s steps(2) infinite; }
+/* painted casino room (owner's image), darkened so the wheel and the felt stay readable */
+.slot.g-storm > .slot-bg, .slot.g-storm-online > .slot-bg { background: radial-gradient(70% 50% at 50% 28%, rgba(31, 86, 255, .18), transparent 70%), linear-gradient(180deg, rgba(5, 10, 36, .55), rgba(5, 10, 36, .72) 45%, rgba(5, 10, 36, .92)), url(assets/games/roulette/bg.webp?v=1) center 30% / cover no-repeat; }
+.slot.g-doublespin > .slot-bg { background: radial-gradient(70% 50% at 50% 28%, rgba(232, 154, 0, .2), transparent 70%), linear-gradient(180deg, rgba(20, 12, 2, .5), rgba(20, 12, 2, .7) 45%, rgba(10, 8, 20, .92)), url(assets/games/roulette/bg.webp?v=1) center 30% / cover no-repeat; }
+.slot.g-storm > .slot-bg::after, .slot.g-storm-online > .slot-bg::after, .slot.g-doublespin > .slot-bg::after { opacity: .25; }
 @keyframes stormBg { 50% { filter: brightness(1.8) saturate(1.4); } }
 .wheel-zone { --rw: max(200px, min(330px, 62vw, calc(100vh - 470px))); position: relative; display: grid; place-items: center; padding: 12px 10px 8px; gap: 8px; }
 .rwheel { width: var(--rw); aspect-ratio: 1; filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .6)); }
@@ -1547,6 +1551,10 @@ body.gated { overflow: hidden; }
 .mw-ptr { position: absolute; left: 50%; top: -8px; width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 30px solid #ffd23f; transform: translateX(-50%); transform-origin: 50% 0; z-index: 3; filter: drop-shadow(0 0 8px #ffd23f) drop-shadow(0 3px 2px rgba(0, 0, 0, .6)); }
 .mw-hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 18%; aspect-ratio: 1; display: grid; place-items: center; text-align: center; font: 900 clamp(8px, 1.6vw, 11px)/1.1 KeCoin, Archivo, sans-serif; color: #ffd23f; z-index: 2; }
 .mw-hub .big { font-size: clamp(18px, 4vw, 28px); color: #fff; text-shadow: 0 0 10px #ffd23f; }
+.mw-hub { width: 13%; }
+.mw-swirl { transform-origin: 150px 150px; animation: mwSwirl 6s linear infinite; }
+@keyframes mwSwirl { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .mw-swirl { animation: none; } }
 .mw-spots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .mw-spot { position: relative; padding: 10px 6px; border-radius: 3px; background: linear-gradient(180deg, color-mix(in srgb, var(--sc) 85%, #fff), var(--sc)); color: #10061f; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .25), 0 4px 12px rgba(0, 0, 0, .4); display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .mw-spot b { font: 900 22px KeCoin, Archivo, sans-serif; height: 32px; display: grid; place-items: center; }
@@ -3128,7 +3136,57 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pt-spot small { font-size: 10px; font-weight: 800; text-shadow: 0 1px 1px rgba(0, 0, 0, .5); }
 .pt-spot.hit { animation: jpHit .9s cubic-bezier(.3, 1.8, .5, 1); box-shadow: 0 0 0 3px #fff, 0 0 22px var(--sc); }
 .pt-note { margin: 10px 0 4px; font-size: 13px; text-align: center; color: #fecdd3; display: flex; gap: 6px; align-items: center; justify-content: center; flex-wrap: wrap; }
+/* Le Plateau: show wheel with a bulb frame (the frame sits around the 0–300 wheel, viewBox -34 … 334) */
+.plateau .pt-zone { --ptz: min(520px, 82vw, calc(100vh - 300px)); }
+.plateau .pt-ptr { top: -1%; width: 7.5%; height: 13.5%; transform-origin: 50% 15%; background: linear-gradient(180deg, #c084fc, #7c3aed 60%, #4c1d95); filter: drop-shadow(0 0 2px #fff) drop-shadow(0 4px 4px rgba(0, 0, 0, .7)); }
+.plateau .pt-ptr::before { content: ''; position: absolute; left: 50%; top: 4%; width: 34%; aspect-ratio: 1; translate: -50% 0; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff, #ffd23f 55%, #a16207); }
+.plateau .pt-view .pt-zone { transform-origin: 50% 11%; }
+.plateau .pt-hub { width: 15.8%; color: #ffd23f; }
+.plateau .pt-hub .big { color: #fff; text-shadow: 0 2px 0 #7a2a0a, 0 0 12px rgba(255, 200, 80, .7); }
+.pt-s { font: 900 clamp(34px, 8.5vw, 62px)/1 'Bebas Neue', Impact, sans-serif; background: linear-gradient(180deg, #fffbe6 0%, #ffd23f 45%, #f59e0b 55%, #b45309 100%); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 0 #4c1d95) drop-shadow(0 0 6px rgba(255, 210, 63, .6)); }
+.pt-bulb.big { filter: drop-shadow(0 0 3px #ffd23f); }
+.plateau .pt-svg { filter: drop-shadow(0 0 26px rgba(234, 88, 12, .45)) drop-shadow(0 14px 30px rgba(0, 0, 0, .6)); }
 @media (max-width: 600px) { .pt-spots { grid-template-columns: repeat(3, 1fr); } }
+/* Le Plateau bonus board in the owner's style: white board game, thin black lines, big corners, colour bands */
+.plateau .pt-board { grid-template: 1.35fr repeat(6, 1fr) 1.35fr / 1.35fr repeat(6, 1fr) 1.35fr; gap: 1.5px; padding: 1.5px; border-radius: 2px; background: #151515;
+  box-shadow: 0 0 0 10px #fbfaf6, 0 0 0 11px #d9d4c7, 0 22px 50px rgba(0, 0, 0, .7); }
+.plateau .pt-cell { border-radius: 0; background: #fbfaf6; color: #151515; box-shadow: none; overflow: visible; }
+.plateau .pt-cell::before { content: ''; position: absolute; background: var(--bc); }
+.plateau .pt-cell.sb::before { left: 0; right: 0; top: 0; height: 20%; border-bottom: 1px solid #151515; }
+.plateau .pt-cell.st::before { left: 0; right: 0; bottom: 0; height: 20%; border-top: 1px solid #151515; }
+.plateau .pt-cell.sl::before { top: 0; bottom: 0; right: 0; width: 20%; border-left: 1px solid #151515; }
+.plateau .pt-cell.sr::before { top: 0; bottom: 0; left: 0; width: 20%; border-right: 1px solid #151515; }
+.plateau .pt-cell.corner::before { display: none; }
+.plateau .pt-cell.sb b { margin-top: 18%; } .plateau .pt-cell.st b { margin-bottom: 18%; }
+.plateau .pt-cell.sl b { margin-right: 18%; } .plateau .pt-cell.sr b { margin-left: 18%; }
+.plateau .pt-cell i { opacity: .3; color: #151515; }
+.plateau .pt-cell.sb i { top: auto; bottom: 1px; }
+.plateau .pt-cell b { color: #151515; }
+.plateau .pt-cell em { color: #f59e0b; text-shadow: none; font-size: 10px; }
+.plateau .pt-cell.t5 { background: linear-gradient(160deg, #fbfaf6 40%, #dbeafe); animation: ptGlowW 1.6s ease-in-out infinite alternate; }
+.plateau .pt-cell.t5 b { color: #1d4ed8; }
+@keyframes ptGlowW { to { box-shadow: inset 0 0 14px rgba(29, 111, 224, .55); } }
+.plateau .pt-cell.corner { background: #f3efe4; }
+.plateau .pt-cell.start { background: #fbfaf6; color: #c81d25; }
+.plateau .pt-cell.start b { color: #c81d25; font-size: clamp(10px, 2.3vw, 15px); }
+.plateau .pt-cell.start small { color: #c81d25; font-size: clamp(16px, 4vw, 26px); line-height: 1; }
+.plateau .pt-cell.pass { box-shadow: inset 0 0 0 3px rgba(250, 204, 21, .95); }
+.plateau .pt-cell.hit { z-index: 2; transform: scale(1.18); box-shadow: 0 0 0 3px #fde047, 0 0 22px rgba(253, 224, 71, .95); }
+.plateau .pt-mid { display: block; border-radius: 0; background: #fbfaf6; overflow: hidden; }
+.plateau .pt-logo { color: rgba(21, 21, 21, .05); }
+.plateau .pt-title { position: absolute; left: 6%; top: 5%; font-size: clamp(16px, 3.8vw, 30px); color: #c81d25; text-shadow: none; text-align: left; }
+.pt-card { position: absolute; display: grid; place-items: center; border: 1.5px solid #151515; background: #fff; box-shadow: 3px 4px 0 rgba(0, 0, 0, .12); }
+.pt-card.c1 { right: 7%; top: 13%; width: 38%; height: 27%; transform: rotate(-22deg); }
+.pt-card.c2 { left: 6%; bottom: 10%; width: 44%; height: 30%; transform: rotate(-22deg); }
+.plateau .pt-info { flex-direction: column; gap: 2px; }
+.plateau .pt-info span { flex-direction: row; justify-content: space-between; gap: 8px; min-width: 0; padding: 0; background: none; border: 0; }
+.plateau .pt-info small { color: #57534e; font-size: clamp(7px, 1.6vw, 10px); }
+.plateau .pt-info b { color: #151515; font-size: clamp(13px, 3vw, 20px); }
+.plateau .pt-info .tot b { color: #c81d25; }
+.plateau .pt-dice { gap: 8px; }
+.plateau .pt-die { width: clamp(30px, 7vw, 52px); box-shadow: 0 4px 0 #9ca3af, 0 6px 10px rgba(0, 0, 0, .3); border: 1px solid #d6d3d1; }
+.plateau .pt-say { position: absolute; left: 50%; top: 52%; width: 62%; transform: translate(-50%, -50%); color: #151515; font-size: clamp(11px, 2.4vw, 15px); text-align: center; }
+.plateau .pt-say .dbl { color: #c81d25; }
 
 /* ============ La Pêche ============ */
 .g-peche { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(125, 211, 252, .25), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(37, 99, 235, .25), transparent 70%), linear-gradient(180deg, #071a2e 0%, #05070b 100%); }
@@ -8034,6 +8092,10 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'plateau', date: '2026-11-02', title: 'Nouvelle roue et nouveau plateau', items: ['Une grande roue de show : cadre rouge à grosses ampoules, rayons de couleur et clous dorés', 'Le médaillon lumineux au centre avec le « S » doré de SpinBet', 'Le plateau du bonus façon jeu de société : cases blanches, bandes de couleur selon le multiplicateur', 'Au milieu du plateau, les dés roulent sur leur carte et le total s’affiche sur l’autre'] },
+  { game: 'madwheel', date: '2026-11-02', title: 'La roue arc-en-ciel', items: ['Des couleurs plus vives et brillantes', 'Chaque valeur dans un médaillon blanc, au bord de la roue', 'Une couronne de perles argentées autour de la roue et du centre', 'Un tourbillon de couleurs qui tourne au milieu'] },
+  { game: 'doublespin', date: '2026-11-02', title: 'Une vraie roulette', items: ['Nouvelle roue noire et dorée, avec sa croix qui tourne', 'Les deux billes roulent sur le bord puis tombent dans leur case', 'Une salle de casino en fond'] },
+  { game: 'storm', date: '2026-11-02', title: 'Une vraie roulette', items: ['Nouvelle roue noire et dorée, avec sa croix qui tourne', 'La bille roule sur le bord puis tombe dans sa case', 'Une salle de casino en fond'] },
   { game: 'storm-online', date: '2026-11-02', title: 'Le salon : prêt, et c’est parti', items: ['Pose tes jetons et appuie sur PRÊT', 'La roue part dès que tout le salon est prêt, tout de suite si tu es seul', 'Plein écran revu pour le téléphone'] },
   { game: 'bj-online', date: '2026-11-02', title: 'Le salon : prêt, et c’est parti', items: ['Mise et appuie sur PRÊT', 'Les cartes partent dès que tout le salon est prêt, tout de suite si tu es seul', 'La croupière joue dès que tout le monde a fini', 'Plein écran revu pour le téléphone'] },
   { game: 'storm-online', date: '2026-11-02', title: 'Nouveau : L’Éclair Online', isNew: true, items: ['La roulette éclair en multijoueur', 'Un tour toutes les 15 secondes pour toute la table', 'Les mises et les gains des autres joueurs en direct', 'Un chat rien que pour la table'] },
@@ -10481,26 +10543,22 @@ function tableHTML(L) {
 
 const pt = (a, r) => { const t = (a * Math.PI) / 180; return [150 + r * Math.sin(t), 150 - r * Math.cos(t)]; };
 
+// The painted wheel (owner's image, assets/games/roulette): rim.webp stays still, rotor.webp (pockets, numbers,
+// golden turret) turns. In the image the 0 is centred at the top, here pocket i spans i·A … (i+1)·A, hence the A/2.
+// Wheel radius 266 px in the image = 148 in the SVG: pockets ≈ 68–84, numbers 86–107, rim 115–147.
+const RIMG_V = 1;
+const rimg = (n) => window.__assets?.[`assets/games/roulette/${n}.webp`] || `assets/games/roulette/${n}.webp?v=${RIMG_V}`;
+const R_TRACK = 129, R_POCKET = 76;
+
 function wheelSVG(balls = 1) {
-  let g = `<defs>
-    <radialGradient id="rwd" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff2b0"/><stop offset=".6" stop-color="#e8b93d"/><stop offset="1" stop-color="#7a5208"/></radialGradient>
-    <radialGradient id="rtk" cx=".5" cy=".5" r=".5"><stop offset=".78" stop-color="#1c2148"/><stop offset=".9" stop-color="#0a0d24"/><stop offset="1" stop-color="#343b78"/></radialGradient>
-    <filter id="rglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>`;
-  g += '<circle cx="150" cy="150" r="149" fill="none" stroke="var(--accent)" stroke-width="2" filter="url(#rglow)" opacity=".9"/>';
-  g += '<circle cx="150" cy="150" r="146" fill="#2a1606"/><circle cx="150" cy="150" r="139" fill="#5a3412"/><circle cx="150" cy="150" r="124" fill="url(#rtk)"/>';
-  for (let i = 0; i < 36; i++) { const p = pt(i * 10, 132); g += `<circle class="rbulb" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="1.8" style="animation-delay:${(i % 2) * 0.5}s"/>`; }
-  g += '<circle cx="150" cy="150" r="124" fill="none" stroke="#fff2b0" stroke-width="2.5"/><g class="rw">';
-  for (let i = 0; i < NP; i++) {
-    const n = ORDER[i], c = colr(n), f = c === 'g' ? '#0f9d4a' : c === 'r' ? '#c8102e' : '#14141c';
-    const a0 = i * A, a1 = (i + 1) * A, p0 = pt(a0, 104), p1 = pt(a1, 104), p2 = pt(a1, 70), p3 = pt(a0, 70);
-    g += `<path d="M${p0[0].toFixed(2)} ${p0[1].toFixed(2)} A104 104 0 0 1 ${p1[0].toFixed(2)} ${p1[1].toFixed(2)} L${p2[0].toFixed(2)} ${p2[1].toFixed(2)} A70 70 0 0 0 ${p3[0].toFixed(2)} ${p3[1].toFixed(2)} Z" fill="${f}" stroke="#e8d38a" stroke-width=".8" data-n="${n}"/>`;
-    g += `<text x="150" y="65" text-anchor="middle" font-family="KeCoin,Archivo,Georgia,serif" font-weight="700" font-size="8" fill="#fff" transform="rotate(${((i + 0.5) * A).toFixed(2)} 150 150)">${n}</text>`;
-  }
-  g += '<circle cx="150" cy="150" r="68" fill="url(#rwd)" stroke="#7a5208" stroke-width="2"/>';
-  for (let k = 0; k < 4; k++) { const a = pt(k * 90, 58), b = pt(k * 90 + 180, 58); g += `<path d="M${a[0]} ${a[1]} L${b[0]} ${b[1]}" stroke="#7a5208" stroke-width="5" stroke-linecap="round"/>`; }
-  g += '<circle cx="150" cy="150" r="15" fill="#fff2b0" stroke="#7a5208" stroke-width="2"/></g>';
-  g += '<circle class="ball b0" cx="150" cy="38" r="5.2" fill="#fff" stroke="#9aa3c7" stroke-width="1"/>';
-  if (balls > 1) g += '<circle class="ball b1" cx="150" cy="262" r="5.2" fill="#ffd23f" stroke="#a87b00" stroke-width="1"/>';
+  let g = `<defs><filter id="rglow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <radialGradient id="rball" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#e6e9f2"/><stop offset="1" stop-color="#8d93a8"/></radialGradient>
+    <radialGradient id="rballY" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff7cc"/><stop offset=".55" stop-color="#ffd23f"/><stop offset="1" stop-color="#a87b00"/></radialGradient></defs>`;
+  g += '<circle cx="150" cy="150" r="148.5" fill="none" stroke="var(--accent)" stroke-width="2" filter="url(#rglow)" opacity=".8"/>';
+  g += `<image href="${rimg('rim')}" x="2" y="2" width="296" height="296"/>`;
+  g += `<g class="rw"><g transform="rotate(${(A / 2).toFixed(3)} 150 150)"><image href="${rimg('rotor')}" x="2" y="2" width="296" height="296"/></g></g>`;
+  g += `<circle class="ball b0" cx="150" cy="${150 - R_TRACK}" r="4.3" fill="url(#rball)" stroke="#5b6178" stroke-width=".6"/>`;
+  if (balls > 1) g += `<circle class="ball b1" cx="150" cy="${150 + R_TRACK}" r="4.3" fill="url(#rballY)" stroke="#7a5600" stroke-width=".6"/>`;
   return g;
 }
 
@@ -10531,14 +10589,14 @@ function spinBalls(svg, state, targets, { turbo = false, tick, speed = 1 } = {})
         const bounce = t > Tb && t < b.T ? 11 * Math.exp(-3.4 * (t - Tb)) * Math.sin(17 * (t - Tb)) : 0;
         const E = t >= b.T ? 0 : b.E0 * Math.pow(1 - ub, p);
         const ba = wa + b.rel + E + bounce;
-        const rad = ub < 0.5 ? 112 : ub < 0.82 ? 112 - 16 * smooth((ub - 0.5) / 0.32) : 96 - (t > Tb && t < b.T ? Math.abs(bounce) * 0.12 : 0);
+        const rad = ub < 0.5 ? R_TRACK : ub < 0.82 ? R_TRACK - (R_TRACK - R_POCKET) * smooth((ub - 0.5) / 0.32) : R_POCKET + (t > Tb && t < b.T ? Math.abs(bounce) * 0.35 : 0);
         const pp = pt(ba, rad);
         b.el.setAttribute('cx', pp[0].toFixed(2)); b.el.setAttribute('cy', pp[1].toFixed(2));
         if (ub > 0.45 && t < b.T) { const nn = Math.floor((ba - wa) / A); if (b.last !== null && nn !== b.last) tick?.(Math.max(0.04, (0.15 * (1 - ub) + 0.04) * b.vol)); b.last = nn; }
       });
       if (t >= T0) {
         state.wcur = wEnd;
-        B.forEach((b) => { const f = pt(wEnd + b.rel, 96); b.el.setAttribute('cx', f[0].toFixed(2)); b.el.setAttribute('cy', f[1].toFixed(2)); });
+        B.forEach((b) => { const f = pt(wEnd + b.rel, R_POCKET); b.el.setAttribute('cx', f[0].toFixed(2)); b.el.setAttribute('cy', f[1].toFixed(2)); });
         res();
         return;
       }
@@ -10694,7 +10752,7 @@ const FILES = {
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '298b0a4b44'],
-  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '4f7a635766'],
+  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '948b0547bb'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '8cbe1f47d4'],
@@ -10716,7 +10774,7 @@ const FILES = {
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
-  plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '461b177bb0'],
+  plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '69b85d4fce'],
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', '05d7e5d6e8'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', 'a91ebf3389'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '6f6628b9f9'],

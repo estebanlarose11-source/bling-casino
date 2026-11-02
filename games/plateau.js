@@ -55,21 +55,47 @@ const pt = (a, r) => { const t = ((a - 90) * Math.PI) / 180; return [150 + r * M
 const slicePath = (i, r = 146) => { const p0 = pt(i * A, r), p1 = pt((i + 1) * A, r); return `M150 150 L${p0[0].toFixed(2)} ${p0[1].toFixed(2)} A${r} ${r} 0 0 1 ${p1[0].toFixed(2)} ${p1[1].toFixed(2)} Z`; };
 const tier = (v) => (v >= 100 ? 't5' : v >= 20 ? 't4' : v >= 5 ? 't3' : v >= 3 ? 't2' : 't1');
 
+// Show wheel (owner's reference: a light-bulb frame, coloured spokes on a dark disc, a number badge at the tip of
+// each spoke, golden pegs, a glowing medallion with the SpinBet "S" in the middle). The frame lies outside the
+// 0–300 box (viewBox -34 … 334) so the wheel itself keeps its geometry (radius 146, centre 150).
 function wheelSVG() {
+  const f = (v) => v.toFixed(2);
   let s = '<g class="pt-wheel">';
+  s += '<circle cx="150" cy="150" r="146" fill="#1b1838"/>';
   for (let i = 0; i < NS; i++) {
-    const k = SEGS[i], ang = ((i + 0.5) * A).toFixed(2);
-    s += `<path d="${slicePath(i)}" fill="${COL[k]}" stroke="#0b0716" stroke-width=".8"/>`;
-    if (ICON[k]) s += `<g transform="rotate(${ang} 150 150) translate(150 18) scale(.5)"><g transform="translate(-12 -12)">${ICON[k](24)}</g></g>`;
-    else {
-      const rs = k.length === 2 ? [[133, 12], [121, 12]] : [[128, 15]];
-      [...k].forEach((d, j) => { const [r, fs] = rs[j]; s += `<text x="150" y="${(150 - r + fs * 0.35).toFixed(1)}" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,sans-serif" font-size="${fs}" fill="#fff" stroke="#0b0716" stroke-width="2" stroke-linejoin="round" paint-order="stroke" transform="rotate(${ang} 150 150)">${d}</text>`; });
-    }
+    const k = SEGS[i], ang = ((i + 0.5) * A).toFixed(2), c = COL[k];
+    // spoke: a wedge from the hub to the badge, a little narrower than its case
+    const a0 = i * A + A * 0.13, a1 = (i + 1) * A - A * 0.13;
+    const q0 = pt(a0, 40), q1 = pt(a1, 40), q2 = pt(a1, 124), q3 = pt(a0, 124);
+    s += `<path d="M${f(q0[0])} ${f(q0[1])} L${f(q3[0])} ${f(q3[1])} A124 124 0 0 1 ${f(q2[0])} ${f(q2[1])} L${f(q1[0])} ${f(q1[1])} Z" fill="${c}"/>`;
+    s += `<path d="M${f(q0[0])} ${f(q0[1])} L${f(q3[0])} ${f(q3[1])}" stroke="rgba(255,255,255,.35)" stroke-width=".8"/>`;
+    // badge at the tip
+    s += `<g transform="rotate(${ang} 150 150)"><circle cx="150" cy="${150 - 130}" r="6.6" fill="#fff6e0" stroke="${c}" stroke-width="1.8"/><circle cx="150" cy="${150 - 130}" r="8.2" fill="none" stroke="#0b0716" stroke-width=".8" opacity=".6"/>`;
+    if (ICON[k]) s += `<g transform="translate(150 ${150 - 130}) scale(.46)"><g transform="translate(-12 -12)">${ICON[k](24)}</g></g>`;
+    else s += `<text x="150" y="${f(150 - 130 + (k.length === 2 ? 2.4 : 2.9))}" text-anchor="middle" font-family="KeCoin,Archivo,sans-serif" font-weight="900" font-size="${k.length === 2 ? 6.6 : 8.2}" fill="#1b1838">${k}</text>`;
+    s += '</g>';
+    // golden peg between two cases
+    const pg = pt(i * A, 141);
+    s += `<circle cx="${f(pg[0])}" cy="${f(pg[1])}" r="1.5" fill="#ffe08a" stroke="#7a5208" stroke-width=".5"/>`;
   }
-  s += '</g>';
-  let bl = '';
-  for (let b = 0; b < 52; b++) { const p = pt((b * 360) / 52, 148.5); bl += `<circle class="pt-bulb" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="1.5" fill="${b % 2 ? '#fff' : '#ffd23f'}" style="animation-delay:${b % 2 ? '.5' : '0'}s"/>`; }
-  return `<svg class="pt-svg" viewBox="0 0 300 300"><circle cx="150" cy="150" r="149.5" fill="#0b0716"/>${s}<g>${bl}</g><circle cx="150" cy="150" r="30" fill="#140b2a" stroke="#ffd23f" stroke-width="3"/></svg>`;
+  s += '<circle cx="150" cy="150" r="138.5" fill="none" stroke="#ffd23f" stroke-width=".8" opacity=".55"/></g>';
+  // frame: dark metal rim, then the red-orange arch with big bulbs
+  let fr = '<circle cx="150" cy="150" r="181" fill="url(#ptFrame)"/><circle cx="150" cy="150" r="181" fill="none" stroke="#ffd23f" stroke-width="2"/>';
+  fr += '<circle cx="150" cy="150" r="153" fill="#2a2333" stroke="#ffd23f" stroke-width="1.6"/>';
+  for (let b = 0; b < 30; b++) {
+    const p = pt(b * 12 + 6, 167);
+    fr += `<circle cx="${f(p[0])}" cy="${f(p[1])}" r="6.2" fill="#5a1a06"/><circle class="pt-bulb big" cx="${f(p[0])}" cy="${f(p[1])}" r="4.6" fill="url(#ptBulb)" style="animation-delay:${b % 2 ? '.5' : '0'}s"/>`;
+  }
+  // medallion
+  let md = '<circle cx="150" cy="150" r="42" fill="url(#ptMed)" stroke="#ffd23f" stroke-width="2"/>';
+  for (let b = 0; b < 14; b++) { const p = pt((b * 360) / 14, 35); md += `<circle class="pt-bulb" cx="${f(p[0])}" cy="${f(p[1])}" r="2.5" fill="#fff3c4" style="animation-delay:${b % 2 ? '.5' : '0'}s"/>`; }
+  md += '<circle cx="150" cy="150" r="29" fill="url(#ptMedIn)" stroke="#7a2a0a" stroke-width="1.5"/>';
+  const defs = `<defs>
+    <radialGradient id="ptFrame" cx="150" cy="150" r="181" gradientUnits="userSpaceOnUse"><stop offset=".8" stop-color="#7a1306"/><stop offset=".9" stop-color="#e2531b"/><stop offset="1" stop-color="#8a1a08"/></radialGradient>
+    <radialGradient id="ptBulb" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#fff2b0"/><stop offset="1" stop-color="#f5b52e"/></radialGradient>
+    <radialGradient id="ptMed" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#ffb347"/><stop offset=".7" stop-color="#ea580c"/><stop offset="1" stop-color="#9a2d07"/></radialGradient>
+    <radialGradient id="ptMedIn" cx=".5" cy=".35" r=".7"><stop offset="0" stop-color="#4c1d95"/><stop offset="1" stop-color="#1b0b3a"/></radialGradient></defs>`;
+  return `<svg class="pt-svg" viewBox="-34 -34 368 368">${defs}${fr}${s}${md}</svg>`;
 }
 
 // 8 × 8 grid, the 28 cases on its border: 0 (DÉPART) bottom right, then left, up, right and down.
@@ -79,11 +105,16 @@ function cellRC(i) {
   if (i <= 21) return [0, i - 14];
   return [i - 21, 7];
 }
+// Board in the owner's style (a white board game: thin black lines, big corners, a colour band on the inner edge
+// of each case). The band colour gives the value: brown ×1–2, sky ×3–4, pink ×5, orange ×6, red ×10, yellow ×20,
+// green ×40, blue ×100–200.
+const band = (v) => (v >= 100 ? '#1d6fe0' : v >= 40 ? '#1f9d48' : v >= 20 ? '#f2cf1d' : v >= 10 ? '#e31b23' : v >= 6 ? '#f28c28' : v >= 5 ? '#c2187f' : v >= 3 ? '#86cfe8' : '#8b5a2b');
+const side = (i) => (i % 7 === 0 ? '' : i < 7 ? ' sb' : i < 14 ? ' sl' : i < 21 ? ' st' : ' sr');
 function boardHTML() {
   return BOARD.map((v, i) => {
     const [r, c] = cellRC(i);
     const corner = i % 7 === 0;
-    return `<div class="pt-cell ${i ? tier(v) : 'start'}${corner ? ' corner' : ''}" data-i="${i}" style="grid-row:${r + 1};grid-column:${c + 1}"><i>${i}</i>${i ? `<b>×${v}</b>${v >= 20 ? '<em>★</em>' : ''}` : '<b>DÉPART</b><small>⟲</small>'}</div>`;
+    return `<div class="pt-cell ${i ? tier(v) : 'start'}${corner ? ' corner' : ''}${side(i)}" data-i="${i}" style="grid-row:${r + 1};grid-column:${c + 1};--bc:${band(v)}"><i>${i}</i>${i ? `<b>×${v}</b>${v >= 20 ? '<em>★</em>' : ''}` : '<b>DÉPART</b><small>⟲</small>'}</div>`;
   }).join('');
 }
 
@@ -103,11 +134,13 @@ class PlateauGame extends BaseGame {
       cls: 'table-game plateau',
       head: '<div class="hist pt-hist"></div>',
       stage: `<div class="pt-view">
-          <div class="pt-zone"><div class="pt-ptr"></div>${wheelSVG()}<div class="pt-hub">LE<br>PLATEAU</div></div>
+          <div class="pt-zone"><div class="pt-ptr"></div>${wheelSVG()}<div class="pt-hub"><span class="pt-s">S</span></div></div>
           <div class="pt-boardwrap" hidden>
             <div class="pt-board">${boardHTML()}
-              <div class="pt-mid"><div class="pt-logo">LE PLATEAU</div><h3 class="pt-title">2 LANCERS</h3><div class="pt-dice">${dieHTML(1)}${dieHTML(1)}</div>
-                <div class="pt-info"><span><small>LANCERS</small><b class="pt-left">2</b></span><span class="tot"><small>TOTAL</small><b class="pt-tot">×0</b></span></div><div class="pt-say"></div></div>
+              <div class="pt-mid"><div class="pt-logo">SPINBET</div><h3 class="pt-title">2 LANCERS</h3>
+                <div class="pt-card c1"><div class="pt-info"><span><small>LANCERS</small><b class="pt-left">2</b></span><span class="tot"><small>TOTAL</small><b class="pt-tot">×0</b></span></div></div>
+                <div class="pt-card c2"><div class="pt-dice">${dieHTML(1)}${dieHTML(1)}</div></div>
+                <div class="pt-say"></div></div>
               <div class="pt-pawn"><i></i></div>
             </div>
           </div>
