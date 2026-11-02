@@ -124,8 +124,11 @@ class PecheGame extends BaseGame {
     this.board.paint();
     this.wheel = this.q('.pe-wheel');
     ['fb', 'fo', 'fr', 'gold', 'fisher1', 'fisher2', 'pond'].forEach((n) => { new Image().src = src(n); });
+    // the fisherman photo as a lit 3D relief (fx3d.js) when the device can; the photo stays otherwise
+    this.fisher3d = __mods['fx3d.js']?.makeFisher(this.q('.pe-fisher'), [src('fisher1'), src('fisher2')]);
   }
 
+  destroy() { this.fisher3d?.dispose(); super.destroy(); }
   stakeLabel() { return this.board ? this.board.total() : 0; }
   chipSound() { sfx.click(); }
   onMeters() { if (this.mainBtn) this.mainBtn.disabled = !this.auto && (this.busy || !this.board?.total()); }
@@ -248,7 +251,7 @@ class PecheGame extends BaseGame {
     // the hook drifts over a few fish (teasing), then bites the chosen one
     const fishEls = this.qa('.pe-fish'), target = fishEls[pick];
     const others = fishEls.filter((_, i) => i !== pick).sort(() => Math.random() - 0.5).slice(0, 3);
-    this.q('.pe-arm').classList.add('cast');
+    this.q('.pe-arm').classList.add('cast'); this.fisher3d?.setState('cast');
     for (const f of [...others, target]) {
       await this.hookTo(f, 520);
       if (this.dead) return 0;
@@ -264,7 +267,7 @@ class PecheGame extends BaseGame {
     fishEls.forEach((f) => { if (f !== target) f.classList.add('flee'); });
     const fight = (1800 + 4200 * (Math.log(v / lo + 1) / Math.log(hi / lo + 1))) * (this.turbo ? 0.5 : 1);
     say(v >= hi / 4 ? '😱 Énorme poisson ! Il se débat…' : v >= hi / 20 ? 'Un beau poisson ! Ça tire…' : 'Ça mord !');
-    this.q('.pe-arm').classList.remove('cast'); this.q('.pe-arm').classList.add('reel');
+    this.q('.pe-arm').classList.remove('cast'); this.q('.pe-arm').classList.add('reel'); this.fisher3d?.setState('reel');
     const tip = () => { const r = this.q('.pe-rod').getBoundingClientRect(); return { x: r.right - wr.left, y: r.top - wr.top }; };
     const start = { x: fr.left - wr.left, y: fr.top - wr.top }, t0 = performance.now();
     await new Promise((res) => {
@@ -291,7 +294,7 @@ class PecheGame extends BaseGame {
     await this.wait(280);
     box.hidden = true; zone.hidden = false;
     zone.animate([{ opacity: 0, transform: 'scale(.9)' }, { opacity: 1, transform: 'none' }], { duration: 400, easing: 'cubic-bezier(.3,1.4,.5,1)' });
-    this.q('.pe-arm').classList.remove('reel');
+    this.q('.pe-arm').classList.remove('reel'); this.fisher3d?.setState('idle');
     this.drawLine(null);
     return v;
   }

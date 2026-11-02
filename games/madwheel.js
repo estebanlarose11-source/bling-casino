@@ -226,12 +226,17 @@ class MadWheelGame extends BaseGame {
     this.board.paint();
     this.wheel = this.q('.mw-wheel');
     this.host = this.q('.mw-host');
+    // the showman in real 3D (fx3d.js) when the device can; the drawing stays otherwise
+    this.host3d = __mods['fx3d.js']?.makeShowman(this.host);
+    if (this.host3d) this.host.classList.add('mw3d');
   }
 
   pose(cls, ms = 0) {
     clearTimeout(this.poseT);
-    this.host.className = 'mw-host' + (cls ? ' ' + cls : '');
-    if (ms) this.poseT = setTimeout(() => { if (!this.dead) this.host.className = 'mw-host'; }, ms);
+    const d3 = this.host3d ? ' mw3d' : '';
+    this.host.className = 'mw-host' + d3 + (cls ? ' ' + cls : '');
+    this.host3d?.setPose(cls || 'idle');
+    if (ms) this.poseT = setTimeout(() => { if (!this.dead) { this.host.className = 'mw-host' + d3; this.host3d?.setPose('idle'); } }, ms);
   }
 
   stakeLabel() { return this.board ? this.board.total() : 0; }
@@ -500,7 +505,7 @@ class MadWheelGame extends BaseGame {
     return ch;
   }
 
-  destroy() { this.ov?.remove(); super.destroy(); }
+  destroy() { this.ov?.remove(); this.host3d?.dispose(); super.destroy(); }
 
   info() {
     return this.rules(`<h4>La roue</h4><p>54 cases : 1 (×22), 2 (×15), 5 (×7), 10 (×4) et 6 cases bonus (Pile ou Face ×2, Pachinko ×2, Chasse au Cash ×1, Méga Folie ×1). Mise sur une ou plusieurs cases : un chiffre paie autant de fois la mise (1 pour 1, 2 pour 1…), mise rendue en plus.</p>

@@ -1526,6 +1526,11 @@ body.gated { overflow: hidden; }
 .mw-zone { --mwz: min(500px, 84vw, calc(100vh - 330px)); position: relative; width: var(--mwz); min-width: 240px; aspect-ratio: 1; margin: 14px auto 14px; }
 /* showman */
 .mw-host { position: absolute; z-index: 4; left: -17%; bottom: -2%; width: 24%; pointer-events: none; }
+.mw-host .fx3d { display: block; width: 100%; aspect-ratio: 140 / 260; }
+.mw-host.mw3d .mh-svg { display: none; }
+.pe-fisher .fx3d { position: absolute; left: -30%; top: -12%; width: 160%; height: 118%; pointer-events: none; }
+.pe-fisher.pe3d > img { visibility: hidden; }
+
 .mh-svg { display: block; width: 100%; height: auto; overflow: visible; }
 .mh-svg * { transform-box: view-box; }
 .mh-body { transform-origin: 70px 250px; animation: mhBob 2.4s ease-in-out infinite; }
@@ -8117,6 +8122,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'madwheel', date: '2026-11-02', title: 'Le présentateur en 3D', items: ['Le présentateur est maintenant un vrai personnage en 3D : chapeau haut-de-forme, moustache, gants blancs', 'Il attrape la roue, la lance, la regarde tourner, saute de joie ou baisse la tête', 'Chaque bonus arrive avec une médaille d’or en 3D et une explosion de pièces'] },
+  { game: 'peche', date: '2026-11-02', title: 'Le pêcheur en relief 3D', items: ['Le pêcheur prend du volume : il est éclairé et tourne en perspective', 'Il se penche quand il lance sa ligne et tire en tremblant quand ça mord', 'Chaque poisson pêché arrive avec une médaille d’or en 3D et une explosion de pièces'] },
   { game: 'huff', date: '2026-11-02', title: 'Lignes gagnantes corrigées', items: ['Les lignes gagnantes restent dans le cadre des rouleaux, sur ordinateur comme sur téléphone'] },
   { game: 'fortune', date: '2026-11-02', title: 'La Fortune plus vivante', items: ['Symboles recadrés : lettres, dragon, enveloppe, chats, lingots et lanterne bien centrés', 'Rouleaux qui défilent plus longtemps, avec une lueur dorée et un flash à chaque arrêt', 'Pendant le Hold & Spin, chaque case vide est un petit rouleau qui défile', 'Un vrai tas de pièces d’or dans le bol, et de la poussière d’or qui tombe'] },
   { game: 'fortune', date: '2026-11-02', title: 'Nouveau : La Fortune', isNew: true, items: ['Le nouvel an chinois : lanternes, dragon d’or WILD et 243 façons de gagner', 'Les pièces d’or montent dans le bol : le tas de pièces grandit jusqu’au prochain bonus', '6 pièces = HOLD & SPIN, avec les jackpots MAJOR et JACKPOT qui grimpent à chaque spin', 'Des lignes s’allument ×2 ou ×5 pendant le bonus', '4 scatters = MÉGA BONUS : chaque pièce vaut ×2 à ×5'] },
@@ -9681,6 +9688,7 @@ class SlotMachine {
   }
 
   async celebrate(amount, { inFree = false, summary = null } = {}) {
+    if (summary) dispatchEvent(new CustomEvent('sb:featureend', { detail: { game: this.game.id } })); // the 3D layer stops the bonus aura
     const x = amount / this.bet;
     const tier = WIN_TIERS.find((t) => x >= t.x);
     const fmtA = (n) => fmt(n);
@@ -10164,6 +10172,7 @@ class BaseGame {
 
   // Count-up in the win bar, or the full BIG/MEGA/EPIC screen past 10× the stake.
   async celebrate(amountC, { summary = null, stake = this.lastStake || this.bet, quick = false } = {}) {
+    if (summary) dispatchEvent(new CustomEvent('sb:featureend', { detail: { game: this.game.id } })); // the 3D layer stops the bonus aura
     if (this.dead || amountC <= 0 && !summary) return;
     const x = amountC / stake;
     const tier = TIERS.find((t) => x >= t.x);
@@ -10786,7 +10795,7 @@ const FILES = {
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '298b0a4b44'],
-  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '485bec25f1'],
+  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '12ce485e98'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '8cbe1f47d4'],
@@ -10810,11 +10819,11 @@ const FILES = {
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '97feeba6fd'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '72bf2923c7'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
-  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', '485bec25f1'],
+  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', '12ce485e98'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
-  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '97feeba6fd'],
+  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '72bf2923c7'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '6f6628b9f9'],
 };
@@ -11622,6 +11631,259 @@ function renderSpecial(root) {
 }
 
 return { renderSpecial, specialStatus: status, SPECIAL_LIST: LIST };
+})();
+
+// ---- fx3d.js ----
+__mods['fx3d.js'] = (() => {
+// Real-time 3D pieces for the games, drawn with Three.js (r128, loaded in <head>): the showman of La Roue Folle (a
+// whole 3D character with his gestures) and the fisherman of La Pêche (the owner's photo turned into a lit 3D relief:
+// its depth is worked out from the silhouette). Each one renders only while it is on screen; nothing happens when
+// Three.js is missing, WebGL is off or the player asked for reduced motion (the 2D art stays).
+
+const ok = () => !!window.THREE && !matchMedia('(prefers-reduced-motion: reduce)').matches && !document.body.classList.contains('ml-off');
+const MOBILE = () => matchMedia('(max-width: 900px)').matches;
+
+// A small warm studio reflected by the metals (gold buttons, hat band…), made once per renderer.
+function studioEnv(renderer) {
+  const THREE = window.THREE;
+  const c = document.createElement('canvas'); c.width = 512; c.height = 256;
+  const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256);
+  gr.addColorStop(0, '#fff6dc'); gr.addColorStop(0.35, '#ffb347'); gr.addColorStop(0.55, '#7a1d2e'); gr.addColorStop(1, '#14060a');
+  g.fillStyle = gr; g.fillRect(0, 0, 512, 256);
+  for (let k = 0; k < 7; k++) { const x = 40 + k * 70, rg = g.createRadialGradient(x, 50, 2, x, 50, 40); rg.addColorStop(0, 'rgba(255,255,255,1)'); rg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = rg; g.fillRect(x - 40, 10, 80, 80); }
+  const tex = new THREE.CanvasTexture(c); tex.mapping = THREE.EquirectangularReflectionMapping; tex.encoding = THREE.sRGBEncoding;
+  const pm = new THREE.PMREMGenerator(renderer), env = pm.fromEquirectangular(tex).texture;
+  tex.dispose(); pm.dispose();
+  return env;
+}
+
+// Base: a canvas in `host`, a renderer, a camera, and a loop that runs only while the host is visible.
+function stage(host, { fov = 30, aspect = 1, cls = '' } = {}) {
+  const THREE = window.THREE;
+  const cv = document.createElement('canvas'); cv.className = `fx3d ${cls}`;
+  host.appendChild(cv);
+  let r;
+  try { r = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true, powerPreference: 'low-power' }); } catch { cv.remove(); return null; }
+  r.setPixelRatio(Math.min(MOBILE() ? 1.5 : 2, devicePixelRatio || 1));
+  r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 0.92;
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(fov, aspect, 0.1, 100);
+  scene.environment = studioEnv(r);
+  const S = { THREE, cv, r, scene, cam, visible: true, dead: false, onFrame: null };
+  const size = () => { const w = cv.clientWidth || 1, h = cv.clientHeight || 1; r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); };
+  const ro = new ResizeObserver(size); ro.observe(cv);
+  const io = new IntersectionObserver((e) => { S.visible = e[0].isIntersecting; if (S.visible) kick(); }, { threshold: 0 }); io.observe(cv);
+  let raf = 0, t0 = performance.now(), last = t0;
+  const frame = (now) => {
+    raf = 0;
+    if (S.dead || !cv.isConnected) return S.dispose();
+    if (!S.visible || document.hidden) return;
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    S.onFrame?.(dt, (now - t0) / 1000);
+    r.render(scene, cam);
+    raf = requestAnimationFrame(frame);
+  };
+  const kick = () => { if (!raf && !S.dead) { last = performance.now(); raf = requestAnimationFrame(frame); } };
+  document.addEventListener('visibilitychange', kick);
+  S.kick = kick;
+  S.dispose = () => {
+    if (S.disposed) return; S.disposed = true; S.dead = true;
+    ro.disconnect(); io.disconnect(); document.removeEventListener('visibilitychange', kick);
+    scene.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { m.map?.dispose(); m.dispose(); }); } });
+    scene.environment?.dispose(); r.dispose(); cv.remove();
+  };
+  requestAnimationFrame(() => { size(); kick(); });
+  return S;
+}
+
+/* ---------- La Roue Folle: the showman ---------- */
+// Joints are nested groups; each pose gives target angles, reached smoothly; breathing, blinking, nodding and the
+// jumps are added on top. The wheel is on his right on screen (+x): that arm grabs and throws it.
+const POSES = {
+  idle: { yaw: 0.35, lean: 0, head: [0, 0.15, 0], W: [0.18, 0.25, 0.1], O: [-0.18, -0.25, 0.1], hat: 0, k: 6 },
+  ready: { yaw: 0.6, lean: -0.12, head: [-0.05, 0.45, 0], W: [2.15, 0.35, 0.2], O: [-0.45, -0.6, 0.1], hat: 0, k: 9 },
+  pull: { yaw: 0.45, lean: 0.14, head: [0.1, 0.35, 0], W: [0.35, 1.1, -0.3], O: [-0.6, -0.4, 0], hat: 0, k: 16 },
+  watch: { yaw: 0.5, lean: -0.04, head: [-0.06, 0.55, 0], W: [0.75, -2.0, 0.25], O: [-0.75, 2.0, 0.25], hat: 0, k: 7 },
+  cheer: { yaw: 0.2, lean: 0, head: [-0.2, 0.1, 0], W: [2.75, 0.3, 0], O: [-2.75, -0.3, 0], hat: 0.32, k: 10 },
+  sad: { yaw: 0.25, lean: 0.06, head: [0.5, 0.1, 0.12], W: [0.06, 0.1, 0], O: [-0.06, -0.1, 0], hat: -0.04, k: 4 },
+};
+function makeShowman(host) {
+  if (!ok()) return null;
+  const S = stage(host, { fov: 28, cls: 'fx3d-host' });
+  if (!S) return null;
+  const { THREE, scene, cam } = S;
+  cam.position.set(0.25, 1.62, 8.3); cam.lookAt(0.05, 1.45, 0);
+  scene.add(new THREE.HemisphereLight(0xfff1d6, 0x3b1060, 0.45));
+  const key = new THREE.DirectionalLight(0xffffff, 1.35); key.position.set(-2.5, 4, 5); scene.add(key);
+  const rim = new THREE.PointLight(0xff4fa3, 2.2, 12); rim.position.set(2.6, 2.4, -2.2); scene.add(rim);
+  const fill = new THREE.PointLight(0xffd23f, 0.9, 12); fill.position.set(2.5, 0.6, 3); scene.add(fill);
+  // non-metals barely reflect the studio (rich colours), the gold reflects it fully
+  const M = (color, o = {}) => { const m = new THREE.MeshStandardMaterial({ color, roughness: 0.55, metalness: 0, envMapIntensity: 0.25, ...o }); m.color.convertSRGBToLinear(); return m; };
+  const coat = M(0xd0102c, { roughness: 0.42 }), coatD = M(0x8f0a20, { roughness: 0.5 }), black = M(0x0c0c12, { roughness: 0.5, envMapIntensity: 0.35 }), pants = M(0x1f2937, { roughness: 0.7 });
+  const skin = M(0xffcfa8, { roughness: 0.65 }), white = M(0xfafafa, { roughness: 0.5 }), gold = M(0xffc83d, { metalness: 1, roughness: 0.22, envMapIntensity: 1.2 }), pink = M(0xff8a9a, { roughness: 0.7 });
+  const mesh = (geo, mat, x = 0, y = 0, z = 0) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); return m; };
+  const grp = (x = 0, y = 0, z = 0) => { const g = new THREE.Group(); g.position.set(x, y, z); return g; };
+  const root = grp(), hips = grp(0, 0.92, 0);
+  root.add(hips); scene.add(root);
+  // shadow on the floor
+  const shc = document.createElement('canvas'); shc.width = shc.height = 64;
+  const sg = shc.getContext('2d'), sgr = sg.createRadialGradient(32, 32, 2, 32, 32, 32); sgr.addColorStop(0, 'rgba(0,0,0,.55)'); sgr.addColorStop(1, 'rgba(0,0,0,0)'); sg.fillStyle = sgr; sg.fillRect(0, 0, 64, 64);
+  const shadow = mesh(new THREE.PlaneGeometry(1.4, 0.6), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shc), transparent: true, depthWrite: false }));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = 0.01; scene.add(shadow);
+  // legs and shoes
+  const legs = [];
+  for (const sx of [-1, 1]) {
+    const leg = grp(sx * 0.15, 0.92, 0);
+    leg.add(mesh(new THREE.CylinderGeometry(0.1, 0.09, 0.86, 18), pants, 0, -0.43, 0));
+    const shoe = mesh(new THREE.SphereGeometry(0.13, 20, 14), black, 0.04, -0.88, 0.06); shoe.scale.set(1, 0.55, 1.6); leg.add(shoe);
+    root.add(leg); legs.push(leg);
+  }
+  // body: the red tailcoat, white shirt, gold buttons, bow tie
+  const torso = grp(0, 0.02, 0); hips.add(torso);
+  const body = mesh(new THREE.CylinderGeometry(0.33, 0.4, 0.98, 32), coat, 0, 0.47, 0); torso.add(body);
+  const belly = mesh(new THREE.SphereGeometry(0.39, 32, 20), coat, 0, 0.12, 0); belly.scale.set(1, 0.42, 0.95); torso.add(belly);
+  const tails = mesh(new THREE.CylinderGeometry(0.4, 0.5, 0.5, 32, 1, true, Math.PI * 0.62, Math.PI * 0.76), coatD, 0, -0.12, 0); tails.material.side = THREE.DoubleSide; torso.add(tails);
+  const shirt = mesh(new THREE.CylinderGeometry(0.335, 0.405, 0.9, 32, 1, false, -0.42, 0.84), white, 0, 0.52, 0.004); torso.add(shirt);
+  for (let k = 0; k < 3; k++) torso.add(mesh(new THREE.SphereGeometry(0.035, 12, 10), gold, 0, 0.62 - k * 0.2, 0.39 + k * 0.012));
+  for (const sx of [-1, 1]) { const lap = mesh(new THREE.BoxGeometry(0.1, 0.5, 0.03), coatD, sx * 0.17, 0.72, 0.31); lap.rotation.z = sx * 0.35; lap.rotation.y = sx * 0.4; torso.add(lap); }
+  for (const sx of [-1, 1]) { const bow = mesh(new THREE.ConeGeometry(0.075, 0.16, 4), gold, sx * 0.08, 0.95, 0.33); bow.rotation.z = sx * Math.PI / 2; torso.add(bow); }
+  torso.add(mesh(new THREE.SphereGeometry(0.035, 10, 8), gold, 0, 0.95, 0.35));
+  // head: face, eyes that blink, red nose, black handlebar mustache, ears
+  const neck = grp(0, 1.0, 0); torso.add(neck);
+  const head = grp(0, 0.24, 0); neck.add(head);
+  const face = mesh(new THREE.SphereGeometry(0.3, 40, 28), skin); face.scale.set(1, 1.06, 0.98); head.add(face);
+  for (const sx of [-1, 1]) {
+    const ear = mesh(new THREE.SphereGeometry(0.07, 14, 10), skin, sx * 0.29, 0, 0); ear.scale.set(0.6, 1, 0.8); head.add(ear);
+    head.add(mesh(new THREE.SphereGeometry(0.06, 14, 10), pink, sx * 0.17, -0.07, 0.24));
+  }
+  const eyes = [];
+  for (const sx of [-1, 1]) {
+    const eg = grp(sx * 0.1, 0.06, 0.255);
+    const ew = mesh(new THREE.SphereGeometry(0.06, 20, 14), white); ew.scale.set(0.9, 1.1, 0.6); eg.add(ew);
+    eg.add(mesh(new THREE.SphereGeometry(0.032, 14, 10), black, 0.008, -0.005, 0.03));
+    eg.add(mesh(new THREE.SphereGeometry(0.01, 8, 6), white, 0.02, 0.012, 0.055));
+    const brow = mesh(new THREE.BoxGeometry(0.09, 0.018, 0.02), black, 0, 0.09, 0.01); brow.rotation.z = -sx * 0.18; eg.add(brow);
+    head.add(eg); eyes.push(eg);
+  }
+  head.add(mesh(new THREE.SphereGeometry(0.06, 18, 14), M(0xf06a6a, { roughness: 0.4 }), 0, -0.02, 0.3));
+  for (const sx of [-1, 1]) {
+    const mu = mesh(new THREE.TorusGeometry(0.075, 0.026, 10, 24, Math.PI * 1.15), black, sx * 0.08, -0.1, 0.27);
+    mu.rotation.set(0.2, sx * 0.25, sx > 0 ? Math.PI * 0.95 : -Math.PI * 0.1 + Math.PI * 0.05); mu.scale.set(sx, 1, 1); head.add(mu);
+  }
+  const smile = mesh(new THREE.TorusGeometry(0.06, 0.012, 8, 20, Math.PI), M(0x7a1d2e), 0, -0.17, 0.26); smile.rotation.z = Math.PI; head.add(smile);
+  // top hat with a red band, it pops when he cheers
+  const hat = grp(0, 0.24, 0); head.add(hat);
+  hat.add(mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.035, 40), black, 0, 0, 0));
+  hat.add(mesh(new THREE.CylinderGeometry(0.235, 0.25, 0.44, 40), black, 0, 0.23, 0));
+  hat.add(mesh(new THREE.CylinderGeometry(0.256, 0.256, 0.08, 40), coat, 0, 0.06, 0));
+  const band = mesh(new THREE.TorusGeometry(0.256, 0.012, 8, 40), gold, 0, 0.1, 0); band.rotation.x = Math.PI / 2; hat.add(band);
+  hat.rotation.z = -0.12;
+  // arms: shoulder → upper arm → elbow → forearm → white glove
+  const arm = (sx) => {
+    const sh = grp(sx * 0.38, 0.86, 0); torso.add(sh);
+    sh.add(mesh(new THREE.SphereGeometry(0.11, 18, 14), coat));
+    sh.add(mesh(new THREE.CylinderGeometry(0.095, 0.085, 0.42, 18), coat, 0, -0.21, 0));
+    const el = grp(0, -0.42, 0); sh.add(el);
+    el.add(mesh(new THREE.SphereGeometry(0.087, 16, 12), coat));
+    el.add(mesh(new THREE.CylinderGeometry(0.083, 0.07, 0.36, 18), coat, 0, -0.18, 0));
+    el.add(mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.06, 18), white, 0, -0.36, 0));
+    const glove = mesh(new THREE.SphereGeometry(0.115, 20, 16), white, 0, -0.47, 0.01); glove.scale.set(1, 1.1, 0.85); el.add(glove);
+    el.add(mesh(new THREE.SphereGeometry(0.045, 12, 10), white, sx * -0.08, -0.43, 0.06));
+    return { sh, el };
+  };
+  const W = arm(1), O = arm(-1);
+  // current angles, eased toward the pose
+  const cur = JSON.parse(JSON.stringify(POSES.idle)); let pose = 'idle', since = 0, blink = 2;
+  const ease = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));
+  S.onFrame = (dt, t) => {
+    since += dt;
+    const P = POSES[pose] || POSES.idle, k = P.k;
+    cur.yaw = ease(cur.yaw, P.yaw, k, dt); cur.lean = ease(cur.lean, P.lean, k, dt); cur.hat = ease(cur.hat, P.hat, k, dt);
+    for (let i = 0; i < 3; i++) { cur.head[i] = ease(cur.head[i], P.head[i], k, dt); cur.W[i] = ease(cur.W[i], P.W[i], k, dt); cur.O[i] = ease(cur.O[i], P.O[i], k, dt); }
+    const breath = Math.sin(t * 2.2) * 0.012;
+    let jump = 0;
+    if (pose === 'cheer') jump = Math.abs(Math.sin(since * 7)) * 0.28 * Math.max(0, 1 - since / 2.2);
+    root.position.y = jump; root.rotation.y = cur.yaw + (pose === 'idle' ? Math.sin(t * 0.7) * 0.08 : 0);
+    hips.rotation.z = cur.lean + (pose === 'sad' ? Math.sin(t * 3) * 0.02 : 0);
+    torso.scale.set(1, 1 + breath, 1);
+    head.rotation.set(cur.head[0] + (pose === 'watch' ? Math.sin(t * 7) * 0.06 : 0), cur.head[1] + (pose === 'idle' ? Math.sin(t * 0.9) * 0.18 : 0), cur.head[2] + (pose === 'sad' ? Math.sin(t * 2.5) * 0.08 : 0));
+    W.sh.rotation.set(cur.W[2], 0, cur.W[0] + (pose === 'idle' ? Math.sin(t * 1.4) * 0.12 : 0)); W.el.rotation.z = cur.W[1];
+    O.sh.rotation.set(cur.O[2], 0, cur.O[0] - (pose === 'idle' ? Math.sin(t * 1.4 + 1) * 0.08 : 0)); O.el.rotation.z = cur.O[1];
+    hat.position.y = 0.24 + cur.hat + (pose === 'cheer' ? Math.abs(Math.sin(since * 7)) * 0.1 : 0);
+    legs.forEach((l, i) => { l.rotation.x = jump ? (i ? 0.25 : -0.25) * (jump / 0.28) : 0; });
+    shadow.scale.setScalar(1 - jump * 0.9);
+    blink -= dt;
+    const bl = blink < 0.12 ? 0.1 : 1; if (blink < 0) blink = 1.8 + Math.random() * 2.6;
+    eyes.forEach((e) => { e.scale.y = pose === 'sad' ? 0.55 : bl; });
+  };
+  return { setPose(p) { pose = POSES[p] ? p : 'idle'; since = 0; S.kick(); }, dispose: () => S.dispose() };
+}
+
+/* ---------- La Pêche: the owner's fisherman photo as a lit 3D relief ---------- */
+// The depth comes from the silhouette (alpha), blurred: thick in the middle, thin at the edges, so the light and the
+// camera turning around him give real volume. Two poses (waiting, reeling), like the 2D version.
+function reliefMesh(THREE, img, mirror) {
+  const W = 120, H = Math.round((W * img.naturalHeight) / img.naturalWidth);
+  const big = document.createElement('canvas'); big.width = img.naturalWidth; big.height = img.naturalHeight;
+  const bg = big.getContext('2d');
+  if (mirror) { bg.translate(big.width, 0); bg.scale(-1, 1); }
+  bg.drawImage(img, 0, 0);
+  const sm = document.createElement('canvas'); sm.width = W; sm.height = H;
+  const sx = sm.getContext('2d'); sx.drawImage(big, 0, 0, W, H);
+  const a = sx.getImageData(0, 0, W, H).data, mask = new Float32Array(W * H);
+  for (let i = 0; i < W * H; i++) mask[i] = a[i * 4 + 3] / 255;
+  let d = mask.slice();
+  const blur = (src, r) => {
+    const tmp = new Float32Array(W * H), out = new Float32Array(W * H);
+    for (let y = 0; y < H; y++) { let s = 0; for (let x = -r; x <= r; x++) s += src[y * W + Math.min(W - 1, Math.max(0, x))]; for (let x = 0; x < W; x++) { tmp[y * W + x] = s / (2 * r + 1); s += src[y * W + Math.min(W - 1, x + r + 1)] - src[y * W + Math.max(0, x - r)]; } }
+    for (let x = 0; x < W; x++) { let s = 0; for (let y = -r; y <= r; y++) s += tmp[Math.min(H - 1, Math.max(0, y)) * W + x]; for (let y = 0; y < H; y++) { out[y * W + x] = s / (2 * r + 1); s += tmp[Math.min(H - 1, y + r + 1) * W + x] - tmp[Math.max(0, y - r) * W + x]; } }
+    return out;
+  };
+  for (let k = 0; k < 3; k++) d = blur(d, 5);
+  const geo = new THREE.PlaneGeometry(W / H, 1, W - 1, H - 1), pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) { const x = i % W, y = Math.floor(i / W), v = d[y * W + x] * mask[y * W + x]; pos.setZ(i, Math.sqrt(v) * 0.16); }
+  geo.computeVertexNormals();
+  const tex = new THREE.CanvasTexture(big); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 4;
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.45, side: THREE.DoubleSide, roughness: 0.75, metalness: 0 }));
+  return m;
+}
+function makeFisher(host, srcs) {
+  if (!ok()) return null;
+  const imgs = srcs.map((s) => Object.assign(new Image(), { src: s, decoding: 'async' }));
+  const S = stage(host, { fov: 24, cls: 'fx3d-fisher' });
+  if (!S) return null;
+  const { THREE, scene, cam } = S;
+  cam.position.set(0, 0, 3.2); cam.lookAt(0, 0, 0);
+  scene.add(new THREE.HemisphereLight(0xfff7e6, 0x2b4a5a, 0.85));
+  const sun = new THREE.DirectionalLight(0xfff1d0, 1.5); sun.position.set(-1.5, 2.2, 2.4); scene.add(sun);
+  const back = new THREE.DirectionalLight(0x9fd4ff, 0.9); back.position.set(1.8, 0.5, -2); scene.add(back);
+  const holder = new THREE.Group(); scene.add(holder);
+  let meshes = [null, null], state = 'idle', since = 0;
+  Promise.all(imgs.map((i) => i.decode().catch(() => null))).then(() => {
+    if (S.dead) return;
+    meshes = imgs.map((im, k) => { if (!im.naturalWidth) return null; const m = reliefMesh(THREE, im, k === 1); m.visible = k === 0; m.position.y = 0; holder.add(m); return m; });
+    host.classList.add('pe3d');
+    S.kick();
+  });
+  const ease = (a, b, k, dt) => a + (b - a) * (1 - Math.exp(-k * dt));
+  const cur = { yaw: 0.25, lean: 0, x: 0 };
+  S.onFrame = (dt, t) => {
+    since += dt;
+    const reel = state === 'reel', cast = state === 'cast';
+    if (meshes[0]) meshes[0].visible = !reel || !meshes[1];
+    if (meshes[1]) meshes[1].visible = reel;
+    const yaw = reel ? -0.28 : cast ? 0.42 : 0.22 + Math.sin(t * 0.6) * 0.16;
+    cur.yaw = ease(cur.yaw, yaw, cast ? 8 : 3, dt);
+    cur.lean = ease(cur.lean, reel ? 0.06 : cast ? -0.12 : 0, 8, dt);
+    holder.rotation.y = cur.yaw;
+    holder.rotation.z = cur.lean + (reel ? Math.sin(t * 28) * 0.025 : 0);
+    holder.rotation.x = -0.05 + Math.sin(t * 1.3) * 0.02;
+    holder.position.x = reel ? Math.sin(t * 31) * 0.012 : 0;
+    holder.scale.y = 1 + Math.sin(t * 2.1) * 0.008;
+  };
+  return { setState(s) { state = s; since = 0; S.kick(); }, dispose: () => S.dispose() };
+}
+
+return { makeShowman, makeFisher, has3D: ok, studioEnv };
 })();
 
 // ---- chat.js ----
@@ -13348,6 +13610,8 @@ body:not(.ml-off) .spin-btn::before { content: ''; position: absolute; inset: -6
 #tl-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0; transition: opacity 1.2s; }
 #tl-bg.on { opacity: 1; }
 #tl-win { position: fixed; inset: 0; z-index: 9990; pointer-events: none; }
+#tl-fx { position: fixed; inset: 0; z-index: 9989; pointer-events: none; width: 100%; height: 100%; }
+body.ml-off #tl-fx { display: none; }
 body.ml-off #tl-bg, body.ml-off #tl-win { display: none; }
 .tl-title { position: fixed; left: 50%; top: 38%; z-index: 9991; pointer-events: none; translate: -50% -50%; white-space: nowrap;
   font: 900 clamp(34px, 8vw, 86px)/1 KeCoin, Archivo, sans-serif; letter-spacing: 3px; color: #fff7c2;
@@ -13936,6 +14200,7 @@ body.fs-on .live-tick { display: none; }
 addEventListener('DOMContentLoaded', () => {
   'use strict';
   const THREE = window.THREE, gsap = window.gsap;
+  const MODS = typeof __mods !== 'undefined' ? __mods : window.__mods; // the site's modules (a const of the main script)
   if (!THREE || !gsap || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const MOBILE = matchMedia('(max-width: 900px)').matches || /Mobi|Android/i.test(navigator.userAgent);
   const off = () => document.body.classList.contains('ml-off');
@@ -14041,7 +14306,8 @@ addEventListener('DOMContentLoaded', () => {
     billets: 'money', casse: 'money', roueor: 'money', dragons: 'dragon', labo: 'dragon', huff: 'wolf', 'big-bad-wolf': 'wolf', penalty: 'sport', chasse: 'sport', poulet: 'sport',
     billes: 'marbles', plinko: 'marbles', robots: 'neon', vortex: 'neon', avion: 'neon', gratteciel: 'neon', pileface: 'casino',
   };
-  const themeNow = () => { const m = location.hash.match(/^#game-([\w-]+)/); return (m && THEME_OF[m[1]]) || 'casino'; };
+  THEME_OF.fortune = 'dragon';
+  const themeNow = () => { const m = location.hash.match(/^#game-([\w-]+)/); return (m && (THEME_OF[m[1]] || THEME_OF[m[1].replace(/-online$/, '')])) || 'casino'; };
 
   /* ---------- background scene ---------- */
   const cv = Object.assign(document.createElement('canvas'), { id: 'tl-bg' });
@@ -14178,7 +14444,7 @@ addEventListener('DOMContentLoaded', () => {
       .to(d, { opacity: 0, y: -40, duration: 0.5, ease: 'power2.in' });
   }
 
-  const wallet = window.__mods?.['wallet.js']?.wallet;
+  const wallet = MODS?.['wallet.js']?.wallet;
   if (wallet) {
     let lastBet = 0;
     wallet.addEventListener('wager', (e) => { lastBet = e.detail?.amount || lastBet; });
@@ -14188,6 +14454,185 @@ addEventListener('DOMContentLoaded', () => {
       if (ratio >= 50) title(ratio >= 250 ? 'JACKPOT !' : ratio >= 100 ? 'MÉGA GAIN !' : 'GROS GAIN !', ratio >= 100 ? '#f472b6' : '#fbbf24');
     });
   }
+
+  /* ---------- bonuses: a 3D gold medallion, an explosion of coins and theme objects, then an aura ----------
+     sb:feature (a slot's bonus starts, featureIntro) and sb:bonus (a wheel stops on a bonus case it has a stake on):
+     a real metal medallion carrying the bonus symbol flies in where the intro shows it, coins and objects of the
+     game's theme burst out of it; while the bonus lasts, coins and objects rise slowly along the sides of the
+     screen (until sb:featureend, or 2 min at most). A retrigger (+3 TOURS…) gets a small burst only. */
+  let fxw = null;
+  function fxLayer() {
+    if (fxw) return fxw;
+    const c = Object.assign(document.createElement('canvas'), { id: 'tl-fx' });
+    document.body.appendChild(c);
+    let r;
+    try { r = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: !MOBILE, powerPreference: 'high-performance' }); } catch { c.remove(); return null; }
+    r.setPixelRatio(Math.min(MOBILE ? 1.25 : 1.5, devicePixelRatio || 1)); // a full-screen layer: kept light for phones
+    r.outputEncoding = THREE.sRGBEncoding; r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1;
+    const s = new THREE.Scene(), cam = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 80);
+    cam.position.z = 14;
+    s.add(new THREE.AmbientLight(0xffffff, 0.45));
+    const d = new THREE.DirectionalLight(0xffffff, 1.2); d.position.set(-3, 5, 8); s.add(d);
+    const glint = new THREE.PointLight(0xfff1c2, 3, 30); glint.position.set(-6, 3, 6); s.add(glint);
+    s.environment = MODS?.['fx3d.js']?.studioEnv?.(r) || null;
+    const size = () => { r.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); };
+    size(); addEventListener('resize', size);
+    fxw = { c, r, s, cam, glint, items: [], raf: 0, idle: 0, size };
+    return fxw;
+  }
+  const view = () => { const h = 2 * Math.tan((fxw.cam.fov * Math.PI) / 360) * fxw.cam.position.z; return { h, w: h * fxw.cam.aspect }; };
+  const toWorld = (px, py) => { const { w, h } = view(); return [(px / innerWidth - 0.5) * w, -(py / innerHeight - 0.5) * h]; };
+  function fxRun() {
+    if (!fxw || fxw.raf) return;
+    let t0 = performance.now();
+    const tick = (now) => {
+      fxw.raf = 0;
+      const dt = Math.min(0.05, (now - t0) / 1000); t0 = now;
+      fxw.glint.position.x = Math.sin(now / 700) * 7;
+      fxw.items = fxw.items.filter((o) => { if (o.userData.update(dt) !== false) return true; fxw.s.remove(o); dispose(o); return false; });
+      if (aura.until > now) auraSpawn(dt);
+      fxw.r.render(fxw.s, fxw.cam);
+      if (fxw.items.length || aura.until > now) { fxw.idle = 0; fxw.raf = requestAnimationFrame(tick); }
+      else { removeEventListener('resize', fxw.size); fxw.s.environment?.dispose(); fxw.r.dispose(); fxw.c.remove(); fxw = null; }
+    };
+    fxw.raf = requestAnimationFrame(tick);
+  }
+  const add = (o, update) => { o.userData.update = update; fxw.s.add(o); fxw.items.push(o); };
+  // gold for the medallion: full metal, polished
+  const goldMat = (map) => { const m = new THREE.MeshStandardMaterial({ color: 0xffd36b, metalness: 1, roughness: 0.24, map: map || null, envMapIntensity: 1.3 }); if (!map) m.color.convertSRGBToLinear(); return m; };
+  function faceTex(glyph, text) {
+    const S = 512, c = document.createElement('canvas'); c.width = c.height = S;
+    const g = c.getContext('2d'), gr = g.createRadialGradient(S * 0.4, S * 0.35, 20, S / 2, S / 2, S / 2);
+    gr.addColorStop(0, '#fff3c4'); gr.addColorStop(0.45, '#f7c548'); gr.addColorStop(1, '#a8620c');
+    g.fillStyle = gr; g.fillRect(0, 0, S, S);
+    g.strokeStyle = 'rgba(110,60,0,.6)'; g.lineWidth = 10; g.beginPath(); g.arc(S / 2, S / 2, S * 0.43, 0, 7); g.stroke();
+    g.strokeStyle = 'rgba(255,248,220,.7)'; g.lineWidth = 4; g.beginPath(); g.arc(S / 2, S / 2, S * 0.405, 0, 7); g.stroke();
+    for (let k = 0; k < 36; k++) { const a = (k / 36) * Math.PI * 2; g.fillStyle = 'rgba(120,70,0,.45)'; g.beginPath(); g.arc(S / 2 + Math.cos(a) * S * 0.465, S / 2 + Math.sin(a) * S * 0.465, 6, 0, 7); g.fill(); }
+    const tex = new THREE.CanvasTexture(c); tex.encoding = THREE.sRGBEncoding; tex.anisotropy = 4;
+    const write = () => {
+      if (glyph && glyph.complete && glyph.naturalWidth) {
+        g.save(); g.beginPath(); g.arc(S / 2, S / 2, S * 0.36, 0, 7); g.clip();
+        const k = Math.min((S * 0.62) / glyph.naturalWidth, (S * 0.62) / glyph.naturalHeight), w = glyph.naturalWidth * k, h = glyph.naturalHeight * k;
+        g.drawImage(glyph, (S - w) / 2, (S - h) / 2, w, h); g.restore();
+      } else {
+        g.fillStyle = '#6b3a00'; g.textAlign = 'center'; g.textBaseline = 'middle';
+        const t = String(text || 'BONUS').slice(0, 16), words = t.split(' ');
+        const lines = words.length > 1 && t.length > 9 ? [words.slice(0, Math.ceil(words.length / 2)).join(' '), words.slice(Math.ceil(words.length / 2)).join(' ')] : [t];
+        const fs = Math.min(120, Math.floor(380 / Math.max(...lines.map((l) => l.length)) * 1.6));
+        g.font = `900 ${fs}px Archivo, Impact, sans-serif`;
+        lines.forEach((l, k) => { const y = S / 2 + (k - (lines.length - 1) / 2) * fs * 1.05; g.fillStyle = 'rgba(255,250,225,.8)'; g.fillText(l, S / 2 + 3, y + 4); g.fillStyle = '#6b3a00'; g.fillText(l, S / 2, y); });
+      }
+      tex.needsUpdate = true;
+    };
+    write();
+    if (glyph && !glyph.complete) glyph.addEventListener('load', write, { once: true });
+    return tex;
+  }
+  let raysTex = null;
+  const rays = () => {
+    if (raysTex) return raysTex;
+    const S = 256, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
+    g.translate(S / 2, S / 2);
+    for (let k = 0; k < 18; k++) { g.rotate((Math.PI * 2) / 18); const gr = g.createLinearGradient(0, 0, S / 2, 0); gr.addColorStop(0, 'rgba(255,236,170,.9)'); gr.addColorStop(1, 'rgba(255,200,80,0)'); g.fillStyle = gr; g.beginPath(); g.moveTo(0, 0); g.lineTo(S / 2, -10); g.lineTo(S / 2, 10); g.fill(); }
+    const rg = g.createRadialGradient(0, 0, 0, 0, 0, S / 2); rg.addColorStop(0, 'rgba(255,255,230,1)'); rg.addColorStop(0.25, 'rgba(255,220,120,.5)'); rg.addColorStop(1, 'rgba(255,200,80,0)'); g.fillStyle = rg; g.fillRect(-S / 2, -S / 2, S, S);
+    raysTex = new THREE.CanvasTexture(c); return raysTex;
+  };
+  function medallion(x, y, radius, glyph, text) {
+    const grp = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.18, 72), goldMat()); body.rotation.x = Math.PI / 2; grp.add(body);
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(1, 0.085, 16, 72), goldMat()); grp.add(rim);
+    const tex = faceTex(glyph, text);
+    const front = new THREE.Mesh(new THREE.CircleGeometry(0.93, 64), goldMat(tex)); front.position.z = 0.092; grp.add(front);
+    const back = new THREE.Mesh(new THREE.CircleGeometry(0.93, 64), goldMat(tex)); back.position.z = -0.092; back.rotation.y = Math.PI; grp.add(back);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: rays(), blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: 0 }));
+    glow.scale.setScalar(radius * 6.5); glow.position.set(x, y, -1);
+    fxw.s.add(glow);
+    let t = 0;
+    grp.position.set(x, y + 3, -24); grp.scale.setScalar(radius * 0.25);
+    add(grp, (dt) => {
+      t += dt;
+      const inn = Math.min(1, t / 0.75), e = 1 - Math.pow(1 - inn, 3), back2 = inn < 1 ? e + Math.sin(inn * Math.PI) * 0.12 : 1;
+      if (t < 2) {
+        grp.position.set(x, y + 3 * (1 - e) + (t > 0.75 ? Math.sin(t * 3) * 0.06 * radius : 0), -24 * (1 - e));
+        grp.scale.setScalar(radius * (0.25 + 0.75 * back2));
+        grp.rotation.y = t < 1.15 ? (1 - Math.min(1, t / 1.15)) ** 2 * Math.PI * 6 : Math.sin((t - 1.15) * 2.4) * 0.28;
+        grp.rotation.x = Math.sin(t * 1.7) * 0.08;
+      } else {
+        const o = Math.min(1, (t - 2) / 0.45);
+        grp.rotation.y += dt * 18; grp.position.y = y + o * o * 9; grp.scale.setScalar(radius * (1 - o * 0.6));
+      }
+      glow.material.opacity = t < 0.3 ? 0 : t < 0.8 ? (t - 0.3) / 0.5 * 0.85 : t < 2 ? 0.85 : Math.max(0, 0.85 - (t - 2) * 2);
+      glow.material.rotation += dt * 0.5;
+      if (t > 2.5) { fxw.s.remove(glow); glow.material.dispose(); return false; }
+      return true;
+    });
+  }
+  function burst(x, y, n, spread = 1) {
+    const th = T[themeNow()], extra = th.mix.filter((m) => m[0] !== 'coin' && !['moon', 'star', 'planet', 'cloud', 'house', 'rock'].includes(m[0]));
+    for (let i = 0; i < n; i++) {
+      const kind = Math.random() < 0.62 || !extra.length ? ['coin'] : pick(extra);
+      const o = MAKE[kind[0]](kind[2] ? pick(kind[2]) : undefined);
+      const base = o.scale.x * (kind[0] === 'coin' ? 1.25 : 1.05);
+      if (kind[0] === 'coin') o.traverse((c) => { if (c.isMesh && c.material) { c.material.metalness = 1; c.material.roughness = 0.25; } });
+      const a = rnd(0, Math.PI * 2), sp = rnd(5, 11) * spread;
+      const u = { vx: Math.cos(a) * sp, vy: Math.sin(a) * sp + 3, vz: rnd(-3, 4), spin: [rnd(-7, 7), rnd(-7, 7), rnd(-4, 4)], t: 0, life: rnd(1.8, 2.6) };
+      o.position.set(x, y, 0.5); o.scale.setScalar(0.001);
+      add(o, (dt) => {
+        u.t += dt; u.vy -= 8 * dt;
+        o.position.x += u.vx * dt; o.position.y += u.vy * dt; o.position.z += u.vz * dt;
+        o.rotation.x += u.spin[0] * dt; o.rotation.y += u.spin[1] * dt; o.rotation.z += u.spin[2] * dt;
+        const k = u.t < 0.18 ? u.t / 0.18 : u.t > u.life - 0.4 ? Math.max(0, (u.life - u.t) / 0.4) : 1;
+        o.scale.setScalar(base * k);
+        return u.t < u.life;
+      });
+    }
+  }
+  const aura = { until: 0, acc: 0 };
+  function auraSpawn(dt) {
+    aura.acc += dt;
+    if (aura.acc < (MOBILE ? 0.7 : 0.32) || fxw.items.length > (MOBILE ? 18 : 40)) return;
+    aura.acc = 0;
+    const { w, h } = view(), th = T[themeNow()], extra = th.mix.filter((m) => !['moon', 'planet', 'cloud', 'house', 'rock'].includes(m[0]));
+    const kind = Math.random() < 0.45 || !extra.length ? ['coin'] : pick(extra);
+    const o = MAKE[kind[0]](kind[2] ? pick(kind[2]) : undefined), base = o.scale.x * 0.9;
+    const side = Math.random() < 0.5 ? -1 : 1, x = side * rnd(MOBILE ? 0.36 : 0.3, 0.5) * w;
+    const u = { vy: rnd(1.1, 2), sway: rnd(0, 6), spin: [rnd(-1.5, 1.5), rnd(-2, 2), rnd(-1, 1)], t: 0 };
+    o.position.set(x, -h / 2 - 1.5, rnd(-4, 1)); o.scale.setScalar(base);
+    add(o, (dt) => {
+      u.t += dt; o.position.y += u.vy * dt; o.position.x += Math.sin(u.t * 1.3 + u.sway) * 0.01;
+      o.rotation.x += u.spin[0] * dt; o.rotation.y += u.spin[1] * dt; o.rotation.z += u.spin[2] * dt;
+      return o.position.y < h / 2 + 1.5;
+    });
+  }
+  const WHEEL_NAMES = { cf: 'PILE OU FACE', ch: 'CHASSE AU CASH', pa: 'PACHINKO', ct: 'MÉGA FOLIE', b2: '2 LANCERS', b4: '4 LANCERS', fb: 'POISSON BLEU', fo: 'POISSON ORANGE', fr: 'POISSON ROUGE', or: 'BONUS' };
+  function bonusFx(title, wheel) {
+    if (off()) return;
+    // a moment later: the intro has put its symbol on screen, the medallion takes its place
+    setTimeout(() => {
+      if (!fxLayer()) return;
+      const gl = !wheel && [...document.querySelectorAll('.slot-overlay.intro .intro-glyph')].pop();
+      let x, y, rad;
+      if (gl) {
+        const b = gl.getBoundingClientRect(), [wx, wy] = toWorld(b.left + b.width / 2, b.top + b.height / 2), wpp = view().h / innerHeight;
+        x = wx; y = wy; rad = Math.max(1.1, Math.min(2.4, (Math.max(b.width, b.height) / 2) * wpp * 1.25));
+        gl.style.transition = 'opacity .25s'; gl.style.opacity = '0';
+      } else { x = 0; y = view().h * 0.12; rad = MOBILE ? 1.5 : 2; }
+      const img = gl ? gl.querySelector('img') : null;
+      medallion(x, y, rad, img, title);
+      setTimeout(() => fxw && burst(x, y, MOBILE ? 16 : 30), 520);
+      aura.until = performance.now() + (wheel ? 25000 : 120000);
+      fxRun();
+    }, 40);
+  }
+  addEventListener('sb:feature', (e) => {
+    const d = e.detail || {};
+    if (off()) return;
+    if (d.re) { if (fxLayer()) { burst(0, view().h * 0.1, MOBILE ? 10 : 18, 0.8); fxRun(); } return; }
+    bonusFx(d.title, false);
+  });
+  addEventListener('sb:bonus', (e) => bonusFx(WHEEL_NAMES[e.detail?.key] || 'BONUS', true));
+  addEventListener('sb:featureend', () => { aura.until = 0; });
+  addEventListener('hashchange', () => { aura.until = 0; });
 });
 </script>
 
