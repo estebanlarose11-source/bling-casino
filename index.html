@@ -1163,6 +1163,16 @@ body.gated { overflow: hidden; }
 .g-pharaon .sg-cell { background: linear-gradient(180deg, rgba(217, 142, 18, .14), rgba(61, 34, 6, .2)); }
 .g-pharaon .sg-cell.scatter { background: radial-gradient(circle, rgba(253, 224, 71, .45), transparent 70%); }
 .g-pharaon .sg-cell.scatter svg { filter: drop-shadow(0 0 14px rgba(253, 224, 71, .95)); animation: sunSpin 8s linear infinite; }
+/* painted symbols (assets/games/pharaon) */
+.g-pharaon .sg-cell { background: radial-gradient(circle at 50% 42%, rgba(253, 230, 138, .12), rgba(20, 12, 4, .55) 72%); border: 1px solid rgba(251, 191, 36, .14); }
+.ph-img { width: 88%; height: 88%; object-fit: contain; display: block; margin: auto; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 0 1px rgba(253, 230, 138, .9)) drop-shadow(0 4px 6px rgba(0, 0, 0, .6)); }
+.g-pharaon .sg-cell.win .ph-img { animation: btImgWin .5s ease-in-out infinite alternate; }
+.g-pharaon .sg-cell.lock { background: radial-gradient(circle, rgba(251, 191, 36, .32), rgba(120, 53, 15, .35)); box-shadow: inset 0 0 0 2px rgba(251, 191, 36, .75), inset 0 0 22px rgba(251, 191, 36, .35); }
+.g-pharaon .sg-cell.lock .ph-img { filter: drop-shadow(0 0 1px #fde68a) drop-shadow(0 0 10px rgba(251, 191, 36, .75)); }
+.g-pharaon .sg-cell.scatter .ph-img { animation: sunSpin 14s linear infinite; filter: drop-shadow(0 0 12px rgba(253, 224, 71, .9)); }
+.pay-sym .ph-img { width: 44px; height: 44px; animation: none; }
+.intro-glyph .ph-img { width: 130px; height: 130px; animation: none; }
+@media (prefers-reduced-motion: reduce) { .ph-img, .g-pharaon .sg-cell.win .ph-img, .g-pharaon .sg-cell.scatter .ph-img { animation: none; } }
 @keyframes sunSpin { to { rotate: 360deg; } }
 .mult-meter b { font-size: 18px; color: #fde68a; text-shadow: 0 0 10px #f59e0b; }
 
@@ -2071,6 +2081,8 @@ body.fs-on { overflow: hidden; }
   .game-host.is-full .mw-host { left: -27%; width: 30%; }
 }
 /* ============ Clean painted slots (owner's backgrounds and symbols): the picture behind the whole machine, no title, no frames ============ */
+.slot.g-pharaon > .slot-bg { background: linear-gradient(180deg, rgba(10, 6, 2, .35), rgba(10, 6, 2, .15) 40%, rgba(10, 6, 2, .55)), url(assets/games/pharaon/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+@media (max-aspect-ratio: 4/5) { .slot.g-pharaon > .slot-bg { background: linear-gradient(180deg, rgba(10, 6, 2, .35), rgba(10, 6, 2, .15) 40%, rgba(10, 6, 2, .55)), url(assets/games/pharaon/bg-m.webp?v=1) center 30% / cover no-repeat !important; } }
 .slot.g-anubis > .slot-bg { background: url(assets/games/anubis/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
 .slot.g-dragons > .slot-bg { background: url(assets/games/dragons/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
 .slot.g-bling > .slot-bg { background: url(assets/games/bling/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
@@ -2080,12 +2092,12 @@ body.fs-on { overflow: hidden; }
 .slot.theme-wolf > .slot-bg { background: url(assets/games/wolf/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
 .slot.g-anubis.under > .slot-bg { background-image: url(assets/games/anubis/bg-under.webp?v=1) !important; }
 .slot.g-anubis.judge > .slot-bg { background-image: url(assets/games/anubis/bg-judge.webp?v=1) !important; }
-.g-anubis > .slot-bg::after, .g-dragons > .slot-bg::after, .g-bling > .slot-bg::after, .g-labo > .slot-bg::after, .g-huff > .slot-bg::after, .g-candy > .slot-bg::after, .slot.theme-wolf > .slot-bg::after { display: none; }
-.g-anubis .slot-title, .g-dragons .slot-title, .g-bling .slot-title, .g-labo .slot-title, .g-huff .slot-title, .g-candy .slot-title, .slot.theme-wolf .slot-title { display: none !important; }
-.g-anubis .slot-head, .g-dragons .slot-head, .g-bling .slot-head, .g-labo .slot-head, .g-huff .slot-head, .g-candy .slot-head, .slot.theme-wolf .slot-head { margin-bottom: 6px; justify-content: center; }
+.g-anubis > .slot-bg::after, .g-dragons > .slot-bg::after, .g-bling > .slot-bg::after, .g-labo > .slot-bg::after, .g-huff > .slot-bg::after, .g-candy > .slot-bg::after, .slot.theme-wolf > .slot-bg::after, .g-pharaon > .slot-bg::after { display: none; }
+.g-anubis .slot-title, .g-dragons .slot-title, .g-bling .slot-title, .g-labo .slot-title, .g-huff .slot-title, .g-candy .slot-title, .slot.theme-wolf .slot-title, .g-pharaon .slot-title { display: none !important; }
+.g-anubis .slot-head, .g-dragons .slot-head, .g-bling .slot-head, .g-labo .slot-head, .g-huff .slot-head, .g-candy .slot-head, .slot.theme-wolf .slot-head, .g-pharaon .slot-head { margin-bottom: 6px; justify-content: center; }
 .g-bling .slot-head, .g-labo .slot-head, .g-candy .slot-head, .g-dragons .slot-head { display: none; }
-.g-anubis > .slot-frame, .g-dragons > .slot-frame, .g-bling > .slot-frame, .g-labo > .slot-frame, .g-huff > .slot-frame, .g-candy > .slot-frame, .slot.theme-wolf > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
-.g-anubis > .slot-frame > .slot-stage, .g-dragons > .slot-frame > .slot-stage, .g-bling > .slot-frame > .slot-stage, .g-labo > .slot-frame > .slot-stage, .g-huff > .slot-frame > .slot-stage, .g-candy > .slot-frame > .slot-stage, .slot.theme-wolf > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; }
+.g-anubis > .slot-frame, .g-dragons > .slot-frame, .g-bling > .slot-frame, .g-labo > .slot-frame, .g-huff > .slot-frame, .g-candy > .slot-frame, .slot.theme-wolf > .slot-frame, .g-pharaon > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.g-anubis > .slot-frame > .slot-stage, .g-dragons > .slot-frame > .slot-stage, .g-bling > .slot-frame > .slot-stage, .g-labo > .slot-frame > .slot-stage, .g-huff > .slot-frame > .slot-stage, .g-candy > .slot-frame > .slot-stage, .slot.theme-wolf > .slot-frame > .slot-stage, .g-pharaon > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; }
 .g-anubis .an-bg, .g-anubis.under .an-bg, .g-anubis.judge .an-bg { background: none !important; }
 .g-anubis .an-bg::after { display: none; }
 .g-dragons .dg-lair { background: none !important; }
@@ -2093,12 +2105,12 @@ body.fs-on { overflow: hidden; }
 .g-labo .lb-scene { background: none !important; } .g-labo .lb-scene.photo::before { display: none; }
 .g-candy .cq-stage .cq-sky { background: none !important; }
 .slot.g-huff .slot-stage, .slot.theme-wolf .slot-stage { background: none !important; }
-.g-anubis .win-bar, .g-dragons .win-bar, .g-bling .win-bar, .g-labo .win-bar, .g-huff .win-bar, .g-candy .win-bar, .slot.theme-wolf .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
-.g-anubis .controls, .g-dragons .controls, .g-bling .controls, .g-labo .controls, .g-huff .controls, .g-candy .controls, .slot.theme-wolf .controls { background: rgba(6, 10, 24, .5); border-color: rgba(255, 255, 255, .14); }
-.game-host.is-full:has(> .slot.g-anubis), .game-host.is-full:has(> .slot.g-dragons), .game-host.is-full:has(> .slot.g-bling), .game-host.is-full:has(> .slot.g-labo), .game-host.is-full:has(> .slot.g-huff), .game-host.is-full:has(> .slot.g-candy), .game-host.is-full:has(> .slot.theme-wolf) { padding: 0; background: #05060c; }
-.game-host.is-full > .slot.g-anubis, .game-host.is-full > .slot.g-dragons, .game-host.is-full > .slot.g-bling, .game-host.is-full > .slot.g-labo, .game-host.is-full > .slot.g-huff, .game-host.is-full > .slot.g-candy, .game-host.is-full > .slot.theme-wolf { width: 100%; max-width: none !important; min-height: 100%; margin: 0; border-radius: 0; border: 0; display: flex; flex-direction: column; justify-content: center; padding: max(8px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px)); }
-.game-host.is-full > .slot.g-anubis > .slot-bg, .game-host.is-full > .slot.g-dragons > .slot-bg, .game-host.is-full > .slot.g-bling > .slot-bg, .game-host.is-full > .slot.g-labo > .slot-bg, .game-host.is-full > .slot.g-huff > .slot-bg, .game-host.is-full > .slot.g-candy > .slot-bg, .game-host.is-full > .slot.theme-wolf > .slot-bg { grid-column: auto !important; grid-row: auto !important; position: absolute; inset: 0; }
-.game-host.is-full > .slot.g-anubis .controls, .game-host.is-full > .slot.g-dragons .controls, .game-host.is-full > .slot.g-bling .controls, .game-host.is-full > .slot.g-labo .controls, .game-host.is-full > .slot.g-huff .controls, .game-host.is-full > .slot.g-candy .controls, .game-host.is-full > .slot.theme-wolf .controls { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+.g-anubis .win-bar, .g-dragons .win-bar, .g-bling .win-bar, .g-labo .win-bar, .g-huff .win-bar, .g-candy .win-bar, .slot.theme-wolf .win-bar, .g-pharaon .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.g-anubis .controls, .g-dragons .controls, .g-bling .controls, .g-labo .controls, .g-huff .controls, .g-candy .controls, .slot.theme-wolf .controls, .g-pharaon .controls { background: rgba(6, 10, 24, .5); border-color: rgba(255, 255, 255, .14); }
+.game-host.is-full:has(> .slot.g-anubis), .game-host.is-full:has(> .slot.g-dragons), .game-host.is-full:has(> .slot.g-bling), .game-host.is-full:has(> .slot.g-labo), .game-host.is-full:has(> .slot.g-huff), .game-host.is-full:has(> .slot.g-candy), .game-host.is-full:has(> .slot.theme-wolf), .game-host.is-full:has(> .slot.g-pharaon) { padding: 0; background: #05060c; }
+.game-host.is-full > .slot.g-anubis, .game-host.is-full > .slot.g-dragons, .game-host.is-full > .slot.g-bling, .game-host.is-full > .slot.g-labo, .game-host.is-full > .slot.g-huff, .game-host.is-full > .slot.g-candy, .game-host.is-full > .slot.theme-wolf, .game-host.is-full > .slot.g-pharaon { width: 100%; max-width: none !important; min-height: 100%; margin: 0; border-radius: 0; border: 0; display: flex; flex-direction: column; justify-content: center; padding: max(8px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px)); }
+.game-host.is-full > .slot.g-anubis > .slot-bg, .game-host.is-full > .slot.g-dragons > .slot-bg, .game-host.is-full > .slot.g-bling > .slot-bg, .game-host.is-full > .slot.g-labo > .slot-bg, .game-host.is-full > .slot.g-huff > .slot-bg, .game-host.is-full > .slot.g-candy > .slot-bg, .game-host.is-full > .slot.theme-wolf > .slot-bg, .game-host.is-full > .slot.g-pharaon > .slot-bg { grid-column: auto !important; grid-row: auto !important; position: absolute; inset: 0; }
+.game-host.is-full > .slot.g-anubis .controls, .game-host.is-full > .slot.g-dragons .controls, .game-host.is-full > .slot.g-bling .controls, .game-host.is-full > .slot.g-labo .controls, .game-host.is-full > .slot.g-huff .controls, .game-host.is-full > .slot.g-candy .controls, .game-host.is-full > .slot.theme-wolf .controls, .game-host.is-full > .slot.g-pharaon .controls { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
 .game-host.is-full > .slot.theme-wolf > .slot-frame { width: 100%; max-width: calc((100dvh - 250px) * 5 / 3); margin-left: auto; margin-right: auto; }
 @media (orientation: landscape) and (max-height: 560px) { .game-host.is-full > .slot.theme-wolf > .slot-frame { max-width: none; } }
 .game-host.is-full:has(> .g-anubis, > .g-bling, > .g-candy, > .g-labo) { --chrome: 175px; }
@@ -7284,7 +7296,7 @@ const SPECS = {
       ${sym('sy-bl4', 84, 276, 50, `filter="url(#sh${u})"`)}`,
   },
   pharaon: {
-    bg: ['#5a3307', '#0a0602'], light: '#fde68a', title: ['LE TOTEM'], font: 'cinzel', metal: ['#fffbe8', '#fbbf24', '#92400e'], tag: 'MULTIPLICATEUR',
+    bg: ['#5a3307', '#0a0602'], light: '#fde68a', title: ['LE TOTEM'], font: 'cinzel', metal: ['#fffbe8', '#fbbf24', '#92400e'], tag: 'MULTIPLICATEUR', photo: 'assets/games/pharaon/cover.webp',
     art: (u) => `
       <circle cx="150" cy="104" r="70" fill="#fde68a" opacity=".18" filter="url(#glow${u})"/>
       <path d="M-10 300 L90 150 L190 300 Z" fill="#2a1704"/><path d="M130 300 L230 130 L330 300 Z" fill="#1f1103"/>
@@ -7690,6 +7702,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'pharaon', date: '2026-11-02', title: 'Le Totem illustré', items: ['Nouveaux symboles peints : masque du pharaon, faucon, ankh d’or, cobra, scarabée, amphore', 'Nouveau soleil scatter', 'Nouveau décor : le pharaon à l’orbe (et le pharaon sur son trône sur téléphone)', 'Nouvelle jaquette']},
   { game: 'billets', date: '2026-11-01', title: 'Nouveaux billets', items: ['Nouvelle jaquette : la montagne de billets', 'Nouveaux billets de 5 à 200 KE, nouvelle mallette, billet FREE SPINS et coffre JACKPOT', 'Nouveau décor : la pluie de billets', 'Affichage épuré et plein écran sur tout l’écran'] },
   { game: 'blackjack', date: '2026-11-01', title: 'Nouvelle table', items: ['Salle de casino et croupière animée', 'Tapis vert en demi-cercle avec sabot et feu de statut', 'Nouvelle barre de jetons : pose tes jetons, annule, double ou répète ta mise'] },
   { game: 'cosmic', date: '2026-11-01', title: 'Le Cosmique peint', items: ['Nouveaux symboles : prisme vert, cube cyan, hexagone violet, diamant rose, météorite, satellite, fusée, OVNI et K-0B', 'Nouvelle balise, supernova, trou noir et vaisseau aspirateur', 'Le guerrier aux sabres à côté de la grille, nouveau décor spatial et nouvelle jaquette', 'Affichage épuré et plein écran sur tout l’écran'] },
@@ -10333,7 +10346,7 @@ const FILES = {
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '0b6becec24'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],
-  pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '2949f3ab3b'],
+  pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '298b0a4b44'],
   bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '4f7a635766'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],

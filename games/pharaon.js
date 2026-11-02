@@ -33,6 +33,11 @@ function clusters(grid) {
 /* ===END ENGINE */
 
 const MUSIC = { sd: 0.3261, len: 16, root: 164.81, lead: { wave: 'triangle', vol: 0.07, dur: 0.4, pat: [12, null, 13, null, 16, 13, 12, null, 8, null, 7, null, 4, null, 5, null] }, bass: { wave: 'sawtooth', vol: 0.05, dur: 0.6, pat: [-12, null, null, null, -12, null, null, null, -12, null, null, null, -7, null, -5, null] }, kick: [0, 6, 10], hat: [3, 7, 11, 14, 15], kv: 0.2, hv: 0.02 };
+// Painted symbols by the owner: assets/games/pharaon/s0..s5.webp + sc.webp (sun scatter), bg.webp / bg-m.webp, cover.webp.
+const IMG_V = 1;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const IMG = { '👑': 's0', '🦅': 's1', '☥': 's2', '🐍': 's3', '🪲': 's4', '🏺': 's5', '☀️': 'sc' };
+const symArt = (v) => (IMG[v] ? `<img class="ph-img" src="${asset(`assets/games/pharaon/${IMG[v]}.webp`)}" alt="" draggable="false" decoding="async">` : art(MAP[v]));
 const NAMES = { '👑': 'Masque du pharaon', '🦅': 'Faucon d’Horus', '☥': 'Ankh', '🐍': 'Cobra', '🪲': 'Scarabée', '🏺': 'Amphore', '☀️': 'Soleil (scatter)' };
 
 class PharaonGame extends BaseGame {
@@ -48,9 +53,10 @@ class PharaonGame extends BaseGame {
       hello: 'Les cases gagnantes se verrouillent, le multiplicateur grimpe',
     });
     this.multEl = this.q('.mult-meter');
+    Object.values(IMG).forEach((n) => { new Image().src = asset(`assets/games/pharaon/${n}.webp`); });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: COLS, rows: ROWS, game: this,
-      art: (v) => art(MAP[v]),
+      art: symArt,
       cls: (v) => (v === SC ? 'scatter' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => SYM[Math.floor(Math.random() * SYM.length)][0]));
@@ -133,7 +139,7 @@ class PharaonGame extends BaseGame {
     const bounty = kind === 'bounty';
     let free = bounty ? 12 : 8, base = bounty ? 10 : 4, fsWin = 0, done = 0;
     this.lastStake = this.bet;
-    await this.featureIntro(bounty ? 'BONUS BOUNTY' : 'BONUS', `${free} tours gratuits · départ ×${base} · le multiplicateur reste`, art(MAP[SC]));
+    await this.featureIntro(bounty ? 'BONUS BOUNTY' : 'BONUS', `${free} tours gratuits · départ ×${base} · le multiplicateur reste`, symArt(SC));
     this.slotEl.classList.add('in-free');
     while (free > 0 && !this.dead) {
       free--; done++;
@@ -141,7 +147,7 @@ class PharaonGame extends BaseGame {
       const r = await this.spinOnce(true, base);
       fsWin += r.total;
       base = r.m; // the multiplier carries over to the next spin
-      if (r.scat >= 3) { free += 3; await this.featureIntro('+3 TOURS', 'Retrigger !', art(MAP[SC]), 1300); }
+      if (r.scat >= 3) { free += 3; await this.featureIntro('+3 TOURS', 'Retrigger !', symArt(SC), 1300); }
       await this.wait(500);
     }
     this.slotEl.classList.remove('in-free');
@@ -149,12 +155,12 @@ class PharaonGame extends BaseGame {
     this.setMult(1);
     this.grid.cells.forEach((c) => c.classList.remove('lock'));
     this.setLast(fsWin);
-    await this.celebrate(fsWin, { summary: bounty ? 'BONUS BOUNTY' : 'BONUS PHARAON' });
+    await this.celebrate(fsWin, { summary: bounty ? 'BONUS BOUNTY' : 'BONUS TOTEM' });
     this.msg(`Bonus terminé : ${fmtC(fsWin)} gagnés`);
   }
 
   info() {
-    const rows = [...SYM.map((s) => s[0]), SC].map((s) => `<div class="pay-item"><div class="pay-sym svg">${art(MAP[s])}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>${s === SC ? '3 = bonus 8 tours ×4 · 4+ = Bounty 12 tours ×10' : `Valeur ${val(s)}`}</span></div></div>`).join('');
+    const rows = [...SYM.map((s) => s[0]), SC].map((s) => `<div class="pay-item"><div class="pay-sym">${symArt(s)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>${s === SC ? '3 = bonus 8 tours ×4 · 4+ = Bounty 12 tours ×10' : `Valeur ${val(s)}`}</span></div></div>`).join('');
     return this.rules(`<h4>Symboles</h4><div class="paytable">${rows}</div>
       <h4>Cases verrouillées</h4><p>Grille 5×4. Une grappe de <b>5 symboles identiques ou plus</b> paie (mise × valeur × 0,0675 × (taille − 2), au prorata des nouvelles cases), puis <b>se verrouille</b>. Les autres cases sont relancées et le <b>multiplicateur monte de +1</b> à chaque nouvelle connexion, jusqu’à 15 fois.</p>
       <h4>Bonus</h4><p>3 soleils : 8 tours qui démarrent à ×4. 4 soleils ou plus : Bounty, 12 tours à ×10. Pendant le bonus, <b>le multiplicateur reste</b> d’un tour à l’autre. 3 soleils de plus : +3 tours.</p>
