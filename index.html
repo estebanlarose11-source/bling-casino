@@ -12285,6 +12285,36 @@ const slotHTML = (cls = '') => `<div class="hta-slot ${cls}" data-hta=""></div>`
 return { mountHta, slotHTML, inject, isShown, watchShown };
 })();
 
+// ---- bonus.js ----
+__mods['bonus.js'] = (() => {
+// Bonus offered by the owner to named players, paid once per account the next time they open the site.
+// Only accounts (not guests or local pseudos) that already existed when the bonus was added get it, so a new
+// account taking the same pseudo later gets nothing. Saved in profile.bonusPaid (list of bonus ids).
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { toast } = __mods['ui.js'];
+
+const BONUSES = [
+  { id: 'b2026-11-02', ke: 150000, names: ['kev27', 'bistoufly', 'xenatix'], before: 1793648400000, text: 'Cadeau de SpinBet' },
+];
+
+function payBonuses() {
+  const me = profiles.current;
+  if (!profiles.online || !me) return;
+  const name = String(me.name || '').trim().toLocaleLowerCase('fr');
+  for (const b of BONUSES) {
+    if (!b.names.includes(name) || (me.created || 0) > b.before || (me.bonusPaid || []).includes(b.id)) continue;
+    profiles.update('bonusPaid', (p) => { p.bonusPaid = [...(p.bonusPaid || []), b.id]; });
+    wallet.grant(b.ke);
+    profiles.flush?.();
+    setTimeout(() => { toast(`🎁 ${b.text} : +${fmt(b.ke)} sur ton compte !`, 'ok'); __mods['fx.js']?.fx?.confetti?.(140); __mods['audio.js']?.sfx?.bigWin?.(); }, 1500);
+  }
+}
+profiles.addEventListener('change', () => setTimeout(payBonuses, 800));
+
+return { payBonuses };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
