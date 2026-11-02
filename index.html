@@ -7399,6 +7399,7 @@ const SPECS = {
       <text x="150" y="98" text-anchor="middle" font-family="KeCoin,${FONTS.orb}" font-weight="900" font-size="34" fill="url(#tit${u})" stroke="#3b2a00" stroke-width="1.5" paint-order="stroke" filter="url(#glow${u})">×100 000</text>`,
   },
   blackjack: {
+    photo: 'assets/games/blackjack/cover.webp', baked: true,
     bg: ['#0b4d31', '#020a06'], light: '#86efac', title: ['LE 21'], font: 'cinzel', metal: ['#fff', '#fde68a', '#a16207'], tag: '3 POUR 2',
     art: (u) => `
       <ellipse cx="150" cy="300" rx="190" ry="110" fill="#0e6b43" stroke="#fde68a" stroke-opacity=".35" stroke-width="3"/>
@@ -7407,6 +7408,7 @@ const SPECS = {
       ${[0, 1, 2].map((k) => `<ellipse cx="240" cy="${276 - k * 7}" rx="24" ry="8" fill="${k % 2 ? '#fff' : '#1e3a8a'}" stroke="#0a1a3b" stroke-width="1"/>`).join('')}`,
   },
   lightningbj: {
+    photo: 'assets/games/lightningbj/cover.webp', baked: true,
     bg: ['#1a2a8a', '#02040f'], light: '#9fd4ff', title: ['LE 21', 'ÉLECTRIQUE'], font: 'bebas', metal: ['#fff', '#bfe3ff', '#2563eb'], tag: '×1000',
     art: (u) => `
       <ellipse cx="150" cy="300" rx="190" ry="110" fill="#123a7a" stroke="#9fd4ff" stroke-opacity=".35" stroke-width="3"/>
@@ -7416,6 +7418,7 @@ const SPECS = {
       <text x="150" y="276" text-anchor="middle" font-family="KeCoin,${FONTS.orb}" font-weight="900" font-size="30" fill="url(#tit${u})" stroke="#0b1437" stroke-width="1.5" paint-order="stroke" filter="url(#glow${u})">×1000</text>`,
   },
   poker: {
+    photo: 'assets/games/poker/cover.webp', baked: true,
     bg: ['#0b4d31', '#020a06'], light: '#86efac', title: ['LE TEXAS'], font: 'bebas', metal: ['#fff', '#fde68a', '#a16207'], tag: 'POKER',
     art: (u) => `
       <ellipse cx="150" cy="292" rx="200" ry="118" fill="#0e6b43" stroke="#5a3412" stroke-width="10"/>
