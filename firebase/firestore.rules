@@ -209,15 +209,38 @@ service cloud.firestore {
     }
 
     // ---------- Tables en ligne (L'Éclair Online, Le 21 Online, Le Texas Online) ----------
-    // Une manche dure LEN ms sur l'horloge du serveur (manche r = temps / LEN). seeds/{r}-{k} : le tirage partagé,
-    // écrit une seule fois, par le premier joueur présent, après la fermeture des mises (ou des décisions).
-    // bets/{r}-{uid} : la mise (et les décisions) d'un joueur, écrite par lui seul et seulement avant la limite.
-    // chat : le chat de la table, mêmes règles que le chat général.
-    function tableLen(g) { return {'storm-online': 15000, 'bj-online': 30000, 'holdem-online': 30000}.get(g, 0); }
-    function seedAt(g, k) { return {'storm-online': {'a': 7500}, 'bj-online': {'a': 9000, 'b': 21000}, 'holdem-online': {'a': 9000, 'b': 21000}}.get(g, {}).get(k, 999999); }
-    function betUntil(g) { return {'storm-online': 7500, 'bj-online': 21000, 'holdem-online': 21000}.get(g, 0); }
+    // Salons (L'Éclair Online, Le 21 Online) : seats/{uid} = le siège de chaque joueur (prêt, mise, décisions),
+    // écrit par lui seul ; seeds/{n}-{k} = le tirage de la manche n, écrit une seule fois par le premier joueur
+    // présent quand tout le salon est prêt (puis, au 21, quand tout le monde a fini).
+    // Le Texas Online : une manche dure LEN ms sur l'horloge du serveur (manche r = temps / LEN) ; seeds/{r}-{k}
+    // écrit après la fermeture des mises (ou des décisions), bets/{r}-{uid} écrit avant la limite.
+    // chat : le chat de chaque table, mêmes règles que le chat général.
+    function roomGame(g) { return g in ['storm-online', 'bj-online']; }
+    function tableLen(g) { return {'holdem-online': 30000}.get(g, 0); }
+    function seedAt(g, k) { return {'holdem-online': {'a': 9000, 'b': 21000}}.get(g, {}).get(k, 999999); }
+    function betUntil(g) { return {'holdem-online': 21000}.get(g, 0); }
+    match /tables/{game}/seats/{uid} {
+      allow read: if true;
+      allow create, update: if isMe(uid) && roomGame(game)
+        && request.resource.data.keys().hasOnly(['name', 'look', 'n', 'ready', 'd', 'rt', 'acts', 'done', 'at'])
+        && isPseudo(request.resource.data.name)
+        && request.resource.data.at == request.time
+        && (!('d' in request.resource.data) || (request.resource.data.d is map && request.resource.data.d.size() <= 160))
+        && (!('acts' in request.resource.data) || (request.resource.data.acts is string && request.resource.data.acts.size() <= 12))
+        && (!('look' in request.resource.data) || isLook(request.resource.data.look));
+      allow delete: if isMe(uid);
+    }
     match /tables/{game}/seeds/{id} {
       allow read: if true;
+      allow create: if signedIn() && roomGame(game)
+        && request.resource.data.keys().hasOnly(['n', 'k', 'rnd', 'at', 'p', 'acts'])
+        && request.resource.data.n is int && request.resource.data.n > 0 && request.resource.data.k in ['a', 'b']
+        && id == string(request.resource.data.n) + '-' + request.resource.data.k
+        && request.resource.data.at == request.time
+        && request.resource.data.rnd is string && request.resource.data.rnd.size() <= 40
+        && (!('p' in request.resource.data) || (request.resource.data.p is list && request.resource.data.p.size() <= 20))
+        && (!('acts' in request.resource.data) || request.resource.data.acts is map)
+        && (request.resource.data.k == 'a' || exists(/databases/$(database)/documents/tables/$(game)/seeds/$(string(request.resource.data.n) + '-a')));
       allow create: if signedIn() && tableLen(game) > 0
         && request.resource.data.keys().hasOnly(['r', 'k', 'rnd', 'at', 'p'])
         && request.resource.data.r is int && request.resource.data.k in ['a', 'b']
@@ -246,7 +269,7 @@ service cloud.firestore {
     }
     match /tables/{game}/chat/{id} {
       allow read: if true;
-      allow create: if signedIn() && tableLen(game) > 0
+      allow create: if signedIn() && (tableLen(game) > 0 || roomGame(game))
         && request.resource.data.keys().hasOnly(['uid', 'name', 'text', 'at', 'look'])
         && (!('look' in request.resource.data) || isLook(request.resource.data.look))
         && request.resource.data.uid == request.auth.uid

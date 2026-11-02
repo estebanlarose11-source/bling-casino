@@ -4407,6 +4407,23 @@ const cloud = {
     await b.commit();
   },
 
+  /* ---------- Online rooms (ready system): tables/{game}/seats and seeds by round number n ---------- */
+  async watchSeats(game, cb) {
+    return (await init()).db.collection('tables').doc(game).collection('seats')
+      .onSnapshot((q) => cb(q.docs.map((d) => { const x = d.data({ serverTimestamps: 'estimate' }); return { uid: d.id, ...x, atMs: x.at?.toMillis?.() || 0 }; })), (e) => console.error(e));
+  },
+  async setSeat(game, uid, data) {
+    await (await init()).db.collection('tables').doc(game).collection('seats').doc(uid).set({ ...JSON.parse(JSON.stringify(data)), at: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  },
+  async leaveSeat(game, uid) { await (await init()).db.collection('tables').doc(game).collection('seats').doc(uid).delete(); },
+  async watchLastSeeds(game, n, cb) {
+    return (await init()).db.collection('tables').doc(game).collection('seeds').orderBy('n', 'desc').limit(n)
+      .onSnapshot({ includeMetadataChanges: true }, (q) => cb(q.docs.filter((d) => !d.metadata.hasPendingWrites).map((d) => { const x = d.data(); return { ...x, atMs: x.at?.toMillis?.() || 0 }; })), (e) => console.error(e));
+  },
+  async createRoomSeed(game, id, data) {
+    await (await init()).db.collection('tables').doc(game).collection('seeds').doc(id).set({ ...JSON.parse(JSON.stringify(data)), at: firebase.firestore.FieldValue.serverTimestamp() });
+  },
+
   /* ---------- Friends: friends/{uid} = { list: { uid: pseudo } }, friendreqs/{from}_{to} ---------- */
   async loadFriends(uid) { const d = await (await init()).db.collection('friends').doc(uid).get(); return d.exists ? d.data().list || {} : {}; },
   async saveFriends(uid, list) { await (await init()).db.collection('friends').doc(uid).set({ list: JSON.parse(JSON.stringify(list)) }); },
@@ -7391,8 +7408,8 @@ const ORIGINALS = [
   {"id": "pharaon", "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
   {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Top Slot, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Top Slot et quatre jeux bonus animés : Pile ou Face, Chasse au Cash, Pachinko et Méga Folie.", "features": ["Top Slot ×2 à ×50", "Pile ou Face", "Chasse au Cash", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
-  {"id": "storm-online", "name": "L’Éclair Online", "cat": "table", "tag": "En ligne", "sub": "Roulette éclair multijoueur, un tour toutes les 15 s", "colors": ["#1f56ff", "#071440"], "description": "La roulette éclair en multijoueur : un tour toutes les 15 secondes pour toute la table. Pose tes jetons pendant le compte à rebours, la foudre frappe et la bille tourne pour tout le monde en même temps. Tu vois les mises et les gains des autres joueurs, et la table a son propre chat.", "features": ["Multijoueur en direct", "Un tour toutes les 15 s", "Éclairs ×50 à ×50 000", "Chat de la table"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
-  {"id": "bj-online", "name": "Le 21 Online", "cat": "table", "tag": "En ligne", "sub": "Blackjack multijoueur, une main toutes les 30 s", "colors": ["#11a05f", "#06301f"], "description": "Le blackjack en multijoueur : une main toutes les 30 secondes, la même croupière pour tous. Mise, puis tire, reste ou double pendant que les autres joueurs jouent leur main à côté de toi. La table a son propre chat.", "features": ["Multijoueur en direct", "Une main toutes les 30 s", "Blackjack 6 pour 5", "Chat de la table"], "rtp": "≈ 97,5 %", "vol": 1, "max": "×2,2"},
+  {"id": "storm-online", "name": "L’Éclair Online", "cat": "table", "tag": "En ligne", "sub": "Roulette éclair multijoueur : la roue part quand tout le salon est prêt", "colors": ["#1f56ff", "#071440"], "description": "La roulette éclair en multijoueur : chacun pose ses jetons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La foudre et la bille sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Éclairs ×50 à ×50 000", "Chat du salon"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
+  {"id": "bj-online", "name": "Le 21 Online", "cat": "table", "tag": "En ligne", "sub": "Blackjack multijoueur : les cartes partent quand tout le salon est prêt", "colors": ["#11a05f", "#06301f"], "description": "Le blackjack en multijoueur : chacun mise et appuie sur PRÊT, les cartes partent dès que tout le salon est prêt (tout de suite si tu es seul). La même croupière pour tous, les mains des autres joueurs à côté de la tienne, et un chat pour le salon.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Blackjack 6 pour 5", "Chat du salon"], "rtp": "≈ 97,5 %", "vol": 1, "max": "×2,2"},
   {"id": "holdem-online", "name": "Le Texas Online", "cat": "table", "tag": "En ligne", "sub": "Texas Hold’em multijoueur contre la croupière", "colors": ["#10b981", "#06301f"], "description": "Le Texas Hold’em en multijoueur : une main toutes les 30 secondes. Chaque joueur reçoit ses 2 cartes, toute la table voit le même flop, puis chacun suit ou se couche contre la croupière. Quinte flush royale payée 100 pour 1. La table a son propre chat.", "features": ["Multijoueur en direct", "Une main toutes les 30 s", "Quinte flush royale ×100", "Chat de la table"], "rtp": "≈ 97,4 %", "vol": 2, "max": "×100 l’ante"},
   {"id": "doublespin", "name": "La Double Bille", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
   {"id": "plateau", "name": "Le Plateau", "cat": "table", "tag": "Jeu de roue", "sub": "Roue, dés et plateau de multiplicateurs", "colors": ["#22c55e", "#0c1a14"], "description": "Une grande roue de 78 cases : mise sur 1, 2, 5, 10 ou sur les bonus 2 lancers et 4 lancers. Dans les bonus, lance 2 dés et fais avancer ton pion sur un plateau de 28 cases jusqu’à ×200. Et si la roue tombe sur Chance, elle repart et ce tour paie ×10 !", "features": ["Cases 1, 2, 5 et 10", "Bonus 2 lancers et 4 lancers", "Plateau jusqu’à ×200 par case", "Double = lancer en plus", "Case Chance ×10"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
@@ -8017,6 +8034,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'storm-online', date: '2026-11-02', title: 'Le salon : prêt, et c’est parti', items: ['Pose tes jetons et appuie sur PRÊT', 'La roue part dès que tout le salon est prêt, tout de suite si tu es seul', 'Plein écran revu pour le téléphone'] },
+  { game: 'bj-online', date: '2026-11-02', title: 'Le salon : prêt, et c’est parti', items: ['Mise et appuie sur PRÊT', 'Les cartes partent dès que tout le salon est prêt, tout de suite si tu es seul', 'La croupière joue dès que tout le monde a fini', 'Plein écran revu pour le téléphone'] },
   { game: 'storm-online', date: '2026-11-02', title: 'Nouveau : L’Éclair Online', isNew: true, items: ['La roulette éclair en multijoueur', 'Un tour toutes les 15 secondes pour toute la table', 'Les mises et les gains des autres joueurs en direct', 'Un chat rien que pour la table'] },
   { game: 'bj-online', date: '2026-11-02', title: 'Nouveau : Le 21 Online', isNew: true, items: ['Le blackjack en multijoueur, une main toutes les 30 secondes', 'La même croupière pour tous', 'Les mains des autres joueurs à côté de la tienne', 'Un chat rien que pour la table'] },
   { game: 'holdem-online', date: '2026-11-02', title: 'Nouveau : Le Texas Online', isNew: true, items: ['Le Texas Hold’em en multijoueur contre la croupière', 'Le même flop pour toute la table', 'Suivre ou se coucher en 12 secondes', 'Un chat rien que pour la table'] },
@@ -10665,8 +10684,8 @@ __mods['games/impl/index.js'] = (() => {
 // tools/build.py: run `python3 tools/build.py` after changing a file in games/.
 
 const FILES = {
-  'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', '2a48f294b6'],
-  'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '206aea3b6f'],
+  'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', 'b631fcbf76'],
+  'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '3357f3e2c8'],
   'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '7e6577831b'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a1fe33533c'],
@@ -11692,6 +11711,75 @@ class OnlineTable {
   }
 }
 
+/* ---------- a room (L’Éclair Online, Le 21 Online): the round starts when every seated player is ready ----------
+   tables/{game}/seats/{uid} = { name, look, n, ready, d, rt, acts, done, at }: each player's seat, refreshed every
+   8 s (a seat counts while it is fresh). A player bets then presses PRÊT (ready for round n). When every seated
+   player is ready for n — or WAIT ms after the first one, so an absent player never blocks the table — the first
+   client present writes seeds/{n}-a = { n, k, rnd, at, p: [{ u, nm, d }] } (the players and their bets). Le 21 then
+   writes seeds/{n}-b (the dealer) when every player of p is done, or DECIDE ms after the deal. */
+class OnlineRoom {
+  // o: { two: bool, resultMs, decideMs, waitMs, onState(st), onSeed(k, seed, doc) }
+  constructor(game, o) { Object.assign(this, { game, o, seats: {}, docs: {}, stops: [], tried: {}, seen: {} }); }
+  get me() { return uid(); }
+  async start() {
+    await syncClock();
+    if (cloud.enabled) {
+      try {
+        this.stops.push(await cloud.watchSeats(this.game, (list) => { this.seats = Object.fromEntries(list.map((s) => [s.uid, s])); this.update(); }));
+        this.stops.push(await cloud.watchLastSeeds(this.game, 4, (list) => { list.forEach((d) => { this.docs[`${d.n}-${d.k}`] = d; }); this.update(); }));
+      } catch (e) { console.error(e); }
+    }
+    this.iv = setInterval(() => this.update(), 250);
+    this.beatIv = setInterval(() => this.seat({}), 8000);
+    this.seat({});
+    this.update();
+  }
+  stop() { clearInterval(this.iv); clearInterval(this.beatIv); this.stops.forEach((f) => f?.()); this.dead = true; if (this.me) cloud.leaveSeat(this.game, this.me).catch(() => {}); }
+  // my seat (merge): heartbeat with {}, or ready / decisions for a round
+  async seat(data) {
+    const me = this.me; if (!me || this.dead) return;
+    const look = __mods['shop.js']?.publicLook?.();
+    try { await cloud.setSeat(this.game, me, { name: String(profiles.current.name || 'Joueur').slice(0, 16), ...(look ? { look } : {}), ...data }); }
+    catch (e) { console.warn('Siège refusé (règles Firestore à jour ?)', e); }
+  }
+  lastN() { let n = 0; for (const k in this.docs) { const d = this.docs[k]; if (d.k === 'a' && d.n > n) n = d.n; } return n; }
+  present() { const t = now(); return Object.values(this.seats).filter((s) => t - (s.atMs || 0) < 25000); }
+  state() {
+    const t = now(), n = this.lastN(), a = this.docs[`${n}-a`], b = this.docs[`${n}-b`];
+    if (n && a) {
+      if (this.o.two && !b && t < a.atMs + this.o.decideMs + 15000) return { phase: 'play', n, a, deadline: a.atMs + this.o.decideMs };
+      const end = (this.o.two ? (b ? b.atMs : a.atMs + this.o.decideMs) : a.atMs) + this.o.resultMs;
+      if (t < end) return { phase: 'result', n, a, b, end };
+    }
+    const m = n + 1, pres = this.present(), ready = pres.filter((s) => s.n === m && s.ready);
+    const first = ready.length ? Math.min(...ready.map((s) => s.rt || t)) : 0;
+    return { phase: 'bet', n: m, present: pres, ready, waiting: pres.filter((s) => !(s.n === m && s.ready)), autoAt: first ? first + this.o.waitMs : 0 };
+  }
+  update() {
+    if (this.dead) return;
+    const st = this.state(), t = now();
+    // new seeds of the round on screen
+    for (const k of ['a', 'b']) { const d = this.docs[`${st.n}-${k}`]; if (d && !this.seen[`${st.n}-${k}`]) { this.seen[`${st.n}-${k}`] = true; this.o.onSeed?.(k, `${d.rnd}:${d.atMs}`, d, st.n); } }
+    if (this.me) {
+      if (st.phase === 'bet' && st.ready.length && (st.ready.length >= st.present.length || t >= st.autoAt)) this.draw(st.n, 'a', { p: st.ready.slice(0, 20).map((s) => ({ u: s.uid, nm: s.name, d: s.d || {} })) });
+      if (st.phase === 'play') {
+        const allDone = (st.a.p || []).every((p) => { const s = this.seats[p.u]; return s && s.n === st.n && s.done; });
+        if (allDone || t >= st.deadline) this.draw(st.n, 'b', { acts: Object.fromEntries((st.a.p || []).map((p) => [p.u, this.seats[p.u]?.n === st.n ? String(this.seats[p.u].acts || '') : ''])) });
+      }
+    }
+    this.o.onState?.(st);
+  }
+  async draw(n, k, extra) {
+    const id = `${n}-${k}`;
+    if (this.tried[id] || this.docs[id]) return;
+    this.tried[id] = true;
+    try {
+      const rnd = [...crypto.getRandomValues(new Uint8Array(12))].map((x) => x.toString(16).padStart(2, '0')).join('');
+      await cloud.createRoomSeed(this.game, id, { n, k, rnd, ...extra });
+    } catch (e) { setTimeout(() => { if (!this.docs[id]) this.tried[id] = false; }, 1200); }
+  }
+}
+
 /* ---------- table chat ---------- */
 const chatHTML = () => `<div class="on-chat"><div class="on-chat-h">💬 Chat de la table</div><div class="on-chat-list"><p class="muted small">Chargement…</p></div>
   <form class="on-chat-f"><input maxlength="200" placeholder="Écris à la table…" autocomplete="off"><button class="btn primary">Envoyer</button></form></div>`;
@@ -11735,7 +11823,7 @@ async function mountChat(root, game) {
   return () => stop?.();
 }
 
-return { OnlineTable, rng, wpickR, shuffleR, cardOf, cardHTML, now, syncClock, chatHTML, mountChat, esc };
+return { OnlineTable, OnlineRoom, rng, wpickR, shuffleR, cardOf, cardHTML, now, syncClock, chatHTML, mountChat, esc };
 })();
 
 // ---- friends.js ----
@@ -12987,11 +13075,67 @@ h1, h2, h3 { letter-spacing: -.01em; }
 @media (hover: none) { .game-card:hover .scene, .game-card:hover .thumb .cover, .game-card:hover .a0 { transform: none; } .game-card:hover .thumb::before { transform: none; } }
 </style>
 <style id="round-accents">
+/* ============ Online tables in full screen: a screen made for the phone ============
+   Everything fits on one screen, nothing to scroll out of reach: the table (wheel or cards) on top, the chips /
+   actions in the middle (they scroll inside if needed), the message and the controls always at the bottom; the
+   players and the chat open from the 💬 button. Phone held sideways: table on the left, the rest on the right. */
+.game-host.is-full:has(> .slot.online-game) { padding: 0 !important; overflow: hidden !important; background: #05080a; }
+.game-host.is-full > .slot.online-game.online-game {
+  position: fixed; inset: 0; width: 100%; height: 100%; max-width: none !important; margin: 0 !important; border: 0; border-radius: 0; box-shadow: none;
+  padding: max(6px, env(safe-area-inset-top, 0px)) max(8px, env(safe-area-inset-right, 0px)) max(6px, env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px));
+  display: grid !important; gap: 6px; overflow: hidden; align-content: stretch;
+  grid-template-columns: minmax(0, 1fr) !important; grid-template-rows: auto minmax(0, 1fr) auto auto !important;
+  grid-template-areas: "top" "main" "msg" "ctl" !important;
+}
+.game-host.is-full > .slot.online-game.online-game > * { grid-column: auto !important; grid-row: auto !important; min-width: 0; }
+.game-host.is-full > .slot.online-game > .slot-bg { position: absolute; inset: 0; }
+.game-host.is-full > .slot.online-game > .slot-head, .game-host.is-full > .slot.online-game > .feature-banner { display: none !important; }
+.game-host.is-full > .slot.online-game > .slot-frame { grid-area: top !important; margin: 0 !important; padding: 0 !important; min-height: 0; }
+.game-host.is-full > .slot.online-game > .slot-frame > .slot-stage { padding: 0 !important; min-height: 0; height: 100%; display: flex; flex-direction: column; }
+.game-host.is-full > .slot.online-game > .felt, .game-host.is-full > .slot.online-game > .bj-actions { grid-area: main !important; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: 0 !important; }
+.game-host.is-full > .slot.online-game > .win-bar { grid-area: msg !important; margin: 0 !important; min-height: 0; padding: 2px 6px; }
+.game-host.is-full > .slot.online-game > .win-bar .msg { font-size: 12px; line-height: 1.25; }
+.game-host.is-full > .slot.online-game > .controls { grid-area: ctl !important; margin: 0 !important; position: static; width: 100% !important; max-width: none !important; }
+.game-host.is-full > .slot.online-game .on-timer { margin: 0 0 4px; max-width: none; padding-right: 54px; }
+.game-host.is-full > .slot.online-game .on-timer b { font-size: 13px; margin-bottom: 3px; }
+.game-host.is-full > .slot.online-game .on-timer .on-wait { font-size: 11px; }
+/* roulette: small wheel, the felt scrolls in the middle */
+.game-host.is-full > .slot.online-game .wheel-zone { --rw: min(30dvh, 230px, 62vw) !important; padding: 0 !important; gap: 4px; }
+.game-host.is-full > .slot.online-game .bolt-bar { font-size: 11px; padding: 3px 8px; }
+.game-host.is-full > .slot.online-game > .felt { padding: 6px; }
+.game-host.is-full > .slot.online-game .hist { display: none; }
+/* cards: the table takes the free height, the actions sit under it */
+.game-host.is-full > .slot.online-game.bjo, .game-host.is-full > .slot.online-game.hdo { grid-template-rows: minmax(0, 1fr) auto auto auto !important; }
+.game-host.is-full > .slot.online-game.bjo > .bj-actions, .game-host.is-full > .slot.online-game.hdo > .bj-actions { overflow: visible; display: flex; gap: 6px; }
+.game-host.is-full > .slot.online-game .bj-actions .bj-btn { flex: 1; min-width: 0; padding: 8px 4px; }
+.game-host.is-full > .slot.online-game .bjo-table { flex: 1; min-height: 0; padding: 6px; gap: 2px; align-content: space-evenly; overflow: hidden; }
+.game-host.is-full > .slot.online-game .bj-cards { min-height: 0; }
+.game-host.is-full > .slot.online-game .bj-card { height: min(96px, 13dvh); width: calc(min(96px, 13dvh) * .72); }
+.game-host.is-full > .slot.online-game .bj-f .mid { font-size: min(30px, 4.6dvh); }
+.game-host.is-full > .slot.online-game .bj-f .tl, .game-host.is-full > .slot.online-game .bj-f .br { font-size: min(15px, 2.4dvh); }
+.game-host.is-full > .slot.online-game .hdo-board .bj-card { height: min(80px, 11dvh); width: calc(min(80px, 11dvh) * .72); }
+.game-host.is-full > .slot.online-game .bj-arc { font-size: 9px; padding: 2px 8px; letter-spacing: 1px; }
+.game-host.is-full > .slot.online-game .bj-label { font-size: 12px; }
+/* phone held sideways */
+@media (orientation: landscape) and (max-height: 560px) {
+  .game-host.is-full > .slot.online-game.online-game { grid-template-columns: minmax(0, 42%) minmax(0, 1fr) !important; grid-template-rows: minmax(0, 1fr) auto auto !important;
+    grid-template-areas: "top main" "top msg" "top ctl" !important; column-gap: 10px; }
+  .game-host.is-full > .slot.online-game.bjo, .game-host.is-full > .slot.online-game.hdo { grid-template-rows: minmax(0, 1fr) auto auto !important; }
+  .game-host.is-full > .slot.online-game.bjo > .bj-actions, .game-host.is-full > .slot.online-game.hdo > .bj-actions { align-self: center; flex-wrap: wrap; }
+  .game-host.is-full > .slot.online-game .wheel-zone { --rw: min(calc(100dvh - 90px), 42vw) !important; }
+  .game-host.is-full > .slot.online-game .bj-card { height: min(72px, 17dvh); width: calc(min(72px, 17dvh) * .72); }
+  .game-host.is-full > .slot.online-game .bj-f .mid { font-size: min(22px, 5dvh); }
+  .game-host.is-full > .slot.online-game .bj-arc { display: none; }
+  .game-host.is-full > .slot.online-game .hdo-board .bj-card { height: min(60px, 15dvh); width: calc(min(60px, 15dvh) * .72); }
+  .game-host.is-full > .slot.online-game .on-timer { padding-right: 0; }
+}
+
+.on-timer .on-wait { display: block; margin-top: 4px; font-size: 12px; color: #fde68a; min-height: 0; }
+.on-timer .on-wait:empty { display: none; }
 .bjo-table .bj-label b:empty { display: none; }
 /* online tables in full screen: the game and its buttons take the screen, the chat opens from a 💬 button */
 .on-fab, .on-side-x { display: none; }
 .game-host.is-full > .slot.online-game { overflow: visible; }
-.game-host.is-full > .slot.online-game .controls { position: sticky; bottom: 0; z-index: 40; background: rgba(8, 12, 10, .94); }
 .game-host.is-full > .slot.online-game .on-side { display: none; }
 .game-host.is-full > .slot.online-game.on-chat-open .on-side { display: grid; grid-template-columns: 1fr; align-content: start; gap: 10px; position: fixed; z-index: 1500;
   left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); top: max(10%, env(safe-area-inset-top)); bottom: max(8px, env(safe-area-inset-bottom));
@@ -13004,18 +13148,6 @@ h1, h2, h3 { letter-spacing: -.01em; }
 .on-fab b { position: absolute; top: -2px; right: -2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 999px; background: #22c55e; color: #fff; font: 800 11px/20px Inter, sans-serif; text-align: center; }
 .on-fab b[hidden] { display: none; }
 @media (orientation: landscape) and (max-height: 560px) { .game-host.is-full .on-fab { top: auto; bottom: max(12px, env(safe-area-inset-bottom)); right: auto; left: max(12px, env(safe-area-inset-left)); width: 46px; height: 46px; font-size: 20px; } }
-/* full screen on phones: no title block, smaller table, so everything fits */
-@media (max-width: 900px) {
-  .game-host.is-full > .slot.online-game .wheel-zone { --rw: min(54vw, 210px, calc(100vh - 560px)) !important; --rw: max(150px, min(54vw, 210px)) !important; padding-top: 4px; }
-  .game-host.is-full > .slot.online-game .bolt-bar { font-size: 11px; padding: 4px 8px; }
-  .game-host.is-full > .slot.online-game .on-timer { margin-bottom: 4px; }
-  .game-host.is-full > .slot.online-game .slot-head .slot-title { display: none; }
-  .game-host.is-full > .slot.online-game .bj-cards { min-height: 80px; }
-  .game-host.is-full > .slot.online-game .bj-card { width: 58px; height: 82px; }
-  .game-host.is-full > .slot.online-game .bj-f .mid { font-size: 26px; }
-  .game-host.is-full > .slot.online-game .bjo-table { padding: 8px; gap: 4px; }
-  .game-host.is-full > .slot.online-game .bj-arc { font-size: 9px; padding: 3px 8px; }
-  .game-host.is-full > .slot.online-game .bj-actions .bj-btn { padding-top: 8px; padding-bottom: 8px; }
 }
 /* ============ Online tables ============ */
 .online-game .rt-autoplay, .online-game .rt-autopick { display: none !important; }
