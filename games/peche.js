@@ -25,7 +25,10 @@ const FISH = {
   fo: [[8, 3690], [10, 2334], [12, 1476], [15, 934], [20, 591], [25, 374], [30, 236], [50, 149], [75, 95], [100, 60], [200, 38], [500, 24]],
   fr: [[20, 3923], [25, 2388], [30, 1454], [40, 885], [50, 539], [75, 328], [100, 200], [150, 121], [250, 74], [500, 45], [1000, 27], [5000, 17]],
 };
-const POND = 12; // fish in the pond
+// The painted pond (assets/games/peche/pond.webp, 1600 × 729) has 10 glowing rings on the sand: one fish waits in each.
+const POND_W = 1600, POND_H = 729;
+const RINGS = [[510, 413, 74], [1012, 413, 74], [343, 472, 92], [805, 462, 96], [1235, 472, 92], [590, 540, 120], [1015, 540, 120], [258, 575, 118], [1355, 577, 118], [805, 640, 170]];
+const POND = RINGS.length; // fish in the pond
 const CAPX = 25000;
 function strikes() {
   const pos = new Set(); while (pos.size < STRIKES) pos.add(Math.floor(Math.random() * NS));
@@ -202,13 +205,17 @@ class PecheGame extends BaseGame {
     const vals = pond(k), pick = Math.floor(Math.random() * POND), v = vals[pick];
     const box = this.q('.pe-bonus'), zone = this.q('.pe-zone'), water = this.q('.pe-water'), list = this.q('.pe-fishes');
     const range = FISH[k], lo = range[0][0], hi = range[range.length - 1][0];
-    const size = (x) => Math.round(54 + 70 * (Math.log(x / lo + 1) / Math.log(hi / lo + 1)));
+    const grow = (x) => 0.85 + 0.35 * (Math.log(x / lo + 1) / Math.log(hi / lo + 1)); // bigger multiplier, bigger fish
     this.q('.pe-title').innerHTML = `PÊCHE AU ${NAME[k].toUpperCase()}${L > 1 ? ` · ⚡×${L}` : ''}`;
-    list.innerHTML = vals.map((x, i) => {
-      const sz = size(x), top = 8 + ((i * 37) % 78), dur = (7 + ((i * 13) % 9)) * (1 + sz / 200), del = -((i * 1.7) % dur);
-      return `<div class="pe-fish${x >= 100 ? ' gold' : ''}" data-i="${i}" style="top:${top}%;--w:${sz}px;--dur:${dur.toFixed(1)}s;--del:${del.toFixed(1)}s;--dir:${i % 2 ? -1 : 1}">${fishImg(x >= 100 ? 'gold' : k, 'pe-fimg')}<b>×${xs(x)}</b></div>`;
-    }).join('');
     zone.hidden = true; box.hidden = false;
+    // the pond is drawn with background-size: cover, centred: map each painted ring to the box
+    const bw = box.clientWidth, bh = box.clientHeight, sc = Math.max(bw / POND_W, bh / POND_H);
+    const ox = (bw - POND_W * sc) / 2, oy = (bh - POND_H * sc) / 2;
+    list.innerHTML = vals.map((x, i) => {
+      const [cx, cy, rx] = RINGS[i], w = Math.round(rx * 1.5 * sc * grow(x)), h = Math.round(w * 0.62);
+      const left = Math.round(ox + cx * sc - w / 2), top = Math.round(oy + cy * sc - h * 0.85);
+      return `<div class="pe-fish${x >= 100 ? ' gold' : ''}" data-i="${i}" style="left:${left}px;top:${top}px;--w:${w}px;--del:-${((i * 0.37) % 2.4).toFixed(2)}s;--dir:${cx > POND_W / 2 ? -1 : 1}">${fishImg(x >= 100 ? 'gold' : k, 'pe-fimg')}<b>×${xs(x)}</b></div>`;
+    }).join('');
     box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400 });
     const br = box.getBoundingClientRect();
     if (br.top < 60 || br.bottom > innerHeight - 20) scrollBy({ top: br.top - 70, behavior: 'smooth' });

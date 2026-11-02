@@ -19,6 +19,8 @@ Ce que ça change :
 - le score du Défi de la semaine ne peut que monter et reste plafonné ;
 - chaque code cadeau (page Recharger) ne peut être utilisé qu’une seule fois, par un seul compte ;
 - le chat et les envois de KE entre joueurs sont protégés (voir 1 bis) ;
+- la liste des joueurs en ligne (`presence` : qui joue à quoi en direct, tables multijoueur) : chacun n’écrit que sa ligne ;
+- le classement accepte la machine du plus gros gain / bonus et le look acheté dans la Boutique ;
 - tout le reste de la base est fermé.
 
 ## 1 bis. Chat général et envoi de KE entre joueurs

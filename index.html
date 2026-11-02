@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="8b76ccd19d0592c9459b0fdb1af53b083f52f85e" content="8b76ccd19d0592c9459b0fdb1af53b083f52f85e" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>SpinBet Casino</title>
   <meta name="description" content="SpinBet Casino : machines à sous, roulettes, roue, blackjack, mines, plinko, le casse et crash en argent fictif.">
   <meta name="theme-color" content="#0b0f17">
@@ -65,6 +65,9 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; }
+/* no zoom on phones: quick repeated taps (bet +, spin) must never zoom the page */
+html { touch-action: manipulation; -webkit-text-size-adjust: 100%; }
+* { touch-action: manipulation; }
 body {
   background: var(--bg);
   background-image: radial-gradient(1200px 600px at 80% -10%, rgba(255, 35, 64, .10), transparent 60%),
@@ -3207,6 +3210,21 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pe-fish.gold .pe-fimg { filter: drop-shadow(0 0 8px rgba(253, 224, 71, .9)); }
 .pe-fish.gold > b { color: #fde047; }
 @media (max-width: 600px) { .g-peche .pe-fisher { width: 76px; bottom: -16px; } .pe-ico { width: 46px; } }
+/* the pond as a normal game scene: the whole painting is visible, the fisherman stands in the shallows on the left,
+   one fish waits in each painted ring (positions set by games/peche.js) */
+.g-peche .pe-bonus { aspect-ratio: 1600 / 729; max-width: 900px; background: #0e3b3a url(assets/games/peche/pond.webp?v=1) center / cover no-repeat; }
+.g-peche .pe-sky { position: absolute; inset: 0; height: auto; z-index: 3; pointer-events: none; background: none; }
+.g-peche .pe-water { position: absolute; inset: 0; height: auto; background: none; overflow: visible; }
+.g-peche .pe-fishes { inset: 0; }
+.g-peche .pe-fisher { left: 1.5%; top: 4%; bottom: auto; width: auto; height: 50%; aspect-ratio: 330 / 453; }
+.g-peche .pe-title { left: 16%; right: 4%; top: 3%; white-space: nowrap; font-size: clamp(13px, 2.6vw, 26px); text-shadow: 0 2px 0 #0c4a6e, 0 0 14px rgba(0, 0, 0, .8); }
+.g-peche .pe-say { bottom: auto; top: 15%; font-size: clamp(11px, 2vw, 14px); padding: 4px 12px; }
+.g-peche .pe-fish { animation: peBob 2.4s ease-in-out var(--del) infinite alternate; }
+.g-peche .pe-fish.hooked, .g-peche .pe-fish.caught { animation: none; }
+.g-peche .pe-fish.caught { animation: peCaught .6s cubic-bezier(.3, 1.6, .5, 1) forwards; }
+.g-peche .pe-hook { width: 1.4%; height: 7%; min-width: 8px; margin: -2px 0 0 -0.7%; }
+@keyframes peBob { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-6%) rotate(2deg); } }
+@media (max-width: 600px) { .g-peche .pe-bonus { aspect-ratio: 1.8; } .g-peche .pe-fisher { width: auto; height: 50%; left: 0; top: 4%; } .g-peche .pe-title { left: 18%; right: 2%; font-size: 13px; letter-spacing: 1px; } .g-peche .pe-say { top: 14%; font-size: 10px; line-height: 1.25; padding: 2px 8px; max-width: 70%; } .g-peche .pe-fish > b { font-size: 10px; } }
 
 /* ============ La Roue d’Or ============ */
 .g-roueor { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(251, 191, 36, .25), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(75, 85, 99, .35), transparent 70%), linear-gradient(180deg, #14110a 0%, #06070b 100%); }
@@ -4036,7 +4054,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
 <symbol id="c-huff" viewBox="0 0 120 160"><path d="M4 68 Q28 60 50 68 M8 84 Q32 76 56 84 M4 100 Q28 92 50 100" stroke="#fff" stroke-opacity=".65" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="92" y="62" width="7" height="14" fill="#8a2a22" stroke="#fff" stroke-width="1.5"/><path d="M70 98 L92 74 L114 98 Z" fill="#8a2a22" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><rect x="75" y="98" width="34" height="34" fill="#d9573f" stroke="#fff" stroke-width="2"/><path d="M75 106 H109 M75 114 H109 M75 122 H109 M84 98 V106 M100 106 V114 M88 114 V122" stroke="#ffd0c0" stroke-opacity=".6" stroke-width="1.3" fill="none"/><rect x="86" y="112" width="10" height="20" rx="1.5" fill="#5a2f14" stroke="#fff" stroke-width="1.2"/><path d="M14 22 L26 44 L52 44 L64 22 L68 60 Q68 82 40 84 Q12 82 12 60 Z" fill="#cfd8e0" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><ellipse cx="40" cy="68" rx="14" ry="10" fill="#fff"/><ellipse cx="40" cy="62" rx="4.6" ry="3.4" fill="#111"/><path d="M26 54 Q32 48 38 55 Q32 58 26 54Z M54 54 Q48 48 42 55 Q48 58 54 54Z" fill="#ffd23f" stroke="#111" stroke-width="1.5"/><path d="M26 47 L38 51 M54 47 L42 51" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M32 72 Q40 78 48 72" fill="#7a1220" stroke="#111" stroke-width="1.4"/><g fill="#d9573f" stroke="#fff" stroke-width="1.8"><rect x="12" y="116" width="26" height="14" rx="3"/><rect x="30" y="134" width="26" height="14" rx="3"/></g><g font-family="KeCoin,Georgia,serif" font-weight="900" font-size="9" fill="#fff" text-anchor="middle"><text x="25" y="126">×5</text><text x="43" y="144">×12</text></g><rect x="6" y="148" width="108" height="3" fill="none"/></symbol>
 <symbol id="c-avion" viewBox="0 0 120 160"><path d="M10 142 H112 M10 142 V22" stroke="#fff" stroke-opacity=".5" stroke-width="2" fill="none"/><path d="M12 138 C40 134 70 112 98 42" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="1 7" stroke-linecap="round"/><g transform="translate(98 40) rotate(-35)"><path d="M-14 6 L16 -4 L-4 16 L-6 8 Z M-6 8 L16 -4" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></g><rect x="6" y="6" width="70" height="28" rx="14" fill="#fff" fill-opacity=".92"/><text x="41" y="26" text-anchor="middle" font-family="KeCoin,Georgia,serif" font-weight="900" font-size="17" fill="#c4132f">×12,4</text></symbol>
 </svg>
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ui-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v12h14V9"/><path d="M10 21v-6h4v6"/></symbol><symbol id="ui-slots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><rect x="3" y="5" width="18" height="14"/><path d="M9 5v14M15 5v14M3 12h18"/></symbol><symbol id="ui-tables" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M12 3v6.5M12 14.5V21M3 12h6.5M14.5 12H21"/></symbol><symbol id="ui-quick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol><symbol id="ui-ach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="12" cy="15" r="6"/><path d="M8.6 10 6 3h4l2 5.2L14 3h4l-2.6 7"/></symbol><symbol id="ui-missions" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol><symbol id="ui-wheel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 8h18v4H3zM5 12v9h14v-9M12 8v13"/><path d="M12 8 8 3M12 8l4-5"/></symbol><symbol id="ui-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M5 22V3"/><path d="M5 4h14l-3 4.5 3 4.5H5"/></symbol><symbol id="ui-vip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 7l4.5 4L12 4l4.5 7L21 7l-2 12H5z"/></symbol><symbol id="ui-top" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 15v3M8 21h8v-3H8z"/></symbol><symbol id="ui-refill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 7h18v13H3z"/><path d="M5 7 16 3v4"/><path d="M15 11.5h6v5h-6z"/></symbol><symbol id="ui-ref" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/></symbol><symbol id="ui-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v9h14v-9"/></symbol><symbol id="ui-app" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M6 2h12v20H6z"/><path d="M10.5 18h3"/></symbol><symbol id="ui-resp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="ui-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 6h18M3 12h18M3 18h18"/></symbol><symbol id="ui-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 4h18v13H8l-5 4z"/><path d="M7.5 9h9M7.5 12.5h6"/></symbol></svg>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ui-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v12h14V9"/><path d="M10 21v-6h4v6"/></symbol><symbol id="ui-slots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><rect x="3" y="5" width="18" height="14"/><path d="M9 5v14M15 5v14M3 12h18"/></symbol><symbol id="ui-tables" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M12 3v6.5M12 14.5V21M3 12h6.5M14.5 12H21"/></symbol><symbol id="ui-quick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol><symbol id="ui-ach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="12" cy="15" r="6"/><path d="M8.6 10 6 3h4l2 5.2L14 3h4l-2.6 7"/></symbol><symbol id="ui-missions" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol><symbol id="ui-wheel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 8h18v4H3zM5 12v9h14v-9M12 8v13"/><path d="M12 8 8 3M12 8l4-5"/></symbol><symbol id="ui-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M5 22V3"/><path d="M5 4h14l-3 4.5 3 4.5H5"/></symbol><symbol id="ui-vip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 7l4.5 4L12 4l4.5 7L21 7l-2 12H5z"/></symbol><symbol id="ui-top" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 15v3M8 21h8v-3H8z"/></symbol><symbol id="ui-refill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 7h18v13H3z"/><path d="M5 7 16 3v4"/><path d="M15 11.5h6v5h-6z"/></symbol><symbol id="ui-ref" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/></symbol><symbol id="ui-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v9h14v-9"/></symbol><symbol id="ui-app" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M6 2h12v20H6z"/><path d="M10.5 18h3"/></symbol><symbol id="ui-resp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="ui-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 6h18M3 12h18M3 18h18"/></symbol><symbol id="ui-shop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M4 8h16l-1.5 13h-13z"/><path d="M8.5 10V6a3.5 3.5 0 0 1 7 0v4"/></symbol><symbol id="ui-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 4h18v13H8l-5 4z"/><path d="M7.5 9h9M7.5 12.5h6"/></symbol></svg>
   <aside class="side">
     <a class="logo" href="#accueil"><span class="logo-mark">S</span><span>SPINBET<em>CASINO</em></span></a>
     <div class="side-label">Jouer</div>
@@ -4056,6 +4074,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
     <div class="side-label">Mon compte</div>
     <nav class="side-nav">
       <a href="#profil" data-nav="vip"><span><svg class="ico"><use href="#ui-vip"/></svg></span>Profil & rangs</a>
+      <a href="#boutique" data-nav="shop"><span><svg class="ico"><use href="#ui-shop"/></svg></span>Boutique<b class="side-new">NEW</b></a>
       <a href="#classement" data-nav="top"><span><svg class="ico"><use href="#ui-top"/></svg></span>Classement</a>
       <a href="#recharger" data-nav="refill"><span><svg class="ico"><use href="#ui-refill"/></svg></span>Recharger</a>
     </nav>
@@ -4104,7 +4123,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
     <a href="#profil" data-nav="vip"><span><svg class="ico"><use href="#ui-vip"/></svg></span>Profil</a>
     <a href="#succes" data-nav="ach"><span><svg class="ico"><use href="#ui-ach"/></svg></span>Succès<b class="side-badge nav-badge" data-ach-badge hidden></b></a>
     <a href="#classement" data-nav="top"><span><svg class="ico"><use href="#ui-top"/></svg></span>Top</a>
-    <a href="#recharger" data-nav="refill"><span><svg class="ico"><use href="#ui-refill"/></svg></span>Recharger</a>
+    <a href="#boutique" data-nav="shop"><span><svg class="ico"><use href="#ui-shop"/></svg></span>Boutique</a>
   </nav>
 
   <script>
@@ -4120,6 +4139,7 @@ const KEY = 'casino_bal';
 const SKEY = 'bling.stats.v3';
 const START = 100000;
 const REFILL_BELOW = 100000; // refill (with 2 ads, 3 times a day) as soon as the balance is under 1 000\u00a0\uE1E0
+const REFILL_TO = 1000000; // … back up to 10 000\u00a0\uE1E0
 
 function readBal() {
   try {
@@ -4194,9 +4214,17 @@ class Wallet extends EventTarget {
     this.cents += Math.round(n * 100);
     this.state.won = round(this.state.won + n);
     if (meta) {
-      this.state.biggest = Math.max(this.state.biggest, n);
-      this.state.history.unshift({ ...meta, amount: round(n), t: Date.now() });
+      const gid = gameNow();
+      if (n > this.state.biggest) { this.state.biggest = n; if (gid) this.state.bestGame = gid; }
+      const entry = { ...meta, gid, amount: round(n), t: Date.now() };
+      this.state.history.unshift(entry);
       this.state.history = this.state.history.slice(0, 30);
+      // the last 15 wins of each game, listed under the game
+      if (gid) {
+        const gh = { ...(this.state.gameHist || {}) };
+        gh[gid] = [{ amount: entry.amount, x: Math.round((meta.x || 0) * 100) / 100, label: meta.game, t: entry.t }, ...(gh[gid] || [])].slice(0, 15);
+        this.state.gameHist = gh;
+      }
     }
     this.save();
     this.dispatchEvent(new CustomEvent('payout', { detail: { amount: n, meta } }));
@@ -4207,7 +4235,17 @@ class Wallet extends EventTarget {
     this.fresh();
     if (n <= (this.state.bestBonus || 0)) return;
     this.state.bestBonus = round(n);
+    const gid = gameNow();
+    if (gid) this.state.bestBonusGame = gid;
     this.save();
+  }
+
+  // Shop purchases: leave the balance without counting as a bet (no XP, no missions, no stats).
+  spend(n) {
+    if (!this.canAfford(n)) return false;
+    this.cents -= Math.round(n * 100);
+    this.save();
+    return true;
   }
 
   // Free credits (daily bonus, level rewards, ads): not counted as winnings, earn no XP.
@@ -4230,7 +4268,7 @@ class Wallet extends EventTarget {
 
   refill() {
     if (!this.canRefill()) return false;
-    this.cents = START;
+    this.cents = REFILL_TO;
     this.save();
     return true;
   }
@@ -4238,12 +4276,13 @@ class Wallet extends EventTarget {
 }
 
 const round = (n) => Math.round(n * 100) / 100;
+const gameNow = () => (location.hash.match(/^#game-([\w-]+)/) || [])[1] || null;
 // The app's play-money currency: the KE (short for kéro).
 // Whole amounts without decimals (1 000 ⓚ), the others with two (12,50 ⓚ).
 const fmt = (n) => { const r = Math.round(n * 100) / 100; return `${r.toLocaleString('fr-FR', { minimumFractionDigits: Number.isInteger(r) ? 0 : 2, maximumFractionDigits: 2 })}\u00a0\uE1E0`; };
 const wallet = new Wallet();
 
-return { START, REFILL_BELOW, round, fmt, wallet };
+return { START, REFILL_BELOW, REFILL_TO, round, fmt, wallet };
 })();
 
 // ---- cloud.js ----
@@ -4346,13 +4385,23 @@ const cloud = {
     return (await init()).db.collection('chat').orderBy('at', 'desc').limit(n)
       .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() })).reverse()), (e) => console.error(e));
   },
-  async sendChat(uid, name, text) {
+  async sendChat(uid, name, text, look) {
     const { db } = await init();
     const now = firebase.firestore.FieldValue.serverTimestamp();
     const b = db.batch();
     b.set(db.collection('chatmeta').doc(uid), { last: now });
-    b.set(db.collection('chat').doc(), { uid, name, text, at: now });
+    b.set(db.collection('chat').doc(), look ? { uid, name, text, at: now, look } : { uid, name, text, at: now });
     await b.commit();
+  },
+  /* ---------- Live presence: presence/{uid} = { name, game, level, look, win, at } ---------- */
+  async setPresence(uid, data) {
+    await (await init()).db.collection('presence').doc(uid).set({ ...JSON.parse(JSON.stringify(data)), at: firebase.firestore.FieldValue.serverTimestamp() });
+  },
+  async clearPresence(uid) { await (await init()).db.collection('presence').doc(uid).delete(); },
+  // Players seen since sinceMs, live: cb(list) on every change. Returns a function that stops listening.
+  async watchPresence(sinceMs, cb) {
+    return (await init()).db.collection('presence').where('at', '>', firebase.firestore.Timestamp.fromMillis(sinceMs)).orderBy('at', 'desc').limit(80)
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ uid: d.id, ...d.data({ serverTimestamps: 'estimate' }) }))), (e) => console.error(e));
   },
   async deleteChat(id) { await (await init()).db.collection('chat').doc(id).delete(); },
   async isAdmin(uid) { try { return (await (await init()).db.collection('admins').doc(uid).get()).exists; } catch { return false; } },
@@ -4562,12 +4611,21 @@ class Profiles extends EventTarget {
       bestBonus: me.stats?.bestBonus || 0,
       updated: Date.now(),
     };
+    // where the records were won, and the look bought in the shop (needs the new Firestore rules: retried without)
+    if (!this.noExtra) {
+      if (me.stats?.bestGame) entry.bestGame = me.stats.bestGame;
+      if (me.stats?.bestBonusGame) entry.bestBonusGame = me.stats.bestBonusGame;
+      const look = __mods['shop.js']?.publicLook?.(me);
+      if (look) entry.look = look;
+    }
     // achievement points (needs the Firestore rules with 'ach'; older rules refuse the field, so retry without it)
     const ach = __mods['achievements.js']?.achievementPoints?.() || 0;
     if (!this.noAch) entry.ach = ach;
     cloud.saveBoard(this.store.current, entry).catch((e) => {
-      if (!('ach' in entry)) return console.error(e);
-      this.noAch = true; delete entry.ach;
+      const extra = ['bestGame', 'bestBonusGame', 'look'].filter((k) => k in entry);
+      if (extra.length) { this.noExtra = true; extra.forEach((k) => delete entry[k]); }
+      else if ('ach' in entry) { this.noAch = true; delete entry.ach; }
+      else return console.error(e);
       cloud.saveBoard(this.store.current, entry).catch((e2) => console.error(e2));
     });
   }
@@ -5188,15 +5246,41 @@ const gifts = {
   },
 };
 
+// The spin is drawn and saved at once (one spin a day), but the reward is only paid once the wheel has stopped
+// (payWheel), so the balance never shows the prize while the wheel is still turning.
+const rewardText = (s, mult = 1, gift) => (s.k === 'ke' ? `+${fmt(s.v * mult)}` : s.k === 'xp' ? `+${s.v * mult} XP` : gift?.label || 'Bonus offert');
 function spinWheel() {
   if (!wheelReady()) return null;
   const i = Math.floor(Math.random() * SEGS.length), s = SEGS[i];
-  let reward;
-  if (s.k === 'ke') { wallet.grant(s.v); reward = `+${fmt(s.v)}`; }
-  else if (s.k === 'xp') { progress.gain(s.v); reward = `+${s.v} XP`; }
-  else { const g = GIFTS[Math.floor(Math.random() * GIFTS.length)]; gifts.add(g); reward = g.label; }
-  profiles.update('wheel', (me) => { me.wheel = { day: dayKey(), seg: i, reward, at: Date.now() }; });
+  const gift = s.k === 'gift' ? GIFTS[Math.floor(Math.random() * GIFTS.length)] : null;
+  const reward = rewardText(s, 1, gift);
+  profiles.update('wheel', (me) => { me.wheel = { day: dayKey(), seg: i, reward, at: Date.now(), paid: false, mult: 1, gift }; });
   return { i, s, reward };
+}
+function payWheel() {
+  const w = profiles.current?.wheel;
+  if (!w || w.paid !== false) return;
+  const s = SEGS[w.seg];
+  profiles.update('wheel', (me) => { me.wheel = { ...me.wheel, paid: true }; });
+  if (s.k === 'ke') wallet.grant(s.v);
+  else if (s.k === 'xp') progress.gain(s.v);
+  else if (w.gift) gifts.add(w.gift);
+}
+// Ads multiply today's wheel prize (KE or XP): one ad → ×5, a second ad → ×15.
+function wheelBoostable(to) {
+  const w = profiles.current?.wheel;
+  if (!w || w.day !== dayKey() || w.paid === false) return false;
+  const s = SEGS[w.seg];
+  if (s.k !== 'ke' && s.k !== 'xp') return false;
+  const cur = w.mult || 1;
+  return to === 5 ? cur === 1 : to === 15 ? cur === 5 : false;
+}
+function boostWheel(to) {
+  if (!wheelBoostable(to)) return 'Plus disponible aujourd’hui';
+  const w = profiles.current.wheel, s = SEGS[w.seg], extra = s.v * (to - (w.mult || 1));
+  if (s.k === 'ke') wallet.grant(extra); else progress.gain(extra);
+  profiles.update('wheel', (me) => { me.wheel = { ...me.wheel, mult: to, reward: rewardText(s, to) }; });
+  return `Roue du jour ×${to} : ${rewardText(s, to)} au total`;
 }
 
 const SEGCOL = { ke: ['#7c3aed', '#4c1d95'], ke2: ['#db2777', '#831843'], xp: ['#0891b2', '#164e63'], gift: ['#16a34a', '#14532d'], small: ['#334155', '#0f172a'], jack: ['#fbbf24', '#b45309'] };
@@ -5229,7 +5313,18 @@ function wheelSVG() {
 </svg>`;
 }
 
+const boostHTML = () => (wheelBoostable(5) ? '<button class="btn primary wh-boost" data-boost="5">▶ Regarde une pub : gain ×5</button>'
+  : wheelBoostable(15) ? '<button class="btn primary wh-boost" data-boost="15">▶ Encore une pub : gain ×15</button>' : '');
+async function boost(to, after) {
+  const { ads } = __mods['ads.js'];
+  const r = await ads.watch(to === 5 ? 'wheel_x5' : 'wheel_x15');
+  toast(r.message, r.ok ? 'ok' : 'warn');
+  if (r.ok) { sfx.bigWin(); fx.confetti(to === 15 ? 140 : 80); fx.coins(to === 15 ? 70 : 40); }
+  after?.();
+}
+
 function renderWheel(root) {
+  payWheel(); // a spin left unpaid (page closed while it was turning)
   const ready = wheelReady(), last = profiles.current?.wheel, gl = gifts.list();
   root.innerHTML = `
     <section class="panel wheel-page${ready ? ' ready' : ''}">
@@ -5240,7 +5335,7 @@ function renderWheel(root) {
         <div class="wh-legend">${[['💰', 'KE', 'ke'], ['⭐', 'XP', 'xp'], ['🎁', 'Bonus offert', 'gift'], ['👑', `Jackpot ${fmt(SEGS.find((x) => x.jackpot).v)}`, 'jack']].map(([i, t, k]) => `<span style="--c:${SEGCOL[k][0]}">${i} ${t}</span>`).join('')}</div>
         <button class="btn primary lg" data-spin ${ready ? '' : 'disabled'}>${ready ? '🎡 Lancer la roue' : `Prochain tour dans <span data-wait></span>`}</button>
         ${!profiles.current ? '<p class="muted small">Connecte-toi ou joue en invité pour tourner la roue.</p>' : ''}
-        ${last && !ready ? `<p class="wh-last">Aujourd’hui : <b>${last.reward}</b></p>` : ''}
+        ${last && !ready ? `<p class="wh-last">Aujourd’hui : <b>${last.reward}</b>${(last.mult || 1) > 1 ? ` <em class="wh-mult">×${last.mult}</em>` : ''}</p>${boostHTML()}` : ''}
         ${gl.length ? `<div class="wh-gifts"><h4>🎁 Tes bonus offerts</h4>${gl.map((g) => `<a class="wh-gift" href="#game-${g.game}">${g.label}<em>Jouer</em></a>`).join('')}<p class="muted small">Ouvre « Bonus & menu » dans le jeu : le bonus y est marqué OFFERT (mise jusqu’à 1\u00a0\uE1E0).</p></div>` : ''}
       </div>
       <div class="wh-stage"><div class="wh-rays"></div>
@@ -5277,18 +5372,25 @@ function renderWheel(root) {
     });
     root.querySelector('.wheel-page').classList.remove('spinning');
     root.querySelector(`.wseg[data-k="${r.i}"]`)?.classList.add('won');
+    payWheel(); // only now: the wheel has stopped
     if (r.s.jackpot || r.s.k === 'gift') { sfx.bigWin(); fx.confetti(120); } else sfx.win();
     fx.coins(r.s.k === 'ke' ? 50 : 24, rot);
     await sleep(700);
-    const ov = el('div', 'modal-back show wh-win', `<div class="modal wh-modal"><div class="wh-burst"></div><div class="wh-big">${segIcon(r.s)}</div><h3>${r.s.jackpot ? 'JACKPOT !' : 'Bravo !'}</h3><p>${r.reward}</p>${r.s.k === 'gift' ? '<p class="muted small">Ouvre « Bonus & menu » dans le jeu pour le lancer gratuitement.</p>' : ''}<button class="btn primary">Super !</button></div>`);
+    const ov = el('div', 'modal-back show wh-win', `<div class="modal wh-modal"><div class="wh-burst"></div><div class="wh-big">${segIcon(r.s)}</div><h3>${r.s.jackpot ? 'JACKPOT !' : 'Bravo !'}</h3><p>${r.reward}</p>${r.s.k === 'gift' ? '<p class="muted small">Ouvre « Bonus & menu » dans le jeu pour le lancer gratuitement.</p>' : ''}${wheelBoostable(5) ? `<button class="btn primary lg wh-boost" data-x="5">▶ Regarde une pub : ${rewardText(r.s, 5)} (×5)</button><button class="btn ghost" data-ok>Non merci</button>` : '<button class="btn primary" data-ok>Super !</button>'}</div>`);
     document.body.appendChild(ov);
-    ov.onclick = (ev) => { if (ev.target === ov || ev.target.closest('button')) { ov.remove(); renderWheel(root); } };
+    const shut = () => { ov.remove(); renderWheel(root); };
+    ov.onclick = async (ev) => {
+      const x = ev.target.closest('[data-x]');
+      if (x) { ov.remove(); await boost(+x.dataset.x); if (root.isConnected) renderWheel(root); return; }
+      if (ev.target === ov || ev.target.closest('[data-ok]')) shut();
+    };
   };
   root.querySelector('[data-spin]').onclick = go;
   root.querySelector('[data-spin2]').onclick = go;
+  root.querySelectorAll('[data-boost]').forEach((b) => { b.onclick = () => { b.disabled = true; boost(+b.dataset.boost, () => { if (root.isConnected) renderWheel(root); }); }; });
 }
 
-return { renderWheel, wheelReady, gifts };
+return { renderWheel, wheelReady, gifts, wheelBoostable, boostWheel };
 })();
 
 // ---- missions.js ----
@@ -5685,8 +5787,7 @@ async function renderChallenge(root) {
           ${!uid() ? '<p class="muted small">En invité, ton record compte pour toi mais n’apparaît pas au classement : crée un compte pour y figurer et être payé.</p>' : ''}
         </div>
       </div>
-      <div class="defi-boards"><div><h4>Classement en direct</h4><ol class="defi-list" data-board><li class="muted">Chargement…</li></ol></div>
-        <div><h4>Top 10 de la semaine dernière</h4><ol class="defi-list" data-prev><li class="muted">Chargement…</li></ol></div></div>
+      <div class="defi-boards defi-one"><div><h4>Classement en direct</h4><ol class="defi-list" data-board><li class="muted">Chargement…</li></ol></div></div>
     </section>`;
   root.querySelectorAll('[data-cat]').forEach((b) => { b.onclick = () => { tab = b.dataset.cat; try { localStorage.setItem('defi_tab', tab); } catch { /* ignore */ } renderChallenge(root); }; });
   const medal = (k) => (k === 0 ? '🥇' : k === 1 ? '🥈' : k === 2 ? '🥉' : `${k + 1}.`);
@@ -5708,12 +5809,8 @@ async function renderChallenge(root) {
     if (boards[cat]?.list) paint(boards[cat].list, null);
     const iv = setInterval(() => { if (!root.querySelector('[data-board]') || tab !== cat) { listeners.delete(onLive); clearInterval(iv); } }, 2000);
   }
-  const ol = root.querySelector('[data-prev]');
-  try {
-    const list = sortB(await cloud.topChallenge(keyOf(cat, prevW), 10));
-    if (ol.isConnected) ol.innerHTML = list.length ? list.map((e, k) => row(e, k, false)).join('') : '<li class="muted">Pas de classement la semaine dernière.</li>';
-    claimChampion();
-  } catch (err) { console.error(err); if (ol.isConnected) ol.innerHTML = '<li class="muted">Classement indisponible pour le moment.</li>'; }
+  // last week's winners are no longer listed; their prizes are still paid automatically
+  claimChampion();
 }
 
 // Share the site, or one game, with the player's referral link when they have an account (their friends then
@@ -5903,13 +6000,15 @@ function renderChip() {
   const p = progress.info(), d = dailyStatus();
   if (chip) {
     chip.style.setProperty('--rk', p.rank.color);
-    chip.innerHTML = `<span class="lvl-ring" style="--p:${(p.pct * 100).toFixed(1)}%"><b>${p.level}</b></span>
-      <span class="me-name"><b>${esc(me.name)}</b><small>${profiles.guest ? 'Non sauvegardé' : p.rank.name}${p.boosted ? ' · ⚡ XP ×2' : ''}</small></span>
+    const look = __mods['shop.js']?.publicLook?.(me), S = __mods['shop.js'];
+    chip.innerHTML = `<span class="lvl-ring" style="--p:${(p.pct * 100).toFixed(1)}%"><b>${p.level}</b></span>${S?.lookHTML?.(look, 'sm') || ''}
+      <span class="me-name"><b ${S?.nameStyle?.(look) || ''}>${esc(me.name)}</b><small>${profiles.guest ? 'Non sauvegardé' : p.rank.name}${p.boosted ? ' · ⚡ XP ×2' : ''}</small></span>
       ${d.ready ? '<i class="gift-dot" title="Bonus du jour disponible">🎁</i>' : ''}`;
   }
   if (side) {
     side.style.setProperty('--rk', p.rank.color);
-    side.innerHTML = `<a class="side-me" href="#profil">${rankBadge(p.rank, 38)}<span><small>${esc(me.name)}</small><b>${p.rank.name} · Niv. ${p.level}</b></span></a>
+    const look = __mods['shop.js']?.publicLook?.(me), S = __mods['shop.js'];
+    side.innerHTML = `<a class="side-me" href="#profil">${S?.lookHTML?.(look, 'md') || rankBadge(p.rank, 38)}<span><small ${S?.nameStyle?.(look) || ''}>${esc(me.name)} ${S?.badgeIcon?.(look) || ''}</small><b>${p.rank.name} · Niv. ${p.level}</b></span></a>
       <div class="progress"><div style="width:${(p.pct * 100).toFixed(1)}%"></div></div>
       <small class="side-xp">${p.level >= 50 ? 'Niveau maximum' : `${Math.floor(p.xp).toLocaleString('fr-FR')} / ${p.need.toLocaleString('fr-FR')} XP`}</small>`;
   }
@@ -6064,9 +6163,16 @@ const { doubleDaily, dailyStatus } = __mods['daily.js'];
 const { adPolicy } = __mods['adpolicy.js'];
 
 const PLACEMENTS = {
-  credits: { label: '+250\u00a0\uE1E0', dailyCap: 20, cooldownMin: 0, reward: () => { wallet.grant(250); return '+250\u00a0\uE1E0 ajoutés'; } },
-  // Refill to START: only under REFILL_BELOW, 3 times a day, after 2 ads of 15 s in a row.
-  refill: { label: 'Recharger à 1 000\u00a0\uE1E0', views: 2, dailyCap: 3, cooldownMin: 0, when: () => wallet.canRefill(), whenMsg: 'Possible seulement sous 1 000\u00a0\uE1E0', reward: () => { wallet.refill(); return 'Solde rechargé à 1 000,00\u00a0\uE1E0'; } },
+  credits: { label: '+500\u00a0\uE1E0', dailyCap: 20, cooldownMin: 0, reward: () => { wallet.grant(500); return '+500\u00a0\uE1E0 ajoutés'; } },
+  // Refill to REFILL_TO (10 000 KE): only under REFILL_BELOW, 3 times a day, after 2 ads of 15 s in a row.
+  refill: { label: 'Recharger à 10 000\u00a0\uE1E0', views: 2, dailyCap: 3, cooldownMin: 0, when: () => wallet.canRefill(), whenMsg: 'Possible seulement sous 1 000\u00a0\uE1E0', reward: () => { wallet.refill(); return 'Solde rechargé à 10 000\u00a0\uE1E0'; } },
+  // Low balance inside a game (under 150 KE): one ad → +1 000 KE.
+  rescue: { label: '+1 000\u00a0\uE1E0', dailyCap: 10, cooldownMin: 0, when: () => wallet.balance < 150, whenMsg: 'Possible seulement sous 150\u00a0\uE1E0', reward: () => { wallet.grant(1000); return '+1 000\u00a0\uE1E0 ajoutés'; } },
+  // Daily wheel: one ad → prize ×5, a second ad → ×15.
+  wheel_x5: { label: 'Roue du jour ×5', dailyCap: 1, cooldownMin: 0, when: () => __mods['wheel.js'].wheelBoostable(5), whenMsg: 'Tourne d’abord la Roue du jour', reward: () => __mods['wheel.js'].boostWheel(5) },
+  wheel_x15: { label: 'Roue du jour ×15', dailyCap: 1, cooldownMin: 0, when: () => __mods['wheel.js'].wheelBoostable(15), whenMsg: 'Regarde d’abord la pub ×5', reward: () => __mods['wheel.js'].boostWheel(15) },
+  // Shop: 3 ads of 15 s in a row → 50 free spins on the slot machine the player chooses (ads.watch('spins50', { game })).
+  spins50: { label: '50 tours offerts', views: 3, dailyCap: 3, cooldownMin: 0, reward: (o) => { const g = o?.game; if (!g) return 'Choisis une machine'; __mods['wheel.js'].gifts.addRounds(g, 50); return `50 tours offerts sur ${__mods['games/index.js'].getGame(g)?.name || 'ta machine'} !`; } },
   daily_x2: { label: 'Doubler mon bonus du jour', dailyCap: 1, cooldownMin: 0, when: () => dailyStatus().canDouble, reward: () => `Bonus du jour doublé : +${doubleDaily()}\u00a0\uE1E0` },
   xp_boost: { label: 'XP ×2 pendant 15 min', dailyCap: 3, cooldownMin: 60, reward: () => { progress.boost(15); return 'XP ×2 activé pendant 15 minutes'; } },
 };
@@ -6131,7 +6237,7 @@ const ads = {
   },
 
   // Plays the ad and grants its reward. Resolves to { ok, message }.
-  async watch(id) {
+  async watch(id, opts) {
     const st = this.status(id);
     if (!st.ok) return { ok: false, message: st.reason };
     let res;
@@ -6150,7 +6256,7 @@ const ads = {
       a.last[id] = Date.now();
       me.ads = a;
     });
-    return { ok: true, message: PLACEMENTS[id].reward() };
+    return { ok: true, message: PLACEMENTS[id].reward(opts) };
   },
 };
 
@@ -6194,10 +6300,11 @@ function renderProfile(root) {
   };
   root.innerHTML = `
     <section class="panel me-hero" style="--rk:${p.rank.color};--rkd:${p.rank.dark}">
-      <div class="me-badge">${rankBadge(p.rank, 96)}</div>
+      <div class="me-badge">${__mods['shop.js']?.lookHTML?.(__mods['shop.js'].publicLook(me), 'xl') || rankBadge(p.rank, 96)}</div>
       <div class="me-main">
         <small class="muted">Profil</small>
-        <h1>${esc(me.name)}</h1>
+        <h1 ${__mods['shop.js']?.nameStyle?.(__mods['shop.js'].publicLook(me)) || ''}>${esc(me.name)}</h1>
+        <div class="me-look">${__mods['shop.js']?.badgeHTML?.(__mods['shop.js'].publicLook(me)) || ''}<a class="btn ghost" href="#boutique">🛍️ Personnaliser mon profil</a></div>
         <div class="me-rank"><b>${p.rank.name}</b><span>Niveau ${p.level}${p.level >= MAX_LEVEL ? ' · MAX' : ''}</span>${p.boosted ? `<span class="boost-tag">⚡ XP ×2 · <em data-boost>${fmtWait(boostLeft)}</em></span>` : ''}</div>
         <div class="xp-bar"><div style="width:${(p.pct * 100).toFixed(1)}%"></div></div>
         <div class="xp-row"><span>${p.level >= MAX_LEVEL ? 'Niveau maximum atteint' : `${n0(p.xp)} / ${n0(p.need)} XP`}</span>${p.level < MAX_LEVEL ? `<span>Niveau ${p.level + 1} : <b>+${fmt(levelReward(p.level + 1))}</b></span>` : ''}</div>
@@ -7254,7 +7361,6 @@ const ORIGINALS = [
   {"id": "anubis", "name": "L’Anubis", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "bling", "name": "La Tour Bling", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "pharaon", "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
-  {"id": "bounty", "name": "Le Récif", "cat": "slot", "tag": "Machine à sous", "sub": "Free spins bounty", "colors": ["#0c93b8", "#0a2a58"], "description": "Gains en groupes sur une petite grille. 3 scatters lancent un bonus de 8 tours, 4 scatters le bonus Bounty de 12 tours avec multiplicateur plus fort.", "features": ["Gains n’importe où", "Bonus 8 et 12 tours", "Multiplicateur ×2 ou ×5", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
   {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Top Slot, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Top Slot et quatre jeux bonus animés : Pile ou Face, Chasse au Cash, Pachinko et Méga Folie.", "features": ["Top Slot ×2 à ×50", "Pile ou Face", "Chasse au Cash", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
   {"id": "doublespin", "name": "La Double Bille", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
@@ -7870,6 +7976,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'peche', date: '2026-11-02', title: 'L’étang remis en ordre', items: ['Le pêcheur se tient dans l’eau, à la bonne taille', 'Chaque poisson attend dans un des cercles lumineux de l’étang', 'Toute l’image de l’étang est visible, sur ordinateur comme sur téléphone'] },
   { game: 'peche', date: '2026-11-02', title: 'La Pêche en vraies images', items: ['Nouvelle roue : cadre en bois verni, moyeu en engrenage doré, flotteur en guise de pointeur', 'Une salle de casino en fond', 'L’étang peint, de vrais poissons bleu, orange et rouge', 'Le pêcheur attend, puis tire sur sa canne quand ça mord', 'Les plus gros poissons (×100 et plus) sont en or massif !'] },
   { game: 'chasse', date: '2026-11-02', title: 'La Chasse en vraies images', isNew: true, items: ['Nouveaux décors peints : jour, coucher du soleil et nuit', 'Vrais animaux : canards et lapins de profil, faisans, sangliers, cerfs', '5 cartouches et 30 secondes : chaque animal touché révèle un multiplicateur de ×0 à ×100', 'Le cerf doré, rare et très rapide : ×1 000 !', 'Plein écran à l’horizontale sur téléphone et sur ordinateur'] },
   { game: 'taco', date: '2026-11-02', title: 'Nouveau jeu : La Pizza Yo-Yo', isNew: true, items: ['La Fiesta devient La Pizza Yo-Yo : une pizza ronde qui tourne', '4 symboles qui se touchent gagnent, les grosses connexions écartent une part', 'Food trucks multiplicateurs jusqu’à ×50', 'Bonus Le Four : 4 pepperonis = une part de plus et +2 tours'] },
@@ -7972,7 +8079,6 @@ const UPDATES = [
   { game: 'anubis', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   { game: 'bling', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   { game: 'pharaon', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
-  { game: 'bounty', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   { game: 'billets', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   { game: 'dragons', date: '2026-10-31', title: 'Mise réglable dans le menu', items: ['Dans « Bonus & menu », règle ta mise avec − et +', 'Le prix des bonus se met à jour tout de suite'] },
   {
@@ -7994,7 +8100,6 @@ const UPDATES = [
   { game: 'anubis', date: '2026-10-31', title: 'Nouveau nom : L’Anubis', items: ['Anubis Reborn s’appelle maintenant L’Anubis', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'bling', date: '2026-10-31', title: 'Nouveau nom : La Tour Bling', items: ['Bling Tower s’appelle maintenant La Tour Bling', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'pharaon', date: '2026-10-31', title: 'Nouveau nom : Le Totem', items: ['Pharaon Gold s’appelle maintenant Le Totem', 'Nouvelle affiche avec le nouveau nom'] },
-  { game: 'bounty', date: '2026-10-31', title: 'Nouveau nom : Le Récif', items: ['Bounty Reef s’appelle maintenant Le Récif', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'billets', date: '2026-10-31', title: 'Nouveau nom : Le Coffre-Fort', items: ['Coffre aux Billets s’appelle maintenant Le Coffre-Fort', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'dragons', date: '2026-10-31', title: 'Nouveau nom : L’Hydre', items: ['Têtes de Dragon s’appelle maintenant L’Hydre', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'madwheel', date: '2026-10-31', title: 'Nouveau nom : La Roue Folle', items: ['Mad Wheel s’appelle maintenant La Roue Folle', 'Nouvelle affiche avec le nouveau nom'] },
@@ -8150,7 +8255,8 @@ function renderLobby(root, params = {}) {
   };
 
   const body = filter === 'all'
-    ? row('Populaires', ['cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
+    ? '<section class="panel live-now" data-live-now></section>'
+      + row('Populaires', ['cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
       + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
       + row('Roues & tables', ORIGINALS.filter(FILTERS[3].test), 'table')
       + row('Jeux rapides', ORIGINALS.filter(FILTERS[4].test), 'quick')
@@ -10517,7 +10623,6 @@ const FILES = {
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '298b0a4b44'],
-  bounty: ['bounty', 'games/impl/bounty.js', 'BountyGame', 'e276b0390b'],
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '4f7a635766'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
@@ -10541,7 +10646,7 @@ const FILES = {
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '461b177bb0'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', 'e0a1ef57db'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '05d7e5d6e8'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', 'a91ebf3389'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '6f6628b9f9'],
 };
@@ -10590,12 +10695,16 @@ function leaveGame() {
   wallet.sync();
 }
 
+// under each game: the live table / players on this game, and the player's own recent wins on it
+const liveHTML = (game) => `<section class="panel live-game" data-live-game="${game.id}"></section>
+    <section class="panel game-wins"><div class="sec-head"><h2>💰 Mes gains récents sur ${game.name}</h2></div><ol class="gw-list" data-gw="${game.id}"></ol></section>`;
 const dots = (n) => `<span class="dots">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</span>`;
 
 function renderRebuilt(root, game) {
   root.innerHTML = `
     <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-${game.cat}">${game.tag}</a><span>›</span><b>${game.name}</b>${challengeOf(game.id) === 'B' ? '<a class="defi-pill" href="#defi">🏁 Défi de la semaine (bonus achetés) · <span data-leader>100 000\u00a0\uE1E0 au n°1</span></a>' : challengeOf(game.id) ? '<a class="defi-pill" href="#defi">🏁 Jeu du Défi de la semaine · 50 000\u00a0\uE1E0 au n°1</a>' : ''}</nav>
     <div class="game-host"></div>
+${liveHTML(game)}
     <section class="game-about panel">
       <div><h2>${game.name} <small>${game.sub}</small></h2><p class="muted">${game.description}</p>
         <div class="feat-chips">${game.features.map((f) => `<span>${f}</span>`).join('')}</div>
@@ -10638,6 +10747,7 @@ function renderGame(root, { id }) {
   root.innerHTML = `
     <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-slot">Machines à sous</a><span>›</span><b>${game.name}</b></nav>
     <div class="game-host"></div>
+${liveHTML(game)}
     <section class="game-about panel">
       <div><h2>${game.name} <small>${game.subtitle}</small></h2><p class="muted">${game.description}</p>
         <button class="btn primary share-btn" data-share-site="${game.id}" data-share-name="${game.name}">📤 Partager ce jeu</button></div>
@@ -10654,7 +10764,7 @@ return { leaveGame, renderGame };
 
 // ---- pages/account.js ----
 __mods['pages/account.js'] = (() => {
-const { wallet, fmt, START, REFILL_BELOW } = __mods['wallet.js'];
+const { wallet, fmt, REFILL_TO, REFILL_BELOW } = __mods['wallet.js'];
 const { ads, PLACEMENTS } = __mods['ads.js'];
 const { profiles } = __mods['profile.js'];
 const { cloud } = __mods['cloud.js'];
@@ -10716,9 +10826,9 @@ function renderRefill(root) {
     <section class="panel daily">
       <div class="daily-gift${rf.ok ? ' ready' : ''}">💰</div>
       <h1>Recharger mon solde</h1>
-      <p class="muted">Quand ton solde passe <b>sous ${fmt(REFILL_BELOW / 100)}</b>, regarde <b>2 pubs de 15 secondes</b> et ton solde remonte à ${fmt(START / 100)}. Possible <b>${PLACEMENTS.refill.dailyCap} fois par jour</b>.</p>
+      <p class="muted">Quand ton solde passe <b>sous ${fmt(REFILL_BELOW / 100)}</b>, regarde <b>2 pubs de 15 secondes</b> et ton solde remonte à <b>${fmt(REFILL_TO / 100)}</b>. Possible <b>${PLACEMENTS.refill.dailyCap} fois par jour</b>.</p>
       <div class="refill-bal"><small>Solde actuel</small><b>${fmt(wallet.balance)}</b></div>
-      <button class="btn primary lg" data-refill ${rf.ok ? '' : 'disabled'}>${rf.ok ? `▶ 2 pubs · recharger à ${fmt(START / 100)}` : ok ? rf.reason : `Disponible sous ${fmt(REFILL_BELOW / 100)}`}</button>
+      <button class="btn primary lg" data-refill ${rf.ok ? '' : 'disabled'}>${rf.ok ? `▶ 2 pubs · recharger à ${fmt(REFILL_TO / 100)}` : ok ? rf.reason : `Disponible sous ${fmt(REFILL_BELOW / 100)}`}</button>
       <p class="muted small">${rf.left} recharge${rf.left > 1 ? 's' : ''} restante${rf.left > 1 ? 's' : ''} aujourd’hui.</p>
       <div class="sep"></div>
       <button class="btn lg ad-btn" data-ad ${ad.ok ? '' : 'disabled'}>▶ Regarder une pub de 15 s <span>${PLACEMENTS.credits.label}</span></button>
@@ -10876,12 +10986,20 @@ const { fmt } = __mods['wallet.js'];
 const BOARDS = [
   { id: 'level', field: 'levelScore', icon: '👑', label: 'Niveau', value: (e) => `Niv. ${e.level}` },
   { id: 'bal', field: 'bal', icon: '💰', label: 'Solde', value: (e) => fmt(e.bal) },
-  { id: 'best', field: 'best', icon: '💥', label: 'Plus gros gain', value: (e) => fmt(e.best) },
-  { id: 'bonus', field: 'bestBonus', icon: '🎁', label: 'Plus gros bonus', value: (e) => fmt(e.bestBonus) },
+  { id: 'best', field: 'best', icon: '💥', label: 'Plus gros gain', value: (e) => fmt(e.best), game: 'bestGame' },
+  { id: 'bonus', field: 'bestBonus', icon: '🎁', label: 'Plus gros bonus', value: (e) => fmt(e.bestBonus), game: 'bestBonusGame' },
   { id: 'ach', field: 'ach', icon: '🏅', label: 'Succès', value: (e) => `${e.ach} pts` },
 ];
 const TOP = 50;
 const MEDAL = ['🥇', '🥈', '🥉'];
+// the game where the record was won: its cover and name next to the amount
+function gameCell(id) {
+  const { getGame } = __mods['games/index.js'], { coverSVG } = __mods['covers.js'];
+  const g = id && getGame(id);
+  if (!g) return '<span class="lb-game none"></span>';
+  return `<a class="lb-game" href="#game-${g.id}" title="${esc(g.name)}"><span class="lb-gthumb">${coverSVG(g, { square: true, badge: false })}</span><small>${esc(g.name)}</small></a>`;
+}
+const look = (e) => __mods['shop.js']?.lookHTML?.(e.look, 'sm') || '';
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 let tab = 'level';
 try { tab = localStorage.getItem('lb_tab') || tab; } catch { /* ignore */ }
@@ -10908,7 +11026,8 @@ function renderLeaderboard(root) {
         <li class="lb-row${e.uid === me ? ' me' : ''}${i < 3 ? ' podium' : ''}">
           <span class="lb-pos">${MEDAL[i] || i + 1}</span>
           <span class="lb-badge">${rankBadge(rankOf(e.level || 1), 30)}</span>
-          <span class="lb-name"><b class="pname" data-player="${esc(e.uid || '')}" data-pname="${esc(e.name || 'Joueur')}" role="button" tabindex="0">${esc(e.name || 'Joueur')}</b><small>${rankOf(e.level || 1).name}${b.id === 'level' ? '' : ` · Niv. ${e.level || 1}`}</small></span>
+          <span class="lb-name"><b class="pname" data-player="${esc(e.uid || '')}" data-pname="${esc(e.name || 'Joueur')}" role="button" tabindex="0">${look(e)}${esc(e.name || 'Joueur')}</b><small>${rankOf(e.level || 1).name}${b.id === 'level' ? '' : ` · Niv. ${e.level || 1}`}</small></span>
+          ${b.game ? gameCell(e[b.game]) : ''}
           <span class="lb-val">${b.value(e)}</span>
         </li>`).join('') : '<li class="lb-msg">Personne pour l’instant : à toi de jouer !</li>';
     } catch (e) {
@@ -11145,17 +11264,19 @@ const clean = (t) => { let x = t; BAD.forEach((w) => { x = x.replace(new RegExp(
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const hhmm = (ts) => { const d = ts?.toDate ? ts.toDate() : null; return d ? d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''; };
 const me = () => (profiles.online && profiles.current ? { uid: profiles.store.current, name: String(profiles.current.name || 'Joueur').slice(0, 16) } : null);
+const shopLook = (l) => __mods['shop.js']?.lookHTML?.(l, 'xs') || '';
 
-let root, list, stopChat, stopGifts, unread = 0, open = false, admin = false, muted = false, msgs = [], tab = 'chat';
+let root, list, stopChat, stopGifts, unread = 0, open = false, admin = false, muted = false, msgs = [], tab = 'chat', noLook = false;
 
 function mountChat() {
   if (!cloud.enabled || document.querySelector('.ct-fab')) return;
   const fab = el('button', 'ct-fab', '<svg class="ico"><use href="#ui-chat"/></svg><b class="ct-badge" hidden></b>');
   fab.setAttribute('aria-label', 'Chat');
   root = el('div', 'ct-panel', `
-    <div class="ct-head"><div class="ct-tabs"><button data-tab="chat" class="on">💬 Chat</button><button data-tab="send">💸 Envoyer des KE</button></div><button class="ct-x" aria-label="Fermer">✕</button></div>
+    <div class="ct-head"><div class="ct-tabs"><button data-tab="chat" class="on">💬 Chat</button><button data-tab="online">🟢 En ligne <b data-online-count>0</b></button><button data-tab="send">💸 Envoyer</button></div><button class="ct-x" aria-label="Fermer">✕</button></div>
     <div class="ct-body chat"><div class="ct-list"></div>
       <form class="ct-form"><input maxlength="${MAX}" placeholder="Écris un message…" autocomplete="off"><button>Envoyer</button></form></div>
+    <div class="ct-body online" hidden><div class="ct-online" data-online-list></div></div>
     <div class="ct-body send" hidden></div>`);
   document.body.append(fab, root);
   list = root.querySelector('.ct-list');
@@ -11174,7 +11295,7 @@ function toggle(v) {
   open = v; root.classList.toggle('open', v); document.querySelector('.ct-fab').classList.toggle('on', v);
   if (v) { unread = 0; badge(); if (!stopChat) watch(); requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; }); if (tab === 'send') renderSend(); }
 }
-function setTab(t) { tab = t; root.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === t)); root.querySelector('.ct-body.chat').hidden = t !== 'chat'; root.querySelector('.ct-body.send').hidden = t !== 'send'; if (t === 'send') renderSend(); }
+function setTab(t) { tab = t; root.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === t)); root.querySelector('.ct-body.chat').hidden = t !== 'chat'; root.querySelector('.ct-body.online').hidden = t !== 'online'; root.querySelector('.ct-body.send').hidden = t !== 'send'; if (t === 'send') renderSend(); }
 function badge() { const b = document.querySelector('.ct-badge'); b.hidden = !unread; b.textContent = unread > 9 ? '9+' : unread; }
 
 async function watch() {
@@ -11189,7 +11310,7 @@ function renderList() {
   const m = me();
   const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
   list.innerHTML = msgs.length ? msgs.map((x) => `<div class="ct-msg${m && x.uid === m.uid ? ' mine' : ''}">
-      <button class="ct-name" data-uid="${esc(x.uid)}" data-name="${esc(x.name)}" data-id="${esc(x.id)}">${esc(x.name)}</button><span class="ct-time">${hhmm(x.at)}</span>
+      ${shopLook(x.look)}<button class="ct-name" data-uid="${esc(x.uid)}" data-name="${esc(x.name)}" data-id="${esc(x.id)}" ${__mods['shop.js']?.nameStyle?.(x.look) || ''}>${esc(x.name)}</button>${__mods['shop.js']?.badgeIcon?.(x.look) || ''}<span class="ct-time">${hhmm(x.at)}</span>
       <p>${esc(clean(x.text))}</p></div>`).join('') : '<p class="ct-empty">Aucun message pour l’instant. Dis bonjour 👋</p>';
   if (atBottom || m) list.scrollTop = list.scrollHeight;
   const form = root.querySelector('.ct-form'), inp = form.querySelector('input');
@@ -11226,8 +11347,17 @@ async function send() {
   const inp = root.querySelector('.ct-form input'), text = inp.value.trim().replace(/\s+/g, ' ').slice(0, MAX);
   if (!text) return;
   const btn = root.querySelector('.ct-form button'); btn.disabled = true;
-  try { await cloud.sendChat(m.uid, m.name, text); inp.value = ''; }
-  catch (e) { console.error(e); toast(/permission/i.test(e?.message || '') ? 'Doucement : un message toutes les 3 secondes' : 'Message non envoyé, réessaie', 'warn'); }
+  const look = noLook ? null : __mods['shop.js']?.publicLook?.();
+  try {
+    try { await cloud.sendChat(m.uid, m.name, text, look); }
+    catch (e) {
+      // older Firestore rules refuse the look: try once without it (if that works, stop sending it)
+      if (!look || !/permission/i.test(e?.code || e?.message || '')) throw e;
+      await cloud.sendChat(m.uid, m.name, text);
+      noLook = true;
+    }
+    inp.value = '';
+  } catch (e) { console.error(e); toast(/permission/i.test(e?.message || '') ? 'Doucement : un message toutes les 3 secondes' : 'Message non envoyé, réessaie', 'warn'); }
   btn.disabled = false; inp.focus();
 }
 
@@ -11326,6 +11456,373 @@ async function renderSend(toUid, toName) {
 return { mountChat, openPlayer };
 })();
 
+// ---- shop.js ----
+__mods['shop.js'] = (() => {
+// La Boutique (#boutique): the KE won in the games buy a look for the profile (photo de profil, cadre, badge,
+// couleur du pseudo), saved in profile.shop = { owned: [ids], avatar, frame, badge, color }. The look is shown in
+// the header, the side menu, the profile, the chat, the leaderboard and the online players list (short ids only:
+// publicLook()). The shop also gathers the ad offers (+500 KE, 50 free spins for 3 ads, XP ×2…) and the TikTok bonus.
+
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { ads, PLACEMENTS } = __mods['ads.js'];
+const { toast, modal } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+
+// TikTok: paste the account link here. Following it pays TIKTOK_KE once per profile.
+const TIKTOK_URL = '';
+const TIKTOK_KE = 10000;
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+// Photos de profil: an emoji on a painted disc.
+const AVATARS = [
+  { id: 'a-dice', name: 'Les Dés', e: '🎲', bg: ['#ef4444', '#7f1d1d'], price: 1000 },
+  { id: 'a-cherry', name: 'Cerises', e: '🍒', bg: ['#f43f5e', '#881337'], price: 1500 },
+  { id: 'a-clover', name: 'Trèfle', e: '🍀', bg: ['#22c55e', '#14532d'], price: 2500 },
+  { id: 'a-slot', name: 'Machine à sous', e: '🎰', bg: ['#f59e0b', '#7c2d12'], price: 3000 },
+  { id: 'a-card', name: 'Le Joker', e: '🃏', bg: ['#6366f1', '#1e1b4b'], price: 5000 },
+  { id: 'a-fish', name: 'Le Pêcheur', e: '🎣', bg: ['#38bdf8', '#0c4a6e'], price: 5000 },
+  { id: 'a-wolf', name: 'Le Loup', e: '🐺', bg: ['#64748b', '#0f172a'], price: 7500 },
+  { id: 'a-pizza', name: 'Pizza Yo-Yo', e: '🍕', bg: ['#fb923c', '#7c2d12'], price: 7500 },
+  { id: 'a-cool', name: 'Le Boss', e: '😎', bg: ['#facc15', '#a16207'], price: 10000 },
+  { id: 'a-money', name: 'Tête de billet', e: '🤑', bg: ['#4ade80', '#166534'], price: 15000 },
+  { id: 'a-tiger', name: 'Le Tigre', e: '🐯', bg: ['#f97316', '#431407'], price: 20000 },
+  { id: 'a-shark', name: 'Le Requin', e: '🦈', bg: ['#0ea5e9', '#082f49'], price: 25000 },
+  { id: 'a-alien', name: 'Le Cosmique', e: '👽', bg: ['#a855f7', '#2e1065'], price: 35000 },
+  { id: 'a-ninja', name: 'Le Ninja', e: '🥷', bg: ['#334155', '#020617'], price: 50000 },
+  { id: 'a-dragon', name: 'L’Hydre', e: '🐉', bg: ['#16a34a', '#052e16'], price: 75000 },
+  { id: 'a-lion', name: 'Le Roi Lion', e: '🦁', bg: ['#fbbf24', '#78350f'], price: 100000 },
+  { id: 'a-gem', name: 'Diamant', e: '💎', bg: ['#22d3ee', '#164e63'], price: 250000 },
+  { id: 'a-crown', name: 'La Couronne', e: '👑', bg: ['#fde047', '#854d0e'], price: 500000 },
+];
+// Cadres autour de la photo.
+const FRAMES = [
+  { id: 'f-silver', name: 'Argent', price: 2000 },
+  { id: 'f-gold', name: 'Or', price: 10000 },
+  { id: 'f-ruby', name: 'Rubis', price: 20000 },
+  { id: 'f-emerald', name: 'Émeraude', price: 20000 },
+  { id: 'f-neon', name: 'Néon', price: 50000 },
+  { id: 'f-fire', name: 'En feu', price: 100000 },
+  { id: 'f-diamond', name: 'Diamant', price: 250000 },
+  { id: 'f-rainbow', name: 'Arc-en-ciel', price: 1000000 },
+];
+// Badges à côté du pseudo.
+const BADGES = [
+  { id: 'b-lucky', name: 'Chanceux', e: '🍀', price: 2500 },
+  { id: 'b-slots', name: 'Accro des slots', e: '🎰', price: 5000 },
+  { id: 'b-21', name: 'As du 21', e: '🃏', price: 7500 },
+  { id: 'b-fire', name: 'En feu', e: '🔥', price: 10000 },
+  { id: 'b-rocket', name: 'To the moon', e: '🚀', price: 15000 },
+  { id: 'b-shark', name: 'Requin', e: '🦈', price: 25000 },
+  { id: 'b-high', name: 'High Roller', e: '💸', price: 50000 },
+  { id: 'b-vip', name: 'VIP', e: '⭐', price: 100000 },
+  { id: 'b-million', name: 'Millionnaire', e: '💰', price: 1000000 },
+  { id: 'b-king', name: 'Roi du casino', e: '👑', price: 2500000 },
+];
+// Couleur du pseudo.
+const COLORS = [
+  { id: 'c-gold', name: 'Or', css: '#fbbf24', price: 5000 },
+  { id: 'c-red', name: 'Rouge', css: '#ff4d5e', price: 5000 },
+  { id: 'c-cyan', name: 'Cyan', css: '#22d3ee', price: 5000 },
+  { id: 'c-green', name: 'Vert', css: '#4ade80', price: 5000 },
+  { id: 'c-violet', name: 'Violet', css: '#c084fc', price: 10000 },
+  { id: 'c-fire', name: 'Feu', css: 'linear-gradient(90deg,#fde047,#f97316,#ef4444)', grad: true, price: 50000 },
+  { id: 'c-ocean', name: 'Océan', css: 'linear-gradient(90deg,#67e8f9,#3b82f6,#a78bfa)', grad: true, price: 50000 },
+  { id: 'c-rainbow', name: 'Arc-en-ciel', css: 'linear-gradient(90deg,#f87171,#fbbf24,#4ade80,#38bdf8,#c084fc)', grad: true, price: 250000 },
+];
+const KINDS = [
+  { k: 'avatar', list: AVATARS, title: '🖼️ Photos de profil', sub: 'Remplace l’écusson de ton rang par une vraie photo de joueur.' },
+  { k: 'frame', list: FRAMES, title: '💠 Cadres', sub: 'Un cadre autour de ta photo, partout sur le site.' },
+  { k: 'badge', list: BADGES, title: '🏅 Badges', sub: 'Affiché à côté de ton pseudo : dans le chat, le classement et la liste des joueurs en ligne.' },
+  { k: 'color', list: COLORS, title: '🎨 Couleur du pseudo', sub: 'Ton pseudo en couleur pour qu’on te remarque.' },
+];
+const BY_ID = Object.fromEntries(KINDS.flatMap(({ k, list }) => list.map((it) => [it.id, { ...it, kind: k }])));
+
+const state = (me = profiles.current) => ({ owned: [], avatar: null, frame: null, badge: null, color: null, ...(me?.shop || {}) });
+const owns = (id) => state().owned.includes(id);
+
+// The public part of the look: short ids, sent with the leaderboard entry, the chat messages and the presence.
+function publicLook(me = profiles.current) {
+  const s = state(me), o = {};
+  if (s.avatar) o.a = s.avatar; if (s.frame) o.f = s.frame; if (s.badge) o.b = s.badge; if (s.color) o.c = s.color;
+  return Object.keys(o).length ? o : null;
+}
+
+// Avatar bubble (photo + cadre) for a public look; '' when the player has no photo and no frame.
+function lookHTML(look, size = 'sm') {
+  const a = BY_ID[look?.a], f = BY_ID[look?.f];
+  if (!a && !f) return '';
+  const bg = a ? `background:radial-gradient(circle at 35% 30%, ${a.bg[0]}, ${a.bg[1]})` : 'background:#1f191b';
+  return `<span class="lk-av lk-${size}${f ? ` ${f.id}` : ''}" style="${bg}" aria-hidden="true">${a ? a.e : '🙂'}</span>`;
+}
+const badgeHTML = (look) => { const b = BY_ID[look?.b]; return b ? `<span class="lk-badge" title="${esc(b.name)}">${b.e}<i>${esc(b.name)}</i></span>` : ''; };
+const badgeIcon = (look) => { const b = BY_ID[look?.b]; return b ? `<span class="lk-bi" title="${esc(b.name)}">${b.e}</span>` : ''; };
+// style attribute for a coloured pseudo
+function nameStyle(look) {
+  const c = BY_ID[look?.c];
+  if (!c) return '';
+  return c.grad ? `style="background:${c.css};-webkit-background-clip:text;background-clip:text;color:transparent"` : `style="color:${c.css}"`;
+}
+
+function buy(id) {
+  const it = BY_ID[id];
+  if (!it || !profiles.current) return { ok: false, message: 'Connecte-toi d’abord' };
+  if (owns(id)) return { ok: false, message: 'Tu l’as déjà' };
+  if (!wallet.spend(it.price)) return { ok: false, message: `Il te manque ${fmt(it.price - wallet.balance)}` };
+  profiles.update('shop', (me) => { const s = state(me); me.shop = { ...s, owned: [...s.owned, id], [it.kind]: id }; });
+  profiles.publish?.();
+  return { ok: true, message: `${it.name} acheté et équipé !` };
+}
+function equip(id) {
+  const it = BY_ID[id];
+  if (!it || !owns(id)) return;
+  profiles.update('shop', (me) => { const s = state(me); me.shop = { ...s, [it.kind]: s[it.kind] === id ? null : id }; });
+  profiles.publish?.();
+}
+
+/* ---------- page ---------- */
+const SLOT_IDS = () => __mods['games/index.js'].ALL_GAMES.filter((g) => g.cat === 'slot');
+
+function preview(it, kind) {
+  if (kind === 'avatar') return lookHTML({ a: it.id }, 'lg');
+  if (kind === 'frame') return lookHTML({ a: state().avatar || 'a-slot', f: it.id }, 'lg');
+  if (kind === 'badge') return `<span class="sh-badge-big">${it.e}</span>`;
+  return `<b class="sh-color" ${nameStyle({ c: it.id })}>${esc(profiles.current?.name || 'Pseudo')}</b>`;
+}
+
+function renderShop(root) {
+  const me = profiles.current, s = state(), look = publicLook();
+  const adCard = (id, icon, title, text, extra = '') => {
+    const st = ads.status(id);
+    return `<div class="sh-offer"><span class="sh-oi">${icon}</span><div><b>${title}</b><small>${text}</small>${extra}</div>
+      <button class="btn primary" data-ad="${id}" ${st.ok ? '' : 'disabled'}>${st.ok ? `▶ ${PLACEMENTS[id].views > 1 ? `${PLACEMENTS[id].views} pubs` : 'Pub 15 s'}` : st.reason}</button></div>`;
+  };
+  const tk = me?.tiktok;
+  root.innerHTML = `
+    <section class="panel shop-hero">
+      <div class="sh-me">${lookHTML(look || { a: null, f: null }, 'xl') || '<span class="lk-av lk-xl" style="background:#1f191b">🙂</span>'}
+        <div><small class="muted">Ton look</small><h1 ${nameStyle(look)}>${esc(me?.name || 'Invité')}</h1>${badgeHTML(look) || '<span class="muted small">Pas encore de badge</span>'}</div></div>
+      <div class="sh-bal"><small>Ton solde</small><b data-balance>${fmt(wallet.balance)}</b></div>
+    </section>
+    ${me ? '' : '<p class="panel muted">Connecte-toi ou joue en invité pour utiliser la boutique.</p>'}
+    <section class="panel shop-ads">
+      <div class="sec-head"><h2>🎬 Avance plus vite avec les pubs</h2></div>
+      <div class="sh-offers">
+        ${adCard('credits', '💰', `+500 `, 'Une pub de 15 secondes, jusqu’à 20 fois par jour.')}
+        ${adCard('spins50', '🎰', '50 tours offerts', '3 pubs de 15 s d’affilée → 50 tours gratuits sur la machine de ton choix.', `<select class="sh-pick" data-pick>${SLOT_IDS().map((g) => `<option value="${g.id}">${esc(g.name)}</option>`).join('')}</select>`)}
+        ${adCard('xp_boost', '⚡', 'XP ×2 pendant 15 min', 'Monte de niveau deux fois plus vite.')}
+        ${adCard('refill', '🔄', 'Recharge à 10 000 ', '2 pubs, quand ton solde passe sous 1 000 .')}
+        <div class="sh-offer"><span class="sh-oi">🎡</span><div><b>Roue du jour ×5 puis ×15</b><small>Après ton tour gratuit : une pub multiplie ton gain par 5, une deuxième par 15.</small></div><a class="btn primary" href="#roue">Ouvrir la roue</a></div>
+        <div class="sh-offer tiktok"><span class="sh-oi">🎵</span><div><b>Rejoins notre TikTok</b><small>Abonne-toi au TikTok SpinBet et gagne <b>${fmt(TIKTOK_KE)}</b> (une seule fois).</small></div>
+          <button class="btn primary" data-tiktok ${tk || !me ? 'disabled' : ''}>${tk ? '✔ Déjà récupéré' : TIKTOK_URL ? `Rejoindre · +${fmt(TIKTOK_KE)}` : 'Bientôt disponible'}</button></div>
+      </div>
+    </section>
+    ${KINDS.map(({ k, list, title, sub }) => `<section class="panel shop-sec">
+      <div class="sec-head"><h2>${title}</h2></div><p class="muted small">${sub}</p>
+      <div class="sh-grid">${list.map((it) => {
+        const have = s.owned.includes(it.id), on = s[k] === it.id;
+        return `<div class="sh-item${have ? ' have' : ''}${on ? ' on' : ''}"><div class="sh-prev">${preview(it, k)}</div><b>${esc(it.name)}</b>
+          ${have ? `<button class="btn ${on ? '' : 'primary'}" data-equip="${it.id}">${on ? 'Retirer' : 'Équiper'}</button>`
+            : `<button class="btn primary" data-buy="${it.id}" ${me && wallet.balance >= it.price ? '' : 'disabled'}>${fmt(it.price)}</button>`}</div>`;
+      }).join('')}</div></section>`).join('')}`;
+
+  root.querySelectorAll('[data-buy]').forEach((b) => { b.onclick = async () => {
+    const it = BY_ID[b.dataset.buy];
+    const ok = await modal(`<h3>Acheter « ${esc(it.name)} » ?</h3><div class="sh-confirm">${preview(it, it.kind)}</div><p class="muted">Prix : <b>${fmt(it.price)}</b>. Il sera équipé tout de suite.</p><div class="ct-menu"><button class="btn primary" data-value="ok">Acheter</button><button class="btn" data-value="">Annuler</button></div>`);
+    if (ok !== 'ok') return;
+    const r = buy(it.id);
+    toast(r.message, r.ok ? 'ok' : 'warn');
+    if (r.ok) { sfx.unlock(); sfx.bigWin(); fx.confetti(70); }
+    renderShop(root);
+  }; });
+  root.querySelectorAll('[data-equip]').forEach((b) => { b.onclick = () => { equip(b.dataset.equip); sfx.click?.(); renderShop(root); }; });
+  root.querySelectorAll('[data-ad]').forEach((b) => { b.onclick = async () => {
+    b.disabled = true;
+    const id = b.dataset.ad, opts = id === 'spins50' ? { game: root.querySelector('[data-pick]').value } : undefined;
+    const r = await ads.watch(id, opts);
+    toast(r.message, r.ok ? 'ok' : 'warn');
+    if (r.ok) { sfx.unlock(); sfx.win(); fx.coins(40, b); }
+    if (root.isConnected) renderShop(root);
+  }; });
+  root.querySelector('[data-tiktok]')?.addEventListener('click', () => {
+    if (!TIKTOK_URL || !profiles.current || profiles.current.tiktok) return;
+    open(TIKTOK_URL, '_blank', 'noopener');
+    profiles.update('tiktok', (p) => { p.tiktok = Date.now(); });
+    wallet.grant(TIKTOK_KE);
+    sfx.unlock(); sfx.bigWin(); fx.coins(80); fx.confetti(100);
+    toast(`Merci ! +${fmt(TIKTOK_KE)}`, 'ok');
+    renderShop(root);
+  });
+}
+
+return { renderShop, publicLook, lookHTML, badgeHTML, badgeIcon, nameStyle, TIKTOK_URL, TIKTOK_KE };
+})();
+
+// ---- live.js ----
+__mods['live.js'] = (() => {
+// En direct: who is online and what they are playing, in real time (Firestore presence/{uid} = { name, game,
+// level, look, win, at }). Every signed-in account writes its presence when it opens a page or a game, then every
+// minute; a player counts as online for 2 min 30 after their last write.
+// - a ticker tells everyone « babsou78 joue à La Pêche » the moment someone opens a game;
+// - [data-live-now] (home page) lists the players online and their game;
+// - [data-live-game="<id>"] (under a game) shows who plays the same game; on the card tables (Le 21, Le 21
+//   Électrique, Le Texas) and the roulettes (L’Éclair, La Double Bille) it becomes a multiplayer table: up to
+//   6 seats, everyone plays their own hand and sees the other seats' wins live;
+// - [data-gw="<id>"] lists the player's own last wins on that game (wallet.state.gameHist).
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { progress, rankBadge, rankOf } = __mods['progress.js'];
+const { el } = __mods['ui.js'];
+
+const ONLINE_MS = 150000, BEAT_MS = 60000, SEATS = 6;
+const TABLE_GAMES = ['blackjack', 'lightningbj', 'poker', 'storm', 'doublespin'];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const shop = () => __mods['shop.js'];
+const game = (id) => __mods['games/index.js'].getGame(id);
+const gameNow = () => (location.hash.match(/^#game-([\w-]+)/) || [])[1] || '';
+const uid = () => (profiles.online && profiles.current ? profiles.store.current : null);
+const ms = (t) => (t?.toMillis ? t.toMillis() : +t || 0);
+
+let players = [], stop = null, since = 0, lastWin = null, lastSent = '', lastBeat = 0, winT = 0, refused = false, first = true;
+const prev = new Map(); // uid -> { game, winT } of the previous snapshot
+
+/* ---------- my presence ---------- */
+async function beat(force) {
+  const me = uid();
+  if (!me || refused) return;
+  if (document.hidden && !force) return;
+  const g = gameNow();
+  const data = { name: String(profiles.current.name || 'Joueur').slice(0, 16), game: game(g) ? g : '', level: progress.info().level };
+  const look = shop()?.publicLook?.();
+  if (look) data.look = look;
+  if (lastWin && Date.now() - lastWin.t < 120000) data.win = lastWin;
+  const sig = JSON.stringify(data);
+  if (!force && sig === lastSent && Date.now() - lastBeat < BEAT_MS - 2000) return;
+  lastSent = sig; lastBeat = Date.now();
+  try { await cloud.setPresence(me, data); }
+  catch (e) { if (/permission/i.test(e?.code || e?.message || '')) refused = true; console.warn('Présence refusée (règles Firestore à jour ?)', e); }
+}
+const soon = () => { clearTimeout(winT); winT = setTimeout(() => beat(true), 600); };
+
+/* ---------- everyone's presence ---------- */
+async function watch() {
+  if (!cloud.enabled) return;
+  stop?.(); stop = null;
+  since = Date.now() - ONLINE_MS;
+  try { stop = await cloud.watchPresence(since, onList); } catch (e) { console.error(e); }
+}
+function onList(list) {
+  const now = Date.now(), me = uid();
+  players = list.filter((p) => now - ms(p.at) < ONLINE_MS && p.name);
+  // tell everyone when someone opens a game, and table neighbours when someone wins
+  for (const p of players) {
+    const was = prev.get(p.uid);
+    if (!first && p.uid !== me) {
+      if (p.game && (!was || was.game !== p.game)) tick(`${shop()?.badgeIcon?.(p.look) || '🟢'} <b>${esc(p.name)}</b> joue à <a href="#game-${p.game}">${esc(game(p.game)?.name || 'un jeu')}</a> actuellement`);
+      if (p.win && p.game && p.game === gameNow() && ms(p.win.t) !== was?.winT && now - p.win.t < 30000) tick(`💰 <b>${esc(p.name)}</b> gagne ${fmt(p.win.a)}${p.win.x >= 2 ? ` (×${String(p.win.x).replace('.', ',')})` : ''} à ta table !`, true);
+    }
+    prev.set(p.uid, { game: p.game, winT: p.win ? ms(p.win.t) : 0 });
+  }
+  first = false;
+  paint();
+}
+
+/* ---------- ticker « X joue à … » ---------- */
+const queue = [];
+let ticking = false;
+function tick(html, hot) {
+  queue.push({ html, hot });
+  while (queue.length > 3) queue.shift();
+  if (!ticking) nextTick();
+}
+function nextTick() {
+  const it = queue.shift();
+  if (!it || document.body.classList.contains('gated')) { ticking = false; return; }
+  ticking = true;
+  const n = el('div', `live-tick${it.hot ? ' hot' : ''}`, `<span class="live-dot"></span><span>${it.html}</span>`);
+  document.body.appendChild(n);
+  requestAnimationFrame(() => n.classList.add('show'));
+  setTimeout(() => { n.classList.remove('show'); setTimeout(() => { n.remove(); nextTick(); }, 350); }, 4200);
+}
+
+/* ---------- painting ---------- */
+const avatar = (p, size = 'sm') => shop()?.lookHTML?.(p.look, size) || `<span class="lk-av lk-${size} lk-none">${rankBadge(rankOf(p.level || 1), size === 'md' ? 34 : 24)}</span>`;
+const pname = (p) => `<b class="pname" data-player="${esc(p.uid)}" data-pname="${esc(p.name)}" role="button" tabindex="0" ${shop()?.nameStyle?.(p.look) || ''}>${esc(p.name)}</b>${shop()?.badgeIcon?.(p.look) || ''}`;
+
+function nowHTML() {
+  const list = players.slice(0, 14);
+  const playing = players.filter((p) => p.game).length;
+  return `<div class="ln-head"><span class="live-dot"></span><b>${players.length} joueur${players.length > 1 ? 's' : ''} en ligne</b><small>${playing} en train de jouer</small></div>
+    <div class="ln-list">${list.length ? list.map((p) => `<div class="ln-p">${avatar(p)}<span>${pname(p)}<small>${p.game && game(p.game) ? `joue à <a href="#game-${p.game}">${esc(game(p.game).name)}</a>` : 'dans le lobby'}</small></span></div>`).join('')
+      : `<p class="muted small">${cloud.enabled ? 'Personne d’autre pour l’instant : invite tes amis !' : 'Le direct s’active avec les comptes en ligne.'}</p>`}</div>`;
+}
+
+function tableHTML(id) {
+  const g = game(id), me = uid(), here = players.filter((p) => p.game === id);
+  const mine = here.find((p) => p.uid === me), others = here.filter((p) => p.uid !== me);
+  if (!TABLE_GAMES.includes(id)) {
+    return `<div class="lt-head"><span class="live-dot"></span><b>${here.length ? `${here.length} joueur${here.length > 1 ? 's' : ''} sur ${esc(g.name)} en ce moment` : `Personne d’autre sur ${esc(g.name)} pour l’instant`}</b></div>
+      ${others.length ? `<div class="ln-list">${others.slice(0, 10).map((p) => `<div class="ln-p">${avatar(p)}<span>${pname(p)}<small>${winTxt(p) || 'en train de jouer'}</small></span></div>`).join('')}</div>` : ''}`;
+  }
+  const seats = [mine || (me ? { uid: me, name: profiles.current?.name, level: progress.info().level, look: shop()?.publicLook?.(), self: true } : null), ...others].filter(Boolean).slice(0, SEATS);
+  while (seats.length < SEATS) seats.push(null);
+  return `<div class="lt-head"><span class="live-dot"></span><b>🪑 Table multijoueur · ${esc(g.name)}</b><small>${here.length || (me ? 1 : 0)} / ${SEATS} joueurs assis</small></div>
+    <div class="lt-seats">${seats.map((p, i) => (p ? `<div class="lt-seat${p.uid === me ? ' me' : ''}${p.win && Date.now() - p.win.t < 15000 ? ' won' : ''}"><i>Place ${i + 1}</i>${avatar(p, 'md')}<span>${pname(p)}</span><small>${winTxt(p) || (p.uid === me ? 'Toi' : `Niv. ${p.level || 1}`)}</small></div>`
+      : '<div class="lt-seat free"><i>Place libre</i><span class="lk-av lk-md lk-none">＋</span><button class="btn ghost" data-invite>Inviter un ami</button></div>')).join('')}</div>
+    <p class="muted small">Chacun joue sa propre main contre la banque, à la même table : les gains de tous les joueurs assis s’affichent ici en direct.${me ? '' : ' Crée un compte pour t’asseoir à la table.'}</p>`;
+}
+const winTxt = (p) => (p.win && Date.now() - p.win.t < 120000 ? `💰 +${fmt(p.win.a)}${p.win.x >= 2 ? ` ×${String(p.win.x).replace('.', ',')}` : ''}` : '');
+
+function gameWinsHTML(id) {
+  const list = wallet.state.gameHist?.[id] || [];
+  const ago = (t) => { const m = Math.floor((Date.now() - t) / 60000); return m < 1 ? 'à l’instant' : m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.floor(m / 60)} h` : `il y a ${Math.floor(m / 1440)} j`; };
+  return list.length ? list.map((w) => `<li><b>+${fmt(w.amount)}</b>${w.x >= 1.01 ? `<em>×${String(w.x).replace('.', ',')}</em>` : ''}<span>${esc((w.label || '').split(' · ').slice(1).join(' · ') || 'Gain')}</span><small>${ago(w.t)}</small></li>`).join('')
+    : '<li class="muted">Pas encore de gain sur ce jeu : à toi de jouer !</li>';
+}
+
+function paint() {
+  document.querySelectorAll('[data-live-now]').forEach((n) => { n.innerHTML = nowHTML(); });
+  document.querySelectorAll('[data-live-game]').forEach((n) => { n.innerHTML = tableHTML(n.dataset.liveGame); });
+  document.querySelectorAll('[data-online-count]').forEach((n) => { n.textContent = players.length; });
+  document.querySelectorAll('[data-online-list]').forEach((n) => { n.innerHTML = nowHTML(); });
+}
+function paintWins() { document.querySelectorAll('[data-gw]').forEach((n) => { n.innerHTML = gameWinsHTML(n.dataset.gw); }); }
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-invite]')) return;
+  const g = game(gameNow());
+  __mods['social.js'].shareSite?.(g);
+});
+
+function mountLive() {
+  new MutationObserver(() => {
+    if (document.querySelector('[data-live-now]:empty, [data-live-game]:empty, [data-online-list]:empty')) paint();
+    if (document.querySelector('[data-gw]:empty')) paintWins();
+  }).observe(document.getElementById('view'), { childList: true, subtree: true });
+  wallet.addEventListener('change', paintWins);
+  wallet.addEventListener('payout', (e) => {
+    const m = e.detail?.meta;
+    if (!m || !gameNow()) return;
+    lastWin = { a: Math.round(e.detail.amount * 100) / 100, x: Math.round((m.x || 0) * 100) / 100, t: Date.now() };
+    soon();
+  });
+  addEventListener('hashchange', () => setTimeout(() => beat(true), 400));
+  profiles.addEventListener('change', () => { lastSent = ''; refused = false; setTimeout(() => { beat(true); paint(); }, 800); });
+  setInterval(() => beat(true), BEAT_MS);
+  setInterval(watch, 10 * 60000); // the "online since" window moves on
+  setInterval(paint, 30000); // seats and "x min ago" stay fresh
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) beat(true); });
+  addEventListener('pagehide', () => { const me = uid(); if (me && !refused) cloud.clearPresence(me).catch(() => {}); });
+  profiles.ready.then(() => { watch(); beat(true); });
+}
+
+return { mountLive, TABLE_GAMES, online: () => players };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -11364,6 +11861,7 @@ const routes = [
   { re: /^responsable$/, page: (r) => renderResponsible(r), nav: 'resp' },
   { re: /^(appli|application)$/, page: (r) => renderApp(r), nav: 'app' },
   { re: /^roue$/, page: (r) => renderWheel(r), nav: 'wheel' },
+  { re: /^boutique$/, page: (r) => __mods['shop.js'].renderShop(r), nav: 'shop' },
   { re: /^missions$/, page: (r) => renderMissions(r), nav: 'missions' },
   { re: /^(parrainage|parrain-[\w-]+)$/, page: (r) => renderReferral(r), nav: 'ref' },
   { re: /^defi$/, page: (r) => renderChallenge(r), nav: 'defi' },
@@ -11386,8 +11884,8 @@ function route() {
 /* ---------- ads: few, well placed, depending on the player ----------
    Banner: always on the login screen (so A-ADS can check it), never while a game is open, never for players of
    level AD_FREE_LEVEL or more, hidden 30 min after its cross is clicked. Nobody sees ads at all when
-   adPolicy.noAds() (the owner, or a ?nopub device). A player who runs out of tokens is offered a rewarded ad
-   (+250\u00a0\uE1E0) or the 2-ad refill, at most once every 20 min. */
+   adPolicy.noAds() (the owner, or a ?nopub device). A player under 150 KE in a game is offered a rewarded ad
+   (+1 000\u00a0\uE1E0) or the 2-ad refill, at most once every 5 min. */
 function mountAdBar() {
   const AD_FREE_LEVEL = 15, CLOSE_KEY = 'spinbet_adbar_closed', OFFER_KEY = 'spinbet_adoffer';
   const bar = document.getElementById('ad-bar');
@@ -11414,19 +11912,20 @@ function mountAdBar() {
   new MutationObserver(update).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   update();
 
-  // out of tokens: offer a rewarded ad
+  // low balance inside a game (under 150 KE): offer one ad for +1 000 KE (at most once every 5 min)
   wallet.addEventListener('change', () => {
-    if (adPolicy.noAds() || !profiles.current || wallet.balance >= 0.1 || document.querySelector('.ad-offer')) return;
-    if (Date.now() - get(OFFER_KEY) < 20 * 60000 || !ads.status('credits').ok) return;
+    if (!profiles.current || wallet.balance >= 150 || !/^#game-/.test(location.hash) || document.querySelector('.ad-offer')) return;
+    if (Date.now() - get(OFFER_KEY) < 5 * 60000 || !ads.status('rescue').ok) return;
     put(OFFER_KEY, Date.now());
     const card = document.createElement('div');
     card.className = 'ad-offer';
-    card.innerHTML = '<b>Plus de jetons ?</b><p>Regarde une pub de 15 secondes et reçois <b>+250\u00a0\uE1E0</b> tout de suite. Ou recharge à 1 000\u00a0\uE1E0 avec 2 pubs.</p><div><button class="btn primary" data-go>▶ +250\u00a0\uE1E0</button><a class="btn ghost" href="#recharger" data-no>Recharger</a></div>';
+    card.innerHTML = '<b>Solde bas ?</b><p>Regarde une pub de 15 secondes et reçois <b>+1 000\u00a0\uE1E0</b> tout de suite pour continuer à jouer. Ou recharge à 10 000\u00a0\uE1E0 avec 2 pubs.</p><div><button class="btn primary" data-go>▶ +1 000\u00a0\uE1E0</button><a class="btn ghost" href="#recharger" data-no>Recharger</a><button class="btn ghost" data-x>✕</button></div>';
     document.body.appendChild(card);
     card.querySelector('[data-no]').onclick = () => card.remove();
+    card.querySelector('[data-x]').onclick = () => card.remove();
     card.querySelector('[data-go]').onclick = async () => {
       card.remove();
-      const r = await ads.watch('credits');
+      const r = await ads.watch('rescue');
       toast(r.message, r.ok ? 'ok' : 'warn');
     };
   });
@@ -11476,6 +11975,8 @@ function mountPro() {
   // Game cards stay still: no tilt and no scroll-in reveal, so rows only slide sideways.
 }
 
+// iOS ignores user-scalable=no: no pinch zoom (double-tap zoom is off through touch-action: manipulation)
+['gesturestart', 'gesturechange'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }));
 document.querySelector('[data-toggle-side]').onclick = () => document.body.classList.toggle('side-open');
 document.querySelector('.side-scrim').onclick = () => document.body.classList.remove('side-open');
 
@@ -11490,6 +11991,7 @@ mountHud();
 mountLikes();
 mountAdBar();
 __mods['chat.js'].mountChat();
+__mods['live.js'].mountLive();
 registerSW();
 // Starts downloading a game as soon as the player points at (or touches) its card.
 const warm = (e) => { const a = e.target.closest?.('a[href^="#game-"]'); if (a) prefetch(a.getAttribute('href').slice(6)); };
@@ -11508,6 +12010,8 @@ return {  };
      Bouton ✨ en haut à droite pour couper/activer. Respecte "réduire les animations". -->
 <style id="motion-layer-css">
 #ml-bg { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+/* animated backgrounds removed (embers, mouse spotlight, 3D scenery): plain background */
+#ml-bg, #ml-spot, #tl-bg { display: none !important; }
 #ml-fx { position: fixed; inset: 0; z-index: 9998; pointer-events: none; }
 #ml-progress { position: fixed; top: 0; left: 0; height: 2px; width: 100%; z-index: 9999; pointer-events: none; transform-origin: 0 50%; transform: scaleX(0);
   background: linear-gradient(90deg, #ff2340, #fbbf24, #ff2340); box-shadow: 0 0 10px #ff2340; }
@@ -11597,8 +12101,9 @@ body:not(.ml-off) .spin-btn::before { content: ''; position: absolute; inset: -6
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
   const KEY = 'spinbet_motion_off';
-  let off = REDUCED;
-  try { const v = localStorage.getItem(KEY); if (v !== null) off = v === '1'; } catch { /* ignore */ }
+  // no on/off button any more: the effects follow "reduce motion" only, and the animated backgrounds are gone
+  const off = REDUCED;
+  try { localStorage.removeItem(KEY); } catch { /* ignore */ }
   const on = () => !off;
   const rand = (a, b) => a + Math.random() * (b - a);
   const $ = (s, r = document) => r.querySelector(s);
@@ -11607,9 +12112,7 @@ body:not(.ml-off) .spin-btn::before { content: ''; position: absolute; inset: -6
   const tb = document.createElement('button');
   tb.className = 'ml-toggle'; tb.type = 'button';
   const label = () => { tb.title = off ? 'Activer les animations' : 'Couper les animations'; tb.setAttribute('aria-label', tb.title); tb.textContent = off ? '✦' : '✨'; };
-  tb.onclick = () => { off = !off; try { localStorage.setItem(KEY, off ? '1' : '0'); } catch { /* ignore */ } apply(); };
-  $('.top-right')?.appendChild(tb);
-  function apply() { document.body.classList.toggle('ml-off', off); label(); if (on()) startBg(); }
+  function apply() { document.body.classList.toggle('ml-off', off); label(); }
 
   /* ---------- layers ---------- */
   const bg = Object.assign(document.createElement('canvas'), { id: 'ml-bg' });
@@ -11638,7 +12141,7 @@ body:not(.ml-off) .spin-btn::before { content: ''; position: absolute; inset: -6
   let shooters = [], bgRun = false, lastShoot = 0;
   const LIGHT = matchMedia('(max-width: 900px)').matches || /Mobi|Android/i.test(navigator.userAgent);
   let bgSkip = false;
-  function startBg() { if (!LIGHT && !bgRun && on()) { bgRun = true; requestAnimationFrame(bgLoop); } }
+  function startBg() { if (false && !LIGHT && !bgRun && on()) { bgRun = true; requestAnimationFrame(bgLoop); } }
   function bgLoop(t) {
     if (off || document.hidden) { bgRun = false; bgx.clearRect(0, 0, bg.width, bg.height); return; }
     bgSkip = !bgSkip;
@@ -11996,6 +12499,139 @@ h1, h2, h3 { letter-spacing: -.01em; }
 .game-row { overflow-y: hidden; overscroll-behavior-x: contain; touch-action: pan-x pan-y; scroll-snap-type: none; -webkit-overflow-scrolling: touch; padding-top: 2px; }
 @media (hover: none) { .game-card:hover .scene, .game-card:hover .thumb .cover, .game-card:hover .a0 { transform: none; } .game-card:hover .thumb::before { transform: none; } }
 </style>
+<style id="round-accents">
+/* ============ Looks (shop): photo de profil, cadres, badges ============ */
+.lk-av { display: inline-grid; place-items: center; flex: none; border-radius: 50%; line-height: 1; position: relative; box-shadow: 0 0 0 2px rgba(255, 255, 255, .12); vertical-align: middle; }
+.lk-xs { width: 20px; height: 20px; font-size: 12px; margin-right: 4px; }
+.lk-sm { width: 30px; height: 30px; font-size: 17px; }
+.lk-md { width: 42px; height: 42px; font-size: 24px; }
+.lk-lg { width: 64px; height: 64px; font-size: 36px; }
+.lk-xl { width: 96px; height: 96px; font-size: 54px; }
+.lk-none { background: transparent !important; box-shadow: none; }
+.lk-av.f-silver { box-shadow: 0 0 0 3px #e5e7eb, 0 0 0 5px #6b7280; }
+.lk-av.f-gold { box-shadow: 0 0 0 3px #fbbf24, 0 0 0 5px #92400e, 0 0 12px rgba(251, 191, 36, .6); }
+.lk-av.f-ruby { box-shadow: 0 0 0 3px #f43f5e, 0 0 0 5px #881337, 0 0 12px rgba(244, 63, 94, .6); }
+.lk-av.f-emerald { box-shadow: 0 0 0 3px #34d399, 0 0 0 5px #065f46, 0 0 12px rgba(52, 211, 153, .5); }
+.lk-av.f-neon { box-shadow: 0 0 0 2px #22d3ee, 0 0 10px #22d3ee, 0 0 0 4px #f472b6, 0 0 18px #f472b6; }
+.lk-av.f-fire { box-shadow: 0 0 0 3px #f97316, 0 0 14px 2px #ef4444, 0 0 26px #fde047; animation: lkFire 1.4s ease-in-out infinite alternate; }
+.lk-av.f-diamond { box-shadow: 0 0 0 3px #a5f3fc, 0 0 0 5px #0e7490, 0 0 16px #67e8f9, inset 0 0 8px rgba(255, 255, 255, .5); }
+.lk-av.f-rainbow::before { content: ''; position: absolute; inset: -5px; z-index: -1; border-radius: 50%; background: conic-gradient(#f87171, #fbbf24, #4ade80, #38bdf8, #c084fc, #f87171); animation: lkSpin 3s linear infinite; }
+.lk-av.f-rainbow { isolation: isolate; }
+@keyframes lkFire { to { box-shadow: 0 0 0 3px #fde047, 0 0 20px 4px #f97316, 0 0 34px #ef4444; } }
+@keyframes lkSpin { to { transform: rotate(1turn); } }
+.lk-xs.f-silver, .lk-xs.f-gold, .lk-xs.f-ruby, .lk-xs.f-emerald, .lk-xs.f-diamond { box-shadow: 0 0 0 2px var(--fc, #fbbf24); }
+.lk-bi { margin-left: 3px; font-size: .9em; }
+.lk-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 6px; border-radius: 999px; background: rgba(255, 35, 64, .12); border: 1px solid rgba(255, 35, 64, .45); font-size: 14px; }
+.lk-badge i { font-style: normal; font-size: 12px; font-weight: 800; }
+.me-chip .lk-av { margin-left: -4px; }
+.me-look { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 6px 0 10px; }
+.me-look .btn { height: 34px; border-radius: 999px; }
+.side-new { margin-left: auto; padding: 1px 6px; border-radius: 999px; background: #ff2340; color: #fff; font: 800 9px Inter, sans-serif; letter-spacing: 1px; }
+
+/* ============ Boutique ============ */
+.shop-hero { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.sh-me { display: flex; align-items: center; gap: 18px; }
+.sh-me h1 { font-size: clamp(22px, 4vw, 32px); margin: 2px 0 6px; }
+.sh-bal { text-align: right; } .sh-bal small { display: block; color: var(--muted); } .sh-bal b { font: 900 24px KeCoin, Archivo, sans-serif; color: var(--gold); }
+.sh-offers { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.sh-offer { display: grid; grid-template-columns: 44px 1fr; gap: 10px; align-items: center; padding: 12px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); }
+.sh-offer > .btn { grid-column: 1 / -1; border-radius: 999px; }
+.sh-offer b { display: block; } .sh-offer small { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+.sh-oi { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: rgba(255, 35, 64, .12); font-size: 22px; }
+.sh-offer.tiktok .sh-oi { background: linear-gradient(135deg, #25f4ee, #fe2c55); }
+.sh-pick { margin-top: 8px; width: 100%; height: 34px; border-radius: 8px; background: var(--bg-2); color: var(--text); border: 1px solid var(--line); padding: 0 8px; font: inherit; }
+.sh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; margin-top: 10px; }
+.sh-item { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 10px 10px; border-radius: 12px; background: var(--panel-2); border: 1px solid var(--line); text-align: center; }
+.sh-item.have { border-color: rgba(34, 197, 94, .45); }
+.sh-item.on { border-color: #ff2340; box-shadow: 0 0 0 1px #ff2340, 0 0 18px rgba(255, 35, 64, .25); }
+.sh-item b { font-size: 13px; }
+.sh-item .btn { width: 100%; height: 34px; padding: 0 8px; border-radius: 999px; font-size: 13px; }
+.sh-prev { height: 72px; display: grid; place-items: center; }
+.sh-badge-big { font-size: 44px; }
+.sh-color { font: 900 18px Archivo, sans-serif; }
+.sh-confirm { display: grid; place-items: center; padding: 10px; }
+
+/* ============ En direct ============ */
+.live-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 0 rgba(34, 197, 94, .6); animation: liveDot 1.6s infinite; display: inline-block; }
+@keyframes liveDot { 70% { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+.live-now { margin-bottom: 18px; }
+.ln-head, .lt-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.ln-head small, .lt-head small { color: var(--muted); }
+.ln-list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+.ln-p { flex: none; display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); }
+.ln-p > span { display: flex; flex-direction: column; line-height: 1.2; }
+.ln-p b { font-size: 13px; } .ln-p small { font-size: 11.5px; color: var(--muted); } .ln-p small a { color: #ff6b7d; font-weight: 700; }
+.ct-online { padding: 12px; overflow-y: auto; height: 100%; }
+.ct-online .ln-list { flex-direction: column; overflow: visible; }
+.ct-tabs b[data-online-count] { color: #22c55e; }
+.live-tick { position: fixed; left: 16px; bottom: 16px; z-index: 70; display: flex; align-items: center; gap: 10px; max-width: min(420px, calc(100vw - 100px)); padding: 10px 14px; border-radius: 999px;
+  background: rgba(17, 14, 16, .96); border: 1px solid rgba(34, 197, 94, .45); box-shadow: 0 10px 28px rgba(0, 0, 0, .5); font-size: 13.5px; opacity: 0; transform: translateY(12px); transition: opacity .3s, transform .3s; }
+.live-tick.show { opacity: 1; transform: none; }
+.live-tick.hot { border-color: #fbbf24; }
+.live-tick a { color: #ff6b7d; font-weight: 800; }
+body.ad-bar-on .live-tick { bottom: 112px; }
+@media (max-width: 900px) { .live-tick { left: 10px; bottom: calc(76px + env(safe-area-inset-bottom)); } body.ad-bar-on .live-tick { bottom: calc(138px + env(safe-area-inset-bottom)); } }
+body.fs-on .live-tick { display: none; }
+.live-game { margin-top: 14px; }
+.lt-seats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 8px; }
+@media (max-width: 700px) { .lt-seats { grid-template-columns: repeat(3, 1fr); } }
+.lt-seat { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 14px; text-align: center; min-width: 0;
+  background: radial-gradient(circle at 50% 0, rgba(22, 101, 52, .35), transparent 70%), var(--panel-2); border: 1px solid var(--line); }
+.lt-seat i { font-style: normal; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
+.lt-seat > span:not(.lk-av) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.lt-seat small { font-size: 11.5px; color: var(--muted); }
+.lt-seat.me { border-color: #ff2340; }
+.lt-seat.won { border-color: #fbbf24; box-shadow: 0 0 18px rgba(251, 191, 36, .35); }
+.lt-seat.won small { color: var(--gold); font-weight: 800; }
+.lt-seat.free { opacity: .7; border-style: dashed; }
+.lt-seat.free .btn { height: 28px; padding: 0 10px; font-size: 11px; border-radius: 999px; }
+.game-wins { margin-top: 14px; }
+.gw-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.gw-list li { display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: var(--panel-2); }
+.gw-list li.muted { display: block; }
+.gw-list b { font: 800 15px KeCoin, Inter, sans-serif; color: var(--gold); }
+.gw-list em { font-style: normal; font-weight: 800; font-size: 12px; padding: 1px 7px; border-radius: 999px; background: rgba(255, 35, 64, .15); color: #ff6b7d; }
+.gw-list span { color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gw-list small { color: var(--muted); font-size: 12px; }
+.wh-boost { margin-top: 10px; border-radius: 999px; }
+.wh-mult { font-style: normal; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #fbbf24; color: #1a1205; font-weight: 900; }
+.wh-modal .btn + .btn { margin-top: 8px; }
+
+/* leaderboard: the game of the record */
+.lb-game { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 170px; margin-left: auto; color: var(--muted); }
+.lb-game.none { width: 0; }
+.lb-gthumb { width: 38px; height: 38px; flex: none; border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255, 255, 255, .12); }
+.lb-gthumb > * { width: 100%; height: 100%; display: block; object-fit: cover; }
+.lb-game small { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 600px) { .lb-game small { display: none; } .lb-game { max-width: none; } }
+.lb-row:has(.lb-game) { grid-template-columns: 40px 34px 1fr auto auto; }
+@media (max-width: 480px) { .lb-row:has(.lb-game) { grid-template-columns: 30px 30px 1fr auto auto; } }
+.defi-boards.defi-one { grid-template-columns: 1fr; }
+/* ============ Rounded accents: the S logo, the + button, the level, the chat button stand out from the straight UI ============ */
+.logo-mark, body:not(.ml-off) .logo-mark {
+  border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ff6b7d, #e3132f 55%, #8f0014);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, .14), 0 0 0 4px rgba(255, 35, 64, .35), 0 6px 18px rgba(255, 35, 64, .45);
+  font-weight: 900; text-shadow: 0 1px 2px rgba(0, 0, 0, .35);
+}
+.top-refill, .top-wallet .btn.top-refill { border-radius: 999px; }
+.top-wallet { border-radius: 999px; padding-left: 14px; }
+@media (max-width: 900px) { .top-refill { width: 40px; height: 40px; padding: 0 !important; border-radius: 50% !important; } }
+.me-chip { border-radius: 999px; padding-right: 14px; }
+.lvl-ring { box-shadow: 0 0 0 2px rgba(255, 255, 255, .08), 0 0 14px color-mix(in srgb, var(--rk) 55%, transparent); }
+.ct-fab, body .ct-fab { border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ff6b7d, #e3132f 55%, #8f0014); box-shadow: 0 0 0 3px rgba(255, 35, 64, .25), 0 10px 28px rgba(0, 0, 0, .5); }
+.ct-fab:hover { background: radial-gradient(circle at 35% 30%, #ff8090, #f5223d 55%, #a3001a); }
+
+/* ============ Side menu: red section titles framed by thin lines, profile card framed in red ============ */
+.side-label {
+  display: flex; align-items: center; gap: 8px; margin: 16px 6px 6px; color: #ff2340; font-size: 11px; font-weight: 800; letter-spacing: 2px;
+}
+.side-label::before { content: ''; width: 10px; height: 1px; background: #ff2340; flex: none; }
+.side-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255, 35, 64, .7), rgba(255, 35, 64, .05)); }
+.side-nav { border: 1px solid rgba(255, 35, 64, .22); border-left: 2px solid rgba(255, 35, 64, .55); margin: 0 4px; padding: 2px 0; background: rgba(255, 35, 64, .025); }
+.side-nav a + a { border-top: 1px solid rgba(255, 255, 255, .04); }
+.side-vip { border: 1px solid #ff2340 !important; border-radius: 10px !important; margin: 16px 4px 0; background: linear-gradient(180deg, rgba(255, 35, 64, .1), rgba(255, 35, 64, .02)); box-shadow: inset 0 0 0 3px rgba(255, 35, 64, .08), 0 0 18px rgba(255, 35, 64, .12); }
+.side-vip:empty { display: none; }
+</style>
 
 <script>
 addEventListener('DOMContentLoaded', () => {
@@ -12110,7 +12746,6 @@ addEventListener('DOMContentLoaded', () => {
 
   /* ---------- background scene ---------- */
   const cv = Object.assign(document.createElement('canvas'), { id: 'tl-bg' });
-  if (!MOBILE) document.body.prepend(cv);
   let renderer;
   try { renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: !MOBILE, powerPreference: 'low-power' }); } catch { cv.remove(); return; }
   renderer.setPixelRatio(Math.min(MOBILE ? 1.25 : 1.6, devicePixelRatio || 1));
@@ -12182,8 +12817,8 @@ addEventListener('DOMContentLoaded', () => {
     renderer.render(scene, camera);
     requestAnimationFrame(loop);
   }
-  const start = () => { if (!MOBILE && !running && !off() && !document.hidden) { running = true; last = performance.now(); requestAnimationFrame(loop); } };
-  const go = () => { setTheme(themeNow()); start(); };
+  const start = () => { if (false && !MOBILE && !running && !off() && !document.hidden) { running = true; last = performance.now(); requestAnimationFrame(loop); } };
+  const go = () => {}; // 3D background removed (only the big-win coin shower below is kept)
   addEventListener('hashchange', go);
   document.addEventListener('visibilitychange', start);
   new MutationObserver(start).observe(document.body, { attributes: true, attributeFilter: ['class'] });
