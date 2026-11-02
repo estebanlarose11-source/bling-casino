@@ -111,7 +111,7 @@ function startCoins(n = 6, R = Math.random) {
 /* ===END ENGINE */
 
 const BUY_HOLD = 46, BUY_MEGA = 245;
-const IMG_V = 1;
+const IMG_V = 2;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const src = (n) => asset(`assets/games/fortune/${n}.webp`);
 const IMG = ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 'wild', 'coin', 'scatter'];
@@ -123,18 +123,20 @@ const KEY = 'fortune_pots_v1';
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
 const save = (o) => { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch { /* ignore */ } };
 
-// The pot drawn as a heap of gold coins in the bowl: the more it holds (in × the stake), the bigger the heap.
-function heapSVG(x) {
-  const n = x <= 0 ? 0 : Math.min(28, Math.round(3 + Math.sqrt(x) * 3.2));
+// The pot drawn as a heap of gold coins in the bowl (the gold coin of Le Loup, recycled): the more it holds
+// (in × the stake), the bigger the heap.
+const HEAP_COIN = asset('assets/games/wolf/coin.webp');
+function heapHTML(x) {
+  const n = x <= 0 ? 0 : Math.min(26, Math.round(3 + Math.sqrt(x) * 3));
   let s = '', k = 0;
   for (let row = 0; k < n; row++) {
-    const w = Math.max(1, 7 - row);
+    const w = Math.max(1, 6 - row);
     for (let j = 0; j < w && k < n; j++, k++) {
-      const cx = 50 + (j - (w - 1) / 2) * 12 + (row % 2 ? 3 : -3), cy = 92 - row * 7;
-      s += `<g transform="translate(${cx.toFixed(1)} ${cy})"><ellipse rx="7" ry="3.4" fill="#a16207"/><ellipse ry="3.4" rx="7" cy="-1.6" fill="url(#ftCoin)"/><rect x="-1.6" y="-3" width="3.2" height="2.4" fill="#92400e" opacity=".7"/></g>`;
+      const left = 50 + (j - (w - 1) / 2) * 15 + (row % 2 ? 4 : -4), bottom = row * 11, rot = ((k * 37) % 50) - 25;
+      s += `<img src="${HEAP_COIN}" alt="" draggable="false" style="left:${left.toFixed(1)}%;bottom:${bottom}%;transform:translateX(-50%) rotate(${rot}deg) scaleY(${(0.62 + (k % 3) * 0.08).toFixed(2)})">`;
     }
   }
-  return `<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMax meet" aria-hidden="true"><defs><linearGradient id="ftCoin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff7d6"/><stop offset=".45" stop-color="#facc15"/><stop offset="1" stop-color="#b45309"/></linearGradient></defs>${s}</svg>`;
+  return s;
 }
 
 class FortuneGame extends BaseGame {
@@ -148,6 +150,7 @@ class FortuneGame extends BaseGame {
           <div class="ft-bowl"><div class="ft-heap"></div><b class="ft-pot"></b></div>
           <div class="ft-win"><div class="reels-host"></div><div class="ft-rows">${[0, 1, 2].map((r) => `<i data-row="${r}"></i>`).join('')}</div></div>
           <div class="ft-word"></div>
+          <div class="ft-dust">${Array.from({ length: 18 }, (_, k) => `<i style="left:${(k * 53) % 100}%;--dx:${((k * 29) % 60) - 30}px;animation-duration:${6 + (k % 5) * 1.7}s;animation-delay:-${(k * 1.3) % 9}s"></i>`).join('')}</div>
         </div></div>`,
       buys: [
         { id: 'hold', icon: '🪙', label: 'Hold & Spin · 6 pièces', desc: '6 pièces d’or verrouillées, 3 respins · MAJOR et JACKPOT en jeu · lignes ×2 et ×5', cost: (b) => b * BUY_HOLD },
@@ -157,7 +160,7 @@ class FortuneGame extends BaseGame {
     });
     this.vals = {}; this.mul = {};
     this.reels = new Reels(this.q('.reels-host'), {
-      cols: COLS, rows: ROWS, game: this, random: (c) => this.filler(c),
+      cols: COLS, rows: ROWS, game: this, random: (c) => this.filler(c), durK: 1.45,
       art: (v, i) => this.cellArt(v, i),
       cls: (v) => (v === COIN ? 'coin' : v === SCAT ? 'scat' : v === WILD ? 'wild' : v === BLANK ? 'blank' : `n${v}`),
     });
@@ -198,7 +201,7 @@ class FortuneGame extends BaseGame {
     }
     const potEl = this.q('.ft-pot'), heap = this.q('.ft-heap');
     if (potEl) potEl.textContent = me.pot > 0 ? fmtC(me.pot) : '';
-    if (heap) { const h = heapSVG(me.pot / this.bet); if (heap.dataset.h !== h) { heap.dataset.h = h; heap.innerHTML = h; } }
+    if (heap) { const h = heapHTML(me.pot / this.bet); if (heap.dataset.h !== h) { heap.dataset.h = h; heap.innerHTML = h; } }
   }
 
   word(t, cls = '') {
@@ -303,19 +306,7 @@ class FortuneGame extends BaseGame {
     await this.wait(600);
     for (const st of run.steps) {
       if (this.dead) return 0;
-      // empty cells shimmer, then the new coins drop in
-      this.reels.el.classList.add('ft-rolling'); sfx.spin?.();
-      await this.wait(this.turbo ? 380 : 700);
-      this.reels.el.classList.remove('ft-rolling');
-      for (const a of st.add) {
-        this.vals[a.i] = a.v; this.mul[a.i] = a.m;
-        this.reels.set(a.i, COIN);
-        const n = this.reels.cell(a.i);
-        n?.animate([{ transform: 'translateY(-120%) scale(.6)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 380, easing: 'cubic-bezier(.3,1.5,.5,1)' });
-        sfx.coin(); const p = center(n); fx.burst(p.x, p.y, 14, GOLD, 6);
-        if (typeof a.v === 'string') { this.word(a.v === 'jackpot' ? 'JACKPOT !' : 'MAJOR !', a.v); this.flash(a.v === 'jackpot' ? 'rgba(239,68,68,.6)' : 'rgba(34,197,94,.5)'); sfx.jackpot(); this.q(`.ft-jp.${a.v}`)?.classList.add('hot'); await this.wait(900); }
-        await this.wait(this.turbo ? 90 : 180);
-      }
+      await this.respinRoll(st.add);
       if (st.light) await this.lightRow(st.light);
       shown = this.sumNow(b);
       banner(st.left);
@@ -359,6 +350,37 @@ class FortuneGame extends BaseGame {
     await this.celebrate(won, { summary: mega ? 'MÉGA BONUS' : 'HOLD & SPIN', stake: b });
     this.vals = {}; this.mul = {};
     return won;
+  }
+
+  // One respin: every empty cell becomes a little reel of coins and blanks that rolls, then the cells stop one
+  // column after the other, on a new coin (it drops in and shines) or on nothing.
+  async respinRoll(add) {
+    const empties = [];
+    for (let i = 0; i < N; i++) if (!(i in this.vals)) empties.push(i);
+    const strip = Array.from({ length: 8 }, (_, k) => (k % 3 === 1 ? img('coin', 'ft-img ft-coin') : '<i class="ft-dot"></i>')).join('');
+    empties.forEach((i) => { const n = this.reels.cell(i); if (n) n.innerHTML = `<div class="ft-mini"><div class="ft-ministrip" style="animation-delay:-${((i * 0.13) % 0.4).toFixed(2)}s">${strip}${strip}</div></div>`; });
+    sfx.spin?.();
+    const byI = Object.fromEntries(add.map((a) => [a.i, a]));
+    await this.wait(this.turbo ? 300 : 650);
+    for (let c = 0; c < COLS; c++) {
+      for (const i of empties.filter((x) => Math.floor(x / ROWS) === c)) {
+        const a = byI[i];
+        if (a) {
+          this.vals[a.i] = a.v; this.mul[a.i] = a.m;
+          this.reels.set(a.i, COIN);
+          const n = this.reels.cell(a.i);
+          n?.animate([{ transform: 'translateY(-60%)', filter: 'blur(3px)' }, { transform: 'translateY(8%)', filter: 'none', offset: 0.7 }, { transform: 'none' }], { duration: 320, easing: 'ease-out' });
+          n?.classList.add('ft-new'); setTimeout(() => n?.classList.remove('ft-new'), 1200);
+          sfx.coin(); const p = center(n); fx.burst(p.x, p.y, 16, GOLD, 6);
+          if (typeof a.v === 'string') { this.word(a.v === 'jackpot' ? 'JACKPOT !' : 'MAJOR !', a.v); this.flash(a.v === 'jackpot' ? 'rgba(239,68,68,.6)' : 'rgba(34,197,94,.5)'); sfx.jackpot(); this.q(`.ft-jp.${a.v}`)?.classList.add('hot'); await this.wait(900); }
+        } else {
+          this.reels.set(i, BLANK);
+          this.reels.cell(i)?.animate([{ transform: 'translateY(-14%)' }, { transform: 'none' }], { duration: 200, easing: 'ease-out' });
+        }
+      }
+      sfx.reelStop?.(c);
+      await this.wait(this.turbo ? 90 : 190);
+    }
   }
 
   startMul(run, i) { return run.mul[i] ? this.firstOf(run, i) : 1; }

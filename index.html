@@ -8115,6 +8115,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'fortune', date: '2026-11-02', title: 'La Fortune plus vivante', items: ['Symboles recadrés : lettres, dragon, enveloppe, chats, lingots et lanterne bien centrés', 'Rouleaux qui défilent plus longtemps, avec une lueur dorée et un flash à chaque arrêt', 'Pendant le Hold & Spin, chaque case vide est un petit rouleau qui défile', 'Un vrai tas de pièces d’or dans le bol, et de la poussière d’or qui tombe'] },
   { game: 'fortune', date: '2026-11-02', title: 'Nouveau : La Fortune', isNew: true, items: ['Le nouvel an chinois : lanternes, dragon d’or WILD et 243 façons de gagner', 'Les pièces d’or montent dans le bol : le tas de pièces grandit jusqu’au prochain bonus', '6 pièces = HOLD & SPIN, avec les jackpots MAJOR et JACKPOT qui grimpent à chaque spin', 'Des lignes s’allument ×2 ou ×5 pendant le bonus', '4 scatters = MÉGA BONUS : chaque pièce vaut ×2 à ×5'] },
   { game: 'madwheel-online', date: '2026-11-02', title: 'Nouveau : La Roue Folle Online', isNew: true, items: ['La Roue Folle en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'Le Top Slot et les 4 bonus sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
   { game: 'plateau-online', date: '2026-11-02', title: 'Nouveau : Le Plateau Online', isNew: true, items: ['Le Plateau en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'La case Chance et les dés du plateau sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
@@ -10225,8 +10226,8 @@ __mods['core/reels.js'] = (() => {
 const { sfx } = __mods['audio.js'];
 
 class Reels {
-  constructor(host, { cols, rows, art, cls = () => '', random, game }) {
-    Object.assign(this, { cols, rows, art, clsOf: cls, random, game });
+  constructor(host, { cols, rows, art, cls = () => '', random, game, durK = 1 }) {
+    Object.assign(this, { cols, rows, art, clsOf: cls, random, game, durK });
     this.el = document.createElement('div');
     this.el.className = 'rs';
     this.el.style.setProperty('--cols', cols);
@@ -10258,7 +10259,7 @@ class Reels {
 
   async spin(vals, { tease = () => false, onStop = null } = {}) {
     const t = this.game?.turbo;
-    const base = t ? 300 : 620, step = t ? 70 : 160;
+    const base = (t ? 300 : 620) * this.durK, step = (t ? 70 : 160) * this.durK;
     let extra = 0;
     const jobs = [];
     for (let c = 0; c < this.cols; c++) {
@@ -10794,7 +10795,7 @@ const FILES = {
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', 'e23f21079d'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', '0957d49ca3'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
-  fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', '65c2e7e09f'],
+  fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', 'bb85af3fad'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '171e756bb8'],
@@ -13520,8 +13521,23 @@ h1, h2, h3 { letter-spacing: -.01em; }
 .ft-cv.jp { top: auto; bottom: 2%; transform: translateX(-50%); font-size: calc(12cqh / var(--rows)); }
 .ft-m { position: absolute; right: 8%; top: 6%; padding: 0 .35em; border-radius: 3px; background: #dc2626; border: 1px solid #fde68a; font: 900 calc(12cqh / var(--rows)) KeCoin, Archivo, sans-serif; color: #fff; font-style: normal; }
 .rs-cell.blank { background: radial-gradient(circle, rgba(250, 204, 21, .06), transparent 70%); }
-.ft-rolling .rs-cell.blank { animation: ftRoll .35s ease-in-out infinite alternate; }
-@keyframes ftRoll { to { background: radial-gradient(circle, rgba(250, 204, 21, .3), transparent 70%); } }
+.ft-mini { position: absolute; inset: 6%; overflow: hidden; border-radius: 8px; background: linear-gradient(180deg, rgba(0, 0, 0, .55), rgba(60, 10, 0, .35), rgba(0, 0, 0, .55)); box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .35); }
+.ft-ministrip { display: flex; flex-direction: column; align-items: center; animation: ftMini .38s linear infinite; filter: blur(1.5px); }
+.ft-ministrip > * { flex: 0 0 auto; height: calc(84cqh / var(--rows)) !important; display: grid; place-items: center; margin-bottom: 6%; }
+.ft-ministrip .ft-dot { width: 22%; aspect-ratio: 1; border-radius: 50%; background: rgba(250, 204, 21, .18); height: auto !important; margin: 34% 0; }
+@keyframes ftMini { to { transform: translateY(-50%); } }
+.rs-cell.ft-new .ft-img { box-shadow: 0 0 0 3px #fff7d6, 0 0 30px rgba(253, 224, 71, 1); }
+/* La Fortune: livelier reels (gold glow while they spin, a flash when one stops) and gold dust over the scene */
+.g-fortune .rs-reel.spinning { box-shadow: inset 0 0 30px rgba(250, 204, 21, .35), 0 0 18px rgba(250, 204, 21, .25); }
+.g-fortune .rs-reel.spinning .rs-strip { filter: blur(3px) brightness(1.15) saturate(1.2); }
+.g-fortune .rs-reel.landed::after { display: block; content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: linear-gradient(180deg, transparent, rgba(255, 236, 160, .45), transparent); animation: ftLand .45s ease-out forwards; }
+@keyframes ftLand { from { opacity: 1; transform: translateY(-30%); } to { opacity: 0; transform: translateY(30%); } }
+.ft-dust { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.ft-dust i { position: absolute; top: -4%; width: .5cqw; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #fff7d6, #facc15 60%, transparent 70%); opacity: .8; animation: ftDust linear infinite; }
+@keyframes ftDust { to { transform: translate(var(--dx), 110cqh) rotate(360deg); opacity: .1; } }
+.ft-heap img { position: absolute; width: 20%; aspect-ratio: 1; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .5)); }
+.ft-art { container-type: size; }
+@media (prefers-reduced-motion: reduce) { .ft-dust, .ft-ministrip { animation: none; } }
 .rs-cell.counted .ft-img { box-shadow: 0 0 0 3px #fde047, 0 0 22px rgba(253, 224, 71, .9); }
 .ft-rows { position: absolute; inset: 0; display: grid; grid-template-rows: repeat(3, 1fr); pointer-events: none; z-index: 2; }
 .ft-rows i { display: grid; place-items: center; font: 900 6cqw 'Bebas Neue', Impact, sans-serif; color: #fff; font-style: normal; opacity: 0; transition: opacity .2s; }
@@ -13537,7 +13553,6 @@ h1, h2, h3 { letter-spacing: -.01em; }
 @keyframes ftHot { to { transform: scale(1.12); filter: brightness(1.5); } }
 .ft-bowl { position: absolute; left: 43.4%; top: 1%; width: 13.2%; height: 27.3%; }
 .ft-heap { position: absolute; left: 6%; right: 6%; bottom: 31%; height: 70%; }
-.ft-heap svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 6px rgba(253, 224, 71, .6)); }
 .ft-pot { position: absolute; left: 50%; bottom: 5%; transform: translateX(-50%); padding: .1em .5em; border-radius: 3px; background: rgba(60, 10, 0, .75); border: 1px solid #facc15;
   font: 900 1.25cqw KeCoin, Archivo, sans-serif; color: #fde047; white-space: nowrap; }
 .ft-pot:empty { display: none; }
