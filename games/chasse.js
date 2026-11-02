@@ -1,7 +1,7 @@
-// SpinBet Casino · ChasseGame — loaded on demand by games/impl/index.js (index.html).
+// SpinBet Casino · ChasseGame (The Hunt) — loaded on demand by games/impl/index.js (index.html).
 // ---- games/impl/chasse.js ----
 __mods['games/impl/chasse.js'] = (() => {
-// La Chasse: 5×3 slot, 243 ways, with the owner's painted animals (lapin, canard, faisan, sanglier, cerf), card
+// The Hunt (ex-La Chasse): 5×3 slot, 243 ways, with the owner's painted animals (lapin, canard, faisan, sanglier, cerf), card
 // symbols 10 J Q K A, the golden deer WILD and the shotgun cartridge SCATTER. 3 cartridges open the hunt (the
 // field of the old La Chasse) with 3 shots, 4 or 5 cartridges the big hunt with 5 shots, where the golden deer may
 // cross (×500). Every animal hit reveals a multiplier × the bet (×2 to ×250). Tuned by simulation: ≈ 92,6 % for a
@@ -86,10 +86,21 @@ const SHELL = `<svg class="ch-shell" viewBox="0 0 44 100" aria-hidden="true"><de
   <rect x="4" y="86" width="36" height="8" rx="2.5" fill="url(#chBrass)" stroke="#5b3402" stroke-width="1.2"/>
   <circle cx="22" cy="76" r="4.2" fill="#b7791f" stroke="#5b3402" stroke-width="1"/><circle cx="22" cy="76" r="1.6" fill="#fde68a"/>
 </svg>`;
+// card symbols: a carved wooden medallion with a brass rim and a coloured enamel letter
+const CARD_COL = [['#7dd3fc', '#1e3a8a'], ['#86efac', '#14532d'], ['#f9a8d4', '#831843'], ['#fdba74', '#7c2d12'], ['#fde047', '#854d0e']];
+const cardSVG = (v) => { const [a, b] = CARD_COL[v]; return `<svg class="ch-card" viewBox="0 0 100 100" aria-hidden="true"><defs>
+  <radialGradient id="chW${v}" cx=".45" cy=".35" r=".7"><stop offset="0" stop-color="#7a4a20"/><stop offset=".7" stop-color="#4a2a10"/><stop offset="1" stop-color="#2a1606"/></radialGradient>
+  <linearGradient id="chM" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff4c2"/><stop offset=".35" stop-color="#e2a93b"/><stop offset=".65" stop-color="#8a5a12"/><stop offset="1" stop-color="#f6d77a"/></linearGradient>
+  <linearGradient id="chE${v}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".25" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs>
+  <circle cx="50" cy="50" r="45" fill="url(#chW${v})" stroke="url(#chM)" stroke-width="6"/>
+  <circle cx="50" cy="50" r="38" fill="none" stroke="#000" stroke-opacity=".35" stroke-width="1.5"/>
+  <path d="M22 30 Q50 18 78 30" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="5" stroke-linecap="round"/>
+  <text x="50" y="${v === 0 ? 64 : 67}" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-weight="900" font-size="${v === 0 ? 40 : 50}" fill="url(#chE${v})" stroke="#1a0d03" stroke-width="2.5" paint-order="stroke">${CARDS[v]}</text>
+</svg>`; };
 const symArt = (v) => (v === SCAT ? SHELL
   : v === WILD ? `<img class="ch-img gold" src="${src('gold')}" alt="" draggable="false"><b class="ch-wild">WILD</b>`
   : v >= 5 ? `<img class="ch-img" src="${src(ANIMALS[v - 5])}" alt="" draggable="false">`
-  : `<b class="ch-card c${v}">${CARDS[v]}</b>`);
+  : cardSVG(v));
 
 // the hunt field (sprites of the old La Chasse)
 const KINDS = {
@@ -110,7 +121,8 @@ class ChasseGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.chasse, cls: 'ch-slot',
-      stage: `<div class="ch-reels"><div class="reels-host"></div></div>
+      stage: `<div class="ch-logo"><b>THE HUNT</b><span><i>${SHELL}×3</i> la chasse<small> · 3 tirs</small> <em>✦</em> <i>${SHELL}×4</i> grande chasse<small> · 5 tirs</small></span></div>
+        <div class="ch-reels"><i class="ch-corner tl"></i><i class="ch-corner tr"></i><i class="ch-corner bl"></i><i class="ch-corner br"></i><div class="reels-host"></div></div>
         <div class="ht-field" hidden>
           <div class="ht-hud"><span class="ht-shells"></span><span class="ht-time">20<small> s</small></span><span class="ht-sum">×0</span></div>
           <div class="ht-layer"></div><div class="ht-scope">${SCOPE}</div><div class="ht-banner"></div>
@@ -188,7 +200,7 @@ class ChasseGame extends BaseGame {
     const big = shots === 5;
     await this.featureIntro(big ? 'LA GRANDE CHASSE' : 'LA CHASSE', `${shots} cartouches · ${HUNT_S[shots]} secondes · chaque animal touché paie ×2 à ×250 la mise${big ? ' · le cerf doré vaut ×500 !' : ''}`, SHELL);
     if (this.dead) return 0;
-    this.q('.ch-reels').hidden = true; this.field.hidden = false;
+    this.q('.ch-reels').hidden = true; this.q('.ch-logo').hidden = true; this.field.hidden = false;
     this.slotEl.classList.add('in-free', 'ht-on');
     this.focusStage?.();
     this.setTod(Math.floor(Math.random() * 3));
@@ -208,7 +220,7 @@ class ChasseGame extends BaseGame {
     const won = Math.min(Math.round(sum * b), capLeft);
     await this.wait(2400);
     cancelAnimationFrame(this.raf);
-    this.field.hidden = true; this.q('.ch-reels').hidden = false;
+    this.field.hidden = true; this.q('.ch-reels').hidden = false; this.q('.ch-logo').hidden = false;
     this.slotEl.classList.remove('in-free', 'ht-on');
     if (won > 0) { this.win(won, big ? 'Grande chasse' : 'Chasse'); this.setLast(won); }
     await this.celebrate(won, { summary: big ? 'GRANDE CHASSE' : 'LA CHASSE', stake: b });

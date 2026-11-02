@@ -7367,7 +7367,7 @@ const ORIGINALS = [
   {"id": "pileface", "name": "La Pièce", "cat": "quick", "tag": "Instantané", "sub": "Double ou rien, jusqu’à 20 fois", "colors": ["#fbbf24", "#1c1404"], "description": "Une pièce, deux faces, et ton gain qui double à chaque bonne prédiction. Lance la série, choisis Pile ou Face jusqu’à 20 fois d’affilée et encaisse quand tu veux : ×1,92 après un lancer, ×3,84 après deux… et plus d’un million de fois la mise après 20 !", "features": ["Jusqu’à 20 lancers", "Gain doublé à chaque fois", "Encaisse quand tu veux", "Vrai 50/50", "Raccourcis clavier P / F"], "rtp": "96 %", "vol": 4, "max": "×1 006 633"},
   {"id": "robots", "name": "La Course", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
   {"id": "poulet", "name": "Le Poulet", "cat": "quick", "tag": "Instantané", "sub": "Traverse la route, voie après voie", "colors": ["#facc15", "#14200c"], "description": "Aide le poulet à traverser la route ! Chaque voie franchie fait grimper le multiplicateur, mais si une voiture arrive, c’est perdu. Choisis ta difficulté et encaisse quand tu veux.", "features": ["4 difficultés", "Jusqu’à 24 voies", "Encaisse quand tu veux", "Multiplicateur à chaque voie"], "rtp": "96 %", "vol": 4, "max": "×2 041"},
-  {"id": "chasse", "name": "La Chasse", "cat": "slot", "tag": "Machine à sous", "sub": "Cartouches, chasse et cerf doré", "colors": ["#84cc16", "#1a2e05"], "description": "La saison de chasse est ouverte sur 5 rouleaux et 243 façons de gagner ! Lapins, canards, faisans, sangliers et cerfs paient en ligne, le cerf doré est WILD. 3 cartouches de fusil ouvrent la chasse avec 3 tirs, 4 cartouches la grande chasse avec 5 tirs : chaque animal touché paie ×2 à ×250 la mise, et le cerf doré vaut ×500.", "features": ["5 rouleaux · 243 façons", "3 cartouches : la chasse, 3 tirs", "4 cartouches : la grande chasse, 5 tirs", "Animaux ×2 à ×250, cerf doré ×500", "Achat de la chasse"], "rtp": "≈ 92,6 %", "vol": 4, "max": "×5 000"},
+  {"id": "chasse", "name": "The Hunt", "cat": "slot", "tag": "Machine à sous", "sub": "Cartouches, chasse et cerf doré", "colors": ["#84cc16", "#1a2e05"], "description": "The Hunt : la saison de chasse est ouverte sur 5 rouleaux et 243 façons de gagner ! Lapins, canards, faisans, sangliers et cerfs paient en ligne, le cerf doré est WILD. 3 cartouches de fusil ouvrent la chasse avec 3 tirs, 4 cartouches la grande chasse avec 5 tirs : chaque animal touché paie ×2 à ×250 la mise, et le cerf doré vaut ×500.", "features": ["5 rouleaux · 243 façons", "3 cartouches : la chasse, 3 tirs", "4 cartouches : la grande chasse, 5 tirs", "Animaux ×2 à ×250, cerf doré ×500", "Achat de la chasse"], "rtp": "≈ 92,6 %", "vol": 4, "max": "×5 000"},
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Chaque cube posé multiplie ta mise, mais gare aux cubes ratés et aux coups de vent.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Bonus PARFAIT", "Encaisse quand tu veux"], "rtp": "96 % (visée parfaite)", "vol": 4, "max": "×125,8"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
@@ -7748,7 +7748,7 @@ const SPECS = {
     },
   },
   chasse: {
-    bg: ['#2f4a12', '#071006'], light: '#fde047', title: ['LA CHASSE'], font: 'bebas', metal: ['#fff', '#fde68a', '#ca8a04'], tag: 'CERF DORÉ ×1 000', photo: 'assets/games/chasse/cover.webp',
+    bg: ['#2f4a12', '#071006'], light: '#fde047', title: ['THE HUNT'], font: 'bebas', metal: ['#fff', '#fde68a', '#ca8a04'], tag: 'CERF DORÉ ×500', photo: 'assets/games/chasse/cover.webp',
     art: () => '',
   },
   poulet: {
@@ -7965,6 +7965,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'chasse', date: '2026-11-02', title: 'La Chasse s’appelle The Hunt', items: ['Nouveau nom : The Hunt', 'Nouveaux graphismes : grands rouleaux en bois et laiton, logo, médaillons gravés', 'Les symboles gagnants s’illuminent'] },
   { game: 'chasse', date: '2026-11-02', title: 'La Chasse devient une machine à sous', items: ['5 rouleaux, 243 façons de gagner, avec tes animaux peints', 'Nouveau symbole : la cartouche de fusil', '3 cartouches : la chasse avec 3 tirs', '4 cartouches : la grande chasse avec 5 tirs et le cerf doré ×500', 'Multiplicateurs des animaux augmentés : ×2 à ×250 la mise'] },
   { game: 'peche', date: '2026-11-02', title: 'L’étang remis en ordre', items: ['Le pêcheur se tient dans l’eau, à la bonne taille', 'Chaque poisson attend dans un des cercles lumineux de l’étang', 'Toute l’image de l’étang est visible, sur ordinateur comme sur téléphone'] },
   { game: 'peche', date: '2026-11-02', title: 'La Pêche en vraies images', items: ['Nouvelle roue : cadre en bois verni, moyeu en engrenage doré, flotteur en guise de pointeur', 'Une salle de casino en fond', 'L’étang peint, de vrais poissons bleu, orange et rouge', 'Le pêcheur attend, puis tire sur sa canne quand ça mord', 'Les plus gros poissons (×100 et plus) sont en or massif !'] },
@@ -10631,7 +10632,7 @@ const FILES = {
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '171e756bb8'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '200ec4fe09'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'ee4862aacf'],
-  chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', 'ca0a9763cf'],
+  chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', 'b611c9f83b'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', '4b91b43686'],
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
@@ -12745,26 +12746,70 @@ h1, h2, h3 { letter-spacing: -.01em; }
 @media (hover: none) { .game-card:hover .scene, .game-card:hover .thumb .cover, .game-card:hover .a0 { transform: none; } .game-card:hover .thumb::before { transform: none; } }
 </style>
 <style id="round-accents">
-/* ============ La Chasse (machine à sous) ============ */
-.slot.g-chasse.ch-slot > .slot-bg { background: linear-gradient(180deg, rgba(8, 14, 4, .45), rgba(8, 14, 4, .25) 40%, rgba(8, 14, 4, .75)), url(assets/games/chasse/bg-day.webp?v=3) center / cover no-repeat !important; filter: none; }
-.slot.g-chasse.ch-slot.in-free > .slot-bg { filter: brightness(.6) saturate(.8); }
-.g-chasse.ch-slot .slot-stage { position: relative; }
-.ch-reels[hidden], .g-chasse .ht-field[hidden] { display: none !important; }
-.ch-reels { padding: 8px; border-radius: 14px; background: linear-gradient(180deg, rgba(60, 38, 14, .85), rgba(30, 18, 6, .9)); box-shadow: inset 0 0 0 3px #8b5a2b, inset 0 0 0 6px rgba(253, 230, 138, .25), 0 18px 40px rgba(0, 0, 0, .55); }
-.g-chasse .rs-reel { background: linear-gradient(180deg, rgba(254, 243, 199, .1), rgba(120, 80, 30, .18)); border-radius: 8px; }
-.g-chasse .rs-cell { position: relative; display: grid; place-items: center; }
-.ch-img { width: 92%; height: 86%; object-fit: contain; filter: drop-shadow(0 4px 5px rgba(0, 0, 0, .55)); pointer-events: none; user-select: none; }
-.ch-img.gold { filter: drop-shadow(0 0 10px rgba(253, 224, 71, .9)); }
-.ch-wild { position: absolute; bottom: 6%; left: 50%; translate: -50% 0; padding: 0 8px; border-radius: 6px; background: linear-gradient(180deg, #fde047, #ca8a04); color: #3b2503; font: 900 clamp(10px, 2.2vw, 16px)/1.3 Archivo, sans-serif; letter-spacing: 1px; box-shadow: 0 2px 6px rgba(0, 0, 0, .5); }
-.ch-shell { width: 46%; height: 88%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6)); }
+/* ============ The Hunt (ex-La Chasse, machine à sous) ============ */
+.slot.g-chasse.ch-slot > .slot-bg { background: radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(10, 5, 2, .65) 100%), linear-gradient(180deg, rgba(20, 8, 2, .2), rgba(20, 8, 2, .05) 40%, rgba(12, 6, 2, .8)), url(assets/games/chasse/bg-dusk.webp?v=3) center 30% / cover no-repeat !important; filter: none; }
+.slot.g-chasse.ch-slot > .slot-bg::after { display: none; }
+.slot.g-chasse.ch-slot.in-free > .slot-bg { filter: brightness(.55) saturate(.8); }
+.g-chasse.ch-slot .slot-title { display: none !important; }
+.g-chasse.ch-slot .slot-head { margin-bottom: 0; justify-content: center; min-height: 0; }
+.g-chasse.ch-slot > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.g-chasse.ch-slot > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; position: relative; }
+.g-chasse.ch-slot .controls { background: rgba(20, 10, 4, .6); border-color: rgba(253, 230, 138, .2); }
+.g-chasse.ch-slot .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.ch-reels[hidden], .ch-logo[hidden], .g-chasse .ht-field[hidden] { display: none !important; }
+/* logo */
+.ch-logo { display: grid; justify-items: center; gap: 4px; margin: 0 auto 10px; text-align: center; }
+.ch-logo b { font: 900 clamp(34px, 7.5vw, 66px)/.95 Cinzel, Georgia, serif; letter-spacing: 4px;
+  background: linear-gradient(180deg, #fffbe6 0%, #fde68a 30%, #d99a1e 55%, #8a520c 75%, #f6d77a 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 3px 0 #3b1d05) drop-shadow(0 0 18px rgba(251, 146, 60, .55)); }
+.ch-logo span { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 6px; padding: 3px 14px; border-radius: 999px; background: rgba(20, 10, 4, .72); border: 1px solid rgba(253, 230, 138, .35);
+  font: 800 clamp(10px, 1.5vw, 13px)/1.4 KeCoin, Inter, sans-serif; color: #fde68a; letter-spacing: .4px; text-transform: uppercase; }
+.ch-logo i { display: inline-flex; align-items: center; gap: 2px; font-style: normal; color: #fff; }
+.ch-logo i .ch-shell { width: 9px; height: 20px; animation: none; }
+.ch-logo em { font-style: normal; color: #f59e0b; }
+/* the reels: carved wood frame with brass corners */
+.ch-reels { position: relative; padding: clamp(8px, 1.4vw, 14px); border-radius: 18px;
+  background: linear-gradient(180deg, #6b4220, #3d2410 45%, #2a1808); box-shadow: inset 0 0 0 2px #a8702e, inset 0 0 0 5px #2a1606, inset 0 0 0 7px rgba(253, 230, 138, .45), inset 0 2px 20px rgba(0, 0, 0, .6), 0 22px 50px rgba(0, 0, 0, .65), 0 0 40px rgba(251, 146, 60, .18); }
+.ch-corner { position: absolute; z-index: 3; width: 26px; height: 26px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 35% 30%, #fff7cc, #e6ad3a 45%, #7a4a0c 85%); box-shadow: 0 2px 4px rgba(0, 0, 0, .6), inset 0 0 0 2px rgba(0, 0, 0, .25); }
+.ch-corner::after { content: ''; position: absolute; inset: 9px; border-radius: 50%; background: #5a3407; }
+.ch-corner.tl { left: -8px; top: -8px; } .ch-corner.tr { right: -8px; top: -8px; } .ch-corner.bl { left: -8px; bottom: -8px; } .ch-corner.br { right: -8px; bottom: -8px; }
+.g-chasse .rs { aspect-ratio: calc(var(--cols) * 1.3 / var(--rows)); width: min(100%, calc((100vh - var(--chrome) - 40px) * var(--cols) * 1.3 / var(--rows))); gap: 6px; }
+.g-chasse .rs-reel { border-radius: 10px; background: linear-gradient(180deg, rgba(14, 8, 3, .85), rgba(30, 18, 7, .7) 50%, rgba(14, 8, 3, .85)); box-shadow: inset 0 0 0 1px rgba(253, 230, 138, .18), inset 0 0 18px rgba(0, 0, 0, .6); }
+.g-chasse .rs-reel::before, .g-chasse .rs-reel::after { content: ''; position: absolute; left: 0; right: 0; height: 14%; z-index: 4; pointer-events: none; }
+.g-chasse .rs-reel::before { top: 0; background: linear-gradient(rgba(10, 5, 2, .75), transparent); }
+.g-chasse .rs-reel::after { bottom: 0; background: linear-gradient(transparent, rgba(10, 5, 2, .75)); }
+/* every symbol sits on its own tile, lit in its colour */
+.g-chasse .rs-cell { position: relative; display: grid; place-items: center; --tg: rgba(253, 230, 138, .14); }
+.g-chasse .rs-cell::before { content: ''; position: absolute; inset: 5% 5%; z-index: 0; border-radius: 10px;
+  background: radial-gradient(circle at 50% 42%, var(--tg), transparent 68%), linear-gradient(180deg, rgba(255, 240, 210, .06), rgba(0, 0, 0, .25)); box-shadow: inset 0 0 0 1px rgba(253, 230, 138, .1); transition: box-shadow .25s; }
+.g-chasse .rs-cell > * { position: relative; z-index: 1; }
+.g-chasse .rs-cell.a5 { --tg: rgba(74, 222, 128, .32); } .g-chasse .rs-cell.a6 { --tg: rgba(45, 212, 191, .32); } .g-chasse .rs-cell.a7 { --tg: rgba(251, 146, 60, .36); }
+.g-chasse .rs-cell.a8 { --tg: rgba(239, 68, 68, .36); } .g-chasse .rs-cell.a9 { --tg: rgba(192, 132, 252, .38); }
+.g-chasse .rs-cell.wild { --tg: rgba(253, 224, 71, .55); } .g-chasse .rs-cell.scat { --tg: rgba(239, 68, 68, .5); }
+.g-chasse .rs-cell.wild::before { box-shadow: inset 0 0 0 2px rgba(253, 224, 71, .7), 0 0 14px rgba(253, 224, 71, .35); }
+.g-chasse .rs-cell.scat::before { box-shadow: inset 0 0 0 2px rgba(248, 113, 113, .65), 0 0 14px rgba(239, 68, 68, .35); }
+.g-chasse .rs.has-win .rs-cell:not(.win) { filter: brightness(.45) saturate(.6); }
+.g-chasse .rs-cell.win::before { box-shadow: inset 0 0 0 3px #fde047, 0 0 22px rgba(253, 224, 71, .8); animation: chTile .5s ease-in-out infinite alternate; }
+@keyframes chTile { to { box-shadow: inset 0 0 0 3px #fff7c2, 0 0 30px rgba(253, 224, 71, 1); } }
+.g-chasse .rs-cell.win > * { animation: pzWin .45s ease-in-out infinite alternate; }
+.ch-img { width: 94%; height: 88%; object-fit: contain; filter: drop-shadow(0 5px 6px rgba(0, 0, 0, .65)); pointer-events: none; user-select: none; }
+.ch-img.gold { filter: drop-shadow(0 0 8px rgba(253, 224, 71, .9)) drop-shadow(0 0 22px rgba(251, 191, 36, .6)); animation: chGold 2.4s ease-in-out infinite; }
+@keyframes chGold { 50% { filter: drop-shadow(0 0 14px rgba(255, 247, 194, 1)) drop-shadow(0 0 30px rgba(251, 191, 36, .8)); } }
+.ch-wild { position: absolute; bottom: 9%; left: 50%; translate: -50% 0; padding: 1px 10px; border-radius: 6px; background: linear-gradient(180deg, #fff3b0, #f5c518 45%, #b27b06); color: #3b2503;
+  font: 900 clamp(10px, 2vw, 17px)/1.25 Cinzel, Georgia, serif; letter-spacing: 1.5px; box-shadow: 0 2px 6px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 255, 255, .5); }
+.ch-shell { width: 40%; height: 86%; filter: drop-shadow(0 5px 6px rgba(0, 0, 0, .65)) drop-shadow(0 0 10px rgba(239, 68, 68, .45)); }
 .g-chasse .rs-cell.scat .ch-shell { animation: chShell 1.6s ease-in-out infinite; }
-@keyframes chShell { 50% { transform: rotate(-8deg) scale(1.06); } }
-.ch-card { font: 900 clamp(26px, 6vw, 52px)/1 'Bebas Neue', Archivo, sans-serif; letter-spacing: 1px; -webkit-text-stroke: 1.5px #3b2503; paint-order: stroke; text-shadow: 0 3px 0 #3b2503, 0 6px 10px rgba(0, 0, 0, .5); }
-.ch-card.c0 { color: #93c5fd; } .ch-card.c1 { color: #86efac; } .ch-card.c2 { color: #f9a8d4; } .ch-card.c3 { color: #fdba74; } .ch-card.c4 { color: #fde047; }
-.ch-word { position: absolute; left: 50%; top: 45%; z-index: 20; pointer-events: none; opacity: 0; white-space: nowrap; transform: translate(-50%, -50%); font: 900 clamp(30px, 7vw, 72px)/1 'Bebas Neue', Archivo, sans-serif; letter-spacing: 2px; color: #fde68a; text-shadow: 0 4px 0 #7c2d12, 0 0 24px rgba(239, 68, 68, .8); }
-.g-chasse .rs-cell.win { animation: pzWin .45s ease-in-out infinite alternate; }
+@keyframes chShell { 50% { transform: rotate(-8deg) scale(1.08); } }
+.ch-card { width: 74%; height: 74%; filter: drop-shadow(0 5px 6px rgba(0, 0, 0, .6)); }
+.ch-word { position: absolute; left: 50%; top: 50%; z-index: 20; pointer-events: none; opacity: 0; white-space: nowrap; transform: translate(-50%, -50%); font: 900 clamp(32px, 7vw, 76px)/1 Cinzel, Georgia, serif; letter-spacing: 2px;
+  background: linear-gradient(180deg, #fffbe6, #fde68a 35%, #d99a1e 60%, #8a520c); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 4px 0 #3b1d05) drop-shadow(0 0 24px rgba(239, 68, 68, .8)); }
+.g-chasse .ht-field { border-radius: 14px; box-shadow: inset 0 0 0 2px #a8702e, 0 22px 50px rgba(0, 0, 0, .65); }
 .ch-pay { width: 56px; height: 56px; display: grid; place-items: center; position: relative; }
-.ch-pay .ch-img { width: 100%; height: 100%; } .ch-pay .ch-card { font-size: 34px; } .ch-pay .ch-shell { width: 60%; height: 100%; } .ch-pay .ch-wild { font-size: 9px; }
+.ch-pay .ch-img { width: 100%; height: 100%; }
+.ch-pay .ch-card { width: 50px; height: 50px; } .ch-pay .ch-shell { width: 45%; height: 100%; } .ch-pay .ch-wild { font-size: 9px; padding: 0 5px; }
+.ch-logo small { font: inherit; }
+@media (max-width: 600px) { .ch-logo small { display: none; } .ch-logo span { gap: 4px; padding: 2px 10px; } .ch-logo { margin-bottom: 6px; } .ch-corner { width: 18px; height: 18px; } .ch-corner::after { inset: 6px; } .g-chasse .rs { gap: 3px; } .ch-reels { border-radius: 12px; } .g-chasse .rs-cell::before { border-radius: 7px; } }
 /* friends */
 .fr-add { display: flex; gap: 8px; margin-bottom: 10px; }
 .fr-add input { flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-2); color: var(--text); font: inherit; }
