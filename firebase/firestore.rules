@@ -112,7 +112,7 @@ service cloud.firestore {
     // ---------- Envoi de KE entre joueurs ----------
     // gifts/{id} = { from, fromName, to, toName, amount (centimes), at, claimed }.
     // Création par l'expéditeur seulement si, dans la même opération : son solde (users/{uid}.bal) baisse au moins
-    // du montant, et son compteur du jour (sends/{uid}) augmente exactement du montant. 1 à 70 KE par envoi,
+    // du montant, et son compteur du jour (sends/{uid}) augmente exactement du montant. 1 à 5 000 KE par envoi,
     // sans plafond par jour (autant d'envois qu'on veut), vers un compte qui existe, jamais soi-même. Lu par l'expéditeur et le destinataire ;
     // le destinataire le marque « récupéré » une seule fois (claimed false → true). Jamais supprimé.
     match /gifts/{id} {
@@ -124,7 +124,7 @@ service cloud.firestore {
         && request.resource.data.to != request.auth.uid
         && exists(/databases/$(database)/documents/users/$(request.resource.data.to))
         && isPseudo(request.resource.data.fromName) && isPseudo(request.resource.data.toName)
-        && request.resource.data.amount is int && request.resource.data.amount >= 100 && request.resource.data.amount <= 7000
+        && request.resource.data.amount is int && request.resource.data.amount >= 100 && request.resource.data.amount <= 500000
         && request.resource.data.claimed == false
         && request.resource.data.at == request.time
         && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.bal

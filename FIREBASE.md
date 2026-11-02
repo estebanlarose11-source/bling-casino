@@ -44,7 +44,7 @@ Ce que les règles imposent :
 
 - chat : lisible par tous, écrit seulement par un compte connecté, à son nom, 200 caractères max,
   1 message toutes les 3 secondes, refusé si le joueur est muet ;
-- envoi de KE : 1 à 70 KE par envoi, autant d’envois qu’on veut (pas de plafond par jour), vers un compte existant, jamais à soi-même ;
+- envoi de KE : 1 à 5 000 KE par envoi, autant d’envois qu’on veut (pas de plafond par jour), vers un compte existant, jamais à soi-même ;
   l'envoi n'est accepté que si le solde de l'expéditeur baisse du montant dans la même opération ;
   le destinataire ne peut récupérer un envoi qu'une seule fois.
 

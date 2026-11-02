@@ -11012,7 +11012,7 @@ const { profiles } = __mods['profile.js'];
 const { wallet, fmt } = __mods['wallet.js'];
 const { el, toast, modal } = __mods['ui.js'];
 
-const MAX = 200, KEEP = 60, GIFT_MIN = 1, GIFT_MAX = 70; // KE par envoi ; autant d’envois qu’on veut, à qui on veut
+const MAX = 200, KEEP = 60, GIFT_MIN = 1, GIFT_MAX = 5000; // KE par envoi ; autant d’envois qu’on veut, à qui on veut
 const BAD = ['connard', 'connasse', 'salope', 'pute', 'enculé', 'encule', 'fdp', 'ntm', 'nique ta', 'pd', 'batard', 'bâtard', 'negro', 'nègre', 'tg'];
 const clean = (t) => { let x = t; BAD.forEach((w) => { x = x.replace(new RegExp(`(^|[^\\p{L}])(${w})(?=$|[^\\p{L}])`, 'giu'), (m, a, b) => a + '•'.repeat(b.length)); }); return x; };
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -11158,7 +11158,7 @@ async function renderSend(toUid, toName) {
     <form class="ct-gift">
       <label>Pseudo du joueur<input name="to" maxlength="16" placeholder="Pseudo exact" value="${toName ? esc(toName) : ''}" ${toUid ? `data-uid="${esc(toUid)}"` : ''} autocomplete="off"></label>
       <label>Montant (KE)<input name="amt" type="number" inputmode="numeric" min="${GIFT_MIN}" max="${GIFT_MAX}" step="1" placeholder="1 à ${GIFT_MAX}"></label>
-      <div class="ct-quick">${[10, 20, 50, GIFT_MAX].map((v) => `<button type="button" data-q="${v}">${v}</button>`).join('')}</div>
+      <div class="ct-quick">${[100, 500, 1000, GIFT_MAX].map((v) => `<button type="button" data-q="${v}">${v}</button>`).join('')}</div>
       <p class="ct-info">Ton solde : <b>${fmt(wallet.cents / 100)}</b> · Maximum <b>${fmt(GIFT_MAX)}</b> par envoi, autant d’envois que tu veux</p>
       <button class="btn primary">💸 Envoyer</button>
       <p class="ct-note">Les KE sont de l’argent fictif : les vendre ou les acheter contre de l’argent réel est interdit et entraîne le bannissement.</p>
