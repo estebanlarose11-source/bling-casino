@@ -24,20 +24,20 @@ const goldHit = () => Math.random() < GOLD.success;
 const payout = (bet, sum) => Math.floor((bet * sum) / SHOTS); // cents
 /* ===END ENGINE */
 
-const IMG_V = 2;
+const IMG_V = 3;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const src = (n) => asset(`assets/games/chasse/${n}.webp`);
 const xs = (m) => (m >= 100 ? Math.round(m).toLocaleString('fr-FR') : String(m).replace('.', ','));
 // sprites: image, natural facing (1 right, -1 left), width (% of the field), sky or ground, crossing time (s), weight
 const KINDS = {
-  duck: { img: 'duck', face: 1, w: 12, sky: true, t: 4.6, wgt: 3, name: 'Canard' },
+  duck: { img: 'duck', face: 1, w: 14, sky: true, t: 4.6, wgt: 3, name: 'Canard' },
   pheasant: { img: 'pheasant', face: 1, w: 15, sky: true, t: 3.9, wgt: 2, name: 'Faisan' },
-  rabbit: { img: 'rabbit', face: -1, w: 5.5, t: 3.6, wgt: 3, hop: true, name: 'Lapin' },
+  rabbit: { img: 'rabbit', face: 1, w: 9, t: 3.6, wgt: 3, hop: true, name: 'Lapin' },
   boar: { img: 'boar', face: 1, w: 15, t: 4.3, wgt: 2, name: 'Sanglier' },
   deer: { img: 'deer', face: 1, w: 21, t: 3.4, wgt: 1, name: 'Cerf' },
   deer2: { img: 'deer2', face: -1, w: 19, t: 3.2, wgt: 1, hop: true, name: 'Cerf' },
 };
-const RATIO = { duck: 277 / 900, pheasant: 361 / 900, rabbit: 679 / 500, boar: 451 / 900, deer: 610 / 900, deer2: 724 / 900, gold: 610 / 900, tree: 519 / 800, log: 152 / 900 };
+const RATIO = { duck: 304 / 900, pheasant: 361 / 900, rabbit: 462 / 900, boar: 451 / 900, deer: 610 / 900, deer2: 724 / 900, gold: 610 / 900, tree: 519 / 800, log: 152 / 900 };
 const TOD = ['day', 'dusk', 'night'];
 const pickKind = () => { const l = Object.entries(KINDS); let r = Math.random() * l.reduce((a, [, k]) => a + k.wgt, 0); for (const [id, k] of l) { if (r < k.wgt) return id; r -= k.wgt; } return 'duck'; };
 const rand = (a, b) => a + Math.random() * (b - a);
