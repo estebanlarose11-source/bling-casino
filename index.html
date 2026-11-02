@@ -7364,6 +7364,7 @@ const SPECS = {
       ${[30, 60, 250, 280, 270].map((x, i) => `<circle cx="${x}" cy="${200 + i * 17}" r="${3 + (i % 3)}" fill="none" stroke="#e0f2fe" stroke-opacity=".6"/>`).join('')}`,
   },
   madwheel: {
+    photo: 'assets/games/madwheel/cover.webp', baked: true,
     bg: ['#4a0a6a', '#0a0214'], light: '#ff7ab6', title: ['LA ROUE', 'FOLLE'], font: 'bebas', metal: ['#fff', '#fde047', '#db2777'], tag: '4 BONUS',
     art: (u) => {
       const cols = ['#f5c518', '#3aa0ff', '#ff5fa8', '#a259ff', '#1dd3b0', '#8bd93b', '#ff8a3d', '#ff3d54'];
@@ -7381,6 +7382,7 @@ const SPECS = {
     },
   },
   storm: {
+    photo: 'assets/games/storm/cover.webp', baked: true,
     bg: ['#0b2a8a', '#02040f'], light: '#9fd4ff', title: ['L’ÉCLAIR'], font: 'bebas', metal: ['#fff', '#bfe3ff', '#2563eb'], tag: '×50 000',
     art: (u) => `
       <g stroke="#e0f2fe" fill="none" stroke-linejoin="round" filter="url(#glow${u})">
@@ -7389,6 +7391,7 @@ const SPECS = {
       <path d="M168 60 L132 148 H158 L140 214 L196 120 H170 L190 60 Z" fill="#ffe14a" stroke="#fff" stroke-width="2" filter="url(#glow${u})"/>`,
   },
   doublespin: {
+    photo: 'assets/games/doublespin/cover.webp', baked: true,
     bg: ['#1b2a8a', '#04051a'], light: '#ffd23f', title: ['LA DOUBLE', 'BILLE'], font: 'bebas', metal: ['#fff', '#ffe58a', '#d97706'], tag: '×100 000',
     art: (u) => `
       ${rouletteWheel(150, 196, 130, u)}
@@ -7584,6 +7587,7 @@ const SPECS = {
     },
   },
   plateau: {
+    photo: 'assets/games/plateau/cover.webp', baked: true,
     bg: ['#14532d', '#05070a'], light: '#86efac', title: ['LE PLATEAU'], font: 'bebas', metal: ['#fff', '#fde047', '#16a34a'], tag: 'BONUS AUX DÉS',
     art: (u) => {
       const C = ['#f5c518', '#3aa0ff', '#ff5fa8', '#a259ff', '#22c55e', '#f5c518', '#3aa0ff', '#ff8a3d', '#f5c518', '#3aa0ff', '#ff5fa8', '#e11d48'];
@@ -7596,6 +7600,7 @@ const SPECS = {
     },
   },
   peche: {
+    photo: 'assets/games/peche/cover.webp', baked: true,
     bg: ['#0c4a6e', '#030712'], light: '#7dd3fc', title: ['LA PÊCHE'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: 'JUSQU’À ×5 000',
     art: (u) => {
       const fish = (x, y, s, c, r, t) => `<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})" filter="url(#sh${u})"><path d="M50 20 L63 7 L60 20 L63 33 Z" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1.5"/><ellipse cx="28" cy="20" rx="25" ry="15" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1.5"/><circle cx="12" cy="16" r="3.6" fill="#fff"/><circle cx="11.2" cy="16" r="1.9" fill="#111"/><text x="30" y="25" text-anchor="middle" font-family="KeCoin,Bebas Neue,Impact,sans-serif" font-size="13" fill="#fff" stroke="rgba(0,0,0,.5)" stroke-width="2" paint-order="stroke">${t}</text></g>`;
@@ -7667,15 +7672,15 @@ function squareSVG(game, sp, cls) {
     <rect width="300" height="300" fill="url(#bg${u})"/>
     <rect width="300" height="300" fill="url(#spot${u})"/>
     ${bokeh}
-    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="300" preserveAspectRatio="xMidYMin slice"/>` : sp.hero ? sp.hero(u) : `<g transform="translate(-18 -50) scale(1.12)">${sp.art(u)}</g>`}
-    <rect y="170" width="300" height="130" fill="url(#fade${u})"/>
+    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="300" preserveAspectRatio="${sp.baked ? 'xMidYMax' : 'xMidYMin'} slice"/>` : sp.hero ? sp.hero(u) : `<g transform="translate(-18 -50) scale(1.12)">${sp.art(u)}</g>`}
+    ${sp.baked ? '' : `    <rect y="170" width="300" height="130" fill="url(#fade${u})"/>
     <g font-family="KeCoin,${FONTS.bebas}" font-weight="900" text-anchor="middle" filter="url(#tsh${u})">
       ${lines.map((t, k) => `<text x="150" y="${(y0 + k * step).toFixed(1)}" font-size="${size.toFixed(0)}" fill="#fff" stroke="rgba(0,0,0,.25)" stroke-width="1.5" paint-order="stroke" letter-spacing="1">${t}</text>`).join('')}
     </g>
     <g text-anchor="middle" fill="#fff" font-family="KeCoin,${FONTS.bebas}" filter="url(#tsh${u})">
       <text x="150" y="282" font-size="17" font-weight="900" letter-spacing="1.5">${p1}</text>
       ${p2 ? `<text x="151" y="292.5" font-family="KeCoin,Inter, Arial, sans-serif" font-size="6.5" font-weight="800" letter-spacing="5.2" fill-opacity=".9">${p2}</text>` : ''}
-    </g>
+    </g>`}
   </svg>`;
 }
 
@@ -7719,17 +7724,19 @@ function coverSVG(game, { cls = 'cover', badge = true, square = false } = {}) {
     <g filter="url(#soft${u})">${bokeh}</g>
     ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="400" preserveAspectRatio="xMidYMin slice"/>` : sp.art(u)}
     <rect width="300" height="400" fill="url(#vig${u})"/>
+    ${sp.baked ? '' : `
     <rect y="250" width="300" height="150" fill="url(#fade${u})"/>
     <g font-family="KeCoin,${FONTS[sp.font]}" font-weight="900" text-anchor="middle" filter="url(#tsh${u})">
       <text x="150" y="${ty}" font-size="${fs1.toFixed(0)}" fill="url(#tit${u})" stroke="#000" stroke-opacity=".55" stroke-width="2" paint-order="stroke" letter-spacing="${sp.font === 'cinzel' ? 1 : 2}">${t1}</text>
       ${t2 ? `<text x="150" y="${ty + small + 2}" font-size="${small}" fill="url(#tit${u})" stroke="#000" stroke-opacity=".55" stroke-width="2" paint-order="stroke" letter-spacing="${sp.font === 'cinzel' ? 2 : 4}">${t2}</text>` : ''}
-    </g>
+    </g>`}
     ${badge && sp.tag ? `<g transform="translate(14 16)"><rect width="${sp.tag.length * 6.6 + 16}" height="20" rx="4" fill="#000" fill-opacity=".55" stroke="${sp.light}" stroke-opacity=".6"/><text x="8" y="14" font-family="KeCoin,Inter, Arial, sans-serif" font-weight="800" font-size="10.5" letter-spacing=".8" fill="#fff">${sp.tag}</text></g>` : ''}
+    ${sp.baked ? '' : `
     <g transform="translate(150 388)" text-anchor="middle">
       <path d="M-98 -5 H-76 M72 -5 H94" stroke="#fff" stroke-opacity=".35"/>
       <circle cx="-64" cy="-5" r="5.5" fill="none" stroke="#ff2340" stroke-width="2"/><path d="M-64 -8.5 V-5 L-61.5 -3.5" stroke="#ff2340" stroke-width="1.6" fill="none" stroke-linecap="round"/>
       <text x="6" y="-1" font-family="KeCoin,Inter, Arial, sans-serif" font-weight="800" font-size="10" letter-spacing="2.2" fill="#fff" fill-opacity=".9">${BRAND.provider.toUpperCase()}</text>
-    </g>
+    </g>`}
   </svg>`;
 }
 
