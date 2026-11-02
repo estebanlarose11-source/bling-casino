@@ -397,7 +397,7 @@ class MadWheelGame extends BaseGame {
     for (let i = 0; i < 64; i++) {
       const t = CTSEQ[i], lab = t === 'D' ? '×2' : t === 'T' ? '×3' : String(t * mult);
       s += `<path d="${slicePath(i, CTA, 124)}" fill="${ctColor(t)}" stroke="#10061f" stroke-width=".7"/>`;
-      s += `<text class="mt" x="150" y="44" text-anchor="middle" dominant-baseline="middle" font-family="KeCoin,Orbitron,Impact,sans-serif" font-weight="900" font-size="${lab.length > 3 ? 6.4 : 7.6}" fill="#fff" stroke="#10061f" stroke-width=".35" paint-order="stroke" transform="rotate(${((i + 0.5) * CTA).toFixed(2)} 150 150) rotate(90 150 44)">${lab}</text>`;
+      s += `<text class="mt" x="150" y="44" text-anchor="middle" dominant-baseline="middle" font-family="KeCoin,Archivo,Impact,sans-serif" font-weight="900" font-size="${lab.length > 3 ? 6.4 : 7.6}" fill="#fff" stroke="#10061f" stroke-width=".35" paint-order="stroke" transform="rotate(${((i + 0.5) * CTA).toFixed(2)} 150 150) rotate(90 150 44)">${lab}</text>`;
     }
     return s;
   }

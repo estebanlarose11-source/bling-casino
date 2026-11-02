@@ -142,7 +142,7 @@ class PecheGame extends BaseGame {
     for (const { i, m } of list) {
       const ang = ((i + 0.5) * A).toFixed(2), fish = SEGS[i][0] === 'f';
       g.insertAdjacentHTML('beforeend', `<g class="pe-strike" transform="rotate(${ang} 150 150)"><path d="${slicePath(i)}" transform="rotate(${-ang} 150 150)" fill="#fde047" opacity=".55"/>
-        <circle cx="150" cy="${fish ? 74 : 62}" r="11" fill="#fde047" stroke="#713f12" stroke-width="2"/><text x="150" y="${fish ? 78.5 : 66.5}" text-anchor="middle" font-family="KeCoin,Orbitron,sans-serif" font-weight="900" font-size="10" fill="#713f12">×${m}</text></g>`);
+        <circle cx="150" cy="${fish ? 74 : 62}" r="11" fill="#fde047" stroke="#713f12" stroke-width="2"/><text x="150" y="${fish ? 78.5 : 66.5}" text-anchor="middle" font-family="KeCoin,Archivo,sans-serif" font-weight="900" font-size="10" fill="#713f12">×${m}</text></g>`);
       fl.classList.remove('on'); void fl.offsetWidth; fl.classList.add('on');
       sfx.tease?.() || sfx.click();
       const p = center(this.q('.pe-zone')); fx.burst(p.x, p.y - 60, 16, ['#fde047', '#fff', '#7dd3fc'], 6);

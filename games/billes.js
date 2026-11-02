@@ -219,12 +219,12 @@ class BillesGame extends BaseGame {
       if (z[4] === 'mud') {
         g.fillStyle = 'rgba(120,72,30,.55)'; g.fillRect(z[0], z[1], z[2], z[3]);
         g.fillStyle = 'rgba(60,35,12,.6)'; for (let k = 0; k < 40; k++) { const px = (k * 97) % W, py = z[1] + ((k * 53) % z[3]); g.beginPath(); g.arc(px, py, 3 + (k % 3), 0, 7); g.fill(); }
-        g.fillStyle = 'rgba(255,220,180,.7)'; g.font = '900 12px KeCoin, Orbitron, sans-serif'; g.textAlign = 'center'; g.fillText('BOUE', W / 2, z[1] + 16);
+        g.fillStyle = 'rgba(255,220,180,.7)'; g.font = '900 12px KeCoin, Archivo, sans-serif'; g.textAlign = 'center'; g.fillText('BOUE', W / 2, z[1] + 16);
       } else {
         g.fillStyle = 'rgba(34,197,94,.16)'; g.fillRect(z[0], z[1], z[2], z[3]);
         g.strokeStyle = 'rgba(134,239,172,.8)'; g.lineWidth = 3; const off = (t * 60) % 24;
         for (let x = 20; x < W; x += 50) for (let yy = z[1] + off - 12; yy < z[1] + z[3] - 6; yy += 24) { if (yy < z[1]) continue; g.beginPath(); g.moveTo(x - 7, yy); g.lineTo(x, yy + 7); g.lineTo(x + 7, yy); g.stroke(); }
-        g.fillStyle = 'rgba(187,247,208,.9)'; g.font = '900 12px KeCoin, Orbitron, sans-serif'; g.textAlign = 'center'; g.fillText('TURBO', W / 2, z[1] + 14);
+        g.fillStyle = 'rgba(187,247,208,.9)'; g.font = '900 12px KeCoin, Archivo, sans-serif'; g.textAlign = 'center'; g.fillText('TURBO', W / 2, z[1] + 14);
       }
     }
     // walls
@@ -242,7 +242,7 @@ class BillesGame extends BaseGame {
       if (big) { g.strokeStyle = 'rgba(253,186,116,.6)'; g.lineWidth = 2; g.beginPath(); g.arc(p[0], p[1], p[2] + 4, 0, 7); g.stroke(); }
     }
     // finish line
-    if (C.FIN < cam + viewH + 20) { const sq = 12; for (let x = 0; x < W; x += sq) for (let r = 0; r < 2; r++) { g.fillStyle = (x / sq + r) % 2 ? '#fff' : '#111'; g.fillRect(x, C.FIN + r * sq, sq, sq); } g.fillStyle = '#fde047'; g.font = '900 16px KeCoin, Orbitron, sans-serif'; g.textAlign = 'center'; g.fillText('ARRIVÉE', W / 2, C.FIN - 8); }
+    if (C.FIN < cam + viewH + 20) { const sq = 12; for (let x = 0; x < W; x += sq) for (let r = 0; r < 2; r++) { g.fillStyle = (x / sq + r) % 2 ? '#fff' : '#111'; g.fillRect(x, C.FIN + r * sq, sq, sq); } g.fillStyle = '#fde047'; g.font = '900 16px KeCoin, Archivo, sans-serif'; g.textAlign = 'center'; g.fillText('ARRIVÉE', W / 2, C.FIN - 8); }
     // trails + marbles
     for (let i = 0; i < NM; i++) {
       const x = f[i * 2], y = f[i * 2 + 1], b = BALLS[i], tr = this.trails[i];
