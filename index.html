@@ -4108,6 +4108,10 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
       <a href="#lobby-table" data-nav="tables"><span><svg class="ico"><use href="#ui-tables"/></svg></span>Roues & tables</a>
       <a href="#lobby-quick" data-nav="quick"><span><svg class="ico"><use href="#ui-quick"/></svg></span>Jeux rapides</a>
     </nav>
+    <div class="side-label">Défi spécial</div>
+    <nav class="side-nav">
+      <a href="#special" data-nav="special" class="side-special"><span>🏆</span>Défi spécial<b class="side-badge sp-badge" data-sp-badge></b></a>
+    </nav>
     <div class="side-label">Récompenses</div>
     <nav class="side-nav">
       <a href="#succes" data-nav="ach"><span><svg class="ico"><use href="#ui-ach"/></svg></span>Succès<b class="side-badge" data-ach-badge hidden></b></a>
@@ -7497,6 +7501,7 @@ const ORIGINALS = [
   {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200\u00a0\uE1E0 tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200\u00a0\uE1E0", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "labo", "name": "Le Labo", "cat": "slot", "tag": "Machine à sous", "sub": "Le Dealer, La Descente, La Mallette", "colors": ["#a855f7", "#0d0415"], "description": "Un labo clandestin multicolore où tout plane : feuilles, joints, pilules arc-en-ciel, champignons magiques, buvards, cachets roses, sachets de poudre et la brique du cartel, en plein festival, avec le Boss en symbole premium. 1024 façons de gagner. Le Dealer pose des WILD, La Descente lance un trip de tours gratuits où le multiplicateur monte à chaque gain, et La Mallette lance un bonus de taz : la fumée verte récolte leurs multiplicateurs, les feuilles les multiplient, la taz magique aspire tout, et un écran plein de taz déclenche le jackpot Le Cartel ×1000.", "features": ["5 rouleaux, 1024 façons", "WILD – Le Dealer", "Free spins – La Descente", "Multiplicateur qui monte", "Bonus – La Mallette", "Jackpot – Le Cartel ×1000", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
+  {"id": "fortune", "name": "La Fortune", "cat": "slot", "tag": "Machine à sous", "sub": "Nouvel an chinois, pièces d’or et Hold & Spin", "colors": ["#ef4444", "#7f1d1d"], "description": "Le nouvel an chinois sous les lanternes : 5 rouleaux, 243 façons de gagner et un dragon d’or WILD. Les pièces d’or qui tombent montent dans le bol et le tas de pièces grandit spin après spin, jusqu’au prochain bonus. 6 pièces lancent le HOLD & SPIN avec les jackpots progressifs MAJOR et JACKPOT, et des lignes qui s’allument ×2 ou ×5. 4 scatters : le MÉGA BONUS, où chaque pièce vaut ×2 à ×5.", "features": ["243 façons de gagner", "Dragon d’or WILD", "Tas de pièces qui grandit", "Hold & Spin dès 6 pièces", "MAJOR et JACKPOT progressifs", "Lignes ×2 et ×5", "MÉGA BONUS : 4 scatters", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
 ].map((g) => ({ ...g, original: true }));
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
@@ -7854,6 +7859,10 @@ const SPECS = {
         ${b('bv1', 70, 120, 120, -18)}${b('bv4', 230, 110, 120, 16)}${b('bv5', 150, 90, 130, -4)}${b('bvg', 150, 175, 170, 3)}${b('bvf', 60, 230, 90, -10)}${b('bvj', 245, 225, 90, 12)}`;
     },
   },
+  fortune: {
+    bg: ['#7f1d1d', '#1c0303'], light: '#fde68a', title: ['LA FORTUNE'], font: 'cinzel', metal: ['#fff7d6', '#facc15', '#b45309'], tag: 'MÉGA BONUS', photo: 'assets/games/fortune/cover.webp',
+    art: () => '',
+  },
   labo: {
     bg: ['#86198f', '#1e0636'], light: '#f472b6', title: ['LE LABO'], font: 'bebas', metal: ['#fff', '#bef264', '#c026d3'], tag: 'JACKPOT ×1000', photo: 'assets/games/labo/cover.webp',
     art: (u) => `
@@ -7974,7 +7983,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  chasse: ['#65a30d', '#14532d'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
+  chasse: ['#65a30d', '#14532d'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
 };
 // the wheel games' salons wear their game's poster, with the ONLINE ribbon
 ['madwheel', 'plateau', 'peche', 'roueor'].forEach((id) => { SPECS[`${id}-online`] = { ...SPECS[id], online: true, tag: 'ONLINE' }; if (CARD[id]) CARD[`${id}-online`] = CARD[id]; });
@@ -8098,6 +8107,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'fortune', date: '2026-11-02', title: 'Nouveau : La Fortune', isNew: true, items: ['Le nouvel an chinois : lanternes, dragon d’or WILD et 243 façons de gagner', 'Les pièces d’or montent dans le bol : le tas de pièces grandit jusqu’au prochain bonus', '6 pièces = HOLD & SPIN, avec les jackpots MAJOR et JACKPOT qui grimpent à chaque spin', 'Des lignes s’allument ×2 ou ×5 pendant le bonus', '4 scatters = MÉGA BONUS : chaque pièce vaut ×2 à ×5'] },
   { game: 'madwheel-online', date: '2026-11-02', title: 'Nouveau : La Roue Folle Online', isNew: true, items: ['La Roue Folle en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'Le Top Slot et les 4 bonus sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
   { game: 'plateau-online', date: '2026-11-02', title: 'Nouveau : Le Plateau Online', isNew: true, items: ['Le Plateau en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'La case Chance et les dés du plateau sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
   { game: 'peche-online', date: '2026-11-02', title: 'Nouveau : La Pêche Online', isNew: true, items: ['La Pêche en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'Les éclairs et le poisson pêché sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
@@ -8393,9 +8403,10 @@ function renderLobby(root, params = {}) {
   };
 
   const body = filter === 'all'
-    ? '<section class="panel live-now" data-live-now></section>'
+    ? `<a class="sp-banner" href="#special"><span>🏆</span><div><b>DÉFI SPÉCIAL · ${fmt(__mods['special.js'].specialStatus().prize)}</b><small>Débloque tous les bonus du casino en jouant : ${__mods['special.js'].specialStatus().have} / ${__mods['special.js'].specialStatus().total}</small></div><em>Voir le défi ›</em></a>`
+      + '<section class="panel live-now" data-live-now></section>'
       + row('🟢 En ligne · joue avec les autres', ['storm-online', 'bj-online', 'holdem-online', 'madwheel-online', 'plateau-online', 'peche-online', 'roueor-online'].map(getGame))
-      + row('Populaires', ['cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
+      + row('Populaires', ['fortune', 'cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
       + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
       + '<div class="hta-slot" data-hta=""></div>'
       + row('Roues & tables', ORIGINALS.filter(FILTERS[3].test), 'table')
@@ -9137,6 +9148,7 @@ const EXTRA_THEMES = {
   'robots': { sd: 0.14, len: 16, root: 164.81, lead: { wave: 'sawtooth', vol: 0.02, dur: 0.1, pat: [12, 12, 15, null, 12, 12, 17, null, 12, 12, 19, 17, 15, null, 14, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.15, pat: [-12, -12, null, -12, -12, null, -10, null, -12, -12, null, -12, -9, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.025 },
   'taco': { sd: 0.16, len: 16, root: 220, lead: { wave: 'triangle', vol: 0.06, dur: 0.14, pat: [12, null, 16, 19, null, 16, 12, null, 14, null, 17, 21, null, 17, 14, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.18, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -10, null, -3, null] }, comp: { wave: 'square', vol: 0.016, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [2, 5, 9] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
   billets: { sd: 0.17, len: 16, root: 146.83, lead: { wave: 'square', vol: 0.028, dur: 0.12, pat: [12, null, 16, 19, null, 24, 19, 16, 14, null, 17, 21, null, 26, 21, 17] }, bass: { wave: 'triangle', vol: 0.13, dur: 0.2, pat: [-12, null, -12, null, -5, null, -5, null, -10, null, -10, null, -3, null, -5, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [2, 5, 9], 14: [-1, 2, 7] } }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.022 },
+  fortune: { sd: 0.18, len: 16, root: 196, pad: { wave: 'triangle', vol: 0.016, dur: 1.6, map: { 0: [0, 7, 12], 8: [-3, 4, 9] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.18, pat: [12, null, 14, 16, null, 19, 21, null, 19, 16, null, 14, 12, null, 9, null] }, bass: { wave: 'sine', vol: 0.13, dur: 0.26, pat: [-12, null, null, -5, null, null, -12, null, -3, null, null, -5, null, null, -10, null] }, kick: [0, 8], hat: [4, 12], kv: 0.15, hv: 0.016 },
   labo: { sd: 0.22, len: 16, root: 87.31, pad: { wave: 'sawtooth', vol: 0.018, dur: 2.4, map: { 0: [0, 3, 7], 8: [1, 5, 8] } }, lead: { wave: 'square', vol: 0.03, dur: 0.18, pat: [12, null, null, 13, null, 15, null, 12, null, null, 18, null, 17, null, 13, null] }, bass: { wave: 'sawtooth', vol: 0.1, dur: 0.22, pat: [-12, null, -12, -12, null, null, -11, null, -12, null, -12, -12, null, null, -9, null] }, kick: [0, 4, 8, 10, 12], hat: [2, 6, 10, 14], kv: 0.26, hv: 0.02 },
   dragons: { sd: 0.24, len: 16, root: 98, pad: { wave: 'sawtooth', vol: 0.02, dur: 2, map: { 0: [0, 3, 7], 8: [-2, 3, 8] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.3, pat: [12, null, 15, null, 19, null, 18, 15, null, 12, null, 10, 12, null, null, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.5, pat: [-12, null, null, -12, null, null, -9, null, -12, null, null, -12, null, null, -7, null] }, kick: [0, 3, 8, 11], hat: [4, 12], kv: 0.26, hv: 0.02 },
   poulet: { sd: 0.15, len: 16, root: 261.63, lead: { wave: 'square', vol: 0.024, dur: 0.1, pat: [12, null, 16, 12, 19, null, 16, null, 12, null, 16, 12, 21, 19, 16, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.16, pat: [-12, null, -5, null, -12, null, -5, null, -7, null, -3, null, -5, null, -8, null] }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
@@ -10762,7 +10774,7 @@ const FILES = {
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '298b0a4b44'],
-  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', 'adbdd3e3fb'],
+  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '485bec25f1'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '8cbe1f47d4'],
@@ -10774,6 +10786,7 @@ const FILES = {
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', 'e23f21079d'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', '0957d49ca3'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
+  fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', '65c2e7e09f'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '171e756bb8'],
@@ -10784,13 +10797,13 @@ const FILES = {
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
-  plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '8da77c98d2'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', 'b3283cd90f'],
-  roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '9c2dbe2784'],
-  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', 'adbdd3e3fb'],
-  'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', '8da77c98d2'],
-  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', 'b3283cd90f'],
-  'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '9c2dbe2784'],
+  plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '97feeba6fd'],
+  roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
+  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', '485bec25f1'],
+  'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
+  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '97feeba6fd'],
+  'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '6f6628b9f9'],
 };
 const loading = {};
@@ -11456,6 +11469,146 @@ async function loadTop(list) {
 }
 
 return { renderAchievements, achievementPoints: points, achievementSummary: summary, trophiesHTML };
+})();
+
+// ---- special.js ----
+__mods['special.js'] = (() => {
+// Défi spécial (#special): unlock every bonus of every slot machine and every wheel game at least once, only by
+// playing (a bought bonus, a bonus offered by the daily wheel never counts). All of them → 1 000 000 KE, plus
+// 100 000 KE for each machine added after the launch. A player who has finished gets those 100 000 KE by himself
+// each time a machine is added. Tracking: 'sb:feature' (featureIntro of the slots, bought or not) and 'sb:bonus'
+// (the wheel games, when the wheel stops on a bonus case with a stake on it). Saved in profile.sp.
+// NEW MACHINE: add its line to LIST (its bonuses, with the featureIntro title of each one).
+
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { toast } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const { getGame } = __mods['games/index.js'];
+const { coverSVG } = __mods['covers.js'];
+
+// [game, [[key, name, title test], …]]: a slot's title test matches its featureIntro title; a wheel game sends its key.
+const T = (re) => (t) => re.test(t);
+const LIST = [
+  ['big-bad-wolf', [['hold', 'Hold & Spin', T(/^HOLD/)], ['fs', 'Free spins', T(/FREE SPINS$/)]]],
+  ['cosmic', [['A', 'Orbite Basse', T(/^ORBITE/)], ['B', 'Ceinture d’Astéroïdes', T(/^CEINTURE/)], ['C', 'Hyper-Espace', T(/^HYPER/)]]],
+  ['zeus', [['fs', 'Free spins', T(/FREE SPINS$/)]]],
+  ['huff', [['n', 'Huff ’n’ Puff', T(/^HUFF/)], ['x', 'XXTREM Puff', T(/^XXTREM/)], ['m', 'MEGA BONUS', T(/^MEGA BONUS/)]]],
+  ['candy', [['fs', 'Bal de la Reine', T(/^BAL DE LA REINE/)]]],
+  ['anubis', [['u', 'Monde souterrain', T(/^MONDE SOUTERRAIN/)], ['j', 'Jugement', T(/^JUGEMENT/)]]],
+  ['bling', [['b2', 'Bonus ×2', T(/^BONUS ×2/)], ['b5', 'Bonus ×5', T(/^BONUS ×5/)]]],
+  ['pharaon', [['n', 'Bonus', T(/^BONUS$/)], ['b', 'Bonus Bounty', T(/^BONUS BOUNTY/)]]],
+  ['taco', [['n', 'Le Four', T(/^LE FOUR/)], ['s', 'Super Four', T(/^SUPER FOUR/)]]],
+  ['billets', [['fs', 'Free spins', T(/^FREE SPINS/)]]],
+  ['dragons', [['A', 'Vol des dragons', T(/^VOL DES DRAGONS/)], ['S', 'Super Bonus', T(/^SUPER BONUS/)]]],
+  ['labo', [['m', 'La Mallette', T(/^LA MALLETTE/)], ['d', 'La Descente', T(/^LA DESCENTE/)]]],
+  ['fortune', [['h', 'Hold & Spin', T(/^HOLD/)], ['m', 'Méga Bonus', T(/^MÉGA BONUS/)]]],
+  ['madwheel', [['cf', 'Pile ou Face'], ['ch', 'Chasse au Cash'], ['pa', 'Pachinko'], ['ct', 'Méga Folie']]],
+  ['plateau', [['b2', 'Bonus 2 lancers'], ['b4', 'Bonus 4 lancers']]],
+  ['peche', [['fb', 'Poisson bleu'], ['fo', 'Poisson orange'], ['fr', 'Poisson rouge']]],
+  ['roueor', [['or', 'Bonus des 24 cubes']]],
+].filter(([g]) => getGame(g));
+const BASE_GAMES = 17; // machines at the launch of the défi (Fortune included): the prize is 1 000 000 for them
+const PRIZE = () => 1000000 + 100000 * Math.max(0, LIST.length - BASE_GAMES);
+const PER_NEW = 100000;
+const ALL = LIST.flatMap(([g, ks]) => ks.map(([k, name, test]) => ({ g, k, id: `${g}:${k}`, name, test })));
+const base = (id) => String(id || '').replace(/-online$/, '');
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+const data = () => profiles.current?.sp || {};
+const got = () => data().u || {};
+function status() {
+  const u = got(), have = ALL.filter((b) => u[b.id]).length, d = data();
+  return { have, total: ALL.length, all: have === ALL.length, done: !!d.done, prize: PRIZE(), paid: d.ke || 0 };
+}
+
+function unlock(b) {
+  if (!profiles.current || got()[b.id]) return;
+  profiles.update('sp', (me) => { const sp = me.sp || (me.sp = {}); sp.u = { ...(sp.u || {}), [b.id]: Date.now() }; });
+  const s = status();
+  toast(`🏆 Défi spécial · ${b.name} (${getGame(b.g)?.name}) débloqué ! ${s.have} / ${s.total}${s.all && !s.done ? ' · TOUT EST DÉBLOQUÉ : va chercher ton million !' : ''}`, 'ok');
+  sfx.upgrade?.();
+  refreshBadge();
+}
+addEventListener('sb:feature', (e) => {
+  const d = e.detail || {};
+  if (d.re || d.bought) return;
+  const g = base(d.game), b = ALL.find((x) => x.g === g && x.test?.(String(d.title || '').toUpperCase()));
+  if (b) unlock(b);
+});
+addEventListener('sb:bonus', (e) => {
+  const d = e.detail || {};
+  const b = ALL.find((x) => x.g === base(d.game) && x.k === d.key);
+  if (b) unlock(b);
+});
+
+// The million (and the 100 000 of every machine added since): an account is needed.
+function claim() {
+  const s = status();
+  if (!s.all || s.done || !profiles.current) return 0;
+  if (!profiles.online) { toast('Crée un compte (ou connecte-toi) pour toucher la récompense du Défi spécial', 'warn'); return 0; }
+  profiles.update('sp', (me) => { const sp = me.sp || (me.sp = {}); sp.done = Date.now(); sp.n = LIST.length; sp.ke = (sp.ke || 0) + s.prize; });
+  wallet.grant(s.prize);
+  fx.confetti?.(160); sfx.jackpot?.();
+  refreshBadge();
+  return s.prize;
+}
+// Finished players: +100 000 for every machine added since their last payment, automatically.
+function payNew() {
+  const d = data();
+  if (!d.done || !profiles.online || !(d.n < LIST.length)) return;
+  const add = (LIST.length - d.n) * PER_NEW;
+  profiles.update('sp', (me) => { me.sp.n = LIST.length; me.sp.ke = (me.sp.ke || 0) + add; });
+  wallet.grant(add);
+  toast(`🏆 Défi spécial : ${LIST.length - d.n > 1 ? `${LIST.length - d.n} nouvelles machines` : 'une nouvelle machine'} sur le site, et tu as déjà fini le défi : +${fmt(add)} pour toi !`, 'ok');
+}
+profiles.addEventListener?.('change', () => { payNew(); refreshBadge(); });
+setTimeout(() => { payNew(); refreshBadge(); }, 3000);
+
+function refreshBadge() {
+  const s = status();
+  document.querySelectorAll('[data-sp-badge]').forEach((n) => { n.textContent = s.done ? '✓' : s.all ? '!' : `${s.have}/${s.total}`; n.classList.toggle('ready', s.all && !s.done); });
+}
+
+function renderSpecial(root) {
+  const s = status(), u = got(), pct = Math.round((s.have / s.total) * 100);
+  const cards = LIST.map(([g, ks]) => {
+    const game = getGame(g), n = ks.filter(([k]) => u[`${g}:${k}`]).length, full = n === ks.length;
+    return `<article class="sp-game${full ? ' full' : ''}">
+      <a class="sp-cover" href="#game-${g}">${coverSVG(game, { square: true })}${full ? '<span class="sp-ok">✓</span>' : ''}</a>
+      <div class="sp-body"><b>${esc(game.name)}</b><small>${n} / ${ks.length} bonus</small>
+        <ul>${ks.map(([k, name]) => `<li class="${u[`${g}:${k}`] ? 'on' : ''}">${u[`${g}:${k}`] ? '✅' : '🔒'} ${esc(name)}</li>`).join('')}</ul>
+        <a class="btn ghost sm" href="#game-${g}">Jouer</a></div></article>`;
+  }).join('');
+  const action = s.done
+    ? `<div class="sp-won">🏆 Défi terminé ! Tu as déjà touché <b>${fmt(s.paid)}</b>. Chaque nouvelle machine te rapporte encore <b>+${fmt(PER_NEW)}</b>, automatiquement.</div>`
+    : s.all ? `<button class="btn primary lg sp-claim" data-sp-claim>🏆 Toucher mes ${fmt(s.prize)}</button>${profiles.online ? '' : '<p class="muted small">Crée un compte (ou connecte-toi) pour toucher la récompense.</p>'}`
+      : `<a class="btn primary lg" href="#lobby-slot">Je relève le défi</a>`;
+  root.innerHTML = `
+    <section class="panel sp-page">
+      <div class="sp-hero">
+        <span class="eyebrow">🏆 Défi spécial</span>
+        <h1>Débloque <em>tous</em> les bonus du casino</h1>
+        <p class="sp-lead">Toutes les machines à sous, toutes les roues : déclenche chaque bonus au moins une fois en jouant, et gagne</p>
+        <div class="sp-prize"><b>${fmt(s.prize)}</b><small>+${fmt(PER_NEW)} à chaque nouvelle machine ajoutée au site</small></div>
+        <div class="sp-progress"><div class="sp-bar"><i style="width:${pct}%"></i></div><span><b>${s.have}</b> / ${s.total} bonus débloqués · ${pct} %</span></div>
+        ${action}
+      </div>
+      <div class="sp-rules">
+        <div><span>🎰</span><b>Joue, tout simplement</b><p>Lance des spins sur les machines à sous et mise sur les roues. Chaque bonus qui tombe <b>en jouant</b> se coche ici, pour toujours.</p></div>
+        <div><span>🚫</span><b>Aucun raccourci</b><p>Les bonus <b>achetés</b> et les bonus offerts par la Roue du jour ne comptent pas. Sur les roues, il faut une mise sur la case bonus quand la roue s’y arrête. Les salons Online comptent aussi.</p></div>
+        <div><span>💰</span><b>${fmt(1000000)} au bout</b><p>Quand tous les bonus sont cochés, tu touches <b>${fmt(1000000)}</b> d’un coup, plus <b>${fmt(PER_NEW)}</b> pour chaque machine ajoutée depuis le lancement du défi.</p></div>
+        <div><span>⚡</span><b>Plus vite tu finis, mieux c’est</b><p>Une fois le défi fini, <b>chaque nouvelle machine te rapporte ${fmt(PER_NEW)} automatiquement</b>, sans rien faire. Ceux qui n’ont pas fini, eux, devront aussi débloquer ses bonus.</p></div>
+      </div>
+      <h2 class="sp-h">Les bonus à débloquer</h2>
+      <div class="sp-grid">${cards}</div>
+      <p class="muted small">Ta progression est gardée dans ton profil. Il faut un compte pour toucher la récompense ; en invité, ta progression compte, mais disparaît quand tu quittes le site.</p>
+    </section>`;
+  root.querySelector('[data-sp-claim]')?.addEventListener('click', () => { const k = claim(); if (k) { toast(`🏆 DÉFI SPÉCIAL RÉUSSI ! +${fmt(k)}`, 'ok'); renderSpecial(root); } });
+}
+
+return { renderSpecial, specialStatus: status, SPECIAL_LIST: LIST };
 })();
 
 // ---- chat.js ----
@@ -12664,6 +12817,7 @@ const routes = [
   { re: /^missions$/, page: (r) => renderMissions(r), nav: 'missions' },
   { re: /^(parrainage|parrain-[\w-]+)$/, page: (r) => renderReferral(r), nav: 'ref' },
   { re: /^defi$/, page: (r) => renderChallenge(r), nav: 'defi' },
+  { re: /^(special|defi-special)$/, page: (r) => __mods['special.js'].renderSpecial(r), nav: 'special' },
 ];
 
 function route() {
@@ -13333,6 +13487,115 @@ h1, h2, h3 { letter-spacing: -.01em; }
   .game-host.is-full > .slot.online-game .on-timer { padding-right: 0; }
 }
 
+/* ============ La Fortune (games/fortune.js): the owner's painted frame, 1280 × 720, cropped on phones ============ */
+.g-fortune { --slot-bg: radial-gradient(600px 300px at 50% -5%, rgba(250, 204, 21, .25), transparent 70%), linear-gradient(180deg, #5b0a0a 0%, #1c0303 100%); }
+.ft-frame { padding: 0; border-radius: 4px; background: none; box-shadow: 0 0 50px rgba(239, 68, 68, .25); }
+.ft-frame > .slot-stage { padding: 0; background: #3b0606; border-radius: 4px; }
+.ft-scene { --x0: 0; --cw: 1280; position: relative; width: min(100%, calc((100vh - 250px) * var(--cw) / 720)); min-width: min(100%, 300px); aspect-ratio: var(--cw) / 720; margin: 0 auto; overflow: hidden; }
+@media (max-aspect-ratio: 1/1), (max-width: 700px) { .ft-scene { --x0: 205; --cw: 870; } }
+.ft-art { position: absolute; top: 0; height: 100%; width: calc(1280 / var(--cw) * 100%); left: calc(var(--x0) / var(--cw) * -100%); container-type: inline-size;
+  background: url(assets/games/fortune/bg.webp?v=1) center / 100% 100% no-repeat; }
+.ft-win { position: absolute; left: 18.9%; top: 30.9%; width: 62%; height: 52.2%; }
+.g-fortune .reels-host { position: absolute; inset: 0; }
+.g-fortune .rs { width: 100%; height: 100%; aspect-ratio: auto; min-width: 0; gap: 0; }
+.g-fortune .rs-reel { background: none; border-radius: 0; }
+.g-fortune .rs-reel::before, .g-fortune .rs-reel::after { display: none; }
+.g-fortune .rs-cell { overflow: visible; }
+.ft-img { height: calc(86cqh / var(--rows)); max-width: 96%; width: auto; aspect-ratio: 1; object-fit: contain; border-radius: 12%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .55)); pointer-events: none; }
+.rs-cell .ft-img.ft-coin { border-radius: 50%; height: calc(84cqh / var(--rows)); }
+.rs-cell.wild .ft-img { box-shadow: 0 0 0 2px #facc15, 0 0 16px rgba(250, 204, 21, .7); }
+.rs-cell.scat .ft-img { box-shadow: 0 0 0 2px #fde68a, 0 0 18px rgba(253, 230, 138, .7); }
+.ft-sc { position: absolute; left: 50%; bottom: 9%; transform: translateX(-50%); padding: 1px 6px; border-radius: 3px; background: linear-gradient(180deg, #b91c1c, #7f1d1d); border: 1px solid #fde68a;
+  font: 900 calc(11cqh / var(--rows)) 'Bebas Neue', Impact, sans-serif; letter-spacing: .08em; color: #fde68a; white-space: nowrap; }
+.ft-cv { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); padding: 0 .3em; border-radius: 3px; background: rgba(60, 20, 0, .55);
+  font: 900 calc(17cqh / var(--rows)) KeCoin, Archivo, sans-serif; color: #fff7d6; text-shadow: 0 1px 0 #000, 0 0 6px #f59e0b; white-space: nowrap; }
+.ft-cv.jp { top: auto; bottom: 2%; transform: translateX(-50%); font-size: calc(12cqh / var(--rows)); }
+.ft-m { position: absolute; right: 8%; top: 6%; padding: 0 .35em; border-radius: 3px; background: #dc2626; border: 1px solid #fde68a; font: 900 calc(12cqh / var(--rows)) KeCoin, Archivo, sans-serif; color: #fff; font-style: normal; }
+.rs-cell.blank { background: radial-gradient(circle, rgba(250, 204, 21, .06), transparent 70%); }
+.ft-rolling .rs-cell.blank { animation: ftRoll .35s ease-in-out infinite alternate; }
+@keyframes ftRoll { to { background: radial-gradient(circle, rgba(250, 204, 21, .3), transparent 70%); } }
+.rs-cell.counted .ft-img { box-shadow: 0 0 0 3px #fde047, 0 0 22px rgba(253, 224, 71, .9); }
+.ft-rows { position: absolute; inset: 0; display: grid; grid-template-rows: repeat(3, 1fr); pointer-events: none; z-index: 2; }
+.ft-rows i { display: grid; place-items: center; font: 900 6cqw 'Bebas Neue', Impact, sans-serif; color: #fff; font-style: normal; opacity: 0; transition: opacity .2s; }
+.ft-rows i.on { opacity: 1; background: linear-gradient(90deg, transparent, rgba(253, 224, 71, .45) 15%, rgba(253, 224, 71, .55) 50%, rgba(253, 224, 71, .45) 85%, transparent); box-shadow: 0 0 30px rgba(253, 224, 71, .8);
+  text-shadow: 0 0 12px #f59e0b, 0 3px 0 #92400e; animation: ftRow .5s ease-in-out infinite alternate; }
+.ft-rows i.on.x5 { background: linear-gradient(90deg, transparent, rgba(239, 68, 68, .5) 15%, rgba(250, 204, 21, .6) 50%, rgba(239, 68, 68, .5) 85%, transparent); color: #fde047; }
+@keyframes ftRow { to { filter: brightness(1.35); } }
+.ft-jp { position: absolute; top: 19.4%; width: 15%; height: 8.6%; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; text-align: center; }
+.ft-jp.major { left: 25.6%; } .ft-jp.jackpot { left: 59.6%; }
+.ft-jp small { font: 900 1.25cqw 'Cinzel', Georgia, serif; letter-spacing: .1em; color: #fde68a; text-shadow: 0 1px 0 #000; }
+.ft-jp b { font: 900 1.9cqw KeCoin, Archivo, sans-serif; color: #fff; text-shadow: 0 0 8px rgba(253, 230, 138, .8), 0 1px 0 #000; }
+.ft-jp.hot { animation: ftHot .4s ease-in-out infinite alternate; }
+@keyframes ftHot { to { transform: scale(1.12); filter: brightness(1.5); } }
+.ft-bowl { position: absolute; left: 43.4%; top: 1%; width: 13.2%; height: 27.3%; }
+.ft-heap { position: absolute; left: 6%; right: 6%; bottom: 31%; height: 70%; }
+.ft-heap svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 6px rgba(253, 224, 71, .6)); }
+.ft-pot { position: absolute; left: 50%; bottom: 5%; transform: translateX(-50%); padding: .1em .5em; border-radius: 3px; background: rgba(60, 10, 0, .75); border: 1px solid #facc15;
+  font: 900 1.25cqw KeCoin, Archivo, sans-serif; color: #fde047; white-space: nowrap; }
+.ft-pot:empty { display: none; }
+.ft-bowl.grow .ft-heap { animation: ftGrow .5s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes ftGrow { 40% { transform: scale(1.2) translateY(-4%); } }
+.ft-bowl.pour { animation: ftHot .3s ease-in-out infinite alternate; }
+.ft-word { position: absolute; left: 50%; top: 56%; z-index: 4; transform: translate(-50%, -50%); opacity: 0; pointer-events: none; white-space: nowrap;
+  font: 900 7cqw 'Bebas Neue', Impact, sans-serif; letter-spacing: .04em; color: #fde047; text-shadow: 0 4px 0 #7f1d1d, 0 0 24px rgba(250, 204, 21, .8); }
+.ft-word.jackpot { color: #fca5a5; } .ft-word.major { color: #86efac; }
+.ft-fly { position: fixed; z-index: 3000; pointer-events: none; }
+.ft-fly .ft-img { height: 100%; border-radius: 50%; }
+.ft-intro { width: 120px; height: 120px; object-fit: contain; border-radius: 12%; }
+.ft-pay { width: 54px; height: 54px; } .ft-pay .ft-img { height: 100%; }
+.slot.ft-mega .ft-art { box-shadow: inset 0 0 80px rgba(250, 204, 21, .5); }
+.slot.ft-hold .ft-win { box-shadow: 0 0 0 2px rgba(253, 224, 71, .4), 0 0 40px rgba(253, 224, 71, .35); }
+/* ============ Défi spécial (#special) ============ */
+.side-special { color: #fde68a !important; }
+.side-special > span { font-size: 15px; }
+.sp-badge { background: #b45309 !important; color: #fff; font-size: 10px; }
+.sp-badge.ready { background: #16a34a !important; animation: spPulse 1s ease-in-out infinite alternate; }
+@keyframes spPulse { to { box-shadow: 0 0 0 4px rgba(34, 197, 94, .35); } }
+.sp-banner { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; padding: 14px 18px; border-radius: 6px; color: #fff; text-decoration: none;
+  background: linear-gradient(110deg, #7c2d12, #b45309 45%, #facc15 100%); border: 1px solid rgba(253, 230, 138, .6); box-shadow: 0 10px 30px rgba(180, 83, 9, .35); position: relative; overflow: hidden; }
+.sp-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .35) 50%, transparent 70%); transform: translateX(-100%); animation: spShine 3.2s ease-in-out infinite; }
+@keyframes spShine { 60%, 100% { transform: translateX(100%); } }
+.sp-banner > span { font-size: 34px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .4)); }
+.sp-banner div { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.sp-banner b { font: 900 clamp(16px, 2.6vw, 22px) 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; text-shadow: 0 2px 0 rgba(0, 0, 0, .3); }
+.sp-banner small { font-size: 13px; opacity: .95; }
+.sp-banner em { font-style: normal; font-weight: 800; white-space: nowrap; background: rgba(0, 0, 0, .25); padding: 6px 12px; border-radius: 4px; }
+@media (max-width: 600px) { .sp-banner em { display: none; } }
+.sp-page { padding: clamp(16px, 3vw, 30px); }
+.sp-hero { text-align: center; padding: clamp(18px, 4vw, 40px) 12px; border-radius: 8px; margin-bottom: 22px;
+  background: radial-gradient(70% 90% at 50% 0%, rgba(250, 204, 21, .35), transparent 70%), linear-gradient(180deg, #3b1d06, #120802); border: 1px solid rgba(253, 230, 138, .35); }
+.sp-hero h1 { margin: 6px 0 8px; font: 900 clamp(30px, 6vw, 56px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; }
+.sp-hero h1 em { font-style: normal; color: #facc15; }
+.sp-lead { margin: 0 auto 10px; max-width: 560px; color: #fde68a; }
+.sp-prize { display: flex; flex-direction: column; align-items: center; margin: 6px 0 18px; }
+.sp-prize b { font: 900 clamp(46px, 11vw, 96px)/1 'Bebas Neue', Impact, KeCoin, sans-serif; background: linear-gradient(180deg, #fffbe6, #facc15 50%, #b45309); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 4px 0 #451a03) drop-shadow(0 0 18px rgba(250, 204, 21, .5)); }
+.sp-prize small { color: #fde68a; font-weight: 700; }
+.sp-progress { max-width: 520px; margin: 0 auto 16px; }
+.sp-bar { height: 14px; border-radius: 8px; background: rgba(0, 0, 0, .45); border: 1px solid rgba(253, 230, 138, .35); overflow: hidden; }
+.sp-bar i { display: block; height: 100%; background: linear-gradient(90deg, #f59e0b, #facc15, #fde68a); box-shadow: 0 0 12px rgba(250, 204, 21, .7); }
+.sp-progress span { display: block; margin-top: 6px; font-size: 14px; color: #fde68a; }
+.sp-claim { animation: spPulse 1s ease-in-out infinite alternate; }
+.sp-won { display: inline-block; padding: 12px 16px; border-radius: 6px; background: rgba(22, 163, 74, .2); border: 1px solid rgba(74, 222, 128, .5); }
+.sp-rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; margin-bottom: 26px; }
+.sp-rules > div { padding: 16px; border-radius: 6px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .08); }
+.sp-rules span { font-size: 28px; }
+.sp-rules > div > b { display: block; margin: 6px 0 4px; font-size: 16px; color: #fde68a; }
+.sp-rules p b { color: #fde68a; }
+.sp-rules p { margin: 0; font-size: 14px; color: #cbd5e1; }
+.sp-h { font: 900 26px 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; margin: 0 0 12px; }
+.sp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.sp-game { display: flex; gap: 12px; padding: 10px; border-radius: 6px; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .08); }
+.sp-game.full { border-color: rgba(74, 222, 128, .55); background: rgba(22, 163, 74, .1); }
+.sp-cover { position: relative; flex: 0 0 92px; height: 92px; border-radius: 4px; overflow: hidden; display: block; }
+.sp-cover svg { width: 100%; height: 100%; display: block; }
+.sp-ok { position: absolute; inset: 0; display: grid; place-items: center; font-size: 40px; color: #fff; background: rgba(22, 163, 74, .55); text-shadow: 0 2px 4px #000; }
+.sp-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sp-body > b { font-size: 15px; }
+.sp-body > small { color: #94a3b8; }
+.sp-body ul { list-style: none; margin: 4px 0 6px; padding: 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.sp-body li { font-size: 12px; padding: 3px 7px; border-radius: 3px; background: rgba(0, 0, 0, .35); color: #94a3b8; }
+.sp-body li.on { color: #bbf7d0; background: rgba(22, 163, 74, .25); }
+.sp-body .btn { align-self: flex-start; margin-top: auto; }
 .on-timer .on-wait { display: block; margin-top: 4px; font-size: 12px; color: #fde68a; min-height: 0; }
 /* wheel games online (La Roue Folle, Le Plateau, La Pêche, La Roue d’Or): no autoplay, the wheel fits the phone screen */
 .online-game .rt-tools, .online-game .rt-autopick { display: none !important; }

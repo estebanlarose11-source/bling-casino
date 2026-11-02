@@ -207,6 +207,7 @@ class PecheGame extends BaseGame {
     const p = center(this.q('.pe-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);
     this.q(`.pe-spot[data-k="${seg}"]`)?.classList.add('hit');
     const b = placed[seg] || 0;
+    if (seg[0] === 'f' && b > 0) dispatchEvent(new CustomEvent('sb:bonus', { detail: { game: this.game.id, key: seg } })); // Défi spécial (special.js)
     // the fishing is played when there is a stake on the fish (always at an online table: everyone watches)
     if (seg[0] === 'f' && (b > 0 || this.online)) { this.msg(`${NAME[seg]} ! Direction l’étang…`); await this.wait(900); await this.fishing(seg, L, O); if (this.dead) return 0; }
     const { ret, M, cap } = payout(O, placed);

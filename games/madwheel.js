@@ -306,6 +306,7 @@ class MadWheelGame extends BaseGame {
     const lines = [];
     const b = placed[seg] || 0, tm = top && top.seg === seg ? top.m : 1;
     this.pose(b > 0 ? 'cheer' : 'sad', 1800);
+    if (isNaN(+seg) && b > 0) dispatchEvent(new CustomEvent('sb:bonus', { detail: { game: this.game.id, key: seg } })); // Défi spécial (special.js)
     let arrow = ctx.arrow ?? (ctx.seed ? arrowOf(ctx.seed, this.room?.me) : undefined);
     // a bonus is played when there is a stake on it (always at an online table: everyone watches)
     if (isNaN(+seg) && (b > 0 || this.online)) {

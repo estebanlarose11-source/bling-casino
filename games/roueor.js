@@ -223,6 +223,7 @@ class RoueOrGame extends BaseGame {
     await this.zoomResult(true);
     if (this.dead) return;
     if (this.auto) this.stopAuto(); // the bonus needs the player's choices
+    if (bet) dispatchEvent(new CustomEvent('sb:bonus', { detail: { game: this.game.id, key: 'or' } })); // Défi spécial (special.js)
     if (!bet) { this.msg('★ De l’or ! Les joueurs qui ont misé jouent leur bonus des 24 cubes…'); return 0; }
     this.msg('★ BONUS DES 24 CUBES ★');
     const M = await this.bonus(m);

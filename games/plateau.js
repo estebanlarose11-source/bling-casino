@@ -280,6 +280,7 @@ class PlateauGame extends BaseGame {
     const seg = O.seg;
     this.q(`.pt-spot[data-k="${seg}"]`)?.classList.add('hit');
     const b = placed[seg] || 0;
+    if (O.run && b > 0) dispatchEvent(new CustomEvent('sb:bonus', { detail: { game: this.game.id, key: seg } })); // Défi spécial (special.js)
     // on a bonus case the board is played when there is a stake on it (always at an online table: everyone watches)
     if (O.run && (b > 0 || this.online)) {
       this.msg(`Bonus ${NAME[seg]} !`);
