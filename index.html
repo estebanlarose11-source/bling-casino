@@ -3171,6 +3171,41 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pe-line { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
 .pe-say { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 6; max-width: 92%; padding: 6px 14px; border-radius: 3px; background: rgba(8, 47, 73, .82); font-weight: 800; font-size: 14px; text-align: center; color: #e0f2fe; }
 @media (max-width: 600px) { .pe-spots { grid-template-columns: repeat(3, 1fr); } .pe-fisher { width: 92px; } .pe-sky { height: 110px; } .pe-title { left: 96px; right: 60px; } .pe-sun { width: 40px; height: 40px; right: 12px; } }
+/* La Pêche · images peintes du propriétaire (assets/games/peche) */
+.slot.g-peche > .slot-bg { background: linear-gradient(180deg, rgba(6, 4, 2, .55), rgba(6, 4, 2, .3) 40%, rgba(6, 4, 2, .7)), url(assets/games/peche/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
+.g-peche > .slot-bg::after { display: none; }
+.g-peche .pe-zone { --ptz: min(560px, calc(100vw - 48px), calc(100vh - 300px)); }
+.g-peche .pe-zone .pt-svg { position: absolute; left: 14.5%; top: 14.5%; width: 71%; height: 71%; filter: none; }
+.pe-frame { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; user-select: none; filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .7)); }
+.g-peche .pe-ptr { top: 2%; z-index: 3; width: 7%; height: auto; background: none; clip-path: none; transform-origin: 50% 10%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6)); }
+.g-peche .pe-ptr img { display: block; width: 100%; height: auto; pointer-events: none; }
+.g-peche .pe-hub { z-index: 2; width: 24%; isolation: isolate; background: none !important; border: 0 !important; box-shadow: none !important; color: #fff; text-shadow: 0 2px 4px #000, 0 0 8px #000; }
+.g-peche .pe-hub::before { content: ''; position: absolute; inset: 0; z-index: -1; background: url(assets/games/peche/hub.webp?v=1) center / contain no-repeat; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); animation: peGear 14s linear infinite; }
+.g-peche .pe-hub .big { color: #fff; text-shadow: 0 2px 4px #000, 0 0 10px #000; }
+.pe-hubfish { width: 82%; height: auto; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .7)); animation: ptPulse .6s ease-in-out infinite alternate; }
+@keyframes peGear { to { transform: rotate(1turn); } }
+.pe-ico { width: 58px; height: 30px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45)); }
+.pe-hico { width: 22px; height: 14px; object-fit: contain; vertical-align: middle; }
+/* the pond */
+.g-peche .pe-bonus { background: #0e3b3a url(assets/games/peche/pond.webp?v=1) center / cover no-repeat; }
+.g-peche .pe-sky, .g-peche .pe-water { background: transparent; }
+.g-peche .pe-sun, .g-peche .pe-waves, .g-peche .pe-water::after { display: none; }
+.g-peche .pe-title { color: #fff; text-shadow: 0 2px 0 #0c4a6e, 0 0 12px rgba(0, 0, 0, .7); }
+.g-peche .pe-fisher { width: 96px; aspect-ratio: 330 / 453; bottom: -22px; left: 6px; }
+.pe-fisher img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: bottom; pointer-events: none; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .45)); }
+.pe-fisher .pe-f2 { display: none; transform: scaleX(-1); }
+.pe-fisher:has(.pe-arm.reel) .pe-f1 { display: none; }
+.pe-fisher:has(.pe-arm.reel) .pe-f2 { display: block; animation: peTug .22s ease-in-out infinite alternate; }
+@keyframes peTug { to { transform: scaleX(-1) rotate(-2deg) translateX(2px); } }
+.pe-fisher .pe-rod { position: absolute; left: 99%; top: 6%; width: 2px; height: 2px; }
+.pe-fisher:has(.pe-arm.reel) .pe-rod { left: 96%; top: 2%; }
+.pe-fisher .pe-arm { display: none; }
+.g-peche .pe-hook { width: 14px; height: 62px; margin: -2px 0 0 -7px; border: 0; border-radius: 0; background: url(assets/games/peche/float.webp?v=1) center top / contain no-repeat; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .5)); }
+.pe-fish .pe-fimg { display: block; width: var(--w); height: auto; transform: scaleX(var(--dir)); pointer-events: none; }
+.pe-fish > b { position: absolute; left: 50%; top: 52%; translate: -50% -50%; font: 900 clamp(12px, calc(var(--w) * .2), 22px)/1 KeCoin, 'Bebas Neue', Archivo, sans-serif; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .65), 0 0 6px rgba(0, 0, 0, .7); white-space: nowrap; pointer-events: none; }
+.pe-fish.gold .pe-fimg { filter: drop-shadow(0 0 8px rgba(253, 224, 71, .9)); }
+.pe-fish.gold > b { color: #fde047; }
+@media (max-width: 600px) { .g-peche .pe-fisher { width: 76px; bottom: -16px; } .pe-ico { width: 46px; } }
 
 /* ============ La Roue d’Or ============ */
 .g-roueor { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(251, 191, 36, .25), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(75, 85, 99, .35), transparent 70%), linear-gradient(180deg, #14110a 0%, #06070b 100%); }
@@ -7834,6 +7869,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'peche', date: '2026-11-02', title: 'La Pêche en vraies images', items: ['Nouvelle roue : cadre en bois verni, moyeu en engrenage doré, flotteur en guise de pointeur', 'Une salle de casino en fond', 'L’étang peint, de vrais poissons bleu, orange et rouge', 'Le pêcheur attend, puis tire sur sa canne quand ça mord', 'Les plus gros poissons (×100 et plus) sont en or massif !'] },
   { game: 'chasse', date: '2026-11-02', title: 'La Chasse en vraies images', isNew: true, items: ['Nouveaux décors peints : jour, coucher du soleil et nuit', 'Vrais animaux : canards et lapins de profil, faisans, sangliers, cerfs', '5 cartouches et 30 secondes : chaque animal touché révèle un multiplicateur de ×0 à ×100', 'Le cerf doré, rare et très rapide : ×1 000 !', 'Plein écran à l’horizontale sur téléphone et sur ordinateur'] },
   { game: 'taco', date: '2026-11-02', title: 'Nouveau jeu : La Pizza Yo-Yo', isNew: true, items: ['La Fiesta devient La Pizza Yo-Yo : une pizza ronde qui tourne', '4 symboles qui se touchent gagnent, les grosses connexions écartent une part', 'Food trucks multiplicateurs jusqu’à ×50', 'Bonus Le Four : 4 pepperonis = une part de plus et +2 tours'] },
   { game: 'pharaon', date: '2026-11-02', title: 'Le Totem illustré', items: ['Nouveaux symboles peints : masque du pharaon, faucon, ankh d’or, cobra, scarabée, amphore', 'Nouveau soleil scatter', 'Nouveau décor : le pharaon à l’orbe (et le pharaon sur son trône sur téléphone)', 'Nouvelle jaquette']},
@@ -10504,7 +10540,7 @@ const FILES = {
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', '461b177bb0'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '20340503d5'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', 'e0a1ef57db'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', 'a91ebf3389'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '6f6628b9f9'],
 };

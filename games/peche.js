@@ -35,6 +35,12 @@ function strikes() {
 function pond(k) { return Array.from({ length: POND }, () => wpick(FISH[k])); }
 /* ===END ENGINE */
 
+// Painted art by the owner (assets/games/peche/): fish, golden fish, fisherman (2 poses), float, wheel frame, hub, pond, room.
+const IMG_V = 1;
+const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
+const src = (n) => asset(`assets/games/peche/${n}.webp`);
+const fishImg = (k, cls = 'pe-ico') => `<img class="${cls}" src="${src(k)}" alt="" draggable="false">`;
+const FILL = { w: '#f8fafc', s: '#7dd3fc', fb: '#1e40af', fo: '#9a3412', fr: '#7f1d1d' };
 const COL = { w: '#f8fafc', s: '#7dd3fc', fb: '#2563eb', fo: '#f97316', fr: '#dc2626' };
 const NAME = { w: '×2 blanc', s: '×2 ciel', fb: 'Poisson bleu', fo: 'Poisson orange', fr: 'Poisson rouge' };
 const RANGE = { fb: '×3 à ×100', fo: '×8 à ×500', fr: '×20 à ×5 000' };
@@ -43,7 +49,7 @@ const fishSVG = (c, sz, txt = '') => `<svg viewBox="0 0 64 40" width="${sz}" hei
   <ellipse cx="28" cy="20" rx="25" ry="15" fill="${c}" stroke="rgba(0,0,0,.4)" stroke-width="1.5"/><path d="M22 6 Q30 0 36 7" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width="1.2"/>
   <ellipse cx="25" cy="25" rx="16" ry="6" fill="#fff" opacity=".25"/><circle cx="12" cy="16" r="3.6" fill="#fff"/><circle cx="11.2" cy="16" r="1.9" fill="#111"/>
   <path d="M5 23 Q8 25 11 23" stroke="#111" stroke-width="1.3" fill="none" stroke-linecap="round"/>${txt ? `<text x="30" y="24.5" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,sans-serif" font-size="13" fill="#fff" stroke="rgba(0,0,0,.55)" stroke-width="2.2" paint-order="stroke">${txt}</text>` : ''}</svg>`;
-const label = (k, sz) => (k[0] === 'f' ? fishSVG(COL[k], sz) : '×2');
+const label = (k) => (k[0] === 'f' ? fishImg(k) : '×2');
 const pt = (a, r) => { const t = ((a - 90) * Math.PI) / 180; return [150 + r * Math.cos(t), 150 + r * Math.sin(t)]; };
 const slicePath = (i, r = 146) => { const p0 = pt(i * A, r), p1 = pt((i + 1) * A, r); return `M150 150 L${p0[0].toFixed(2)} ${p0[1].toFixed(2)} A${r} ${r} 0 0 1 ${p1[0].toFixed(2)} ${p1[1].toFixed(2)} Z`; };
 const xs = (m) => m.toLocaleString('fr-FR');
@@ -52,8 +58,8 @@ function wheelSVG() {
   let s = '<g class="pe-wheel">';
   for (let i = 0; i < NS; i++) {
     const k = SEGS[i], ang = ((i + 0.5) * A).toFixed(2);
-    s += `<path d="${slicePath(i)}" fill="${COL[k]}" stroke="#0b1626" stroke-width=".9"/>`;
-    if (k[0] === 'f') s += `<g transform="rotate(${ang} 150 150) translate(150 30) rotate(90) scale(.42)"><g transform="translate(-32 -20)">${fishSVG(COL[k], 64)}</g></g>`;
+    s += `<path d="${slicePath(i)}" fill="${FILL[k]}" stroke="#0b1626" stroke-width=".9"/>`;
+    if (k[0] === 'f') s += `<g transform="rotate(${ang} 150 150) translate(150 30) rotate(90) scale(.42)"><image href="${src(k)}" x="-34" y="-17" width="68" height="34" preserveAspectRatio="xMidYMid meet"/></g>`;
     else s += `<text x="150" y="32" text-anchor="middle" font-family="KeCoin,'Bebas Neue',Impact,sans-serif" font-size="15" fill="${k === 'w' ? '#0f172a' : '#0c4a6e'}" transform="rotate(${ang} 150 150)">×2</text>`;
   }
   s += '<g class="pe-bolts"></g></g>';
@@ -62,15 +68,7 @@ function wheelSVG() {
   return `<svg class="pt-svg" viewBox="0 0 300 300"><circle cx="150" cy="150" r="149.5" fill="#0b1626"/>${s}<g>${bl}</g><circle cx="150" cy="150" r="30" fill="#0c2a4a" stroke="#7dd3fc" stroke-width="3"/></svg>`;
 }
 
-const FISHER = `<svg viewBox="0 0 120 150" aria-hidden="true">
-  <rect x="0" y="118" width="120" height="14" rx="3" fill="#8b5a2b" stroke="#4a2c12" stroke-width="2"/><rect x="10" y="130" width="8" height="20" fill="#4a2c12"/><rect x="90" y="130" width="8" height="20" fill="#4a2c12"/>
-  <path d="M38 118 L42 92 L58 92 L62 118" fill="#1e3a8a"/><rect x="34" y="60" width="32" height="36" rx="8" fill="#facc15" stroke="#a16207" stroke-width="2"/>
-  <path d="M40 66 L60 66 L56 92 L44 92 Z" fill="#16a34a" opacity=".85"/>
-  <circle cx="50" cy="44" r="15" fill="#f2c39a" stroke="#7c4a24" stroke-width="2"/><path d="M33 40 Q50 22 67 40 L71 42 L29 42 Z" fill="#facc15" stroke="#a16207" stroke-width="2"/>
-  <circle cx="45" cy="46" r="2" fill="#111"/><circle cx="55" cy="46" r="2" fill="#111"/><path d="M44 52 Q50 57 56 52" stroke="#7c4a24" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <path d="M42 54 Q50 62 58 54 Q56 66 50 66 Q44 66 42 54Z" fill="#9a6a3a"/>
-  <g class="pe-arm"><path d="M64 70 L82 62" stroke="#facc15" stroke-width="9" stroke-linecap="round"/><circle cx="84" cy="61" r="5" fill="#f2c39a"/>
-  <path class="pe-rod" d="M80 66 L118 6" stroke="#5b3716" stroke-width="3.5" stroke-linecap="round"/><circle cx="86" cy="57" r="4" fill="#94a3b8" stroke="#334155"/></g></svg>`;
+const FISHER = () => `<img class="pe-f1" src="${src('fisher1')}" alt="" draggable="false"><img class="pe-f2" src="${src('fisher2')}" alt="" draggable="false"><i class="pe-rod"></i><i class="pe-arm"></i>`;
 
 function tick(v) {
   if (isMuted()) return;
@@ -88,15 +86,15 @@ class PecheGame extends BaseGame {
       cls: 'table-game peche',
       head: '<div class="hist pt-hist pe-hist"></div>',
       stage: `<div class="pe-view">
-          <div class="pt-zone pe-zone"><div class="pt-ptr pe-ptr"></div>${wheelSVG()}<div class="pt-hub pe-hub">LA<br>PÊCHE</div><div class="pe-flash"></div></div>
+          <div class="pt-zone pe-zone"><div class="pt-ptr pe-ptr"><img src="${src('float')}" alt="" draggable="false"></div>${wheelSVG()}<img class="pe-frame" src="${src('frame')}" alt="" draggable="false"><div class="pt-hub pe-hub">LA<br>PÊCHE</div><div class="pe-flash"></div></div>
           <div class="pe-bonus" hidden>
-            <div class="pe-sky"><div class="pe-sun"></div><div class="pe-fisher">${FISHER}</div><h3 class="pe-title">PÊCHE AU POISSON BLEU</h3></div>
+            <div class="pe-sky"><div class="pe-sun"></div><div class="pe-fisher">${FISHER()}</div><h3 class="pe-title">PÊCHE AU POISSON BLEU</h3></div>
             <div class="pe-water"><div class="pe-waves"></div><div class="pe-fishes"></div><div class="pe-hook"></div></div>
             <svg class="pe-line" aria-hidden="true"><path d="" fill="none" stroke="#e2e8f0" stroke-width="1.6"/></svg>
             <div class="pe-say">Le pêcheur lance sa ligne…</div>
           </div>
         </div>`,
-      below: `<div class="felt pe-felt"><div class="pt-spots pe-spots">${SPOTS.map((k) => `<button class="pt-spot pe-spot ${k}" data-k="${k}" style="--sc:${COL[k]}"><b>${label(k, 42)}</b><small>${k[0] === 'f' ? `${NAME[k]} · ${RANGE[k]}` : NAME[k]}</small></button>`).join('')}</div>
+      below: `<div class="felt pe-felt"><div class="pt-spots pe-spots">${SPOTS.map((k) => `<button class="pt-spot pe-spot ${k}" data-k="${k}" style="--sc:${COL[k]}"><b>${label(k)}</b><small>${k[0] === 'f' ? `${NAME[k]} · ${RANGE[k]}` : NAME[k]}</small></button>`).join('')}</div>
         <p class="pt-note pe-note">⚡<span>À chaque lancer, <b>4 éclairs</b> frappent la roue : la case touchée est multipliée (jusqu’à ×10 sur les ×2, ×5 sur les poissons).</span></p>${BetBoard.chipsHTML()}</div>`,
       hello: 'Mise sur ×2 blanc, ×2 ciel ou un poisson, puis lance la roue.',
     });
@@ -104,6 +102,7 @@ class PecheGame extends BaseGame {
     this.board = new BetBoard(this, this.q('.pe-felt'), null);
     this.board.paint();
     this.wheel = this.q('.pe-wheel');
+    ['fb', 'fo', 'fr', 'gold', 'fisher1', 'fisher2', 'pond'].forEach((n) => { new Image().src = src(n); });
   }
 
   stakeLabel() { return this.board ? this.board.total() : 0; }
@@ -112,7 +111,7 @@ class PecheGame extends BaseGame {
 
   histAdd(seg, m) {
     this.histArr.unshift([seg, m]); this.histArr = this.histArr.slice(0, 12);
-    this.q('.pe-hist').innerHTML = this.histArr.map(([s, mm]) => `<span style="background:${COL[s]};color:${s === 'w' || s === 's' ? '#0f172a' : '#fff'}">${s[0] === 'f' ? fishSVG('#fff', 18) : '×2'}${mm > 1 ? `<em>⚡${mm}</em>` : ''}</span>`).join('');
+    this.q('.pe-hist').innerHTML = this.histArr.map(([s, mm]) => `<span style="background:${COL[s]};color:${s === 'w' || s === 's' ? '#0f172a' : '#fff'}">${s[0] === 'f' ? fishImg(s, 'pe-hico') : '×2'}${mm > 1 ? `<em>⚡${mm}</em>` : ''}</span>`).join('');
   }
 
   spin(idx) {
@@ -176,7 +175,7 @@ class PecheGame extends BaseGame {
       if (this.dead) return;
       this.histAdd(seg, L);
       this.wheel.insertAdjacentHTML('beforeend', `<path class="pt-hl" d="${slicePath(idx)}" fill="#fff"/>`);
-      this.q('.pe-hub').innerHTML = seg[0] === 'f' ? fishSVG(COL[seg], 46) : '<b class="big">×2</b>';
+      this.q('.pe-hub').innerHTML = seg[0] === 'f' ? fishImg(seg, 'pe-hubfish') : '<b class="big">×2</b>';
       if (L > 1) { this.q('.pe-hub').insertAdjacentHTML('beforeend', `<em class="pe-lx">⚡×${L}</em>`); sfx.upgrade?.(); }
       const p = center(this.q('.pe-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);
       this.q(`.pe-spot[data-k="${seg}"]`)?.classList.add('hit');
@@ -207,7 +206,7 @@ class PecheGame extends BaseGame {
     this.q('.pe-title').innerHTML = `PÊCHE AU ${NAME[k].toUpperCase()}${L > 1 ? ` · ⚡×${L}` : ''}`;
     list.innerHTML = vals.map((x, i) => {
       const sz = size(x), top = 8 + ((i * 37) % 78), dur = (7 + ((i * 13) % 9)) * (1 + sz / 200), del = -((i * 1.7) % dur);
-      return `<div class="pe-fish" data-i="${i}" style="top:${top}%;--w:${sz}px;--dur:${dur.toFixed(1)}s;--del:${del.toFixed(1)}s;--dir:${i % 2 ? -1 : 1}">${fishSVG(COL[k], sz, `×${xs(x)}`)}</div>`;
+      return `<div class="pe-fish${x >= 100 ? ' gold' : ''}" data-i="${i}" style="top:${top}%;--w:${sz}px;--dur:${dur.toFixed(1)}s;--del:${del.toFixed(1)}s;--dir:${i % 2 ? -1 : 1}">${fishImg(x >= 100 ? 'gold' : k, 'pe-fimg')}<b>×${xs(x)}</b></div>`;
     }).join('');
     zone.hidden = true; box.hidden = false;
     box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400 });
