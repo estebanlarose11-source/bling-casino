@@ -208,14 +208,14 @@ service cloud.firestore {
         && request.resource.data.list is map && request.resource.data.list.size() <= 500;
     }
 
-    // ---------- Tables en ligne (L'Éclair Online, Le 21 Online, Le Texas Online) ----------
-    // Salons (L'Éclair Online, Le 21 Online) : seats/{uid} = le siège de chaque joueur (prêt, mise, décisions),
+    // ---------- Tables en ligne (L'Éclair Online, Le 21 Online, Le Texas Online, les roues Online) ----------
+    // Salons (L'Éclair Online, Le 21 Online, La Roue Folle, Le Plateau, La Pêche et La Roue d'Or Online) : seats/{uid} = le siège de chaque joueur (prêt, mise, décisions),
     // écrit par lui seul ; seeds/{n}-{k} = le tirage de la manche n, écrit une seule fois par le premier joueur
     // présent quand tout le salon est prêt (puis, au 21, quand tout le monde a fini).
     // Le Texas Online : une manche dure LEN ms sur l'horloge du serveur (manche r = temps / LEN) ; seeds/{r}-{k}
     // écrit après la fermeture des mises (ou des décisions), bets/{r}-{uid} écrit avant la limite.
     // chat : le chat de chaque table, mêmes règles que le chat général.
-    function roomGame(g) { return g in ['storm-online', 'bj-online']; }
+    function roomGame(g) { return g in ['storm-online', 'bj-online', 'madwheel-online', 'plateau-online', 'peche-online', 'roueor-online']; }
     function tableLen(g) { return {'holdem-online': 30000}.get(g, 0); }
     function seedAt(g, k) { return {'holdem-online': {'a': 9000, 'b': 21000}}.get(g, {}).get(k, 999999); }
     function betUntil(g) { return {'holdem-online': 21000}.get(g, 0); }

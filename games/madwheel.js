@@ -8,6 +8,7 @@ const { BetBoard } = __mods['core/roulette.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, audioContext, isMuted } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
+const { mergeOpts, withRoom, wpickR, rng } = __mods['online.js'];
 
 /* ===ENGINE (original) */
 // 54 cases spread evenly around the wheel; with the Top Slot odds below every spot returns about 94 %.
@@ -35,14 +36,15 @@ const CTC = { 5: 16, 10: 14, 15: 10, 20: 7, 25: 5, 50: 4, 100: 2, 200: 1, 500: 1
 })();
 const CAPX = 25000;
 const ZOOM_MAX = 2.4; // camera zoom on the pointer when the wheel stops
-const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-function drawTop() { const r = Math.random(); let a = 0; for (const k in TQ) { a += TQ[k]; if (r < a) return { seg: k, m: wpick(TM) }; } return null; }
-function chBoard() { const a = []; for (const v in CHB) for (let i = 0; i < CHB[v]; i++) a.push(+v); return shuffle(a); }
-function coinRun() { const a = wpick(CL), b = wpick(CL), f = Math.random() < 0.5 ? 0 : 1; return { v: [a, b], face: f, M: [a, b][f] }; }
-function pachRun() {
+const shuffle = (a, R = Math.random) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+// every draw takes its random source R (Math.random, or the shared seed of an online table)
+function drawTop(R = Math.random) { const r = R(); let a = 0; for (const k in TQ) { a += TQ[k]; if (r < a) return { seg: k, m: wpickR(R, TM) }; } return null; }
+function chBoard(R = Math.random) { const a = []; for (const v in CHB) for (let i = 0; i < CHB[v]; i++) a.push(+v); return shuffle(a, R); }
+function coinRun(R = Math.random) { const a = wpickR(R, CL), b = wpickR(R, CL), f = R() < 0.5 ? 0 : 1; return { v: [a, b], face: f, M: [a, b][f] }; }
+function pachRun(R = Math.random) {
   let vals = PV.slice(); const drops = [];
   for (let n = 0; n < 40; n++) {
-    const path = []; let k = 0; for (let s = 0; s < 15; s++) { const d = Math.random() < 0.5 ? 1 : 0; path.push(d); k += d; }
+    const path = []; let k = 0; for (let s = 0; s < 15; s++) { const d = R() < 0.5 ? 1 : 0; path.push(d); k += d; }
     drops.push({ path, k, vals: vals.slice() });
     if (vals[k] === 'D') { vals = vals.map((v) => (v === 'D' ? 'D' : v * 2)); continue; }
     return { drops, M: vals[k] };
@@ -50,14 +52,40 @@ function pachRun() {
   return { drops, M: 5 };
 }
 const ctIdx = (phi) => CTARR.map((a) => Math.floor(((((a - phi) % 360) + 360) % 360) / CTA));
-function ctRun(ch) {
+function ctRun(ch, R = Math.random) {
   let mult = 1; const spins = [];
   for (let n = 0; n < 60; n++) {
-    const phi = Math.random() * 360, idx = ctIdx(phi), seg = CTSEQ[idx[ch]]; spins.push({ phi, idx });
+    const phi = R() * 360, idx = ctIdx(phi), seg = CTSEQ[idx[ch]]; spins.push({ phi, idx });
     if (seg === 'D') mult *= 2; else if (seg === 'T') mult *= 3;
     else return { spins, mult, seg, idx, M: seg * mult };
   }
   return { spins, mult, seg: 5, idx: [0, 0, 0], M: 5 * mult };
+}
+// A whole round drawn in advance (the same for every player of an online table): Top Slot, the case, and the bonus
+// of that case (Méga Folie: one run per arrow colour, the player's arrow picks one).
+function outcome(R = Math.random) {
+  const top = drawTop(R), idx = Math.floor(R() * NS), seg = SEGS[idx];
+  const O = { top, idx, seg };
+  if (seg === 'cf') O.cf = coinRun(R);
+  else if (seg === 'ch') { O.bd = chBoard(R); O.chm = O.bd[Math.floor(R() * 108)]; }
+  else if (seg === 'pa') O.pa = pachRun(R);
+  else if (seg === 'ct') O.ct = [0, 1, 2].map((c) => ctRun(c, R));
+  return O;
+}
+// Online, each player's Méga Folie arrow is drawn from the round's seed and the player's account: everyone can work
+// out everyone's result.
+const arrowOf = (seed, uid) => Math.floor(rng(`${seed}|arrow|${uid || ''}`)() * 3);
+const bonusM = (O, arrow) => (O.seg === 'cf' ? O.cf.M : O.seg === 'ch' ? O.chm : O.seg === 'pa' ? O.pa.M : O.seg === 'ct' ? O.ct[arrow].M : 0);
+// What a set of bets returns on that round (stake included).
+function payout(O, bets, arrow = 0) {
+  const seg = O.seg, b = bets[seg] || 0;
+  if (!b) return { ret: 0, M: 0, cap: false, tm: 1 };
+  const tm = O.top && O.top.seg === seg ? O.top.m : 1;
+  let ret, M;
+  if (!isNaN(+seg)) { M = +seg; ret = b * (M * tm + 1); } else { M = bonusM(O, arrow); ret = M > 0 ? b * (M * tm + 1) : 0; }
+  let cap = false;
+  if (ret > b * CAPX) { ret = b * CAPX; cap = true; }
+  return { ret, M, cap, tm };
 }
 /* ===END ENGINE */
 
@@ -182,8 +210,8 @@ const HOST = `<svg class="mh-svg" viewBox="0 0 140 260" aria-hidden="true">
 </svg>`;
 
 class MadWheelGame extends BaseGame {
-  constructor(root, game) {
-    super(root, game, {
+  constructor(root, game, ov) {
+    super(root, game, mergeOpts(ov, {
       music: EXTRA_THEMES.madwheel, stepper: false, autoplay: true, mainLabel: 'LANCER', betLabel: 'Mise totale',
       cls: 'table-game',
       head: '<div class="hist mw-hist"></div>',
@@ -191,7 +219,7 @@ class MadWheelGame extends BaseGame {
         <div class="mw-view"><div class="mw-zone"><div class="mw-ptr"></div>${bigWheelSVG()}<div class="mw-hub">ROUE<br>FOLLE</div><div class="mw-host">${HOST}</div></div></div>`,
       below: `<div class="felt mw-felt"><div class="mw-spots">${SPOTS.map((k) => `<button class="mw-spot" data-k="${k}" style="--sc:${COL[k]}"><b>${isNaN(+k) ? iconSVG(k, 30) : k}</b><small>${HINT[k]}</small></button>`).join('')}</div>${BetBoard.chipsHTML()}</div>`,
       hello: 'Pose tes jetons sur les cases puis lance la roue.',
-    });
+    }));
     this.cur = 0;
     this.histArr = [];
     this.board = new BetBoard(this, this.q('.mw-felt'), null);
@@ -228,70 +256,80 @@ class MadWheelGame extends BaseGame {
       this.board.last = Object.fromEntries(Object.entries(placed).filter(([, v]) => v));
       this.focusStage();
       this.setLast(0); this.winAmt.textContent = '';
-      this.q('.mw-hl')?.remove();
-      this.qa('.mw-spot').forEach((b) => b.classList.remove('hit', 'tsel'));
-      this.msg('Top Slot…');
-      this.q('.mw-hub').innerHTML = 'TOP<br>SLOT';
-      const top = drawTop(), tv = this.q('.tsv'), topBox = this.q('.mw-top');
-      topBox.classList.add('rolling');
-      const t0 = performance.now();
-      while (performance.now() - t0 < (this.turbo ? 600 : 1400)) {
-        const k = SPOTS[Math.floor(Math.random() * 8)];
-        tv.innerHTML = `${isNaN(+k) ? iconSVG(k, 18) : k} ×${wpick(TM)}`;
-        sfx.tick();
-        await sleep(80);
-      }
-      topBox.classList.remove('rolling');
-      tv.innerHTML = top ? `${isNaN(+top.seg) ? iconSVG(top.seg, 18) + ' ' + NAME[top.seg] : 'Case ' + top.seg} ×${top.m}` : 'Pas de multiplicateur';
-      if (top) { topBox.classList.add('hit'); this.q(`.mw-spot[data-k="${top.seg}"]`)?.classList.add('tsel'); sfx.upgrade(); const p = center(topBox); fx.burst(p.x, p.y, 24, ['#ffd23f', '#fff', '#ff3d6e']); }
-      await this.wait(600);
-      this.msg('Les jeux sont faits…');
-      this.q('.mw-hub').innerHTML = 'C’EST<br>PARTI';
-      const idx = Math.floor(Math.random() * NS), seg = SEGS[idx];
-      const delta = ((-(idx + 0.5) * A - this.cur) % 360 + 360) % 360;
-      const from = this.cur;
-      this.cur += 360 * 6 + delta + (Math.random() - 0.5) * A * 0.7;
-      // the showman grabs the rim, then throws the wheel
-      this.pose('ready');
-      await this.wait(380);
-      this.pose('pull');
-      await this.wait(260);
-      setTimeout(() => { if (!this.dead && this.host.classList.contains('pull')) this.pose('watch'); }, this.turbo ? 300 : 600);
-      // long slow crawl over the last slices, with the camera already zooming in on the pointer
-      this.zoomStart();
-      await spinWheel(this.wheel, from, this.cur, { ptr: this.q('.mw-ptr'), k: 0.68, w1: 9, crawl: 2.2, turbo: this.turbo, onFrame: (p) => this.zoomTo(p) });
-      topBox.classList.remove('hit');
-      this.histAdd(seg);
-      this.q('.mw-hub').innerHTML = isNaN(+seg) ? iconSVG(seg, 34) : `<b class="big">${seg}</b>`;
-      this.wheel.insertAdjacentHTML('beforeend', `<path class="mw-hl" d="${slicePath(idx, A, 141)}" fill="#fff"/>`);
-      await this.zoomOnResult(seg);
-      this.q(`.mw-spot[data-k="${seg}"]`)?.classList.add('hit');
-      const p = center(this.q('.mw-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);
-      let ret = 0, cap = false;
-      const lines = [];
-      this.pose(placed[seg] > 0 ? 'cheer' : 'sad', 1800);
-      if (placed[seg] > 0) {
-        const b = placed[seg], tm = top && top.seg === seg ? top.m : 1;
-        if (!isNaN(+seg)) { ret = b * (+seg * tm + 1); lines.push(`Tu gagnes ${fmtC(ret - b)}${tm > 1 ? ` (Top Slot ×${tm})` : ''}`); }
-        else {
-          this.msg(`Bonus : ${NAME[seg]} !`);
-          sfx.feature();
-          await this.wait(900);
-          const M = seg === 'cf' ? await this.bonusCF(tm) : seg === 'ch' ? await this.bonusCH(tm) : seg === 'pa' ? await this.bonusPA(tm) : await this.bonusCT(tm);
-          ret = M > 0 ? b * (M * tm + 1) : 0;
-          lines.push(M > 0 ? `${NAME[seg]} : ×${M * tm} → ${fmtC(ret - b)}` : `${NAME[seg]} : perdu`);
-        }
-        if (ret > b * CAPX) { ret = b * CAPX; cap = true; }
-      } else lines.push(`La roue s’arrête sur ${isNaN(+seg) ? NAME[seg] : seg}. Pas de mise dessus.`);
-      const all = Object.values(placed).reduce((a, x) => a + x, 0);
-      this.msg(lines.join(' · ') + (cap ? ' · GAIN MAXIMUM !' : '') + ` · Bilan : ${ret - all >= 0 ? '+' : '−'}${fmtC(Math.abs(ret - all))}`);
-      if (ret > 0) {
-        this.win(ret, isNaN(+seg) ? NAME[seg] : null);
-        this.setLast(ret);
-        if (ret > (placed[seg] || 0)) await this.celebrate(ret, { summary: isNaN(+seg) ? NAME[seg].toUpperCase() : null });
-      }
+      await this.play(outcome(), placed);
       this.board.afterRound();
     });
+  }
+
+  // Plays a drawn round on screen (Top Slot, wheel, bonus) and pays the bets in `placed`.
+  // arrow: the Méga Folie arrow (chosen by the player alone; drawn for each player at an online table).
+  async play(O, placed, ctx = {}) {
+    this.q('.mw-hl')?.remove();
+    this.qa('.mw-spot').forEach((b) => b.classList.remove('hit', 'tsel'));
+    this.msg('Top Slot…');
+    this.q('.mw-hub').innerHTML = 'TOP<br>SLOT';
+    const top = O.top, tv = this.q('.tsv'), topBox = this.q('.mw-top');
+    topBox.classList.add('rolling');
+    const t0 = performance.now();
+    while (performance.now() - t0 < (this.turbo ? 600 : 1400)) {
+      const k = SPOTS[Math.floor(Math.random() * 8)];
+      tv.innerHTML = `${isNaN(+k) ? iconSVG(k, 18) : k} ×${wpick(TM)}`;
+      sfx.tick();
+      await sleep(80);
+    }
+    topBox.classList.remove('rolling');
+    tv.innerHTML = top ? `${isNaN(+top.seg) ? iconSVG(top.seg, 18) + ' ' + NAME[top.seg] : 'Case ' + top.seg} ×${top.m}` : 'Pas de multiplicateur';
+    if (top) { topBox.classList.add('hit'); this.q(`.mw-spot[data-k="${top.seg}"]`)?.classList.add('tsel'); sfx.upgrade(); const p = center(topBox); fx.burst(p.x, p.y, 24, ['#ffd23f', '#fff', '#ff3d6e']); }
+    await this.wait(600);
+    this.msg('Les jeux sont faits…');
+    this.q('.mw-hub').innerHTML = 'C’EST<br>PARTI';
+    const idx = O.idx, seg = O.seg;
+    const delta = ((-(idx + 0.5) * A - this.cur) % 360 + 360) % 360;
+    const from = this.cur;
+    this.cur += 360 * 6 + delta + (Math.random() - 0.5) * A * 0.7;
+    // the showman grabs the rim, then throws the wheel
+    this.pose('ready');
+    await this.wait(380);
+    this.pose('pull');
+    await this.wait(260);
+    setTimeout(() => { if (!this.dead && this.host.classList.contains('pull')) this.pose('watch'); }, this.turbo ? 300 : 600);
+    // long slow crawl over the last slices, with the camera already zooming in on the pointer
+    this.zoomStart();
+    await spinWheel(this.wheel, from, this.cur, { ptr: this.q('.mw-ptr'), k: 0.68, w1: 9, crawl: 2.2, turbo: this.turbo, onFrame: (p) => this.zoomTo(p) });
+    topBox.classList.remove('hit');
+    this.histAdd(seg);
+    this.q('.mw-hub').innerHTML = isNaN(+seg) ? iconSVG(seg, 34) : `<b class="big">${seg}</b>`;
+    this.wheel.insertAdjacentHTML('beforeend', `<path class="mw-hl" d="${slicePath(idx, A, 141)}" fill="#fff"/>`);
+    await this.zoomOnResult(seg);
+    this.q(`.mw-spot[data-k="${seg}"]`)?.classList.add('hit');
+    const p = center(this.q('.mw-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);
+    const lines = [];
+    const b = placed[seg] || 0, tm = top && top.seg === seg ? top.m : 1;
+    this.pose(b > 0 ? 'cheer' : 'sad', 1800);
+    let arrow = ctx.arrow ?? (ctx.seed ? arrowOf(ctx.seed, this.room?.me) : undefined);
+    // a bonus is played when there is a stake on it (always at an online table: everyone watches)
+    if (isNaN(+seg) && (b > 0 || this.online)) {
+      this.msg(`Bonus : ${NAME[seg]} !`);
+      sfx.feature();
+      await this.wait(900);
+      if (seg === 'cf') await this.bonusCF(tm, O.cf);
+      else if (seg === 'ch') await this.bonusCH(tm, O);
+      else if (seg === 'pa') await this.bonusPA(tm, O.pa);
+      else arrow = await this.bonusCT(tm, O.ct, arrow);
+    }
+    const { ret, M, cap } = payout(O, placed, arrow ?? 0);
+    if (b > 0) {
+      if (!isNaN(+seg)) lines.push(`Tu gagnes ${fmtC(ret - b)}${tm > 1 ? ` (Top Slot ×${tm})` : ''}`);
+      else lines.push(M > 0 ? `${NAME[seg]} : ×${M * tm} → ${fmtC(ret - b)}` : `${NAME[seg]} : perdu`);
+    } else lines.push(`La roue s’arrête sur ${isNaN(+seg) ? NAME[seg] : seg}.${Object.keys(placed).length ? ' Pas de mise dessus.' : ''}`);
+    const all = Object.values(placed).reduce((a, x) => a + x, 0);
+    this.msg(lines.join(' · ') + (cap ? ' · GAIN MAXIMUM !' : '') + (all ? ` · Bilan : ${ret - all >= 0 ? '+' : '−'}${fmtC(Math.abs(ret - all))}` : ''));
+    if (ret > 0) {
+      this.win(ret, isNaN(+seg) ? NAME[seg] : null);
+      this.setLast(ret);
+      if (ret > b) await this.celebrate(ret, { summary: isNaN(+seg) ? NAME[seg].toUpperCase() : null, quick: this.online });
+    }
+    return ret;
   }
 
   // The camera closes in on the pointer for the whole spin: slowly at first, then faster, fully in at the stop.
@@ -335,11 +373,17 @@ class MadWheelGame extends BaseGame {
   }
   closeOv() { const o = this.ov; if (!o) return; o.classList.add('out'); setTimeout(() => o.remove(), 300); this.ov = null; }
   ovp(t) { const p = this.ov?.querySelector('.msgov'); if (p) p.innerHTML = t; }
-  waitTap(els) { return new Promise((res) => els.forEach((e, i) => { e.onclick = () => res(i); })); }
+  // a tap on one of els; online, a random one after ms if the player does not choose
+  waitTap(els, ms = 0) {
+    return new Promise((res) => {
+      let done = false; const go = (i) => { if (done) return; done = true; clearTimeout(t); res(i); };
+      els.forEach((e, i) => { e.onclick = () => go(i); });
+      const t = ms ? setTimeout(() => go(Math.floor(Math.random() * els.length)), ms) : 0;
+    });
+  }
   tmTxt(tm) { return tm > 1 ? ` <b class="tm">Top Slot ×${tm}</b>` : ''; }
 
-  async bonusCF(tm) {
-    const r = coinRun();
+  async bonusCF(tm, r = coinRun()) {
     this.openOv(`<h2>Pile ou Face</h2><p class="msgov">La pièce va tourner…${this.tmTxt(tm)}</p>
       <div class="coin3d"><div class="cface r">×${r.v[0] * tm}</div><div class="cface b">×${r.v[1] * tm}</div></div>
       <p class="sub">Rouge ×${r.v[0] * tm} · Bleu ×${r.v[1] * tm}</p>`);
@@ -356,17 +400,17 @@ class MadWheelGame extends BaseGame {
     return r.M;
   }
 
-  async bonusCH(tm) {
-    const bd = chBoard();
+  async bonusCH(tm, O) {
+    const bd = O ? O.bd : chBoard();
     this.openOv(`<h2>Chasse au Cash</h2><p class="msgov">Mémorise les multiplicateurs… ils vont se mélanger !${this.tmTxt(tm)}</p><div class="grid12">${bd.map((v) => `<button class="ch-t${v >= 80 ? ' hi' : ''}">${v}</button>`).join('')}</div>`);
     const btns = [...this.ov.querySelectorAll('.ch-t')];
     await this.wait(3000);
     for (let i = 0; i < btns.length; i++) { const b = btns[i]; setTimeout(() => { b.textContent = '🎯'; b.classList.remove('hi'); b.classList.add('hidden'); }, (i % 12) * 30); }
     sfx.spin();
     await sleep(500);
-    this.ovp('Choisis une cible !');
-    const idx = await this.waitTap(btns);
-    const m = bd[Math.floor(Math.random() * 108)];
+    this.ovp(this.online ? 'Choisis une cible ! (choix auto dans 8 s)' : 'Choisis une cible !');
+    const idx = await this.waitTap(btns, this.online ? 8000 : 0);
+    const m = O ? O.chm : bd[Math.floor(Math.random() * 108)];
     btns.forEach((b) => { b.onclick = null; });
     const rest = bd.slice(); const pos = rest.indexOf(m); if (pos > -1) rest.splice(pos, 1); shuffle(rest);
     btns[idx].textContent = '×' + m; btns[idx].classList.add('pick');
@@ -380,8 +424,8 @@ class MadWheelGame extends BaseGame {
     return m;
   }
 
-  async bonusPA(tm) {
-    const run = pachRun(), X = (r, k) => 170 + (2 * k - r) * 10, Y = (r) => 26 + r * 20;
+  async bonusPA(tm, run = pachRun()) {
+    const X = (r, k) => 170 + (2 * k - r) * 10, Y = (r) => 26 + r * 20;
     let pegs = '';
     for (let r = 0; r < 15; r++) for (let j = 0; j <= r; j++) pegs += `<i class="peg" style="left:${X(r, j)}px;top:${Y(r) + 10}px"></i>`;
     let slots = '';
@@ -415,11 +459,13 @@ class MadWheelGame extends BaseGame {
     return s;
   }
 
-  async bonusCT(tm) {
-    this.openOv(`<h2>Méga Folie</h2><p class="msgov">Choisis la couleur de ta flèche !${this.tmTxt(tm)}</p>
+  async bonusCT(tm, runs = null, arrow) {
+    this.openOv(`<h2>Méga Folie</h2><p class="msgov">${arrow != null ? 'Ta flèche est tirée au sort…' : 'Choisis la couleur de ta flèche !'}${this.tmTxt(tm)}</p>
       <div class="flaps">${ARC.map((c, i) => `<button class="apick" style="--c:${c}">▼<small>${ARN[i][0].toUpperCase() + ARN[i].slice(1)}</small></button>`).join('')}</div>
       <p class="sub">La roue tourne : là où ta flèche s’arrête, c’est ton multiplicateur.</p>`);
-    const ch = await this.waitTap([...this.ov.querySelectorAll('.apick')]), run = ctRun(ch);
+    let ch;
+    if (arrow != null) { ch = arrow; const bt = this.ov.querySelectorAll('.apick')[ch]; bt?.classList.add('on'); await this.wait(1200); } else ch = await this.waitTap([...this.ov.querySelectorAll('.apick')]);
+    const run = runs ? runs[ch] : ctRun(ch);
     this.ov.remove();
     let arrows = '';
     for (let c = 0; c < 3; c++) arrows += `<g transform="rotate(${CTARR[c]} 150 150)" opacity="${ch === c ? 1 : 0.45}"><polygon points="150,27 138,1 162,1" fill="${ARC[c]}" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></g>`;
@@ -450,7 +496,7 @@ class MadWheelGame extends BaseGame {
     sfx.jackpot(); fx.confetti(80);
     await this.wait(3000);
     this.closeOv();
-    return run.M;
+    return ch;
   }
 
   destroy() { this.ov?.remove(); super.destroy(); }
@@ -463,5 +509,16 @@ class MadWheelGame extends BaseGame {
   }
 }
 
-return { MadWheelGame };
+// La Roue Folle Online: the same Top Slot, wheel and bonuses for the whole salon (online.js, withRoom).
+const MadWheelOnlineGame = withRoom(MadWheelGame, {
+  cls: 'g-madwheel',
+  outcome: (R) => outcome(R),
+  payout: (O, d, { uid, seed }) => payout(O, d, O.seg === 'ct' ? arrowOf(seed, uid) : 0).ret,
+  resultMs: (O) => 19000 + (O.seg === 'cf' ? 6000 : O.seg === 'ch' ? 14000 : O.seg === 'pa' ? 2000 + O.pa.drops.length * 3000 : O.seg === 'ct' ? 4000 + Math.max(...O.ct.map((r) => r.spins.length)) * 4500 : 0),
+  reset() { this.q('.mw-hl')?.remove(); this.qa('.mw-spot').forEach((b) => b.classList.remove('hit', 'tsel')); this.q('.mw-hub').innerHTML = 'ROUE<br>FOLLE'; this.q('.tsv').textContent = '—'; },
+  hello: 'Pose tes jetons puis appuie sur PRÊT : la roue part quand tout le salon est prêt.',
+  rules: '<p>À la Méga Folie, la couleur de ta flèche est tirée au sort pour chaque joueur. À la Chasse au Cash, tout le salon gagne le même multiplicateur.</p>',
+});
+
+return { MadWheelGame, MadWheelOnlineGame, outcome };
 })();

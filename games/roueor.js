@@ -12,6 +12,7 @@ const { BaseGame, fmtC, wpick } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, audioContext, isMuted } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
+const { mergeOpts, withRoom } = __mods['online.js'];
 
 /* ===ENGINE */
 const CUBES = 24;
@@ -26,6 +27,8 @@ const isGold = (deg, m) => deg < m.gold * 360; // pointer angle on the wheel, th
 const shuffle = (a) => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const reveals = (left) => Math.max(1, Math.round(left / 4)); // a quarter of the other cubes still hidden
 const offerOf = (hidden) => hidden.reduce((a, v) => a + v, 0) / hidden.length; // fair offer: their average
+// The wheel's angle (the same for every player of an online table; each player's level decides if it is gold).
+const outcome = (R = Math.random) => ({ deg: R() * 360 });
 /* ===END ENGINE */
 
 const xs = (m) => m.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
@@ -67,8 +70,8 @@ function tick(v) {
 }
 
 class RoueOrGame extends BaseGame {
-  constructor(root, game) {
-    super(root, game, {
+  constructor(root, game, ov) {
+    super(root, game, mergeOpts(ov, {
       music: EXTRA_THEMES.roueor, autoplay: true, mainLabel: 'LANCER',
       cls: 'table-game roueor',
       head: '<div class="hist pt-hist ro-hist"></div>',
@@ -86,7 +89,7 @@ class RoueOrGame extends BaseGame {
         <div class="rt-tools"><button type="button" class="rt-autoplay" data-ro-auto>▶ Tours auto</button></div>
         <div class="rt-autopick" hidden><span>Combien de tours ?</span>${[10, 25, 50, 100, 250].map((n) => `<button type="button" data-ro-n="${n}">${n}</button>`).join('')}</div>`,
       hello: 'Si la roue s’arrête sur l’or, c’est le bonus des 24 cubes ! Choisis ton niveau : plus c’est compliqué, plus les cubes sont gros.',
-    });
+    }));
     this.mi = this.loadNum('roueor_mode', 1, 0, MODES.length - 1);
     this.cur = 0; this.histArr = [];
     this.setMode(this.mi);
@@ -124,7 +127,14 @@ class RoueOrGame extends BaseGame {
     if (ab) { ab.classList.toggle('on', !!this.auto); ab.textContent = this.auto ? `■ Stop (${this.auto})` : '▶ Tours auto'; }
   }
 
-  ask() { return new Promise((res) => { this.answer = res; }); }
+  // the player's answer; online, `def` is chosen for him after ms (so a table never waits for an absent player)
+  ask(def, ms = 0) {
+    return new Promise((res) => {
+      let t = 0;
+      this.answer = (v) => { clearTimeout(t); res(v); };
+      if (ms) t = setTimeout(() => { if (!this.answer) return; const r = this.answer; this.answer = null; r(typeof def === 'function' ? def() : def); }, ms);
+    });
+  }
   say(t) { this.q('.ro-say').innerHTML = t; }
 
   histAdd(g) {
@@ -175,15 +185,22 @@ class RoueOrGame extends BaseGame {
     view.classList.remove('zooming', 'done', 'unzoom');
   }
 
-  onMain() { this.round(() => this.play()); }
+  onMain() {
+    this.round(async () => {
+      const bet = this.bet;
+      if (!this.pay(bet)) return;
+      this.lastStake = bet;
+      this.setLast(0); this.winAmt.textContent = '';
+      this.focusStage();
+      await this.play(outcome(), { [this.mode.id]: bet });
+    });
+  }
 
-  async play() {
-    const bet = this.bet;
-    if (!this.pay(bet)) return;
-    this.lastStake = bet;
-    this.setLast(0); this.winAmt.textContent = '';
-    this.focusStage();
-    const m = this.mode, deg = Math.random() * 360, gold = isGold(deg, m);
+  // Plays a drawn round on screen: placed = { level id: stake } (empty online when the player only watches).
+  async play(O, placed) {
+    const id = Object.keys(placed)[0], bet = id ? placed[id] : 0;
+    if (id) { const i = MODES.findIndex((x) => x.id === id); if (i > -1 && i !== this.mi) this.setMode(i); }
+    const m = this.mode, deg = O.deg, gold = isGold(deg, m);
     this.msg('La roue tourne…');
     this.q('.ro-hub').innerHTML = 'BONNE<br>CHANCE';
     const view = this.q('.ro-view');
@@ -196,9 +213,9 @@ class RoueOrGame extends BaseGame {
     if (!gold) {
       this.q('.ro-hub').innerHTML = '✕';
       fx.burst(p.x, p.y + 20, 12, ['#6b7280', '#9ca3af']);
-      this.msg(`Pas d’or cette fois · −${fmtC(bet)}`);
+      this.msg(bet ? `Pas d’or cette fois · −${fmtC(bet)}` : 'Pas d’or cette fois');
       await this.zoomResult(false);
-      return;
+      return 0;
     }
     fx.burst(p.x, p.y + 20, 40, ['#fde047', '#fbbf24', '#fff']);
     sfx.feature(); fx.confetti(70);
@@ -206,14 +223,16 @@ class RoueOrGame extends BaseGame {
     await this.zoomResult(true);
     if (this.dead) return;
     if (this.auto) this.stopAuto(); // the bonus needs the player's choices
+    if (!bet) { this.msg('★ De l’or ! Les joueurs qui ont misé jouent leur bonus des 24 cubes…'); return 0; }
     this.msg('★ BONUS DES 24 CUBES ★');
     const M = await this.bonus(m);
-    if (this.dead) return;
+    if (this.dead) return 0;
     const won = Math.round(bet * M);
     this.win(won, 'Bonus des cubes');
     this.setLast(won);
     this.msg(`Bonus des 24 cubes : ×${xs(M)} → ${fmtC(won)}`);
-    await this.celebrate(won, { summary: 'BONUS DES CUBES' });
+    await this.celebrate(won, { summary: 'BONUS DES CUBES', quick: this.online });
+    return won;
   }
 
   async bonus(m) {
@@ -263,9 +282,9 @@ class RoueOrGame extends BaseGame {
     }
     if (this.dead) return 0;
     cubes.forEach((c) => { c.disabled = false; });
-    this.say('Choisis ton cube ! Il restera caché jusqu’à la fin.');
+    this.say(`Choisis ton cube ! Il restera caché jusqu’à la fin.${this.online ? ' <small>(choix auto dans 15 s)</small>' : ''}`);
     this.slotEl.classList.add('ro-ask');
-    const pick = await this.ask();
+    const pick = await this.ask(() => Math.floor(Math.random() * CUBES), this.online ? 15000 : 0);
     this.slotEl.classList.remove('ro-ask');
     if (this.dead) return 0;
     sfx.click();
@@ -294,9 +313,9 @@ class RoueOrGame extends BaseGame {
       const hidden = [pick, ...others].map((i) => vals[i]), offer = offerOf(hidden);
       deal.hidden = false;
       this.q('.ro-offer b').textContent = `×${xs(Math.round(offer * 100) / 100)} · ${fmtC(Math.round(this.lastStake * offer))}`;
-      this.say(`Encore ${others.length} autre${others.length > 1 ? 's' : ''} cube${others.length > 1 ? 's' : ''} caché${others.length > 1 ? 's' : ''} + le tien. Tu encaisses ou tu continues ?`);
+      this.say(`Encore ${others.length} autre${others.length > 1 ? 's' : ''} cube${others.length > 1 ? 's' : ''} caché${others.length > 1 ? 's' : ''} + le tien. Tu encaisses ou tu continues ?${this.online ? ' <small>(sans réponse en 10 s, tu encaisses)</small>' : ''}`);
       this.slotEl.classList.add('ro-deciding');
-      const d = await this.ask();
+      const d = await this.ask('cash', this.online ? 10000 : 0);
       this.slotEl.classList.remove('ro-deciding');
       deal.hidden = true;
       if (d === 'cash') { result = Math.round(offer * 100) / 100; break; }
@@ -342,5 +361,24 @@ class RoueOrGame extends BaseGame {
   }
 }
 
-return { RoueOrGame };
+// La Roue d’Or Online: one wheel for the whole salon, each player at his own level (online.js, withRoom). The bonus of
+// the 24 cubes is each player's own (his choices); his result reaches the others when he has finished.
+const RoueOrOnlineGame = withRoom(RoueOrGame, {
+  cls: 'g-roueor',
+  outcome: (R) => outcome(R),
+  bets() { return { [this.mode.id]: this.bet }; },
+  payout: (O, d, { seat }) => {
+    const id = Object.keys(d)[0], m = MODES.find((x) => x.id === id);
+    if (!m || !isGold(O.deg, m)) return 0;
+    return seat?.done && seat.acts !== '' ? +seat.acts || 0 : null; // null: still in the bonus
+  },
+  // a long result when the wheel is gold for one of the levels played (the bonus), a short one otherwise
+  resultMs: (O, a) => ((a.p || []).some((p) => { const m = MODES.find((x) => x.id === Object.keys(p.d || {})[0]); return m && isGold(O.deg, m); }) ? 90000 : 10000),
+  reset() { this.q('.ro-hub').innerHTML = 'BONNE<br>CHANCE'; },
+  belowWrap: 'ro-felt',
+  hello: 'Choisis ton niveau et ta mise, puis appuie sur PRÊT : la roue part quand tout le salon est prêt.',
+  rules: '<p>Chaque joueur choisit son niveau : la même roue tombe dans l’or pour certains niveaux et pas pour d’autres. Le bonus des 24 cubes se joue chacun pour soi ; sans réponse, ton cube est choisi au hasard au bout de 15 s et tu encaisses l’offre au bout de 10 s.</p>',
+});
+
+return { RoueOrGame, RoueOrOnlineGame, outcome };
 })();

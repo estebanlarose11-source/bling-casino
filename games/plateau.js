@@ -12,6 +12,7 @@ const { BetBoard } = __mods['core/roulette.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, audioContext, isMuted } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
+const { mergeOpts, withRoom } = __mods['online.js'];
 
 /* ===ENGINE */
 const SEG_COUNT = [['1', 33, 0.5], ['2', 22, 0.5], ['5', 11, 0.5], ['10', 6, 0.5], ['b2', 4, 0.37], ['b4', 1, 0.62], ['ch', 1, 0.12]];
@@ -22,18 +23,37 @@ const CHANCE_X = 10;
 const BOARD = [0, 1, 3, 2, 5, 2, 3, 5, 2, 2, 3, 3, 2, 6, 4, 5, 2, 3, 5, 3, 10, 3, 5, 20, 3, 100, 40, 200];
 const NB = BOARD.length;
 const CAPX = 10000;
-const die = () => 1 + Math.floor(Math.random() * 6);
+const die = (R) => 1 + Math.floor(R() * 6);
 // Plays a whole bonus: rolls (plus one per double) → the list of moves and the sum of the multipliers.
-function boardRun(rolls) {
+function boardRun(rolls, R = Math.random) {
   let pos = 0, left = rolls, M = 0; const moves = [];
   while (left > 0 && moves.length < 40) {
-    const a = die(), b = die(), from = pos;
+    const a = die(R), b = die(R), from = pos;
     pos = (pos + a + b) % NB;
     M += BOARD[pos];
     left += a === b ? 0 : -1;
     moves.push({ a, b, from, pos, v: BOARD[pos], dbl: a === b });
   }
   return { moves, M };
+}
+// A whole round drawn in advance (the same for every player of an online table): the wheel spins (CHANCE spins
+// again, that round pays ×10) and, on a bonus case, the board run.
+function outcome(R = Math.random) {
+  const spins = [];
+  let seg;
+  for (let n = 0; n < 10; n++) { const idx = Math.floor(R() * NS); spins.push(idx); seg = SEGS[idx]; if (seg !== 'ch') break; }
+  const mult = spins.length > 1 ? CHANCE_X : 1;
+  const run = seg === 'b2' || seg === 'b4' ? boardRun(seg === 'b2' ? 2 : 4, R) : null;
+  return { spins, seg, mult, run };
+}
+// What a set of bets returns on that round (stake included), and the bonus total M.
+function payout(O, bets) {
+  const b = bets[O.seg] || 0;
+  if (!b) return { ret: 0, M: 0, cap: false };
+  const M = O.run ? O.run.M : +O.seg;
+  let ret = b * (M + 1) * O.mult, cap = false;
+  if (ret > b * CAPX) { ret = b * CAPX; cap = true; }
+  return { ret, M, cap };
 }
 /* ===END ENGINE */
 
@@ -128,8 +148,8 @@ function tick(v) {
 }
 
 class PlateauGame extends BaseGame {
-  constructor(root, game) {
-    super(root, game, {
+  constructor(root, game, ov) {
+    super(root, game, mergeOpts(ov, {
       music: EXTRA_THEMES.plateau, stepper: false, autoplay: true, mainLabel: 'LANCER', betLabel: 'Mise totale',
       cls: 'table-game plateau',
       head: '<div class="hist pt-hist"></div>',
@@ -148,7 +168,7 @@ class PlateauGame extends BaseGame {
       below: `<div class="felt pt-felt"><div class="pt-spots">${SPOTS.map((k) => `<button class="pt-spot" data-k="${k}" style="--sc:${COL[k]}"><b>${label(k, 30)}</b><small>${HINT[k]}</small></button>`).join('')}</div>
         <p class="pt-note">${ICON.ch(16)}<span><b>Chance</b> : on ne mise pas dessus. Elle relance la roue avec tes mises, et ce tour-là paie <b>×${CHANCE_X}</b> !</span></p>${BetBoard.chipsHTML()}</div>`,
       hello: 'Pose tes jetons sur 1, 2, 5, 10 ou les bonus, puis lance la roue.',
-    });
+    }));
     this.cur = 0; this.histArr = [];
     this.board = new BetBoard(this, this.q('.pt-felt'), null);
     this.board.paint();
@@ -228,56 +248,59 @@ class PlateauGame extends BaseGame {
       this.board.last = Object.fromEntries(Object.entries(placed).filter(([, v]) => v));
       this.focusStage();
       this.setLast(0); this.winAmt.textContent = '';
-      this.qa('.pt-spot').forEach((b) => b.classList.remove('hit'));
-      let mult = 1, seg;
-      for (let n = 0; n < 10; n++) {
-        this.msg(mult > 1 ? `CHANCE : ce tour paie ×${mult} !` : 'La roue tourne…');
-        this.q('.pt-hub').innerHTML = mult > 1 ? `<b class="x">×${mult}</b>` : 'BONNE<br>CHANCE';
-        this.q('.pt-hl')?.remove();
-        const idx = Math.floor(Math.random() * NS);
-        seg = SEGS[idx];
-        this.zoomStart();
-        await this.spin(idx, (p) => this.zoomTo(p));
-        if (this.dead) return;
-        this.histAdd(seg);
-        this.wheel.insertAdjacentHTML('beforeend', `<path class="pt-hl" d="${slicePath(idx)}" fill="#fff"/>`);
-        this.q('.pt-hub').innerHTML = ICON[seg] ? ICON[seg](40) : `<b class="big">${seg}</b>`;
-        const p = center(this.q('.pt-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);
-        await this.zoomOnResult(seg, mult);
-        if (this.dead) return;
-        if (seg !== 'ch') break;
-        mult = CHANCE_X;
-        sfx.feature(); fx.confetti(50);
-        this.msg(`CHANCE ! La roue repart avec tes mises, et ce tour paie ×${CHANCE_X} !`);
-        await this.wait(1600);
-      }
-      this.q(`.pt-spot[data-k="${seg}"]`)?.classList.add('hit');
-      const b = placed[seg] || 0;
-      let ret = 0, M = 0, cap = false;
-      if (b > 0) {
-        if (ICON[seg]) {
-          this.msg(`Bonus ${NAME[seg]} !`);
-          M = await this.bonus(seg === 'b2' ? 2 : 4, mult);
-          if (this.dead) return;
-        } else M = +seg;
-        ret = b * (M + 1) * mult;
-        if (ret > b * CAPX) { ret = b * CAPX; cap = true; }
-      }
-      const all = Object.values(placed).reduce((a, x) => a + x, 0);
-      const what = ICON[seg] ? NAME[seg] : `le ${seg}`;
-      this.msg((b ? `${ICON[seg] ? `${NAME[seg]} : ×${M}` : `Le ${seg} paie ${seg} pour 1`}${mult > 1 ? ` · Chance ×${mult}` : ''} → ${fmtC(ret)}${cap ? ' · GAIN MAXIMUM !' : ''}` : `La roue s’arrête sur ${what}. Pas de mise dessus.`) + ` · Bilan : ${ret - all >= 0 ? '+' : '−'}${fmtC(Math.abs(ret - all))}`);
-      if (ret > 0) {
-        this.win(ret, ICON[seg] ? NAME[seg] : null);
-        this.setLast(ret);
-        if (ret > b) await this.celebrate(ret, { summary: ICON[seg] ? NAME[seg].toUpperCase() : null });
-      }
+      await this.play(outcome(), placed);
       this.board.afterRound();
     });
   }
 
+  // Plays a drawn round on screen (wheel, CHANCE, bonus board) and pays the bets in `placed`.
+  async play(O, placed) {
+    this.qa('.pt-spot').forEach((b) => b.classList.remove('hit'));
+    let mult = 1;
+    for (let n = 0; n < O.spins.length; n++) {
+      const idx = O.spins[n], seg = SEGS[idx];
+      this.msg(mult > 1 ? `CHANCE : ce tour paie ×${mult} !` : 'La roue tourne…');
+      this.q('.pt-hub').innerHTML = mult > 1 ? `<b class="x">×${mult}</b>` : 'BONNE<br>CHANCE';
+      this.q('.pt-hl')?.remove();
+      this.zoomStart();
+      await this.spin(idx, (p) => this.zoomTo(p));
+      if (this.dead) return;
+      this.histAdd(seg);
+      this.wheel.insertAdjacentHTML('beforeend', `<path class="pt-hl" d="${slicePath(idx)}" fill="#fff"/>`);
+      this.q('.pt-hub').innerHTML = ICON[seg] ? ICON[seg](40) : `<b class="big">${seg}</b>`;
+      const p = center(this.q('.pt-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);
+      await this.zoomOnResult(seg, mult);
+      if (this.dead) return;
+      if (seg !== 'ch') break;
+      mult = CHANCE_X;
+      sfx.feature(); fx.confetti(50);
+      this.msg(`CHANCE ! La roue repart avec tes mises, et ce tour paie ×${CHANCE_X} !`);
+      await this.wait(1600);
+    }
+    const seg = O.seg;
+    this.q(`.pt-spot[data-k="${seg}"]`)?.classList.add('hit');
+    const b = placed[seg] || 0;
+    // on a bonus case the board is played when there is a stake on it (always at an online table: everyone watches)
+    if (O.run && (b > 0 || this.online)) {
+      this.msg(`Bonus ${NAME[seg]} !`);
+      await this.bonus(seg === 'b2' ? 2 : 4, O.mult, O.run);
+      if (this.dead) return;
+    }
+    const { ret, M, cap } = payout(O, placed);
+    const all = Object.values(placed).reduce((a, x) => a + x, 0);
+    const what = ICON[seg] ? NAME[seg] : `le ${seg}`;
+    this.msg((b ? `${ICON[seg] ? `${NAME[seg]} : ×${M}` : `Le ${seg} paie ${seg} pour 1`}${O.mult > 1 ? ` · Chance ×${O.mult}` : ''} → ${fmtC(ret)}${cap ? ' · GAIN MAXIMUM !' : ''}` : all ? `La roue s’arrête sur ${what}. Pas de mise dessus.` : `La roue s’arrête sur ${what}.`) + (all ? ` · Bilan : ${ret - all >= 0 ? '+' : '−'}${fmtC(Math.abs(ret - all))}` : ''));
+    if (ret > 0) {
+      this.win(ret, ICON[seg] ? NAME[seg] : null);
+      this.setLast(ret);
+      if (ret > b) await this.celebrate(ret, { summary: ICON[seg] ? NAME[seg].toUpperCase() : null, quick: this.online });
+    }
+    return ret;
+  }
+
   // The board bonus: dice, pawn hopping case by case, multipliers adding up.
-  async bonus(rolls, mult) {
-    const run = boardRun(rolls), wrap = this.q('.pt-boardwrap'), zone = this.q('.pt-zone');
+  async bonus(rolls, mult, run = boardRun(rolls)) {
+    const wrap = this.q('.pt-boardwrap'), zone = this.q('.pt-zone');
     sfx.feature(); fx.confetti(60);
     this.q('.pt-title').textContent = `${rolls} LANCERS${mult > 1 ? ` · ×${mult}` : ''}`;
     this.qa('.pt-cell').forEach((c) => c.classList.remove('hit', 'pass'));
@@ -354,5 +377,16 @@ class PlateauGame extends BaseGame {
   }
 }
 
-return { PlateauGame };
+// Le Plateau Online: the same wheel and board for the whole salon (online.js, withRoom).
+const PlateauOnlineGame = withRoom(PlateauGame, {
+  cls: 'g-plateau',
+  outcome: (R) => outcome(R),
+  payout: (O, d) => payout(O, d).ret,
+  // how long the round stays on screen: the spins (CHANCE spins again), the board, then the results
+  resultMs: (O) => 6000 + O.spins.length * 4800 + (O.run ? 4000 + O.run.moves.length * 1700 : 0),
+  reset() { this.q('.pt-hl')?.remove(); this.qa('.pt-spot').forEach((b) => b.classList.remove('hit')); this.q('.pt-hub').innerHTML = '<span class="pt-s">S</span>'; },
+  hello: 'Pose tes jetons sur 1, 2, 5, 10 ou les bonus, puis appuie sur PRÊT : la roue part quand tout le salon est prêt.',
+});
+
+return { PlateauGame, PlateauOnlineGame, outcome };
 })();

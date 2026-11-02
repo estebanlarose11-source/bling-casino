@@ -11,6 +11,7 @@ const { BetBoard } = __mods['core/roulette.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, audioContext, isMuted } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
+const { mergeOpts, withRoom, wpickR } = __mods['online.js'];
 
 /* ===ENGINE */
 const SEG_COUNT = [['w', 22, 0.5], ['s', 22, 0.25], ['fb', 6, 0.4], ['fo', 3, 0.15], ['fr', 1, 0.66]];
@@ -30,12 +31,29 @@ const POND_W = 1600, POND_H = 729;
 const RINGS = [[510, 413, 74], [1012, 413, 74], [343, 472, 92], [805, 462, 96], [1235, 472, 92], [590, 540, 120], [1015, 540, 120], [258, 575, 118], [1355, 577, 118], [805, 640, 170]];
 const POND = RINGS.length; // fish in the pond
 const CAPX = 25000;
-function strikes() {
-  const pos = new Set(); while (pos.size < STRIKES) pos.add(Math.floor(Math.random() * NS));
-  return [...pos].map((i) => ({ i, m: wpick(SEGS[i][0] === 'f' ? LF : LN) }));
+// every draw takes its random source R (Math.random, or the shared seed of an online table)
+function strikes(R = Math.random) {
+  const pos = new Set(); while (pos.size < STRIKES) pos.add(Math.floor(R() * NS));
+  return [...pos].map((i) => ({ i, m: wpickR(R, SEGS[i][0] === 'f' ? LF : LN) }));
 }
 // The pond: POND fish drawn from the table; the fisherman hooks one of them at random.
-function pond(k) { return Array.from({ length: POND }, () => wpick(FISH[k])); }
+function pond(k, R = Math.random) { return Array.from({ length: POND }, () => wpickR(R, FISH[k])); }
+// A whole round drawn in advance (the same for every player of an online table): lightning, case, and the fish.
+function outcome(R = Math.random) {
+  const hits = strikes(R), idx = Math.floor(R() * NS), seg = SEGS[idx], L = hits.find((h) => h.i === idx)?.m || 1;
+  const O = { hits, idx, seg, L };
+  if (seg[0] === 'f') { O.vals = pond(seg, R); O.pick = Math.floor(R() * POND); }
+  return O;
+}
+// What a set of bets returns on that round.
+function payout(O, bets) {
+  const b = bets[O.seg] || 0;
+  if (!b) return { ret: 0, M: 0, cap: false };
+  const M = O.vals ? O.vals[O.pick] : 2;
+  let ret = b * M * O.L, cap = false;
+  if (ret > b * CAPX) { ret = b * CAPX; cap = true; }
+  return { ret, M, cap };
+}
 /* ===END ENGINE */
 
 // Painted art by the owner (assets/games/peche/): fish, golden fish, fisherman (2 poses), float, wheel frame, hub, pond, room.
@@ -83,8 +101,8 @@ function tick(v) {
 }
 
 class PecheGame extends BaseGame {
-  constructor(root, game) {
-    super(root, game, {
+  constructor(root, game, ov) {
+    super(root, game, mergeOpts(ov, {
       music: EXTRA_THEMES.peche, stepper: false, autoplay: true, mainLabel: 'LANCER', betLabel: 'Mise totale',
       cls: 'table-game peche',
       head: '<div class="hist pt-hist pe-hist"></div>',
@@ -100,7 +118,7 @@ class PecheGame extends BaseGame {
       below: `<div class="felt pe-felt"><div class="pt-spots pe-spots">${SPOTS.map((k) => `<button class="pt-spot pe-spot ${k}" data-k="${k}" style="--sc:${COL[k]}"><b>${label(k)}</b><small>${k[0] === 'f' ? `${NAME[k]} · ${RANGE[k]}` : NAME[k]}</small></button>`).join('')}</div>
         <p class="pt-note pe-note">⚡<span>À chaque lancer, <b>4 éclairs</b> frappent la roue : la case touchée est multipliée (jusqu’à ×10 sur les ×2, ×5 sur les poissons).</span></p>${BetBoard.chipsHTML()}</div>`,
       hello: 'Mise sur ×2 blanc, ×2 ciel ou un poisson, puis lance la roue.',
-    });
+    }));
     this.cur = 0; this.histArr = [];
     this.board = new BetBoard(this, this.q('.pe-felt'), null);
     this.board.paint();
@@ -164,45 +182,47 @@ class PecheGame extends BaseGame {
       this.board.last = Object.fromEntries(Object.entries(placed).filter(([, v]) => v));
       this.focusStage();
       this.setLast(0); this.winAmt.textContent = '';
-      this.qa('.pe-spot').forEach((b) => b.classList.remove('hit'));
-      this.q('.pt-hl')?.remove();
-      this.q('.pe-hub').innerHTML = '⚡';
-      this.msg('Les éclairs frappent la roue…');
-      const hits = strikes();
-      await this.lightning(hits);
-      if (this.dead) return;
-      this.msg('La roue tourne…');
-      this.q('.pe-hub').innerHTML = 'BONNE<br>PÊCHE';
-      const idx = Math.floor(Math.random() * NS), seg = SEGS[idx], L = hits.find((h) => h.i === idx)?.m || 1;
-      await this.spin(idx);
-      if (this.dead) return;
-      this.histAdd(seg, L);
-      this.wheel.insertAdjacentHTML('beforeend', `<path class="pt-hl" d="${slicePath(idx)}" fill="#fff"/>`);
-      this.q('.pe-hub').innerHTML = seg[0] === 'f' ? fishImg(seg, 'pe-hubfish') : '<b class="big">×2</b>';
-      if (L > 1) { this.q('.pe-hub').insertAdjacentHTML('beforeend', `<em class="pe-lx">⚡×${L}</em>`); sfx.upgrade?.(); }
-      const p = center(this.q('.pe-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);
-      this.q(`.pe-spot[data-k="${seg}"]`)?.classList.add('hit');
-      const b = placed[seg] || 0;
-      let ret = 0, M = 2, cap = false;
-      if (b > 0) {
-        if (seg[0] === 'f') { this.msg(`${NAME[seg]} ! Direction l’étang…`); await this.wait(900); M = await this.fishing(seg, L); if (this.dead) return; }
-        ret = b * M * L;
-        if (ret > b * CAPX) { ret = b * CAPX; cap = true; }
-      }
-      const all = Object.values(placed).reduce((a, x) => a + x, 0);
-      this.msg((b ? `${NAME[seg]} : ×${xs(M)}${L > 1 ? ` · éclair ×${L}` : ''} → ${fmtC(ret)}${cap ? ' · GAIN MAXIMUM !' : ''}` : `La roue s’arrête sur ${NAME[seg]}. Pas de mise dessus.`) + ` · Bilan : ${ret - all >= 0 ? '+' : '−'}${fmtC(Math.abs(ret - all))}`);
-      if (ret > 0) {
-        this.win(ret, seg[0] === 'f' ? NAME[seg] : null);
-        this.setLast(ret);
-        if (ret > b) await this.celebrate(ret, { summary: seg[0] === 'f' ? NAME[seg].toUpperCase() : null });
-      }
+      await this.play(outcome(), placed);
       this.board.afterRound();
     });
   }
 
+  // Plays a drawn round on screen (lightning, wheel, fishing) and pays the bets in `placed`.
+  async play(O, placed) {
+    this.qa('.pe-spot').forEach((b) => b.classList.remove('hit'));
+    this.q('.pt-hl')?.remove();
+    this.q('.pe-hub').innerHTML = '⚡';
+    this.msg('Les éclairs frappent la roue…');
+    await this.lightning(O.hits);
+    if (this.dead) return 0;
+    this.msg('La roue tourne…');
+    this.q('.pe-hub').innerHTML = 'BONNE<br>PÊCHE';
+    const idx = O.idx, seg = O.seg, L = O.L;
+    await this.spin(idx);
+    if (this.dead) return 0;
+    this.histAdd(seg, L);
+    this.wheel.insertAdjacentHTML('beforeend', `<path class="pt-hl" d="${slicePath(idx)}" fill="#fff"/>`);
+    this.q('.pe-hub').innerHTML = seg[0] === 'f' ? fishImg(seg, 'pe-hubfish') : '<b class="big">×2</b>';
+    if (L > 1) { this.q('.pe-hub').insertAdjacentHTML('beforeend', `<em class="pe-lx">⚡×${L}</em>`); sfx.upgrade?.(); }
+    const p = center(this.q('.pe-ptr')); fx.burst(p.x, p.y + 20, 30, [COL[seg], '#fff']);
+    this.q(`.pe-spot[data-k="${seg}"]`)?.classList.add('hit');
+    const b = placed[seg] || 0;
+    // the fishing is played when there is a stake on the fish (always at an online table: everyone watches)
+    if (seg[0] === 'f' && (b > 0 || this.online)) { this.msg(`${NAME[seg]} ! Direction l’étang…`); await this.wait(900); await this.fishing(seg, L, O); if (this.dead) return 0; }
+    const { ret, M, cap } = payout(O, placed);
+    const all = Object.values(placed).reduce((a, x) => a + x, 0);
+    this.msg((b ? `${NAME[seg]} : ×${xs(M)}${L > 1 ? ` · éclair ×${L}` : ''} → ${fmtC(ret)}${cap ? ' · GAIN MAXIMUM !' : ''}` : `La roue s’arrête sur ${NAME[seg]}.${all ? ' Pas de mise dessus.' : ''}`) + (all ? ` · Bilan : ${ret - all >= 0 ? '+' : '−'}${fmtC(Math.abs(ret - all))}` : ''));
+    if (ret > 0) {
+      this.win(ret, seg[0] === 'f' ? NAME[seg] : null);
+      this.setLast(ret);
+      if (ret > b) await this.celebrate(ret, { summary: seg[0] === 'f' ? NAME[seg].toUpperCase() : null, quick: this.online });
+    }
+    return ret;
+  }
+
   /* ---------- fishing bonus ---------- */
-  async fishing(k, L) {
-    const vals = pond(k), pick = Math.floor(Math.random() * POND), v = vals[pick];
+  async fishing(k, L, O = null) {
+    const vals = O ? O.vals : pond(k), pick = O ? O.pick : Math.floor(Math.random() * POND), v = vals[pick];
     const box = this.q('.pe-bonus'), zone = this.q('.pe-zone'), water = this.q('.pe-water'), list = this.q('.pe-fishes');
     const range = FISH[k], lo = range[0][0], hi = range[range.length - 1][0];
     const grow = (x) => 0.85 + 0.35 * (Math.log(x / lo + 1) / Math.log(hi / lo + 1)); // bigger multiplier, bigger fish
@@ -312,5 +332,16 @@ class PecheGame extends BaseGame {
   }
 }
 
-return { PecheGame };
+// La Pêche Online: the same lightning, wheel and fish for the whole salon (online.js, withRoom).
+const PecheOnlineGame = withRoom(PecheGame, {
+  cls: 'g-peche',
+  outcome: (R) => outcome(R),
+  payout: (O, d) => payout(O, d).ret,
+  // lightning, spin, then the fishing (the bigger the fish, the longer the fight) and the results
+  resultMs: (O) => 14000 + (O.vals ? 12000 + 2100 * Math.log(O.vals[O.pick] / FISH[O.seg][0][0] + 1) / Math.log(FISH[O.seg].at(-1)[0] / FISH[O.seg][0][0] + 1) : 0),
+  reset() { this.q('.pt-hl')?.remove(); this.qa('.pe-spot').forEach((b) => b.classList.remove('hit')); this.q('.pe-hub').innerHTML = 'LA<br>PÊCHE'; this.q('.pe-bolts').innerHTML = ''; },
+  hello: 'Mise sur ×2 blanc, ×2 ciel ou un poisson, puis appuie sur PRÊT : la roue part quand tout le salon est prêt.',
+});
+
+return { PecheGame, PecheOnlineGame, outcome };
 })();
