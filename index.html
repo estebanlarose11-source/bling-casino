@@ -35,9 +35,17 @@
   <meta name="apple-mobile-web-app-title" content="SpinBet">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎰</text></svg>">
-  <!-- 3D (Three.js r128) et animations fluides (GSAP 3.12.2) : couche 3D en bas de page -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <!-- 3D (Three.js r128) et animations fluides (GSAP 3.12.2) : chargées seulement à l'ouverture d'un jeu
+       (window.__load3D), pour un accueil plus rapide ; la couche 3D est en bas de page (window.__init3D) -->
+  <script>
+  window.__load3D = (() => {
+    let p = null;
+    const one = (src) => new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
+    return () => p || (p = Promise.all([one('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'), one('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js')])
+      .then(() => { window.__3dLoaded = true; try { window.__init3D?.(); } catch (e) { console.error(e); } })
+      .catch((e) => { p = null; throw e; }));
+  })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -7435,7 +7443,7 @@ const GAMES = [
   {
     id: 'big-bad-wolf',
     name: 'Le Loup',
-    subtitle: 'Huff & Spin',
+    subtitle: 'Souffle & Spin',
     tags: ['hold', 'featured', 'buy'],
     theme: 'wolf',
     art: ['🐺', '🏠', '🐷'],
@@ -7452,7 +7460,7 @@ const GAMES = [
       { id: 'moon', glyph: WOLF_IMG.moon, scatter: true, w: 6, reels: [0, 2, 4], pays: { 3: 2 } },
       { id: 'coin', glyph: WOLF_IMG.coin, coin: true, w: 15, noFree: true },
     ], 3.18),
-    freeSpins: { scatter: 'moon', count: { 3: 8 }, type: 'sticky-wilds', title: 'Blow Down Free Spins', retrigger: 3 },
+    freeSpins: { scatter: 'moon', count: { 3: 8 }, type: 'sticky-wilds', title: 'Tempête du Loup', retrigger: 3 },
     holdSpin: {
       coin: 'coin', trigger: 6, respins: 3, landChance: 0.08, img: { coin: WOLF_IMG.coin, wolf: WOLF_IMG.wolf, pig: WOLF_IMG.pig1 },
       coinValues: [
@@ -7480,17 +7488,17 @@ const GAMES = [
 const ORIGINALS = [
   {"id": "cosmic", "name": "Le Cosmique", "cat": "slot", "tag": "Machine à sous", "sub": "Casse néon dans l’espace", "colors": ["#22d3ee", "#7c3aed"], "description": "K-0B, le robot cambrioleur, vide un astéroïde de ses cristaux. Les grappes de 5 symboles explosent en cascade et chargent leurs cases d’énergie : bleu, rose, puis doré. Quand une supernova éclate, toutes les cellules chargées livrent leur butin, avec des trous noirs qui multiplient leur ligne et leur colonne et des vaisseaux qui aspirent tout. 3 bonus avec les balises.", "features": ["Grappes de 5", "Cellules d’énergie à 3 niveaux", "Supernova et Surcharge", "Trous noirs ×2 à ×25", "Vaisseaux-aspirateurs", "3 bonus", "Radar à balises", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "zeus", "name": "L’Olympe", "cat": "slot", "tag": "Machine à sous", "sub": "Pay Anywhere, multiplicateurs ×500", "colors": ["#3b82f6", "#1e1b4b"], "description": "Sur l’Olympe, Zeus fait pleuvoir les gemmes. 8 symboles identiques n’importe où sur la grille 6×5 paient, les gains tombent en cascade et Zeus lance des orbes multiplicateurs de ×2 à ×500. 4 scatters lancent 15 tours gratuits avec un multiplicateur global qui ne se réinitialise jamais.", "features": ["Grille 6×5 Pay Anywhere", "Cascades", "Orbes ×2 à ×500", "15 Free Spins", "Multiplicateur global", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
-  {"id": "huff", "name": "Le Loup 2.0", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Huff ’n’ Puff : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent XXTREM Puff avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. 5 scatters lancent le MEGA BONUS et sa roue du loup. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Huff ’n’ Puff", "4 scatters : roulette des maisons", "5 scatters : MEGA BONUS", "Cases ×2 à ×200", "Mini, Minor, Major, Jackpot ×5 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
+  {"id": "huff", "name": "Le Loup 2.0", "cat": "slot", "tag": "Machine à sous", "sub": "Cases rouges, bleues, dorées", "colors": ["#4fb3ff", "#2f7a2a"], "description": "Les trois petits cochons contre le grand méchant loup. 3 scatters lancent Le Souffle : chaque scatter colore sa case en rouge, puis en bleu, puis en or. 4 scatters lancent Grand Souffle avec la roulette des maisons et 6 cases rouges, bleues ou dorées d’entrée. 5 scatters lancent le MEGA BONUS et sa roue du loup. À la fin, le loup souffle et révèle les multiplicateurs et les jackpots cachés.", "features": ["25 lignes", "3 scatters : Le Souffle", "4 scatters : roulette des maisons", "5 scatters : MEGA BONUS", "Cases ×2 à ×200", "Mini, Minor, Major, Jackpot ×5 000", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "candy", "name": "La Sweety", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs sur les cases", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et chaque case gagnante prend un multiplicateur qui double à chaque nouvelle connexion. Les grosses grappes créent des bonbons spéciaux : cœur explosif, bocal bombe et baguette magique. 4 couronnes ouvrent le Bal de la Reine, où toutes les cases démarrent à ×5 et gardent leur multiplicateur.", "features": ["Grappes de 5", "Multiplicateurs sur les cases", "Cœur explosif, bocal bombe, baguette", "Bal de la Reine : cases à ×5 au départ", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "anubis", "name": "L’Anubis", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "bling", "name": "La Tour Bling", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "pharaon", "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
-  {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Top Slot, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Top Slot et quatre jeux bonus animés : Pile ou Face, Chasse au Cash, Pachinko et Méga Folie.", "features": ["Top Slot ×2 à ×50", "Pile ou Face", "Chasse au Cash", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
+  {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Boost, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Boost et quatre jeux bonus animés : Pile ou Face, Tir aux Cibles, Pachinko et Méga Folie.", "features": ["Boost ×2 à ×50", "Pile ou Face", "Tir aux Cibles", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
   {"id": "storm-online", "name": "L’Éclair Online", "cat": "table", "tag": "En ligne", "sub": "Roulette éclair multijoueur : la roue part quand tout le salon est prêt", "colors": ["#1f56ff", "#071440"], "description": "La roulette éclair en multijoueur : chacun pose ses jetons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La foudre et la bille sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Éclairs ×50 à ×50 000", "Chat du salon"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
   {"id": "bj-online", "name": "Le 21 Online", "cat": "table", "tag": "En ligne", "sub": "Blackjack multijoueur : les cartes partent quand tout le salon est prêt", "colors": ["#11a05f", "#06301f"], "description": "Le blackjack en multijoueur : chacun mise et appuie sur PRÊT, les cartes partent dès que tout le salon est prêt (tout de suite si tu es seul). La même croupière pour tous, les mains des autres joueurs à côté de la tienne, et un chat pour le salon.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Blackjack 6 pour 5", "Chat du salon"], "rtp": "≈ 97,5 %", "vol": 1, "max": "×2,2"},
   {"id": "holdem-online", "name": "Le Texas Online", "cat": "table", "tag": "En ligne", "sub": "Texas Hold’em multijoueur contre la croupière", "colors": ["#10b981", "#06301f"], "description": "Le Texas Hold’em en multijoueur : une main toutes les 30 secondes. Chaque joueur reçoit ses 2 cartes, toute la table voit le même flop, puis chacun suit ou se couche contre la croupière. Quinte flush royale payée 100 pour 1. La table a son propre chat.", "features": ["Multijoueur en direct", "Une main toutes les 30 s", "Quinte flush royale ×100", "Chat de la table"], "rtp": "≈ 97,4 %", "vol": 2, "max": "×100 l’ante"},
-  {"id": "madwheel-online", "name": "La Roue Folle Online", "cat": "table", "tag": "En ligne", "sub": "La grande roue en multijoueur : elle part quand tout le salon est prêt", "colors": ["#ff3d6e", "#5a1bff"], "description": "La Roue Folle en multijoueur : chacun pose ses jetons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). Le Top Slot, la roue et les 4 bonus sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Top Slot ×2 à ×50", "4 bonus pour tout le salon", "Chat du salon"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
+  {"id": "madwheel-online", "name": "La Roue Folle Online", "cat": "table", "tag": "En ligne", "sub": "La grande roue en multijoueur : elle part quand tout le salon est prêt", "colors": ["#ff3d6e", "#5a1bff"], "description": "La Roue Folle en multijoueur : chacun pose ses jetons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). Le Boost, la roue et les 4 bonus sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Boost ×2 à ×50", "4 bonus pour tout le salon", "Chat du salon"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "plateau-online", "name": "Le Plateau Online", "cat": "table", "tag": "En ligne", "sub": "Roue et plateau aux dés en multijoueur", "colors": ["#22c55e", "#0c1a14"], "description": "Le Plateau en multijoueur : chacun mise sur 1, 2, 5, 10 ou les bonus et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La roue, la case Chance et les lancers de dés du plateau sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Plateau jusqu’à ×200 par case", "Case Chance ×10", "Chat du salon"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
   {"id": "peche-online", "name": "La Pêche Online", "cat": "table", "tag": "En ligne", "sub": "La roue à éclairs et la pêche en multijoueur", "colors": ["#38bdf8", "#071a2e"], "description": "La Pêche en multijoueur : chacun mise sur les ×2 ou les poissons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). Les éclairs, la roue et le poisson pêché sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "4 éclairs à chaque lancer", "Poisson rouge jusqu’à ×5 000", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
   {"id": "roueor-online", "name": "La Roue d’Or Online", "cat": "table", "tag": "En ligne", "sub": "Une roue pour tout le salon, chacun son niveau", "colors": ["#fbbf24", "#14110a"], "description": "La Roue d’Or en multijoueur : chacun choisit son niveau et sa mise puis appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La même roue tombe dans l’or pour certains niveaux : ces joueurs jouent leur bonus des 24 cubes. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "3 niveaux", "Bonus des 24 cubes jusqu’à ×5 000", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×5 000"},
@@ -8124,12 +8132,14 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'huff', date: '2026-11-03', title: 'Nouveaux noms de bonus', items: ['Les bonus s’appellent maintenant Le Souffle (3 scatters), Grand Souffle (4 scatters) et MEGA BONUS (5 scatters)', 'Rien ne change dans le jeu ni dans les gains'] },
+  { game: 'madwheel', date: '2026-11-03', title: 'Nouveaux noms', items: ['Le tirage avant chaque tour s’appelle maintenant le Boost', 'Le bonus des cibles s’appelle Tir aux Cibles', 'Rien ne change dans le jeu ni dans les gains'] },
   { game: 'madwheel', date: '2026-11-02', title: 'Le présentateur en 3D', items: ['Le présentateur est maintenant un vrai personnage en 3D : chapeau haut-de-forme, moustache, gants blancs', 'Il attrape la roue, la lance, la regarde tourner, saute de joie ou baisse la tête', 'Chaque bonus arrive avec une médaille d’or en 3D et une explosion de pièces'] },
   { game: 'peche', date: '2026-11-02', title: 'Le pêcheur en relief 3D', items: ['Le pêcheur prend du volume : il est éclairé et tourne en perspective', 'Il se penche quand il lance sa ligne et tire en tremblant quand ça mord', 'Chaque poisson pêché arrive avec une médaille d’or en 3D et une explosion de pièces'] },
   { game: 'huff', date: '2026-11-02', title: 'Lignes gagnantes corrigées', items: ['Les lignes gagnantes restent dans le cadre des rouleaux, sur ordinateur comme sur téléphone'] },
   { game: 'fortune', date: '2026-11-02', title: 'La Fortune plus vivante', items: ['Symboles recadrés : lettres, dragon, enveloppe, chats, lingots et lanterne bien centrés', 'Rouleaux qui défilent plus longtemps, avec une lueur dorée et un flash à chaque arrêt', 'Pendant le Hold & Spin, chaque case vide est un petit rouleau qui défile', 'Un vrai tas de pièces d’or dans le bol, et de la poussière d’or qui tombe'] },
   { game: 'fortune', date: '2026-11-02', title: 'Nouveau : La Fortune', isNew: true, items: ['Le nouvel an chinois : lanternes, dragon d’or WILD et 243 façons de gagner', 'Les pièces d’or montent dans le bol : le tas de pièces grandit jusqu’au prochain bonus', '6 pièces = HOLD & SPIN, avec les jackpots MAJOR et JACKPOT qui grimpent à chaque spin', 'Des lignes s’allument ×2 ou ×5 pendant le bonus', '4 scatters = MÉGA BONUS : chaque pièce vaut ×2 à ×5'] },
-  { game: 'madwheel-online', date: '2026-11-02', title: 'Nouveau : La Roue Folle Online', isNew: true, items: ['La Roue Folle en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'Le Top Slot et les 4 bonus sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
+  { game: 'madwheel-online', date: '2026-11-02', title: 'Nouveau : La Roue Folle Online', isNew: true, items: ['La Roue Folle en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'Le Boost et les 4 bonus sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
   { game: 'plateau-online', date: '2026-11-02', title: 'Nouveau : Le Plateau Online', isNew: true, items: ['Le Plateau en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'La case Chance et les dés du plateau sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
   { game: 'peche-online', date: '2026-11-02', title: 'Nouveau : La Pêche Online', isNew: true, items: ['La Pêche en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'Les éclairs et le poisson pêché sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
   { game: 'roueor-online', date: '2026-11-02', title: 'Nouveau : La Roue d’Or Online', isNew: true, items: ['La Roue d’Or en multijoueur', 'Choisis ton niveau, ta mise, et appuie sur PRÊT', 'Une seule roue pour tout le salon : l’or dépend de ton niveau', 'Les gains des autres joueurs, et le chat du salon'] },
@@ -8264,7 +8274,7 @@ const UPDATES = [
   },
   { game: 'cosmic', date: '2026-10-31', title: 'Nouveau nom : Le Cosmique', items: ['Cosmic Heist s’appelle maintenant Le Cosmique', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'zeus', date: '2026-10-31', title: 'Nouveau nom : L’Olympe', items: ['Zeus Thunder s’appelle maintenant L’Olympe', 'Nouvelle affiche avec le nouveau nom'] },
-  { game: 'huff', date: '2026-10-31', title: 'Nouveau nom : Le Loup 2.0', items: ['Huff la Puff XXTrem s’appelle maintenant Le Loup 2.0', 'Nouvelle affiche avec le nouveau nom'] },
+  { game: 'huff', date: '2026-10-31', title: 'Nouveau nom : Le Loup 2.0', items: ['Le jeu s’appelle maintenant Le Loup 2.0'] },
   { game: 'candy', date: '2026-10-31', title: 'Nouveau nom : La Sweety', items: ['Candy Queen s’appelle maintenant La Sweety', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'anubis', date: '2026-10-31', title: 'Nouveau nom : L’Anubis', items: ['Anubis Reborn s’appelle maintenant L’Anubis', 'Nouvelle affiche avec le nouveau nom'] },
   { game: 'bling', date: '2026-10-31', title: 'Nouveau nom : La Tour Bling', items: ['Bling Tower s’appelle maintenant La Tour Bling', 'Nouvelle affiche avec le nouveau nom'] },
@@ -8468,7 +8478,7 @@ function renderLobby(root, params = {}) {
       <div class="hero-main theme-wolf has-bg">${bgArt(wolf, 'upd-bg')}
         <div class="hero-copy">
           <span class="eyebrow">Nouveau · ${BRAND.provider}</span>
-          <h1>Le Loup<br><em>Huff & Spin</em></h1>
+          <h1>Le Loup<br><em>Souffle & Spin</em></h1>
           <p>Le loup souffle, les maisons montent en gamme : Paille → Bois → Brique → Château. Jusqu’à ×${wolf.holdSpin.jackpots.grand} au Grand Jackpot.</p>
           <div class="hero-cta"><a class="btn primary lg" href="#game-${wolf.id}">Jouer maintenant</a><a class="btn ghost lg" href="#lobby-all">Tous les jeux</a></div>
         </div>
@@ -9871,7 +9881,7 @@ const GIFT_MAX_BET = 100; // free bonus rounds from the daily wheel are played a
 const FREE_BET = 100; // free spins (referral reward) are played at 1\u00a0\uE1E0
 
 const TIERS = [
-  { x: 150, label: 'XXTREM WIN', cls: 'legend' },
+  { x: 150, label: 'Grand Souffle WIN', cls: 'legend' },
   { x: 100, label: 'LEGENDARY WIN', cls: 'legend' },
   { x: 50, label: 'EPIC WIN', cls: 'epic' },
   { x: 25, label: 'MEGA WIN', cls: 'mega' },
@@ -10791,13 +10801,13 @@ const FILES = {
   'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '3357f3e2c8'],
   'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '7e6577831b'],
-  huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'f1fe43fcd8'],
+  huff: ['huff', 'games/impl/huff.js', 'HuffGame', '8bdf0c0cce'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '0b6becec24'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],
-  pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '298b0a4b44'],
-  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '12ce485e98'],
+  pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '16818b1efe'],
+  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '9e528dfdf5'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '8cbe1f47d4'],
@@ -10821,11 +10831,11 @@ const FILES = {
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '72bf2923c7'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '17ab6a334a'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
-  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', '12ce485e98'],
+  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', '9e528dfdf5'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
-  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '72bf2923c7'],
+  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '17ab6a334a'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '6f6628b9f9'],
 };
@@ -11518,17 +11528,17 @@ const LIST = [
   ['big-bad-wolf', [['hold', 'Hold & Spin', T(/^HOLD/)], ['fs', 'Free spins', T(/FREE SPINS$/)]]],
   ['cosmic', [['A', 'Orbite Basse', T(/^ORBITE/)], ['B', 'Ceinture d’Astéroïdes', T(/^CEINTURE/)], ['C', 'Hyper-Espace', T(/^HYPER/)]]],
   ['zeus', [['fs', 'Free spins', T(/FREE SPINS$/)]]],
-  ['huff', [['n', 'Huff ’n’ Puff', T(/^HUFF/)], ['x', 'XXTREM Puff', T(/^XXTREM/)], ['m', 'MEGA BONUS', T(/^MEGA BONUS/)]]],
+  ['huff', [['n', 'Le Souffle', T(/^LE SOUFFLE/)], ['x', 'Grand Souffle', T(/^GRAND SOUFFLE/)], ['m', 'MEGA BONUS', T(/^MEGA BONUS/)]]],
   ['candy', [['fs', 'Bal de la Reine', T(/^BAL DE LA REINE/)]]],
   ['anubis', [['u', 'Monde souterrain', T(/^MONDE SOUTERRAIN/)], ['j', 'Jugement', T(/^JUGEMENT/)]]],
   ['bling', [['b2', 'Bonus ×2', T(/^BONUS ×2/)], ['b5', 'Bonus ×5', T(/^BONUS ×5/)]]],
-  ['pharaon', [['n', 'Bonus', T(/^BONUS$/)], ['b', 'Bonus Bounty', T(/^BONUS BOUNTY/)]]],
+  ['pharaon', [['n', 'Bonus', T(/^BONUS$/)], ['b', 'Bonus Royal', T(/^BONUS ROYAL/)]]],
   ['taco', [['n', 'Le Four', T(/^LE FOUR/)], ['s', 'Super Four', T(/^SUPER FOUR/)]]],
   ['billets', [['fs', 'Free spins', T(/^FREE SPINS/)]]],
   ['dragons', [['A', 'Vol des dragons', T(/^VOL DES DRAGONS/)], ['S', 'Super Bonus', T(/^SUPER BONUS/)]]],
   ['labo', [['m', 'La Mallette', T(/^LA MALLETTE/)], ['d', 'La Descente', T(/^LA DESCENTE/)]]],
   ['fortune', [['h', 'Hold & Spin', T(/^HOLD/)], ['m', 'Méga Bonus', T(/^MÉGA BONUS/)]]],
-  ['madwheel', [['cf', 'Pile ou Face'], ['ch', 'Chasse au Cash'], ['pa', 'Pachinko'], ['ct', 'Méga Folie']]],
+  ['madwheel', [['cf', 'Pile ou Face'], ['ch', 'Tir aux Cibles'], ['pa', 'Pachinko'], ['ct', 'Méga Folie']]],
   ['plateau', [['b2', 'Bonus 2 lancers'], ['b4', 'Bonus 4 lancers']]],
   ['peche', [['fb', 'Poisson bleu'], ['fo', 'Poisson orange'], ['fr', 'Poisson rouge']]],
   ['roueor', [['or', 'Bonus des 24 cubes']]],
@@ -11885,7 +11895,9 @@ function makeFisher(host, srcs) {
   return { setState(s) { state = s; since = 0; S.kick(); }, dispose: () => S.dispose() };
 }
 
-return { makeShowman, makeFisher, has3D: ok, studioEnv };
+const ready = () => (window.__load3D ? window.__load3D() : Promise.reject(new Error('no 3D')));
+
+return { makeShowman, makeFisher, has3D: ok, studioEnv, ready };
 })();
 
 // ---- chat.js ----
@@ -13099,6 +13111,7 @@ const routes = [
 
 function route() {
   const path = location.hash.replace(/^#\/?/, '');
+  if (path.startsWith('game-')) window.__load3D?.().catch(() => {}); // the 3D layer, only when a game opens
   leaveGame();
   const hit = routes.find((r) => r.re.test(path)) || routes[0];
   view.classList.remove('enter');
@@ -14246,7 +14259,9 @@ body.fs-on .live-tick { display: none; }
 </style>
 
 <script>
-addEventListener('DOMContentLoaded', () => {
+window.__init3D = () => {
+  if (window.__init3Ddone) return;
+  window.__init3Ddone = true;
   'use strict';
   const THREE = window.THREE, gsap = window.gsap;
   const MODS = typeof __mods !== 'undefined' ? __mods : window.__mods; // the site's modules (a const of the main script)
@@ -14653,7 +14668,7 @@ addEventListener('DOMContentLoaded', () => {
       return o.position.y < h / 2 + 1.5;
     });
   }
-  const WHEEL_NAMES = { cf: 'PILE OU FACE', ch: 'CHASSE AU CASH', pa: 'PACHINKO', ct: 'MÉGA FOLIE', b2: '2 LANCERS', b4: '4 LANCERS', fb: 'POISSON BLEU', fo: 'POISSON ORANGE', fr: 'POISSON ROUGE', or: 'BONUS' };
+  const WHEEL_NAMES = { cf: 'PILE OU FACE', ch: 'TIR AUX CIBLES', pa: 'PACHINKO', ct: 'MÉGA FOLIE', b2: '2 LANCERS', b4: '4 LANCERS', fb: 'POISSON BLEU', fo: 'POISSON ORANGE', fr: 'POISSON ROUGE', or: 'BONUS' };
   function bonusFx(title, wheel) {
     if (off()) return;
     // a moment later: the intro has put its symbol on screen, the medallion takes its place
@@ -14682,7 +14697,9 @@ addEventListener('DOMContentLoaded', () => {
   addEventListener('sb:bonus', (e) => bonusFx(WHEEL_NAMES[e.detail?.key] || 'BONUS', true));
   addEventListener('sb:featureend', () => { aura.until = 0; });
   addEventListener('hashchange', () => { aura.until = 0; });
-});
+};
+if (window.__3dLoaded) window.__init3D();
+
 </script>
 
 <script>

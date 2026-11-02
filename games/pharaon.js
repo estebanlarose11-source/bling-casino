@@ -48,7 +48,7 @@ class PharaonGame extends BaseGame {
       stage: '<div class="grid-host"></div>',
       buys: [
         { id: 'normal', icon: '☀️', label: 'Bonus 3 soleils', desc: '8 tours gratuits, multiplicateur de départ ×4', cost: (b) => b * BUYN },
-        { id: 'bounty', icon: '👑', label: 'Bonus Bounty · 4 soleils', desc: '12 tours gratuits, multiplicateur de départ ×10', cost: (b) => b * BUYB },
+        { id: 'bounty', icon: '👑', label: 'Bonus Royal · 4 soleils', desc: '12 tours gratuits, multiplicateur de départ ×10', cost: (b) => b * BUYB },
       ],
       hello: 'Les cases gagnantes se verrouillent, le multiplicateur grimpe',
     });
@@ -139,7 +139,7 @@ class PharaonGame extends BaseGame {
     const bounty = kind === 'bounty';
     let free = bounty ? 12 : 8, base = bounty ? 10 : 4, fsWin = 0, done = 0;
     this.lastStake = this.bet;
-    await this.featureIntro(bounty ? 'BONUS BOUNTY' : 'BONUS', `${free} tours gratuits · départ ×${base} · le multiplicateur reste`, symArt(SC));
+    await this.featureIntro(bounty ? 'BONUS ROYAL' : 'BONUS', `${free} tours gratuits · départ ×${base} · le multiplicateur reste`, symArt(SC));
     this.slotEl.classList.add('in-free');
     while (free > 0 && !this.dead) {
       free--; done++;
@@ -155,7 +155,7 @@ class PharaonGame extends BaseGame {
     this.setMult(1);
     this.grid.cells.forEach((c) => c.classList.remove('lock'));
     this.setLast(fsWin);
-    await this.celebrate(fsWin, { summary: bounty ? 'BONUS BOUNTY' : 'BONUS TOTEM' });
+    await this.celebrate(fsWin, { summary: bounty ? 'BONUS ROYAL' : 'BONUS TOTEM' });
     this.msg(`Bonus terminé : ${fmtC(fsWin)} gagnés`);
   }
 
@@ -163,8 +163,8 @@ class PharaonGame extends BaseGame {
     const rows = [...SYM.map((s) => s[0]), SC].map((s) => `<div class="pay-item"><div class="pay-sym">${symArt(s)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>${s === SC ? '3 = bonus 8 tours ×4 · 4+ = Bounty 12 tours ×10' : `Valeur ${val(s)}`}</span></div></div>`).join('');
     return this.rules(`<h4>Symboles</h4><div class="paytable">${rows}</div>
       <h4>Cases verrouillées</h4><p>Grille 5×4. Une grappe de <b>5 symboles identiques ou plus</b> paie (mise × valeur × 0,0675 × (taille − 2), au prorata des nouvelles cases), puis <b>se verrouille</b>. Les autres cases sont relancées et le <b>multiplicateur monte de +1</b> à chaque nouvelle connexion, jusqu’à 15 fois.</p>
-      <h4>Bonus</h4><p>3 soleils : 8 tours qui démarrent à ×4. 4 soleils ou plus : Bounty, 12 tours à ×10. Pendant le bonus, <b>le multiplicateur reste</b> d’un tour à l’autre. 3 soleils de plus : +3 tours.</p>
-      <h4>Achats</h4><p>Bonus ×${BUYN} la mise · Bonus Bounty ×${BUYB} la mise.</p>`);
+      <h4>Bonus</h4><p>3 soleils : 8 tours qui démarrent à ×4. 4 soleils ou plus : le Bonus Royal, 12 tours à ×10. Pendant le bonus, <b>le multiplicateur reste</b> d’un tour à l’autre. 3 soleils de plus : +3 tours.</p>
+      <h4>Achats</h4><p>Bonus ×${BUYN} la mise · Bonus Royal ×${BUYB} la mise.</p>`);
   }
 }
 

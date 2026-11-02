@@ -145,7 +145,7 @@ const HOUSE_NAME = [null, 'MAISON ROUGE', 'MAISON BLEUE', 'MAISON OR'];
 // MEGA wheel as drawn (the result itself follows MEGA in the engine).
 const MWHEEL = ['five', 'gold', 'five', 'major', 'five', 'gold', 'five', 'grand', 'five', 'gold', 'five', 'major'];
 const MLAB = { five: ['5 TOURS', 'Bonus 5 tours'], gold: ['MAISONS OR', 'Bonus maisons en or'], major: ['MAJOR', 'MAJOR JACKPOT'], grand: ['JACKPOT', 'GRAND JACKPOT'] };
-const BONUS_NAME = { n: 'HUFF ’N’ PUFF', x: 'XXTREM PUFF', g: 'MAISONS EN OR', f: 'MEGA PUFF' };
+const BONUS_NAME = { n: 'LE SOUFFLE', x: 'GRAND SOUFFLE', g: 'MAISONS EN OR', f: 'SOUFFLE GÉANT' };
 // Painted images from the owner (assets/games/huff): the wolf, the 3 houses, the pig and the scatter coin.
 // The card symbols (A K Q J 10) keep their drawn art.
 const IMG_V = 1;
@@ -166,11 +166,11 @@ class HuffGame extends BaseGame {
       head: `<div class="jackpots">${['mini', 'minor', 'major', 'grand'].map((k) => `<div class="jp jp-${k}" data-jp="${k}"><small>${JPN[k]}</small><b></b></div>`).join('')}</div>`,
       stage: '<div class="reels-host"></div><svg class="paylines" viewBox="0 0 500 300" preserveAspectRatio="none"></svg>',
       buys: [
-        { id: 'n', icon: '🏠', label: 'Huff ’n’ Puff · 3 scatters', desc: '3 cases rouges au départ, 3 tours remis à zéro à chaque scatter', cost: (b) => b * BUYN },
-        { id: 'x', icon: '🐺', label: 'XXTREM · 4 scatters', desc: 'Roulette des maisons : 6 cases rouges, bleues ou dorées d’entrée', cost: (b) => b * BUYX },
+        { id: 'n', icon: '🏠', label: 'Le Souffle · 3 scatters', desc: '3 cases rouges au départ, 3 tours remis à zéro à chaque scatter', cost: (b) => b * BUYN },
+        { id: 'x', icon: '🐺', label: 'Grand Souffle · 4 scatters', desc: 'Roulette des maisons : 6 cases rouges, bleues ou dorées d’entrée', cost: (b) => b * BUYX },
         { id: 'm', icon: '👑', label: 'MEGA BONUS · 5 scatters', desc: `La roue du loup : JACKPOT ×${JPV.grand}, MAJOR, bonus maisons en or ou bonus 5 tours`, cost: (b) => b * BUYM },
       ],
-      hello: '3 scatters = Huff ’n’ Puff · 4 = XXTREM · 5 = MEGA BONUS',
+      hello: '3 scatters = Le Souffle · 4 = Grand Souffle · 5 = MEGA BONUS',
     });
     this.reels = new Reels(this.q('.reels-host'), {
       cols: COLS, rows: ROWS, game: this,
@@ -250,12 +250,12 @@ class HuffGame extends BaseGame {
     if (sc.length >= 5) return this.megaBonus(sc, bet);
     let st;
     if (sc.length >= 4) {
-      await this.featureIntro('XXTREM PUFF', `${sc.length} scatters · la roulette des maisons décide de tes 6 cases`, art('wolf'));
+      await this.featureIntro('GRAND SOUFFLE', `${sc.length} scatters · la roulette des maisons décide de tes 6 cases`, art('wolf'));
       const house = spinHouse();
       await this.houseRoulette(house);
       st = newBonus(sc, 'x', house);
     } else {
-      await this.featureIntro('HUFF ’N’ PUFF', 'Les cases des scatters deviennent rouges · 3 tours', art('hsc'));
+      await this.featureIntro('LE SOUFFLE', 'Les cases des scatters deviennent rouges · 3 tours', art('hsc'));
       st = newBonus(sc, 'n');
     }
     await this.runBonus(st, bet, false);
@@ -581,12 +581,12 @@ class HuffGame extends BaseGame {
       return `<div class="pay-item"><div class="pay-sym svg">${art(id)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>${t}</span></div></div>`;
     }).join('');
     return this.rules(`<h4>Table des gains (× la mise totale)</h4><div class="paytable">${rows}</div>
-      <div class="pay-item"><div class="pay-sym svg">${art('hsc')}</div><div class="pay-vals"><b>Scatter BONUS</b><br><span>3 = Huff ’n’ Puff · 4 ou 5 = XXTREM Puff</span></div></div>
-      <h4>Huff ’n’ Puff (3 scatters)</h4><ul class="rules"><li>Les cases où sont tombés les scatters deviennent <b>rouges</b>.</li><li>3 tours, remis à 3 à chaque scatter qui tombe.</li><li>Scatter sur une case vide : elle devient rouge. Sur une rouge : elle devient <b>bleue</b>. Sur une bleue : elle devient <b>dorée</b>.</li><li>Scatter sur une case dorée : elle ne monte plus, le scatter <b>bondit</b> sur une case rouge ou bleue et la rend dorée.</li></ul>
-      <h4>XXTREM Puff (4 scatters)</h4><p>La roulette des maisons tourne d’abord : <b>maison rouge</b>, <b>maison bleue</b> ou <b>maison OR</b>. Tu commences avec 6 cases de cette couleur, puis le bonus se joue comme Huff ’n’ Puff.</p>
+      <div class="pay-item"><div class="pay-sym svg">${art('hsc')}</div><div class="pay-vals"><b>Scatter BONUS</b><br><span>3 = Le Souffle · 4 ou 5 = Grand Souffle</span></div></div>
+      <h4>Le Souffle (3 scatters)</h4><ul class="rules"><li>Les cases où sont tombés les scatters deviennent <b>rouges</b>.</li><li>3 tours, remis à 3 à chaque scatter qui tombe.</li><li>Scatter sur une case vide : elle devient rouge. Sur une rouge : elle devient <b>bleue</b>. Sur une bleue : elle devient <b>dorée</b>.</li><li>Scatter sur une case dorée : elle ne monte plus, le scatter <b>bondit</b> sur une case rouge ou bleue et la rend dorée.</li></ul>
+      <h4>Grand Souffle (4 scatters)</h4><p>La roulette des maisons tourne d’abord : <b>maison rouge</b>, <b>maison bleue</b> ou <b>maison OR</b>. Tu commences avec 6 cases de cette couleur, puis le bonus se joue comme Le Souffle.</p>
       <h4>MEGA BONUS (5 scatters)</h4><p>La roue du loup choisit entre : le <b>GRAND JACKPOT ×${JPV.grand}</b> la mise, le <b>MAJOR ×${JPV.major}</b>, le bonus <b>maisons en or</b> (les 5 cases de départ et chaque scatter qui tombe deviennent directement des maisons en or) ou un bonus <b>${MEGA_SPINS} tours</b> qui se rechargent à ${MEGA_SPINS} au lieu de ${BONUS_SPINS}.</p>
       <h4>Valeurs cachées</h4><ul class="rules"><li>Rouge : ×2 à ×10 la mise.</li><li>Bleue : ×15 à ×50.</li><li>Rouge = maison de paille, bleue = maison en bois, dorée = maison en briques.</li><li>Dorée : ×70 à ×200, ou une <b>pièce jackpot</b> : MINI ×${JPV.mini}, MINOR ×${JPV.minor}, MAJOR ×${JPV.major} ou JACKPOT ×${JPV.grand} (max win). Le montant suit ta mise.</li><li>Tout reste caché jusqu’à la fin : le loup souffle sur les maisons et révèle chaque case.</li><li>Gain plafonné à ×${CAPX}.</li></ul>
-      <h4>Achats</h4><p>Huff ’n’ Puff ×${BUYN} · XXTREM Puff ×${BUYX} · MEGA BONUS ×${BUYM}. RTP ≈ 92 %.</p>`);
+      <h4>Achats</h4><p>Le Souffle ×${BUYN} · Grand Souffle ×${BUYX} · MEGA BONUS ×${BUYM}. RTP ≈ 92 %.</p>`);
   }
 }
 

@@ -125,7 +125,7 @@ class PecheGame extends BaseGame {
     this.wheel = this.q('.pe-wheel');
     ['fb', 'fo', 'fr', 'gold', 'fisher1', 'fisher2', 'pond'].forEach((n) => { new Image().src = src(n); });
     // the fisherman photo as a lit 3D relief (fx3d.js) when the device can; the photo stays otherwise
-    this.fisher3d = __mods['fx3d.js']?.makeFisher(this.q('.pe-fisher'), [src('fisher1'), src('fisher2')]);
+    __mods['fx3d.js']?.ready().then(() => { if (!this.dead) this.fisher3d = __mods['fx3d.js'].makeFisher(this.q('.pe-fisher'), [src('fisher1'), src('fisher2')]); }).catch(() => {});
   }
 
   destroy() { this.fisher3d?.dispose(); super.destroy(); }

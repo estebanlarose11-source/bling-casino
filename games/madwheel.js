@@ -16,9 +16,9 @@ const SEG_COUNT = [['1', 22, 0.5], ['2', 15, 0.5], ['5', 7, 0.5], ['10', 4, 0.5]
 const SEGS = SEG_COUNT.flatMap(([k, n, ph], j) => Array.from({ length: n }, (_, i) => ({ k, at: (i + ph) / n + j * 1e-4 }))).sort((a, b) => a.at - b.at).map((x) => x.k);
 const NS = SEGS.length, A = 360 / NS;
 const COL = { 1: '#f5c518', 2: '#3aa0ff', 5: '#ff5fa8', 10: '#a259ff', cf: '#1dd3b0', ch: '#8bd93b', pa: '#ff8a3d', ct: '#ff3d54' };
-const NAME = { 1: '1', 2: '2', 5: '5', 10: '10', cf: 'Pile ou Face', ch: 'Chasse au Cash', pa: 'Pachinko', ct: 'Méga Folie' };
+const NAME = { 1: '1', 2: '2', 5: '5', 10: '10', cf: 'Pile ou Face', ch: 'Tir aux Cibles', pa: 'Pachinko', ct: 'Méga Folie' };
 const SPOTS = ['1', '2', '5', '10', 'cf', 'ch', 'pa', 'ct'];
-const HINT = { 1: '1 pour 1', 2: '2 pour 1', 5: '5 pour 1', 10: '10 pour 1', cf: 'Pile ou Face', ch: 'Chasse au Cash', pa: 'Pachinko', ct: 'Méga Folie' };
+const HINT = { 1: '1 pour 1', 2: '2 pour 1', 5: '5 pour 1', 10: '10 pour 1', cf: 'Pile ou Face', ch: 'Tir aux Cibles', pa: 'Pachinko', ct: 'Méga Folie' };
 const TM = [[2, 30], [3, 20], [5, 18], [7, 10], [10, 9], [15, 5], [20, 3.5], [25, 2.5], [30, 1.5], [50, 0.5]];
 const TQ = { 1: 0.0562, 2: 0.0351, 5: 0.0458, 10: 0.0309, cf: 0.1141, ch: 0.1335, pa: 0.1369, ct: 0.0986 };
 const CL = [[4, 24], [6, 19], [8, 15], [10, 12], [14, 10], [20, 8], [30, 5.5], [40, 3.5], [100, 2], [200, 1.23]];
@@ -215,7 +215,7 @@ class MadWheelGame extends BaseGame {
       music: EXTRA_THEMES.madwheel, stepper: false, autoplay: true, mainLabel: 'LANCER', betLabel: 'Mise totale',
       cls: 'table-game',
       head: '<div class="hist mw-hist"></div>',
-      stage: `<div class="mw-top"><small>TOP SLOT</small><b class="tsv">—</b></div>
+      stage: `<div class="mw-top"><small>BOOST</small><b class="tsv">—</b></div>
         <div class="mw-view"><div class="mw-zone"><div class="mw-ptr"></div>${bigWheelSVG()}<div class="mw-hub">ROUE<br>FOLLE</div><div class="mw-host">${HOST}</div></div></div>`,
       below: `<div class="felt mw-felt"><div class="mw-spots">${SPOTS.map((k) => `<button class="mw-spot" data-k="${k}" style="--sc:${COL[k]}"><b>${isNaN(+k) ? iconSVG(k, 30) : k}</b><small>${HINT[k]}</small></button>`).join('')}</div>${BetBoard.chipsHTML()}</div>`,
       hello: 'Pose tes jetons sur les cases puis lance la roue.',
@@ -227,8 +227,11 @@ class MadWheelGame extends BaseGame {
     this.wheel = this.q('.mw-wheel');
     this.host = this.q('.mw-host');
     // the showman in real 3D (fx3d.js) when the device can; the drawing stays otherwise
-    this.host3d = __mods['fx3d.js']?.makeShowman(this.host);
-    if (this.host3d) this.host.classList.add('mw3d');
+    __mods['fx3d.js']?.ready().then(() => {
+      if (this.dead) return;
+      this.host3d = __mods['fx3d.js'].makeShowman(this.host);
+      if (this.host3d) { this.host.classList.add('mw3d'); this.host3d.setPose(['ready', 'pull', 'watch', 'cheer', 'sad'].find((c) => this.host.classList.contains(c)) || 'idle'); }
+    }).catch(() => {});
   }
 
   pose(cls, ms = 0) {
@@ -271,8 +274,8 @@ class MadWheelGame extends BaseGame {
   async play(O, placed, ctx = {}) {
     this.q('.mw-hl')?.remove();
     this.qa('.mw-spot').forEach((b) => b.classList.remove('hit', 'tsel'));
-    this.msg('Top Slot…');
-    this.q('.mw-hub').innerHTML = 'TOP<br>SLOT';
+    this.msg('Boost…');
+    this.q('.mw-hub').innerHTML = 'BOOST';
     const top = O.top, tv = this.q('.tsv'), topBox = this.q('.mw-top');
     topBox.classList.add('rolling');
     const t0 = performance.now();
@@ -325,7 +328,7 @@ class MadWheelGame extends BaseGame {
     }
     const { ret, M, cap } = payout(O, placed, arrow ?? 0);
     if (b > 0) {
-      if (!isNaN(+seg)) lines.push(`Tu gagnes ${fmtC(ret - b)}${tm > 1 ? ` (Top Slot ×${tm})` : ''}`);
+      if (!isNaN(+seg)) lines.push(`Tu gagnes ${fmtC(ret - b)}${tm > 1 ? ` (Boost ×${tm})` : ''}`);
       else lines.push(M > 0 ? `${NAME[seg]} : ×${M * tm} → ${fmtC(ret - b)}` : `${NAME[seg]} : perdu`);
     } else lines.push(`La roue s’arrête sur ${isNaN(+seg) ? NAME[seg] : seg}.${Object.keys(placed).length ? ' Pas de mise dessus.' : ''}`);
     const all = Object.values(placed).reduce((a, x) => a + x, 0);
@@ -387,7 +390,7 @@ class MadWheelGame extends BaseGame {
       const t = ms ? setTimeout(() => go(Math.floor(Math.random() * els.length)), ms) : 0;
     });
   }
-  tmTxt(tm) { return tm > 1 ? ` <b class="tm">Top Slot ×${tm}</b>` : ''; }
+  tmTxt(tm) { return tm > 1 ? ` <b class="tm">Boost ×${tm}</b>` : ''; }
 
   async bonusCF(tm, r = coinRun()) {
     this.openOv(`<h2>Pile ou Face</h2><p class="msgov">La pièce va tourner…${this.tmTxt(tm)}</p>
@@ -408,7 +411,7 @@ class MadWheelGame extends BaseGame {
 
   async bonusCH(tm, O) {
     const bd = O ? O.bd : chBoard();
-    this.openOv(`<h2>Chasse au Cash</h2><p class="msgov">Mémorise les multiplicateurs… ils vont se mélanger !${this.tmTxt(tm)}</p><div class="grid12">${bd.map((v) => `<button class="ch-t${v >= 80 ? ' hi' : ''}">${v}</button>`).join('')}</div>`);
+    this.openOv(`<h2>Tir aux Cibles</h2><p class="msgov">Mémorise les multiplicateurs… ils vont se mélanger !${this.tmTxt(tm)}</p><div class="grid12">${bd.map((v) => `<button class="ch-t${v >= 80 ? ' hi' : ''}">${v}</button>`).join('')}</div>`);
     const btns = [...this.ov.querySelectorAll('.ch-t')];
     await this.wait(3000);
     for (let i = 0; i < btns.length; i++) { const b = btns[i]; setTimeout(() => { b.textContent = '🎯'; b.classList.remove('hi'); b.classList.add('hidden'); }, (i % 12) * 30); }
@@ -422,7 +425,7 @@ class MadWheelGame extends BaseGame {
     btns[idx].textContent = '×' + m; btns[idx].classList.add('pick');
     const p = center(btns[idx]); fx.burst(p.x, p.y, 40, ['#8bd93b', '#fff', '#fde047'], 8);
     sfx.bigWin();
-    this.ovp(`Tu as touché ×${m}${tm > 1 ? ` → ×${m * tm} avec le Top Slot` : ''} !`);
+    this.ovp(`Tu as touché ×${m}${tm > 1 ? ` → ×${m * tm} avec le Boost` : ''} !`);
     await this.wait(900);
     let j = 0; btns.forEach((b, i) => { if (i !== idx) { b.textContent = rest[j++]; b.classList.remove('hidden'); b.classList.add('dimmed'); } });
     await this.wait(1800);
@@ -449,7 +452,7 @@ class MadWheelGame extends BaseGame {
       sl[dr.k].classList.add('hit');
       const p = center(sl[dr.k]); fx.burst(p.x, p.y, 30, ['#ff8a3d', '#fff', '#fde047']);
       if (dr.vals[dr.k] === 'D') { this.ovp('DOUBLE ! Tous les multiplicateurs ×2, on relance…'); sfx.upgrade(); this.flash('rgba(255,138,61,.6)'); await this.wait(1600); }
-      else { this.ovp(`Palet sur ×${dr.vals[dr.k]}${tm > 1 ? ` → ×${dr.vals[dr.k] * tm} avec le Top Slot` : ''} !`); sfx.bigWin(); await this.wait(1800); }
+      else { this.ovp(`Palet sur ×${dr.vals[dr.k]}${tm > 1 ? ` → ×${dr.vals[dr.k] * tm} avec le Boost` : ''} !`); sfx.bigWin(); await this.wait(1800); }
     }
     this.closeOv();
     return run.M;
@@ -498,7 +501,7 @@ class MadWheelGame extends BaseGame {
     }
     const vals = run.idx.map((i) => { const t = CTSEQ[i]; return t === 'D' || t === 'T' ? '?' : t * mult; });
     const others = [0, 1, 2].filter((c) => c !== ch).map((c) => `${ARN[c]} ×${vals[c]}`).join(' · ');
-    this.ovp(`Ta flèche ${ARN[ch]} s’arrête sur ×${run.M}${tm > 1 ? ` → ×${run.M * tm} avec le Top Slot` : ''} ! <small>(les autres : ${others})</small>`);
+    this.ovp(`Ta flèche ${ARN[ch]} s’arrête sur ×${run.M}${tm > 1 ? ` → ×${run.M * tm} avec le Boost` : ''} ! <small>(les autres : ${others})</small>`);
     sfx.jackpot(); fx.confetti(80);
     await this.wait(3000);
     this.closeOv();
@@ -508,9 +511,9 @@ class MadWheelGame extends BaseGame {
   destroy() { this.ov?.remove(); this.host3d?.dispose(); super.destroy(); }
 
   info() {
-    return this.rules(`<h4>La roue</h4><p>54 cases : 1 (×22), 2 (×15), 5 (×7), 10 (×4) et 6 cases bonus (Pile ou Face ×2, Pachinko ×2, Chasse au Cash ×1, Méga Folie ×1). Mise sur une ou plusieurs cases : un chiffre paie autant de fois la mise (1 pour 1, 2 pour 1…), mise rendue en plus.</p>
-      <h4>Top Slot</h4><p>Avant chaque tour, le Top Slot peut tirer une case et un multiplicateur de ×2 à ×50. Si la roue s’arrête sur cette case, son gain est multiplié.</p>
-      <h4>Les 4 bonus</h4><ul class="rules"><li>${iconSVG('cf', 18)} <b>Pile ou Face</b> : une pièce, deux multiplicateurs.</li><li>${iconSVG('ch', 18)} <b>Chasse au Cash</b> : 108 multiplicateurs mélangés, choisis une cible.</li><li>${iconSVG('pa', 18)} <b>Pachinko</b> : le palet tombe dans une case ; ×2 double tout et on relance.</li><li>${iconSVG('ct', 18)} <b>Méga Folie</b> : choisis ta flèche, la roue géante peut doubler ou tripler.</li></ul>
+    return this.rules(`<h4>La roue</h4><p>54 cases : 1 (×22), 2 (×15), 5 (×7), 10 (×4) et 6 cases bonus (Pile ou Face ×2, Pachinko ×2, Tir aux Cibles ×1, Méga Folie ×1). Mise sur une ou plusieurs cases : un chiffre paie autant de fois la mise (1 pour 1, 2 pour 1…), mise rendue en plus.</p>
+      <h4>Boost</h4><p>Avant chaque tour, le Boost peut tirer une case et un multiplicateur de ×2 à ×50. Si la roue s’arrête sur cette case, son gain est multiplié.</p>
+      <h4>Les 4 bonus</h4><ul class="rules"><li>${iconSVG('cf', 18)} <b>Pile ou Face</b> : une pièce, deux multiplicateurs.</li><li>${iconSVG('ch', 18)} <b>Tir aux Cibles</b> : 108 multiplicateurs mélangés, choisis une cible.</li><li>${iconSVG('pa', 18)} <b>Pachinko</b> : le palet tombe dans une case ; ×2 double tout et on relance.</li><li>${iconSVG('ct', 18)} <b>Méga Folie</b> : choisis ta flèche, la roue géante peut doubler ou tripler.</li></ul>
       <p>Gain maximum ×25 000 la mise d’une case.</p>`);
   }
 }
@@ -523,7 +526,7 @@ const MadWheelOnlineGame = withRoom(MadWheelGame, {
   resultMs: (O) => 19000 + (O.seg === 'cf' ? 6000 : O.seg === 'ch' ? 14000 : O.seg === 'pa' ? 2000 + O.pa.drops.length * 3000 : O.seg === 'ct' ? 4000 + Math.max(...O.ct.map((r) => r.spins.length)) * 4500 : 0),
   reset() { this.q('.mw-hl')?.remove(); this.qa('.mw-spot').forEach((b) => b.classList.remove('hit', 'tsel')); this.q('.mw-hub').innerHTML = 'ROUE<br>FOLLE'; this.q('.tsv').textContent = '—'; },
   hello: 'Pose tes jetons puis appuie sur PRÊT : la roue part quand tout le salon est prêt.',
-  rules: '<p>À la Méga Folie, la couleur de ta flèche est tirée au sort pour chaque joueur. À la Chasse au Cash, tout le salon gagne le même multiplicateur.</p>',
+  rules: '<p>À la Méga Folie, la couleur de ta flèche est tirée au sort pour chaque joueur. À la Tir aux Cibles, tout le salon gagne le même multiplicateur.</p>',
 });
 
 return { MadWheelGame, MadWheelOnlineGame, outcome };
