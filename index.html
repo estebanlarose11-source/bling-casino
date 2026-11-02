@@ -8259,6 +8259,7 @@ function renderLobby(root, params = {}) {
     ? '<section class="panel live-now" data-live-now></section>'
       + row('Populaires', ['cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
       + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
+      + '<div class="hta-slot" data-hta=""></div>'
       + row('Roues & tables', ORIGINALS.filter(FILTERS[3].test), 'table')
       + row('Jeux rapides', ORIGINALS.filter(FILTERS[4].test), 'quick')
     : `<section>
@@ -10698,7 +10699,8 @@ function leaveGame() {
 
 // under each game: the live table / players on this game, and the player's own recent wins on it
 const liveHTML = (game) => `<section class="panel live-game" data-live-game="${game.id}"></section>
-    <section class="panel game-wins"><div class="sec-head"><h2>💰 Mes gains récents sur ${game.name}</h2></div><ol class="gw-list" data-gw="${game.id}"></ol></section>`;
+    <section class="panel game-wins"><div class="sec-head"><h2>💰 Mes gains récents sur ${game.name}</h2></div><ol class="gw-list" data-gw="${game.id}"></ol></section>
+    <div class="hta-slot" data-hta=""></div>`;
 const dots = (n) => `<span class="dots">${[1, 2, 3, 4, 5].map((i) => `<i class="${i <= n ? 'on' : ''}"></i>`).join('')}</span>`;
 
 function renderRebuilt(root, game) {
@@ -10836,6 +10838,7 @@ function renderRefill(root) {
       <p class="muted small">${ad.ok ? `Encore ${ad.left} pub${ad.left > 1 ? 's' : ''} récompensée${ad.left > 1 ? 's' : ''} aujourd’hui, quel que soit ton solde.` : ad.reason}</p>
       <a class="btn ghost" href="#profil">${daily.ready ? '🎁 Ton bonus du jour est disponible' : '🎁 Bonus du jour et niveaux'}</a>
     </section>
+    <div class="hta-slot" data-hta=""></div>
     <section class="panel gift-code">
       <h2>🎟️ Code cadeau</h2>
       <p class="muted">Tu as un code ? Entre-le ici pour recevoir tes KE. Chaque code ne marche qu’une seule fois.</p>
@@ -11620,6 +11623,7 @@ function renderShop(root) {
           <button class="btn primary" data-tiktok>${tk ? '✔ +10 000 récupérés · Revoir le TikTok' : `Rejoindre · +${fmt(TIKTOK_KE)}`}</button></div>
       </div>
     </section>
+    <div class="hta-slot" data-hta=""></div>
     ${KINDS.map(({ k, list, title, sub }) => `<section class="panel shop-sec">
       <div class="sec-head"><h2>${title}</h2></div><p class="muted small">${sub}</p>
       <div class="sh-grid">${list.map((it) => {
@@ -11833,6 +11837,50 @@ function mountLive() {
 return { mountLive, TABLE_GAMES, online: () => players };
 })();
 
+// ---- hta.js ----
+__mods['hta.js'] = (() => {
+// HilltopAds banner 300 × 250 (zone « SpinBet - Banniere 300x250 », code hta-code-7588813). Every element
+// <div data-hta></div> on a page gets one banner. Same audience as the other banners: nobody when adPolicy.noAds()
+// (the owner, a ?nopub device) and no banner for players of level AD_FREE_LEVEL or more. A slot the network
+// leaves empty folds away after a few seconds.
+const { adPolicy } = __mods['adpolicy.js'];
+const { profiles } = __mods['profile.js'];
+const { progress } = __mods['progress.js'];
+
+const AD_FREE_LEVEL = 15;
+const SRC = '//narrowefficiency.com/b.XIV/sQdZGAlE0wYvWycN/IeNmu9/uoZ/U/l/kOPtTucT1/OMDbgz4HMaT/MytPNYzOU/4iOMDig/xYNfwC';
+
+const allowed = () => !adPolicy.noAds() && !(profiles.current && progress.info().level >= AD_FREE_LEVEL);
+
+function fill(slot) {
+  slot.dataset.hta = 'on';
+  if (!allowed()) { slot.hidden = true; return; }
+  slot.hidden = false;
+  slot.innerHTML = '<small>Publicité</small><div class="hta-box"></div>';
+  const box = slot.querySelector('.hta-box');
+  // the network's loader, unchanged: it puts the banner script right before itself
+  const loader = document.createElement('script');
+  loader.text = `(function(sdbhdr){var d=document,s=d.createElement('script'),l=d.currentScript||d.scripts[d.scripts.length-1];s.settings=sdbhdr||{};s.src=${JSON.stringify(SRC)};s.async=true;s.referrerPolicy='no-referrer-when-downgrade';l.parentNode.insertBefore(s,l);})({})`;
+  box.appendChild(loader);
+  // no banner served (ad blocker, no ad for this visitor): fold the empty slot
+  setTimeout(() => {
+    if (!slot.isConnected) return;
+    const shown = [...box.children].some((n) => n.tagName !== 'SCRIPT' && n.offsetHeight > 20);
+    if (!shown) slot.classList.add('hta-empty');
+  }, 8000);
+}
+
+function scan() { document.querySelectorAll('[data-hta=""]').forEach(fill); }
+function mountHta() {
+  new MutationObserver(scan).observe(document.getElementById('view'), { childList: true, subtree: true });
+  adPolicy.addEventListener('change', () => document.querySelectorAll('[data-hta]').forEach((n) => { if (!allowed()) n.hidden = true; }));
+  scan();
+}
+const slotHTML = (cls = '') => `<div class="hta-slot ${cls}" data-hta=""></div>`;
+
+return { mountHta, slotHTML };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -12002,6 +12050,7 @@ mountLikes();
 mountAdBar();
 __mods['chat.js'].mountChat();
 __mods['live.js'].mountLive();
+__mods['hta.js'].mountHta();
 registerSW();
 // Starts downloading a game as soon as the player points at (or touches) its card.
 const warm = (e) => { const a = e.target.closest?.('a[href^="#game-"]'); if (a) prefetch(a.getAttribute('href').slice(6)); };
@@ -12510,6 +12559,11 @@ h1, h2, h3 { letter-spacing: -.01em; }
 @media (hover: none) { .game-card:hover .scene, .game-card:hover .thumb .cover, .game-card:hover .a0 { transform: none; } .game-card:hover .thumb::before { transform: none; } }
 </style>
 <style id="round-accents">
+/* HilltopAds 300 × 250 */
+.hta-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 18px auto; max-width: 100%; }
+.hta-slot[hidden], .hta-slot.hta-empty { display: none; }
+.hta-slot > small { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
+.hta-box { width: 300px; min-height: 250px; max-width: 100%; display: grid; place-items: center; overflow: hidden; border-radius: 8px; background: rgba(255, 255, 255, .02); }
 /* ============ Looks (shop): photo de profil, cadres, badges ============ */
 .lk-av { display: inline-grid; place-items: center; flex: none; border-radius: 50%; line-height: 1; position: relative; box-shadow: 0 0 0 2px rgba(255, 255, 255, .12); vertical-align: middle; }
 .lk-xs { width: 20px; height: 20px; font-size: 12px; margin-right: 4px; }
