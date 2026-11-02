@@ -4368,6 +4368,45 @@ const cloud = {
     b.set(db.collection('chat').doc(), look ? { uid, name, text, at: now, look } : { uid, name, text, at: now });
     await b.commit();
   },
+  /* ---------- Online tables: tables/{game}/seeds, bets, chat (see online.js) + clock/{uid} ---------- */
+  async clockPing(uid) {
+    const ref = (await init()).db.collection('clock').doc(uid);
+    await ref.set({ at: firebase.firestore.FieldValue.serverTimestamp() });
+    return (await ref.get({ source: 'server' })).data().at.toMillis();
+  },
+  async createSeed(game, id, data) {
+    await (await init()).db.collection('tables').doc(game).collection('seeds').doc(id).set({ ...data, at: firebase.firestore.FieldValue.serverTimestamp() });
+  },
+  async watchSeed(game, id, cb) {
+    return (await init()).db.collection('tables').doc(game).collection('seeds').doc(id).onSnapshot({ includeMetadataChanges: true }, (d) => {
+      if (!d.exists || d.metadata.hasPendingWrites) return cb(null);
+      const x = d.data(); cb({ ...x, atMs: x.at?.toMillis?.() || 0 });
+    }, (e) => console.error(e));
+  },
+  async watchTableBets(game, r, cb) {
+    return (await init()).db.collection('tables').doc(game).collection('bets').where('r', '==', r)
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() }))), (e) => console.error(e));
+  },
+  async getTableBets(game, r) {
+    const q = await (await init()).db.collection('tables').doc(game).collection('bets').where('r', '==', r).get({ source: 'server' });
+    return q.docs.map((d) => ({ id: d.id, ...d.data() }));
+  },
+  async setTableBet(game, id, data) {
+    await (await init()).db.collection('tables').doc(game).collection('bets').doc(id).set({ ...JSON.parse(JSON.stringify(data)), at: firebase.firestore.FieldValue.serverTimestamp() });
+  },
+  async watchTableChat(game, n, cb) {
+    return (await init()).db.collection('tables').doc(game).collection('chat').orderBy('at', 'desc').limit(n)
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() })).reverse()), (e) => console.error(e));
+  },
+  async sendTableChat(game, uid, name, text, look) {
+    const { db } = await init();
+    const now = firebase.firestore.FieldValue.serverTimestamp();
+    const b = db.batch();
+    b.set(db.collection('chatmeta').doc(uid), { last: now });
+    b.set(db.collection('tables').doc(game).collection('chat').doc(), look ? { uid, name, text, at: now, look } : { uid, name, text, at: now });
+    await b.commit();
+  },
+
   /* ---------- Friends: friends/{uid} = { list: { uid: pseudo } }, friendreqs/{from}_{to} ---------- */
   async loadFriends(uid) { const d = await (await init()).db.collection('friends').doc(uid).get(); return d.exists ? d.data().list || {} : {}; },
   async saveFriends(uid, list) { await (await init()).db.collection('friends').doc(uid).set({ list: JSON.parse(JSON.stringify(list)) }); },
@@ -7352,6 +7391,9 @@ const ORIGINALS = [
   {"id": "pharaon", "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
   {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Top Slot, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Top Slot et quatre jeux bonus animés : Pile ou Face, Chasse au Cash, Pachinko et Méga Folie.", "features": ["Top Slot ×2 à ×50", "Pile ou Face", "Chasse au Cash", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
+  {"id": "storm-online", "name": "L’Éclair Online", "cat": "table", "tag": "En ligne", "sub": "Roulette éclair multijoueur, un tour toutes les 15 s", "colors": ["#1f56ff", "#071440"], "description": "La roulette éclair en multijoueur : un tour toutes les 15 secondes pour toute la table. Pose tes jetons pendant le compte à rebours, la foudre frappe et la bille tourne pour tout le monde en même temps. Tu vois les mises et les gains des autres joueurs, et la table a son propre chat.", "features": ["Multijoueur en direct", "Un tour toutes les 15 s", "Éclairs ×50 à ×50 000", "Chat de la table"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
+  {"id": "bj-online", "name": "Le 21 Online", "cat": "table", "tag": "En ligne", "sub": "Blackjack multijoueur, une main toutes les 30 s", "colors": ["#11a05f", "#06301f"], "description": "Le blackjack en multijoueur : une main toutes les 30 secondes, la même croupière pour tous. Mise, puis tire, reste ou double pendant que les autres joueurs jouent leur main à côté de toi. La table a son propre chat.", "features": ["Multijoueur en direct", "Une main toutes les 30 s", "Blackjack 6 pour 5", "Chat de la table"], "rtp": "≈ 97,5 %", "vol": 1, "max": "×2,2"},
+  {"id": "holdem-online", "name": "Le Texas Online", "cat": "table", "tag": "En ligne", "sub": "Texas Hold’em multijoueur contre la croupière", "colors": ["#10b981", "#06301f"], "description": "Le Texas Hold’em en multijoueur : une main toutes les 30 secondes. Chaque joueur reçoit ses 2 cartes, toute la table voit le même flop, puis chacun suit ou se couche contre la croupière. Quinte flush royale payée 100 pour 1. La table a son propre chat.", "features": ["Multijoueur en direct", "Une main toutes les 30 s", "Quinte flush royale ×100", "Chat de la table"], "rtp": "≈ 97,4 %", "vol": 2, "max": "×100 l’ante"},
   {"id": "doublespin", "name": "La Double Bille", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
   {"id": "plateau", "name": "Le Plateau", "cat": "table", "tag": "Jeu de roue", "sub": "Roue, dés et plateau de multiplicateurs", "colors": ["#22c55e", "#0c1a14"], "description": "Une grande roue de 78 cases : mise sur 1, 2, 5, 10 ou sur les bonus 2 lancers et 4 lancers. Dans les bonus, lance 2 dés et fais avancer ton pion sur un plateau de 28 cases jusqu’à ×200. Et si la roue tombe sur Chance, elle repart et ce tour paie ×10 !", "features": ["Cases 1, 2, 5 et 10", "Bonus 2 lancers et 4 lancers", "Plateau jusqu’à ×200 par case", "Double = lancer en plus", "Case Chance ×10"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
   {"id": "peche", "name": "La Pêche", "cat": "table", "tag": "Jeu de roue", "sub": "Roue à éclairs et pêche aux multiplicateurs", "colors": ["#38bdf8", "#071a2e"], "description": "Une roue de 54 cases : ×2 blanc, ×2 ciel et trois poissons. À chaque lancer, des éclairs multiplient des cases. Sur un poisson, direction l’étang : le pêcheur attrape un poisson et son multiplicateur, de ×3 à ×100 (bleu), ×8 à ×500 (orange) ou ×20 à ×5 000 (rouge) !", "features": ["Cases ×2 blanc et ×2 ciel", "4 éclairs à chaque lancer", "Poisson bleu ×3 à ×100", "Poisson orange ×8 à ×500", "Poisson rouge ×20 à ×5 000"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
@@ -7448,6 +7490,9 @@ function gem(x, y, s, u) {
 }
 
 const SPECS = {
+  'storm-online': { photo: 'assets/games/storm/cover.webp', baked: true, online: true, bg: ['#0b2a8a', '#02040f'], light: '#9fd4ff', title: ['L’ÉCLAIR'], font: 'bebas', metal: ['#fff', '#bfe3ff', '#2563eb'], tag: 'ONLINE', art: () => '' },
+  'bj-online': { photo: 'assets/games/blackjack/cover.webp', baked: true, online: true, bg: ['#0b4d31', '#020a06'], light: '#86efac', title: ['LE 21'], font: 'cinzel', metal: ['#fff', '#fde68a', '#a16207'], tag: 'ONLINE', art: () => '' },
+  'holdem-online': { photo: 'assets/games/poker/cover.webp', baked: true, online: true, bg: ['#0b4d31', '#020a06'], light: '#86efac', title: ['LE TEXAS'], font: 'bebas', metal: ['#fff', '#fde68a', '#a16207'], tag: 'ONLINE', art: () => '' },
   'big-bad-wolf': {
     bg: ['#24123f', '#05060d'], light: '#fde68a', title: ['LE LOUP'], font: 'bebas', metal: ['#fff7d6', '#fbbf24', '#b45309'], tag: 'HOLD & SPIN', photo: 'assets/games/wolf/cover.webp',
     hero: (u) => `
@@ -7846,6 +7891,7 @@ const SPECS = {
 
 // Bright card colours (top, bottom) for the square lobby posters.
 const CARD = {
+  'storm-online': ['#1f56ff', '#071440'], 'bj-online': ['#11a05f', '#06301f'], 'holdem-online': ['#10b981', '#06301f'],
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
@@ -7897,7 +7943,13 @@ function squareSVG(game, sp, cls) {
 
 // Covers can be a painted picture from the owner (spec.photo); the single-file version inlines it (window.__assets).
 const photoSrc = (p) => window.__assets?.[p] || `${p}?v=1`;
-function coverSVG(game, { cls = 'cover', badge = true, square = false } = {}) {
+// online tables: the photo of the solo game with a red ONLINE ribbon
+const ONLINE_RIB = '<g class="cv-online"><rect x="0" y="0" width="300" height="300" fill="none"/><path d="M-40 70 L70 -40 L120 -40 L-40 120 Z" fill="#e3132f"/><text transform="translate(38 46) rotate(-45)" text-anchor="middle" font-family="Archivo, sans-serif" font-weight="900" font-size="22" letter-spacing="2" fill="#fff">ONLINE</text><circle cx="270" cy="30" r="9" fill="#22c55e" stroke="#fff" stroke-width="3"/></g>';
+function coverSVG(game, opts = {}) {
+  const out = coverSVG0(game, opts);
+  return SPECS[game.id]?.online && out ? out.replace(/<\/svg>\s*$/, `${ONLINE_RIB}</svg>`) : out;
+}
+function coverSVG0(game, { cls = 'cover', badge = true, square = false } = {}) {
   const sp = SPECS[game.id];
   if (!sp) return '';
   if (square) return squareSVG(game, sp, cls);
@@ -7965,6 +8017,9 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'storm-online', date: '2026-11-02', title: 'Nouveau : L’Éclair Online', isNew: true, items: ['La roulette éclair en multijoueur', 'Un tour toutes les 15 secondes pour toute la table', 'Les mises et les gains des autres joueurs en direct', 'Un chat rien que pour la table'] },
+  { game: 'bj-online', date: '2026-11-02', title: 'Nouveau : Le 21 Online', isNew: true, items: ['Le blackjack en multijoueur, une main toutes les 30 secondes', 'La même croupière pour tous', 'Les mains des autres joueurs à côté de la tienne', 'Un chat rien que pour la table'] },
+  { game: 'holdem-online', date: '2026-11-02', title: 'Nouveau : Le Texas Online', isNew: true, items: ['Le Texas Hold’em en multijoueur contre la croupière', 'Le même flop pour toute la table', 'Suivre ou se coucher en 12 secondes', 'Un chat rien que pour la table'] },
   { game: 'chasse', date: '2026-11-02', title: 'The Hunt en grand', items: ['Des rouleaux beaucoup plus grands', 'Des canards qui volent au-dessus de la machine', 'Un cerf et le cerf doré qui courent en dessous'] },
   { game: 'chasse', date: '2026-11-02', title: 'La Chasse s’appelle The Hunt', items: ['Nouveau nom : The Hunt', 'Nouveaux graphismes : grands rouleaux en bois et laiton, logo, médaillons gravés', 'Les symboles gagnants s’illuminent'] },
   { game: 'chasse', date: '2026-11-02', title: 'La Chasse devient une machine à sous', items: ['5 rouleaux, 243 façons de gagner, avec tes animaux peints', 'Nouveau symbole : la cartouche de fusil', '3 cartouches : la chasse avec 3 tirs', '4 cartouches : la grande chasse avec 5 tirs et le cerf doré ×500', 'Multiplicateurs des animaux augmentés : ×2 à ×250 la mise'] },
@@ -8248,6 +8303,7 @@ function renderLobby(root, params = {}) {
 
   const body = filter === 'all'
     ? '<section class="panel live-now" data-live-now></section>'
+      + row('🟢 En ligne · joue avec les autres', ['storm-online', 'bj-online', 'holdem-online'].map(getGame))
       + row('Populaires', ['cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
       + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
       + '<div class="hta-slot" data-hta=""></div>'
@@ -10432,11 +10488,11 @@ function wheelSVG(balls = 1) {
 const smooth = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 
 // Spins the wheel and lands each ball on its pocket index (original timing and physics).
-function spinBalls(svg, state, targets, { turbo = false, tick } = {}) {
+function spinBalls(svg, state, targets, { turbo = false, tick, speed = 1 } = {}) {
   const rw = svg.querySelector('.rw');
   const balls = [...svg.querySelectorAll('.ball')];
   const T0 = targets.length > 1 ? 10.8 : 9.2;
-  const sc = (matchMedia('(prefers-reduced-motion: reduce)').matches ? 8 : 1) * (turbo ? 1.9 : 1);
+  const sc = (matchMedia('(prefers-reduced-motion: reduce)').matches ? 8 : 1) * (turbo ? 1.9 : 1) * speed;
   const w0 = state.wcur, wEnd = w0 + 560 + Math.random() * 80, p = 2.3;
   const rel = targets.map((idx) => idx * A + A / 2);
   if (targets.length > 1) {
@@ -10609,6 +10665,9 @@ __mods['games/impl/index.js'] = (() => {
 // tools/build.py: run `python3 tools/build.py` after changing a file in games/.
 
 const FILES = {
+  'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', '2a48f294b6'],
+  'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', 'c02f98394e'],
+  'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '0cf35817bb'],
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '7e6577831b'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a1fe33533c'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
@@ -11526,6 +11585,141 @@ async function renderSend(toUid, toName) {
 }
 
 return { mountChat, openPlayer };
+})();
+
+// ---- online.js ----
+__mods['online.js'] = (() => {
+// Les tables « Online » (L’Éclair Online, Le 21 Online, Le Texas Online): every player at a table plays the same
+// rounds at the same time. A round lasts `len` ms on the server clock (round number r = floor(serverTime / len)).
+// Shared randomness: once betting is closed, the first player present writes a seed (tables/{game}/seeds/{r}-{k} =
+// { r, k, rnd, at = server time, p = players }) and every client derives the same result from it. Each player writes
+// their own bet (tables/{game}/bets/{r}-{uid}) so the others see it, and each table has its own chat
+// (tables/{game}/chat). Balances stay on each player's side, like every other game of the site.
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { toast } = __mods['ui.js'];
+
+/* ---------- seeded randomness ---------- */
+function hash(str) {
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for (let i = 0; i < str.length; i++) { const c = str.charCodeAt(i); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (h1 >>> 0) ^ (h2 >>> 0);
+}
+function rng(str) {
+  let a = hash(str) >>> 0;
+  return () => { a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+function wpickR(r, l) { let t = 0; for (const x of l) t += x[1]; let q = r() * t; for (const x of l) { if (q < x[1]) return x[0]; q -= x[1]; } return l[l.length - 1][0]; }
+function shuffleR(r, arr) { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+// cards 0..51: rank i % 13 (0 = As … 12 = Roi), suit Math.floor(i / 13)
+const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'], SUITS = ['♠', '♥', '♦', '♣'];
+const cardOf = (i) => ({ i, r: RANKS[i % 13], s: SUITS[Math.floor(i / 13)], red: Math.floor(i / 13) === 1 || Math.floor(i / 13) === 2 });
+const cardHTML = (i, down = false) => { if (i == null || down) return '<div class="bj-card down"><div class="bj-in"><div class="bj-f"></div><div class="bj-k"></div></div></div>';
+  const c = cardOf(i); return `<div class="bj-card${c.red ? ' red' : ''}"><div class="bj-in"><div class="bj-f"><span class="tl">${c.r}<i>${c.s}</i></span><span class="mid">${c.s}</span><span class="br">${c.r}<i>${c.s}</i></span></div><div class="bj-k"></div></div></div>`; };
+
+/* ---------- server clock ---------- */
+let offset = 0, syncing = null;
+const uid = () => (profiles.online && profiles.current ? profiles.store.current : null);
+function syncClock() {
+  if (syncing) return syncing;
+  syncing = (async () => {
+    const me = uid(); if (!me) { syncing = null; return; }
+    try { const t0 = Date.now(), at = await cloud.clockPing(me), t1 = Date.now(); offset = at - (t0 + t1) / 2; }
+    catch (e) { console.warn('Horloge serveur indisponible', e); syncing = null; }
+  })();
+  return syncing;
+}
+const now = () => Date.now() + offset;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+/* ---------- a table ---------- */
+class OnlineTable {
+  // o: { len, seeds: { a: ms, b: ms }, onRound(r), onTick(t, r), onSeed(k, seed, doc, r), onBets(list, r), withPlayers }
+  constructor(game, o) {
+    Object.assign(this, { game, o, r: null, seeds: {}, tried: {}, stops: [], bets: [] });
+  }
+  get me() { return uid(); }
+  async start() {
+    await syncClock();
+    this.iv = setInterval(() => this.tick(), 120);
+    this.tick();
+  }
+  stop() { clearInterval(this.iv); this.unwatch(); this.dead = true; }
+  unwatch() { this.stops.forEach((f) => f?.()); this.stops = []; }
+  tick() {
+    if (this.dead) return;
+    const n = now(), r = Math.floor(n / this.o.len), t = n - r * this.o.len;
+    if (r !== this.r) this.newRound(r);
+    for (const [k, at] of Object.entries(this.o.seeds)) {
+      if (t >= at + this.jit && !this.seeds[k] && !this.tried[k] && this.me) { this.tried[k] = true; this.writeSeed(r, k); }
+    }
+    this.o.onTick?.(t, r);
+  }
+  async newRound(r) {
+    this.r = r; this.seeds = {}; this.tried = {}; this.bets = []; this.jit = 150 + Math.random() * 450;
+    this.unwatch();
+    this.o.onRound?.(r);
+    if (!cloud.enabled) return;
+    for (const k of Object.keys(this.o.seeds)) {
+      cloud.watchSeed(this.game, `${r}-${k}`, (d) => {
+        if (!d || this.r !== r || this.seeds[k]) return;
+        this.seeds[k] = `${d.rnd}:${d.atMs}`;
+        this.o.onSeed?.(k, this.seeds[k], d, r);
+      }).then((f) => { if (this.r === r) this.stops.push(f); else f?.(); }).catch((e) => console.error(e));
+    }
+    cloud.watchTableBets(this.game, r, (list) => { if (this.r !== r) return; this.bets = list; this.o.onBets?.(list, r); })
+      .then((f) => { if (this.r === r) this.stops.push(f); else f?.(); }).catch((e) => console.error(e));
+  }
+  async writeSeed(r, k) {
+    try {
+      const rnd = [...crypto.getRandomValues(new Uint8Array(12))].map((b) => b.toString(16).padStart(2, '0')).join('');
+      const data = { r, k, rnd };
+      if (k === 'a' && this.o.withPlayers) data.p = (await cloud.getTableBets(this.game, r)).map((b) => b.uid).sort().slice(0, 20);
+      await cloud.createSeed(this.game, `${r}-${k}`, data);
+    } catch (e) {
+      // another player wrote it first (then it arrives through watchSeed), or our clock was a bit early: retry soon
+      setTimeout(() => { if (this.r === r && !this.seeds[k]) this.tried[k] = false; }, 900);
+    }
+  }
+  // my bet (or my decisions) for the current round, seen by the whole table
+  async putBet(d) {
+    const me = this.me; if (!me) throw new Error('signed out');
+    const look = __mods['shop.js']?.publicLook?.();
+    await cloud.setTableBet(this.game, `${this.r}-${me}`, { r: this.r, uid: me, name: String(profiles.current.name || 'Joueur').slice(0, 16), d, ...(look ? { look } : {}) });
+  }
+}
+
+/* ---------- table chat ---------- */
+const chatHTML = () => `<div class="on-chat"><div class="on-chat-h">💬 Chat de la table</div><div class="on-chat-list"><p class="muted small">Chargement…</p></div>
+  <form class="on-chat-f"><input maxlength="200" placeholder="Écris à la table…" autocomplete="off"><button class="btn primary">Envoyer</button></form></div>`;
+async function mountChat(root, game) {
+  const list = root.querySelector('.on-chat-list'), f = root.querySelector('.on-chat-f'), inp = f.querySelector('input');
+  const me = uid();
+  if (!me) { inp.disabled = true; f.querySelector('button').disabled = true; inp.placeholder = 'Crée un compte pour parler à la table'; }
+  let stop = null;
+  try {
+    stop = await cloud.watchTableChat(game, 40, (msgs) => {
+      if (!list.isConnected) return stop?.();
+      const end = list.scrollHeight - list.scrollTop - list.clientHeight < 40;
+      list.innerHTML = msgs.length ? msgs.map((m) => `<div class="on-msg${m.uid === me ? ' mine' : ''}">${__mods['shop.js']?.lookHTML?.(m.look, 'xs') || ''}<b class="pname" data-player="${esc(m.uid)}" data-pname="${esc(m.name)}" ${__mods['shop.js']?.nameStyle?.(m.look) || ''}>${esc(m.name)}</b> ${esc(m.text)}</div>`).join('')
+        : '<p class="muted small">Personne n’a encore parlé à cette table. Dis bonjour 👋</p>';
+      if (end) list.scrollTop = list.scrollHeight;
+    });
+  } catch (e) { console.error(e); list.innerHTML = '<p class="muted small">Chat indisponible pour le moment.</p>'; }
+  f.onsubmit = async (e) => {
+    e.preventDefault();
+    const text = inp.value.trim().replace(/\s+/g, ' ').slice(0, 200);
+    if (!text || !uid()) return;
+    try { await cloud.sendTableChat(game, uid(), String(profiles.current.name).slice(0, 16), text, __mods['shop.js']?.publicLook?.()); inp.value = ''; }
+    catch (err) { console.error(err); toast('Doucement : un message toutes les 3 secondes', 'warn'); }
+  };
+  return () => stop?.();
+}
+
+return { OnlineTable, rng, wpickR, shuffleR, cardOf, cardHTML, now, syncClock, chatHTML, mountChat, esc };
 })();
 
 // ---- friends.js ----
@@ -12747,6 +12941,39 @@ h1, h2, h3 { letter-spacing: -.01em; }
 @media (hover: none) { .game-card:hover .scene, .game-card:hover .thumb .cover, .game-card:hover .a0 { transform: none; } .game-card:hover .thumb::before { transform: none; } }
 </style>
 <style id="round-accents">
+/* ============ Online tables ============ */
+.online-game .rt-autoplay, .online-game .rt-autopick { display: none !important; }
+.on-timer { position: relative; margin: 0 auto 10px; max-width: 520px; text-align: center; }
+.on-timer b { display: block; font: 900 15px KeCoin, Archivo, sans-serif; letter-spacing: .5px; color: #fff; margin-bottom: 5px; }
+.on-timer i { display: block; height: 8px; border-radius: 999px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.on-timer span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, #22c55e, #fde047); transition: width .12s linear; }
+.on-timer.closed b { color: #fca5a5; }
+.on-side { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 12px; margin-top: 14px; }
+@media (max-width: 760px) { .on-side { grid-template-columns: 1fr; } }
+.on-players, .on-chat { display: flex; flex-direction: column; min-height: 0; padding: 10px; border-radius: 12px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(255, 255, 255, .1); }
+.on-chat-h { font: 800 12px KeCoin, Inter, sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #fde68a; margin-bottom: 8px; }
+.on-plist { display: grid; gap: 6px; max-height: 260px; overflow-y: auto; }
+.on-p { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 6px 8px; border-radius: 8px; background: rgba(255, 255, 255, .05); font-size: 13px; }
+.on-p.me { box-shadow: inset 0 0 0 1px #ff2340; }
+.on-p > span { color: var(--muted); }
+.on-p em { margin-left: auto; font-style: normal; font-weight: 800; } .on-p em.w { color: #4ade80; } .on-p em.l { color: #f87171; }
+.on-st { color: var(--muted); font-size: 11px; }
+.on-mini { display: inline-flex; gap: 3px; align-items: center; }
+.on-mini i { font-style: normal; font-weight: 900; font-size: 12px; padding: 1px 4px; border-radius: 3px; background: #fff; color: #111; }
+.on-mini i.red { color: #c8102e; } .on-mini small { margin-left: 3px; font-weight: 800; color: #fde68a; }
+.on-chat-list { flex: 1; min-height: 160px; max-height: 260px; overflow-y: auto; display: grid; align-content: start; gap: 4px; font-size: 13.5px; }
+.on-msg { padding: 3px 6px; border-radius: 6px; } .on-msg.mine { background: rgba(255, 35, 64, .1); }
+.on-msg b { margin-right: 4px; }
+.on-chat-f { display: flex; gap: 6px; margin-top: 8px; }
+.on-chat-f input { flex: 1; min-width: 0; height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-2); color: var(--text); font: inherit; }
+.on-chat-f .btn { height: 36px; border-radius: 999px; padding: 0 14px; }
+.bjo-table { padding: 14px; border-radius: 16px; background: radial-gradient(ellipse at 50% 0, #15803d, #0b4d31 60%, #062a1b); box-shadow: inset 0 0 0 3px #a16207, inset 0 0 0 6px rgba(0, 0, 0, .35), 0 18px 40px rgba(0, 0, 0, .5); display: grid; gap: 10px; justify-items: center; }
+.bjo-table .bj-zone { display: grid; justify-items: center; gap: 4px; }
+.bjo-table .bj-label { font: 800 13px KeCoin, Inter, sans-serif; color: #fde68a; } .bjo-table .bj-label b { color: #fff; margin-left: 6px; }
+.hdo-board .bj-cards { padding-left: 0; gap: 6px; } .hdo-board .bj-card { margin-left: 0; width: 62px; height: 88px; }
+.bj-cards.folded { filter: grayscale(1) brightness(.5); }
+.bj-actions .bj-btn:disabled { opacity: .4; }
+@media (max-width: 600px) { .hdo-board .bj-card { width: 50px; height: 70px; } .hdo-board .bj-f .mid { font-size: 24px; } }
 /* ============ The Hunt (ex-La Chasse, machine à sous) ============ */
 .slot.g-chasse.ch-slot > .slot-bg { background: radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(10, 5, 2, .65) 100%), linear-gradient(180deg, rgba(20, 8, 2, .2), rgba(20, 8, 2, .05) 40%, rgba(12, 6, 2, .8)), url(assets/games/chasse/bg-dusk.webp?v=3) center 30% / cover no-repeat !important; filter: none; }
 .slot.g-chasse.ch-slot > .slot-bg::after { display: none; }

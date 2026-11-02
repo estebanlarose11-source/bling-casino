@@ -23,6 +23,7 @@ Ce que ça change :
 - le classement accepte la machine du plus gros gain / bonus et le look acheté dans la Boutique ;
 - les amis (`friendreqs` : demandes d’ami, `friends` : la liste de chacun) : chacun ne gère que ses demandes et sa liste ;
 - les points de succès du classement montent jusqu’à 100 000 (prestiges) ;
+- les tables Online (`tables` : tirages partagés, mises et chat de chaque table, `clock` : l’heure du serveur) ;
 - tout le reste de la base est fermé.
 
 ## 1 bis. Chat général et envoi de KE entre joueurs
@@ -67,3 +68,10 @@ Le site est une démo en argent fictif : tout le jeu tourne dans le navigateur. 
 grossières (valeurs impossibles, modifier le profil d'un autre), mais un joueur très motivé peut toujours
 tricher sur son propre solde dans les limites autorisées. Pour l'empêcher complètement, il faudrait faire
 tourner les tirages sur un serveur (Cloud Functions), ce qui demande le forfait payant Blaze de Firebase.
+
+## Tables Online et quota gratuit Firebase
+
+Les tables Online (L’Éclair Online, Le 21 Online, Le Texas Online) écrivent un tirage à chaque tour (toutes les 15 s
+pour la roulette, toutes les 30 s pour les cartes) et chaque joueur présent le lit. Le forfait gratuit de Firebase
+(Spark) permet environ 20 000 écritures et 50 000 lectures par jour : largement assez au début, mais si beaucoup de
+joueurs restent longtemps aux tables, surveille **Firestore → Utilisation** dans la console.

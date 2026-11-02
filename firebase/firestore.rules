@@ -208,6 +208,64 @@ service cloud.firestore {
         && request.resource.data.list is map && request.resource.data.list.size() <= 500;
     }
 
+    // ---------- Tables en ligne (L'Éclair Online, Le 21 Online, Le Texas Online) ----------
+    // Une manche dure LEN ms sur l'horloge du serveur (manche r = temps / LEN). seeds/{r}-{k} : le tirage partagé,
+    // écrit une seule fois, par le premier joueur présent, après la fermeture des mises (ou des décisions).
+    // bets/{r}-{uid} : la mise (et les décisions) d'un joueur, écrite par lui seul et seulement avant la limite.
+    // chat : le chat de la table, mêmes règles que le chat général.
+    function tableLen(g) { return {'storm-online': 15000, 'bj-online': 30000, 'holdem-online': 30000}.get(g, 0); }
+    function seedAt(g, k) { return {'storm-online': {'a': 7500}, 'bj-online': {'a': 9000, 'b': 21000}, 'holdem-online': {'a': 9000, 'b': 21000}}.get(g, {}).get(k, 999999); }
+    function betUntil(g) { return {'storm-online': 7500, 'bj-online': 21000, 'holdem-online': 21000}.get(g, 0); }
+    match /tables/{game}/seeds/{id} {
+      allow read: if true;
+      allow create: if signedIn() && tableLen(game) > 0
+        && request.resource.data.keys().hasOnly(['r', 'k', 'rnd', 'at', 'p'])
+        && request.resource.data.r is int && request.resource.data.k in ['a', 'b']
+        && id == string(request.resource.data.r) + '-' + request.resource.data.k
+        && request.resource.data.at == request.time
+        && request.time.toMillis() >= request.resource.data.r * tableLen(game) + seedAt(game, request.resource.data.k)
+        && request.time.toMillis() < (request.resource.data.r + 1) * tableLen(game)
+        && request.resource.data.rnd is string && request.resource.data.rnd.size() <= 40
+        && (!('p' in request.resource.data) || (request.resource.data.p is list && request.resource.data.p.size() <= 20));
+      allow update, delete: if false;
+    }
+    match /tables/{game}/bets/{id} {
+      allow read: if true;
+      allow create, update: if signedIn() && tableLen(game) > 0
+        && request.resource.data.keys().hasOnly(['r', 'uid', 'name', 'look', 'd', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.r is int
+        && id == string(request.resource.data.r) + '-' + request.auth.uid
+        && isPseudo(request.resource.data.name)
+        && request.resource.data.at == request.time
+        && request.resource.data.d is map && request.resource.data.d.size() <= 10
+        && request.time.toMillis() >= request.resource.data.r * tableLen(game)
+        && request.time.toMillis() < request.resource.data.r * tableLen(game) + betUntil(game)
+        && (!('look' in request.resource.data) || isLook(request.resource.data.look));
+      allow delete: if false;
+    }
+    match /tables/{game}/chat/{id} {
+      allow read: if true;
+      allow create: if signedIn() && tableLen(game) > 0
+        && request.resource.data.keys().hasOnly(['uid', 'name', 'text', 'at', 'look'])
+        && (!('look' in request.resource.data) || isLook(request.resource.data.look))
+        && request.resource.data.uid == request.auth.uid
+        && isPseudo(request.resource.data.name)
+        && request.resource.data.text is string && request.resource.data.text.size() >= 1 && request.resource.data.text.size() <= 200
+        && request.resource.data.at == request.time
+        && !exists(/databases/$(database)/documents/mutes/$(request.auth.uid))
+        && getAfter(/databases/$(database)/documents/chatmeta/$(request.auth.uid)).data.last == request.time
+        && (!exists(/databases/$(database)/documents/chatmeta/$(request.auth.uid))
+            || get(/databases/$(database)/documents/chatmeta/$(request.auth.uid)).data.last < request.time - duration.value(3, 's'));
+      allow delete: if signedIn() && (resource.data.uid == request.auth.uid || isAdmin());
+      allow update: if false;
+    }
+    // Horloge : chaque joueur écrit l'heure du serveur dans clock/{uid} pour caler son compte à rebours.
+    match /clock/{uid} {
+      allow read: if isMe(uid);
+      allow create, update: if isMe(uid) && request.resource.data.keys().hasOnly(['at']) && request.resource.data.at == request.time;
+    }
+
     // Tout le reste est fermé.
     match /{document=**} {
       allow read, write: if false;
