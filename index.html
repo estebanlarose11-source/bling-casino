@@ -3817,7 +3817,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
 .aads-head { display: flex; justify-content: space-between; align-items: center; }
 .aads-x { background: none; border: 0; color: var(--muted); font-size: 18px; cursor: pointer; }
-.aads-card .rw-box { margin: 12px auto; }
+.aads-card .rw-box { margin: 12px auto; min-height: 250px; background: #fff1; }
+.rw-wait { margin: 0; padding: 20px; text-align: center; color: var(--muted); font-size: 14px; }
 
 /* ============ Premium layer: ambiance, motion and polish shared by every page ============ */
 :root { --gold-grad: linear-gradient(135deg, #fff3c4, #fbbf24 45%, #d97706); --spring: cubic-bezier(.3, 1.5, .5, 1); --glass: rgba(18, 14, 16, .72); }
@@ -6163,11 +6164,15 @@ const htaProvider = {
     box.innerHTML = `
       <div class="aads-card">
         <div class="aads-head"><b>Publicité${o.of > 1 ? ` ${o.step} / ${o.of}` : ''}</b><button class="aads-x" aria-label="Fermer">✕</button></div>
-        <div class="hta-box rw-box"></div>
+        <div class="hta-box rw-box"><p class="rw-wait">Chargement de la pub…</p></div>
         <button class="btn primary lg aads-done" disabled>Récompense dans <span>${AD_SECONDS}</span> s</button>
       </div>`;
     document.body.appendChild(box);
-    __mods['hta.js']?.inject(box.querySelector('.rw-box'));
+    const rw = box.querySelector('.rw-box'), H = __mods['hta.js'];
+    H?.inject(rw);
+    // if the network sends nothing (ad blocker, no ad right now), say so instead of showing an empty black box
+    H?.watchShown(rw, () => rw.querySelector('.rw-wait')?.remove(), 4000);
+    setTimeout(() => { const w = rw.querySelector('.rw-wait'); if (w && box.isConnected && !H?.isShown(rw)) w.textContent = 'Pas de pub disponible pour le moment : ta récompense arrive quand même à la fin du compte à rebours.'; }, 4000);
     const done = box.querySelector('.aads-done');
     let left = AD_SECONDS;
     const tick = setInterval(() => {
@@ -11816,7 +11821,7 @@ const { adPolicy } = __mods['adpolicy.js'];
 const { profiles } = __mods['profile.js'];
 const { progress } = __mods['progress.js'];
 
-const SRC = '//narrowefficiency.com/b.XIV/sQdZGAlE0wYvWycN/IeNmu9/uoZ/U/l/kOPtTucT1/OMDbgz4HMaT/MytPNYzOU/4iOMDig/xYNfwC';
+const SRC = 'https://narrowefficiency.com/b.XIV/sQdZGAlE0wYvWycN/IeNmu9/uoZ/U/l/kOPtTucT1/OMDbgz4HMaT/MytPNYzOU/4iOMDig/xYNfwC';
 
 const allowed = () => !adPolicy.noAds(); // every player, whatever their level (only the owner / ?nopub devices are left out)
 
@@ -11827,12 +11832,16 @@ function fill(slot) {
   slot.innerHTML = '<small>Publicité</small><div class="hta-box"></div>';
   const box = slot.querySelector('.hta-box');
   inject(box);
-  // no banner served (ad blocker, no ad for this visitor): fold the empty slot
-  setTimeout(() => {
-    if (!slot.isConnected) return;
-    const shown = [...box.children].some((n) => n.tagName !== 'SCRIPT' && n.offsetHeight > 20);
-    if (!shown) slot.classList.add('hta-empty');
-  }, 8000);
+  // the slot stays flat (no empty dark box) until the banner is really there; never served → it stays folded
+  watchShown(box, () => slot.classList.add('hta-on'));
+}
+const isShown = (box) => [...box.querySelectorAll('iframe, img, ins, a, div')].some((n) => n.offsetHeight > 20 && n.offsetWidth > 20);
+function watchShown(box, cb, ms = 15000) {
+  const t0 = Date.now();
+  const iv = setInterval(() => {
+    if (!box.isConnected || Date.now() - t0 > ms) return clearInterval(iv);
+    if (isShown(box)) { clearInterval(iv); cb(); }
+  }, 300);
 }
 
 // the network's loader, unchanged: it puts the banner script right before itself, inside box
@@ -11850,7 +11859,7 @@ function mountHta() {
 }
 const slotHTML = (cls = '') => `<div class="hta-slot ${cls}" data-hta=""></div>`;
 
-return { mountHta, slotHTML, inject };
+return { mountHta, slotHTML, inject, isShown, watchShown };
 })();
 
 // ---- main.js ----
@@ -12510,9 +12519,12 @@ h1, h2, h3 { letter-spacing: -.01em; }
 <style id="round-accents">
 /* HilltopAds 300 × 250 */
 .hta-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 18px auto; max-width: 100%; }
-.hta-slot[hidden], .hta-slot.hta-empty { display: none; }
+.hta-slot[hidden] { display: none; }
+.hta-slot:not(.hta-on) { margin: 0 auto; }
+.hta-slot:not(.hta-on) > small { display: none; }
 .hta-slot > small { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
-.hta-box { width: 300px; min-height: 250px; max-width: 100%; display: grid; place-items: center; overflow: hidden; border-radius: 8px; background: rgba(255, 255, 255, .02); }
+.hta-box { width: 300px; max-width: 100%; display: grid; place-items: center; overflow: hidden; border-radius: 8px; }
+.hta-slot.hta-on .hta-box { min-height: 250px; }
 /* ============ Looks (shop): photo de profil, cadres, badges ============ */
 .lk-av { display: inline-grid; place-items: center; flex: none; border-radius: 50%; line-height: 1; position: relative; box-shadow: 0 0 0 2px rgba(255, 255, 255, .12); vertical-align: middle; }
 .lk-xs { width: 20px; height: 20px; font-size: 12px; margin-right: 4px; }
