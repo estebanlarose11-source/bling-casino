@@ -132,7 +132,7 @@ const MUSIC = { sd: 0.2, len: 12, root: 220, lead: { wave: 'triangle', vol: 0.06
 // geometry (in % of the board): ring limits from the centre to the crust
 const RING = [0.08, 0.29, 0.5, 0.71, 0.92];
 const pol = (rad, deg) => ({ x: 50 + 50 * rad * Math.cos(deg * Math.PI / 180), y: 50 + 50 * rad * Math.sin(deg * Math.PI / 180) });
-const sliceA = (k) => -90 + k * 45;
+const sliceA = (k) => -135 + k * 45; // slices 0 and 1 make the open quarter at the top
 function cellPos(i) {
   const k = Math.floor(i / NR), r = i % NR, a = sliceA(k) + 22.5, mid = (RING[r] + RING[r + 1]) / 2;
   const p = pol(mid, a), arc = mid * Math.PI / 4, w = Math.min((RING[r + 1] - RING[r]) * 1.12, arc * 1.02);
@@ -144,20 +144,25 @@ function sectorPath(r0, r1, a0, a1) {
     : `M${p(r1, a0)} A${50 * r1} ${50 * r1} 0 0 1 ${p(r1, a1)} L${p(r0, a1)} A${50 * r0} ${50 * r0} 0 0 0 ${p(r0, a0)} Z`;
 }
 
-function boardSVG() {
+function discSVG() {
+  let rings = '';
+  for (let k = 0; k < NS; k++) {
+    const a0 = sliceA(k), a1 = a0 + 45;
+    for (let r = 0; r < NR; r++) rings += `<path d="${sectorPath(RING[r] + 0.006, RING[r + 1] - 0.006, a0 + 0.9, a1 - 0.9)}" class="pz-hole"/>`;
+  }
+  return `<svg class="pz-svg pz-disc-svg" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="pzPlate"><stop offset="0" stop-color="#5b3416"/><stop offset=".9" stop-color="#2f1a0b"/><stop offset="1" stop-color="#1c0f06"/></radialGradient></defs>
+    <circle cx="50" cy="50" r="50" fill="url(#pzPlate)"/>${rings}</svg>`;
+}
+function pizzaSVG() {
   const pz = asset('assets/games/pizza/pizza.webp');
-  let defs = '', plate = '', pieces = '';
+  let defs = '', pieces = '';
   for (let k = 0; k < NS; k++) {
     const a0 = sliceA(k), a1 = a0 + 45;
     defs += `<clipPath id="pzc${k}"><path d="${sectorPath(0, 1.002, a0 - 0.15, a1 + 0.15)}"/></clipPath>`;
-    let rings = '';
-    for (let r = 0; r < NR; r++) rings += `<path d="${sectorPath(RING[r] + 0.006, RING[r + 1] - 0.006, a0 + 0.9, a1 - 0.9)}" class="pz-hole"/>`;
-    plate += `<g class="pz-tray" data-k="${k}">${rings}</g>`;
     const m = pol(0.55, a0 + 22.5);
     pieces += `<g class="pz-piece" data-k="${k}" style="--ox:${(m.x - 50) * 0.55}%;--oy:${(m.y - 50) * 0.55}%"><image href="${pz}" x="0" y="0" width="100" height="100" clip-path="url(#pzc${k})" preserveAspectRatio="none"/><path d="${sectorPath(0, 1, a0, a1)}" class="pz-cut"/></g>`;
   }
-  return `<svg class="pz-svg" viewBox="0 0 100 100" aria-hidden="true"><defs>${defs}<radialGradient id="pzPlate"><stop offset="0" stop-color="#5b3416"/><stop offset=".9" stop-color="#2f1a0b"/><stop offset="1" stop-color="#1c0f06"/></radialGradient></defs>
-    <circle cx="50" cy="50" r="50" fill="url(#pzPlate)"/><g class="pz-trays">${plate}</g><g class="pz-pieces">${pieces}</g></svg>`;
+  return `<svg class="pz-svg pz-top" viewBox="0 0 100 100" aria-hidden="true"><defs>${defs}</defs>${pieces}</svg>`;
 }
 
 class PizzaGame extends BaseGame {
@@ -166,7 +171,7 @@ class PizzaGame extends BaseGame {
       music: MUSIC,
       head: '<div class="head-meters"><div class="meter pz-mult"><small>Food trucks</small><b>×0</b></div></div>',
       stage: `<div class="pz-scene"><div class="pz-hud"><div class="pz-peps"><small>Pepperonis</small><span class="pz-dots">${'<i></i>'.repeat(4)}</span></div><div class="pz-spins"><small>Tours</small><b>0</b></div><div class="pz-parts"><small>Parts</small><b>2 / 8</b></div></div>
-        <div class="pz-board"><div class="pz-rot">${boardSVG()}<div class="pz-cells"></div></div><i class="pz-pin"></i></div><div class="pz-word"></div></div>`,
+        <div class="pz-board"><div class="pz-rot">${discSVG()}<div class="pz-cells"></div></div>${pizzaSVG()}</div><div class="pz-word"></div></div>`,
       buys: [
         { id: 'normal', icon: '🍕', label: 'Bonus Le Four · 3 roulettes', desc: '8 tours, un quart de pizza ; 4 pepperonis = une part de plus et +2 tours', cost: (b) => b * BUYN },
         { id: 'super', icon: '🔥', label: 'Super Four · 4 roulettes', desc: '14 tours, un quart de pizza ; 4 pepperonis = une part de plus et +2 tours', cost: (b) => b * BUYS },
@@ -177,7 +182,7 @@ class PizzaGame extends BaseGame {
     this.cellsEl = this.q('.pz-cells');
     this.multEl = this.q('.pz-mult');
     this.els = new Map(); // symbol id -> element
-    this.angle = 0;
+    this.spinN = 0;
     this.open = 2;
     this.setOpen(2, false);
     IMG.forEach((n) => { new Image().src = asset(`assets/games/pizza/${n}.webp`); });
@@ -195,7 +200,6 @@ class PizzaGame extends BaseGame {
       if (out && !p.classList.contains('out') && anim) { p.classList.add('pulling'); setTimeout(() => p.classList.remove('pulling'), 900); }
       p.classList.toggle('out', out);
     });
-    this.qa('.pz-tray').forEach((t) => t.classList.toggle('on', +t.dataset.k < n));
     this.q('.pz-parts b').textContent = `${n} / ${NS}`;
   }
 
@@ -225,19 +229,19 @@ class PizzaGame extends BaseGame {
     this.at = [];
   }
 
-  // The pizza turns clockwise for a while and stops on a slice boundary (the symbols stay upright).
+  // The tray turns clockwise under the still pizza and stops after whole turns: the symbols placed on it come
+  // round into the open quarter (they stay upright).
   spinTo(turns) {
-    const from = this.angle, to = from + 360 * turns + 45 * Math.floor(Math.random() * 8);
-    const dur = this.turbo ? 700 : 1500, t0 = performance.now();
-    this.angle = to % 360;
+    const from = -45 * (2 + Math.floor(Math.random() * 4)), to = 360 * turns;
+    const dur = this.turbo ? 800 : 1700, t0 = performance.now();
+    this.rot.style.setProperty('--a', `${from}deg`);
     return new Promise((res) => {
       const step = (t) => {
         if (this.dead) return res();
         const u = Math.min(1, (t - t0) / dur);
-        const e = 1 - Math.pow(1 - u, 3) + Math.sin(u * Math.PI) * 0.015 * (1 - u);
-        const a = from + (to - from) * e;
-        this.rot.style.setProperty('--a', `${a}deg`);
-        if (u < 1) requestAnimationFrame(step); else { this.rot.style.setProperty('--a', `${this.angle}deg`); res(); }
+        const e = 1 - Math.pow(1 - u, 3) + Math.sin(u * Math.PI) * 0.02 * (1 - u);
+        this.rot.style.setProperty('--a', `${from + (to - from) * e}deg`);
+        if (u < 1) requestAnimationFrame(step); else { this.rot.style.setProperty('--a', '0deg'); res(); }
       };
       requestAnimationFrame(step);
     });
@@ -275,6 +279,9 @@ class PizzaGame extends BaseGame {
     this.msg(free ? 'Le four tourne…' : 'La pizza tourne…');
     this.clearCells();
     if (!free) this.setOpen(open, false);
+    // the tray is filled all round: the real symbols in the open slices, random ones under the pizza
+    const land = r.frames[0].b, seq = ++this.spinN;
+    this.showBoard(land.map((x, i) => x || { s: Math.floor(Math.random() * 8), m: 0, id: `d${seq}_${i}` }), [], false);
     sfx.click?.();
     await this.spinTo(free ? 1 : 2);
     sfx.reelStop?.();
@@ -282,9 +289,10 @@ class PizzaGame extends BaseGame {
     for (const f of r.frames) {
       if (this.dead) break;
       if (f.t === 'land') {
-        this.showBoard(f.b, f.b.map((x, i) => (x ? i : -1)).filter((i) => i >= 0));
+        this.showBoard(f.b, [], false);
+        this.q('.pz-board').classList.remove('stop'); void this.rot.offsetWidth; this.q('.pz-board').classList.add('stop');
         f.b.forEach((x, i) => { if (x && x.s === SCAT) { sfx.land(); const e = this.els.get(x.id); e?.classList.add('scat'); } });
-        await this.wait(520);
+        await this.wait(380);
       } else if (f.t === 'win') {
         const ids = []; f.clusters.forEach((c) => c.cells.forEach((i) => ids.push(this.cellAt(i))));
         ids.forEach((e) => e?.classList.add('win'));

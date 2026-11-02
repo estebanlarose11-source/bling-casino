@@ -3273,13 +3273,15 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pz-rot { position: absolute; inset: 0; transform: rotate(var(--a, 0deg)); will-change: transform; }
 .pz-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 18px 30px rgba(0, 0, 0, .65)); }
 .pz-hole { fill: rgba(0, 0, 0, .28); stroke: rgba(253, 230, 138, .16); stroke-width: .25; }
-.pz-tray { opacity: 0; transition: opacity .3s; } .pz-tray.on { opacity: 1; }
+.pz-top { z-index: 2; pointer-events: none; }
+.pz-disc-svg { filter: none; }
+.pz-board.stop .pz-rot { animation: pzStop .35s ease-out; }
+@keyframes pzStop { 40% { transform: rotate(1.6deg); } }
 .pz-piece { transition: transform .8s cubic-bezier(.3, .7, .3, 1), opacity .6s .2s; transform-box: view-box; }
 .pz-piece.out { transform: translate(var(--ox), var(--oy)) scale(.9); opacity: 0; pointer-events: none; }
 .pz-piece.pulling { animation: pzPull .9s cubic-bezier(.3, .7, .3, 1) both; }
 @keyframes pzPull { 0% { transform: none; opacity: 1; } 35% { transform: translate(calc(var(--ox) * .25), calc(var(--oy) * .25)) scale(1.05); opacity: 1; filter: drop-shadow(0 0 2px #fde68a); } 100% { transform: translate(var(--ox), var(--oy)) scale(.9); opacity: 0; } }
 .pz-cut { fill: none; stroke: rgba(60, 25, 5, .55); stroke-width: .35; }
-.pz-pin { position: absolute; left: 50%; top: -2.5%; width: 7%; aspect-ratio: 1; translate: -50% 0; z-index: 3; background: #e3132f; clip-path: polygon(0 0, 100% 0, 50% 100%); filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .6)); }
 .pz-cells { position: absolute; inset: 0; }
 .pz-cell { position: absolute; translate: -50% -50%; display: grid; place-items: center; transition: left .32s ease-in, top .32s ease-in, opacity .25s, transform .25s; }
 .pz-cell .pz-img { width: 100%; height: 100%; object-fit: contain; transform: rotate(calc(-1 * var(--a, 0deg))); filter: drop-shadow(0 0 1px rgba(255, 255, 255, .9)) drop-shadow(0 3px 4px rgba(0, 0, 0, .65)); pointer-events: none; user-select: none; -webkit-user-drag: none; }
@@ -10372,7 +10374,7 @@ const FILES = {
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
-  taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '0dec5bf935'],
+  taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '171e756bb8'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '200ec4fe09'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'ee4862aacf'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', '4b91b43686'],
