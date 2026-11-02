@@ -51,7 +51,7 @@ Ce que les règles imposent :
 
 
 **Build → Authentication → Settings → Authorized domains** : vérifie que
-`estebanlarose11-source.github.io` est dans la liste. Sinon, **Add domain** et ajoute-le.
+`www.spinbetcaz.com` (l’adresse officielle du site) est dans la liste. Sinon, **Add domain** et ajoute-le.
 
 ## 3. E-mails en français (facultatif)
 

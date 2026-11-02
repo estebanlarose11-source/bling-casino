@@ -10,13 +10,13 @@
   <meta property="og:site_name" content="SpinBet Casino">
   <meta property="og:title" content="SpinBet Casino · Joue gratuitement">
   <meta property="og:description" content="Plus de 20 jeux gratuits : machines à sous, roulettes, blackjack, poker et jeux rapides. Argent fictif, aucun vrai pari.">
-  <meta property="og:url" content="https://estebanlarose11-source.github.io/bling-casino/">
-  <meta property="og:image" content="https://estebanlarose11-source.github.io/bling-casino/assets/og.jpg">
+  <meta property="og:url" content="https://www.spinbetcaz.com/">
+  <meta property="og:image" content="https://www.spinbetcaz.com/assets/og.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:locale" content="fr_FR">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://estebanlarose11-source.github.io/bling-casino/assets/og.jpg">
+  <meta name="twitter:image" content="https://www.spinbetcaz.com/assets/og.jpg">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -5383,9 +5383,8 @@ const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
 const REF_KE = 1000, REF_PARRAIN = 50000, REF_SPINS = 50, REF_GAME = 'huff', REF_LEVEL = 2, REF_MAX = 50, REF_KEY = 'spinbet_ref';
-// The site's own address, wherever it is hosted (the old GitHub Pages address gave a 404); the fixed address is
-// only a fallback for a copy opened as a local file.
-const SITE = /^https?:$/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html?$/, '') : 'https://estebanlarose11-source.github.io/bling-casino/';
+// The site's official address: every referral and share link points there, wherever the player opened the site.
+const SITE = 'https://www.spinbetcaz.com/';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const uid = () => (profiles.mode === 'cloud' ? profiles.store.current : null);
 
@@ -10762,7 +10761,7 @@ const phone = (step) => `<div class="ph">
   : step === 2 ? `<div class="ph-sheet"><div class="ph-row">Copier</div><div class="ph-row">Ajouter aux favoris</div>
     <div class="ph-row hl">Sur l’écran d’accueil <i>${PLUS}</i></div><div class="ph-row">Imprimer</div></div>`
   : `<div class="ph-add"><div class="ph-addh"><span>Annuler</span><b>Écran d’accueil</b><span class="hl">Ajouter</span></div>
-    <div class="ph-addr"><img src="assets/apple-touch-icon.png" alt=""><div><b>SpinBet</b><small>estebanlarose11-source.github.io</small></div></div></div>`}
+    <div class="ph-addr"><img src="assets/apple-touch-icon.png" alt=""><div><b>SpinBet</b><small>www.spinbetcaz.com</small></div></div></div>`}
 </div>`;
 
 function renderApp(root) {
