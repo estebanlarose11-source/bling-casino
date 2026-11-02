@@ -19,3 +19,7 @@ def bump(m):
 s2, n = re.subn(r"\['([\w-]+)', ('games/impl/[\w-]+\.js', '\w+'), '\w*'\]", bump, s)
 index.write_text(s2, encoding='utf8')
 print(f'{n} game files versioned' + ('' if s2 != s else ' (no change)'))
+
+# référencement : pages des jeux, sitemap.xml et robots.txt (tools/seo.py)
+import runpy
+runpy.run_path(str(root / 'tools' / 'seo.py'))

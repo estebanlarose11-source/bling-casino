@@ -23,6 +23,12 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - `firebase/firestore.rules` : règles Firestore (à recoller dans la console Firebase si elles changent, voir
   `FIREBASE.md`). Toute nouvelle collection Firestore doit y être ajoutée, sinon elle est refusée.
 
+## Référencement (SEO)
+
+`python3 tools/seo.py` (lancé aussi par `tools/build.py`) fabrique, à partir du catalogue, une page par jeu
+(`jeux/<id>.html`), la liste `jeux/index.html`, `sitemap.xml` et `robots.txt` : Google ne lit pas les `#game-…`.
+À relancer après un nouveau jeu ou un changement de description, puis commit des fichiers générés.
+
 ## Affiche « Mise à jour » (à faire à chaque mise à jour d'un jeu)
 
 Chaque fois qu'un jeu est modifié ou ajouté à la demande du propriétaire, ajouter une entrée **en tête** de
