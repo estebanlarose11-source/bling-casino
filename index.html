@@ -1054,6 +1054,8 @@ body.gated { overflow: hidden; }
 .g-huff .rs-reel::after { background: linear-gradient(transparent, rgba(255, 255, 255, .7)); }
 .hf-img { width: 88%; height: 88%; object-fit: contain; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .35)); }
 .g-huff .rs-cell.win .hf-img { animation: winBounce 1s ease-in-out infinite; }
+.g-huff .rs { position: relative; }
+.g-huff .rs > .paylines { inset: 0; overflow: hidden; }
 .g-huff .rs-cell.scat .hf-img { animation: orbPulse 1.6s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(253, 224, 71, .95)); }
 .hr-hub .hf-img { width: 100%; height: 100%; object-fit: contain; }
 .intro-glyph .hf-img { width: 140px; height: 140px; }
@@ -8115,6 +8117,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'huff', date: '2026-11-02', title: 'Lignes gagnantes corrigées', items: ['Les lignes gagnantes restent dans le cadre des rouleaux, sur ordinateur comme sur téléphone'] },
   { game: 'fortune', date: '2026-11-02', title: 'La Fortune plus vivante', items: ['Symboles recadrés : lettres, dragon, enveloppe, chats, lingots et lanterne bien centrés', 'Rouleaux qui défilent plus longtemps, avec une lueur dorée et un flash à chaque arrêt', 'Pendant le Hold & Spin, chaque case vide est un petit rouleau qui défile', 'Un vrai tas de pièces d’or dans le bol, et de la poussière d’or qui tombe'] },
   { game: 'fortune', date: '2026-11-02', title: 'Nouveau : La Fortune', isNew: true, items: ['Le nouvel an chinois : lanternes, dragon d’or WILD et 243 façons de gagner', 'Les pièces d’or montent dans le bol : le tas de pièces grandit jusqu’au prochain bonus', '6 pièces = HOLD & SPIN, avec les jackpots MAJOR et JACKPOT qui grimpent à chaque spin', 'Des lignes s’allument ×2 ou ×5 pendant le bonus', '4 scatters = MÉGA BONUS : chaque pièce vaut ×2 à ×5'] },
   { game: 'madwheel-online', date: '2026-11-02', title: 'Nouveau : La Roue Folle Online', isNew: true, items: ['La Roue Folle en multijoueur', 'Pose tes jetons et appuie sur PRÊT : la roue part quand tout le salon est prêt', 'Le Top Slot et les 4 bonus sont les mêmes pour tout le monde', 'Les mises et les gains des autres joueurs, et le chat du salon'] },
@@ -10777,7 +10780,7 @@ const FILES = {
   'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '3357f3e2c8'],
   'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '7e6577831b'],
-  huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a1fe33533c'],
+  huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'f1fe43fcd8'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '0b6becec24'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],

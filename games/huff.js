@@ -180,6 +180,9 @@ class HuffGame extends BaseGame {
     });
     this.reels.setAll([1, 2, 4, 5, 0, 3, 6, SC, 7, 8, 2, 0, 9, 4, 3]);
     this.svg = this.q('.paylines');
+    // the winning lines are drawn over the reels themselves (not the whole stage, wider than the reels): they stay
+    // inside the slot's frame
+    this.reels.el.appendChild(this.svg);
     try { localStorage.removeItem('huff_state'); } catch { /* old Hold & Spin save */ }
     Object.keys(PAINT).forEach((id) => { new Image().src = src(id); });
     this.q('.slot-stage').style.setProperty('--hf-bg', `url("${asset('assets/games/huff/bg.webp')}")`);
