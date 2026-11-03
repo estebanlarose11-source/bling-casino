@@ -4179,6 +4179,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
       <a href="#jackpot" data-nav="jackpot"><span>💎</span>Jackpot commun</a>
       <a href="#duels" data-nav="duels"><span>⚔️</span>Duels entre amis<b class="side-badge" data-duel-badge hidden></b></a>
       <a href="#cashback" data-nav="cashback"><span>💸</span>Cashback<b class="side-badge" data-cb-badge hidden></b></a>
+      <a href="#paris" data-nav="paris"><span>⚽</span>Paris pour rire<b class="side-new">NEW</b></a>
     </nav>
     <div class="side-label">Récompenses</div>
     <nav class="side-nav">
@@ -15304,6 +15305,177 @@ async function renderPlayer(root, name) {
 return { renderPlayer, flashNow, flashesOf, FLASH, shareProfile, buzz };
 })();
 
+// ---- paris.js ----
+__mods['paris.js'] = (() => {
+// Paris pour rire (#paris): bets in KE on real matches (Ligue 1, Ligue des champions, Ligue Europa, Premier League,
+// Liga, Serie A, NBA). The matches, live scores and odds come from paris/matchs.json on the « data » branch, written
+// every 30 min by GitHub (tools/matchs/fetch.mjs). Bets are saved in the profile (profile.paris) and paid at the next
+// visit after the final whistle. Odds fixed before the match (≈ 95 % return). Play money only.
+
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { toast, modal } = __mods['ui.js'];
+const { sfx } = __mods['audio.js'];
+const { fx } = __mods['fx.js'];
+
+const URL_ = 'https://raw.githubusercontent.com/estebanlarose11-source/bling-casino/data/paris/matchs.json';
+const MAX_BET = 10000, CLOSE_MS = 60000;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const ox = (o) => o.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const hm = (t) => new Date(t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+const dayLabel = (t) => {
+  const d = new Date(t), n = new Date(), k = (x) => x.toDateString();
+  if (k(d) === k(n)) return 'Aujourd’hui';
+  const tm = new Date(n); tm.setDate(n.getDate() + 1); if (k(d) === k(tm)) return 'Demain';
+  const y = new Date(n); y.setDate(n.getDate() - 1); if (k(d) === k(y)) return 'Hier';
+  return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+};
+
+let data = null, loading = null, lastLoad = 0;
+function load(force) {
+  if (loading) return loading;
+  if (!force && data && Date.now() - lastLoad < 120000) return Promise.resolve(data);
+  loading = fetch(`${URL_}?t=${Math.floor(Date.now() / 60000)}`, { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null)).then((j) => { if (j?.matches) { data = j; lastLoad = Date.now(); settle(); } return data; })
+    .catch(() => data).finally(() => { loading = null; });
+  return loading;
+}
+const byId = (id) => data?.matches.find((m) => m.id === id);
+const open = (m) => m.state === 'pre' && Date.now() < m.start - CLOSE_MS;
+const bets = () => profiles.current?.paris || [];
+const save = (fn) => profiles.update('paris', (p) => { p.paris = fn(Array.isArray(p.paris) ? p.paris : []).slice(0, 80); });
+
+const pickName = (m, k) => (k === '1' ? m.home.name : k === '2' ? m.away.name : k === 'N' ? 'Match nul' : `Score exact ${k.slice(2).replace('-', ' - ')}`);
+function result(m, k) {
+  const [h, a] = m.score || [0, 0];
+  if (k.startsWith('S:')) return `${h}-${a}` === k.slice(2);
+  return k === (h > a ? '1' : h < a ? '2' : 'N');
+}
+
+// pays the finished matches (at most once per bet)
+function settle() {
+  const me = profiles.current;
+  if (!me || !data || !bets().some((b) => b.st === 'open')) return;
+  let won = 0, lost = 0, back = 0;
+  const pay = [];
+  save((list) => list.map((b) => {
+    if (b.st !== 'open') return b;
+    const m = byId(b.m);
+    if (m && m.state === 'post' && m.done && m.score) {
+      if (result(m, b.k)) { const g = Math.round(b.stake * b.odds * 100) / 100; won += g; pay.push([g, b]); return { ...b, st: 'won', paid: g, res: m.score }; }
+      lost++; return { ...b, st: 'lost', res: m.score };
+    }
+    // postponed / cancelled, or gone from the list long after its date: stake back
+    if ((m && m.state === 'post' && !m.done && Date.now() > m.start + 6 * 3600e3) || (!m && Date.now() > b.start + 4 * 864e5)) { back += b.stake; return { ...b, st: 'void' }; }
+    return b;
+  }));
+  pay.forEach(([g, b]) => wallet.credit(g, { game: `Paris · ${b.label}`, x: b.odds }));
+  if (back) wallet.grant(back);
+  if (won) { toast(`⚽ Paris gagnés : +${fmt(won)} !`, 'ok'); sfx.win(); }
+  else if (lost) toast(`⚽ ${lost} pari${lost > 1 ? 's' : ''} perdu${lost > 1 ? 's' : ''}… la prochaine sera la bonne !`, 'info');
+  if (back) toast(`⚽ Match reporté : ${fmt(back)} remboursés`, 'info');
+  if (won || lost || back) paintPage();
+}
+
+async function placeBet(m, k) {
+  if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour parier', 'warn');
+  if (!open(m)) return toast('Les paris sont fermés pour ce match', 'warn');
+  const odds = k.startsWith('S:') ? m.odds.scores?.[k.slice(2)] : m.odds[k];
+  if (!odds) return;
+  const max = Math.min(MAX_BET, Math.floor(wallet.balance));
+  const quick = [10, 50, 100, 500, 1000, 5000].filter((v) => v <= max);
+  const p = modal(`<div class="pr-slip"><small class="muted">${esc(m.league)} · ${dayLabel(m.start)} ${hm(m.start)}</small>
+      <h3>${esc(m.home.name)} – ${esc(m.away.name)}</h3>
+      <div class="pr-pick"><span>Ton choix</span><b>${esc(pickName(m, k))}</b><em>cote ${ox(odds)}</em></div>
+      <label class="pr-lab">Mise (KE)<input type="number" inputmode="numeric" min="1" max="${max}" step="1" value="${Math.min(100, max) || 1}" data-stake></label>
+      <div class="pr-quick">${quick.map((v) => `<button type="button" class="chip" data-q="${v}">${v.toLocaleString('fr-FR')}</button>`).join('')}<button type="button" class="chip" data-q="${max}">Max</button></div>
+      <p class="pr-gain">Gain possible : <b data-gain></b></p>
+      <button class="btn primary lg ga-wide" data-value="ok">Valider le pari</button>
+      <p class="muted small">Pour rire, en argent fictif. Payé tout seul après le match.</p></div>`, { cls: 'pr-modal' });
+  const box = [...document.querySelectorAll('.pr-modal')].pop(), inp = box.querySelector('[data-stake]');
+  const upd = () => { const v = Math.max(0, Math.floor(+inp.value || 0)); box.querySelector('[data-gain]').textContent = fmt(Math.round(v * odds * 100) / 100); };
+  box.querySelectorAll('[data-q]').forEach((b) => { b.onclick = () => { inp.value = b.dataset.q; upd(); }; });
+  inp.addEventListener('input', upd); upd();
+  let stake = 0;
+  box.querySelector('[data-value="ok"]').addEventListener('click', () => { stake = Math.floor(+inp.value || 0); }, { capture: true });
+  if ((await p) !== 'ok') return;
+  if (!(stake >= 1) || stake > max) return toast(`Mise entre 1 et ${fmt(max)}`, 'warn');
+  if (!open(m)) return toast('Trop tard : le match a commencé', 'warn');
+  if (!wallet.debit(stake)) return toast('Solde insuffisant', 'warn');
+  const label = `${m.home.name} – ${m.away.name} : ${pickName(m, k)}`;
+  save((list) => [{ id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, m: m.id, k, odds, stake, at: Date.now(), start: m.start, st: 'open', label, league: m.league }, ...list]);
+  sfx.coin(); fx.coins?.(14);
+  toast(`⚽ Pari validé : ${fmt(stake)} sur ${esc(pickName(m, k))} (cote ${ox(odds)})`, 'ok');
+  paintPage();
+}
+
+/* ---------- the page ---------- */
+let root = null, league = 'all', showScores = new Set();
+const logo = (t) => (t.logo ? `<img src="${esc(t.logo)}" alt="" loading="lazy" onerror="this.remove()">` : '<i class="pr-nologo"></i>');
+function matchHTML(m) {
+  const live = m.state === 'in', fin = m.state === 'post', can = open(m);
+  const mine = bets().filter((b) => b.m === m.id);
+  const btn = (k, lab) => `<button class="pr-odd" data-bet="${m.id}" data-k="${k}" ${can ? '' : 'disabled'}><small>${lab}</small><b>${ox(m.odds[k])}</b></button>`;
+  return `<div class="pr-match${live ? ' live' : ''}${fin ? ' fin' : ''}">
+    <div class="pr-top"><span>${esc(m.league)}</span>${live ? `<b class="pr-live"><i></i>EN DIRECT ${esc(m.clock)}</b>` : fin ? '<b>Terminé</b>' : `<b>${dayLabel(m.start)} · ${hm(m.start)}</b>`}</div>
+    <div class="pr-teams"><div>${logo(m.home)}<span>${esc(m.home.name)}</span></div>
+      <div class="pr-score">${m.score ? `${m.score[0]} - ${m.score[1]}` : 'vs'}</div>
+      <div>${logo(m.away)}<span>${esc(m.away.name)}</span></div></div>
+    ${fin ? '' : `<div class="pr-odds">${btn('1', m.sport === 'soccer' ? '1' : esc(m.home.name))}${m.odds.N ? btn('N', 'Nul') : ''}${btn('2', m.sport === 'soccer' ? '2' : esc(m.away.name))}</div>`}
+    ${!fin && can && m.odds.scores ? `<button class="pr-more" data-scores="${m.id}">${showScores.has(m.id) ? '▴ Cacher les scores exacts' : '▾ Score exact (grosses cotes)'}</button>
+      ${showScores.has(m.id) ? `<div class="pr-scores">${Object.entries(m.odds.scores).map(([s, o]) => `<button class="pr-odd sm" data-bet="${m.id}" data-k="S:${s}"><small>${s.replace('-', ' - ')}</small><b>${ox(o)}</b></button>`).join('')}</div>` : ''}` : ''}
+    ${mine.length ? `<div class="pr-mine">${mine.map((b) => `<span class="${b.st}">🎟️ ${fmt(b.stake)} sur ${esc(pickName(m, b.k))} · cote ${ox(b.odds)}${b.st === 'won' ? ` · <b>+${fmt(b.paid)}</b>` : b.st === 'lost' ? ' · perdu' : b.st === 'void' ? ' · remboursé' : ''}</span>`).join('')}</div>` : ''}
+  </div>`;
+}
+function paintPage() {
+  if (!root?.isConnected) return;
+  const list = (data?.matches || []).filter((m) => m.state !== 'post' || Date.now() - m.start < 864e5);
+  const leagues = [...new Set(list.map((m) => m.league))];
+  const shown = list.filter((m) => league === 'all' || m.league === league);
+  const groups = {};
+  shown.forEach((m) => { const k = m.state === 'in' ? '🔴 En direct' : m.state === 'post' ? 'Terminés' : dayLabel(m.start); (groups[k] = groups[k] || []).push(m); });
+  const order = Object.keys(groups).sort((a, b) => (a.startsWith('🔴') ? -1 : b.startsWith('🔴') ? 1 : a === 'Terminés' ? 1 : b === 'Terminés' ? -1 : 0));
+  const my = bets(), openB = my.filter((b) => b.st === 'open'), doneB = my.filter((b) => b.st !== 'open').slice(0, 12);
+  root.innerHTML = `
+    <section class="panel pr-hero"><span class="eyebrow">⚽🏀 Paris pour rire</span><h1>Parie tes KE sur les vrais matchs</h1>
+      <p class="muted">Ligue 1, Ligue des champions, Ligue Europa, Premier League, Liga, Serie A et NBA. Choisis le vainqueur, le nul ou le score exact : tu es payé tout seul après le match. Argent fictif, juste pour le fun.</p></section>
+    ${openB.length || doneB.length ? `<section class="panel pr-bets"><h2>🎟️ Mes paris</h2>
+      ${openB.length ? `<ul>${openB.map((b) => { const m = byId(b.m); return `<li><span>${esc(b.label)}</span><em>${fmt(b.stake)} × ${ox(b.odds)} = <b>${fmt(Math.round(b.stake * b.odds * 100) / 100)}</b></em><small>${m?.state === 'in' ? `🔴 ${m.score?.join(' - ')} · ${esc(m.clock)}` : `${dayLabel(b.start)} ${hm(b.start)}`}</small></li>`; }).join('')}</ul>` : ''}
+      ${doneB.length ? `<details><summary>Paris terminés (${doneB.length})</summary><ul>${doneB.map((b) => `<li class="${b.st}"><span>${esc(b.label)}</span><em>${b.st === 'won' ? `✅ +${fmt(b.paid)}` : b.st === 'lost' ? `❌ −${fmt(b.stake)}` : '↩️ remboursé'}</em>${b.res ? `<small>score ${b.res.join(' - ')}</small>` : ''}</li>`).join('')}</ul></details>` : ''}
+    </section>` : ''}
+    <div class="chips pr-chips"><a class="chip${league === 'all' ? ' on' : ''}" href="#" data-league="all">Tous</a>${leagues.map((l) => `<a class="chip${league === l ? ' on' : ''}" href="#" data-league="${esc(l)}">${esc(l)}</a>`).join('')}</div>
+    ${!data ? '<p class="panel muted">Chargement des matchs…</p>' : !shown.length ? '<p class="panel muted">Pas de match dans les prochains jours pour ce championnat.</p>'
+      : order.map((k) => `<section><div class="sec-head"><h2>${k}</h2><small>${groups[k].length} match${groups[k].length > 1 ? 's' : ''}</small></div><div class="pr-grid">${groups[k].map(matchHTML).join('')}</div></section>`).join('')}
+    <p class="muted small pr-note">Cotes calculées par SpinBet avant chaque match (retour ≈ 95 %). Les paris ferment au coup d’envoi. Scores mis à jour toutes les 30 minutes. Jeu en argent fictif : aucun gain réel.</p>`;
+}
+function renderParis(r) {
+  root = r;
+  paintPage();
+  load(true).then(paintPage);
+}
+document.addEventListener('click', (e) => {
+  if (!root?.isConnected) return;
+  const b = e.target.closest('[data-bet]');
+  if (b) { const m = byId(b.dataset.bet); if (m) placeBet(m, b.dataset.k); return; }
+  const s = e.target.closest('[data-scores]');
+  if (s) { const id = s.dataset.scores; showScores.has(id) ? showScores.delete(id) : showScores.add(id); paintPage(); return; }
+  const l = e.target.closest('[data-league]');
+  if (l) { e.preventDefault(); league = l.dataset.league; paintPage(); }
+});
+setInterval(() => { if (root?.isConnected) load(true).then(paintPage); }, 120000);
+// pay the bets of finished matches on arrival, and show tonight's matches on the home page
+profiles.ready?.then(() => setTimeout(() => load(), 2500));
+profiles.addEventListener('change', () => setTimeout(settle, 1500));
+__mods['events.js'].addHome(() => {
+  const n = (data?.matches || []).filter((m) => open(m) && m.start - Date.now() < 18 * 3600e3).length;
+  const live = (data?.matches || []).filter((m) => m.state === 'in').length;
+  if (!n && !live) return '';
+  return `<a class="ev-card ev-paris" href="#paris"><span class="ev-ico">⚽</span><div><small>${live ? '<i class="ev-dot"></i>' : ''}PARIS POUR RIRE</small><b>${live ? `${live} match${live > 1 ? 's' : ''} en direct` : `${n} match${n > 1 ? 's' : ''} à parier`}</b><em>Ligue 1, C1, Premier League, NBA… payés tout seuls</em></div><span class="ev-go">Parier ›</span></a>`;
+});
+
+return { renderParis, load, settle };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -15352,6 +15524,7 @@ const routes = [
   { re: /^jackpot$/, page: (r) => __mods['jackpot.js'].renderJackpot(r), nav: 'jackpot' },
   { re: /^duels?$/, page: (r) => __mods['duels.js'].renderDuels(r), nav: 'duels' },
   { re: /^cashback$/, page: (r) => __mods['cashback.js'].renderCashback(r), nav: 'cashback' },
+  { re: /^paris$/, page: (r) => __mods['paris.js'].renderParis(r), nav: 'paris' },
   { re: /^@(.+)$/, page: (r, m) => __mods['extras.js'].renderPlayer(r, decodeURIComponent(m[1])), nav: 'top' },
 ];
 
@@ -16846,6 +17019,51 @@ html.light .panel { border-radius: var(--fin-r) !important; background: linear-g
 html.light .side-nav a.on { background: linear-gradient(90deg, rgba(47, 143, 224, .16), transparent) !important; box-shadow: inset 3px 0 0 #2f8fe0 !important; color: #0e1a2b !important; }
 html.light .side-label { background: linear-gradient(90deg, #2f8fe0, #7c3aed); -webkit-background-clip: text; background-clip: text; }
 html.light .btn.primary { color: #fff !important; background: linear-gradient(180deg, #5fb4f2, #2f8fe0 60%, #1d6dbd) !important; }
+
+/* ---------- paris pour rire (#paris) ---------- */
+.pr-hero h1 { margin: 6px 0; font: 900 clamp(24px, 4vw, 34px)/1.1 KeCoin, Archivo, sans-serif; }
+.pr-chips { margin: 4px 0 14px; }
+.pr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.pr-match { padding: 14px; border-radius: 14px; background: var(--fin-panel) padding-box, var(--fin-edge) border-box; border: 1px solid transparent; box-shadow: 0 10px 26px rgba(0, 0, 0, .3); }
+.pr-match.live { background: linear-gradient(180deg, rgba(239, 68, 68, .14), rgba(13, 17, 24, .96)) padding-box, linear-gradient(135deg, #ef4444, rgba(255, 255, 255, .05)) border-box; }
+.pr-match.fin { opacity: .75; }
+.pr-top { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.pr-top b { color: var(--text); font-weight: 700; }
+.pr-live { color: #fca5a5 !important; display: inline-flex; align-items: center; gap: 5px; }
+.pr-live i { width: 7px; height: 7px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: liveDot 1.2s infinite; }
+.pr-teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin-bottom: 12px; }
+.pr-teams > div { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; font-weight: 800; font-size: 14px; }
+.pr-teams img, .pr-nologo { width: 40px; height: 40px; object-fit: contain; }
+.pr-nologo { display: block; border-radius: 50%; background: rgba(255, 255, 255, .08); }
+.pr-score { font: 900 22px KeCoin, Archivo, sans-serif; color: var(--muted); }
+.pr-match.live .pr-score, .pr-match.fin .pr-score { color: #fff; }
+.pr-odds { display: flex; gap: 8px; }
+.pr-odd { flex: 1; display: grid; gap: 2px; padding: 9px 6px; border-radius: 10px; background: linear-gradient(180deg, rgba(124, 200, 255, .16), rgba(124, 200, 255, .05)); box-shadow: inset 0 0 0 1px rgba(124, 200, 255, .3); color: var(--text); transition: transform .15s, box-shadow .2s; }
+.pr-odd small { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pr-odd b { font: 900 16px KeCoin, Archivo, sans-serif; color: #bfe6ff; }
+.pr-odd:hover:not(:disabled) { transform: translateY(-1px); box-shadow: inset 0 0 0 1px #7cc8ff, 0 0 14px rgba(124, 200, 255, .3); }
+.pr-odd:disabled { opacity: .45; }
+.pr-more { margin-top: 8px; width: 100%; padding: 6px; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.pr-scores { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 6px; }
+.pr-odd.sm { padding: 6px 2px; } .pr-odd.sm b { font-size: 13px; }
+.pr-mine { display: grid; gap: 4px; margin-top: 10px; font-size: 12.5px; }
+.pr-mine span { padding: 5px 8px; border-radius: 8px; background: rgba(251, 191, 36, .1); }
+.pr-mine .won { background: rgba(34, 197, 94, .16); } .pr-mine .lost { opacity: .6; }
+.pr-bets ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.pr-bets li { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 9px 12px; border-radius: 10px; background: rgba(255, 255, 255, .04); font-size: 13.5px; }
+.pr-bets li small { grid-column: 1 / -1; color: var(--muted); } .pr-bets li em { font-style: normal; white-space: nowrap; }
+.pr-bets li.won em { color: #4ade80; } .pr-bets li.lost em { color: var(--muted); }
+.pr-bets summary { cursor: pointer; margin-top: 10px; color: var(--muted); font-weight: 700; }
+.pr-slip h3 { margin: 4px 0 12px; }
+.pr-pick { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; padding: 10px 12px; border-radius: 10px; background: rgba(124, 200, 255, .1); margin-bottom: 12px; }
+.pr-pick span { color: var(--muted); font-size: 13px; } .pr-pick em { margin-left: auto; font-style: normal; font-weight: 800; color: #bfe6ff; }
+.pr-lab { display: grid; gap: 6px; font-weight: 700; font-size: 13px; }
+.pr-lab input { padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: #0a0d13; color: #fff; font: 800 18px KeCoin, Inter, sans-serif; }
+.pr-quick { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.pr-gain { margin: 4px 0 6px; } .pr-gain b { color: #4ade80; font-size: 18px; }
+.pr-note { margin-top: 6px; }
+.ev-paris { background: linear-gradient(90deg, rgba(34, 197, 94, .2), rgba(59, 130, 246, .12)) !important; border-color: rgba(34, 197, 94, .5) !important; }
+@media (max-width: 520px) { .pr-grid { grid-template-columns: 1fr; } }
 
 /* ---------- profil public (#@pseudo) and événements flash ---------- */
 .pp { text-align: center; max-width: 640px; margin: 0 auto; padding: 28px 20px !important; background: radial-gradient(420px 220px at 50% 0%, color-mix(in srgb, var(--rk, #7cc8ff) 26%, transparent), transparent 70%), var(--fin-panel) padding-box, var(--fin-edge) border-box !important; }

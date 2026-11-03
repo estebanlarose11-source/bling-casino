@@ -80,6 +80,12 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   et les bonus ; interrupteur « 📳 Vibrations » dans le menu (`spinbet_vibe`).
 - **Profil public** : `www.spinbetcaz.com/#@pseudo` (`renderPlayer` dans `extras.js`), lu dans `leaderboard`.
 
+- **Paris pour rire** (`paris.js`, page `#paris`) : paris en KE sur les vrais matchs (Ligue 1, C1, C3, Premier League,
+  Liga, Serie A, NBA). `tools/matchs/fetch.mjs` (GitHub Actions `matchs.yml`, toutes les 30 min) lit le tableau des
+  scores public d'ESPN, calcule les cotes une fois avant le match (Poisson, retour ≈ 95 %) et range
+  `paris/matchs.json` sur la branche **`data`** (pas déployée par Vercel : `git.deploymentEnabled`), lue par le site
+  sur raw.githubusercontent.com. Paris dans `profile.paris`, payés à la visite suivante ; match reporté = remboursé.
+
 ## Arrivée des visiteurs et partage
 
 - **Pas d'écran de connexion à l'arrivée** (`hud.js`) : un nouveau visiteur joue tout de suite en invité. La création
