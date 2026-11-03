@@ -9062,8 +9062,11 @@ function renderLobby(root, params = {}) {
         ${ALL_GAMES.some(f.test) ? `<div class="game-grid">${ALL_GAMES.filter(f.test).map(gameCard).join('')}</div>` : '<p class="muted">Aucun favori pour l’instant : touche le cœur en haut à droite d’une affiche pour l’ajouter ici.</p>'}
       </section>`;
 
-  // Category pages lead with their latest game update; the home page keeps the Big Bad Wolf hero.
-  const ups = ['slot', 'table', 'quick'].includes(filter) ? latestFor(f.test) : [];
+  // Category pages lead with their latest game update; the home page with the newest game (NOUVEAU for 14 days),
+  // and the Big Bad Wolf hero when no game is new.
+  const isFresh = (u) => (Date.now() - Date.parse(`${u.date}T12:00:00`)) / 864e5 <= 14;
+  const ups = ['slot', 'table', 'quick'].includes(filter) ? latestFor(f.test)
+    : UPDATES.filter((u) => u.isNew && isFresh(u) && getGame(u.game));
   const upd = ups[0], ug = upd && getGame(upd.game);
   const updTile = (u, k) => {
     const g = getGame(u.game);
@@ -11541,7 +11544,7 @@ const FILES = {
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
   'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '17ab6a334a'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
-  billes: ['billes', 'games/impl/billes.js', 'BillesGame', '6f6628b9f9'],
+  billes: ['billes', 'games/impl/billes.js', 'BillesGame', '234dd4780f'],
   totemx: ['totemx', 'games/impl/totemx.js', 'TotemXGame', '9ed53a6ac8'],
   noel: ['noel', 'games/impl/noel.js', 'NoelGame', '494e5d3f25'],
 };
@@ -13793,6 +13796,7 @@ function tableHTML(id) {
   if (!TABLE_GAMES.includes(id)) {
     // outside the multiplayer tables, only friends are shown on a game
     const fr = others.filter((p) => isFriend(p.uid));
+    if (!fr.length) return '<i class="lg-none" hidden></i>'; // nobody to show: the box is hidden (CSS), not left empty
     return `<div class="lt-head"><span class="live-dot"></span><b>${fr.length ? `${fr.length} ami${fr.length > 1 ? 's' : ''} sur ${esc(g.name)} en ce moment` : `Aucun ami sur ${esc(g.name)} pour l’instant`}</b></div>
       ${fr.length ? `<div class="ln-list">${fr.slice(0, 10).map((p) => `<div class="ln-p friend">${avatar(p)}<span>${pname(p)}<small>${winTxt(p) || 'en train de jouer'}</small></span></div>`).join('')}</div>` : ''}`;
   }
@@ -15277,6 +15281,8 @@ body:not(.ml-off) .spin-btn { position: relative; }
 body:not(.ml-off) .spin-btn::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; pointer-events: none; border: 2px dashed rgba(255, 255, 255, .25); animation: mlSpinVarRot 12s linear infinite; }
 .game-host.ml-busy .spin-btn::before { border-color: #fbbf24; border-style: solid; border-top-color: transparent; animation-duration: .6s !important; }
 @keyframes mlSpinVarRot { to { transform: rotate(360deg); } }
+/* the orbit is for the round button only: on the wide buttons (CHOISIS UNE CASE, REJOUER…) it crossed the rectangle */
+.spin-btn.wide::before, body:not(.ml-off) .spin-btn.wide::before { display: none !important; }
 .ml-flash { position: absolute; inset: 0; z-index: 30; pointer-events: none; border-radius: inherit; mix-blend-mode: screen;
   background: radial-gradient(circle at 50% 45%, rgba(255, 247, 194, .9), rgba(251, 191, 36, .35) 35%, transparent 70%); animation: mlFlash .7s ease-out forwards; }
 @keyframes mlFlash { from { opacity: 1; } to { opacity: 0; } }
@@ -16381,6 +16387,7 @@ body.ad-bar-on .live-tick { bottom: 112px; }
 @media (max-width: 900px) { .live-tick { left: 10px; bottom: calc(76px + env(safe-area-inset-bottom)); } body.ad-bar-on .live-tick { bottom: calc(138px + env(safe-area-inset-bottom)); } }
 body.fs-on .live-tick { display: none; }
 .live-game { margin-top: 14px; }
+.live-game:has(> .lg-none) { display: none; }
 .lt-seats { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 8px; }
 @media (max-width: 700px) { .lt-seats { grid-template-columns: repeat(3, 1fr); } }
 .lt-seat { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 14px; text-align: center; min-width: 0;
@@ -16453,6 +16460,133 @@ body.fs-on .live-tick { display: none; }
 .side-nav a + a { border-top: 1px solid rgba(255, 255, 255, .04); }
 .side-vip { border: 1px solid #7cc8ff !important; border-radius: 10px !important; margin: 16px 4px 0; background: linear-gradient(180deg, rgba(124, 200, 255, .1), rgba(124, 200, 255, .02)); box-shadow: inset 0 0 0 3px rgba(124, 200, 255, .08), 0 0 18px rgba(124, 200, 255, .12); }
 .side-vip:empty { display: none; }
+</style>
+<style id="finition">
+/* ============ Finition : dégradés, reliefs et lumière sur toute l'interface (après toutes les autres couches) ============
+   Les écrans des jeux gardent leurs propres couleurs ; le mode clair a ses propres règles plus bas. */
+:root {
+  --fin-r: 12px;
+  --fin-panel: linear-gradient(180deg, rgba(23, 29, 40, .96), rgba(13, 17, 24, .96));
+  --fin-edge: linear-gradient(135deg, rgba(124, 200, 255, .38), rgba(255, 255, 255, .05) 38%, rgba(255, 255, 255, .03) 62%, rgba(251, 191, 36, .28));
+  --fin-glow: 0 18px 40px rgba(0, 0, 0, .38), 0 0 0 1px rgba(255, 255, 255, .02);
+  --fin-blue: linear-gradient(180deg, #a9dcff 0%, #5fb4f2 45%, #2f86d6 100%);
+  --fin-gold: linear-gradient(180deg, #fff2c2 0%, #fbbf24 50%, #d97706 100%);
+}
+
+/* ---------- the page: a deep night with two soft lights ---------- */
+html:not(.light) body {
+  background:
+    radial-gradient(900px 520px at 12% -6%, rgba(47, 134, 214, .20), transparent 62%),
+    radial-gradient(760px 520px at 104% 18%, rgba(139, 92, 246, .13), transparent 60%),
+    radial-gradient(900px 600px at 70% 112%, rgba(251, 191, 36, .08), transparent 60%),
+    linear-gradient(180deg, #0a0d13 0%, #070910 100%) fixed;
+}
+
+/* ---------- top bar and side menu: glass ---------- */
+html:not(.light) .top {
+  background: linear-gradient(180deg, rgba(14, 18, 26, .86), rgba(10, 13, 19, .74));
+  -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
+  border-bottom: 1px solid rgba(124, 200, 255, .12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+}
+html:not(.light) .side {
+  background: linear-gradient(180deg, #0f141c 0%, #0a0d13 60%, #0c0f16 100%);
+  border-right: 1px solid rgba(124, 200, 255, .1);
+}
+.side-nav a { border-radius: 9px; margin: 1px 2px; transition: background .2s, color .2s, box-shadow .2s, transform .2s; }
+.side-nav a:hover { background: linear-gradient(90deg, rgba(124, 200, 255, .1), rgba(124, 200, 255, 0)); transform: translateX(2px); }
+.side-nav a.on {
+  background: linear-gradient(90deg, rgba(95, 180, 242, .28), rgba(95, 180, 242, .06) 70%, transparent) !important;
+  box-shadow: inset 3px 0 0 #7cc8ff, 0 0 18px rgba(95, 180, 242, .12) !important; color: #fff !important;
+}
+.side-label { background: linear-gradient(90deg, #7cc8ff, #c9b6ff 60%, #fbbf24); -webkit-background-clip: text; background-clip: text; color: transparent !important; }
+.logo > span:not(.logo-mark) em { background: linear-gradient(90deg, #7cc8ff, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* ---------- panels: soft gradient, light edge, rounded ---------- */
+html:not(.light) .panel {
+  background: var(--fin-panel) padding-box, var(--fin-edge) border-box !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--fin-r) !important;
+  box-shadow: var(--fin-glow) !important;
+}
+.sec-head h2 { letter-spacing: -.01em; }
+.sec-head h2::before { width: 4px !important; border-radius: 4px !important; background: linear-gradient(180deg, #7cc8ff, #a78bfa 60%, #fbbf24) !important; box-shadow: 0 0 12px rgba(124, 200, 255, .55) !important; }
+
+/* ---------- buttons ---------- */
+.btn { border-radius: 10px !important; transition: transform .15s, box-shadow .2s, background .2s, filter .2s !important; }
+.btn:active:not(:disabled) { transform: translateY(1px) scale(.99); }
+.btn.primary, body:not(.ml-off) .btn.primary {
+  background: var(--fin-blue) !important; color: #06121f !important; font-weight: 800;
+  box-shadow: 0 8px 22px rgba(47, 134, 214, .35), inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -2px 0 rgba(0, 0, 0, .18) !important;
+}
+.btn.primary:hover:not(:disabled) { filter: brightness(1.08) saturate(1.1); box-shadow: 0 10px 28px rgba(47, 134, 214, .5), inset 0 1px 0 rgba(255, 255, 255, .6), inset 0 -2px 0 rgba(0, 0, 0, .18) !important; }
+html:not(.light) .btn.ghost {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .015)) !important;
+  box-shadow: inset 0 0 0 1px rgba(124, 200, 255, .2), inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+}
+html:not(.light) .btn.ghost:hover:not(:disabled) { background: linear-gradient(180deg, rgba(124, 200, 255, .14), rgba(124, 200, 255, .04)) !important; box-shadow: inset 0 0 0 1px rgba(124, 200, 255, .45) !important; }
+.top-refill { border-radius: 999px !important; }
+
+/* ---------- game posters ---------- */
+.thumb { border-radius: var(--fin-r) !important; overflow: hidden; box-shadow: 0 10px 26px rgba(0, 0, 0, .45), 0 0 0 1px rgba(255, 255, 255, .06) !important; transition: transform .25s var(--spring, ease), box-shadow .25s !important; }
+@media (hover: hover) {
+  .game-card:hover .thumb { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(0, 0, 0, .55), 0 0 0 1px rgba(124, 200, 255, .5), 0 0 26px rgba(124, 200, 255, .25) !important; }
+}
+.promo-tile, .hero-main { border-radius: 14px !important; }
+html:not(.light) .promo-tile { box-shadow: 0 14px 34px rgba(0, 0, 0, .4), inset 0 0 0 1px rgba(255, 255, 255, .06) !important; }
+.upd-tag, .upd-eye { border-radius: 6px !important; }
+
+/* ---------- filter chips ---------- */
+.chip { border-radius: 999px !important; transition: background .2s, box-shadow .2s, color .2s; }
+html:not(.light) .chip { background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .015)) !important; }
+html:not(.light) .chip.on { background: linear-gradient(180deg, rgba(124, 200, 255, .32), rgba(47, 134, 214, .18)) !important; box-shadow: inset 0 0 0 1px rgba(124, 200, 255, .65), 0 0 18px rgba(124, 200, 255, .2) !important; color: #fff !important; }
+
+/* ---------- phone bottom bar: glass, the active tab glows ---------- */
+html:not(.light) .bottom-nav { background: linear-gradient(180deg, #121823, #080a0f) !important; opacity: 1 !important; -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-top: 1px solid rgba(124, 200, 255, .14) !important; }
+.bottom-nav a { border-radius: 12px !important; }
+html:not(.light) .bottom-nav a.on { background: linear-gradient(180deg, rgba(124, 200, 255, .22), rgba(124, 200, 255, .04)) !important; color: #fff !important; box-shadow: inset 0 1px 0 rgba(124, 200, 255, .35); }
+
+/* ---------- modals, toasts, cards that float ---------- */
+html:not(.light) .modal { background: linear-gradient(180deg, #161c27, #0d1118) padding-box, var(--fin-edge) border-box !important; border: 1px solid transparent !important; }
+.modal, .ad-offer, .gate-card { border-radius: 16px !important; }
+html:not(.light) .ad-offer { background: linear-gradient(180deg, #161c27, #0d1118) padding-box, var(--fin-edge) border-box !important; border: 1px solid transparent !important; box-shadow: 0 24px 60px rgba(0, 0, 0, .55) !important; }
+.toast { border-radius: 12px !important; }
+html:not(.light) .gate-card { background: linear-gradient(180deg, #151b26, #0b0e14) padding-box, var(--fin-edge) border-box !important; border: 1px solid transparent !important; }
+.gate-input { border-radius: 10px !important; }
+.gate-tabs, .gate-tabs button { border-radius: 10px !important; }
+
+/* ---------- the game cabinets: rounded and lifted (their colours stay) ---------- */
+.game-host > .slot { border-radius: 16px; }
+.game-host.is-full > .slot { border-radius: 0; }
+.controls { border-radius: 14px !important; }
+.round-btn { border-radius: 10px !important; }
+
+/* ---------- small things ---------- */
+.side-badge, .side-new { border-radius: 6px !important; }
+.jp-chip, .me-chip { border-radius: 999px !important; }
+.foot { background: linear-gradient(180deg, transparent, rgba(124, 200, 255, .04)); }
+::selection { background: rgba(124, 200, 255, .35); }
+html:not(.light) ::-webkit-scrollbar { width: 10px; height: 10px; }
+html:not(.light) ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #2a3546, #1a2230); border-radius: 10px; border: 2px solid #0a0d13; }
+html:not(.light) ::-webkit-scrollbar-track { background: #0a0d13; }
+
+/* ---------- light mode: the same shapes, lighter gradients ---------- */
+html.light body { background: radial-gradient(900px 520px at 10% -8%, rgba(95, 180, 242, .18), transparent 60%), radial-gradient(800px 520px at 105% 20%, rgba(167, 139, 250, .12), transparent 60%), linear-gradient(180deg, #f6f9fd, #edf3f9) fixed; }
+html.light .panel { border-radius: var(--fin-r) !important; background: linear-gradient(180deg, #ffffff, #f7fafd) !important; }
+html.light .side-nav a.on { background: linear-gradient(90deg, rgba(47, 143, 224, .16), transparent) !important; box-shadow: inset 3px 0 0 #2f8fe0 !important; color: #0e1a2b !important; }
+html.light .side-label { background: linear-gradient(90deg, #2f8fe0, #7c3aed); -webkit-background-clip: text; background-clip: text; }
+html.light .btn.primary { color: #fff !important; background: linear-gradient(180deg, #5fb4f2, #2f8fe0 60%, #1d6dbd) !important; }
+
+/* ---------- phones: the home poster stays a compact card ---------- */
+@media (max-width: 760px) {
+  .hero:not(.upd-wrap) .hero-main { min-height: 0 !important; padding: 18px !important; }
+  .hero:not(.upd-wrap) .hero-main h1 { font-size: 28px !important; }
+  .hero:not(.upd-wrap) .hero-main p { font-size: 14px; margin: 8px 0 14px; }
+  .hero:not(.upd-wrap) .hero-cta { flex-wrap: nowrap; }
+  .hero:not(.upd-wrap) .hero-cta .btn { padding: 10px 14px; font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .side-nav a:hover, .game-card:hover .thumb { transform: none; } }
 </style>
 
 <script>

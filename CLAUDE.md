@@ -44,6 +44,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Le Totem Extrême** (`games/totemx.js`) : grille 6×5, totem ×1 ×2 ×3 ×4 ×5 puis en feu ×8 … ×100, FULL SCREEN
   (30 cases scellées) = 21 × la mise × le totem. Réglages vérifiés par simulation : RTP ≈ 92,3 %, achats 43 et 99 fois
   la mise (≈ 87,4 / 88,2 %), full screen ≈ 1 tour sur 1 700, max win ×2 000 ≈ 1 tour sur 55 000.
+- **Finition** (`<style id="finition">`, dernière couche de style de `index.html`) : fond de nuit à deux lumières,
+  panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
+  en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en
+  priorité pour retoucher l'allure générale. Le mode clair a ses propres lignes en bas de cette couche.
+- **Vérification complète** : un robot Playwright parcourt les 20 pages et les 44 jeux sur ordinateur et téléphone,
+  lance une partie dans chaque jeu et relève erreurs, images cassées, débordements et textes « undefined ».
+  À relancer après une grosse modification.
 - **Couvertures** (`covers.js`, `poster()`) : un seul gabarit pour tous les jeux (plaque de titre, Bebas Neue, marque).
   Une image avec un titre peint dedans se déclare dans `CROP` (partie gardée, au-dessus du titre).
 - **Dessins par code en 3D** (`tools/render3d/`, Three.js) : couvertures des jeux sans image peinte et pièces des

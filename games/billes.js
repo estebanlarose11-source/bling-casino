@@ -313,7 +313,8 @@ class BillesGame extends BaseGame {
       let lastRank = 0;
       const step = (ts) => {
         if (this.dead) return res();
-        const k = Math.min(frames.length - 1, Math.floor(((ts - t0) / 1000) * FPS * speed)), f = frames[k];
+        // the first frame's time can be a hair before t0: never ask for frame −1 (it froze the race)
+        const k = Math.max(0, Math.min(frames.length - 1, Math.floor(((ts - t0) / 1000) * FPS * speed))), f = frames[k];
         for (let i = 0; i < NM; i++) { const tr = this.trails[i]; tr.push([f[i * 2], f[i * 2 + 1]]); if (tr.length > 10) tr.shift(); }
         this.frame = f; this.lastT = k / FPS;
         this.draw(f, k / FPS);
