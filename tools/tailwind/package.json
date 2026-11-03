@@ -1,0 +1,9 @@
+{
+  "name": "spinbet-tailwind",
+  "private": true,
+  "type": "module",
+  "description": "Compile le CSS Tailwind du Totem (games/pharaon.js) dans index.html : node build.mjs",
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

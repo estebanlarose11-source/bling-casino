@@ -36,6 +36,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Pas d'effets 3D dans les machines à sous** (choix du propriétaire, `inSlot()` dans la couche d'animations) : ni
   pluie de pièces et gemmes 3D sur les gains, ni médaillon 3D sur les bonus. Les roues et tables gardent les leurs ;
   le grand titre « GROS GAIN ! » reste partout.
+- **Tailwind (essai sur Le Totem)** : `games/pharaon.js` est écrit avec des classes Tailwind préfixées `tw-` (sans remise à
+  zéro de la page). Après une modification de ses classes ou de `tools/tailwind/pharaon.css` :
+  `cd tools/tailwind && npm i && node build.mjs` (recompile `<style id="tw-pharaon">` dans `index.html`). Le préfixe
+  `pt-` est déjà pris par Le Plateau : les pièces du Totem sont en `tm-`.
 - **Couvertures** (`covers.js`, `poster()`) : un seul gabarit pour tous les jeux (plaque de titre, Bebas Neue, marque).
   Une image avec un titre peint dedans se déclare dans `CROP` (partie gardée, au-dessus du titre).
 - **Dessins par code en 3D** (`tools/render3d/`, Three.js) : couvertures des jeux sans image peinte et pièces des
