@@ -7913,6 +7913,7 @@ const WOLF_IMG = { wolf: wimg('huff/wolfplain'), pig1: wimg('huff/pig'), pig2: w
 const GAMES = [
   {
     id: 'big-bad-wolf',
+    colors: ['#4a5fd6', '#161c5c'],
     name: 'Le Loup',
     subtitle: 'Souffle & Spin',
     tags: ['hold', 'featured', 'buy'],
@@ -8006,6 +8007,7 @@ const getGame = (id) => ALL_GAMES.find((g) => g.id === id);
 // Max win: every slot machine stops paying at maxX × the stake for one round (bonus included). Reaching it wins
 // the site's common jackpot (jackpot.js). Read from the "max" shown on the game page (×5 000 → 5000).
 const isSlot = (g) => !!g && (!g.original || g.cat === 'slot');
+ALL_GAMES.forEach((g) => { if (!g.colors) g.colors = ['#7cc8ff', '#1e293b']; }); // posters and accents read g.colors
 ALL_GAMES.forEach((g) => { if (isSlot(g)) g.maxX = parseInt(String(g.max || '').replace(/\D/g, ''), 10) || 5000; });
 const SLOTS = ALL_GAMES.filter(isSlot);
 
