@@ -73,6 +73,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - `duels.js` (page `#duels`) : duels entre amis sur une machine à sous (20/50/100 tours, mise de duel, 24 h).
 - `cashback.js` (page `#cashback`) : chaque jour, 5 à 25 % des pertes de la veille selon le total misé.
 
+- **Événements flash** (`extras.js`) : 3 fois par jour, 30 min, gains ×2 sur une machine à sous (bonus achetés exclus,
+  plafond `FLASH.cap` par joueur), tirés de la date de Paris (`flashesOf`, entre 12 h et 21 h 30, jamais pendant la
+  Happy Hour). Même tirage dans `tools/push/send.mjs` pour la notification : garder les deux identiques.
+- **Vibrations** (`extras.js`) : sur les téléphones qui savent vibrer (Android), à l'arrêt des rouleaux, sur les gains
+  et les bonus ; interrupteur « 📳 Vibrations » dans le menu (`spinbet_vibe`).
+- **Profil public** : `www.spinbetcaz.com/#@pseudo` (`renderPlayer` dans `extras.js`), lu dans `leaderboard`.
+
 ## Arrivée des visiteurs et partage
 
 - **Pas d'écran de connexion à l'arrivée** (`hud.js`) : un nouveau visiteur joue tout de suite en invité. La création

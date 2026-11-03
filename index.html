@@ -4201,6 +4201,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
       <a href="#" data-share-site><span><svg class="ico"><use href="#ui-share"/></svg></span>Partager le site</a>
       <a href="#appli" data-nav="app"><span><svg class="ico"><use href="#ui-app"/></svg></span>Télécharger l’appli</a>
       <a href="#admin" data-nav="admin" data-admin-link hidden><span>🛠️</span>Admin</a>
+      <a href="#" data-vibe hidden><span>📳</span><em>Vibrations : oui</em></a>
       <a href="#" data-theme-toggle><span class="th-ico"><b class="th-sun">☀️</b><b class="th-moon">🌙</b></span><em class="th-sun">Mode clair</em><em class="th-moon">Mode sombre</em></a>
     </nav>
     <div class="side-vip"></div>
@@ -7017,7 +7018,7 @@ function renderProfile(root) {
       <div class="me-main">
         <small class="muted">Profil</small>
         <h1 ${__mods['shop.js']?.nameStyle?.(__mods['shop.js'].publicLook(me)) || ''}>${esc(me.name)}</h1>
-        <div class="me-look">${__mods['shop.js']?.badgeHTML?.(__mods['shop.js'].publicLook(me)) || ''}<a class="btn ghost" href="#boutique">🛍️ Personnaliser mon profil</a></div>
+        <div class="me-look">${__mods['shop.js']?.badgeHTML?.(__mods['shop.js'].publicLook(me)) || ''}<a class="btn ghost" href="#boutique">🛍️ Personnaliser mon profil</a>${profiles.online ? `<a class="btn ghost" href="#@${encodeURIComponent(me.name)}">🌐 Mon profil public</a>` : ''}</div>
         <div class="me-rank"><b>${p.rank.name}</b><span>Niveau ${p.level}${p.level >= MAX_LEVEL ? ' · MAX' : ''}</span>${p.boosted ? `<span class="boost-tag">⚡ XP ×2 · <em data-boost>${fmtWait(boostLeft)}</em></span>` : ''}</div>
         <div class="xp-bar"><div style="width:${(p.pct * 100).toFixed(1)}%"></div></div>
         <div class="xp-row"><span>${p.level >= MAX_LEVEL ? 'Niveau maximum atteint' : `${n0(p.xp)} / ${n0(p.need)} XP`}</span>${p.level < MAX_LEVEL ? `<span>Niveau ${p.level + 1} : <b>+${fmt(levelReward(p.level + 1))}</b></span>` : ''}</div>
@@ -12994,6 +12995,7 @@ async function openPlayer(uid, name, { msgId = null } = {}) {
     acts.push('<button class="btn primary" data-value="gift">💸 Envoyer des KE</button><button class="btn" data-value="at">💬 Lui répondre dans le chat</button>');
   }
   else acts.push('<p class="muted small"><a href="#" class="signup-link" data-signup>Crée un compte</a> (ou connecte-toi) pour envoyer des KE ou écrire dans le chat.</p>');
+  acts.push('<button class="btn" data-value="page">🌐 Page de profil · partager</button>');
   if (m && !self) acts.push('<button class="btn" data-value="report">🚩 Signaler ce joueur</button>');
   if (msgId && (admin || self)) acts.push('<button class="btn" data-value="del">🗑️ Supprimer ce message</button>');
   if (admin && !self) acts.push('<button class="btn" data-value="mute">🔇 Rendre muet</button><button class="btn" data-value="unmute">🔈 Enlever le muet</button>');
@@ -13014,6 +13016,7 @@ async function openPlayer(uid, name, { msgId = null } = {}) {
   const r = await done;
   try {
     if (r === 'me') location.hash = '#profil';
+    if (r === 'page') location.hash = `#@${encodeURIComponent(name || '')}`;
     if (r === 'friend') await __mods['friends.js'].request(uid, name);
     if (r === 'unfriend') await __mods['friends.js'].remove(uid);
     if (r === 'gift' || r === 'at') {
@@ -15134,6 +15137,173 @@ const shareBtn = (gid, w) => (w.x >= LIST_X ? `<button class="gw-share" data-sha
 return { openShare, shareBtn, SHARE_X };
 })();
 
+// ---- extras.js ----
+__mods['extras.js'] = (() => {
+// Three small things that make the site livelier:
+// 1. Vibration (phones that have it, Android): a tap when a reel stops, a buzz on the wins, a longer one on the big
+//    wins and the bonuses. Off with the « 📳 Vibrations » switch (localStorage spinbet_vibe = '0').
+// 2. Événements flash: 3 times a day (same for everybody, drawn from the Paris date), for 30 minutes, the wins of one
+//    slot machine are doubled (bought bonuses excluded), up to FLASH.cap KE per player and per flash (profile.flash).
+//    Never during the Happy Hour (22 h). tools/push/send.mjs sends a notification when one starts (same draw).
+// 3. Profil public: www.spinbetcaz.com/#@pseudo, built from the leaderboard entry (look, rank, records).
+
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { cloud } = __mods['cloud.js'];
+const { getGame, SLOTS } = __mods['games/index.js'];
+const { toast } = __mods['ui.js'];
+const { sfx } = __mods['audio.js'];
+const E = __mods['events.js'];
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const get = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+const put = (k, v) => { try { localStorage.setItem(k, v); } catch { /* ignore */ } };
+
+/* ---------- 1. vibration ---------- */
+const vibeOn = () => get('spinbet_vibe') !== '0' && 'vibrate' in navigator && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+let lastBuzz = 0;
+const buzz = (p) => {
+  if (!vibeOn() || document.hidden) return;
+  const now = performance.now();
+  if (typeof p === 'number' && now - lastBuzz < 40) return; // reels stopping together: one tap each, not a blur
+  lastBuzz = now;
+  try { navigator.vibrate(p); } catch { /* ignore */ }
+};
+const wrap = (name, pattern) => { const f = sfx[name]; if (typeof f === 'function') sfx[name] = (...a) => { buzz(pattern); return f(...a); }; };
+wrap('reelStop', 12);
+wrap('land', 25);
+wrap('win', [30, 40, 30]);
+wrap('bigWin', [80, 60, 120, 60, 200]);
+wrap('jackpot', [120, 60, 120, 60, 300]);
+wrap('feature', [60, 50, 60, 50, 150]);
+wrap('upgrade', 20);
+function setVibe(on) {
+  put('spinbet_vibe', on ? '1' : '0');
+  paintVibe();
+  if (on) buzz([40, 40, 40]);
+  toast(on ? '📳 Vibrations activées' : 'Vibrations coupées', 'info');
+}
+function paintVibe() {
+  const ok = 'vibrate' in navigator;
+  document.querySelectorAll('[data-vibe]').forEach((n) => {
+    n.hidden = !ok;
+    n.querySelector('em').textContent = get('spinbet_vibe') !== '0' ? 'Vibrations : oui' : 'Vibrations : non';
+  });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-vibe]');
+  if (!b) return;
+  e.preventDefault();
+  setVibe(get('spinbet_vibe') === '0');
+});
+paintVibe();
+
+/* ---------- 2. événements flash ---------- */
+const FLASH = { per: 3, minutes: 30, mult: 2, cap: 20000, from: 12, to: 21 };
+// Same draw as tools/push/send.mjs (flashesOf): keep both in step.
+const seedOf = (s) => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) / 4294967296); };
+const POOL = ['fortune', 'cosmic', 'zeus', 'huff', 'candy', 'anubis', 'bling', 'pharaon', 'taco', 'billets', 'dragons', 'labo', 'chasse', 'big-bad-wolf', 'noel', 'totemx'];
+function flashesOf(t = Date.now()) {
+  const p = E.paris(t), key = `${p.y}-${p.m}-${p.d}`, rnd = seedOf(`flash-${key}`);
+  const hours = [];
+  while (hours.length < FLASH.per) { const h = FLASH.from + Math.floor(rnd() * (FLASH.to - FLASH.from + 1)); if (!hours.includes(h)) hours.push(h); }
+  const pool = POOL.filter((g) => getGame(g));
+  return hours.sort((a, b) => a - b).map((h) => {
+    const half = rnd() < 0.5 ? 30 : 0, game = pool[Math.floor(rnd() * pool.length)];
+    const start = E.at(p.y, p.m, p.d, h) + half * 60000;
+    return { key: `${key}-${h}-${half}`, game, start, end: start + FLASH.minutes * 60000 };
+  });
+}
+const flashNow = (t = Date.now()) => flashesOf(t).find((f) => t >= f.start && t < f.end) || null;
+const used = (f) => { const x = profiles.current?.flash; return x && x.key === f.key ? x.paid || 0 : 0; };
+
+let capSaid = '';
+addEventListener('sb:roundend', (e) => {
+  const d = e.detail || {}, f = flashNow();
+  if (!f || d.bought || !(d.win > 0) || d.game !== f.game || !profiles.current) return;
+  const u = used(f), extra = Math.min(Math.round(d.win * (FLASH.mult - 1) * 100) / 100, Math.round((FLASH.cap - u) * 100) / 100);
+  if (extra <= 0) {
+    if (capSaid !== f.key) { capSaid = f.key; toast(`⚡ Tu as touché les ${fmt(FLASH.cap)} de bonus de cet événement flash`, 'info'); }
+    return;
+  }
+  profiles.update('flash', (p) => { p.flash = { key: f.key, paid: Math.round((u + extra) * 100) / 100 }; });
+  wallet.grant(extra);
+  toast(`⚡ Flash ×${FLASH.mult} : +${fmt(extra)} en plus !`, 'ok');
+});
+// announce it to everybody on the site when it starts
+let announced = '';
+setInterval(() => {
+  const f = flashNow();
+  if (!f || announced === f.key) return;
+  announced = f.key;
+  const g = getGame(f.game);
+  if (!location.hash.includes(f.game)) toast(`⚡ ÉVÉNEMENT FLASH : gains ×${FLASH.mult} sur <a href="#game-${f.game}">${esc(g.name)}</a> pendant ${FLASH.minutes} min !`, 'ok');
+  E.paint();
+}, 15000);
+E.addHome((t) => {
+  const f = flashNow(t);
+  if (!f) return '';
+  const g = getGame(f.game);
+  return `<a class="ev-card ev-flash" href="#game-${f.game}" style="--ac:${g.colors[0]}"><span class="ev-ico">⚡</span><div><small><i class="ev-dot"></i>ÉVÉNEMENT FLASH</small><b>Gains ×${FLASH.mult} sur ${esc(g.name)}</b><em>Encore <span data-cd-to="${f.end}">${E.left(f.end - t)}</span> · jusqu’à ${fmt(FLASH.cap)} de bonus</em></div><span class="ev-go">Jouer ›</span></a>`;
+});
+E.addGamePill((gid, t) => {
+  const f = flashNow(t);
+  if (!f || f.game !== gid) return '';
+  return `<span class="ev-pill flash">⚡ <b>Flash ×${FLASH.mult}</b> · encore <span data-cd-to="${f.end}">${E.left(f.end - t)}</span> · bonus touché ${fmt(used(f))} / ${fmt(FLASH.cap)}</span>`;
+});
+
+/* ---------- 3. profil public : #@pseudo ---------- */
+const LINK = (name) => `https://www.spinbetcaz.com/#@${encodeURIComponent(name)}`;
+async function shareProfile(name) {
+  const url = LINK(name), text = `Mon profil SpinBet Casino 🎰 ${name}`;
+  if (navigator.share) { try { await navigator.share({ title: 'SpinBet Casino', text, url }); return; } catch (e) { if (e?.name === 'AbortError') return; } }
+  try { await navigator.clipboard.writeText(url); toast('Lien du profil copié', 'ok'); } catch { prompt('Copie ce lien :', url); }
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-share-profile]');
+  if (!b) return;
+  e.preventDefault();
+  shareProfile(b.dataset.shareProfile || profiles.current?.name || '');
+});
+
+async function renderPlayer(root, name) {
+  const { rankBadge, rankOf } = __mods['progress.js'];
+  const S = __mods['shop.js'];
+  root.innerHTML = `<section class="panel pp"><p class="muted">Chargement du profil de ${esc(name)}…</p></section>`;
+  let e = null;
+  try { e = cloud.enabled ? (await cloud.findPlayer(name))[0] || null : null; } catch { e = null; }
+  if (!root.isConnected) return;
+  if (!e) {
+    root.innerHTML = `<section class="panel pp pp-none"><div class="pp-ico">🕵️</div><h1>${esc(name)}</h1><p class="muted">Aucun joueur avec ce pseudo pour l’instant.</p><a class="btn primary lg" href="#accueil">Jouer sur SpinBet</a></section>`;
+    return;
+  }
+  const lv = e.level || 1, rk = rankOf(lv), me = profiles.online && profiles.store.current === e.uid;
+  const bg = e.bestGame && getGame(e.bestGame), bb = e.bestBonusGame && getGame(e.bestBonusGame);
+  const st = (ico, label, v, sub = '') => `<div class="pp-st"><span>${ico}</span><small>${label}</small><b>${v}</b>${sub ? `<em>${sub}</em>` : ''}</div>`;
+  root.innerHTML = `
+    <section class="panel pp" style="--rk:${rk.color}">
+      <div class="pp-look">${S?.lookHTML?.(e.look, 'xl') || rankBadge(rk, 110)}</div>
+      <h1 ${S?.nameStyle?.(e.look) || ''}>${esc(e.name)}</h1>
+      <div class="pp-rank">${rankBadge(rk, 26)}<b>${rk.name}</b><span>Niveau ${lv}</span>${S?.badgeHTML?.(e.look) || ''}</div>
+      <div class="pp-stats">
+        ${st('💥', 'Plus gros gain', fmt(e.best || 0), bg ? `sur ${esc(bg.name)}` : '')}
+        ${st('🎁', 'Plus gros bonus', fmt(e.bestBonus || 0), bb ? `sur ${esc(bb.name)}` : '')}
+        ${st('🏅', 'Succès', `${e.ach || 0} pts`)}
+        ${st('💰', 'Solde', fmt(e.bal || 0))}
+      </div>
+      <div class="pp-acts">
+        ${me ? '<button class="btn primary lg" data-share-profile>🔗 Partager mon profil</button>'
+          : `${bg ? `<a class="btn primary lg" href="#game-${bg.id}">🎰 Jouer à ${esc(bg.name)}</a>` : '<a class="btn primary lg" href="#accueil">🎰 Jouer sur SpinBet</a>'}
+             ${profiles.online ? `<button class="btn ghost lg" data-player="${esc(e.uid)}" data-pname="${esc(e.name)}">👥 Ajouter en ami · envoyer des KE</button>` : ''}
+             <button class="btn ghost lg" data-share-profile="${esc(e.name)}">🔗 Partager</button>`}
+      </div>
+      <p class="muted small">SpinBet Casino : machines à sous, roues et jeux rapides gratuits, en argent fictif.</p>
+    </section>`;
+}
+
+return { renderPlayer, flashNow, flashesOf, FLASH, shareProfile, buzz };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -15182,6 +15352,7 @@ const routes = [
   { re: /^jackpot$/, page: (r) => __mods['jackpot.js'].renderJackpot(r), nav: 'jackpot' },
   { re: /^duels?$/, page: (r) => __mods['duels.js'].renderDuels(r), nav: 'duels' },
   { re: /^cashback$/, page: (r) => __mods['cashback.js'].renderCashback(r), nav: 'cashback' },
+  { re: /^@(.+)$/, page: (r, m) => __mods['extras.js'].renderPlayer(r, decodeURIComponent(m[1])), nav: 'top' },
 ];
 
 function route() {
@@ -16675,6 +16846,21 @@ html.light .panel { border-radius: var(--fin-r) !important; background: linear-g
 html.light .side-nav a.on { background: linear-gradient(90deg, rgba(47, 143, 224, .16), transparent) !important; box-shadow: inset 3px 0 0 #2f8fe0 !important; color: #0e1a2b !important; }
 html.light .side-label { background: linear-gradient(90deg, #2f8fe0, #7c3aed); -webkit-background-clip: text; background-clip: text; }
 html.light .btn.primary { color: #fff !important; background: linear-gradient(180deg, #5fb4f2, #2f8fe0 60%, #1d6dbd) !important; }
+
+/* ---------- profil public (#@pseudo) and événements flash ---------- */
+.pp { text-align: center; max-width: 640px; margin: 0 auto; padding: 28px 20px !important; background: radial-gradient(420px 220px at 50% 0%, color-mix(in srgb, var(--rk, #7cc8ff) 26%, transparent), transparent 70%), var(--fin-panel) padding-box, var(--fin-edge) border-box !important; }
+.pp-look { display: grid; place-items: center; margin-bottom: 10px; }
+.pp h1 { margin: 6px 0; font: 900 clamp(28px, 6vw, 40px)/1.1 KeCoin, Archivo, sans-serif; }
+.pp-rank { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: rgba(255, 255, 255, .06); margin-bottom: 18px; }
+.pp-rank b { color: var(--rk); }
+.pp-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+.pp-st { display: grid; gap: 2px; padding: 14px 10px; border-radius: 14px; background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .015)); box-shadow: inset 0 0 0 1px rgba(124, 200, 255, .14); }
+.pp-st span { font-size: 22px; } .pp-st small { color: var(--muted); font-size: 12px; } .pp-st b { font: 900 19px KeCoin, Archivo, sans-serif; } .pp-st em { font-style: normal; font-size: 12px; color: var(--muted); }
+.pp-acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.pp-ico { font-size: 56px; }
+.ev-flash { background: linear-gradient(90deg, rgba(250, 204, 21, .22), rgba(249, 115, 22, .12)) !important; border-color: rgba(250, 204, 21, .6) !important; }
+.ev-pill.flash { background: linear-gradient(90deg, rgba(250, 204, 21, .25), rgba(249, 115, 22, .15)); border-color: rgba(250, 204, 21, .6); }
+.side-more [data-vibe] em { font-style: normal; }
 
 /* ---------- « Télécharger l'appli » (pages/app.js getApp) ---------- */
 .ga-back { position: fixed; inset: 0; z-index: 420; display: flex; align-items: flex-end; justify-content: center; padding: 12px; background: rgba(3, 6, 12, .66); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; transition: opacity .25s; }

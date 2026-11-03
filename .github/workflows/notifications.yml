@@ -7,6 +7,7 @@ on:
     - cron: '35 11,12 * * *'   # roue du jour, 13 h 35 à Paris (heure d'été / d'hiver)
     - cron: '35 18,19 * * *'   # tournoi du soir, 20 h 35 à Paris
     - cron: '35 9,10 * * 6'    # tournoi du week-end, samedi 11 h 35 à Paris
+    - cron: '2,32 10-20 * * *' # événements flash (12 h → 21 h 30 à Paris), voir extras.js
   workflow_dispatch:
     inputs:
       title:
