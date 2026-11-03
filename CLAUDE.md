@@ -104,7 +104,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **APK Android** (`android/`, Java, WebView sur le site, sans dépendance) : fabriqué par GitHub Actions
   (`.github/workflows/android.yml`) quand `android/` change, publié dans `app/spinbet.apk` (le bouton APK n'apparaît
   que si ce fichier existe). Les mises à jour du site arrivent toutes seules dans l'appli. Secret GitHub
-  `ANDROID_KEYSTORE` (clé de signature en base64, mot de passe `spinbet-app`) : toujours la même clé, sinon les
+  `APK` (ou `ANDROID_KEYSTORE`, `SPINBET` ; clé de signature en base64, mot de passe `spinbet-app`) : toujours la même clé, sinon les
   téléphones refusent la mise à jour. L'appli se signale par « SpinBetApp » dans le user agent et partage les
   images de gros gain par `window.SpinBetApp.share(dataUrl, texte)`. Pas de notifications dans l'APK.
 

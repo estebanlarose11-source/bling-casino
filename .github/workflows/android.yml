@@ -27,7 +27,7 @@ jobs:
       - name: Clé de signature
         id: key
         env:
-          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE || secrets.ANDROIDKEYSTORE || secrets.SPINBET }}
+          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE || secrets.ANDROIDKEYSTORE || secrets.SPINBET || secrets.APK }}
         run: |
           if [ -z "$ANDROID_KEYSTORE" ]; then
             echo "::warning::Pas de secret ANDROID_KEYSTORE : APK d'essai seulement, non publié sur le site."
