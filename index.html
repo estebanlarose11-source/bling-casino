@@ -93,6 +93,12 @@
 
 * { box-sizing: border-box; }
 html, body { margin: 0; }
+/* phones: the page never slides sideways — only the rows of posters do (their swipe stops at their ends instead of
+   dragging the whole page) */
+html, body { overflow-x: hidden; max-width: 100%; overscroll-behavior-x: none; }
+@supports (overflow: clip) { html, body { overflow-x: clip; } }
+.view, .top, .foot { max-width: 100vw; min-width: 0; }
+.chips, .hero-side, .game-row, .table-scroll, .ln-list, .pf-ladder, .pn-ladder, .pl-road { overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; }
 /* no zoom on phones: quick repeated taps (bet +, spin) must never zoom the page */
 html { touch-action: manipulation; -webkit-text-size-adjust: 100%; }
 * { touch-action: manipulation; }
@@ -688,7 +694,7 @@ section { margin-bottom: 28px; }
   .toast:not(:last-child) { display: none; }
 }
 
-.fx-layer { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 90; }
+.fx-layer { position: fixed; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 90; }
 
 /* ============ VIP / daily ============ */
 .vip-card { background: radial-gradient(500px 200px at 0% 0%, color-mix(in srgb, var(--vip) 25%, transparent), transparent 70%), var(--panel); }
