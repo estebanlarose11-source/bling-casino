@@ -4251,6 +4251,8 @@ __mods['core/pixi.js'] = (() => {
 // turned the animations off, the reels simply turn in HTML as before.
 
 const PX = { stages: new Set() };
+// Phones: no antialiasing (the motion blur hides the edges) and a lighter blur, so the spins stay smooth.
+const PHONE = matchMedia('(max-width: 900px), (pointer: coarse)').matches;
 const usable = () => !!window.PIXI && !matchMedia('(prefers-reduced-motion: reduce)').matches && !document.body.classList.contains('ml-off');
 const load = () => { try { return window.__loadPixi?.() || Promise.reject(new Error('no pixi')); } catch (e) { return Promise.reject(e); } };
 
@@ -4357,8 +4359,10 @@ class Stage {
     const PIXI = window.PIXI;
     this.host = host;
     if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
-    this.app = new PIXI.Application({ backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, width: 10, height: 10 });
+    this.app = new PIXI.Application({ backgroundAlpha: 0, antialias: !PHONE, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, width: 10, height: 10, powerPreference: 'high-performance' });
     const cv = this.app.view;
+    // the browser took the context back (too many open on the phone…): this stage stops and the reels turn in HTML
+    cv.addEventListener('webglcontextlost', (e) => { if (this.destroying) return; e.preventDefault(); this.lost = true; PX.broken = true; this.cols.clear(); this.parts = []; cv.remove(); });
     cv.className = 'px-stage';
     host.appendChild(cv);
     this.cols = new Set();
@@ -4370,7 +4374,7 @@ class Stage {
     baseTextures();
     this.resize();
   }
-  get alive() { return this.host.isConnected; }
+  get alive() { return this.host.isConnected && !this.lost; }
   resize() {
     const w = Math.max(10, Math.round(this.host.clientWidth)), h = Math.max(10, Math.round(this.host.clientHeight));
     if (w !== this.w || h !== this.h) { this.w = w; this.h = h; this.app.renderer.resize(w, h); }
@@ -4388,7 +4392,7 @@ class Stage {
       if (!this.alive) { this.destroy(); return; }
       const dt = Math.min(120, now - last); last = now;
       this.step(dt, now);
-      this.app.render();
+      try { this.app.render(); } catch (e) { this.lost = true; PX.broken = true; }
       if (this.cols.size || this.parts.length) requestAnimationFrame(tick);
       else { this.loopOn = false; this.app.render(); }
     };
@@ -4402,12 +4406,16 @@ class Stage {
       p.upd(p, p.t / p.life, dt, now);
     }
   }
-  add(sprite, life, upd, done) { this.fx.addChild(sprite); this.parts.push({ s: sprite, t: 0, life, upd, done }); this.kick(); }
+  add(sprite, life, upd, done) {
+    if (!this.alive || this.fx.destroyed) { sprite.destroy(); return; }
+    this.fx.addChild(sprite); this.parts.push({ s: sprite, t: 0, life, upd, done }); this.kick();
+  }
 
   /* ----- one spinning column ----- */
   // cells: HTML of the whole strip, top to bottom; returns null if a picture is not ready (HTML fallback).
   column(reelEl, cellsHTML, rows) {
     const PIXI = window.PIXI;
+    if (!this.alive) return null;
     const tex = cellsHTML.map(texFor);
     if (tex.some((t) => !t)) return null;
     this.resize();
@@ -4430,7 +4438,7 @@ class Stage {
       strip.addChild(s);
     });
     box.addChild(strip);
-    const blur = new PIXI.BlurFilter(0, 3, 1);
+    const blur = new PIXI.BlurFilter(0, PHONE ? 2 : 3, 1);
     blur.blurX = 0;
     const shade = new PIXI.ColorMatrixFilter();
     strip.filters = [blur, shade];
@@ -4446,6 +4454,7 @@ class Stage {
     const col = {
       r, ch, strip, blur, shade, lastY: 0, first: true,
       set: (y) => {
+        if (strip.destroyed) return; // the stage was dropped mid-spin (lost context): the reel finishes in HTML
         const v = col.first ? 0 : Math.abs(y - col.lastY); col.first = false; col.lastY = y;
         strip.y = y;
         const speed = Math.min(1, v / (ch * 0.9));
@@ -4454,7 +4463,7 @@ class Stage {
         for (const s of strip.children) s.height = s.baseH * st;
         shade.brightness(1 + speed * 0.18, false);
       },
-      end: () => { this.cols.delete(col); box.destroy({ children: true }); mask.destroy(); this.kick(); },
+      end: () => { this.cols.delete(col); if (!box.destroyed) box.destroy({ children: true }); if (!mask.destroyed) mask.destroy(); if (this.alive) this.kick(); },
     };
     this.cols.add(col);
     this.kick();
@@ -4464,12 +4473,12 @@ class Stage {
   // one symbol falling into its cell (cascade grids): motion blur while it falls, then the HTML cell takes over
   drop(cellEl, html, fromDy, dur, ease, clip) {
     const PIXI = window.PIXI, t = texFor(html);
-    if (!t || t.empty) return null;
+    if (!t || t.empty || !this.alive) return null;
     const r = this.rectOf(cellEl), [bx, by, bw, bh] = t.box, side = Math.min(bw * r.w, bh * r.h);
     const s = new PIXI.Sprite(t.tex);
     s.anchor.set(0.5); s.width = s.height = side;
     const x = r.x + (bx + bw / 2) * r.w, y = r.y + (by + bh / 2) * r.h;
-    const blur = new PIXI.BlurFilter(0, 2, 1); blur.blurX = 0; s.filters = [blur];
+    const blur = new PIXI.BlurFilter(0, PHONE ? 1 : 2, 1); blur.blurX = 0; s.filters = [blur];
     const c = clip && this.rectOf(clip);
     let m = null;
     if (c) { m = new PIXI.Graphics().beginFill(0xffffff).drawRect(c.x, c.y, c.w, c.h).endFill(); this.app.stage.addChildAt(m, 0); s.mask = m; }
@@ -4483,9 +4492,9 @@ class Stage {
       const f = (now) => {
         const q = Math.min(1, (now - t0) / dur), yy = y + fromDy * (1 - ease(q));
         const v = Math.abs(yy - last); last = yy;
-        s.y = yy; blur.blurY = Math.min(r.h * 0.25, v * 0.9); s.height = side * (1 + Math.min(0.25, v / r.h));
+        if (!s.destroyed) { s.y = yy; blur.blurY = Math.min(r.h * 0.25, v * 0.9); s.height = side * (1 + Math.min(0.25, v / r.h)); }
         if (q < 1 && this.alive) return requestAnimationFrame(f);
-        this.cols.delete(col); s.destroy(); m?.destroy(); this.kick(); res();
+        this.cols.delete(col); if (!s.destroyed) s.destroy(); if (m && !m.destroyed) m.destroy(); if (this.alive) this.kick(); res();
       };
       requestAnimationFrame(f);
       this.kick();
@@ -4583,12 +4592,14 @@ class Stage {
     rects.forEach((r, k) => {
       const sw = new PIXI.Sprite(BEAM); sw.anchor.set(0.5); sw.blendMode = PIXI.BLEND_MODES.ADD; sw.rotation = 0.6; sw.width = r.w * 0.35; sw.height = r.h * 1.6; sw.alpha = 0;
       const m = new PIXI.Graphics().beginFill(0xffffff).drawRect(r.x, r.y, r.w, r.h).endFill();
+      if (!this.alive) { m.destroy(); sw.destroy(); return; }
       this.fx.addChild(m); sw.mask = m;
       this.add(sw, 700, (p, q) => { const qq = Math.max(0, q - (k % 6) * 0.05); p.s.x = r.x - r.w * 0.3 + qq * r.w * 1.6; p.s.y = r.y + r.h / 2; p.s.alpha = 0.32 * Math.sin(Math.min(1, qq) * Math.PI); }, done);
     });
   }
   clear() { this.winId = (this.winId || 0) + 1; this.kick(); }
   destroy() {
+    this.destroying = true; // Pixi frees its own context here: that is not a loss
     PX.stages.delete(this);
     this.cols.clear(); this.parts = [];
     try { this.app.destroy(true, { children: true }); } catch { /* ignore */ }
@@ -4599,7 +4610,7 @@ class Stage {
 const STAGES = new WeakMap();
 function stageFor(host) {
   for (const s of PX.stages) if (!s.alive) s.destroy();
-  if (!host || !usable()) { if (!window.PIXI) load().catch(() => {}); return null; }
+  if (!host || !usable() || PX.broken) { if (!window.PIXI) load().catch(() => {}); return null; }
   let s = STAGES.get(host);
   if (s && s.alive) return s;
   try { s = new Stage(host); } catch (e) { console.warn('Pixi off', e); PX.broken = true; return null; }
@@ -12541,7 +12552,7 @@ function stage(host, { fov = 30, aspect = 1, cls = '' } = {}) {
     if (S.disposed) return; S.disposed = true; S.dead = true;
     ro.disconnect(); io.disconnect(); document.removeEventListener('visibilitychange', kick);
     scene.traverse((o) => { if (o.isMesh) { o.geometry.dispose(); (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { m.map?.dispose(); m.dispose(); }); } });
-    scene.environment?.dispose(); r.dispose(); cv.remove();
+    scene.environment?.dispose(); r.dispose(); r.forceContextLoss(); cv.remove(); // the context is freed now, not at the next GC
   };
   requestAnimationFrame(() => { size(); kick(); });
   return S;
@@ -15458,7 +15469,7 @@ body:not(.ml-off) .spin-btn::before { content: ''; position: absolute; inset: -6
 <style id="three-layer-css">
 #tl-bg { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0; transition: opacity 1.2s; }
 #tl-bg.on { opacity: 1; }
-#tl-win { position: fixed; inset: 0; z-index: 9990; pointer-events: none; }
+#tl-win { position: fixed; inset: 0; z-index: 9990; pointer-events: none; width: 100%; height: 100%; }
 #tl-fx { position: fixed; inset: 0; z-index: 9989; pointer-events: none; width: 100%; height: 100%; }
 body.ml-off #tl-fx { display: none; }
 body.ml-off #tl-bg, body.ml-off #tl-win { display: none; }
@@ -16374,6 +16385,9 @@ window.__init3D = () => {
   };
   const mesh = (geo, mat, s = 1) => { const m = new THREE.Mesh(geo, mat); m.scale.setScalar(s); return m; };
   const group = (...ch) => { const g = new THREE.Group(); ch.forEach((c) => g.add(c)); return g; };
+  // Frees what one fallen object owns on the GPU (its own canvas textures); the shared coin texture, geometries and
+  // shader programs stay, so the next shower starts at once.
+  const disposeObj = (o) => o.traverse((c) => { if (c.isMesh) (Array.isArray(c.material) ? c.material : [c.material]).forEach((m) => { if (m.map && m.map !== coinTex) m.map.dispose(); }); });
   const MAKE = {
     coin: () => mesh(G.coin, M.coin(), rnd(0.5, 0.8)),
     chip: () => { const c = pick(['#d42a3c', '#2a6ae0', '#1fa356', '#111827', '#7a3ab8']); const t = chipTex(c); const side = M.color(c, 0.1, 0.5); const face = std({ map: t, roughness: 0.5 }); return mesh(G.chip, [side, face, face], rnd(0.5, 0.7)); },
@@ -16429,10 +16443,9 @@ window.__init3D = () => {
 
   /* ---------- background scene ---------- */
   const cv = Object.assign(document.createElement('canvas'), { id: 'tl-bg' });
-  let renderer;
-  try { renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: !MOBILE, powerPreference: 'low-power' }); } catch { cv.remove(); return; }
-  renderer.setPixelRatio(Math.min(MOBILE ? 1.25 : 1.6, devicePixelRatio || 1));
-  renderer.outputEncoding = THREE.sRGBEncoding;
+  // The 3D background was removed (go() and start() do nothing): no WebGL context is opened for it, phones only
+  // allow a few at once (the reels, the coin shower and the bonus layer need theirs).
+  const renderer = { setSize() {}, render() {} };
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
   camera.position.set(0, 0, 10);
@@ -16512,17 +16525,25 @@ window.__init3D = () => {
   function shower(ratio) {
     if (off()) return;
     const n = Math.round(Math.min(MOBILE ? 50 : 90, 14 + ratio * 1.2));
+    // One renderer (one WebGL context) for the whole visit, hidden between showers. Opening a new one for every
+    // big win piled up contexts: phones then dropped the oldest ones (the WebGL reels) and stuttered at each win.
     if (!win) {
       const c = Object.assign(document.createElement('canvas'), { id: 'tl-win' });
       document.body.appendChild(c);
-      const r = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: !MOBILE });
-      r.setPixelRatio(Math.min(1.5, devicePixelRatio || 1)); r.outputEncoding = THREE.sRGBEncoding;
+      let r;
+      try { r = new THREE.WebGLRenderer({ canvas: c, alpha: true, antialias: !MOBILE }); } catch { c.remove(); return; }
+      r.setPixelRatio(Math.min(MOBILE ? 1.25 : 1.5, devicePixelRatio || 1)); r.outputEncoding = THREE.sRGBEncoding;
       const s = new THREE.Scene(), cam = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 60);
       cam.position.z = 14; s.add(new THREE.AmbientLight(0xffffff, 0.6)); const d = new THREE.DirectionalLight(0xffffff, 1.1); d.position.set(3, 5, 8); s.add(d);
       const p = new THREE.PointLight(0xfbbf24, 2.5, 40); p.position.set(0, 2, 6); s.add(p);
-      win = { c, r, s, cam, list: [], raf: 0 };
-      r.setSize(innerWidth, innerHeight, false);
+      win = { c, r, s, cam, list: [], raf: 0, w: 0, h: 0 };
+      c.addEventListener('webglcontextlost', (e) => { e.preventDefault(); if (win?.c === c) { cancelAnimationFrame(win.raf); c.remove(); win = null; } });
     }
+    if (win.w !== innerWidth || win.h !== innerHeight) {
+      win.w = innerWidth; win.h = innerHeight;
+      win.r.setSize(innerWidth, innerHeight, false); win.cam.aspect = innerWidth / innerHeight; win.cam.updateProjectionMatrix();
+    }
+    win.c.style.display = '';
     const th = T[themeNow()], extra = th.mix.filter((m) => m[0] !== 'coin' && !['moon', 'star', 'planet', 'cloud', 'house', 'rock'].includes(m[0]));
     const h = 2 * Math.tan((win.cam.fov * Math.PI) / 360) * win.cam.position.z, w = h * win.cam.aspect;
     for (let i = 0; i < n; i++) {
@@ -16543,11 +16564,11 @@ window.__init3D = () => {
           o.rotation.x += u.spin[0] * dt; o.rotation.y += u.spin[1] * dt; o.rotation.z += u.spin[2] * dt;
           if (u.t > u.life) o.userData.dead = true;
         }
-        win.list.filter((o) => o.userData.dead || o.position.y < o.userData.floor).forEach((o) => { win.s.remove(o); });
+        win.list.filter((o) => o.userData.dead || o.position.y < o.userData.floor).forEach((o) => { win.s.remove(o); disposeObj(o); });
         win.list = win.list.filter((o) => !o.userData.dead && o.position.y >= o.userData.floor);
         win.r.render(win.s, win.cam);
         if (win.list.length) win.raf = requestAnimationFrame(tick);
-        else { win.r.dispose(); win.c.remove(); win = null; }
+        else { win.raf = 0; win.r.clear(); win.c.style.display = 'none'; } // kept for the next shower
       };
       win.raf = requestAnimationFrame(tick);
     }
@@ -16596,12 +16617,14 @@ window.__init3D = () => {
     const size = () => { r.setSize(innerWidth, innerHeight, false); cam.aspect = innerWidth / innerHeight; cam.updateProjectionMatrix(); };
     size(); addEventListener('resize', size);
     fxw = { c, r, s, cam, glint, items: [], raf: 0, idle: 0, size };
+    c.addEventListener('webglcontextlost', (e) => { e.preventDefault(); if (fxw?.c === c) { cancelAnimationFrame(fxw.raf); removeEventListener('resize', size); c.remove(); fxw = null; } });
     return fxw;
   }
   const view = () => { const h = 2 * Math.tan((fxw.cam.fov * Math.PI) / 360) * fxw.cam.position.z; return { h, w: h * fxw.cam.aspect }; };
   const toWorld = (px, py) => { const { w, h } = view(); return [(px / innerWidth - 0.5) * w, -(py / innerHeight - 0.5) * h]; };
   function fxRun() {
     if (!fxw || fxw.raf) return;
+    fxw.c.style.display = '';
     let t0 = performance.now();
     const tick = (now) => {
       fxw.raf = 0;
@@ -16611,7 +16634,7 @@ window.__init3D = () => {
       if (aura.until > now) auraSpawn(dt);
       fxw.r.render(fxw.s, fxw.cam);
       if (fxw.items.length || aura.until > now) { fxw.idle = 0; fxw.raf = requestAnimationFrame(tick); }
-      else { removeEventListener('resize', fxw.size); fxw.s.environment?.dispose(); fxw.r.dispose(); fxw.c.remove(); fxw = null; }
+      else { fxw.r.clear(); fxw.c.style.display = 'none'; } // kept (one WebGL context) for the next bonus
     };
     fxw.raf = requestAnimationFrame(tick);
   }
