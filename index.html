@@ -8092,6 +8092,7 @@ const ORIGINALS = [
   {"id": "robots", "name": "La Course", "cat": "quick", "tag": "Course", "sub": "Parie sur le vainqueur ou le podium", "colors": ["#22d3ee", "#0a1020"], "description": "Six robots, une piste néon et 15 secondes de suspense. Avant chaque course, chaque robot reçoit sa forme du jour et sa cote : parie sur le vainqueur pour une grosse cote, ou sur le podium pour jouer plus sûr.", "features": ["6 robots", "Pari Vainqueur ou Podium", "Cotes jusqu’à ×11,87", "Forme qui change à chaque course", "Course animée de 15 secondes"], "rtp": "95 %", "vol": 3, "max": "×11,87"},
   {"id": "poulet", "name": "Le Poulet", "cat": "quick", "tag": "Instantané", "sub": "Traverse la route, voie après voie", "colors": ["#facc15", "#14200c"], "description": "Aide le poulet à traverser la route ! Chaque voie franchie fait grimper le multiplicateur, mais si une voiture arrive, c’est perdu. Choisis ta difficulté et encaisse quand tu veux.", "features": ["4 difficultés", "Jusqu’à 24 voies", "Encaisse quand tu veux", "Multiplicateur à chaque voie"], "rtp": "96 %", "vol": 4, "max": "×2 041"},
   {"id": "chasse", "name": "The Hunt", "cat": "slot", "tag": "Machine à sous", "sub": "Cartouches, chasse et cerf doré", "colors": ["#84cc16", "#1a2e05"], "description": "The Hunt : la saison de chasse est ouverte sur 5 rouleaux et 243 façons de gagner ! Lapins, canards, faisans, sangliers et cerfs paient en ligne, le cerf doré est WILD. 3 cartouches de fusil ouvrent la chasse avec 3 tirs, 4 cartouches la grande chasse avec 5 tirs : chaque animal touché paie ×2 à ×250 la mise, et le cerf doré vaut ×500.", "features": ["5 rouleaux · 243 façons", "3 cartouches : la chasse, 3 tirs", "4 cartouches : la grande chasse, 5 tirs", "Animaux ×2 à ×250, cerf doré ×500", "Achat de la chasse"], "rtp": "≈ 92,6 %", "vol": 4, "max": "×5 000"},
+  {"id": "noel", "name": "La Tournée du Père Noël", "cat": "slot", "tag": "Machine à sous", "sub": "Traîneau WILD qui monte jusqu’à ×8", "colors": ["#ef4444", "#1e3a8a"], "description": "Le Père Noël part pour sa tournée au-dessus des plaines enneigées ! Une grande machine de 5 rouleaux et 7 rangées, 16 807 façons de gagner. 3 lettres au Père Noël lancent La Tournée : de nuit, sous les aurores boréales, le traîneau WILD tombe et monte jusqu’en haut de sa colonne, de ×2 à ×8, et les multiplicateurs se multiplient. 6 boules de neige lancent le bonus Boules de neige : elles restent, le lutin double tout, le Père Noël ramasse tout, et la grille pleine paie le GRAND ×1 000.", "features": ["5 × 7 · 16 807 façons", "Traîneau WILD qui monte : ×2 à ×8", "Multiplicateurs qui se multiplient", "Boules de neige : lutin, Père Noël, MINI, MAXI, GRAND", "2 achats de bonus"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Chaque cube posé multiplie ta mise, mais gare aux cubes ratés et aux coups de vent.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Bonus PARFAIT", "Encaisse quand tu veux"], "rtp": "96 % (visée parfaite)", "vol": 4, "max": "×125,8"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
@@ -8489,6 +8490,10 @@ const SPECS = {
     bg: ['#2f4a12', '#071006'], light: '#fde047', title: ['THE HUNT'], font: 'bebas', metal: ['#fff', '#fde68a', '#ca8a04'], tag: 'CERF DORÉ ×500', photo: 'assets/games/chasse/cover.webp',
     art: () => '',
   },
+  noel: {
+    bg: ['#7f1d1d', '#0b1a3a'], light: '#fde68a', title: ['LA TOURNÉE', 'DU PÈRE NOËL'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'WILD ×8', photo: 'assets/games/noel/cover.webp',
+    art: () => '',
+  },
   poulet: { photo: 'assets/games/poulet/cover.webp',
     bg: ['#3a3a0a', '#06070a'], light: '#facc15', title: ['LE POULET'], font: 'bebas', metal: ['#fff', '#fde047', '#ca8a04'], tag: 'JUSQU’À ×2 041',
     art: (u) => `
@@ -8588,7 +8593,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  chasse: ['#65a30d', '#14532d'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
+  chasse: ['#65a30d', '#14532d'], noel: ['#ef4444', '#1e3a8a'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
 };
 // the wheel games' salons wear their game's poster, with the ONLINE ribbon
 ['madwheel', 'plateau', 'peche', 'roueor'].forEach((id) => { SPECS[`${id}-online`] = { ...SPECS[id], online: true, tag: 'ONLINE' }; if (CARD[id]) CARD[`${id}-online`] = CARD[id]; });
@@ -8695,6 +8700,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'noel', date: '2026-11-03', title: 'Nouvelle machine de Noël', isNew: true, items: ['Une grande machine de 7 rangées devant une plaine enneigée qui défile, avec des flocons qui tombent', 'La Tournée : 3 lettres au Père Noël, des tours gratuits de nuit sous les aurores boréales', 'Le traîneau WILD tombe et monte jusqu’en haut de sa colonne : ×2 à ×8, et les multiplicateurs se multiplient', 'Boules de neige : elles restent, le lutin double tout, le Père Noël ramasse tout, la grille pleine paie ×1 000'] },
   { game: 'big-bad-wolf', date: '2026-11-03', title: 'Rouleaux plus spectaculaires', items: ['Rouleaux plus fluides et plus spectaculaires : ils filent à toute vitesse et chaque rouleau s’arrête dans un éclat de lumière', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
   { game: 'fortune', date: '2026-11-03', title: 'Rouleaux plus spectaculaires', items: ['Rouleaux plus fluides et plus spectaculaires : ils filent à toute vitesse et chaque rouleau s’arrête dans un éclat de lumière', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
   { game: 'labo', date: '2026-11-03', title: 'Rouleaux plus spectaculaires', items: ['Rouleaux plus fluides et plus spectaculaires : ils filent à toute vitesse et chaque rouleau s’arrête dans un éclat de lumière', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
@@ -9755,6 +9761,7 @@ class Music {
 
 // Themes for the games that had no music of their own.
 const EXTRA_THEMES = {
+  noel: { sd: 0.16, len: 32, root: 261.63, lead: { wave: 'triangle', vol: 0.055, dur: 0.2, pat: [16, null, 16, null, 16, null, null, null, 16, null, 16, null, 16, null, null, null, 16, null, 19, null, 12, null, null, 14, 16, null, null, null, null, null, null, null] }, bass: { wave: 'sine', vol: 0.13, dur: 0.3, pat: [-12, null, null, null, -5, null, null, null, -12, null, null, null, -5, null, null, null, -12, null, null, null, -7, null, null, null, -5, null, null, null, -12, null, null, null] }, comp: { wave: 'square', vol: 0.012, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [0, 4, 7], 14: [0, 4, 7], 18: [0, 4, 7], 22: [-3, 0, 5], 26: [-1, 2, 7], 30: [0, 4, 7] } }, hat: [2, 6, 10, 14, 18, 22, 26, 30], hv: 0.03, kick: [0, 8, 16, 24], kv: 0.14 },
   chasse: { sd: 0.18, len: 16, root: 196, lead: { wave: 'triangle', vol: 0.05, dur: 0.22, pat: [12, null, 14, 16, null, 19, null, 16, 14, null, 12, null, 9, null, 12, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.3, pat: [-12, null, null, -5, null, null, -12, null, -7, null, null, -5, null, null, -7, null] }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.018 },
   zeus: { sd: 0.24, len: 16, root: 130.81, pad: { wave: 'sawtooth', vol: 0.018, dur: 1.8, map: { 0: [0, 7, 12], 8: [-2, 5, 10] } }, lead: { wave: 'triangle', vol: 0.055, dur: 0.3, pat: [12, null, 15, 19, null, 17, 15, null, 14, null, 17, 22, null, 19, 17, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.5, pat: [-12, null, null, -12, null, null, -5, null, -14, null, null, -14, null, null, -7, null] }, kick: [0, 3, 8, 11], hat: [4, 12], kv: 0.26, hv: 0.02 },
   candy: { sd: 0.16, len: 16, root: 293.66, lead: { wave: 'triangle', vol: 0.06, dur: 0.2, pat: [12, 16, 19, 24, null, 19, 21, null, 17, 21, 24, 29, null, 24, 19, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.28, pat: [-12, null, -5, null, -12, null, -5, null, -7, null, 0, null, -7, null, -3, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.1, map: { 2: [0, 4, 7], 6: [0, 4, 9], 10: [-3, 0, 5], 14: [-5, -1, 2] } }, kick: [0, 8], hat: [2, 6, 10, 14], kv: 0.15, hv: 0.018 },
@@ -11518,6 +11525,7 @@ const FILES = {
   'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '17ab6a334a'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '6f6628b9f9'],
+  noel: ['noel', 'games/impl/noel.js', 'NoelGame', '494e5d3f25'],
 };
 const loading = {};
 
@@ -12220,6 +12228,7 @@ const LIST = [
   ['dragons', [['A', 'Vol des dragons', T(/^VOL DES DRAGONS/)], ['S', 'Super Bonus', T(/^SUPER BONUS/)]]],
   ['labo', [['m', 'La Mallette', T(/^LA MALLETTE/)], ['d', 'La Descente', T(/^LA DESCENTE/)]]],
   ['fortune', [['h', 'Hold & Spin', T(/^HOLD/)], ['m', 'Méga Bonus', T(/^MÉGA BONUS/)]]],
+  ['noel', [['fs', 'La Tournée', T(/^LA TOURNÉE/)], ['b', 'Boules de neige', T(/^BOULES DE NEIGE/)]]],
   ['madwheel', [['cf', 'Pile ou Face'], ['ch', 'Tir aux Cibles'], ['pa', 'Pachinko'], ['ct', 'Méga Folie']]],
   ['plateau', [['b2', 'Bonus 2 lancers'], ['b4', 'Bonus 4 lancers']]],
   ['peche', [['fb', 'Poisson bleu'], ['fo', 'Poisson orange'], ['fr', 'Poisson rouge']]],
@@ -16029,6 +16038,96 @@ html.light .slot small { color: inherit; }
 .ch-pay .ch-img { width: 100%; height: 100%; }
 .ch-pay .ch-card { width: 50px; height: 50px; } .ch-pay .ch-shell { width: 45%; height: 100%; } .ch-pay .ch-wild { font-size: 9px; padding: 0 5px; }
 @media (max-width: 600px) { .ch-corner { width: 18px; height: 18px; } .ch-corner::after { inset: 6px; } .g-chasse .rs { gap: 3px; } .ch-reels { border-radius: 12px; } .g-chasse .rs-cell::before { border-radius: 7px; } }
+/* ============ La Tournée du Père Noël (machine à sous 5×7, fond vidéo) ============ */
+.g-noel { --slot-bg: linear-gradient(180deg, #a9c1dd, #efe1cf); }
+.slot.g-noel.nl-slot > .slot-bg { background: #b9cbe0 url(assets/games/noel/bg.webp?v=1) center / cover no-repeat !important; overflow: hidden; filter: none; border-radius: inherit; }
+.slot.g-noel.nl-slot > .slot-bg::after { display: none; }
+.nl-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; transition: filter 1.4s ease; }
+.nl-shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(8, 18, 44, .25), rgba(8, 18, 44, 0) 22%, rgba(8, 18, 44, 0) 70%, rgba(8, 18, 44, .5)); }
+.nl-snow { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.nl-snow i { position: absolute; top: -10px; width: var(--s); height: var(--s); border-radius: 50%; background: #fff; opacity: .85; box-shadow: 0 0 6px rgba(255, 255, 255, .8); animation: nlSnow var(--d) linear infinite; }
+@keyframes nlSnow { to { transform: translate(var(--x), 110vh); } }
+.nl-aurora { position: absolute; inset: 0 0 45% 0; opacity: 0; pointer-events: none; transition: opacity 1.4s ease; mix-blend-mode: screen; }
+.nl-aurora i { position: absolute; left: -20%; right: -20%; height: 46%; border-radius: 50%; filter: blur(26px); animation: nlAurora 9s ease-in-out infinite alternate; }
+.nl-aurora i:nth-child(1) { top: 8%; background: linear-gradient(90deg, transparent, rgba(52, 211, 153, .75), rgba(45, 212, 191, .5), transparent); }
+.nl-aurora i:nth-child(2) { top: 26%; background: linear-gradient(90deg, transparent, rgba(167, 139, 250, .55), rgba(52, 211, 153, .55), transparent); animation-duration: 12s; animation-delay: -4s; }
+.nl-aurora i:nth-child(3) { top: 0; background: linear-gradient(90deg, transparent, rgba(110, 231, 183, .45), transparent 70%); animation-duration: 15s; animation-delay: -7s; }
+@keyframes nlAurora { from { transform: translateX(-8%) skewX(-12deg) scaleY(.8); } to { transform: translateX(8%) skewX(10deg) scaleY(1.15); } }
+.slot.g-noel.nl-night .nl-video { filter: brightness(.36) saturate(.55) hue-rotate(185deg) contrast(1.15); }
+.slot.g-noel.nl-night .nl-aurora { opacity: 1; }
+.slot.g-noel.nl-night > .slot-bg { background-color: #0b1530 !important; }
+.g-noel.nl-slot .slot-title { display: none !important; }
+.g-noel.nl-slot .slot-head { margin-bottom: 0; justify-content: center; min-height: 0; }
+.g-noel.nl-slot > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.g-noel.nl-slot > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; position: relative; }
+.g-noel.nl-slot { padding-top: 10px; }
+.g-noel.nl-slot .controls { background: rgba(10, 22, 52, .55); border-color: rgba(255, 255, 255, .28); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.g-noel.nl-slot .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.g-noel.nl-slot .win-bar .msg:empty { display: none; }
+.g-noel .nl-x { color: #fde047; }
+/* the video fills a wide card: the tall grid stays in the middle */
+.game-host:not(.is-full):has(> .g-noel.nl-slot) { max-width: 1100px; }
+.game-host.is-full > .slot.g-noel { max-width: none; border-radius: 0; }
+@media (max-width: 600px) {
+  .game-host:not(.is-full):has(> .g-noel.nl-slot) { margin-left: -12px; margin-right: -12px; }
+  .slot.g-noel.nl-slot { padding-left: 4px; padding-right: 4px; }
+}
+@media (prefers-reduced-motion: reduce) { .nl-snow, .nl-aurora i { animation: none; } .nl-snow { display: none; } }
+/* the tall machine: frosted glass reels, a snow cap on top, the plain seen through */
+.nl-reels { position: relative; width: fit-content; max-width: 100%; margin: 14px auto 0; padding: clamp(6px, 1.2vw, 12px); border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .22), rgba(186, 214, 255, .1)); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .55), inset 0 0 0 5px rgba(185, 28, 28, .55), inset 0 0 0 7px rgba(253, 230, 138, .55), 0 20px 50px rgba(5, 12, 35, .45); }
+.nl-cap { position: absolute; left: -6px; right: -6px; top: -14px; height: 26px; z-index: 7; pointer-events: none; border-radius: 16px 16px 10px 10px;
+  background: radial-gradient(14px 12px at 8% 100%, #fff 98%, transparent) , radial-gradient(18px 14px at 30% 100%, #fff 98%, transparent), radial-gradient(16px 12px at 55% 100%, #fff 98%, transparent), radial-gradient(20px 14px at 80% 100%, #fff 98%, transparent), linear-gradient(180deg, #fff, #e8f1ff);
+  box-shadow: 0 4px 10px rgba(30, 58, 138, .35); }
+.g-noel .rs.nl-rs { position: relative; aspect-ratio: calc(var(--cols) / var(--rows)); width: min(calc(100vw - 32px), calc((100vh - var(--chrome) + 210px) * var(--cols) / var(--rows))); min-width: min(calc(100vw - 32px), 250px); gap: 4px; }
+.g-noel .rs-reel { border-radius: 10px; background: linear-gradient(180deg, rgba(14, 30, 70, .34), rgba(20, 40, 90, .2) 50%, rgba(14, 30, 70, .34)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); }
+.g-noel .rs-reel::before { background: linear-gradient(rgba(8, 18, 44, .35), transparent); height: 7%; }
+.g-noel .rs-reel::after { background: linear-gradient(transparent, rgba(8, 18, 44, .35)); height: 7%; }
+.g-noel .rs-cell { --tg: rgba(255, 255, 255, .12); }
+.g-noel .rs-cell::before { content: ''; position: absolute; inset: 4%; z-index: 0; border-radius: 9px; background: radial-gradient(circle at 50% 45%, var(--tg), transparent 70%); transition: box-shadow .25s; }
+.g-noel .rs-cell > * { position: relative; z-index: 1; }
+.g-noel .rs-cell.p12, .g-noel .rs-cell.p13 { --tg: rgba(248, 113, 113, .4); } .g-noel .rs-cell.p9, .g-noel .rs-cell.p10, .g-noel .rs-cell.p11 { --tg: rgba(253, 230, 138, .3); }
+.g-noel .rs-cell.wild { --tg: rgba(253, 224, 71, .55); } .g-noel .rs-cell.scat { --tg: rgba(239, 68, 68, .5); } .g-noel .rs-cell.globe { --tg: rgba(147, 197, 253, .55); }
+.g-noel .rs.has-win .rs-cell:not(.win) { filter: brightness(.5) saturate(.6); }
+.g-noel .rs-cell.win::before { box-shadow: inset 0 0 0 3px #fde047, 0 0 18px rgba(253, 224, 71, .85); animation: chTile .5s ease-in-out infinite alternate; }
+.g-noel .rs-cell.win > * { animation: pzWin .45s ease-in-out infinite alternate; }
+.nl-img { width: 90%; height: 90%; object-fit: contain; filter: drop-shadow(0 4px 5px rgba(0, 0, 0, .55)); pointer-events: none; user-select: none; }
+.nl-card { width: 80%; height: 80%; filter: drop-shadow(0 4px 5px rgba(0, 0, 0, .5)); }
+.nl-wild, .nl-bonus { position: absolute; bottom: 6%; left: 50%; translate: -50% 0; padding: 0 6px; border-radius: 5px; font: 900 clamp(8px, 1.6vw, 13px)/1.35 Cinzel, Georgia, serif; letter-spacing: 1px; box-shadow: 0 2px 5px rgba(0, 0, 0, .5); }
+.nl-wild { background: linear-gradient(180deg, #fff3b0, #f5c518 45%, #b27b06); color: #3b2503; }
+.nl-bonus { background: linear-gradient(180deg, #fecaca, #dc2626 50%, #7f1d1d); color: #fff; }
+.g-noel .rs-cell.scat .nl-img { animation: nlLetter 1.8s ease-in-out infinite; }
+@keyframes nlLetter { 50% { transform: rotate(-7deg) scale(1.08); } }
+.nl-gv { position: absolute; left: 50%; bottom: 8%; translate: -50% 0; padding: 0 5px; border-radius: 6px; white-space: nowrap; background: rgba(10, 25, 60, .85); color: #fff; box-shadow: 0 0 0 1px rgba(191, 219, 254, .7);
+  font: 900 clamp(8px, 1.7vw, 14px)/1.4 KeCoin, Archivo, sans-serif; }
+.nl-gv.jp { color: #1c1200; background: linear-gradient(180deg, #fff7c2, #fbbf24); } .nl-gv.jp.maxi { background: linear-gradient(180deg, #fecaca, #ef4444); color: #fff; }
+.nl-gk { position: absolute; right: 2%; top: 2%; width: 46%; height: 46%; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+.g-noel .rs-cell.globe.elf::before { box-shadow: inset 0 0 0 2px #4ade80, 0 0 14px rgba(74, 222, 128, .7); } .g-noel .rs-cell.globe.santa::before { box-shadow: inset 0 0 0 2px #f87171, 0 0 14px rgba(248, 113, 113, .7); }
+.nl-frost { width: 58%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(255, 255, 255, .2), rgba(255, 255, 255, .04) 70%); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18); }
+.g-noel .rs-cell.rolling .nl-frost { animation: nlRoll .25s linear infinite; }
+@keyframes nlRoll { 50% { opacity: .2; transform: translateY(-12%) scale(.8); } }
+.g-noel .rs-cell.counted::before { box-shadow: inset 0 0 0 2px #fde047, 0 0 14px rgba(253, 224, 71, .7); }
+.nl-flake { position: fixed; z-index: 1200; width: 18px; height: 18px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, #bfdbfe 60%, transparent 70%); box-shadow: 0 0 10px #fff; }
+/* the climbing sleigh: a glowing column from the cell where it landed up to the top */
+.nl-col { position: absolute; z-index: 6; pointer-events: none; border-radius: 10px; overflow: hidden; transition: top .16s cubic-bezier(.3, 1.4, .5, 1);
+  background: linear-gradient(180deg, rgba(254, 240, 138, .92), rgba(251, 146, 60, .85) 55%, rgba(220, 38, 38, .85)); box-shadow: inset 0 0 0 2px #fff7c2, 0 0 22px rgba(253, 224, 71, .9), 0 0 50px rgba(239, 68, 68, .5); }
+.nl-trail { position: absolute; inset: 0; background: repeating-linear-gradient(180deg, rgba(255, 255, 255, .0) 0 14px, rgba(255, 255, 255, .5) 14px 16px); animation: nlTrail .6s linear infinite; opacity: .6; }
+@keyframes nlTrail { to { background-position: 0 -32px; } }
+.nl-sleigh { position: absolute; left: 50%; top: 0; translate: -50% 0; width: 100%; aspect-ratio: 1; height: auto; max-height: 100%; object-fit: contain; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .45)); animation: nlBob .7s ease-in-out infinite alternate; }
+@keyframes nlBob { to { transform: translateY(-4%) rotate(-3deg); } }
+.nl-m { position: absolute; left: 50%; bottom: 6px; translate: -50% 0; min-width: 70%; text-align: center; padding: 1px 6px; border-radius: 8px; background: linear-gradient(180deg, #fff, #fde68a); color: #7f1d1d;
+  font: 900 clamp(14px, 3.2vw, 30px)/1.1 KeCoin, Archivo, sans-serif; box-shadow: 0 3px 8px rgba(0, 0, 0, .45), 0 0 0 2px #b91c1c; }
+.nl-m.done { animation: nlPulse .8s ease-in-out infinite alternate; }
+@keyframes nlPulse { to { box-shadow: 0 3px 8px rgba(0, 0, 0, .45), 0 0 0 2px #b91c1c, 0 0 18px #fde047; } }
+.nl-col.win { box-shadow: inset 0 0 0 3px #fff, 0 0 30px #fde047, 0 0 70px rgba(239, 68, 68, .7); }
+.nl-col.held::after { content: 'RESTE 1 TOUR'; position: absolute; left: 50%; top: 42%; translate: -50% 0; white-space: nowrap; padding: 1px 6px; border-radius: 6px; background: #1e3a8a; color: #fff; font: 900 clamp(8px, 1.5vw, 12px)/1.4 Archivo, sans-serif; letter-spacing: .5px; }
+.nl-word { position: absolute; left: 50%; top: 45%; z-index: 20; pointer-events: none; opacity: 0; white-space: nowrap; transform: translate(-50%, -50%); font: 900 clamp(28px, 6.5vw, 72px)/1 Cinzel, Georgia, serif; letter-spacing: 2px;
+  background: linear-gradient(180deg, #fff, #fde68a 40%, #f59e0b 65%, #b91c1c); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 1.5px #7f1d1d; filter: drop-shadow(0 4px 0 #450a0a) drop-shadow(0 0 10px rgba(8, 18, 44, .9)); }
+.nl-word.elf { background-image: linear-gradient(180deg, #fff, #86efac 45%, #15803d); -webkit-text-stroke-color: #14532d; } .nl-word.hold, .nl-word.grand { background-image: linear-gradient(180deg, #fff, #bfdbfe 45%, #2563eb); -webkit-text-stroke-color: #1e3a8a; }
+.nl-intro { width: 100%; height: 100%; object-fit: contain; }
+.nl-pay { width: 56px; height: 56px; display: grid; place-items: center; position: relative; }
+.nl-pay .nl-img, .nl-pay .nl-card { width: 100%; height: 100%; }
+@media (max-width: 600px) { .g-noel .rs.nl-rs { gap: 2px; } .g-noel .rs-reel { border-radius: 7px; } .nl-reels { border-radius: 12px; padding: 5px; } .nl-cap { height: 18px; top: -10px; } }
 /* friends */
 .fr-add { display: flex; gap: 8px; margin-bottom: 10px; }
 .fr-add input { flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-2); color: var(--text); font: inherit; }
