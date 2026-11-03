@@ -45,11 +45,16 @@ function nbaOdds(sh, sa) {
   return { '1': odd(ph), '2': odd(1 - ph) };
 }
 
-async function league([sport, code, name], from, to) {
-  const url = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${code}/scoreboard?dates=${from}-${to}&limit=200`;
-  const r = await fetch(url, { headers: { 'user-agent': 'SpinBet-matchs/1' } });
-  if (!r.ok) throw new Error(`${name} : ${r.status}`);
-  return parse(await r.json(), sport, code, name);
+// one request per day (ESPN refuses long date ranges)
+async function league([sport, code, name], days) {
+  const out = [];
+  for (const d of days) {
+    const url = `https://site.api.espn.com/apis/site/v2/sports/${sport}/${code}/scoreboard?dates=${d}`;
+    const r = await fetch(url, { headers: { 'user-agent': 'SpinBet-matchs/1' } });
+    if (!r.ok) { console.warn(`${name} ${d} : ${r.status} ${(await r.text()).slice(0, 120)}`); continue; }
+    out.push(...parse(await r.json(), sport, code, name));
+  }
+  return out;
 }
 
 function parse(j, sport, code, name) {
@@ -70,12 +75,12 @@ function parse(j, sport, code, name) {
 }
 
 async function main() {
-  const now = Date.now(), from = day(now - 864e5), to = day(now + 6 * 864e5);
+  const now = Date.now(), days = Array.from({ length: 8 }, (_, k) => day(now + (k - 1) * 864e5));
   let old = {};
   try { old = Object.fromEntries(JSON.parse(readFileSync(OUT, 'utf8')).matches.map((m) => [m.id, m])); } catch { /* first run */ }
   const all = [];
   for (const L of LEAGUES) {
-    try { all.push(...await league(L, from, to)); } catch (e) { console.warn(e.message); }
+    try { all.push(...await league(L, days)); } catch (e) { console.warn(L[2], e.message); }
   }
   for (const m of all) {
     // odds: fixed once, before the match (never changed after, so the bets stay fair)
@@ -85,7 +90,9 @@ async function main() {
     delete m.home.rec; delete m.away.rec;
   }
   // keep finished matches 3 days (for the bets to be paid), then drop them
-  const keep = all.filter((m) => m.start > now - 3 * 864e5).sort((a, b) => a.start - b.start);
+  const seen = new Set();
+  const uniq = all.filter((m) => !seen.has(m.id) && seen.add(m.id));
+  const keep = uniq.filter((m) => m.start > now - 3 * 864e5).sort((a, b) => a.start - b.start);
   for (const o of Object.values(old)) if (!keep.some((m) => m.id === o.id) && o.start > now - 3 * 864e5) keep.push(o);
   keep.sort((a, b) => a.start - b.start);
   mkdirSync(OUT.split('/').slice(0, -1).join('/') || '.', { recursive: true });
