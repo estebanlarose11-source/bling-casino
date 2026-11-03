@@ -307,7 +307,7 @@ class ZeusGame extends BaseGame {
     await this.featureIntro(`${FREE_SPINS} FREE SPINS`, 'Chaque multiplicateur s’ajoute au multiplicateur global', art('zsc'));
     this.slotEl.classList.add('in-free');
     this.setMeter(0, { label: 'Multiplicateur global' });
-    while (left > 0 && !this.dead) {
+    while (left > 0 && !this.dead && !this.maxHit) { // stops at the max win (core/base.js)
       left--; done++;
       this.setBanner(`<b>FREE SPINS</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill hot">Global ×${state.global || 0}</span><span class="pill gold">Gain ${fmtC(total)}</span>`);
       const r = await this.playSpin(true, state);

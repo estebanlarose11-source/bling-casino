@@ -24,6 +24,9 @@ Ce que ça change :
 - les amis (`friendreqs` : demandes d’ami, `friends` : la liste de chacun) : chacun ne gère que ses demandes et sa liste ;
 - les points de succès du classement montent jusqu’à 100 000 (prestiges) ;
 - les tables Online (`tables` : tirages partagés, mises et chat de chaque table, `clock` : l’heure du serveur) ;
+- les tournois du soir et du week-end (`tournois`) : un score ne s’écrit que pendant le tournoi et ne peut que monter ;
+- le jackpot commun (`jackpot`, `jackpotwins`) : la cagnotte ne fait que monter, sauf pour celui qui touche le max win ;
+- les duels entre amis (`duels`) : lus par les deux joueurs seulement, chacun n’écrit que ses propres tours ;
 - tout le reste de la base est fermé.
 
 ## 1 bis. Chat général et envoi de KE entre joueurs

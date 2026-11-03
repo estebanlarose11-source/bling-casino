@@ -357,7 +357,7 @@ class PizzaGame extends BaseGame {
     this.setOpen(open, false);
     this.setPeps(0, spins);
     this.onPep = (n) => { cnt += n; this.setPeps(Math.min(cnt, PEP_STEP)); };
-    while (done < spins && done < MAX_SPINS && !this.dead) {
+    while (done < spins && done < MAX_SPINS && !this.dead && !this.maxHit) { // stops at the max win (core/base.js)
       done++;
       this.setPeps(cnt, spins - done);
       this.setBanner(`<b>${kind === 'super' ? 'SUPER FOUR' : 'LE FOUR'}</b><span class="pill">Tour ${done} / ${spins}</span><span class="pill gold">Gain ${fmtC(fsWin)}</span>`);

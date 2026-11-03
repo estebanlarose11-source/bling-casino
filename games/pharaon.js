@@ -141,7 +141,7 @@ class PharaonGame extends BaseGame {
     this.lastStake = this.bet;
     await this.featureIntro(bounty ? 'BONUS ROYAL' : 'BONUS', `${free} tours gratuits · départ ×${base} · le multiplicateur reste`, symArt(SC));
     this.slotEl.classList.add('in-free');
-    while (free > 0 && !this.dead) {
+    while (free > 0 && !this.dead && !this.maxHit) { // stops at the max win (core/base.js)
       free--; done++;
       this.setBanner(`<b>${bounty ? 'BOUNTY ×10' : 'BONUS ×4'}</b><span class="pill">Tour ${done} / ${done + free}</span><span class="pill hot">×${base}</span><span class="pill gold">Gain ${fmtC(fsWin)}</span>`);
       const r = await this.spinOnce(true, base);

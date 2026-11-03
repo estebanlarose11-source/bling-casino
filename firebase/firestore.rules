@@ -334,6 +334,102 @@ service cloud.firestore {
       allow read: if isAdmin();
     }
 
+    // ---------- Tournois du soir et du week-end (events.js) ----------
+    // tournois/{tid}/scores/{uid} = { name, best, spins, game, updated, look }, tid = soir_<début ms>_<fin ms> ou
+    // we_<début>_<fin> : un score ne s'écrit que pendant le tournoi (5 min de marge à la fin), un tournoi dure 2 jours
+    // au plus, le record (best, en × la mise, max win ×10 000 compris) et le nombre de tours ne peuvent que monter.
+    function tourStart(tid) { return int(tid.split('_')[1]); }
+    function tourEnd(tid) { return int(tid.split('_')[2]); }
+    match /tournois/{tid}/scores/{uid} {
+      allow read: if true;
+      allow create, update: if isMe(uid)
+        && tid.matches('^(soir|we)_[0-9]{13}_[0-9]{13}$')
+        && tourEnd(tid) > tourStart(tid) && tourEnd(tid) - tourStart(tid) <= 180000000
+        && request.time.toMillis() >= tourStart(tid) && request.time.toMillis() <= tourEnd(tid) + 300000
+        && request.resource.data.keys().hasOnly(['name', 'best', 'spins', 'game', 'updated', 'look'])
+        && isName(request.resource.data.name)
+        && isNum(request.resource.data.best, 0, 10000)
+        && request.resource.data.spins is int && request.resource.data.spins >= 0 && request.resource.data.spins <= 200000
+        && isGameId(request.resource.data.game)
+        && (!('look' in request.resource.data) || isLook(request.resource.data.look))
+        && (resource == null || (request.resource.data.best >= resource.data.best && request.resource.data.spins >= resource.data.spins));
+      allow delete: if false;
+    }
+
+    // ---------- Jackpot commun (jackpot.js) ----------
+    // jackpot/main = { amount, last } : amount = ce que la cagnotte a gagné depuis le dernier jackpot (KE). Chaque compte
+    // y ajoute 1 % de ses mises (100 000 KE au plus par envoi) ; celui qui touche le max win d'une machine la vide
+    // (last = son nom, à l'heure du serveur) et laisse une trace dans jackpotwins/{id}.
+    match /jackpot/{id} {
+      allow read: if true;
+      allow create: if signedIn() && id == 'main' && request.resource.data.keys().hasOnly(['amount'])
+        && isNum(request.resource.data.amount, 0, 100000);
+      allow update: if signedIn() && id == 'main' && request.resource.data.keys().hasOnly(['amount', 'last'])
+        && isNum(request.resource.data.amount, -100000, 1000000000)
+        && (
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['amount'])
+            && request.resource.data.amount > resource.data.amount
+            && request.resource.data.amount <= resource.data.amount + 100000)
+          || (request.resource.data.last is map
+            && request.resource.data.last.keys().hasOnly(['uid', 'name', 'game', 'ke', 'at'])
+            && request.resource.data.last.uid == request.auth.uid
+            && request.resource.data.last.at == request.time
+            && isPseudo(request.resource.data.last.name) && isGameId(request.resource.data.last.game)
+            && isNum(request.resource.data.last.ke, 0, resource.data.amount + 100000)
+            && request.resource.data.amount <= resource.data.amount)
+        );
+      allow delete: if false;
+    }
+    match /jackpotwins/{id} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['uid', 'name', 'game', 'ke', 'share', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && isPseudo(request.resource.data.name) && isGameId(request.resource.data.game)
+        && isNum(request.resource.data.ke, 0, 1000000000) && isNum(request.resource.data.share, 0, 1)
+        && request.resource.data.at == request.time;
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Duels entre amis (duels.js) ----------
+    // duels/{id} = { from, fromName, to, toName, game, spins, stake, status, at, acc, fn, fp, tn, tp }.
+    // Créé par le joueur qui défie (en attente) ; l'invité accepte ou refuse dans les 24 h ; celui qui défie peut
+    // annuler tant que personne n'a répondu ; ensuite chacun n'écrit que ses tours (fn/fp ou tn/tp), qui ne font que
+    // monter, pendant 24 h après l'acceptation. Lu par les deux joueurs seulement.
+    function duelProgress(n, p) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([n, p])
+        && request.resource.data[n] is int && request.resource.data[n] >= resource.data[n] && request.resource.data[n] <= resource.data.spins
+        && isNum(request.resource.data[p], 0, 1000000) && request.resource.data[p] >= resource.data[p];
+    }
+    match /duels/{id} {
+      allow read: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['from', 'fromName', 'to', 'toName', 'game', 'spins', 'stake', 'status', 'at', 'fn', 'fp', 'tn', 'tp'])
+        && request.resource.data.from == request.auth.uid
+        && request.resource.data.to is string && request.resource.data.to.size() > 5 && request.resource.data.to.size() < 128
+        && request.resource.data.to != request.auth.uid
+        && isPseudo(request.resource.data.fromName) && isPseudo(request.resource.data.toName)
+        && isGameId(request.resource.data.game)
+        && request.resource.data.spins in [20, 50, 100]
+        && request.resource.data.stake is int && request.resource.data.stake >= 0 && request.resource.data.stake <= 100000
+        && request.resource.data.status == 'pending'
+        && request.resource.data.fn == 0 && request.resource.data.fp == 0 && request.resource.data.tn == 0 && request.resource.data.tp == 0
+        && request.resource.data.at == request.time;
+      allow update: if signedIn() && (
+        (resource.data.to == request.auth.uid && resource.data.status == 'pending'
+          && request.time < resource.data.at + duration.value(24, 'h')
+          && ((request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'acc'])
+                && request.resource.data.status == 'accepted' && request.resource.data.acc == request.time)
+            || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) && request.resource.data.status == 'declined')))
+        || (resource.data.from == request.auth.uid && resource.data.status == 'pending'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']) && request.resource.data.status == 'cancelled')
+        || (resource.data.status == 'accepted' && request.time < resource.data.acc + duration.value(1445, 'm')
+          && ((resource.data.from == request.auth.uid && duelProgress('fn', 'fp'))
+            || (resource.data.to == request.auth.uid && duelProgress('tn', 'tp'))))
+      );
+      allow delete: if false;
+    }
+
     // Tout le reste est fermé.
     match /{document=**} {
       allow read, write: if false;

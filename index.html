@@ -4136,6 +4136,13 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
     <nav class="side-nav">
       <a href="#special" data-nav="special" class="side-special"><span>🏆</span>Défi spécial<b class="side-badge sp-badge" data-sp-badge></b></a>
     </nav>
+    <div class="side-label">Événements</div>
+    <nav class="side-nav">
+      <a href="#tournois" data-nav="tournois"><span>🏁</span>Tournois<b class="side-badge ev-live-badge" data-ev-live hidden>LIVE</b></a>
+      <a href="#jackpot" data-nav="jackpot"><span>💎</span>Jackpot commun</a>
+      <a href="#duels" data-nav="duels"><span>⚔️</span>Duels entre amis<b class="side-badge" data-duel-badge hidden></b></a>
+      <a href="#cashback" data-nav="cashback"><span>💸</span>Cashback<b class="side-badge" data-cb-badge hidden></b></a>
+    </nav>
     <div class="side-label">Récompenses</div>
     <nav class="side-nav">
       <a href="#succes" data-nav="ach"><span><svg class="ico"><use href="#ui-ach"/></svg></span>Succès<b class="side-badge" data-ach-badge hidden></b></a>
@@ -4171,7 +4178,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
       <div class="balance"><b data-balance>0&nbsp;&#xE1E0;</b></div>
       <a class="btn primary top-refill" href="#recharger" aria-label="Recharger"><span>Recharger</span><b>+</b></a>
     </div>
-    <div class="top-right"><button class="icon-btn theme-btn" type="button" data-theme-toggle aria-label="Mode clair / mode sombre" title="Mode clair / mode sombre"><span class="th-sun">☀️</span><span class="th-moon">🌙</span></button><span class="demo-tag">MODE DÉMO</span></div>
+    <div class="top-right"><a class="jp-chip" href="#jackpot" title="Jackpot commun : touche le max win d’une machine à sous"><span>💎</span><b data-jackpot="short">…</b></a><button class="icon-btn theme-btn" type="button" data-theme-toggle aria-label="Mode clair / mode sombre" title="Mode clair / mode sombre"><span class="th-sun">☀️</span><span class="th-moon">🌙</span></button><span class="demo-tag">MODE DÉMO</span></div>
   </header>
 
   <main id="view" class="view"></main>
@@ -4558,6 +4565,59 @@ const cloud = {
     const ref = (await init()).db.collection('mutes').doc(uid);
     if (on) await ref.set({ by, at: Date.now() }); else await ref.delete();
   },
+
+  /* ---------- Tournois (events.js): tournois/{tid}/scores/{uid} = { name, best, spins, game, updated, look } ---------- */
+  // tid = soir_<début ms>_<fin ms> or we_<début>_<fin>: the Firestore rules only accept a score during that window.
+  async saveTour(tid, uid, entry) { await (await init()).db.collection('tournois').doc(tid).collection('scores').doc(uid).set(JSON.parse(JSON.stringify(entry))); },
+  async watchTour(tid, n, cb) {
+    return (await init()).db.collection('tournois').doc(tid).collection('scores').orderBy('best', 'desc').limit(n)
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ uid: d.id, ...d.data() }))), (e) => console.error(e));
+  },
+  async topTour(tid, n) {
+    const q = await (await init()).db.collection('tournois').doc(tid).collection('scores').orderBy('best', 'desc').limit(n).get({ source: 'server' });
+    return q.docs.map((d) => ({ uid: d.id, ...d.data() }));
+  },
+  async tourEntry(tid, uid) { const d = await (await init()).db.collection('tournois').doc(tid).collection('scores').doc(uid).get(); return d.exists ? d.data() : null; },
+
+  /* ---------- Jackpot commun (jackpot.js): jackpot/main = { amount, last }, jackpotwins/{id} ---------- */
+  // amount = what the pot gained since the last win (the pot shown is the seed + amount).
+  async watchJackpot(cb) {
+    return (await init()).db.collection('jackpot').doc('main').onSnapshot((d) => cb(d.exists ? d.data() : { amount: 0 }), (e) => console.error(e));
+  },
+  async feedJackpot(ke) { await (await init()).db.collection('jackpot').doc('main').set({ amount: firebase.firestore.FieldValue.increment(ke) }, { merge: true }); },
+  // Pays the pot (share 1) or a part of it (small stakes) in one transaction; returns the KE won.
+  async winJackpot(uid, name, game, share, seed) {
+    const { db } = await init();
+    const ref = db.collection('jackpot').doc('main');
+    return db.runTransaction(async (tx) => {
+      const d = await tx.get(ref);
+      const amt = d.exists ? d.data().amount || 0 : 0, pot = seed + amt;
+      const ke = Math.max(0, Math.floor(pot * share));
+      const now = firebase.firestore.FieldValue.serverTimestamp();
+      tx.set(ref, { amount: share >= 1 ? 0 : Math.round((amt - ke) * 100) / 100, last: { uid, name, game, ke, at: now } });
+      tx.set(db.collection('jackpotwins').doc(), { uid, name, game, ke, share, at: now });
+      return ke;
+    });
+  },
+  async jackpotWins(n) {
+    const q = await (await init()).db.collection('jackpotwins').orderBy('at', 'desc').limit(n).get();
+    return q.docs.map((d) => ({ id: d.id, ...d.data(), atMs: d.data().at?.toMillis?.() || 0 }));
+  },
+
+  /* ---------- Duels entre amis (duels.js): duels/{id} ---------- */
+  async createDuel(data) {
+    const ref = await (await init()).db.collection('duels').add({ ...data, at: firebase.firestore.FieldValue.serverTimestamp() });
+    return ref.id;
+  },
+  async watchDuels(field, uid, cb) {
+    return (await init()).db.collection('duels').where(field, '==', uid)
+      .onSnapshot((q) => cb(q.docs.map((d) => { const x = d.data({ serverTimestamps: 'estimate' }); return { id: d.id, ...x, atMs: x.at?.toMillis?.() || 0, accMs: x.acc?.toMillis?.() || 0 }; })), (e) => console.error(e));
+  },
+  async answerDuel(id, ok) {
+    const patch = ok ? { status: 'accepted', acc: firebase.firestore.FieldValue.serverTimestamp() } : { status: 'declined' };
+    await (await init()).db.collection('duels').doc(id).update(patch);
+  },
+  async updateDuel(id, patch) { await (await init()).db.collection('duels').doc(id).update(patch); },
 
   /* ---------- KE between players: gifts/{id} = { from, fromName, to, toName, amount (cents), at, claimed } ---------- */
   // The sender's balance drops by the amount in the same write (the rules check it) and sends/{uid} counts
@@ -7498,6 +7558,7 @@ const GAMES = [
     },
     buyBonus: { cost: 68, feature: 'hold' },
     freeBuyCost: 76,
+    max: '×5 000',
   },
 ];
 
@@ -7509,7 +7570,7 @@ const ORIGINALS = [
   {"id": "candy", "name": "La Sweety", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs sur les cases", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et chaque case gagnante prend un multiplicateur qui double à chaque nouvelle connexion. Les grosses grappes créent des bonbons spéciaux : cœur explosif, bocal bombe et baguette magique. 4 couronnes ouvrent le Bal de la Reine, où toutes les cases démarrent à ×5 et gardent leur multiplicateur.", "features": ["Grappes de 5", "Multiplicateurs sur les cases", "Cœur explosif, bocal bombe, baguette", "Bal de la Reine : cases à ×5 au départ", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "anubis", "name": "L’Anubis", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "bling", "name": "La Tour Bling", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
-  {"id": "pharaon", "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "Non plafonné"},
+  {"id": "pharaon", "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×500"},
   {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Boost, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Boost et quatre jeux bonus animés : Pile ou Face, Tir aux Cibles, Pachinko et Méga Folie.", "features": ["Boost ×2 à ×50", "Pile ou Face", "Tir aux Cibles", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
   {"id": "storm-online", "name": "L’Éclair Online", "cat": "table", "tag": "En ligne", "sub": "Roulette éclair multijoueur : la roue part quand tout le salon est prêt", "colors": ["#1f56ff", "#071440"], "description": "La roulette éclair en multijoueur : chacun pose ses jetons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La foudre et la bille sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Éclairs ×50 à ×50 000", "Chat du salon"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
@@ -7548,8 +7609,13 @@ const ORIGINALS = [
 
 const ALL_GAMES = [...GAMES, ...ORIGINALS];
 const getGame = (id) => ALL_GAMES.find((g) => g.id === id);
+// Max win: every slot machine stops paying at maxX × the stake for one round (bonus included). Reaching it wins
+// the site's common jackpot (jackpot.js). Read from the "max" shown on the game page (×5 000 → 5000).
+const isSlot = (g) => !!g && (!g.original || g.cat === 'slot');
+ALL_GAMES.forEach((g) => { if (isSlot(g)) g.maxX = parseInt(String(g.max || '').replace(/\D/g, ''), 10) || 5000; });
+const SLOTS = ALL_GAMES.filter(isSlot);
 
-return { GAMES, ORIGINALS, ALL_GAMES, getGame };
+return { GAMES, ORIGINALS, ALL_GAMES, getGame, isSlot, SLOTS };
 })();
 
 // ---- covers.js ----
@@ -8149,6 +8215,9 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'pharaon', date: '2026-11-03', title: 'Max win et jackpot commun', items: ['Le Totem a maintenant un gain maximum : ×500 la mise par tour, bonus compris', 'Atteindre le max win fait gagner le jackpot commun du site', 'Les gains ne changent pas'] },
+  { game: 'taco', date: '2026-11-03', title: 'Max win et jackpot commun', items: ['Le gain maximum de ×5 000 la mise est maintenant appliqué à chaque tour, bonus compris', 'Atteindre le max win fait gagner le jackpot commun du site'] },
+  { game: 'big-bad-wolf', date: '2026-11-03', title: 'Max win et jackpot commun', items: ['Le Loup a maintenant un gain maximum : ×5 000 la mise par tour, bonus compris', 'Atteindre le max win fait gagner le jackpot commun du site'] },
   { game: 'huff', date: '2026-11-03', title: 'Nouveaux noms de bonus', items: ['Les bonus s’appellent maintenant Le Souffle (3 scatters), Grand Souffle (4 scatters) et MEGA BONUS (5 scatters)', 'Rien ne change dans le jeu ni dans les gains'] },
   { game: 'madwheel', date: '2026-11-03', title: 'Nouveaux noms', items: ['Le tirage avant chaque tour s’appelle maintenant le Boost', 'Le bonus des cibles s’appelle Tir aux Cibles', 'Rien ne change dans le jeu ni dans les gains'] },
   { game: 'madwheel', date: '2026-11-02', title: 'Le présentateur en 3D', items: ['Le présentateur est maintenant un vrai personnage en 3D : chapeau haut-de-forme, moustache, gants blancs', 'Il attrape la roue, la lance, la regarde tourner, saute de joie ou baisse la tête', 'Chaque bonus arrive avec une médaille d’or en 3D et une explosion de pièces'] },
@@ -8451,7 +8520,7 @@ function renderLobby(root, params = {}) {
   };
 
   const body = filter === 'all'
-    ? `<a class="sp-banner" href="#special"><span>🏆</span><div><b>DÉFI SPÉCIAL · ${fmt(__mods['special.js'].specialStatus().prize)}</b><small>Débloque tous les bonus du casino en jouant : ${__mods['special.js'].specialStatus().have} / ${__mods['special.js'].specialStatus().total}</small></div><em>Voir le défi ›</em></a>`
+    ? '<div data-ev-home></div>' + `<a class="sp-banner" href="#special"><span>🏆</span><div><b>DÉFI SPÉCIAL · ${fmt(__mods['special.js'].specialStatus().prize)}</b><small>Débloque tous les bonus du casino en jouant : ${__mods['special.js'].specialStatus().have} / ${__mods['special.js'].specialStatus().total}</small></div><em>Voir le défi ›</em></a>`
       + '<section class="panel live-now" data-live-now></section>'
       + row('🟢 En ligne · joue avec les autres', ['storm-online', 'bj-online', 'holdem-online', 'madwheel-online', 'plateau-online', 'peche-online', 'roueor-online'].map(getGame))
       + row('Populaires', ['fortune', 'cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
@@ -9594,18 +9663,20 @@ class SlotMachine {
       return;
     }
     this.setBusy(true);
+    this.capKE = g.maxX ? g.maxX * bet : Infinity; // max win of the round, bonus included
+    this.roundPaid = 0;
     this.root.querySelector('.last-win').textContent = fmt(0);
     const res = await this.spinOnce('base');
     if (res.total > 0) {
-      wallet.credit(res.total, { game: g.name, x: res.total / bet });
+      this.payOut(res.total, { game: g.name, x: res.total / bet });
       await this.celebrate(res.total);
     }
     if (g.holdSpin && res.coins >= g.holdSpin.trigger) {
       this.stopAuto();
       await this.featureIntro('HOLD & SPIN', `${res.coins} pièces verrouillées · 3 respins`, '🪙');
-      const won = await runHoldSpin(this, res.grid);
+      const won = Math.min(await runHoldSpin(this, res.grid), this.capKE - this.roundPaid);
       if (won > 0) {
-        wallet.credit(won, { game: `${g.name} · Hold & Spin`, x: won / bet });
+        this.payOut(won, { game: `${g.name} · Hold & Spin`, x: won / bet });
         wallet.bonusWin(won);
         this.root.querySelector('.last-win').textContent = fmt(won);
         await this.celebrate(won, { summary: 'HOLD & SPIN' });
@@ -9616,6 +9687,7 @@ class SlotMachine {
       this.stopAuto();
       await this.runFreeSpins(res.scatters);
     }
+    if (!this.dead) __mods['core/base.js'].roundEnd(this, Math.round(bet * 100), Math.round(this.roundPaid * 100), buy);
     this.setBusy(false);
     if (this.auto > 0 && !this.dead) {
       this.auto--;
@@ -9623,6 +9695,15 @@ class SlotMachine {
       if (this.auto > 0) setTimeout(() => this.play(), this.turbo ? 150 : 400);
       else this.stopAuto();
     }
+  }
+
+  // Pays a win without going past the round's max win (maxX × the stake).
+  payOut(n, meta) {
+    n = round(Math.min(n, this.capKE - this.roundPaid));
+    if (n <= 0) return 0;
+    this.roundPaid = round(this.roundPaid + n);
+    wallet.credit(n, meta);
+    return n;
   }
 
   restoreAfterFeature() {
@@ -9642,7 +9723,7 @@ class SlotMachine {
     await this.featureIntro(`${count} FREE SPINS`, cfg.title, symbolById(g, cfg.scatter).glyph);
     if (cfg.type === 'expanding') await this.revealSpecial();
     this.slotEl.classList.add('in-free');
-    while (this.free.left > 0 && !this.dead) {
+    while (this.free.left > 0 && !this.dead && this.free.won < this.capKE - this.roundPaid) {
       this.free.left--;
       this.updateBanner();
       const res = await this.spinOnce('free');
@@ -9659,12 +9740,12 @@ class SlotMachine {
       await sleep(this.turbo ? 180 : 480);
     }
     if (this.dead) return;
-    const won = this.free.won;
+    const won = round(Math.min(this.free.won, this.capKE - this.roundPaid));
     this.free = null;
     this.layer.innerHTML = '';
     this.updateBanner();
     this.slotEl.classList.remove('in-free');
-    if (won > 0) { wallet.credit(won, { game: `${g.name} · Free Spins`, x: won / this.bet }); wallet.bonusWin(won); }
+    if (won > 0) { this.payOut(won, { game: `${g.name} · Free Spins`, x: won / this.bet }); wallet.bonusWin(won); }
     await this.celebrate(won, { summary: cfg.title.toUpperCase() });
     this.restoreAfterFeature();
   }
@@ -9949,8 +10030,16 @@ class BaseGame {
     if (!wallet.debit(c / 100)) { toast('Solde insuffisant : rechargez votre argent fictif', 'warn'); this.stopAuto(); return false; }
     return true;
   }
+  // Max win of a slot machine for this round, in cents (0 = no cap): maxX × the stake, bonus included.
+  capC() { return this.game.maxX ? this.game.maxX * (this.roundStake || this.bet) : 0; }
   win(c, label) {
     if (c <= 0) return;
+    const cap = this.capC();
+    if (cap) {
+      const room = cap - (this.roundWin || 0);
+      if (room <= 0) { this.maxHit = true; return; }
+      if (c >= room) { c = room; this.maxHit = true; }
+    }
     if (label) this.featWin += c;
     this.roundWin = (this.roundWin || 0) + c;
     wallet.credit(c / 100, { game: label ? `${this.game.name} · ${label}` : this.game.name, x: c / Math.max(1, this.lastStake || this.bet) });
@@ -10115,8 +10204,12 @@ class BaseGame {
     this.setBusy(true);
     this.featWin = 0;
     this.roundWin = 0;
+    this.maxHit = false;
+    this.roundBuy = false;
+    this.roundStake = this.bet;
     try { await fn(); } catch (e) { console.error(e); }
     if (this.featWin > 0) wallet.bonusWin(this.featWin / 100);
+    roundEnd(this, this.roundStake, this.roundWin || 0, this.roundBuy);
     if (this.dead) return;
     this.setBusy(false);
     if (this.auto > 0) {
@@ -10163,6 +10256,7 @@ class BaseGame {
     const x = this.cfg.buys.find((y) => y.id === id);
     this.stopAuto();
     this.round(async () => {
+      this.roundBuy = true;
       this.buying = true; window.__sbBuying = true;
       const ok = (this.bet <= GIFT_MAX_BET && gifts.use(this.game.id, id)) || this.pay(x.cost(this.bet));
       this.buying = false; window.__sbBuying = false;
@@ -10256,7 +10350,20 @@ class BaseGame {
 
 const art = (id, vb = '0 0 64 64') => `<svg viewBox="${vb}" aria-hidden="true"><use href="#${id}" width="64" height="64"/></svg>`;
 
-return { fmtC, shortC, wpick, BETS, BaseGame, art };
+// End of one paid round (a spin with its bonus, or a bought bonus), for the tournaments, duels and the jackpot:
+// sb:roundend = { game, stake, win (KE), x, bought } and, when a slot reached its max win, sb:maxwin.
+// stakeC / winC in cents. Called by core/base.js and slot/machine.js.
+function roundEnd(g, stakeC, winC, bought) {
+  if (g.dead || !(stakeC > 0)) return;
+  const d = { game: g.game.id, stake: stakeC / 100, win: winC / 100, x: winC / stakeC, bought: !!bought };
+  dispatchEvent(new CustomEvent('sb:roundend', { detail: d }));
+  if (g.game.maxX && winC >= g.game.maxX * stakeC - 1) {
+    if (typeof g.msg === 'function') g.msg(`MAX WIN ! ×${g.game.maxX.toLocaleString('fr-FR')} la mise`);
+    dispatchEvent(new CustomEvent('sb:maxwin', { detail: { ...d, maxX: g.game.maxX } }));
+  }
+}
+
+return { fmtC, shortC, wpick, BETS, BaseGame, art, roundEnd };
 })();
 
 // ---- core/reels.js ----
@@ -10817,13 +10924,13 @@ const FILES = {
   'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', 'b631fcbf76'],
   'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '3357f3e2c8'],
   'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
-  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '7e6577831b'],
+  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '3f67cd2454'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', '8bdf0c0cce'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '0b6becec24'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
-  bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'b34a5e4635'],
-  pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', '16818b1efe'],
+  bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'fcbe76e4e1'],
+  pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'e2f21802ce'],
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '9e528dfdf5'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
@@ -10839,7 +10946,7 @@ const FILES = {
   fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', 'bb85af3fad'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
-  taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '171e756bb8'],
+  taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '9621261bab'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '200ec4fe09'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'ee4862aacf'],
   chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', '14b7bec1aa'],
@@ -10910,6 +11017,7 @@ const dots = (n) => `<span class="dots">${[1, 2, 3, 4, 5].map((i) => `<i class="
 function renderRebuilt(root, game) {
   root.innerHTML = `
     <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-${game.cat}">${game.tag}</a><span>›</span><b>${game.name}</b>${challengeOf(game.id) === 'B' ? '<a class="defi-pill" href="#defi">🏁 Défi de la semaine (bonus achetés) · <span data-leader>100 000\u00a0\uE1E0 au n°1</span></a>' : challengeOf(game.id) ? '<a class="defi-pill" href="#defi">🏁 Jeu du Défi de la semaine · 50 000\u00a0\uE1E0 au n°1</a>' : ''}</nav>
+    <div class="ev-game" data-ev-game="${game.id}"></div>
     <div class="game-host"></div>
 ${liveHTML(game)}
     <section class="game-about panel">
@@ -10953,6 +11061,7 @@ function renderGame(root, { id }) {
   if (hasImpl(game.id)) return renderRebuilt(root, game);
   root.innerHTML = `
     <nav class="crumbs"><a href="#accueil">Casino</a><span>›</span><a href="#lobby-slot">Machines à sous</a><span>›</span><b>${game.name}</b></nav>
+    <div class="ev-game" data-ev-game="${game.id}"></div>
     <div class="game-host"></div>
 ${liveHTML(game)}
     <section class="game-about panel">
@@ -13236,6 +13345,784 @@ profiles.addEventListener('change', () => setTimeout(payBonuses, 800));
 return { payBonuses };
 })();
 
+// ---- events.js ----
+__mods['events.js'] = (() => {
+// Tournois en direct (#tournois) et Happy Hour, à l'heure de Paris.
+// - Tournoi du soir : tous les soirs de 21 h à minuit, sur une machine à sous qui change chaque jour.
+// - Tournoi du week-end : du samedi 0 h au dimanche minuit, sur une autre machine, avec de plus gros prix.
+// Score = le plus gros gain d'un tour (bonus compris) en × la mise (sb:roundend, core/base.js) : petite ou grosse
+// mise, tout le monde part à égalité. Les bonus achetés ne comptent pas. Scores : tournois/{tid}/scores/{uid}, tid =
+// <soir|we>_<début ms>_<fin ms> (les règles Firestore n'acceptent un score que pendant le tournoi et un record ne
+// peut que monter). Le top 10 et la participation sont payés automatiquement à la visite suivante (profile.tourPaid).
+// - Happy Hour : de 22 h à 23 h, les gains sur la machine du tournoi (et celle du week-end) sont doublés, bonus
+//   achetés exclus, jusqu'à HH.cap KE de bonus par joueur et par Happy Hour (profile.hh).
+// Les autres modules ajoutent leurs encarts sur l'accueil et sous les jeux avec addHome(fn) / addGamePill(fn).
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { toast, modal } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const { getGame } = __mods['games/index.js'];
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const uid = () => (profiles.online && profiles.current ? profiles.store.current : null);
+const xs = (x) => `×${(Math.round(x * 100) / 100).toLocaleString('fr-FR')}`;
+const place = (r) => (r === 0 ? '1er' : `${r + 1}e`);
+
+/* ---------- l'heure de Paris ---------- */
+const PF = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
+function paris(t = Date.now()) {
+  const o = {};
+  for (const p of PF.formatToParts(new Date(t))) o[p.type] = p.value;
+  const y = +o.year, m = +o.month, d = +o.day;
+  return { y, m, d, h: +o.hour % 24, mi: +o.minute, s: +o.second, dow: new Date(Date.UTC(y, m - 1, d)).getUTCDay(), key: `${o.year}-${o.month}-${o.day}` };
+}
+// UTC ms of a Paris wall-clock time; d may overflow (d + 1 = the next day).
+function at(y, m, d, h = 0) {
+  const wall = Date.UTC(y, m - 1, d, h);
+  let t = wall;
+  for (let k = 0; k < 2; k++) { const p = paris(t); t += wall - Date.UTC(p.y, p.m - 1, p.d, p.h, p.mi, p.s); }
+  return t;
+}
+const dayKey = (t = Date.now()) => paris(t).key;
+function left(ms) {
+  ms = Math.max(0, ms);
+  const h = Math.floor(ms / 3600e3), m = Math.floor((ms % 3600e3) / 60e3), s = Math.floor((ms % 60e3) / 1e3);
+  if (h >= 24) return `${Math.floor(h / 24)} j ${h % 24} h`;
+  if (h) return `${h} h ${String(m).padStart(2, '0')} min`;
+  return `${m} min ${String(s).padStart(2, '0')} s`;
+}
+const hhmm = (t) => { const p = paris(t); return p.h === 0 && p.mi === 0 ? 'minuit' : `${p.h} h${p.mi ? ' ' + String(p.mi).padStart(2, '0') : ''}`; };
+const dayName = (t) => new Date(t).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long' });
+
+/* ---------- les tournois ---------- */
+const ROT = ['fortune', 'cosmic', 'zeus', 'huff', 'candy', 'anubis', 'bling', 'pharaon', 'taco', 'billets', 'dragons', 'labo', 'chasse', 'big-bad-wolf'].filter((g) => getGame(g));
+const KINDS = {
+  soir: { label: 'Tournoi du soir', short: 'Du soir', icon: '🌙', when: 'tous les soirs de 21 h à minuit',
+    prizes: [10000, 5000, 2500, 1000, 1000, 1000, 1000, 1000, 1000, 1000], part: { spins: 50, ke: 500 } },
+  we: { label: 'Tournoi du week-end', short: 'Du week-end', icon: '🏆', when: 'du samedi 0 h au dimanche minuit',
+    prizes: [50000, 25000, 10000, 5000, 5000, 5000, 5000, 5000, 5000, 5000], part: { spins: 200, ke: 2000 } },
+};
+const dayIdx = (y, m, d) => Math.round(Date.UTC(y, m - 1, d) / 864e5);
+function soirOf(y, m, d) {
+  const start = at(y, m, d, 21), end = at(y, m, d + 1, 0);
+  return { kind: 'soir', tid: `soir_${start}_${end}`, start, end, game: ROT[dayIdx(y, m, d) % ROT.length] };
+}
+function weOf(y, m, d) { // (y, m, d) = the Saturday
+  const start = at(y, m, d, 0), end = at(y, m, d + 2, 0);
+  const avoid = [soirOf(y, m, d).game, soirOf(y, m, d + 1).game];
+  let k = (Math.floor(dayIdx(y, m, d) / 7) * 5 + 3) % ROT.length;
+  for (let i = 0; i < ROT.length && avoid.includes(ROT[k]); i++) k = (k + 1) % ROT.length;
+  return { kind: 'we', tid: `we_${start}_${end}`, start, end, game: ROT[k] };
+}
+// Tonight's evening tournament (it ends at midnight, so it is always today's) and this / the next week-end's.
+function soirNow(t = Date.now()) { const p = paris(t); return soirOf(p.y, p.m, p.d); }
+function weNow(t = Date.now()) {
+  const p = paris(t);
+  if (p.dow === 6) return weOf(p.y, p.m, p.d);
+  if (p.dow === 0) return weOf(p.y, p.m, p.d - 1);
+  return weOf(p.y, p.m, p.d + 6 - p.dow);
+}
+const isLive = (T, t = Date.now()) => t >= T.start && t < T.end;
+const current = (t = Date.now()) => [soirNow(t), weNow(t)];
+const liveFor = (gid, t = Date.now()) => current(t).filter((T) => isLive(T, t) && T.game === gid);
+const kindOf = (tid) => String(tid).split('_')[0];
+const endOf = (tid) => +String(tid).split('_')[2] || 0;
+
+/* ---------- Happy Hour ---------- */
+const HH = { mult: 2, cap: 50000, hour: 22 };
+function hhNow(t = Date.now()) {
+  const p = paris(t);
+  if (p.h !== HH.hour) return null;
+  const games = [soirNow(t).game], W = weNow(t);
+  if (isLive(W, t)) games.push(W.game);
+  return { key: p.key, games: [...new Set(games)], end: at(p.y, p.m, p.d, HH.hour + 1) };
+}
+function hhNext(t = Date.now()) { const p = paris(t), s = at(p.y, p.m, p.d, HH.hour); return t < s ? s : at(p.y, p.m, p.d + 1, HH.hour); }
+const hhUsed = (h) => (profiles.current?.hh?.key === h.key ? profiles.current.hh.paid || 0 : 0);
+
+/* ---------- my records, scores sent to the server ---------- */
+const myRec = (tid) => profiles.current?.tour?.[tid] || null;
+const saving = {};
+function queueSave(T) {
+  const me = uid();
+  if (!me || !cloud.enabled) return;
+  clearTimeout(saving[T.tid]);
+  saving[T.tid] = setTimeout(() => {
+    const r = myRec(T.tid);
+    if (!r || !profiles.current) return;
+    const entry = { name: String(profiles.current.name || 'Joueur').slice(0, 64), best: r.best, spins: r.spins, game: T.game, updated: Date.now() };
+    const look = __mods['shop.js']?.publicLook?.(profiles.current);
+    if (look) entry.look = look;
+    cloud.saveTour(T.tid, me, entry).catch((e) => console.warn('Tournoi : score non envoyé (règles Firestore à jour ?)', e));
+  }, 2500);
+}
+
+function onRound(d) {
+  if (!profiles.current || d.bought) return;
+  const t = Date.now();
+  for (const T of liveFor(d.game, t)) {
+    const x = Math.min(10000, Math.round((d.x || 0) * 100) / 100), K = KINDS[T.kind];
+    const r = profiles.update('tour', (p) => {
+      const all = { ...(p.tour || {}) };
+      const rec = { best: 0, spins: 0, game: T.game, ...(all[T.tid] || {}) };
+      rec.spins++;
+      const better = x > rec.best;
+      if (better) rec.best = x;
+      all[T.tid] = rec;
+      const keys = Object.keys(all).sort((a, b) => endOf(a) - endOf(b));
+      keys.slice(0, Math.max(0, keys.length - 12)).forEach((k) => delete all[k]);
+      p.tour = all;
+      return { ...rec, better };
+    });
+    if (!r) continue;
+    if (r.better && x > 0) toast(`${K.icon} ${K.label} : nouveau record ${xs(x)} !`, 'ok');
+    if (r.spins === K.part.spins) toast(`${K.icon} ${K.part.spins} tours joués au ${K.label} : ta participation (+${fmt(K.part.ke)}) est assurée !`, 'ok');
+    queueSave(T);
+    paint();
+  }
+}
+
+let hhCapSaid = '';
+function onHappy(d) {
+  const h = hhNow();
+  if (!h || d.bought || !(d.win > 0) || !h.games.includes(d.game) || !profiles.current) return;
+  const used = hhUsed(h);
+  const extra = Math.min(Math.round(d.win * (HH.mult - 1) * 100) / 100, Math.round((HH.cap - used) * 100) / 100);
+  if (extra <= 0) {
+    if (hhCapSaid !== h.key) { hhCapSaid = h.key; toast(`🍹 Tu as déjà touché les ${fmt(HH.cap)} de bonus de cette Happy Hour. Rendez-vous demain à 22 h !`, 'info'); }
+    return;
+  }
+  profiles.update('hh', (p) => { p.hh = { key: h.key, paid: Math.round((used + extra) * 100) / 100 }; });
+  wallet.grant(extra);
+  toast(`🍹 Happy Hour ×${HH.mult} : +${fmt(extra)} en plus !`, 'ok');
+}
+addEventListener('sb:roundend', (e) => { const d = e.detail || {}; onRound(d); onHappy(d); });
+
+/* ---------- live boards ---------- */
+const boards = {}; // tid -> { list, rank, unwatch, seen }
+const subs = new Set();
+const sortB = (l) => l.slice().sort((a, b) => b.best - a.best || (a.updated || 0) - (b.updated || 0));
+async function watchBoard(T) {
+  if (!cloud.enabled || boards[T.tid]) return;
+  const b = boards[T.tid] = { list: null, rank: -1, unwatch: null, seen: false };
+  try {
+    b.unwatch = await cloud.watchTour(T.tid, 20, (raw) => {
+      const list = sortB(raw), me = uid(), prev = b.rank;
+      b.list = list; b.rank = me ? list.findIndex((e) => e.uid === me) : -1;
+      if (b.seen && me && (myRec(T.tid)?.best || 0) > 0 && prev >= 0 && (b.rank < 0 || b.rank > prev)) {
+        const by = list[b.rank < 0 ? 0 : b.rank - 1];
+        toast(`⚠️ ${esc(by?.name || 'Un joueur')} t’a dépassé au ${KINDS[T.kind].label} : tu es ${b.rank < 0 ? 'sorti du top 20' : place(b.rank)}. Reprends ta place !`, 'warn');
+      }
+      b.seen = true;
+      subs.forEach((fn) => fn());
+      paint();
+    });
+  } catch (e) { console.warn(e); delete boards[T.tid]; }
+}
+function syncBoards() {
+  const t = Date.now(), want = current(t).filter((T) => isLive(T, t));
+  want.forEach(watchBoard);
+  for (const k of Object.keys(boards)) if (!want.some((T) => T.tid === k)) { boards[k].unwatch?.(); delete boards[k]; }
+}
+
+/* ---------- prizes: paid automatically once the tournament is over ---------- */
+let paying = false;
+async function payout() {
+  const me = uid(), p = profiles.current;
+  if (!me || !p || paying || !cloud.enabled) return;
+  const paid = new Set(p.tourPaid || []), now = Date.now();
+  const todo = Object.entries(p.tour || {}).filter(([tid]) => !paid.has(tid) && KINDS[kindOf(tid)] && now > endOf(tid) + 90000);
+  if (!todo.length) return;
+  paying = true;
+  try {
+    for (const [tid, r] of todo) {
+      const K = KINDS[kindOf(tid)];
+      let top;
+      try { top = sortB(await cloud.topTour(tid, 10)); } catch (e) { console.warn(e); continue; }
+      const rank = top.findIndex((e) => e.uid === me && e.best > 0);
+      const prize = rank >= 0 ? K.prizes[rank] || 0 : 0, part = (r.spins || 0) >= K.part.spins ? K.part.ke : 0;
+      const gname = getGame(r.game)?.name || '';
+      profiles.update('tourPaid', (q) => {
+        q.tourPaid = [...(q.tourPaid || []), tid].slice(-60);
+        if (prize && rank < 3) q.badges = [...new Set([...(q.badges || []), `${rank === 0 ? 'Vainqueur' : 'Podium'} du ${K.label} (${dayKey(endOf(tid) - 3600e3)})`])];
+      });
+      if (prize + part <= 0) continue;
+      wallet.grant(prize + part);
+      sfx.bigWin(); fx.coins(prize ? 70 : 30); fx.confetti(rank === 0 ? 150 : 70);
+      if (prize) {
+        modal(`<div class="ev-won"><span>${rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : '🏅'}</span><h2>${K.label} : ${place(rank)} !</h2>
+          <p>Sur ${esc(gname)}, avec ${xs(top[rank].best)}.</p><b>+${fmt(prize + part)}</b>${part ? `<small>dont ${fmt(part)} de participation</small>` : ''}
+          <button class="btn primary lg" data-value="ok">Je récupère</button></div>`, { cls: 'ev-modal' });
+      } else toast(`${K.icon} ${K.label} (${esc(gname)}) : merci d’avoir joué ${r.spins} tours ! +${fmt(part)} de participation`, 'ok');
+    }
+  } finally { paying = false; }
+}
+
+/* ---------- encarts : accueil, sous les jeux, menu ---------- */
+const homeParts = [], pillParts = [];
+const addHome = (fn) => homeParts.push(fn);
+const addGamePill = (fn) => pillParts.push(fn);
+
+function tourCard(T, t) {
+  const K = KINDS[T.kind], g = getGame(T.game), live = isLive(T, t), lead = boards[T.tid]?.list?.[0];
+  if (live) {
+    return `<a class="ev-card ev-live" href="#tournois" style="--ac:${g.colors[0]}"><span class="ev-ico">${K.icon}</span><div>
+      <small><i class="ev-dot"></i>EN DIRECT · ${K.label}</small><b>${esc(g.name)}</b>
+      <em>Fin dans ${left(T.end - t)} · ${lead && lead.best > 0 ? `1er : ${esc(lead.name)} ${xs(lead.best)}` : 'personne en tête'} · ${fmt(K.prizes[0])} au n°1</em></div><span class="ev-go">Jouer ›</span></a>`;
+  }
+  return `<a class="ev-card" href="#tournois" style="--ac:${g.colors[0]}"><span class="ev-ico">${K.icon}</span><div>
+    <small>${K.label} · ${T.kind === 'soir' ? 'ce soir 21 h' : 'samedi 0 h'}</small><b>${esc(g.name)}</b>
+    <em>Commence dans ${left(T.start - t)} · ${fmt(K.prizes[0])} au n°1</em></div><span class="ev-go">Voir ›</span></a>`;
+}
+function hhCard(t) {
+  const h = hhNow(t);
+  if (h) return `<a class="ev-card ev-hh" href="#game-${h.games[0]}"><span class="ev-ico">🍹</span><div><small><i class="ev-dot"></i>HAPPY HOUR EN COURS</small><b>Gains ×${HH.mult} sur ${h.games.map((g) => esc(getGame(g).name)).join(' et ')}</b><em>Encore ${left(h.end - t)} · jusqu’à ${fmt(HH.cap)} de bonus par joueur</em></div><span class="ev-go">Jouer ›</span></a>`;
+  return '';
+}
+function homeHTML() {
+  const t = Date.now(), [S, W] = current(t);
+  const tours = [S, W].filter((T) => isLive(T, t));
+  if (!isLive(S, t)) tours.push(S); // tonight's, not started yet (it always ends at midnight)
+  if (!isLive(W, t) && W.start - t < 2 * 864e5) tours.push(W);
+  return `<div class="ev-home">${hhCard(t)}${tours.map((T) => tourCard(T, t)).join('')}${homeParts.map((fn) => fn(t)).join('')}</div>`;
+}
+function gameHTML(gid) {
+  const t = Date.now(), out = [];
+  for (const T of current(t)) {
+    if (T.game !== gid) continue;
+    const K = KINDS[T.kind];
+    if (isLive(T, t)) {
+      const r = myRec(T.tid), b = boards[T.tid], rank = b?.rank ?? -1;
+      out.push(`<a class="ev-pill live" href="#tournois"><i class="ev-dot"></i><b>${K.label}</b> · fin dans ${left(T.end - t)} · ton record ${r?.best ? xs(r.best) : '—'}${rank >= 0 ? ` · ${place(rank)}` : ''} · ${r?.spins || 0}/${K.part.spins} tours</a>`);
+    } else if (T.start > t && T.start - t < 12 * 3600e3) out.push(`<a class="ev-pill" href="#tournois">${K.icon} ${K.label} sur ce jeu dans ${left(T.start - t)} · ${fmt(K.prizes[0])} au n°1</a>`);
+  }
+  const h = hhNow(t);
+  if (h && h.games.includes(gid)) out.push(`<span class="ev-pill hh">🍹 <b>Happy Hour ×${HH.mult}</b> · encore ${left(h.end - t)} · bonus touché ${fmt(hhUsed(h))} / ${fmt(HH.cap)}</span>`);
+  pillParts.forEach((fn) => { const x = fn(gid, t); if (x) out.push(x); });
+  return out.join('');
+}
+function paint() {
+  const t = Date.now();
+  document.querySelectorAll('[data-ev-home]').forEach((n) => { const h = homeHTML(); if (n.dataset.v !== h) { n.dataset.v = h; n.innerHTML = h; } });
+  document.querySelectorAll('[data-ev-game]').forEach((n) => { const h = gameHTML(n.dataset.evGame); if (n.dataset.v !== h) { n.dataset.v = h; n.innerHTML = h; } });
+  const live = current(t).some((T) => isLive(T, t)) || !!hhNow(t);
+  document.querySelectorAll('[data-ev-live]').forEach((n) => { n.hidden = !live; });
+  document.querySelectorAll('[data-cd-to]').forEach((n) => { n.textContent = left(+n.dataset.cdTo - t); });
+}
+setInterval(() => { syncBoards(); paint(); }, 1000);
+profiles.addEventListener('change', () => { for (const k of Object.keys(boards)) { boards[k].unwatch?.(); delete boards[k]; } setTimeout(() => { syncBoards(); payout(); }, 2500); });
+setInterval(payout, 5 * 60000);
+
+/* ---------- la page #tournois ---------- */
+let tab = 'soir';
+try { tab = localStorage.getItem('tour_tab') || 'soir'; } catch { /* ignore */ }
+if (!KINDS[tab]) tab = 'soir';
+function renderTournois(root) {
+  const { coverSVG } = __mods['covers.js'];
+  const t = Date.now(), T = tab === 'we' ? weNow(t) : soirNow(t);
+  const K = KINDS[T.kind], g = getGame(T.game), live = isLive(T, t), r = myRec(T.tid);
+  const prizes = K.prizes.map((p, k) => (k < 3 ? `${['🥇', '🥈', '🥉'][k]} ${fmt(p)}` : '')).filter(Boolean).join(' · ') + ` · 4e à 10e : ${fmt(K.prizes[3])}`;
+  const prog = [];
+  { const p = paris(t); for (let k = 0; k < 7; k++) { const S = soirOf(p.y, p.m, p.d + k); prog.push(`<li class="${isLive(S, t) ? 'on' : ''}"><span>${k === 0 ? 'Ce soir' : k === 1 ? 'Demain' : dayName(S.start).split(' ')[0]}</span><a href="#game-${S.game}">${esc(getGame(S.game).name)}</a><small>21 h → minuit</small></li>`); } }
+  const W = weNow(t);
+  const h = hhNow(t);
+  root.innerHTML = `
+    <section class="panel ev-page">
+      <div class="lb-tabs" role="tablist">${Object.entries(KINDS).map(([k, c]) => `<button type="button" data-tab="${k}" class="${k === tab ? 'on' : ''}"><span>${c.icon}</span>${c.label}</button>`).join('')}</div>
+      <div class="ev-top" style="--ac:${g.colors[0]}">
+        <a class="defi-cover" href="#game-${g.id}">${coverSVG(g, { square: true })}</a>
+        <div>
+          <span class="eyebrow">${live ? '<i class="ev-dot"></i> En direct · ' : ''}${K.label} · ${K.when}</span>
+          <h1>${esc(g.name)}</h1>
+          <p class="muted">${live ? `Le tournoi est en cours, fin à ${hhmm(T.end)}.` : `Début ${dayName(T.start)} à ${hhmm(T.start)}.`} Ton score = <b>ton plus gros gain en un tour</b> (bonus compris), en × ta mise : petite ou grosse mise, tout le monde part à égalité. Les bonus achetés ne comptent pas. À égalité, le premier arrivé garde la place.</p>
+          <div class="defi-prize">🏆 ${prizes}<br>🎟️ Participation : <b>${fmt(K.part.ke)}</b> pour tous ceux qui jouent au moins <b>${K.part.spins} tours</b> sur ${esc(g.name)} pendant le tournoi. Payé automatiquement à la fin.</div>
+          <div class="ref-stats"><div><b>${r?.best ? xs(r.best) : '—'}</b><small>ton record</small></div><div><b data-tour-rank>—</b><small>ta place</small></div><div><b>${r?.spins || 0} / ${K.part.spins}</b><small>tours joués</small></div><div><b data-cd-to="${live ? T.end : T.start}">${left((live ? T.end : T.start) - t)}</b><small>${live ? 'avant la fin' : 'avant le début'}</small></div></div>
+          <a class="btn primary lg" href="#game-${g.id}">${live ? 'Jouer au tournoi' : 'S’entraîner sur ce jeu'}</a>
+          ${!uid() ? '<p class="muted small">En invité, tu ne figures pas au classement : crée un compte pour jouer le tournoi et être payé.</p>' : ''}
+        </div>
+      </div>
+      <div class="ev-cols">
+        <div><h4>${live ? 'Classement en direct' : 'Classement'}</h4><ol class="defi-list" data-tour-board><li class="muted">${live ? 'Chargement…' : 'Le classement s’ouvre au début du tournoi.'}</li></ol></div>
+        <div>
+          <div class="ev-hhbox ${h ? 'on' : ''}"><b>🍹 Happy Hour · tous les soirs de 22 h à 23 h</b><p>Pendant le tournoi du soir, tes gains sur la machine du tournoi sont <b>doublés</b> (et sur celle du tournoi du week-end, le samedi et le dimanche). Jusqu’à ${fmt(HH.cap)} de bonus par joueur, bonus achetés exclus.</p>
+            <small>${h ? `En cours : encore <b data-cd-to="${h.end}">${left(h.end - t)}</b>` : `Prochaine Happy Hour dans <b data-cd-to="${hhNext(t)}">${left(hhNext(t) - t)}</b>`}</small></div>
+          <h4>Programme des tournois du soir</h4><ol class="ev-prog">${prog.join('')}</ol>
+          <p class="muted small">Tournoi du week-end ${isLive(W, t) ? 'en cours' : `du ${dayName(W.start)}`} : <a href="#game-${W.game}">${esc(getGame(W.game).name)}</a>, ${fmt(KINDS.we.prizes[0])} au n°1.</p>
+        </div>
+      </div>
+    </section>`;
+  root.querySelectorAll('[data-tab]').forEach((b) => { b.onclick = () => { tab = b.dataset.tab; try { localStorage.setItem('tour_tab', tab); } catch { /* ignore */ } renderTournois(root); }; });
+  const medal = (k) => (k === 0 ? '🥇' : k === 1 ? '🥈' : k === 2 ? '🥉' : `${k + 1}.`);
+  const draw = () => {
+    const ol = root.querySelector('[data-tour-board]');
+    if (!ol) { subs.delete(draw); return; }
+    const b = boards[T.tid];
+    if (!live || !b?.list) return;
+    const list = b.list.filter((e) => e.best > 0);
+    ol.innerHTML = list.length ? list.map((e, k) => `<li class="${e.uid === uid() ? 'me' : ''}"><span>${medal(k)}</span><b class="pname" data-player="${esc(e.uid)}" data-pname="${esc(e.name)}" role="button" tabindex="0">${esc(e.name)}</b><em>${xs(e.best)}</em><small class="defi-prz">${k < 10 ? '+' + fmt(K.prizes[k]) : ''}</small></li>`).join('') : '<li class="muted">Personne pour l’instant : sois le premier !</li>';
+    const rk = root.querySelector('[data-tour-rank]');
+    if (rk) rk.textContent = b.rank >= 0 && b.list[b.rank]?.best > 0 ? place(b.rank) : r?.best ? 'hors top 20' : '—';
+  };
+  subs.clear(); subs.add(draw);
+  if (!cloud.enabled) root.querySelector('[data-tour-board]').innerHTML = '<li class="muted">Le classement s’active avec les comptes en ligne.</li>';
+  else { syncBoards(); draw(); }
+  payout();
+}
+
+return { renderTournois, addHome, addGamePill, paint, paris, at, dayKey, left, KINDS, HH, hhNow, soirNow, weNow, isLive };
+})();
+
+// ---- jackpot.js ----
+__mods['jackpot.js'] = (() => {
+// Jackpot commun (#jackpot) : 1 % de chaque mise du site (comptes connectés) remplit la cagnotte jackpot/main.
+// Chaque machine à sous a un gain maximum (game.maxX, ×5 000 ou ×10 000 la mise, bonus compris) : le joueur qui
+// l'atteint (sb:maxwin, core/base.js) touche le jackpot commun, en entier dès FULL_STAKE KE de mise, sinon une
+// part (mise / FULL_STAKE). Après un jackpot entier, la cagnotte repart de SEED.
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { toast, modal, fmtShort } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const { getGame, SLOTS } = __mods['games/index.js'];
+const events = __mods['events.js'];
+
+const SEED = 100000, FEED = 0.01, FULL_STAKE = 100;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const uid = () => (profiles.online && profiles.current ? profiles.store.current : null);
+const xs = (x) => `×${x.toLocaleString('fr-FR')}`;
+
+let doc = null, pend = 0, started = false, lastAt = null;
+const pot = () => Math.max(0, SEED + (doc?.amount || 0) + pend);
+
+wallet.addEventListener('wager', (e) => {
+  if (!uid() || !/^#game-/.test(location.hash)) return;
+  pend += (e.detail?.amount || 0) * FEED;
+  paint();
+});
+async function flush() {
+  if (!uid() || !cloud.enabled || pend < 0.01) return;
+  const ke = Math.min(100000, Math.round(pend * 100) / 100);
+  pend = Math.max(0, pend - ke);
+  try { await cloud.feedJackpot(ke); } catch (e) { pend += ke; console.warn('Jackpot : cagnotte non envoyée (règles Firestore à jour ?)', e); }
+}
+setInterval(flush, 60000);
+addEventListener('pagehide', flush);
+
+async function start() {
+  if (started || !cloud.enabled) return;
+  started = true;
+  try {
+    await cloud.watchJackpot((d) => {
+      doc = d;
+      const l = d?.last, la = l?.at?.toMillis?.() || 0;
+      if (lastAt !== null && la && la !== lastAt && l.uid !== uid()) {
+        toast(`💎 ${esc(l.name)} vient de remporter le JACKPOT : ${fmt(l.ke)} sur ${esc(getGame(l.game)?.name || 'une machine')} !`, 'ok');
+        sfx.jackpot?.();
+      }
+      if (la || lastAt === null) lastAt = la;
+      paint();
+    });
+  } catch (e) { console.warn(e); started = false; }
+}
+setTimeout(start, 1200);
+
+function paint() {
+  const v = pot();
+  document.querySelectorAll('[data-jackpot]').forEach((n) => { n.textContent = n.dataset.jackpot === 'short' ? `${fmtShort(v)} ` : fmt(Math.floor(v)); });
+}
+setInterval(paint, 2000);
+
+addEventListener('sb:maxwin', async (e) => {
+  const d = e.detail || {}, g = getGame(d.game), share = Math.min(1, (d.stake || 0) / FULL_STAKE);
+  sfx.jackpot?.(); fx.confetti(200); fx.coins(100);
+  const me = uid();
+  if (!me || !cloud.enabled) {
+    modal(`<div class="ev-won jp"><span>💎</span><h2>MAX WIN !</h2><p>${xs(d.maxX)} la mise sur ${esc(g?.name)}.</p><b>+${fmt(d.win)}</b>
+      <small>Avec un compte, tu aurais aussi touché le jackpot commun (${fmt(Math.floor(pot()))}) ! Crée ton compte pour la prochaine fois.</small><button class="btn primary lg" data-value="ok">OK</button></div>`, { cls: 'ev-modal' });
+    return;
+  }
+  let ke = 0;
+  try { await flush(); ke = await cloud.winJackpot(me, String(profiles.current?.name || 'Joueur').slice(0, 16), d.game, share, SEED); } catch (err) { console.error(err); }
+  if (ke > 0) {
+    wallet.grant(ke);
+    profiles.update('jpWins', (p) => { p.jpWins = [...(p.jpWins || []), { ke, game: d.game, t: Date.now() }].slice(-20); });
+  }
+  modal(`<div class="ev-won jp"><span>💎</span><h2>MAX WIN + JACKPOT !</h2><p>${xs(d.maxX)} la mise sur ${esc(g?.name)} : <b>+${fmt(d.win)}</b></p>
+    ${ke > 0 ? `<b>+${fmt(ke)}</b><small>Le jackpot commun est à toi${share < 1 ? ` : avec ${fmt(d.stake)} de mise, tu touches ${Math.round(share * 100)} % de la cagnotte (100 % dès ${fmt(FULL_STAKE)} de mise)` : ''} !</small>`
+    : '<small>Le jackpot n’a pas pu être versé (connexion ?). Préviens l’équipe avec une capture d’écran.</small>'}
+    <button class="btn primary lg" data-value="ok">Incroyable !</button></div>`, { cls: 'ev-modal' });
+});
+
+// encarts : accueil et sous chaque machine à sous
+events.addHome(() => `<a class="ev-card ev-jp" href="#jackpot"><span class="ev-ico">💎</span><div><small>Jackpot commun · toutes les machines à sous</small><b data-jackpot>${fmt(Math.floor(pot()))}</b><em>Atteins le max win d’une machine à sous et la cagnotte est à toi</em></div><span class="ev-go">Voir ›</span></a>`);
+events.addGamePill((gid) => {
+  const g = getGame(gid);
+  if (!g?.maxX) return '';
+  return `<a class="ev-pill jp" href="#jackpot">💎 Max win <b>${xs(g.maxX)}</b> la mise → jackpot commun <b data-jackpot>${fmt(Math.floor(pot()))}</b></a>`;
+});
+
+async function renderJackpot(root) {
+  const { coverSVG } = __mods['covers.js'];
+  const rows = SLOTS.slice().sort((a, b) => b.maxX - a.maxX || a.name.localeCompare(b.name)).map((g) => `<a class="jp-row" href="#game-${g.id}"><span class="jp-cov">${coverSVG(g, { square: true })}</span><b>${esc(g.name)}</b><em>${xs(g.maxX)}</em></a>`).join('');
+  root.innerHTML = `
+    <section class="panel ev-page jp-page">
+      <div class="jp-hero">
+        <span class="eyebrow">💎 Jackpot commun</span>
+        <div class="jp-amt" data-jackpot>${fmt(Math.floor(pot()))}</div>
+        <p>Une seule cagnotte pour tout le site. Chaque mise la fait monter : <b>1 %</b> de tout ce qui est misé y tombe.</p>
+        <a class="btn primary lg" href="#lobby-slot">Tenter le max win</a>
+      </div>
+      <div class="sp-rules">
+        <div><span>🎰</span><b>Chaque machine a un max win</b><p>Sur chaque machine à sous, un tour (bonus compris) paie au maximum un certain nombre de fois la mise : <b>×500</b>, <b>×5 000</b> ou <b>×10 000</b> selon la machine (liste ci-dessous). Quand ce plafond est atteint, le tour s’arrête et paie le max win.</p></div>
+        <div><span>💎</span><b>Max win = jackpot</b><p>Le joueur qui atteint le max win d’une machine touche <b>en plus toute la cagnotte</b>. Elle repart ensuite de ${fmt(SEED)}.</p></div>
+        <div><span>⚖️</span><b>Mise mini pour tout rafler</b><p>Dès <b>${fmt(FULL_STAKE)}</b> de mise, c’est 100 % du jackpot. En dessous, tu en touches une part : à ${fmt(10)} de mise, 10 % ; le reste reste dans la cagnotte.</p></div>
+        <div><span>🔐</span><b>Compte obligatoire</b><p>Il faut un compte connecté pour remplir la cagnotte et la toucher. Les bonus achetés comptent aussi.</p></div>
+      </div>
+      <h2 class="sp-h">Le max win de chaque machine à sous</h2>
+      <div class="jp-grid">${rows}</div>
+      <h2 class="sp-h">Derniers gagnants</h2>
+      <ol class="defi-list" data-jp-wins><li class="muted">${cloud.enabled ? 'Chargement…' : 'Disponible avec les comptes en ligne.'}</li></ol>
+    </section>`;
+  paint();
+  if (!cloud.enabled) return;
+  start();
+  const wins = await cloud.jackpotWins(10).catch(() => null);
+  const ol = root.querySelector('[data-jp-wins]');
+  if (!ol) return;
+  ol.innerHTML = wins?.length ? wins.map((w) => `<li><span>💎</span><b>${esc(w.name)}</b><small>${esc(getGame(w.game)?.name || '')} · ${w.atMs ? new Date(w.atMs).toLocaleDateString('fr-FR') : ''}</small><em>${fmt(w.ke)}</em></li>`).join('') : '<li class="muted">Personne pour l’instant : le premier max win rafle tout !</li>';
+}
+
+return { renderJackpot, pot, SEED, FULL_STAKE };
+})();
+
+// ---- duels.js ----
+__mods['duels.js'] = (() => {
+// Duels entre amis (#duels) : je défie un ami sur une machine à sous, N tours chacun (20, 50 ou 100), avec une mise
+// de duel. Le score = la somme des gains de chaque tour en × la mise (sb:roundend, bonus achetés exclus) : la taille
+// de la mise ne compte pas. Chacun joue quand il veut, pendant 24 h après l'acceptation. Le gagnant touche les deux
+// mises ; égalité = chacun récupère la sienne. Firestore : duels/{id} = { from, fromName, to, toName, game, spins,
+// stake, status (pending | accepted | declined | cancelled), at, acc, fn, fp, tn, tp }. Chaque navigateur se paie
+// lui-même une seule fois (profile.duelDone).
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { toast } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const { getGame, SLOTS } = __mods['games/index.js'];
+const events = __mods['events.js'];
+
+const DUR = 24 * 3600e3, SPINS = [20, 50, 100], STAKES = [0, 500, 1000, 5000, 10000, 50000, 100000];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const me = () => (profiles.online && profiles.current ? { uid: profiles.store.current, name: String(profiles.current.name || 'Joueur').slice(0, 16) } : null);
+const xs = (x) => `×${(Math.round(x * 100) / 100).toLocaleString('fr-FR')}`;
+
+let from = [], to = [], stops = [], startedFor = null;
+const all = () => [...from, ...to].sort((a, b) => (b.atMs || 0) - (a.atMs || 0));
+const done = () => profiles.current?.duelDone || {};
+const mark = (id, v) => profiles.update('duelDone', (p) => { p.duelDone = { ...(p.duelDone || {}), [id]: v }; const k = Object.keys(p.duelDone); if (k.length > 80) delete p.duelDone[k[0]]; });
+const mine = (D) => D.from === me()?.uid;
+const prog = (D) => {
+  const srv = mine(D) ? { n: D.fn || 0, p: D.fp || 0 } : { n: D.tn || 0, p: D.tp || 0 };
+  const loc = profiles.current?.duelProg?.[D.id];
+  return loc && loc.n >= srv.n ? loc : srv;
+};
+const opp = (D) => (mine(D) ? { name: D.toName, n: D.tn || 0, p: D.tp || 0 } : { name: D.fromName, n: D.fn || 0, p: D.fp || 0 });
+const expired = (D, t = Date.now()) => (D.status === 'pending' ? t > (D.atMs || t) + DUR : D.status === 'accepted' ? t > (D.accMs || t) + DUR : false);
+const active = (t = Date.now()) => all().filter((D) => D.status === 'accepted' && !expired(D, t));
+
+async function start() {
+  const m = me();
+  if ((m?.uid || null) === startedFor) return;
+  stops.forEach((f) => f?.()); stops = []; from = []; to = []; startedFor = m?.uid || null;
+  if (!m || !cloud.enabled) return;
+  const first = { to: true };
+  try {
+    stops.push(await cloud.watchDuels('from', m.uid, (l) => { from = l; settle(); paintAll(); }));
+    stops.push(await cloud.watchDuels('to', m.uid, (l) => {
+      const before = new Set(to.map((d) => d.id));
+      to = l;
+      if (!first.to) l.filter((d) => d.status === 'pending' && !before.has(d.id)).forEach((d) => { toast(`⚔️ ${esc(d.fromName)} te défie en duel sur ${esc(getGame(d.game)?.name)} (${d.spins} tours${d.stake ? `, ${fmt(d.stake)} en jeu` : ''}) : va dans Duels !`, 'info'); sfx.win?.(); });
+      first.to = false;
+      settle(); paintAll();
+    }));
+  } catch (e) { console.warn('Duels indisponibles (règles Firestore à jour ?)', e); }
+}
+profiles.addEventListener('change', () => setTimeout(start, 2000));
+setInterval(() => { settle(); }, 60000);
+
+// Refunds and prizes, once per duel.
+function settle() {
+  const m = me();
+  if (!m) return;
+  const t = Date.now(), dd = done();
+  for (const D of all()) {
+    if (dd[D.id]) continue;
+    const isFrom = mine(D);
+    if (D.status === 'declined' || D.status === 'cancelled' || (D.status === 'pending' && expired(D, t))) {
+      if (!isFrom) { if (D.status !== 'pending') mark(D.id, 'off'); continue; }
+      mark(D.id, 'refund');
+      if (D.stake) { wallet.grant(D.stake); toast(`⚔️ Duel contre ${esc(D.toName)} ${D.status === 'declined' ? 'refusé' : D.status === 'cancelled' ? 'annulé' : 'expiré'} : ta mise de ${fmt(D.stake)} t’est rendue`, 'info'); }
+      continue;
+    }
+    if (D.status !== 'accepted' || !D.accMs) continue;
+    const bothDone = (D.fn || 0) >= D.spins && (D.tn || 0) >= D.spins;
+    if (!bothDone && !expired(D, t)) continue;
+    const a = isFrom ? D.fp || 0 : D.tp || 0, b = isFrom ? D.tp || 0 : D.fp || 0, o = opp(D);
+    const res = a > b ? 'win' : a < b ? 'lose' : 'tie';
+    mark(D.id, res);
+    if (res === 'win') {
+      if (D.stake) wallet.grant(D.stake * 2);
+      sfx.bigWin(); fx.confetti(110); fx.coins(50);
+      toast(`⚔️ Duel gagné contre ${esc(o.name)} : ${xs(a)} contre ${xs(b)}${D.stake ? ` → +${fmt(D.stake * 2)}` : ''} !`, 'ok');
+    } else if (res === 'tie') {
+      if (D.stake) wallet.grant(D.stake);
+      toast(`⚔️ Égalité contre ${esc(o.name)} (${xs(a)})${D.stake ? ` : ta mise de ${fmt(D.stake)} t’est rendue` : ''}`, 'info');
+    } else toast(`⚔️ Duel perdu contre ${esc(o.name)} : ${xs(a)} contre ${xs(b)}. Revanche ?`, 'warn');
+  }
+}
+
+// Every paid round on the duel's machine counts, for each of my running duels on it.
+const writing = {};
+addEventListener('sb:roundend', (e) => {
+  const d = e.detail || {};
+  if (d.bought || !me()) return;
+  for (const D of active()) {
+    if (D.game !== d.game) continue;
+    const cur = prog(D);
+    if (cur.n >= D.spins) continue;
+    const nx = { n: cur.n + 1, p: Math.round((cur.p + (d.x || 0)) * 100) / 100 };
+    profiles.update('duelProg', (p) => { p.duelProg = { ...(p.duelProg || {}), [D.id]: nx }; const k = Object.keys(p.duelProg); if (k.length > 40) delete p.duelProg[k[0]]; });
+    const send = () => cloud.updateDuel(D.id, mine(D) ? { fn: nx.n, fp: nx.p } : { tn: nx.n, tp: nx.p }).catch((err) => console.warn(err));
+    clearTimeout(writing[D.id]);
+    if (nx.n >= D.spins) { send(); toast(`⚔️ Tes ${D.spins} tours du duel contre ${esc(opp(D).name)} sont joués : ${xs(nx.p)}. ${opp(D).n >= D.spins ? 'Résultat dans un instant…' : 'On attend ton adversaire !'}`, 'ok'); }
+    else writing[D.id] = setTimeout(send, 1500);
+  }
+  events.paint();
+});
+
+events.addGamePill((gid) => active().filter((D) => D.game === gid).map((D) => {
+  const p = prog(D), o = opp(D);
+  return `<a class="ev-pill duel" href="#duels">⚔️ <b>Duel vs ${esc(o.name)}</b> · toi ${xs(p.p)} (${p.n}/${D.spins}) · ${esc(o.name)} ${xs(o.p)} (${o.n}/${D.spins})</a>`;
+}).join(''));
+
+function paintAll() {
+  const n = to.filter((D) => D.status === 'pending' && !expired(D)).length;
+  document.querySelectorAll('[data-duel-badge]').forEach((b) => { b.hidden = !n; b.textContent = n; });
+  const root = document.querySelector('[data-duels-page]');
+  if (root) list(root);
+  events.paint();
+}
+
+async function create(form) {
+  const m = me();
+  const fr = form.friend.value, game = form.game.value, spins = +form.spins.value, stake = +form.stake.value;
+  const friends = __mods['friends.js']?.friends?.() || {};
+  if (!fr || !friends[fr]) return toast('Choisis un ami à défier', 'warn');
+  if (!getGame(game)?.maxX || !SPINS.includes(spins) || !STAKES.includes(stake)) return;
+  if (stake && !wallet.spend(stake)) return toast(`Solde insuffisant pour miser ${fmt(stake)}`, 'warn');
+  try {
+    await cloud.createDuel({ from: m.uid, fromName: m.name, to: fr, toName: String(friends[fr]).slice(0, 16), game, spins, stake, status: 'pending', fn: 0, fp: 0, tn: 0, tp: 0 });
+    toast(`⚔️ Défi envoyé à ${esc(friends[fr])} !`, 'ok');
+  } catch (e) {
+    console.error(e);
+    if (stake) wallet.grant(stake);
+    toast('Défi impossible pour le moment (réessaie dans un instant)', 'warn');
+  }
+}
+async function answer(id, ok) {
+  const D = to.find((x) => x.id === id);
+  if (!D || D.status !== 'pending') return;
+  if (ok && D.stake && !wallet.spend(D.stake)) return toast(`Il te faut ${fmt(D.stake)} pour accepter ce duel`, 'warn');
+  try {
+    await cloud.answerDuel(id, ok);
+    if (ok) { toast(`⚔️ Duel accepté : joue tes ${D.spins} tours sur ${esc(getGame(D.game)?.name)} !`, 'ok'); }
+  } catch (e) {
+    console.error(e);
+    if (ok && D.stake) wallet.grant(D.stake);
+    toast('Réponse impossible (le duel a peut-être expiré)', 'warn');
+  }
+}
+
+function card(D) {
+  const g = getGame(D.game), t = Date.now(), p = prog(D), o = opp(D), isFrom = mine(D), r = done()[D.id];
+  const head = `<div class="du-head"><b>${isFrom ? `Toi vs ${esc(D.toName)}` : `${esc(D.fromName)} vs toi`}</b><small>${esc(g?.name || '')} · ${D.spins} tours · ${D.stake ? `${fmt(D.stake)} chacun` : 'pour l’honneur'}</small></div>`;
+  let body = '', cls = '';
+  if (D.status === 'pending' && !expired(D, t)) {
+    cls = 'wait';
+    body = isFrom ? `<p class="muted">En attente de la réponse de ${esc(D.toName)} (expire dans ${events.left((D.atMs || t) + DUR - t)}).</p><button class="btn ghost sm" data-cancel="${D.id}">Annuler</button>`
+      : `<p>${esc(D.fromName)} te défie ! ${D.stake ? `Mise : <b>${fmt(D.stake)}</b>, le gagnant prend <b>${fmt(D.stake * 2)}</b>.` : ''}</p><button class="btn primary sm" data-acc="${D.id}">⚔️ Accepter</button><button class="btn ghost sm" data-ref="${D.id}">Refuser</button>`;
+  } else if (D.status === 'accepted' && !r) {
+    cls = 'on';
+    const bar = (n) => `<i style="width:${Math.min(100, (n / D.spins) * 100)}%"></i>`;
+    body = `<div class="du-vs"><div><small>Toi</small><b>${xs(p.p)}</b><span class="du-bar">${bar(p.n)}</span><small>${p.n} / ${D.spins} tours</small></div>
+      <div><small>${esc(o.name)}</small><b>${xs(o.p)}</b><span class="du-bar">${bar(o.n)}</span><small>${o.n} / ${D.spins} tours</small></div></div>
+      <p class="muted small">Fin dans ${events.left((D.accMs || t) + DUR - t)} au plus tard.</p>${p.n < D.spins ? `<a class="btn primary sm" href="#game-${D.game}">Jouer mes tours</a>` : ''}`;
+  } else {
+    cls = 'end';
+    const a = isFrom ? D.fp || 0 : D.tp || 0, b = isFrom ? D.tp || 0 : D.fp || 0;
+    body = D.status === 'accepted' || r === 'win' || r === 'lose' || r === 'tie'
+      ? `<p>${r === 'win' ? '🏆 Gagné' : r === 'lose' ? '❌ Perdu' : '🤝 Égalité'} : ${xs(a)} contre ${xs(b)}${r === 'win' && D.stake ? ` · +${fmt(D.stake * 2)}` : ''}</p>`
+      : `<p class="muted">${D.status === 'declined' ? 'Refusé' : D.status === 'cancelled' ? 'Annulé' : 'Expiré sans réponse'}${isFrom && D.stake ? ' · mise rendue' : ''}</p>`;
+  }
+  return `<article class="du-card ${cls}">${head}${body}</article>`;
+}
+function list(root) {
+  const box = root.querySelector('[data-duel-list]');
+  if (!box) return;
+  const l = all();
+  const groups = [['À toi de répondre', l.filter((D) => D.status === 'pending' && !mine(D) && !expired(D))], ['En cours', l.filter((D) => (D.status === 'accepted' && !done()[D.id]) || (D.status === 'pending' && mine(D) && !expired(D)))], ['Terminés', l.filter((D) => done()[D.id]).slice(0, 12)]];
+  box.innerHTML = groups.filter(([, x]) => x.length).map(([h, x]) => `<h4>${h}</h4><div class="du-list">${x.map(card).join('')}</div>`).join('') || '<p class="muted">Aucun duel pour l’instant : défie un ami !</p>';
+  box.querySelectorAll('[data-acc]').forEach((b) => { b.onclick = () => { b.disabled = true; answer(b.dataset.acc, true); }; });
+  box.querySelectorAll('[data-ref]').forEach((b) => { b.onclick = () => { b.disabled = true; answer(b.dataset.ref, false); }; });
+  box.querySelectorAll('[data-cancel]').forEach((b) => { b.onclick = () => { b.disabled = true; cloud.updateDuel(b.dataset.cancel, { status: 'cancelled' }).catch(() => toast('Annulation impossible : ton ami a peut-être déjà répondu', 'warn')); }; });
+}
+
+function renderDuels(root) {
+  const m = me();
+  start();
+  const friends = Object.entries(__mods['friends.js']?.friends?.() || {}).sort((a, b) => a[1].localeCompare(b[1]));
+  root.innerHTML = `
+    <section class="panel ev-page du-page" data-duels-page>
+      <span class="eyebrow">⚔️ Duels entre amis</span>
+      <h1>Défie tes amis sur une machine à sous</h1>
+      <p class="muted">Choisis un ami, une machine, un nombre de tours et une mise. Chacun joue ses tours quand il veut (24 h max). Ton score = <b>la somme de tes gains en × ta mise</b> sur tous tes tours : petite ou grosse mise, c’est pareil. Le meilleur rafle les deux mises. Les bonus achetés ne comptent pas.</p>
+      ${!m ? '<p class="ref-need">Les duels demandent un <b>compte</b> : connecte-toi ou crée ton compte depuis l’écran d’accueil.</p>'
+      : !friends.length ? '<p class="ref-need">Ajoute d’abord des amis : ouvre le <b>chat › Amis</b> et tape le pseudo d’un joueur.</p>'
+        : `<form class="du-form">
+        <label>Ami<select name="friend">${friends.map(([u, n]) => `<option value="${esc(u)}">${esc(n)}</option>`).join('')}</select></label>
+        <label>Machine<select name="game">${SLOTS.map((g) => `<option value="${g.id}">${esc(g.name)}</option>`).join('')}</select></label>
+        <label>Tours<select name="spins">${SPINS.map((n) => `<option value="${n}"${n === 50 ? ' selected' : ''}>${n} tours</option>`).join('')}</select></label>
+        <label>Mise du duel<select name="stake">${STAKES.map((n) => `<option value="${n}"${n === 1000 ? ' selected' : ''}>${n ? fmt(n) : 'Pour l’honneur'}</option>`).join('')}</select></label>
+        <button class="btn primary">⚔️ Lancer le défi</button>
+      </form>`}
+      <div data-duel-list></div>
+    </section>`;
+  root.querySelector('.du-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const b = e.currentTarget.querySelector('button'); b.disabled = true;
+    await create(e.currentTarget);
+    b.disabled = false;
+  });
+  list(root);
+}
+
+return { renderDuels };
+})();
+
+// ---- cashback.js ----
+__mods['cashback.js'] = (() => {
+// Cashback (#cashback) : chaque jour (heure de Paris), une part de tes pertes (mises − gains dans les jeux) te
+// revient le lendemain. Plus tu as misé dans la journée, plus le pourcentage monte (TIERS). À récupérer pendant
+// 7 jours. Suivi depuis les événements 'wager' / 'payout' du portefeuille, sauvé dans profile.cb.
+
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { toast } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const events = __mods['events.js'];
+
+const TIERS = [
+  { min: 0, pct: 5, name: 'Bronze', icon: '🥉' },
+  { min: 5000, pct: 10, name: 'Argent', icon: '🥈' },
+  { min: 50000, pct: 15, name: 'Or', icon: '🥇' },
+  { min: 500000, pct: 20, name: 'Diamant', icon: '💎' },
+  { min: 5000000, pct: 25, name: 'Légende', icon: '👑' },
+];
+const KEEP_DAYS = 7;
+const r2 = (n) => Math.round(n * 100) / 100;
+const tierOf = (wag) => TIERS.filter((t) => wag >= t.min).pop();
+const amountOf = (c) => r2((Math.max(0, (c.wag || 0) - (c.won || 0)) * tierOf(c.wag || 0).pct) / 100);
+const inGame = () => /^#game-/.test(location.hash);
+
+// Rolls the day over: yesterday's cashback becomes claimable.
+function cb() {
+  const p = profiles.current;
+  if (!p) return null;
+  const today = events.dayKey();
+  const c = p.cb || {};
+  if (c.day === today) return c;
+  return profiles.update('cb', (q) => {
+    const o = q.cb || {}, pend = { ...(o.pend || {}) };
+    if (o.day && o.day !== today) { const amt = amountOf(o); if (amt >= 0.01) pend[o.day] = { amt, wag: r2(o.wag || 0), pct: tierOf(o.wag || 0).pct }; }
+    const cut = events.dayKey(Date.now() - KEEP_DAYS * 864e5);
+    Object.keys(pend).forEach((k) => { if (k < cut) delete pend[k]; });
+    q.cb = { day: today, wag: 0, won: 0, pend };
+    return q.cb;
+  });
+}
+const pending = () => Object.entries(cb()?.pend || {}).sort();
+const pendTotal = () => r2(pending().reduce((s, [, v]) => s + v.amt, 0));
+
+wallet.addEventListener('wager', (e) => {
+  if (!inGame() || !cb()) return;
+  profiles.update('cb', (q) => { q.cb.wag = r2((q.cb.wag || 0) + (e.detail?.amount || 0)); });
+  badge();
+});
+wallet.addEventListener('payout', (e) => {
+  if (!inGame() || !cb()) return;
+  profiles.update('cb', (q) => { q.cb.won = r2((q.cb.won || 0) + (e.detail?.amount || 0)); });
+});
+
+function claim() {
+  const total = pendTotal();
+  if (!(total > 0)) return 0;
+  profiles.update('cb', (q) => { q.cb.pend = {}; q.cb.got = r2((q.cb.got || 0) + total); });
+  wallet.grant(total);
+  sfx.bigWin(); fx.coins(50); fx.confetti(80);
+  badge();
+  return total;
+}
+
+function badge() {
+  const n = profiles.current ? pendTotal() : 0;
+  document.querySelectorAll('[data-cb-badge]').forEach((b) => { b.hidden = !(n > 0); b.textContent = '!'; });
+}
+profiles.addEventListener('change', () => setTimeout(() => {
+  badge();
+  const n = profiles.current ? pendTotal() : 0;
+  if (n > 0) toast(`💸 Ton cashback t’attend : ${fmt(n)} à récupérer dans Cashback !`, 'ok');
+}, 3500));
+setInterval(badge, 60000);
+
+events.addHome(() => {
+  const n = profiles.current ? pendTotal() : 0;
+  return n > 0 ? `<a class="ev-card ev-cb" href="#cashback"><span class="ev-ico">💸</span><div><small>Cashback</small><b>${fmt(n)} à récupérer</b><em>Une part de tes pertes d’hier te revient</em></div><span class="ev-go">Récupérer ›</span></a>` : '';
+});
+
+function renderCashback(root) {
+  const c = cb() || { wag: 0, won: 0 }, tier = tierOf(c.wag || 0), next = TIERS[TIERS.indexOf(tier) + 1], est = profiles.current ? amountOf(c) : 0, total = profiles.current ? pendTotal() : 0;
+  const pct = next ? Math.min(100, ((c.wag || 0) / next.min) * 100) : 100;
+  const endDay = (() => { const p = events.paris(); return events.at(p.y, p.m, p.d + 1, 0); })();
+  root.innerHTML = `
+    <section class="panel ev-page cb-page">
+      <span class="eyebrow">💸 Cashback</span>
+      <h1>Plus tu joues, plus tu récupères</h1>
+      <p class="muted">Chaque jour, une part de tes pertes (tes mises moins tes gains dans les jeux) te revient le lendemain. Le pourcentage monte avec ce que tu as misé dans la journée.</p>
+      <div class="cb-claim">
+        <div><small>À récupérer</small><b>${fmt(total)}</b>${pending().length ? `<small>${pending().map(([d, v]) => `${d.split('-').reverse().slice(0, 2).join('/')} : ${fmt(v.amt)} (${v.pct} %)`).join(' · ')}</small>` : '<small>Rien pour l’instant : reviens demain !</small>'}</div>
+        <button class="btn primary lg" data-cb-claim ${total > 0 ? '' : 'disabled'}>💸 Récupérer</button>
+      </div>
+      <h4>Aujourd’hui</h4>
+      <div class="ref-stats"><div><b>${fmt(c.wag || 0)}</b><small>misé</small></div><div><b>${fmt(Math.max(0, (c.wag || 0) - (c.won || 0)))}</b><small>pertes</small></div><div><b>${tier.icon} ${tier.pct} %</b><small>palier ${tier.name}</small></div><div><b>${fmt(est)}</b><small>cashback demain</small></div></div>
+      ${next ? `<div class="cb-next"><span class="du-bar"><i style="width:${pct}%"></i></span><small>Encore <b>${fmt(Math.max(0, next.min - (c.wag || 0)))}</b> de mises aujourd’hui pour passer ${next.icon} ${next.name} (${next.pct} %) · la journée finit dans <b data-cd-to="${endDay}">${events.left(endDay - Date.now())}</b></small></div>` : '<p class="muted">Palier maximum atteint aujourd’hui : bravo !</p>'}
+      <h4>Les paliers (selon tes mises de la journée)</h4>
+      <div class="cb-tiers">${TIERS.map((t) => `<div class="${t === tier ? 'on' : ''}"><span>${t.icon}</span><b>${t.pct} %</b><small>${t.name}<br>${t.min ? `dès ${fmt(t.min)} misés` : 'dès la 1re mise'}</small></div>`).join('')}</div>
+      <p class="muted small">Le cashback se garde ${KEEP_DAYS} jours. Les achats de la Boutique et les KE offerts ne comptent pas ; les gains des jeux, oui. Heure de Paris.</p>
+    </section>`;
+  root.querySelector('[data-cb-claim]')?.addEventListener('click', () => { const k = claim(); if (k) toast(`💸 Cashback récupéré : +${fmt(k)} !`, 'ok'); renderCashback(root); });
+}
+
+return { renderCashback };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -13280,6 +14167,10 @@ const routes = [
   { re: /^defi$/, page: (r) => renderChallenge(r), nav: 'defi' },
   { re: /^(special|defi-special)$/, page: (r) => __mods['special.js'].renderSpecial(r), nav: 'special' },
   { re: /^admin$/, page: (r) => __mods['pages/admin.js'].renderAdmin(r), nav: 'admin' },
+  { re: /^tournois?$/, page: (r) => __mods['events.js'].renderTournois(r), nav: 'tournois' },
+  { re: /^jackpot$/, page: (r) => __mods['jackpot.js'].renderJackpot(r), nav: 'jackpot' },
+  { re: /^duels?$/, page: (r) => __mods['duels.js'].renderDuels(r), nav: 'duels' },
+  { re: /^cashback$/, page: (r) => __mods['cashback.js'].renderCashback(r), nav: 'cashback' },
 ];
 
 function route() {
@@ -13289,6 +14180,7 @@ function route() {
   const hit = routes.find((r) => r.re.test(path)) || routes[0];
   view.classList.remove('enter');
   hit.page(view, path.match(hit.re) || []);
+  __mods['events.js'].paint(); // tournaments, happy hour, jackpot and duels boxes
   void view.offsetWidth;
   view.classList.add('enter');
   const nav = typeof hit.nav === 'function' ? hit.nav(path.match(hit.re) || []) : hit.nav;
@@ -13941,6 +14833,110 @@ html.light .sp-hero h1 em { color: #facc15; }
 html.light .slot, html.light .slot-overlay, html.light .gm-back { --bg: #07090d; --bg-2: #0e1117; --panel: #12151b; --panel-2: #191d25; --panel-3: #232833; --line: #2a313d; --text: #eef4fb; --muted: #93a0b3; --green: #7cc8ff; --green-d: #2f86d6; color-scheme: dark; color: #eef4fb; }
 html.light .slot h2, html.light .slot h3, html.light .slot h4 { color: #fff; }
 html.light .slot small { color: inherit; }
+</style>
+<style id="events-css">
+/* ---------- Événements : tournois, happy hour, jackpot commun, duels, cashback ---------- */
+.ev-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; margin-right: 6px; vertical-align: 1px; box-shadow: 0 0 0 0 rgba(239, 68, 68, .7); animation: liveDot 1.4s infinite; }
+.ev-home { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.ev-home:empty { display: none; }
+.ev-card { --ac: #7cc8ff; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 6px; color: var(--text); text-decoration: none; min-width: 0;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--ac) 22%, var(--panel)), var(--panel)); border: 1px solid color-mix(in srgb, var(--ac) 45%, var(--line)); }
+.ev-card:hover { border-color: var(--ac); }
+.ev-card > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.ev-card small { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); }
+.ev-card b { font: 900 clamp(17px, 2.2vw, 21px) 'Bebas Neue', Impact, sans-serif; letter-spacing: .5px; line-height: 1.1; overflow-wrap: anywhere; }
+.ev-card em { font-style: normal; font-size: 12.5px; color: var(--muted); }
+.ev-ico { font-size: 30px; flex: none; }
+.ev-go { flex: none; font-weight: 800; font-size: 13px; padding: 6px 10px; border-radius: 4px; background: color-mix(in srgb, var(--ac) 30%, transparent); }
+.ev-card.ev-live { box-shadow: 0 0 0 1px color-mix(in srgb, var(--ac) 40%, transparent), 0 8px 24px color-mix(in srgb, var(--ac) 22%, transparent); }
+.ev-card.ev-live small { color: #fca5a5; }
+.ev-card.ev-hh { --ac: #f472b6; }
+.ev-card.ev-hh small { color: #f9a8d4; }
+.ev-card.ev-jp { --ac: #fbbf24; }
+.ev-card.ev-jp b { color: #fbbf24; font-family: KeCoin, 'Bebas Neue', Impact, sans-serif; }
+.ev-card.ev-cb { --ac: #4ade80; }
+.ev-game { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.ev-game:empty { display: none; }
+.ev-pill { display: inline-block; line-height: 1.45; padding: 6px 12px; border-radius: 14px; font-size: 12.5px; color: var(--text); text-decoration: none; background: var(--panel-2); border: 1px solid var(--line); }
+.ev-pill b { font-weight: 800; }
+.ev-pill.live { border-color: rgba(239, 68, 68, .6); }
+.ev-pill.hh { border-color: rgba(244, 114, 182, .7); background: color-mix(in srgb, #f472b6 16%, var(--panel-2)); }
+.ev-pill.jp { border-color: rgba(251, 191, 36, .55); }
+.ev-pill.jp b { color: #fbbf24; }
+.ev-pill.duel { border-color: rgba(124, 200, 255, .6); }
+.jp-chip { display: inline-flex; align-items: center; gap: 5px; margin-right: 8px; padding: 5px 10px; border-radius: 999px; text-decoration: none; color: #fbbf24; font-weight: 800; font-size: 13px;
+  background: rgba(251, 191, 36, .12); border: 1px solid rgba(251, 191, 36, .5); white-space: nowrap; }
+.jp-chip b { font-family: KeCoin, Inter, sans-serif; }
+@media (max-width: 640px) { .jp-chip { display: none; } }
+[data-ev-live][hidden], [data-duel-badge][hidden], [data-cb-badge][hidden] { display: none !important; }
+.ev-live-badge { background: #ef4444 !important; font-size: 9px !important; letter-spacing: 1px; }
+.ev-page h1 { margin: 4px 0 8px; }
+.ev-page h4 { margin: 18px 0 8px; }
+.ev-top { display: grid; grid-template-columns: 150px 1fr; gap: 18px; align-items: start; margin-top: 6px; }
+.ev-top .defi-cover { display: block; border-radius: 6px; overflow: hidden; }
+.ev-top .ref-stats { flex-wrap: wrap; }
+.ev-top .ref-stats > div { min-width: 110px; }
+.ev-cols { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; margin-top: 8px; }
+.ev-hhbox { margin-top: 18px; padding: 12px 14px; border-radius: 6px; background: color-mix(in srgb, #f472b6 10%, var(--panel-2)); border: 1px solid color-mix(in srgb, #f472b6 40%, var(--line)); }
+.ev-hhbox.on { box-shadow: 0 0 18px rgba(244, 114, 182, .35); border-color: #f472b6; }
+.ev-hhbox p { margin: 6px 0; font-size: 13.5px; }
+.ev-prog { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; }
+.ev-prog li { display: grid; grid-template-columns: 90px 1fr auto; gap: 8px; align-items: center; padding: 7px 10px; border-radius: 4px; background: var(--panel-2); border: 1px solid var(--line); font-size: 13.5px; }
+.ev-prog li span { color: var(--muted); }
+.ev-prog li span::first-letter { text-transform: uppercase; }
+.ev-prog li a { color: var(--text); font-weight: 700; text-decoration: none; }
+.ev-prog li small { color: var(--muted); }
+.ev-prog li.on { border-color: rgba(239, 68, 68, .6); }
+@media (max-width: 760px) { .ev-top { grid-template-columns: 1fr; } .ev-top .defi-cover { max-width: 140px; } .ev-cols { grid-template-columns: 1fr; } }
+.ev-modal { text-align: center; }
+.ev-won { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; }
+.ev-won > span { font-size: 64px; line-height: 1; filter: drop-shadow(0 6px 18px rgba(251, 191, 36, .5)); }
+.ev-won h2 { margin: 4px 0 0; font: 900 30px 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; }
+.ev-won > b { font: 900 34px KeCoin, Archivo, sans-serif; color: #fbbf24; }
+.ev-won small { color: var(--muted); max-width: 340px; }
+.ev-won .btn { margin-top: 10px; }
+.jp-hero { text-align: center; padding: 18px 10px 22px; border-radius: 8px; margin-bottom: 16px;
+  background: radial-gradient(circle at 50% 0%, rgba(251, 191, 36, .28), transparent 65%), var(--panel-2); border: 1px solid rgba(251, 191, 36, .45); }
+.jp-amt { font: 900 clamp(40px, 8vw, 72px) KeCoin, Archivo, sans-serif; color: #fbbf24; text-shadow: 0 4px 24px rgba(251, 191, 36, .45); margin: 4px 0 8px; }
+.jp-hero p { max-width: 520px; margin: 0 auto 14px; }
+.jp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.jp-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); color: var(--text); text-decoration: none; }
+.jp-row:hover { border-color: #fbbf24; }
+.jp-cov { width: 42px; height: 42px; flex: none; border-radius: 4px; overflow: hidden; display: block; }
+.jp-cov svg { width: 100%; height: 100%; display: block; }
+.jp-row b { flex: 1; min-width: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jp-row em { font: 900 15px KeCoin, Archivo, sans-serif; font-style: normal; color: #fbbf24; }
+.du-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end; margin: 14px 0; padding: 14px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); }
+.du-form label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 700; color: var(--muted); }
+.du-form select { padding: 9px 10px; border-radius: 4px; background: var(--panel); color: var(--text); border: 1px solid var(--line); font: inherit; font-size: 14px; }
+.du-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.du-card { padding: 12px 14px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.du-card.on { border-color: rgba(124, 200, 255, .6); }
+.du-card.wait { border-color: rgba(251, 191, 36, .5); }
+.du-card p { margin: 0; font-size: 13.5px; }
+.du-card .btn { align-self: flex-start; }
+.du-card .btn + .btn { margin-top: -4px; }
+.du-head { display: flex; flex-direction: column; }
+.du-head small { color: var(--muted); }
+.du-vs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.du-vs > div { display: flex; flex-direction: column; gap: 3px; }
+.du-vs small { color: var(--muted); font-size: 12px; }
+.du-vs b { font: 900 20px KeCoin, Archivo, sans-serif; color: #fbbf24; }
+.du-bar { display: block; height: 6px; border-radius: 3px; background: var(--panel-3); overflow: hidden; }
+.du-bar i { display: block; height: 100%; background: linear-gradient(90deg, #38bdf8, #7cc8ff); }
+.cb-claim { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 14px 0; padding: 16px; border-radius: 8px;
+  background: radial-gradient(circle at 0% 50%, rgba(74, 222, 128, .2), transparent 60%), var(--panel-2); border: 1px solid rgba(74, 222, 128, .45); }
+.cb-claim > div { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 2px; }
+.cb-claim b { font: 900 34px KeCoin, Archivo, sans-serif; color: #4ade80; }
+.cb-claim small { color: var(--muted); }
+.cb-next { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 6px; }
+.cb-next .du-bar i { background: linear-gradient(90deg, #22c55e, #86efac); }
+.cb-tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+.cb-tiers > div { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); text-align: center; }
+.cb-tiers > div.on { border-color: #4ade80; box-shadow: 0 0 14px rgba(74, 222, 128, .3); }
+.cb-tiers span { font-size: 24px; }
+.cb-tiers b { font: 900 22px KeCoin, Archivo, sans-serif; }
+.cb-tiers small { color: var(--muted); font-size: 11.5px; }
 </style>
 
 <style id="round-accents">

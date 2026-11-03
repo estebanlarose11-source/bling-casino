@@ -23,6 +23,22 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - `firebase/firestore.rules` : règles Firestore (à recoller dans la console Firebase si elles changent, voir
   `FIREBASE.md`). Toute nouvelle collection Firestore doit y être ajoutée, sinon elle est refusée.
 
+## Événements (tournois, jackpot, duels, cashback)
+
+- `events.js` (page `#tournois`) : tournoi du soir (21 h → minuit, heure de Paris, machine qui change chaque jour,
+  liste `ROT`) et du week-end (samedi 0 h → dimanche minuit), score = plus gros gain d'un tour en × la mise (bonus
+  achetés exclus), prix `KINDS` payés automatiquement à la visite suivante. Happy Hour 22 h → 23 h : gains ×2 sur la
+  machine du tournoi (`HH`, plafond par joueur). Encarts de l'accueil (`[data-ev-home]`) et sous les jeux
+  (`[data-ev-game]`) : les autres modules s'y ajoutent avec `addHome` / `addGamePill`.
+- **Max win** : chaque machine à sous a un gain maximum par tour, bonus compris (`max` du catalogue → `maxX`),
+  appliqué par `core/base.js` (`win()`) et `slot/machine.js` (`payOut()`). Fin de chaque tour payé : événement
+  `sb:roundend` ; max win atteint : `sb:maxwin`. **Nouvelle machine à sous : lui donner un `max` atteignable**
+  (vérifié par simulation), sinon le jackpot ne peut pas tomber dessus.
+- `jackpot.js` (page `#jackpot`) : jackpot commun, 1 % des mises (comptes connectés), gagné au max win d'une machine
+  à sous (100 % dès 100 KE de mise, sinon une part), repart de 100 000 KE.
+- `duels.js` (page `#duels`) : duels entre amis sur une machine à sous (20/50/100 tours, mise de duel, 24 h).
+- `cashback.js` (page `#cashback`) : chaque jour, 5 à 25 % des pertes de la veille selon le total misé.
+
 ## Suivi et administration
 
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu

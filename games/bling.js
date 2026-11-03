@@ -187,7 +187,7 @@ class BlingGame extends BaseGame {
     await this.featureIntro(bounty ? 'BONUS ×5' : 'BONUS ×2', `${free} tours gratuits · toutes les cases à ×${this.startM}`, symArt(SC));
     this.slotEl.classList.add('in-free');
     const rain = setInterval(() => fx.coins(4), 900);
-    while (free > 0 && !this.dead) {
+    while (free > 0 && !this.dead && !this.maxHit) { // stops at the max win (core/base.js)
       free--; done++;
       this.setBanner(`<b>${bounty ? 'BONUS ×5' : 'BONUS ×2'}</b><span class="pill">Tour ${done} / ${totalSpins()}</span><span class="pill gold">Gain ${fmtC(fsWin)}</span>`);
       const r = await this.spinOnce(true, fsWin);
