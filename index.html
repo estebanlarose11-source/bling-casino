@@ -16333,6 +16333,13 @@ window.__init3D = () => {
   if (!THREE || !gsap || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const MOBILE = matchMedia('(max-width: 900px)').matches || /Mobi|Android/i.test(navigator.userAgent);
   const off = () => document.body.classList.contains('ml-off');
+  // No 3D effects in the slot machines (the owner's choice): no shower of 3D coins and gems on the wins, no 3D
+  // medallion or rising objects on the bonuses. The wheels and tables keep theirs.
+  const inSlot = () => {
+    const m = location.hash.match(/^#game-([\w-]+)/), G = MODS?.['games/index.js'];
+    const g = m && G?.getGame(m[1]);
+    return !!g && !!G.isSlot(g);
+  };
   const rnd = (a, b) => a + Math.random() * (b - a);
   const pick = (l) => l[Math.floor(Math.random() * l.length)];
 
@@ -16523,7 +16530,7 @@ window.__init3D = () => {
   /* ---------- big wins: a shower of 3D coins and theme objects ---------- */
   let win = null;
   function shower(ratio) {
-    if (off()) return;
+    if (off() || inSlot()) return;
     const n = Math.round(Math.min(MOBILE ? 50 : 90, 14 + ratio * 1.2));
     // One renderer (one WebGL context) for the whole visit, hidden between showers. Opening a new one for every
     // big win piled up contexts: phones then dropped the oldest ones (the WebGL reels) and stuttered at each win.
@@ -16767,7 +16774,7 @@ window.__init3D = () => {
   }
   addEventListener('sb:feature', (e) => {
     const d = e.detail || {};
-    if (off()) return;
+    if (off() || inSlot()) return;
     if (d.re) { if (fxLayer()) { burst(0, view().h * 0.1, MOBILE ? 10 : 18, 0.8); fxRun(); } return; }
     bonusFx(d.title, false);
   });
