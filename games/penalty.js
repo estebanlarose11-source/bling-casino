@@ -26,8 +26,9 @@ const KEEPER = `<svg viewBox="0 0 80 100" aria-hidden="true">
   <circle cx="40" cy="18" r="13" fill="#f2c39a" stroke="#7c4a24" stroke-width="2"/><path d="M27 15 Q30 3 40 4 Q51 3 53 15 Q46 9 40 10 Q33 9 27 15Z" fill="#3f2a14"/>
   <circle cx="35" cy="19" r="1.8" fill="#111"/><circle cx="45" cy="19" r="1.8" fill="#111"/><path d="M35 25 Q40 28 45 25" stroke="#7c4a24" stroke-width="1.8" fill="none" stroke-linecap="round"/>
   <rect x="24" y="66" width="32" height="10" rx="3" fill="#111827"/><path d="M30 76 L28 94 M50 76 L52 94" stroke="#f2c39a" stroke-width="8" stroke-linecap="round"/><path d="M22 96 H34 M46 96 H58" stroke="#111" stroke-width="6" stroke-linecap="round"/></svg>`;
-const BALL = `<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#fff" stroke="#111" stroke-width="2"/>
-  <path d="M20 11 L27 16 L24 24 L16 24 L13 16Z" fill="#111"/><path d="M20 11 V3 M27 16 L35 13 M24 24 L29 32 M16 24 L11 32 M13 16 L5 13" stroke="#111" stroke-width="2"/></svg>`;
+// 3D pieces drawn by code (tools/render3d), wrapped in the same viewBox as the old drawings so the CSS still applies
+const PIC = (n, v = 1) => window.__assets?.[`assets/games/penalty/${n}.webp`] || `assets/games/penalty/${n}.webp?v=${v}`;
+const BALL = `<svg viewBox="0 0 40 40" aria-hidden="true"><image href="${PIC('ball')}" x="1" y="1" width="38" height="38"/></svg>`;
 
 class PenaltyGame extends BaseGame {
   constructor(root, game) {

@@ -17,15 +17,10 @@ const flip = () => (Math.random() < 0.5 ? 'pile' : 'face');
 /* ===END ENGINE */
 
 const xs = (m) => (m >= 1000 ? Math.round(m).toLocaleString('fr-FR') : m >= 100 ? String(Math.round(m)) : m.toFixed(2).replace('.', ','));
-const FACE_SVG = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="url(#pfGold)" stroke="#92400e" stroke-width="3"/><circle cx="50" cy="50" r="39" fill="none" stroke="#fef3c7" stroke-width="1.5" stroke-dasharray="2 3"/>
-  <path d="M31 36 L35 22 L43 31 L50 18 L57 31 L65 22 L69 36 Z" fill="#fde68a" stroke="#92400e" stroke-width="2" stroke-linejoin="round"/>
-  <circle cx="50" cy="55" r="17" fill="#fcd34d" stroke="#92400e" stroke-width="2"/><circle cx="44" cy="52" r="2.4" fill="#78350f"/><circle cx="56" cy="52" r="2.4" fill="#78350f"/>
-  <path d="M42 60 Q50 67 58 60" stroke="#78350f" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-  <text x="50" y="88" text-anchor="middle" font-family="KeCoin,Archivo,sans-serif" font-weight="900" font-size="9" fill="#78350f">FACE</text></svg>`;
-const PILE_SVG = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="47" fill="url(#pfSilver)" stroke="#334155" stroke-width="3"/><circle cx="50" cy="50" r="39" fill="none" stroke="#f1f5f9" stroke-width="1.5" stroke-dasharray="2 3"/>
-  <text x="50" y="62" text-anchor="middle" font-family="KeCoin,Archivo,sans-serif" font-weight="900" font-size="34" fill="#1e293b">×2</text>
-  <path d="M26 30 l3 -6 l3 6 l-3 -2z M68 30 l3 -6 l3 6 l-3 -2z" fill="#1e293b"/>
-  <text x="50" y="88" text-anchor="middle" font-family="KeCoin,Archivo,sans-serif" font-weight="900" font-size="9" fill="#1e293b">PILE</text></svg>`;
+// 3D pieces drawn by code (tools/render3d), wrapped in the same viewBox as the old drawings so the CSS still applies
+const PIC = (n, v = 1) => window.__assets?.[`assets/games/pileface/${n}.webp`] || `assets/games/pileface/${n}.webp?v=${v}`;
+const FACE_SVG = `<svg viewBox="0 0 100 100" aria-hidden="true"><image href="${PIC('face')}" x="-4" y="-4" width="108" height="108"/></svg>`;
+const PILE_SVG = `<svg viewBox="0 0 100 100" aria-hidden="true"><image href="${PIC('pile')}" x="-4" y="-4" width="108" height="108"/></svg>`;
 const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
   <radialGradient id="pfGold" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fffbeb"/><stop offset=".45" stop-color="#fbbf24"/><stop offset="1" stop-color="#b45309"/></radialGradient>
   <radialGradient id="pfSilver" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffffff"/><stop offset=".45" stop-color="#cbd5e1"/><stop offset="1" stop-color="#64748b"/></radialGradient></defs></svg>`;

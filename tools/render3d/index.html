@@ -1,0 +1,13 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>render3d</title>
+<script type="importmap">{ "imports": { "three": "/three/build/three.module.js", "three/addons/": "/three/examples/jsm/" } }</script>
+<style>body{margin:0;background:#000}</style></head>
+<body><script type="module">
+import { SCENES, SPRITES } from './scenes.js';
+const q = new URLSearchParams(location.search), id = q.get('id');
+try {
+  const s = await (q.get('p') ? SPRITES : SCENES)[id]();
+  s.render();
+  window.__shot = s.renderer.domElement.toDataURL('image/webp', 0.9);
+} catch (e) { window.__err = String(e && e.stack || e); }
+</script></body></html>

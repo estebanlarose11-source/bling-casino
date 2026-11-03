@@ -46,14 +46,12 @@ const BOTS = [
   { name: 'Nova', c: '#e879f9' }, { name: 'Boulon', c: '#4ade80' }, { name: 'Zap', c: '#f43f5e' },
 ];
 const xs = (m) => m.toFixed(2).replace('.', ',');
+// 3D pieces drawn by code (tools/render3d), wrapped in the same viewBox as the old drawings so the CSS still applies
+const PIC = (n, v = 1) => window.__assets?.[`assets/games/robots/${n}.webp`] || `assets/games/robots/${n}.webp?v=${v}`;
 const botSVG = (c, k) => `<svg viewBox="0 0 64 48" aria-hidden="true">
   <path d="M2 30 H14 M0 36 H12 M4 24 H12" stroke="${c}" stroke-width="2.5" stroke-linecap="round" class="rb-trail"/>
-  <rect x="16" y="10" width="34" height="24" rx="8" fill="#e2e8f0" stroke="${c}" stroke-width="2.5"/>
-  <rect x="22" y="15" width="22" height="9" rx="4" fill="#0f172a"/><circle cx="28" cy="19.5" r="2.6" fill="${c}"/><circle cx="38" cy="19.5" r="2.6" fill="${c}"/>
-  <path d="M33 10 V4" stroke="#e2e8f0" stroke-width="2"/><circle cx="33" cy="3.5" r="2.5" fill="${c}"/>
-  <rect x="50" y="18" width="8" height="6" rx="2" fill="${c}"/>
-  <circle cx="24" cy="39" r="6.5" fill="#1e293b" stroke="${c}" stroke-width="2" class="rb-wheel"/><circle cx="43" cy="39" r="6.5" fill="#1e293b" stroke="${c}" stroke-width="2" class="rb-wheel"/>
-  <text x="33" y="31.5" text-anchor="middle" font-family="KeCoin,Archivo,sans-serif" font-weight="900" font-size="7" fill="#0f172a">${k + 1}</text></svg>`;
+  <image href="${PIC('bot' + (k % 6))}" x="10" y="-6" width="56" height="56"/>
+  <circle cx="30" cy="30" r="6" fill="#0f172a" stroke="${c}" stroke-width="1.5"/><text x="30" y="32.6" text-anchor="middle" font-family="KeCoin,Archivo,sans-serif" font-weight="900" font-size="7.5" fill="#fff">${k + 1}</text></svg>`;
 
 class RobotsGame extends BaseGame {
   constructor(root, game) {

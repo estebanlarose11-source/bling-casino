@@ -23,6 +23,18 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - `firebase/firestore.rules` : règles Firestore (à recoller dans la console Firebase si elles changent, voir
   `FIREBASE.md`). Toute nouvelle collection Firestore doit y être ajoutée, sinon elle est refusée.
 
+## Graphismes
+
+- **Rouleaux en WebGL** (`core/pixi.js`, PixiJS 7.4.2 hébergé dans `vendor/pixi.min.js`, chargé par `window.__loadPixi`) :
+  pendant la rotation, `core/reels.js`, `slot/machine.js` et `core/grid.js` dessinent les symboles dans un canvas Pixi
+  (flou de mouvement, suspense, éclat à l'arrêt, étincelles des gains) puis rendent la main aux cases HTML à l'arrêt.
+  Repli HTML automatique (pas de WebGL, animations coupées, image pas encore prête).
+- **Couvertures** (`covers.js`, `poster()`) : un seul gabarit pour tous les jeux (plaque de titre, Bebas Neue, marque).
+  Une image avec un titre peint dedans se déclare dans `CROP` (partie gardée, au-dessus du titre).
+- **Dessins par code en 3D** (`tools/render3d/`, Three.js) : couvertures des jeux sans image peinte et pièces des
+  jeux rapides (`SPRITES`). `cd tools/render3d && npm i three@0.160.0 && node render.js` (couvertures) ou
+  `node render.js --pieces` → `assets/games/<id>/…webp` (puis changer `CACHE` dans `sw.js`).
+
 ## Événements (tournois, jackpot, duels, cashback)
 
 - `events.js` (page `#tournois`) : tournoi du soir (21 h → minuit, heure de Paris, machine qui change chaque jour,

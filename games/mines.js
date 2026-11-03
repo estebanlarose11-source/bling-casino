@@ -14,8 +14,10 @@ function mult(k, m) { let r = 0.96; for (let i = 0; i < k; i++) r *= (SIZE - i) 
 /* ===END ENGINE */
 
 const fm = (x) => '×' + x.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const GEM = '<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="mgem" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a7f3d0"/><stop offset=".5" stop-color="#10b981"/><stop offset="1" stop-color="#065f46"/></linearGradient></defs><polygon points="32,6 54,22 32,58 10,22" fill="url(#mgem)" stroke="#ecfdf5" stroke-width="2" stroke-linejoin="round"/><path d="M10 22 H54 M32 6 L22 22 L32 58 L42 22 Z" fill="none" stroke="#ecfdf5" stroke-opacity=".7" stroke-width="1.5"/></svg>';
-const BOMB = '<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="38" r="18" fill="#1f2937" stroke="#f87171" stroke-width="2"/><circle cx="24" cy="32" r="5" fill="#fff" opacity=".35"/><path d="M40 22 L46 14" stroke="#9ca3af" stroke-width="4" stroke-linecap="round"/><circle cx="48" cy="11" r="5" fill="#fbbf24"/><circle cx="48" cy="11" r="2.5" fill="#fff"/></svg>';
+// 3D pieces drawn by code (tools/render3d), wrapped in the same viewBox as the old drawings so the CSS still applies
+const PIC = (n, v = 1) => window.__assets?.[`assets/games/mines/${n}.webp`] || `assets/games/mines/${n}.webp?v=${v}`;
+const GEM = `<svg viewBox="0 0 64 64" aria-hidden="true"><image href="${PIC('gem')}" x="-4" y="-4" width="72" height="72"/></svg>`;
+const BOMB = `<svg viewBox="0 0 64 64" aria-hidden="true"><image href="${PIC('bomb')}" x="-4" y="-4" width="72" height="72"/></svg>`;
 
 class MinesGame extends BaseGame {
   constructor(root, game) {

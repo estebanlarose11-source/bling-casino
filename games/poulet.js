@@ -25,15 +25,10 @@ const crash = (m) => Math.random() < m.p;
 
 const xs = (m) => (m >= 1000 ? Math.round(m).toLocaleString('fr-FR') : m >= 100 ? m.toFixed(1).replace('.', ',') : m.toFixed(2).replace('.', ','));
 const CAR_COLORS = ['#ef4444', '#3b82f6', '#eab308', '#a855f7', '#22c55e', '#f97316', '#ec4899', '#14b8a6'];
-const car = (c) => `<svg viewBox="0 0 40 70" aria-hidden="true"><rect x="3" y="4" width="34" height="62" rx="10" fill="${c}" stroke="rgba(0,0,0,.45)" stroke-width="2"/>
-  <rect x="8" y="14" width="24" height="12" rx="4" fill="#0f172a" opacity=".85"/><rect x="8" y="44" width="24" height="9" rx="3" fill="#0f172a" opacity=".7"/>
-  <rect x="9" y="29" width="22" height="12" rx="3" fill="#fff" opacity=".18"/><circle cx="10" cy="64" r="3" fill="#fde68a"/><circle cx="30" cy="64" r="3" fill="#fde68a"/>
-  <rect x="0" y="16" width="4" height="10" rx="2" fill="#111"/><rect x="36" y="16" width="4" height="10" rx="2" fill="#111"/><rect x="0" y="46" width="4" height="10" rx="2" fill="#111"/><rect x="36" y="46" width="4" height="10" rx="2" fill="#111"/></svg>`;
-const CHICK = `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M26 54 L24 62 M24 62 L20 63 M24 62 L27 63 M36 54 L38 62 M38 62 L35 63 M38 62 L42 63" stroke="#f59e0b" stroke-width="2.6" stroke-linecap="round"/>
-  <ellipse cx="32" cy="40" rx="18" ry="16" fill="#fff" stroke="#cbd5e1" stroke-width="2"/><path d="M16 38 Q8 30 12 24 Q18 30 20 34Z" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1.5"/>
-  <ellipse cx="38" cy="42" rx="9" ry="6" fill="#e2e8f0" transform="rotate(-18 38 42)"/><circle cx="40" cy="20" r="12" fill="#fff" stroke="#cbd5e1" stroke-width="2"/>
-  <path d="M34 9 Q36 3 39 8 Q41 2 44 8 Q47 4 47 11 Q42 10 34 11Z" fill="#ef4444"/><path d="M51 20 L58 23 L51 26Z" fill="#f59e0b"/><path d="M49 27 Q52 33 47 33 Q46 29 49 27Z" fill="#ef4444"/>
-  <circle cx="44" cy="18" r="2.6" fill="#0f172a"/><circle cx="45" cy="17" r=".9" fill="#fff"/></svg>`;
+// 3D pieces drawn by code (tools/render3d), wrapped in the same viewBox as the old drawings so the CSS still applies
+const PIC = (n, v = 1) => window.__assets?.[`assets/games/poulet/${n}.webp`] || `assets/games/poulet/${n}.webp?v=${v}`;
+const car = (c) => `<svg viewBox="0 0 40 70" aria-hidden="true"><image href="${PIC('car' + Math.max(0, CAR_COLORS.indexOf(c)))}" x="-31.5" y="-16.5" width="103" height="103"/></svg>`;
+const CHICK = `<svg viewBox="0 0 64 64" aria-hidden="true"><image href="${PIC('chick')}" x="-2" y="-2" width="68" height="68"/></svg>`;
 const FEATHER = '<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="44" rx="22" ry="8" fill="#fff" opacity=".9"/><path d="M14 40 Q20 30 26 40 M30 38 Q36 28 42 38 M40 42 Q48 34 52 44" stroke="#e2e8f0" stroke-width="3" fill="none"/><path d="M26 30 L30 36 L34 30" stroke="#ef4444" stroke-width="3" fill="none"/><text x="32" y="22" text-anchor="middle" font-size="16">💫</text></svg>';
 const BARRIER = '<svg viewBox="0 0 80 20" aria-hidden="true"><rect x="2" y="4" width="76" height="12" rx="4" fill="#fff" stroke="#111" stroke-width="1.5"/><path d="M10 4 L4 16 M24 4 L16 16 M38 4 L30 16 M52 4 L44 16 M66 4 L58 16 M78 6 L72 16" stroke="#ef4444" stroke-width="6"/></svg>';
 

@@ -46,6 +46,16 @@
       .catch((e) => { p = null; throw e; }));
   })();
   </script>
+  <!-- Rouleaux en WebGL (PixiJS 7.4.2, hébergé dans vendor/) : chargé à l'ouverture d'un jeu (window.__loadPixi) -->
+  <script>
+  window.__loadPixi = (() => {
+    let p = null;
+    const one = (src) => new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.async = true; s.onload = ok; s.onerror = () => { s.remove(); ko(new Error(src)); }; document.head.appendChild(s); });
+    return () => p || (p = one('vendor/pixi.min.js?v=7.4.2').catch(() => one('https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.4.2/pixi.min.js'))
+      .then(() => { if (!window.PIXI) throw new Error('PIXI missing'); window.PIXI.settings && (window.PIXI.settings.FAIL_IF_MAJOR_PERFORMANCE_CAVEAT = false); })
+      .catch((e) => { p = null; throw e; }));
+  })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@600;700;800;900&display=swap" rel="stylesheet">
@@ -1025,6 +1035,7 @@ body.gated { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) { .sg-links .lk-line { animation: none; } }
 
 /* ============ Reel strips ============ */
+.px-stage { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 3; }
 .rs { display: grid; grid-template-columns: repeat(var(--cols), 1fr); gap: 4px; aspect-ratio: calc(var(--cols) / var(--rows)); margin: 0 auto; width: min(100%, calc((100vh - var(--chrome)) * var(--cols) / var(--rows))); min-width: min(100%, 240px); }
 .rs-reel { position: relative; overflow: hidden; container-type: size; border-radius: 3px; background: linear-gradient(180deg, rgba(255, 255, 255, .03), rgba(255, 255, 255, .07) 50%, rgba(255, 255, 255, .03)); }
 .rs-reel::before, .rs-reel::after { content: ''; position: absolute; left: 0; right: 0; height: 12%; z-index: 2; pointer-events: none; }
@@ -4199,6 +4210,383 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
   <script>
 'use strict';
 const __mods = {};
+// ---- core/pixi.js ----
+__mods['core/pixi.js'] = (() => {
+// WebGL reels (PixiJS 7, vendor/pixi.min.js, loaded the first time a game opens with window.__loadPixi).
+// A Pixi canvas lies over the reel area of a game. While the reels turn, the symbols are drawn by Pixi with a
+// motion blur that follows the speed, a stretch, a flash and a shock when each reel stops, light beams on the
+// reels that make you wait (tease) and sparks on the wins. When a reel stops, the HTML cells come back, so every
+// game keeps its own bonuses, labels and classes. If Pixi, WebGL or a symbol picture is missing, or the player
+// turned the animations off, the reels simply turn in HTML as before.
+
+const PX = { stages: new Set() };
+const usable = () => !!window.PIXI && !matchMedia('(prefers-reduced-motion: reduce)').matches && !document.body.classList.contains('ml-off');
+const load = () => { try { return window.__loadPixi?.() || Promise.reject(new Error('no pixi')); } catch (e) { return Promise.reject(e); } };
+
+/* ---------- symbol pictures → textures ---------- */
+// A cell is drawn from its main picture (the first <img> or <svg> of its HTML); its texts are left to the HTML.
+const TEX = new Map(); // key → { tex, box: [x, y, w, h] in cell fractions } | 'loading' | 'bad'
+const BOX = new Map(); // key → box measured on a real cell
+const tpl = document.createElement('template');
+function visualOf(html) {
+  tpl.innerHTML = html;
+  const root = tpl.content.firstElementChild;
+  const v = root?.querySelector('img, svg');
+  if (!v) return null;
+  if (v.tagName === 'IMG') return { key: 'i:' + v.getAttribute('src'), img: v.getAttribute('src') };
+  return { key: 's:' + v.outerHTML, svg: v };
+}
+// SVG symbols use the art sheets of the page (<use href="#id">, url(#grad)): copy what they need into the picture.
+function standaloneSVG(svg, size) {
+  const seen = new Set(), defs = [];
+  const scan = (markup) => {
+    for (const m of markup.matchAll(/(?:href="#|url\(#|url\(&quot;#)([\w.:-]+)/g)) {
+      const id = m[1];
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const n = document.getElementById(id);
+      if (!n) continue;
+      const html = n.outerHTML;
+      defs.push(html);
+      scan(html);
+    }
+  };
+  const inner = svg.innerHTML;
+  scan(svg.outerHTML);
+  const vb = svg.getAttribute('viewBox') || '0 0 64 64';
+  return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${size}" height="${size}" viewBox="${vb}" preserveAspectRatio="${svg.getAttribute('preserveAspectRatio') || 'xMidYMid meet'}"><defs>${defs.join('')}</defs>${inner}</svg>`;
+}
+function rasterize(vis) {
+  if (TEX.has(vis.key)) return;
+  TEX.set(vis.key, 'loading');
+  const img = new Image();
+  img.decoding = 'async';
+  img.onload = () => {
+    try {
+      const c = document.createElement('canvas'), S = 256;
+      c.width = c.height = S;
+      const g = c.getContext('2d');
+      const k = Math.min(S / (img.naturalWidth || S), S / (img.naturalHeight || S));
+      const w = (img.naturalWidth || S) * k, h = (img.naturalHeight || S) * k;
+      g.drawImage(img, (S - w) / 2, (S - h) / 2, w, h);
+      TEX.set(vis.key, { tex: window.PIXI.Texture.from(c) });
+    } catch { TEX.set(vis.key, 'bad'); }
+  };
+  img.onerror = () => TEX.set(vis.key, 'bad');
+  if (vis.img) img.src = vis.img;
+  else img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(standaloneSVG(vis.svg, 256));
+}
+// Called with the HTML cells the game shows: learns where the picture sits in its cell and prepares its texture.
+function warm(nodes) {
+  if (!window.PIXI) return;
+  for (const n of nodes) {
+    if (!n) continue;
+    const v = n.querySelector('img, svg');
+    if (!v) continue;
+    const vis = v.tagName === 'IMG' ? { key: 'i:' + v.getAttribute('src'), img: v.getAttribute('src') } : { key: 's:' + v.outerHTML, svg: v };
+    if (!BOX.has(vis.key)) {
+      const a = n.getBoundingClientRect(), b = v.getBoundingClientRect();
+      if (a.width > 4 && b.width > 2) {
+        // keep the picture's aspect (an <img> may be letter-boxed in its box by object-fit)
+        BOX.set(vis.key, [(b.left - a.left) / a.width, (b.top - a.top) / a.height, b.width / a.width, b.height / a.height]);
+      }
+    }
+    rasterize(vis);
+  }
+}
+function texFor(html) {
+  const vis = visualOf(html);
+  if (!vis) return { empty: true };
+  const t = TEX.get(vis.key);
+  if (t && typeof t === 'object') return { tex: t.tex, box: BOX.get(vis.key) || [0.08, 0.08, 0.84, 0.84] };
+  rasterize(vis);
+  return null;
+}
+
+/* ---------- small shared textures ---------- */
+let SPARK = null, STAR = null, BEAM = null;
+function baseTextures() {
+  if (SPARK) return;
+  const PIXI = window.PIXI;
+  const mk = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); return PIXI.Texture.from(c); };
+  SPARK = mk(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(0.25, 'rgba(255,255,255,.8)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); });
+  STAR = mk(64, 64, (g) => {
+    const r = g.createRadialGradient(32, 32, 0, 32, 32, 30); r.addColorStop(0, 'rgba(255,255,255,1)'); r.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = r; g.beginPath();
+    for (let i = 0; i < 8; i++) { const a = (i * Math.PI) / 4, rr = i % 2 ? 6 : 32; g.lineTo(32 + Math.cos(a) * rr, 32 + Math.sin(a) * rr); }
+    g.fill();
+  });
+  BEAM = mk(8, 256, (g, w, h) => { const r = g.createLinearGradient(0, 0, 0, h); r.addColorStop(0, 'rgba(255,255,255,0)'); r.addColorStop(0.5, 'rgba(255,255,255,1)'); r.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = r; g.fillRect(0, 0, w, h); });
+}
+const hex = (c) => { if (typeof c === 'number') return c; const s = String(c).replace('#', ''); const f = s.length === 3 ? s.split('').map((x) => x + x).join('') : s.slice(0, 6); return parseInt(f, 16) || 0xffffff; };
+
+/* ---------- a stage over one reel area ---------- */
+class Stage {
+  constructor(host) {
+    const PIXI = window.PIXI;
+    this.host = host;
+    if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+    this.app = new PIXI.Application({ backgroundAlpha: 0, antialias: true, resolution: Math.min(2, window.devicePixelRatio || 1), autoDensity: true, autoStart: false, width: 10, height: 10 });
+    const cv = this.app.view;
+    cv.className = 'px-stage';
+    host.appendChild(cv);
+    this.cols = new Set();
+    this.fx = new PIXI.Container();
+    this.app.stage.addChild(this.fx);
+    this.parts = [];
+    this.loopOn = false;
+    this.accent = getComputedStyle(host).getPropertyValue('--accent').trim() || '#fde047';
+    baseTextures();
+    this.resize();
+  }
+  get alive() { return this.host.isConnected; }
+  resize() {
+    const w = Math.max(10, Math.round(this.host.clientWidth)), h = Math.max(10, Math.round(this.host.clientHeight));
+    if (w !== this.w || h !== this.h) { this.w = w; this.h = h; this.app.renderer.resize(w, h); }
+  }
+  rectOf(el) {
+    if (!el.getBoundingClientRect) return el; // already a rect of the stage
+    const a = this.host.getBoundingClientRect(), b = el.getBoundingClientRect();
+    return { x: b.left - a.left, y: b.top - a.top, w: b.width, h: b.height };
+  }
+  kick() {
+    if (this.loopOn) return;
+    this.loopOn = true;
+    let last = performance.now();
+    const tick = (now) => {
+      if (!this.alive) { this.destroy(); return; }
+      const dt = Math.min(120, now - last); last = now;
+      this.step(dt, now);
+      this.app.render();
+      if (this.cols.size || this.parts.length) requestAnimationFrame(tick);
+      else { this.loopOn = false; this.app.render(); }
+    };
+    requestAnimationFrame(tick);
+  }
+  step(dt, now) {
+    for (let i = this.parts.length - 1; i >= 0; i--) {
+      const p = this.parts[i];
+      p.t += dt;
+      if (p.t >= p.life || p.done?.()) { const m = p.s.mask; p.s.mask = null; p.s.destroy(); if (m && m !== p.s) m.destroy(); this.parts.splice(i, 1); continue; }
+      p.upd(p, p.t / p.life, dt, now);
+    }
+  }
+  add(sprite, life, upd, done) { this.fx.addChild(sprite); this.parts.push({ s: sprite, t: 0, life, upd, done }); this.kick(); }
+
+  /* ----- one spinning column ----- */
+  // cells: HTML of the whole strip, top to bottom; returns null if a picture is not ready (HTML fallback).
+  column(reelEl, cellsHTML, rows) {
+    const PIXI = window.PIXI;
+    const tex = cellsHTML.map(texFor);
+    if (tex.some((t) => !t)) return null;
+    this.resize();
+    const r = this.rectOf(reelEl), ch = r.h / rows;
+    const box = new PIXI.Container();
+    box.position.set(r.x, r.y);
+    const mask = new PIXI.Graphics().beginFill(0xffffff).drawRect(r.x, r.y, r.w, r.h).endFill();
+    box.mask = mask;
+    const strip = new PIXI.Container();
+    tex.forEach((t, k) => {
+      if (t.empty) return;
+      const [bx, by, bw, bh] = t.box;
+      const s = new PIXI.Sprite(t.tex);
+      // fit the square texture into the measured box, keeping its aspect
+      const side = Math.min(bw * r.w, bh * ch);
+      s.anchor.set(0.5);
+      s.width = side; s.height = side;
+      s.position.set((bx + bw / 2) * r.w, k * ch + (by + bh / 2) * ch);
+      s.baseY = s.position.y; s.baseH = side;
+      strip.addChild(s);
+    });
+    box.addChild(strip);
+    const blur = new PIXI.BlurFilter(0, 3, 1);
+    blur.blurX = 0;
+    const shade = new PIXI.ColorMatrixFilter();
+    strip.filters = [blur, shade];
+    // reel edge shadows (the HTML ones are under the canvas)
+    const fade = new PIXI.Graphics();
+    for (let i = 0; i < 12; i++) {
+      const a = 0.5 * (1 - i / 12);
+      fade.beginFill(0x03060c, a).drawRect(0, (i * r.h * 0.12) / 12, r.w, (r.h * 0.12) / 12 + 0.5).drawRect(0, r.h - ((i + 1) * r.h * 0.12) / 12, r.w, (r.h * 0.12) / 12 + 0.5).endFill();
+    }
+    box.addChild(fade);
+    this.app.stage.addChildAt(mask, 0);
+    this.app.stage.addChildAt(box, 0);
+    const col = {
+      r, ch, strip, blur, shade, lastY: 0, first: true,
+      set: (y) => {
+        const v = col.first ? 0 : Math.abs(y - col.lastY); col.first = false; col.lastY = y;
+        strip.y = y;
+        const speed = Math.min(1, v / (ch * 0.9));
+        blur.blurY = speed * ch * 0.16;
+        const st = 1 + speed * 0.22;
+        for (const s of strip.children) s.height = s.baseH * st;
+        shade.brightness(1 + speed * 0.18, false);
+      },
+      end: () => { this.cols.delete(col); box.destroy({ children: true }); mask.destroy(); this.kick(); },
+    };
+    this.cols.add(col);
+    this.kick();
+    return col;
+  }
+
+  // one symbol falling into its cell (cascade grids): motion blur while it falls, then the HTML cell takes over
+  drop(cellEl, html, fromDy, dur, ease, clip) {
+    const PIXI = window.PIXI, t = texFor(html);
+    if (!t || t.empty) return null;
+    const r = this.rectOf(cellEl), [bx, by, bw, bh] = t.box, side = Math.min(bw * r.w, bh * r.h);
+    const s = new PIXI.Sprite(t.tex);
+    s.anchor.set(0.5); s.width = s.height = side;
+    const x = r.x + (bx + bw / 2) * r.w, y = r.y + (by + bh / 2) * r.h;
+    const blur = new PIXI.BlurFilter(0, 2, 1); blur.blurX = 0; s.filters = [blur];
+    const c = clip && this.rectOf(clip);
+    let m = null;
+    if (c) { m = new PIXI.Graphics().beginFill(0xffffff).drawRect(c.x, c.y, c.w, c.h).endFill(); this.app.stage.addChildAt(m, 0); s.mask = m; }
+    this.app.stage.addChildAt(s, 0);
+    let last = y + fromDy;
+    s.position.set(x, last);
+    return new Promise((res) => {
+      const col = { set() {}, end() {} };
+      this.cols.add(col);
+      const t0 = performance.now();
+      const f = (now) => {
+        const q = Math.min(1, (now - t0) / dur), yy = y + fromDy * (1 - ease(q));
+        const v = Math.abs(yy - last); last = yy;
+        s.y = yy; blur.blurY = Math.min(r.h * 0.25, v * 0.9); s.height = side * (1 + Math.min(0.25, v / r.h));
+        if (q < 1 && this.alive) return requestAnimationFrame(f);
+        this.cols.delete(col); s.destroy(); m?.destroy(); this.kick(); res();
+      };
+      requestAnimationFrame(f);
+      this.kick();
+    });
+  }
+
+  /* ----- effects ----- */
+  land(reelEl, strong = false) {
+    const PIXI = window.PIXI, r = this.rectOf(reelEl);
+    const fl = new PIXI.Sprite(PIXI.Texture.WHITE);
+    fl.position.set(r.x, r.y); fl.width = r.w; fl.height = r.h; fl.blendMode = PIXI.BLEND_MODES.ADD; fl.alpha = strong ? 0.5 : 0.22;
+    this.add(fl, strong ? 420 : 260, (p, q) => { p.s.alpha = (strong ? 0.5 : 0.22) * (1 - q) ** 2; });
+    // a ring of light at the bottom edge
+    const ring = new PIXI.Sprite(SPARK);
+    ring.anchor.set(0.5); ring.position.set(r.x + r.w / 2, r.y + r.h); ring.tint = hex(this.accent); ring.blendMode = PIXI.BLEND_MODES.ADD;
+    this.add(ring, 380, (p, q) => { p.s.width = r.w * (0.6 + q * 1.2); p.s.height = r.w * 0.25 * (1 + q); p.s.alpha = 0.7 * (1 - q); });
+    if (strong) this.sparks(r.x + r.w / 2, r.y + r.h / 2, 18, ['#fff7d6', '#fde047', '#fbbf24'], r.w * 0.7);
+  }
+  // light beams and rising sparks on a reel that makes the player wait; returns stop()
+  tease(reelEl, color = '#fbbf24') {
+    const PIXI = window.PIXI, r = this.rectOf(reelEl), tint = hex(color);
+    let on = true;
+    const done = () => !on || !this.alive;
+    const glow = new PIXI.Graphics();
+    this.add(glow, 1e6, (p, q, dt, now) => {
+      const k = 0.55 + 0.45 * Math.sin(now / 90);
+      glow.clear();
+      for (let i = 0; i < 5; i++) glow.lineStyle(2 + i * 3, tint, (0.42 - i * 0.08) * k).drawRoundedRect(r.x + 1, r.y + 1, r.w - 2, r.h - 2, 4);
+    }, done);
+    glow.blendMode = PIXI.BLEND_MODES.ADD;
+    for (let b = 0; b < 3; b++) {
+      const beam = new PIXI.Sprite(BEAM);
+      beam.anchor.set(0.5); beam.tint = tint; beam.blendMode = PIXI.BLEND_MODES.ADD;
+      beam.position.set(r.x + r.w / 2, r.y + r.h / 2); beam.height = r.h * 1.3; beam.width = r.w * 0.5;
+      const ph = b * 2.1;
+      this.add(beam, 1e6, (p, q, dt, now) => { p.s.x = r.x + r.w / 2 + Math.sin(now / 260 + ph) * r.w * 0.32; p.s.alpha = 0.18 + 0.14 * Math.sin(now / 140 + ph); }, done);
+    }
+    const emit = () => {
+      if (done()) return;
+      for (let i = 0; i < 2; i++) {
+        const s = new PIXI.Sprite(Math.random() < 0.3 ? STAR : SPARK);
+        s.anchor.set(0.5); s.tint = Math.random() < 0.5 ? 0xffffff : tint; s.blendMode = PIXI.BLEND_MODES.ADD;
+        const x = r.x + Math.random() * r.w, sz = 4 + Math.random() * 10, vy = 0.08 + Math.random() * 0.12;
+        s.position.set(x, r.y + r.h); s.width = s.height = sz;
+        this.add(s, 900 + Math.random() * 500, (p, q, dt) => { p.s.y -= vy * dt * (r.h / 300); p.s.x += Math.sin(p.t / 120) * 0.4; p.s.alpha = Math.sin(q * Math.PI); });
+      }
+      setTimeout(emit, 45);
+    };
+    emit();
+    return () => { on = false; };
+  }
+  sparks(x, y, n = 14, colors = ['#fde68a', '#fbbf24', '#fff'], spread = 60) {
+    const PIXI = window.PIXI;
+    for (let i = 0; i < n; i++) {
+      const s = new PIXI.Sprite(Math.random() < 0.35 ? STAR : SPARK);
+      s.anchor.set(0.5); s.tint = hex(colors[i % colors.length]); s.blendMode = PIXI.BLEND_MODES.ADD;
+      const a = Math.random() * Math.PI * 2, v = (0.25 + Math.random() * 0.6) * (spread / 60), sz = 6 + Math.random() * 14;
+      s.position.set(x, y); s.width = s.height = sz; s.rotation = Math.random() * 6;
+      const vx = Math.cos(a) * v, vy0 = Math.sin(a) * v - 0.15;
+      this.add(s, 500 + Math.random() * 450, (p, q, dt) => { p.s.x += vx * dt; p.s.y += (vy0 + q * 0.5) * dt; p.s.rotation += 0.01 * dt; p.s.alpha = 1 - q; p.s.scale.set((sz / 64) * (1 - q * 0.6)); });
+    }
+  }
+  // winning cells: a pulsing glow frame, a light sweep and sparks running around the frame, until clear()
+  win(cellEls, color) {
+    const PIXI = window.PIXI, tint = hex(color || this.accent);
+    this.resize();
+    const id = (this.winId = (this.winId || 0) + 1);
+    const done = () => this.winId !== id || !this.alive;
+    const rects = cellEls.filter(Boolean).map((c) => this.rectOf(c));
+    const g = new PIXI.Graphics(); g.blendMode = PIXI.BLEND_MODES.ADD;
+    this.add(g, 1e6, (p, q, dt, now) => {
+      g.clear();
+      const k = 0.6 + 0.4 * Math.sin(now / 160);
+      for (const r of rects) {
+        const i = Math.min(r.w, r.h) * 0.06;
+        for (let L = 0; L < 4; L++) g.lineStyle(1.5 + L * 2.5, tint, (0.5 - L * 0.11) * k).drawRoundedRect(r.x + i, r.y + i, r.w - 2 * i, r.h - 2 * i, i * 1.4);
+      }
+    }, done);
+    let n = 0;
+    const emit = () => {
+      if (done() || n++ > 400) return;
+      const r = rects[Math.floor(Math.random() * rects.length)];
+      if (r) {
+        const per = 2 * (r.w + r.h), d = Math.random() * per;
+        const [x, y] = d < r.w ? [r.x + d, r.y] : d < r.w + r.h ? [r.x + r.w, r.y + d - r.w] : d < 2 * r.w + r.h ? [r.x + r.w - (d - r.w - r.h), r.y + r.h] : [r.x, r.y + r.h - (d - 2 * r.w - r.h)];
+        const s = new PIXI.Sprite(Math.random() < 0.5 ? STAR : SPARK);
+        s.anchor.set(0.5); s.tint = Math.random() < 0.5 ? 0xffffff : tint; s.blendMode = PIXI.BLEND_MODES.ADD; s.position.set(x, y);
+        const sz = 6 + Math.random() * 10;
+        this.add(s, 600, (p, q) => { p.s.alpha = Math.sin(q * Math.PI); p.s.scale.set((sz / 64) * (0.6 + Math.sin(q * Math.PI))); p.s.rotation += 0.05; }, done);
+      }
+      setTimeout(emit, rects.length > 6 ? 30 : 60);
+    };
+    emit();
+    // one diagonal light sweep over each cell
+    rects.forEach((r, k) => {
+      const sw = new PIXI.Sprite(BEAM); sw.anchor.set(0.5); sw.blendMode = PIXI.BLEND_MODES.ADD; sw.rotation = 0.6; sw.width = r.w * 0.35; sw.height = r.h * 1.6; sw.alpha = 0;
+      const m = new PIXI.Graphics().beginFill(0xffffff).drawRect(r.x, r.y, r.w, r.h).endFill();
+      this.fx.addChild(m); sw.mask = m;
+      this.add(sw, 700, (p, q) => { const qq = Math.max(0, q - (k % 6) * 0.05); p.s.x = r.x - r.w * 0.3 + qq * r.w * 1.6; p.s.y = r.y + r.h / 2; p.s.alpha = 0.32 * Math.sin(Math.min(1, qq) * Math.PI); }, done);
+    });
+  }
+  clear() { this.winId = (this.winId || 0) + 1; this.kick(); }
+  destroy() {
+    PX.stages.delete(this);
+    this.cols.clear(); this.parts = [];
+    try { this.app.destroy(true, { children: true }); } catch { /* ignore */ }
+  }
+}
+
+// The stage of a reel area, made on first use. null while Pixi loads or when it cannot run (HTML reels then).
+const STAGES = new WeakMap();
+function stageFor(host) {
+  for (const s of PX.stages) if (!s.alive) s.destroy();
+  if (!host || !usable()) { if (!window.PIXI) load().catch(() => {}); return null; }
+  let s = STAGES.get(host);
+  if (s && s.alive) return s;
+  try { s = new Stage(host); } catch (e) { console.warn('Pixi off', e); PX.broken = true; return null; }
+  STAGES.set(host, s);
+  PX.stages.add(s);
+  return s;
+}
+const prepare = () => { if (!window.PIXI) load().catch(() => {}); };
+
+// CSS cubic-bezier(x1, y1, x2, y2) as a function of time 0..1
+function bezier(x1, y1, x2, y2) {
+  const B = (a, b, t) => 3 * a * t * (1 - t) ** 2 + 3 * b * t * t * (1 - t) + t ** 3;
+  return (x) => { let lo = 0, hi = 1, t = x; for (let i = 0; i < 22; i++) { t = (lo + hi) / 2; if (B(x1, x2, t) < x) lo = t; else hi = t; } return B(y1, y2, t); };
+}
+
+return { stageFor, warm, prepare, bezier, pixiOn: () => usable() && !PX.broken };
+})();
+
 // ---- wallet.js ----
 __mods['wallet.js'] = (() => {
 // Demo wallet shared by every game: the balance lives in localStorage 'casino_bal' (cents),
@@ -7867,7 +8255,7 @@ const SPECS = {
       ${[0, 1, 2, 3, 4].map((k) => `<ellipse cx="58" cy="${272 - k * 7}" rx="24" ry="8" fill="${k % 2 ? '#fff' : '#c8102e'}" stroke="#3b0a0a" stroke-width="1"/>`).join('')}
       ${[0, 1, 2, 3].map((k) => `<ellipse cx="244" cy="${276 - k * 7}" rx="24" ry="8" fill="${k % 2 ? '#fff' : '#111827'}" stroke="#000" stroke-width="1"/>`).join('')}`,
   },
-  mines: {
+  mines: { photo: 'assets/games/mines/cover.webp',
     bg: ['#5a2a05', '#0b0502'], light: '#fdba74', title: ['LE CHAMP', 'DE MINES'], font: 'bebas', metal: ['#fff', '#fdba74', '#c2410c'], tag: 'JUSQU’À 24 BOMBES',
     art: (u) => {
       let t = '';
@@ -7880,7 +8268,7 @@ const SPECS = {
         <g transform="translate(204 232)" filter="url(#sh${u})"><circle r="34" fill="#1f2937" stroke="#f87171" stroke-width="2"/><circle cx="-11" cy="-11" r="9" fill="#fff" opacity=".3"/><path d="M22 -24 L32 -36" stroke="#9ca3af" stroke-width="6" stroke-linecap="round"/><circle cx="35" cy="-40" r="8" fill="#fbbf24" filter="url(#glow${u})"/></g>`;
     },
   },
-  avion: {
+  avion: { photo: 'assets/games/avion/cover.webp',
     bg: ['#5a0a2a', '#08020a'], light: '#ff7aa0', title: ['L’AVION'], font: 'bebas', metal: ['#fff', '#ffb3c6', '#e11d48'], tag: 'CRASH',
     art: (u) => `
       <g stroke="#fff" stroke-opacity=".08">${[60, 110, 160, 210, 260].map((y) => `<path d="M0 ${y} H300"/>`).join('')}</g>
@@ -7889,7 +8277,7 @@ const SPECS = {
       <g transform="translate(252 86) rotate(-62) scale(2.3)" filter="url(#glow${u})"><path d="M22 0 L-14 -7 L-10 0 L-14 7 Z" fill="#fff"/><path d="M4 0 L-6 -18 L-10 -18 L-4 0 Z M4 0 L-6 18 L-10 18 L-4 0 Z" fill="#ff3b6b"/><circle cx="-16" cy="0" r="4" fill="#ffd23f"/></g>
       <text x="120" y="170" text-anchor="middle" font-family="KeCoin,${FONTS.orb}" font-weight="900" font-size="46" fill="url(#tit${u})" stroke="#4a0418" stroke-width="2" paint-order="stroke" filter="url(#glow${u})">×1000</text>`,
   },
-  plinko: {
+  plinko: { photo: 'assets/games/plinko/cover.webp',
     bg: ['#1e1b4b', '#05030f'], light: '#7dd3fc', title: ['LA CASCADE'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: 'JUSQU’À ×1 000',
     art: (u) => {
       let pegs = '';
@@ -7901,7 +8289,7 @@ const SPECS = {
         ${slots.map(([t, c], k) => `<rect x="${150 + (k - 4) * 30 - 13}" y="250" width="26" height="22" rx="5" fill="${c}"/><text x="${150 + (k - 4) * 30}" y="265" text-anchor="middle" font-family="KeCoin,Inter,sans-serif" font-weight="800" font-size="${t.length > 3 ? 7.5 : 9}" fill="#1a0b06">${t}</text>`).join('')}`;
     },
   },
-  vortex: {
+  vortex: { photo: 'assets/games/vortex/cover.webp',
     bg: ['#3a0a10', '#050203'], light: '#ff6b6b', title: ['LE VORTEX'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'JUSQU’À ×1 000',
     art: (u) => {
       let rings = '';
@@ -7919,7 +8307,7 @@ const SPECS = {
         <g filter="url(#glow${u})"><circle cx="150" cy="47" r="15" fill="#ffd6dd" fill-opacity=".85" stroke="#fff" stroke-width="2"/><circle cx="145" cy="42" r="4.5" fill="#fff"/></g>`;
     },
   },
-  casse: {
+  casse: { photo: 'assets/games/casse/cover.webp',
     bg: ['#1e293b', '#020617'], light: '#fde68a', title: ['LE CASSE'], font: 'bebas', metal: ['#fff', '#fde68a', '#b45309'], tag: 'JUSQU’À ×2 000',
     art: (u) => {
       const bolts = Array.from({ length: 12 }, (_, k) => { const a = (k / 12) * Math.PI * 2; return `<circle cx="${(150 + Math.cos(a) * 74).toFixed(1)}" cy="${(140 + Math.sin(a) * 74).toFixed(1)}" r="4.5" fill="#e2e8f0" stroke="#1e293b"/>`; }).join('');
@@ -7931,7 +8319,7 @@ const SPECS = {
         <g transform="translate(86 222)"><path d="M-30 18 L-22 -4 H22 L30 18 Z" fill="url(#gold${u})" stroke="#78350f" stroke-width="2"/></g>`;
     },
   },
-  pileface: {
+  pileface: { photo: 'assets/games/pileface/cover.webp',
     bg: ['#3b2a05', '#05060b'], light: '#fbbf24', title: ['LA PIÈCE'], font: 'bebas', metal: ['#fff', '#fde68a', '#b45309'], tag: 'JUSQU’À 20 LANCERS',
     art: (u) => `
       <circle cx="150" cy="130" r="120" fill="#fbbf24" opacity=".12"/>
@@ -7942,7 +8330,7 @@ const SPECS = {
       <g transform="translate(214 190) rotate(18)" filter="url(#sh${u})"><circle r="40" fill="#cbd5e1" stroke="#334155" stroke-width="3"/><text y="12" text-anchor="middle" font-family="KeCoin,Archivo,sans-serif" font-weight="900" font-size="30" fill="#1e293b">×2</text></g>
       <g fill="#fde047">${[[60, 60, 6], [250, 70, 8], [50, 200, 5], [180, 40, 4]].map(([x, y, s]) => `<path d="M${x} ${y - s} Q${x} ${y} ${x + s} ${y} Q${x} ${y} ${x} ${y + s} Q${x} ${y} ${x - s} ${y} Q${x} ${y} ${x} ${y - s}Z"/>`).join('')}</g>`,
   },
-  robots: {
+  robots: { photo: 'assets/games/robots/cover.webp',
     bg: ['#0b2440', '#04060c'], light: '#22d3ee', title: ['LA COURSE'], font: 'bebas', metal: ['#fff', '#a5f3fc', '#0e7490'], tag: '6 ROBOTS',
     art: (u) => {
       const bot = (x, y, s, c, r) => `<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})" filter="url(#sh${u})"><path d="M-30 6 H-16 M-34 14 H-18 M-28 -2 H-18" stroke="${c}" stroke-width="3" stroke-linecap="round"/>
@@ -7992,7 +8380,7 @@ const SPECS = {
     bg: ['#2f4a12', '#071006'], light: '#fde047', title: ['THE HUNT'], font: 'bebas', metal: ['#fff', '#fde68a', '#ca8a04'], tag: 'CERF DORÉ ×500', photo: 'assets/games/chasse/cover.webp',
     art: () => '',
   },
-  poulet: {
+  poulet: { photo: 'assets/games/poulet/cover.webp',
     bg: ['#3a3a0a', '#06070a'], light: '#facc15', title: ['LE POULET'], font: 'bebas', metal: ['#fff', '#fde047', '#ca8a04'], tag: 'JUSQU’À ×2 041',
     art: (u) => `
       <g transform="skewX(-8)"><rect x="40" y="70" width="240" height="190" fill="#374151"/>${[0, 1, 2, 3].map((k) => `<path d="M${88 + k * 48} 70 V260" stroke="#fff" stroke-width="4" stroke-dasharray="14 12" opacity=".7"/>`).join('')}</g>
@@ -8004,7 +8392,7 @@ const SPECS = {
         <path d="M51 20 L58 23 L51 26Z" fill="#f59e0b"/><path d="M49 27 Q52 33 47 33 Q46 29 49 27Z" fill="#ef4444"/><circle cx="44" cy="18" r="2.6" fill="#0f172a"/><circle cx="45" cy="17" r=".9" fill="#fff"/></g>
       <g font-family="KeCoin,Archivo,sans-serif" font-weight="900" text-anchor="middle"><circle cx="60" cy="230" r="26" fill="url(#gold${u})" stroke="#78350f" stroke-width="3"/><text x="60" y="236" font-size="14" fill="#78350f">×2</text></g>`,
   },
-  gratteciel: {
+  gratteciel: { photo: 'assets/games/gratteciel/cover.webp',
     bg: ['#1e3a8a', '#05060d'], light: '#38bdf8', title: ['LE GRATTE', 'CIEL'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: '30 CUBES',
     art: (u) => {
       const C = [['#f43f5e', '#9f1239'], ['#f59e0b', '#b45309'], ['#22c55e', '#15803d'], ['#3b82f6', '#1d4ed8'], ['#a855f7', '#7e22ce'], ['#06b6d4', '#0e7490']];
@@ -8017,7 +8405,7 @@ const SPECS = {
         <rect x="0" y="276" width="300" height="20" fill="#334155"/>`;
     },
   },
-  penalty: {
+  penalty: { photo: 'assets/games/penalty/cover.webp',
     bg: ['#14532d', '#04080a'], light: '#86efac', title: ['LE PENALTY'], font: 'bebas', metal: ['#fff', '#bbf7d0', '#15803d'], tag: '×1,5 PAR BUT',
     art: (u) => `
       <rect x="30" y="60" width="240" height="110" fill="none" stroke="#f8fafc" stroke-width="8"/>
@@ -8027,7 +8415,7 @@ const SPECS = {
       <path d="M150 260 Q176 180 206 120" stroke="#fde047" stroke-width="3" stroke-dasharray="6 8" fill="none" opacity=".8"/>
       <ellipse cx="150" cy="262" rx="60" ry="12" fill="#fff" opacity=".25"/>`,
   },
-  ticket: {
+  ticket: { photo: 'assets/games/ticket/cover.webp',
     bg: ['#4a1d6e', '#07060b'], light: '#facc15', title: ['LE TICKET'], font: 'bebas', metal: ['#fff', '#fde047', '#db2777'], tag: '5 TICKETS',
     art: (u) => {
       const tk = (x, y, r, sc) => `<g transform="translate(${x} ${y}) rotate(${r})" filter="url(#sh${u})"><rect x="-70" y="-48" width="140" height="96" rx="10" fill="url(#gold${u})" stroke="#fff" stroke-width="3"/>
@@ -8062,7 +8450,7 @@ const SPECS = {
         <path d="M250 30 L232 64 L248 64 L226 104 L262 56 L246 56 L262 30 Z" fill="#fde047" stroke="#713f12" stroke-width="2" filter="url(#glow${u})"/>`;
     },
   },
-  roueor: {
+  roueor: { photo: 'assets/games/roueor/cover.webp',
     bg: ['#3b2a05', '#030303'], light: '#fbbf24', title: ['LA ROUE', 'D’OR'], font: 'cinzel', metal: ['#fff7d6', '#fbbf24', '#92400e'], tag: 'BONUS DES 24 CUBES',
     art: (u) => {
       const P = (a, r) => [150 + r * Math.cos((a - 90) * Math.PI / 180), 125 + r * Math.sin((a - 90) * Math.PI / 180)];
@@ -8072,7 +8460,7 @@ const SPECS = {
         ${cube(62, 222, -12, '×50')}${cube(150, 236, 4, '?')}${cube(238, 220, 12, '×1000')}`;
     },
   },
-  billes: {
+  billes: { photo: 'assets/games/billes/cover.webp',
     bg: ['#0c4a6e', '#05070b'], light: '#7dd3fc', title: ['LA DESCENTE'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: 'COURSE DE BILLES',
     art: (u) => {
       const C = [['#ef4444', '#7f1d1d'], ['#3b82f6', '#1e3a8a'], ['#22c55e', '#14532d'], ['#facc15', '#854d0e'], ['#a855f7', '#581c87']];
@@ -8096,22 +8484,21 @@ const CARD = {
 // the wheel games' salons wear their game's poster, with the ONLINE ribbon
 ['madwheel', 'plateau', 'peche', 'roueor'].forEach((id) => { SPECS[`${id}-online`] = { ...SPECS[id], online: true, tag: 'ONLINE' }; if (CARD[id]) CARD[`${id}-online`] = CARD[id]; });
 
-// Square lobby poster: full-bleed bright background, the game art large at the top, a condensed white title
-// over its lower part and the studio wordmark underneath.
-function squareSVG(game, sp, cls) {
-  const u = `q${++uid}`, rnd = seeded(game.id), [c0, c1] = CARD[game.id] || [sp.light, sp.bg[1]];
-  let bokeh = '';
-  for (let i = 0; i < 12; i++) bokeh += `<circle cx="${(rnd() * 300).toFixed(0)}" cy="${(rnd() * 220).toFixed(0)}" r="${(3 + rnd() * 10).toFixed(1)}" fill="#fff" opacity="${(0.05 + rnd() * 0.12).toFixed(2)}"/>`;
-  const lines = sp.title.flatMap((t) => (t.length > 13 && t.includes(' ') ? [t.slice(0, t.lastIndexOf(' ')), t.slice(t.lastIndexOf(' ') + 1)] : [t]));
-  const size = Math.min(40, ...lines.map((t) => 270 / (t.length * 0.5 + 0.6)));
-  const step = size * 0.88, y0 = 264 - (lines.length - 1) * step;
-  const [p1, p2] = BRAND.provider.toUpperCase().split(' ');
-  return `<svg class="${cls}" viewBox="0 0 300 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs>
-      <linearGradient id="bg${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c0}"/><stop offset="1" stop-color="${c1}"/></linearGradient>
-      <radialGradient id="spot${u}" cx=".5" cy=".35" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-      <linearGradient id="fade${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}" stop-opacity="0"/><stop offset=".55" stop-color="${c1}" stop-opacity=".75"/><stop offset="1" stop-color="${c1}"/></linearGradient>
-      <linearGradient id="tit${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sp.metal[0]}"/><stop offset=".5" stop-color="${sp.metal[1]}"/><stop offset=".52" stop-color="${sp.metal[2]}"/><stop offset="1" stop-color="${sp.metal[1]}"/></linearGradient>
+// One poster template for every game (lobby tiles, headers, lists): the art fills the card, then the same studio
+// finish everywhere — vignette, top gloss, a dark title plate in the card colour, the title in Bebas Neue with a
+// light metal fill, a thin accent line, the studio wordmark and a lit rim. Pictures with a title painted in them
+// (CROP) are cut above that title, so only one style of title is ever shown.
+const CROP = { // [top, bottom] of the picture that is kept (fractions of its height)
+  'assets/games/madwheel/cover.webp': [0, 0.5], 'assets/games/storm/cover.webp': [0.04, 0.72], 'assets/games/doublespin/cover.webp': [0.02, 0.62],
+  'assets/games/blackjack/cover.webp': [0.17, 0.67], 'assets/games/lightningbj/cover.webp': [0.2, 0.66], 'assets/games/poker/cover.webp': [0.2, 0.62],
+  'assets/games/plateau/cover.webp': [0.04, 0.84], 'assets/games/peche/cover.webp': [0, 0.76],
+};
+function photoArt(sp, H) {
+  const c = CROP[sp.photo];
+  if (c) return `<svg width="300" height="${H}" viewBox="0 ${Math.round(800 * c[0])} 600 ${Math.round(800 * (c[1] - c[0]))}" preserveAspectRatio="xMidYMin slice"><image href="${photoSrc(sp.photo)}" width="600" height="800"/></svg>`;
+  return `<image href="${photoSrc(sp.photo)}" width="300" height="${H}" preserveAspectRatio="xMidYMin slice"/>`;
+}
+const SHARED_DEFS = (u) => `
       <linearGradient id="gold${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".45" stop-color="#fbbf24"/><stop offset="1" stop-color="#a16207"/></linearGradient>
       <linearGradient id="wood${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a4b1c"/><stop offset="1" stop-color="#3b1a06"/></linearGradient>
       <linearGradient id="paper${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e2e8f0"/></linearGradient>
@@ -8120,24 +8507,50 @@ function squareSVG(game, sp, cls) {
       <radialGradient id="moon${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fffbe6"/><stop offset=".7" stop-color="#f6e7a8"/><stop offset="1" stop-color="#d8c27a"/></radialGradient>
       <radialGradient id="pearl${u}" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#9aa3c7"/></radialGradient>
       <filter id="glow${u}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      <filter id="sh${u}" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#000" flood-opacity=".45"/></filter>
-      <filter id="soft${u}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4"/></filter>
-      <filter id="tsh${u}" x="-20%" y="-40%" width="140%" height="190%"><feDropShadow dx="0" dy="4" stdDeviation="3" flood-color="#000" flood-opacity=".55"/></filter>
+      <filter id="sh${u}" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#000" flood-opacity=".5"/></filter>
+      <filter id="soft${u}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4"/></filter>`;
+function poster(game, sp, cls, H, { badge = false } = {}) {
+  const u = `q${++uid}`, rnd = seeded(game.id), [c0, c1] = CARD[game.id] || [sp.light, sp.bg[1]];
+  const light = sp.light || '#fff';
+  let bokeh = '';
+  if (!sp.photo) for (let i = 0; i < 12; i++) bokeh += `<circle cx="${(rnd() * 300).toFixed(0)}" cy="${(rnd() * H * 0.7).toFixed(0)}" r="${(3 + rnd() * 10).toFixed(1)}" fill="#fff" opacity="${(0.05 + rnd() * 0.12).toFixed(2)}"/>`;
+  const lines = sp.title.flatMap((t) => (t.length > 13 && t.includes(' ') ? [t.slice(0, t.lastIndexOf(' ')), t.slice(t.lastIndexOf(' ') + 1)] : [t])).slice(0, 2);
+  const size = Math.min(H > 300 ? 50 : 42, ...lines.map((t) => 272 / (t.length * 0.5 + 0.6)));
+  const step = size * 0.86, base = H - 40, y0 = base - (lines.length - 1) * step;
+  const plateTop = Math.max(H * 0.5, y0 - size * 1.35);
+  const art = sp.photo ? photoArt(sp, H) : sp.hero ? sp.hero(u) : (H > 300 ? sp.art(u) : `<g transform="translate(-18 -50) scale(1.12)">${sp.art(u)}</g>`);
+  return `<svg class="${cls}" viewBox="0 0 300 ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="bg${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c0}"/><stop offset="1" stop-color="${c1}"/></linearGradient>
+      <radialGradient id="spot${u}" cx=".5" cy=".35" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="vig${u}" cx=".5" cy=".42" r=".78"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient>
+      <linearGradient id="gl${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".35" stop-color="#fff" stop-opacity="0"/></linearGradient>
+      <linearGradient id="pl${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c1}" stop-opacity="0"/><stop offset=".42" stop-color="${c1}" stop-opacity=".82"/><stop offset="1" stop-color="${c1}"/></linearGradient>
+      <linearGradient id="pk${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></linearGradient>
+      <linearGradient id="tit${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="${light}"/></linearGradient>
+      <linearGradient id="acc${u}" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${light}" stop-opacity="0"/><stop offset=".5" stop-color="${light}"/><stop offset="1" stop-color="${light}" stop-opacity="0"/></linearGradient>
+      <filter id="tsh${u}" x="-20%" y="-40%" width="140%" height="190%"><feDropShadow dx="0" dy="3" stdDeviation="2.2" flood-color="#000" flood-opacity=".75"/><feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="${light}" flood-opacity=".35"/></filter>
+      ${SHARED_DEFS(u)}
     </defs>
-    <rect width="300" height="300" fill="url(#bg${u})"/>
-    <rect width="300" height="300" fill="url(#spot${u})"/>
+    <rect width="300" height="${H}" fill="url(#bg${u})"/>
+    <rect width="300" height="${H}" fill="url(#spot${u})"/>
     ${bokeh}
-    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="300" preserveAspectRatio="${sp.baked ? 'xMidYMax' : 'xMidYMin'} slice"/>` : sp.hero ? sp.hero(u) : `<g transform="translate(-18 -50) scale(1.12)">${sp.art(u)}</g>`}
-    ${sp.baked ? '' : `    <rect y="170" width="300" height="130" fill="url(#fade${u})"/>
-    <g font-family="KeCoin,${FONTS.bebas}" font-weight="900" text-anchor="middle" filter="url(#tsh${u})">
-      ${lines.map((t, k) => `<text x="150" y="${(y0 + k * step).toFixed(1)}" font-size="${size.toFixed(0)}" fill="#fff" stroke="rgba(0,0,0,.25)" stroke-width="1.5" paint-order="stroke" letter-spacing="1">${t}</text>`).join('')}
+    ${art}
+    <rect width="300" height="${H}" fill="url(#vig${u})"/>
+    <rect width="300" height="${H}" fill="url(#gl${u})"/>
+    <rect y="${plateTop.toFixed(0)}" width="300" height="${(H - plateTop).toFixed(0)}" fill="url(#pl${u})"/>
+    <rect y="${plateTop.toFixed(0)}" width="300" height="${(H - plateTop).toFixed(0)}" fill="url(#pk${u})"/>
+    <g font-family="KeCoin,${FONTS.bebas}" text-anchor="middle" filter="url(#tsh${u})">
+      ${lines.map((t, k) => `<text x="150" y="${(y0 + k * step).toFixed(1)}" font-size="${size.toFixed(0)}" fill="url(#tit${u})" stroke="#000" stroke-opacity=".45" stroke-width="2" paint-order="stroke" letter-spacing="1.5">${t}</text>`).join('')}
     </g>
-    <g text-anchor="middle" fill="#fff" font-family="KeCoin,${FONTS.bebas}" filter="url(#tsh${u})">
-      <text x="150" y="282" font-size="17" font-weight="900" letter-spacing="1.5">${p1}</text>
-      ${p2 ? `<text x="151" y="292.5" font-family="KeCoin,Inter, Arial, sans-serif" font-size="6.5" font-weight="800" letter-spacing="5.2" fill-opacity=".9">${p2}</text>` : ''}
-    </g>`}
+    <rect x="70" y="${base + 9}" width="160" height="1.4" fill="url(#acc${u})"/>
+    <text x="150" y="${base + 24}" text-anchor="middle" font-family="KeCoin,Inter, Arial, sans-serif" font-weight="800" font-size="8.5" letter-spacing="3.4" fill="#fff" fill-opacity=".85">${BRAND.provider.toUpperCase()}</text>
+    ${badge && sp.tag ? `<g transform="translate(14 16)"><rect width="${sp.tag.length * 6.6 + 16}" height="20" rx="4" fill="#000" fill-opacity=".55" stroke="${light}" stroke-opacity=".6"/><text x="8" y="14" font-family="KeCoin,Inter, Arial, sans-serif" font-weight="800" font-size="10.5" letter-spacing=".8" fill="#fff">${sp.tag}</text></g>` : ''}
+    <rect x=".75" y=".75" width="298.5" height="${H - 1.5}" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1.5"/>
+    <rect y="${H - 3}" width="300" height="3" fill="${light}" opacity=".85"/>
   </svg>`;
 }
+const squareSVG = (game, sp, cls) => poster(game, sp, cls, 300);
 
 // Covers can be a painted picture from the owner (spec.photo); the single-file version inlines it (window.__assets).
 const photoSrc = (p) => window.__assets?.[p] || `${p}?v=1`;
@@ -8150,55 +8563,7 @@ function coverSVG(game, opts = {}) {
 function coverSVG0(game, { cls = 'cover', badge = true, square = false } = {}) {
   const sp = SPECS[game.id];
   if (!sp) return '';
-  if (square) return squareSVG(game, sp, cls);
-  const u = `c${++uid}`, rnd = seeded(game.id);
-  let bokeh = '';
-  for (let i = 0; i < 16; i++) bokeh += `<circle cx="${(rnd() * 300).toFixed(0)}" cy="${(rnd() * 300).toFixed(0)}" r="${(2 + rnd() * 9).toFixed(1)}" fill="${sp.light}" opacity="${(0.06 + rnd() * 0.2).toFixed(2)}"/>`;
-  let rays = '';
-  for (let i = 0; i < 14; i++) rays += `<path d="M150 150 L${150 + 420 * Math.cos(i * 0.449)} ${150 + 420 * Math.sin(i * 0.449)} L${150 + 420 * Math.cos(i * 0.449 + 0.12)} ${150 + 420 * Math.sin(i * 0.449 + 0.12)} Z"/>`;
-  const [t1, t2] = sp.title;
-  const big = sp.font === 'cinzel' ? 40 : 52, small = sp.font === 'cinzel' ? 30 : 40;
-  const fs1 = Math.min(big, 560 / Math.max(6, t1.length) * (sp.font === 'cinzel' ? 0.78 : 1));
-  const ty = t2 ? 322 : 340;
-  return `<svg class="${cls}" viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <defs>
-      <linearGradient id="bg${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sp.bg[0]}"/><stop offset=".62" stop-color="${sp.bg[1]}"/><stop offset="1" stop-color="#000"/></linearGradient>
-      <radialGradient id="spot${u}" cx=".5" cy=".38" r=".55"><stop offset="0" stop-color="${sp.light}" stop-opacity=".55"/><stop offset=".45" stop-color="${sp.light}" stop-opacity=".12"/><stop offset="1" stop-color="${sp.light}" stop-opacity="0"/></radialGradient>
-      <radialGradient id="vig${u}" cx=".5" cy=".45" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".7"/></radialGradient>
-      <linearGradient id="tit${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${sp.metal[0]}"/><stop offset=".5" stop-color="${sp.metal[1]}"/><stop offset=".52" stop-color="${sp.metal[2]}"/><stop offset="1" stop-color="${sp.metal[1]}"/></linearGradient>
-      <linearGradient id="gold${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".45" stop-color="#fbbf24"/><stop offset="1" stop-color="#a16207"/></linearGradient>
-      <linearGradient id="wood${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a4b1c"/><stop offset="1" stop-color="#3b1a06"/></linearGradient>
-      <linearGradient id="paper${u}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#e2e8f0"/></linearGradient>
-      <linearGradient id="tile${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#334155"/><stop offset="1" stop-color="#1e293b"/></linearGradient>
-      <linearGradient id="emer${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a7f3d0"/><stop offset=".5" stop-color="#10b981"/><stop offset="1" stop-color="#065f46"/></linearGradient>
-      <radialGradient id="moon${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fffbe6"/><stop offset=".7" stop-color="#f6e7a8"/><stop offset="1" stop-color="#d8c27a"/></radialGradient>
-      <radialGradient id="pearl${u}" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#9aa3c7"/></radialGradient>
-      <linearGradient id="fade${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".85"/></linearGradient>
-      <filter id="glow${u}" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-      <filter id="sh${u}" x="-30%" y="-30%" width="160%" height="170%"><feDropShadow dx="0" dy="8" stdDeviation="7" flood-color="#000" flood-opacity=".6"/></filter>
-      <filter id="soft${u}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4"/></filter>
-      <filter id="tsh${u}" x="-20%" y="-40%" width="140%" height="190%"><feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="#000" flood-opacity=".8"/><feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="${sp.light}" flood-opacity=".45"/></filter>
-    </defs>
-    <rect width="300" height="400" fill="url(#bg${u})"/>
-    <g fill="${sp.light}" opacity=".05">${rays}</g>
-    <rect width="300" height="400" fill="url(#spot${u})"/>
-    <g filter="url(#soft${u})">${bokeh}</g>
-    ${sp.photo ? `<image href="${photoSrc(sp.photo)}" width="300" height="400" preserveAspectRatio="xMidYMin slice"/>` : sp.art(u)}
-    <rect width="300" height="400" fill="url(#vig${u})"/>
-    ${sp.baked ? '' : `
-    <rect y="250" width="300" height="150" fill="url(#fade${u})"/>
-    <g font-family="KeCoin,${FONTS[sp.font]}" font-weight="900" text-anchor="middle" filter="url(#tsh${u})">
-      <text x="150" y="${ty}" font-size="${fs1.toFixed(0)}" fill="url(#tit${u})" stroke="#000" stroke-opacity=".55" stroke-width="2" paint-order="stroke" letter-spacing="${sp.font === 'cinzel' ? 1 : 2}">${t1}</text>
-      ${t2 ? `<text x="150" y="${ty + small + 2}" font-size="${small}" fill="url(#tit${u})" stroke="#000" stroke-opacity=".55" stroke-width="2" paint-order="stroke" letter-spacing="${sp.font === 'cinzel' ? 2 : 4}">${t2}</text>` : ''}
-    </g>`}
-    ${badge && sp.tag ? `<g transform="translate(14 16)"><rect width="${sp.tag.length * 6.6 + 16}" height="20" rx="4" fill="#000" fill-opacity=".55" stroke="${sp.light}" stroke-opacity=".6"/><text x="8" y="14" font-family="KeCoin,Inter, Arial, sans-serif" font-weight="800" font-size="10.5" letter-spacing=".8" fill="#fff">${sp.tag}</text></g>` : ''}
-    ${sp.baked ? '' : `
-    <g transform="translate(150 388)" text-anchor="middle">
-      <path d="M-98 -5 H-76 M72 -5 H94" stroke="#fff" stroke-opacity=".35"/>
-      <circle cx="-64" cy="-5" r="5.5" fill="none" stroke="#7cc8ff" stroke-width="2"/><path d="M-64 -8.5 V-5 L-61.5 -3.5" stroke="#7cc8ff" stroke-width="1.6" fill="none" stroke-linecap="round"/>
-      <text x="6" y="-1" font-family="KeCoin,Inter, Arial, sans-serif" font-weight="800" font-size="10" letter-spacing="2.2" fill="#fff" fill-opacity=".9">${BRAND.provider.toUpperCase()}</text>
-    </g>`}
-  </svg>`;
+  return square ? squareSVG(game, sp, cls) : poster(game, sp, cls, 400, { badge });
 }
 
 // Wide banner version for the lobby hero: the cover art on the right, lit background on the left.
@@ -8215,6 +8580,32 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'big-bad-wolf', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'fortune', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'labo', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'billets', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'chasse', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'huff', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'zeus', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'candy', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'cosmic', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'anubis', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'bling', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'pharaon', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'dragons', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'mines', date: '2026-11-03', title: 'Graphismes 3D', items: ['Nouvelle couverture dessinée en 3D', 'La gemme et la bombe sont maintenant dessinés en 3D', 'Les gains ne changent pas'] },
+  { game: 'pileface', date: '2026-11-03', title: 'Graphismes 3D', items: ['Nouvelle couverture dessinée en 3D', 'Les deux faces de la pièce sont maintenant dessinés en 3D', 'Les gains ne changent pas'] },
+  { game: 'casse', date: '2026-11-03', title: 'Graphismes 3D', items: ['Nouvelle couverture dessinée en 3D', 'Les portes de coffre, les billets et les lingots sont maintenant dessinés en 3D', 'Les gains ne changent pas'] },
+  { game: 'robots', date: '2026-11-03', title: 'Graphismes 3D', items: ['Nouvelle couverture dessinée en 3D', 'Les six robots sont maintenant dessinés en 3D', 'Les gains ne changent pas'] },
+  { game: 'poulet', date: '2026-11-03', title: 'Graphismes 3D', items: ['Nouvelle couverture dessinée en 3D', 'Le poulet et les voitures sont maintenant dessinés en 3D', 'Les gains ne changent pas'] },
+  { game: 'penalty', date: '2026-11-03', title: 'Graphismes 3D', items: ['Nouvelle couverture dessinée en 3D', 'Le ballon est maintenant dessiné en 3D', 'Les gains ne changent pas'] },
+  { game: 'avion', date: '2026-11-03', title: 'Nouvelle couverture 3D', items: ['Nouvelle couverture dessinée en 3D, dans le même style que tout le lobby', 'Les gains ne changent pas'] },
+  { game: 'plinko', date: '2026-11-03', title: 'Nouvelle couverture 3D', items: ['Nouvelle couverture dessinée en 3D, dans le même style que tout le lobby', 'Les gains ne changent pas'] },
+  { game: 'vortex', date: '2026-11-03', title: 'Nouvelle couverture 3D', items: ['Nouvelle couverture dessinée en 3D, dans le même style que tout le lobby', 'Les gains ne changent pas'] },
+  { game: 'gratteciel', date: '2026-11-03', title: 'Nouvelle couverture 3D', items: ['Nouvelle couverture dessinée en 3D, dans le même style que tout le lobby', 'Les gains ne changent pas'] },
+  { game: 'ticket', date: '2026-11-03', title: 'Nouvelle couverture 3D', items: ['Nouvelle couverture dessinée en 3D, dans le même style que tout le lobby', 'Les gains ne changent pas'] },
+  { game: 'billes', date: '2026-11-03', title: 'Nouvelle couverture 3D', items: ['Nouvelle couverture dessinée en 3D, dans le même style que tout le lobby', 'Les gains ne changent pas'] },
+  { game: 'roueor', date: '2026-11-03', title: 'Nouvelle couverture 3D', items: ['Nouvelle couverture dessinée en 3D, dans le même style que tout le lobby', 'Les gains ne changent pas'] },
   { game: 'pharaon', date: '2026-11-03', title: 'Max win et jackpot commun', items: ['Le Totem a maintenant un gain maximum : ×500 la mise par tour, bonus compris', 'Atteindre le max win fait gagner le jackpot commun du site', 'Les gains ne changent pas'] },
   { game: 'taco', date: '2026-11-03', title: 'Max win et jackpot commun', items: ['Le gain maximum de ×5 000 la mise est maintenant appliqué à chaque tour, bonus compris', 'Atteindre le max win fait gagner le jackpot commun du site'] },
   { game: 'big-bad-wolf', date: '2026-11-03', title: 'Max win et jackpot commun', items: ['Le Loup a maintenant un gain maximum : ×5 000 la mise par tour, bonus compris', 'Atteindre le max win fait gagner le jackpot commun du site'] },
@@ -9293,6 +9684,7 @@ const { el, toast, modal, animateNumber, fmtShort } = __mods['ui.js'];
 const { coverSVG } = __mods['covers.js'];
 const { gameMenu, toggleFull, setFull, isFull, MENU_BTN, FULL_BTN, autoFit } = __mods['core/chrome.js'];
 const { Music, musicOn, EXTRA_THEMES } = __mods['core/music.js'];
+const { stageFor, warm, prepare } = __mods['core/pixi.js'];
 
 const BETS = [1, 2, 3, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000]; // whole KE, capped by the balance
 const LINE_COLORS = ['#22d3ee', '#f43f9e', '#00e701', '#fbbf24', '#a855f7', '#fb7185', '#38bdf8', '#facc15', '#34d399', '#e879f9'];
@@ -9384,6 +9776,7 @@ class SlotMachine {
     this.msg = q('.win-bar .msg');
     this.winAmt = q('.win-amt');
     this.reelEls.forEach((reel, r) => { reel.firstChild.innerHTML = this.grid[r].map((c) => this.cellHTML(c)).join(''); });
+    prepare(); requestAnimationFrame(() => warm(this.root.querySelectorAll('.reels .cell')));
     this.updateMeters();
   }
 
@@ -9444,6 +9837,7 @@ class SlotMachine {
     this.betIdx = Math.max(0, Math.min(BETS.length - 1, this.betIdx + d));
     sfx.click();
     this.reelEls.forEach((reel, r) => { reel.firstChild.innerHTML = this.grid[r].map((c) => this.cellHTML(c)).join(''); });
+    prepare(); requestAnimationFrame(() => warm(this.root.querySelectorAll('.reels .cell')));
     this.updateMeters();
   }
 
@@ -9481,19 +9875,23 @@ class SlotMachine {
     const filler = Array.from({ length: Math.max(8, Math.floor(dur / 38)) }, () => randomCell(g, r, Math.random, mode));
     const top = randomCell(g, r, Math.random, mode);
     const cells = [top, ...finalCol, ...filler, ...current];
-    strip.innerHTML = cells.map((c) => this.cellHTML(c)).join('');
+    const html = cells.map((c) => this.cellHTML(c));
     const end = -h;
     const start = -(cells.length - rows) * h;
     const bounce = h * 0.22;
+    // WebGL reel (Pixi) when every picture is ready, HTML strip otherwise
+    const px = stageFor(this.reelsEl), col = px?.column(reel, html, rows);
+    if (col) { strip.innerHTML = ''; strip.style.visibility = 'hidden'; col.set(start); } else strip.innerHTML = html.join('');
     strip.style.transform = `translate3d(0,${start}px,0)`;
     reel.classList.add('spinning');
-    if (tease) { reel.classList.add('tease'); setTimeout(() => sfx.tease(), dur - 900); }
+    let unTease = null;
+    if (tease) { reel.classList.add('tease'); setTimeout(() => sfx.tease(), dur - 900); unTease = px?.tease(reel); }
 
     return new Promise((resolve) => {
       const t0 = performance.now();
       const mainDur = dur * 0.9;
       const frame = (now) => {
-        if (this.dead) return resolve();
+        if (this.dead) { col?.end(); unTease?.(); return resolve(); }
         const t = now - t0;
         let y;
         if (t < mainDur) {
@@ -9506,10 +9904,14 @@ class SlotMachine {
           const q = Math.min(1, (t - mainDur) / (dur - mainDur));
           y = end + bounce * (1 - (1 - Math.pow(1 - q, 2)));
         }
-        strip.style.transform = `translate3d(0,${y}px,0)`;
+        if (col) col.set(y); else strip.style.transform = `translate3d(0,${y}px,0)`;
         if (t < dur) return requestAnimationFrame(frame);
         strip.innerHTML = finalCol.map((c) => this.cellHTML(c)).join('');
         strip.style.transform = 'translate3d(0,0,0)';
+        if (col) { col.end(); strip.style.visibility = ''; }
+        unTease?.();
+        px?.land(reel, tease);
+        warm(strip.children);
         reel.classList.remove('spinning', 'tease');
         reel.classList.remove('landed'); void reel.offsetWidth; reel.classList.add('landed');
         sfx.reelStop(r);
@@ -9532,6 +9934,7 @@ class SlotMachine {
   clearWins() {
     this.svg.innerHTML = '';
     this.reelsEl.classList.remove('has-win');
+    stageFor(this.reelsEl)?.clear();
     this.root.querySelectorAll('.cell.win').forEach((c) => c.classList.remove('win'));
     this.layer.querySelectorAll('.transient').forEach((n) => n.remove());
     this.winAmt.textContent = '';
@@ -9550,6 +9953,7 @@ class SlotMachine {
       svg += `<polyline points="${pts}" stroke="${col}" filter="url(#glow)" />`;
     });
     this.svg.innerHTML = svg;
+    stageFor(this.reelsEl)?.win([...this.root.querySelectorAll('.cell.win')]);
   }
 
   /* ---------------- one spin ---------------- */
@@ -9710,6 +10114,7 @@ class SlotMachine {
     this.clearWins();
     this.grid = this.safeGrid();
     this.reelEls.forEach((reel, r) => { reel.firstChild.innerHTML = this.grid[r].map((c) => this.cellHTML(c)).join(''); });
+    prepare(); requestAnimationFrame(() => warm(this.root.querySelectorAll('.reels .cell')));
   }
 
   async runFreeSpins(scatters) {
@@ -10372,6 +10777,7 @@ __mods['core/reels.js'] = (() => {
 // Values are a flat array indexed col * rows + row, like the original games.
 
 const { sfx } = __mods['audio.js'];
+const { stageFor, warm, prepare } = __mods['core/pixi.js'];
 
 class Reels {
   constructor(host, { cols, rows, art, cls = () => '', random, game, durK = 1 }) {
@@ -10384,7 +10790,10 @@ class Reels {
     host.appendChild(this.el);
     this.reelEls = [...this.el.children];
     this.values = new Array(cols * rows).fill(null);
+    prepare();
   }
+
+  get px() { return stageFor(this.el); }
 
   cellHTML(v, i) { return `<div class="rs-cell ${this.clsOf(v, i)}">${this.art(v, i)}</div>`; }
 
@@ -10394,6 +10803,7 @@ class Reels {
       this.reelEls[c].firstChild.innerHTML = vals.slice(c * this.rows, (c + 1) * this.rows).map((v, r) => this.cellHTML(v, c * this.rows + r)).join('');
       this.reelEls[c].firstChild.style.transform = 'translate3d(0,0,0)';
     }
+    requestAnimationFrame(() => warm(this.el.querySelectorAll('.rs-cell')));
   }
 
   set(i, v) {
@@ -10425,15 +10835,19 @@ class Reels {
     const current = this.values.slice(c * R, (c + 1) * R);
     const filler = Array.from({ length: Math.max(8, Math.floor(dur / 38)) }, () => this.random(c));
     const cells = [this.random(c), ...finalCol, ...filler, ...current.map((v) => (v == null ? this.random(c) : v))];
-    strip.innerHTML = cells.map((v, k) => this.cellHTML(v, k >= 1 && k <= R ? c * R + k - 1 : -1)).join('');
+    const html = cells.map((v, k) => this.cellHTML(v, k >= 1 && k <= R ? c * R + k - 1 : -1));
     const end = -h, start = -(cells.length - R) * h, bounce = h * 0.22;
+    // WebGL reel (Pixi) when every picture is ready, HTML strip otherwise
+    const px = this.px, col = px?.column(reel, html, R);
+    if (col) { strip.innerHTML = ''; strip.style.visibility = 'hidden'; col.set(start); } else strip.innerHTML = html.join('');
     strip.style.transform = `translate3d(0,${start}px,0)`;
     reel.classList.add('spinning');
-    if (slow) { reel.classList.add('tease'); setTimeout(() => sfx.tease(), dur - 900); }
+    let unTease = null;
+    if (slow) { reel.classList.add('tease'); setTimeout(() => sfx.tease(), dur - 900); unTease = px?.tease(reel); }
     return new Promise((resolve) => {
       const t0 = performance.now(), mainDur = dur * 0.9;
       const frame = (now) => {
-        if (this.game?.dead) return resolve();
+        if (this.game?.dead) { col?.end(); unTease?.(); return resolve(); }
         const tt = now - t0;
         let y;
         if (tt < mainDur) {
@@ -10445,10 +10859,14 @@ class Reels {
           const q = Math.min(1, (tt - mainDur) / (dur - mainDur));
           y = end + bounce * Math.pow(1 - q, 2);
         }
-        strip.style.transform = `translate3d(0,${y}px,0)`;
+        if (col) col.set(y); else strip.style.transform = `translate3d(0,${y}px,0)`;
         if (tt < dur) return requestAnimationFrame(frame);
         strip.innerHTML = finalCol.map((v, r) => this.cellHTML(v, c * R + r)).join('');
         strip.style.transform = 'translate3d(0,0,0)';
+        if (col) { col.end(); strip.style.visibility = ''; }
+        unTease?.();
+        px?.land(reel, slow);
+        warm(strip.children);
         reel.classList.remove('spinning', 'tease', 'landed');
         void reel.offsetWidth;
         reel.classList.add('landed');
@@ -10459,8 +10877,8 @@ class Reels {
     });
   }
 
-  mark(idxs, cls = 'win') { this.el.classList.add('has-win'); idxs.forEach((i) => this.cell(i)?.classList.add(cls)); }
-  unmark() { this.el.classList.remove('has-win'); this.el.querySelectorAll('.rs-cell.win').forEach((n) => n.classList.remove('win')); }
+  mark(idxs, cls = 'win') { this.el.classList.add('has-win'); idxs.forEach((i) => this.cell(i)?.classList.add(cls)); if (cls === 'win') this.px?.win(idxs.map((i) => this.cell(i))); }
+  unmark() { this.px?.clear(); this.el.classList.remove('has-win'); this.el.querySelectorAll('.rs-cell.win').forEach((n) => n.classList.remove('win')); }
 }
 
 return { Reels };
@@ -10473,6 +10891,8 @@ __mods['core/grid.js'] = (() => {
 
 const { fx, sleep, center } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
+const { stageFor, warm, prepare, bezier } = __mods['core/pixi.js'];
+const BOUNCE_F = bezier(0.3, 1.35, 0.55, 1);
 
 const BOUNCE = 'cubic-bezier(.3,1.35,.55,1)';
 
@@ -10497,6 +10917,13 @@ class SymbolGrid {
       this.cells.push(c);
     }
     host.appendChild(this.el);
+    prepare();
+  }
+
+  get px() { return stageFor(this.el); }
+  colRect(c) {
+    const a = this.el.getBoundingClientRect(), t = this.cells[c * this.rows].getBoundingClientRect(), b = this.cells[c * this.rows + this.rows - 1].getBoundingClientRect();
+    return { x: t.left - a.left, y: t.top - a.top, w: t.width, h: b.bottom - t.top };
   }
 
   get turbo() { return this.game?.turbo; }
@@ -10540,14 +10967,24 @@ class SymbolGrid {
         extra += t ? 250 : 750;
         setTimeout(() => { this.el.classList.add('tease'); sfx.tease(); }, extra - (t ? 250 : 750) + c * (t ? 50 : 110));
       }
+      const px = this.px;
+      if (slow && px) setTimeout(() => { const stop = px.tease(this.colRect(c)); setTimeout(stop, (t ? 250 : 750) + 200); }, extra - (t ? 250 : 750) + c * (t ? 50 : 110));
       for (let r = R - 1; r >= 0; r--) {
         const i = c * R + r;
         if (keep.has(i)) continue;
         const delay = c * (t ? 50 : 110) + (R - 1 - r) * (t ? 12 : 28) + extra;
         jobs.push(new Promise((res) => setTimeout(() => {
           this.set(i, vals[i]);
-          const a = this.sym(i).animate([{ transform: `translateY(${-(r + 2) * 110}%)`, opacity: 1 }, { transform: 'translateY(0)', opacity: 1 }],
-            { duration: t ? 230 : 380, easing: BOUNCE, fill: 'forwards' });
+          const dur = t ? 230 : 380, sym = this.sym(i);
+          // WebGL fall (Pixi) with motion blur; the HTML symbol appears when it lands
+          const fall = px?.drop(this.cells[i], `<div>${sym.innerHTML}</div>`, -(r + 2) * this.cells[i].offsetHeight * 1.1, dur, BOUNCE_F, this.el);
+          if (fall) {
+            sym.style.visibility = 'hidden';
+            fall.then(() => { sym.style.visibility = ''; onLand?.(i, vals[i]); res(); });
+            return;
+          }
+          const a = sym.animate([{ transform: `translateY(${-(r + 2) * 110}%)`, opacity: 1 }, { transform: 'translateY(0)', opacity: 1 }],
+            { duration: dur, easing: BOUNCE, fill: 'forwards' });
           a.finished.then(() => { onLand?.(i, vals[i]); res(); });
         }, delay)));
       }
@@ -10557,17 +10994,19 @@ class SymbolGrid {
     this.el.classList.remove('tease');
     for (let i = 0; i < vals.length; i++) if (!keep.has(i)) this.values[i] = vals[i];
     sfx.reelStop(2);
+    warm(this.cells.map((c) => c.firstChild));
   }
 
-  mark(idxs, cls = 'win') { idxs.forEach((i) => this.cells[i].classList.add(cls)); }
-  unmark(cls = 'win') { this.cells.forEach((c) => c.classList.remove(cls)); }
+  mark(idxs, cls = 'win') { idxs.forEach((i) => this.cells[i].classList.add(cls)); if (cls === 'win') this.px?.win(idxs.map((i) => this.cells[i])); }
+  unmark(cls = 'win') { if (cls === 'win') this.px?.clear(); this.cells.forEach((c) => c.classList.remove(cls)); }
 
   async explode(idxs, colors = ['#fde68a', '#fbbf24', '#fff', '#f0abfc']) {
     idxs.forEach((i, k) => {
       const s = this.sym(i);
       s.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.35)', opacity: 1, offset: 0.4 }, { transform: 'scale(0)', opacity: 0 }],
         { duration: this.turbo ? 200 : 340, easing: 'ease-in', fill: 'forwards' });
-      if (k % 2 === 0) { const p = center(this.cells[i]); fx.burst(p.x, p.y, 8, colors, 5); }
+      const px = this.px;
+      if (px) { const r = px.rectOf(this.cells[i]); px.sparks(r.x + r.w / 2, r.y + r.h / 2, k < 24 ? 10 : 4, colors, r.w * 0.8); } else if (k % 2 === 0) { const p = center(this.cells[i]); fx.burst(p.x, p.y, 8, colors, 5); }
     });
     sfx.coin();
     await sleep(this.turbo ? 200 : 340);
@@ -10937,22 +11376,22 @@ const FILES = {
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '8cbe1f47d4'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'bdcfd7b479'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
-  mines: ['mines', 'games/impl/mines.js', 'MinesGame', '99a0a088b7'],
+  mines: ['mines', 'games/impl/mines.js', 'MinesGame', '4f6ae0eba7'],
   avion: ['avion', 'games/impl/avion.js', 'AvionGame', 'c403583020'],
   plinko: ['plinko', 'games/impl/plinko.js', 'PlinkoGame', '217f54e3fd'],
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', 'e23f21079d'],
-  casse: ['casse', 'games/impl/casse.js', 'CasseGame', '0957d49ca3'],
+  casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'fb3eda6835'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
   fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', 'bb85af3fad'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '9621261bab'],
-  robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '200ec4fe09'],
-  pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'ee4862aacf'],
+  robots: ['robots', 'games/impl/robots.js', 'RobotsGame', 'efd42e420a'],
+  pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'b3c63b68ca'],
   chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', '14b7bec1aa'],
-  poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', '4b91b43686'],
+  poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', 'e3a4bec1eb'],
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
-  penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '13250e3224'],
+  penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '6e1081a69e'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', '17ab6a334a'],
