@@ -86,6 +86,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `paris/matchs.json` sur la branche **`data`** (pas déployée par Vercel : `git.deploymentEnabled`), lue par le site
   sur raw.githubusercontent.com. Paris dans `profile.paris`, payés à la visite suivante ; match reporté = remboursé.
 
+- **Battle Royale** (`battle.js`, page `#battle`) : toutes les heures de 12 h à 23 h (Paris), une machine (tirée de
+  l'heure). Entrée 500 KE (inscriptions 1 h avant et pendant la manche 1), 3 manches de 15 min, 10 tours comptés par
+  manche (somme des gains en × la mise, achats exclus), la moitié la plus faible éliminée après les manches 1 et 2
+  (au moins 2 restent), le meilleur de la finale gagne tout le pot ; seul = remboursé. Firestore
+  `battles/{br_<début>}/players/{uid}` (règles). Chaque navigateur se paie lui-même (`profile.br`).
+- **La Course Online** (`robots-online`, `RobotsOnlineGame` dans `games/robots.js`, `withRoom`) : forme des robots
+  tirée du numéro de manche (`formOf`), arrivée tirée de la graine partagée. Salon dans `roomGame` des règles.
+
 ## Arrivée des visiteurs et partage
 
 - **Pas d'écran de connexion à l'arrivée** (`hud.js`) : un nouveau visiteur joue tout de suite en invité. La création

@@ -356,6 +356,26 @@ service cloud.firestore {
     // au plus, le record (best, en × la mise, max win ×10 000 compris) et le nombre de tours ne peuvent que monter.
     function tourStart(tid) { return int(tid.split('_')[1]); }
     function tourEnd(tid) { return int(tid.split('_')[2]); }
+    // Battle Royale (battle.js) : battles/br_<début ms>/players/{uid} = { name, look, s: [3 scores], n: [3 tours], at }.
+    // Chacun écrit sa ligne pendant la battle (45 min + 5 min de marge), les scores et les tours ne font que monter.
+    match /battles/{bid}/players/{uid} {
+      allow read: if true;
+      allow create, update: if isMe(uid)
+        && bid.matches('^br_[0-9]{13}$')
+        && request.time.toMillis() >= int(bid.split('_')[1]) - 3600000
+        && request.time.toMillis() <= int(bid.split('_')[1]) + 3000000
+        && request.resource.data.keys().hasOnly(['name', 'look', 's', 'n', 'at'])
+        && isPseudo(request.resource.data.name)
+        && request.resource.data.at == request.time
+        && request.resource.data.s is list && request.resource.data.s.size() == 3
+        && request.resource.data.n is list && request.resource.data.n.size() == 3
+        && isNum(request.resource.data.s[0], 0, 1000000) && isNum(request.resource.data.s[1], 0, 1000000) && isNum(request.resource.data.s[2], 0, 1000000)
+        && isNum(request.resource.data.n[0], 0, 10) && isNum(request.resource.data.n[1], 0, 10) && isNum(request.resource.data.n[2], 0, 10)
+        && (!('look' in request.resource.data) || isLook(request.resource.data.look))
+        && (resource == null || (request.resource.data.n[0] >= resource.data.n[0] && request.resource.data.n[1] >= resource.data.n[1] && request.resource.data.n[2] >= resource.data.n[2]));
+      allow delete: if false;
+    }
+
     match /tournois/{tid}/scores/{uid} {
       allow read: if true;
       allow create, update: if isMe(uid)
