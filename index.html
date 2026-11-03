@@ -4156,6 +4156,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
       <a href="https://www.tiktok.com/@spinbet_casino" data-tiktok-link target="_blank" rel="noopener"><span><svg class="ico"><use href="#ui-tiktok"/></svg></span>Notre TikTok<b class="side-new">+10K</b></a>
       <a href="#" data-share-site><span><svg class="ico"><use href="#ui-share"/></svg></span>Partager le site</a>
       <a href="#appli" data-nav="app"><span><svg class="ico"><use href="#ui-app"/></svg></span>Application</a>
+      <a href="#admin" data-nav="admin" data-admin-link hidden><span>🛠️</span>Admin</a>
       <a href="#" data-theme-toggle><span class="th-ico"><b class="th-sun">☀️</b><b class="th-moon">🌙</b></span><em class="th-sun">Mode clair</em><em class="th-moon">Mode sombre</em></a>
     </nav>
     <div class="side-vip"></div>
@@ -4535,6 +4536,22 @@ const cloud = {
       .onSnapshot((q) => cb(q.docs.map((d) => ({ uid: d.id, ...d.data({ serverTimestamps: 'estimate' }) }))), (e) => console.error(e));
   },
   async deleteChat(id) { await (await init()).db.collection('chat').doc(id).delete(); },
+  /* ---------- Défi spécial (special/{uid}), signalements, erreurs, statistiques (page #admin) ---------- */
+  async specialOf(uid) { const d = await (await init()).db.collection('special').doc(uid).get({ source: 'server' }); return d.exists ? d.data() : null; },
+  async claimSpecial(uid, prize, n) { await (await init()).db.collection('special').doc(uid).set({ prize, n, ke: prize, at: firebase.firestore.FieldValue.serverTimestamp() }); },
+  async specialMore(uid, n, ke) { await (await init()).db.collection('special').doc(uid).update({ n, ke }); },
+  async report(data) { await (await init()).db.collection('reports').add({ ...data, at: firebase.firestore.FieldValue.serverTimestamp() }); },
+  async logError(data) { await (await init()).db.collection('errors').add({ ...data, at: firebase.firestore.FieldValue.serverTimestamp() }); },
+  async bumpStats(day, opens, spins) {
+    const inc = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, firebase.firestore.FieldValue.increment(v)]));
+    await (await init()).db.collection('stats').doc(day).set({ opens: inc(opens), spins: inc(spins) }, { merge: true });
+  },
+  async adminList(col, n = 50) {
+    const q = await (await init()).db.collection(col).orderBy('at', 'desc').limit(n).get();
+    return q.docs.map((d) => ({ id: d.id, ...d.data(), atMs: d.data().at?.toMillis?.() || 0 }));
+  },
+  async adminStats(days) { const db = (await init()).db; return Promise.all(days.map(async (k) => { const d = await db.collection('stats').doc(k).get(); return { day: k, ...(d.exists ? d.data() : {}) }; })); },
+  async adminDelete(col, id) { await (await init()).db.collection(col).doc(id).delete(); },
   async isAdmin(uid) { try { return (await (await init()).db.collection('admins').doc(uid).get()).exists; } catch { return false; } },
   async isMuted(uid) { try { return (await (await init()).db.collection('mutes').doc(uid).get()).exists; } catch { return false; } },
   async setMute(uid, on, by) {
@@ -11557,8 +11574,13 @@ function status() {
   return { have, total: ALL.length, all: have === ALL.length, done: !!d.done, prize: PRIZE(), paid: d.ke || 0 };
 }
 
+// A bonus counts only right after a real stake on that game (the last 15 minutes): a bonus has to come from play.
+const lastWager = {};
+const gameNow = () => base((location.hash.match(/^#game-([\w-]+)/) || [])[1]);
+wallet.addEventListener('wager', () => { const g = gameNow(); if (g) lastWager[g] = Date.now(); });
 function unlock(b) {
   if (!profiles.current || got()[b.id]) return;
+  if (!(Date.now() - (lastWager[b.g] || 0) < 15 * 60000)) return;
   profiles.update('sp', (me) => { const sp = me.sp || (me.sp = {}); sp.u = { ...(sp.u || {}), [b.id]: Date.now() }; });
   const s = status();
   toast(`🏆 Défi spécial · ${b.name} (${getGame(b.g)?.name}) débloqué ! ${s.have} / ${s.total}${s.all && !s.done ? ' · TOUT EST DÉBLOQUÉ : va chercher ton million !' : ''}`, 'ok');
@@ -11577,25 +11599,42 @@ addEventListener('sb:bonus', (e) => {
   if (b) unlock(b);
 });
 
-// The million (and the 100 000 of every machine added since): an account is needed.
-function claim() {
+// The million (and the 100 000 of every machine added since): an account is needed. It is written once per account
+// on the server (special/{uid}, Firestore rules): a second claim — after clearing the progress — is refused.
+const { cloud } = __mods['cloud.js'];
+const myUid = () => (profiles.online && profiles.store?.current) || null;
+let claiming = false;
+async function claim() {
   const s = status();
-  if (!s.all || s.done || !profiles.current) return 0;
-  if (!profiles.online) { toast('Crée un compte (ou connecte-toi) pour toucher la récompense du Défi spécial', 'warn'); return 0; }
+  if (!s.all || s.done || !profiles.current || claiming) return 0;
+  if (!profiles.online || !cloud.enabled) { toast('Crée un compte (ou connecte-toi) pour toucher la récompense du Défi spécial', 'warn'); return 0; }
+  claiming = true;
+  try {
+    const old = await cloud.specialOf(myUid());
+    if (old) { profiles.update('sp', (me) => { const sp = me.sp || (me.sp = {}); sp.done = old.atMs || Date.now(); sp.n = old.n; sp.ke = old.ke; }); toast('Ce compte a déjà touché la récompense du Défi spécial', 'warn'); refreshBadge(); return 0; }
+    await cloud.claimSpecial(myUid(), s.prize, LIST.length);
+  } catch (e) { console.error(e); toast('Récompense indisponible pour le moment, réessaie dans un instant', 'warn'); return 0; } finally { claiming = false; }
   profiles.update('sp', (me) => { const sp = me.sp || (me.sp = {}); sp.done = Date.now(); sp.n = LIST.length; sp.ke = (sp.ke || 0) + s.prize; });
   wallet.grant(s.prize);
   fx.confetti?.(160); sfx.jackpot?.();
   refreshBadge();
   return s.prize;
 }
-// Finished players: +100 000 for every machine added since their last payment, automatically.
-function payNew() {
+// Finished players: +100 000 for every machine added since their last payment, automatically (counted on the server).
+let paying = false;
+async function payNew() {
   const d = data();
-  if (!d.done || !profiles.online || !(d.n < LIST.length)) return;
-  const add = (LIST.length - d.n) * PER_NEW;
-  profiles.update('sp', (me) => { me.sp.n = LIST.length; me.sp.ke = (me.sp.ke || 0) + add; });
-  wallet.grant(add);
-  toast(`🏆 Défi spécial : ${LIST.length - d.n > 1 ? `${LIST.length - d.n} nouvelles machines` : 'une nouvelle machine'} sur le site, et tu as déjà fini le défi : +${fmt(add)} pour toi !`, 'ok');
+  if (!d.done || !profiles.online || !cloud.enabled || !(d.n < LIST.length) || paying) return;
+  paying = true;
+  try {
+    const srv = await cloud.specialOf(myUid());
+    if (!srv || srv.n >= LIST.length) { if (srv) profiles.update('sp', (me) => { me.sp.n = srv.n; me.sp.ke = srv.ke; }); return; }
+    const add = (LIST.length - srv.n) * PER_NEW;
+    await cloud.specialMore(myUid(), LIST.length, srv.ke + add);
+    profiles.update('sp', (me) => { me.sp.n = LIST.length; me.sp.ke = srv.ke + add; });
+    wallet.grant(add);
+    toast(`🏆 Défi spécial : ${LIST.length - srv.n > 1 ? `${LIST.length - srv.n} nouvelles machines` : 'une nouvelle machine'} sur le site, et tu as déjà fini le défi : +${fmt(add)} pour toi !`, 'ok');
+  } catch (e) { console.error(e); } finally { paying = false; }
 }
 profiles.addEventListener?.('change', () => { payNew(); refreshBadge(); });
 setTimeout(() => { payNew(); refreshBadge(); }, 3000);
@@ -11631,7 +11670,7 @@ function renderSpecial(root) {
       </div>
       <div class="sp-rules">
         <div><span>🎰</span><b>Joue, tout simplement</b><p>Lance des spins sur les machines à sous et mise sur les roues. Chaque bonus qui tombe <b>en jouant</b> se coche ici, pour toujours.</p></div>
-        <div><span>🚫</span><b>Aucun raccourci</b><p>Les bonus <b>achetés</b> et les bonus offerts par la Roue du jour ne comptent pas. Sur les roues, il faut une mise sur la case bonus quand la roue s’y arrête. Les salons Online comptent aussi.</p></div>
+        <div><span>🚫</span><b>Aucun raccourci</b><p>Les bonus <b>achetés</b> et les bonus offerts par la Roue du jour ne comptent pas, et un bonus ne compte que s’il tombe pendant que tu joues avec une vraie mise. Sur les roues, il faut une mise sur la case bonus quand la roue s’y arrête. Les salons Online comptent aussi.</p></div>
         <div><span>💰</span><b>${fmt(1000000)} au bout</b><p>Quand tous les bonus sont cochés, tu touches <b>${fmt(1000000)}</b> d’un coup, plus <b>${fmt(PER_NEW)}</b> pour chaque machine ajoutée depuis le lancement du défi.</p></div>
         <div><span>⚡</span><b>Plus vite tu finis, mieux c’est</b><p>Une fois le défi fini, <b>chaque nouvelle machine te rapporte ${fmt(PER_NEW)} automatiquement</b>, sans rien faire. Ceux qui n’ont pas fini, eux, devront aussi débloquer ses bonus.</p></div>
       </div>
@@ -11639,10 +11678,137 @@ function renderSpecial(root) {
       <div class="sp-grid">${cards}</div>
       <p class="muted small">Ta progression est gardée dans ton profil. Il faut un compte pour toucher la récompense ; en invité, ta progression compte, mais disparaît quand tu quittes le site.</p>
     </section>`;
-  root.querySelector('[data-sp-claim]')?.addEventListener('click', () => { const k = claim(); if (k) { toast(`🏆 DÉFI SPÉCIAL RÉUSSI ! +${fmt(k)}`, 'ok'); renderSpecial(root); } });
+  root.querySelector('[data-sp-claim]')?.addEventListener('click', async (e) => { e.currentTarget.disabled = true; const k = await claim(); if (k) toast(`🏆 DÉFI SPÉCIAL RÉUSSI ! +${fmt(k)}`, 'ok'); renderSpecial(root); });
 }
 
 return { renderSpecial, specialStatus: status, SPECIAL_LIST: LIST };
+})();
+
+// ---- monitor.js ----
+__mods['monitor.js'] = (() => {
+// Suivi du site, pour le propriétaire (page #admin) : les erreurs JavaScript des joueurs (errors/, 5 au plus par
+// visite, sans les coupures réseau) et combien de fois chaque jeu est ouvert et joué (stats/AAAA-MM-JJ, envoyé
+// toutes les minutes). Rien de personnel : le jeu, le navigateur, et l'identifiant du compte pour les erreurs.
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet } = __mods['wallet.js'];
+
+const gameNow = () => (location.hash.match(/^#game-([\w-]+)/) || [])[1] || '';
+const uid = () => (profiles.online && profiles.store?.current) || '';
+const sent = new Set(); let errs = 0;
+function logError(msg, src, stack) {
+  if (!cloud.enabled || errs >= 5) return;
+  const key = `${msg}|${src}`;
+  if (sent.has(key)) return;
+  sent.add(key); errs++;
+  cloud.logError({ msg: String(msg).slice(0, 300), src: String(src || '').slice(0, 300), stack: String(stack || '').slice(0, 2000), url: location.href.slice(0, 300),
+    game: gameNow().slice(0, 40), ua: navigator.userAgent.slice(0, 200), uid: uid().slice(0, 128) }).catch(() => {});
+}
+const NOISE = /Script error|ResizeObserver|permission|network|offline|Failed to fetch|unavailable|quota|Load failed|AbortError|Cannot load https/i;
+addEventListener('error', (e) => { if (!e.message || NOISE.test(e.message)) return; logError(e.message, `${e.filename || ''}:${e.lineno || 0}`, e.error?.stack); });
+addEventListener('unhandledrejection', (e) => { const r = e.reason, m = r?.message || String(r); if (NOISE.test(m)) return; logError(m, 'promise', r?.stack); });
+
+// counts, sent once a minute (and when the page is left)
+let opens = {}, spins = {}, lastOpen = '';
+const day = () => new Date().toISOString().slice(0, 10);
+function onRoute() { const g = gameNow(); if (g && g !== lastOpen) opens[g] = (opens[g] || 0) + 1; lastOpen = g; }
+addEventListener('hashchange', onRoute); setTimeout(onRoute, 1500);
+wallet.addEventListener('wager', () => { const g = gameNow(); if (g) spins[g] = (spins[g] || 0) + 1; });
+function flush() {
+  if (!cloud.enabled || (!Object.keys(opens).length && !Object.keys(spins).length)) return;
+  const o = opens, s = spins; opens = {}; spins = {};
+  cloud.bumpStats(day(), o, s).catch(() => { for (const k in o) opens[k] = (opens[k] || 0) + o[k]; for (const k in s) spins[k] = (spins[k] || 0) + s[k]; });
+}
+setInterval(flush, 60000);
+addEventListener('pagehide', flush);
+document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
+
+return { logError };
+})();
+
+// ---- pages/admin.js ----
+__mods['pages/admin.js'] = (() => {
+// #admin, pour les admins seulement (collection admins/) : les jeux les plus joués des 7 derniers jours, les
+// signalements des joueurs (avec « rendre muet ») et les dernières erreurs du site.
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { getGame } = __mods['games/index.js'];
+const { toast } = __mods['ui.js'];
+const esc = (t) => String(t ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const uid = () => (profiles.online && profiles.store?.current) || null;
+const when = (ms) => (ms ? new Date(ms).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '');
+
+// the side menu shows the Admin link to admins only
+async function refreshLink() {
+  const a = document.querySelector('[data-admin-link]'); if (!a) return;
+  a.hidden = !(uid() && cloud.enabled && await cloud.isAdmin(uid()).catch(() => false));
+}
+profiles.addEventListener('change', () => setTimeout(refreshLink, 500));
+setTimeout(refreshLink, 2500);
+
+async function renderAdmin(root) {
+  root.innerHTML = '<section class="panel adm"><h1>🛠️ Admin</h1><p class="muted">Chargement…</p></section>';
+  const me = uid();
+  if (!me || !cloud.enabled || !(await cloud.isAdmin(me).catch(() => false))) { root.querySelector('.adm').innerHTML = '<h1>🛠️ Admin</h1><p class="muted">Cette page est réservée aux administrateurs.</p>'; return; }
+  const days = Array.from({ length: 7 }, (_, k) => new Date(Date.now() - k * 864e5).toISOString().slice(0, 10));
+  const [stats, reports, errors] = await Promise.all([cloud.adminStats(days).catch(() => []), cloud.adminList('reports', 60).catch(() => []), cloud.adminList('errors', 80).catch(() => [])]);
+  const tot = {};
+  stats.forEach((d) => { for (const k in d.opens || {}) (tot[k] = tot[k] || { o: 0, s: 0 }).o += d.opens[k]; for (const k in d.spins || {}) (tot[k] = tot[k] || { o: 0, s: 0 }).s += d.spins[k]; });
+  const rows = Object.entries(tot).sort((a, b) => b[1].s - a[1].s || b[1].o - a[1].o);
+  const perDay = stats.map((d) => `<div><b>${Object.values(d.spins || {}).reduce((a, x) => a + x, 0).toLocaleString('fr-FR')}</b><small>${d.day.slice(5).split('-').reverse().join('/')}</small></div>`).reverse().join('');
+  const errGroups = {};
+  errors.forEach((e) => { const k = e.msg; (errGroups[k] = errGroups[k] || { n: 0, last: e, ids: [] }).n++; errGroups[k].ids.push(e.id); });
+  root.querySelector('.adm').innerHTML = `<h1>🛠️ Admin</h1>
+    <h2>Tours joués par jour</h2><div class="adm-days">${perDay}</div>
+    <h2>Jeux des 7 derniers jours</h2>
+    <table class="adm-t"><tr><th>Jeu</th><th>Ouvertures</th><th>Tours joués</th></tr>${rows.map(([k, v]) => `<tr><td>${esc(getGame(k)?.name || k)}</td><td>${v.o.toLocaleString('fr-FR')}</td><td>${v.s.toLocaleString('fr-FR')}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">Pas encore de données.</td></tr>'}</table>
+    <h2>Signalements (${reports.length})</h2>
+    <div class="adm-list">${reports.map((r) => `<div class="adm-item" data-id="${esc(r.id)}"><b>${esc(r.name)}</b> signalé par ${esc(r.byName)} · <small>${when(r.atMs)}</small>${r.text ? `<p>« ${esc(r.text)} »</p>` : ''}
+      <div><button class="btn" data-mute="${esc(r.uid)}" data-name="${esc(r.name)}">🔇 Rendre muet</button> <button class="btn" data-del="reports" data-id="${esc(r.id)}">✓ Traité</button></div></div>`).join('') || '<p class="muted">Aucun signalement.</p>'}</div>
+    <h2>Erreurs du site (${errors.length})</h2>
+    <div class="adm-list">${Object.entries(errGroups).map(([m, g]) => `<div class="adm-item"><b>${esc(m)}</b> · ${g.n}× · <small>${when(g.last.atMs)} · ${esc(g.last.game || 'hors jeu')} · ${esc(g.last.src)}</small>
+      <pre>${esc(g.last.stack).slice(0, 600)}</pre><div><button class="btn" data-del="errors" data-ids="${esc(g.ids.join(','))}">✓ Effacer</button></div></div>`).join('') || '<p class="muted">Aucune erreur. 👍</p>'}</div>`;
+  root.querySelectorAll('[data-mute]').forEach((b) => { b.onclick = async () => { try { await cloud.setMute(b.dataset.mute, true, me); toast(`${b.dataset.name} ne peut plus écrire`); } catch { toast('Action impossible', 'warn'); } }; });
+  root.querySelectorAll('[data-del]').forEach((b) => { b.onclick = async () => {
+    const ids = (b.dataset.ids || b.dataset.id).split(',');
+    try { await Promise.all(ids.map((id) => cloud.adminDelete(b.dataset.del, id))); b.closest('.adm-item').remove(); } catch { toast('Action impossible', 'warn'); }
+  }; });
+}
+
+return { renderAdmin };
+})();
+
+// ---- tuto.js ----
+__mods['tuto.js'] = (() => {
+// Premier passage : 3 petits écrans pour expliquer le site (montré une fois par appareil, « Passer » à tout moment).
+const { profiles } = __mods['profile.js'];
+const KEY = 'spinbet_tuto_v1';
+const STEPS = [
+  { ico: '🎰', h: 'Bienvenue sur SpinBet Casino !', p: 'Tu joues avec des <b>KE</b>, une monnaie fictive : aucun dépôt, aucun vrai pari. Si ton solde baisse, la page <b>Recharger</b> et la <b>Roue du jour</b> te remettent des KE.' },
+  { ico: '🎁', h: 'Les bonus, c’est là que ça paie', p: 'Chaque machine a ses bonus : free spins, Hold & Spin, roues… Tu peux les déclencher en jouant, ou les <b>acheter</b> dans le menu <b>Bonus & menu</b> de chaque jeu.' },
+  { ico: '🏆', h: 'Défis, salons et amis', p: 'Le <b>Défi spécial</b> paie <b>1 000 000 KE</b> à qui débloque tous les bonus. Les jeux <b>Online</b> se jouent avec les autres joueurs, et le 💬 chat est en bas à droite. Bonne chance !' },
+];
+function show() {
+  let k = 0;
+  const ov = document.createElement('div'); ov.className = 'tuto';
+  const paint = () => {
+    const s = STEPS[k];
+    ov.innerHTML = `<div class="tuto-card"><div class="tuto-ico">${s.ico}</div><h3>${s.h}</h3><p>${s.p}</p>
+      <div class="tuto-dots">${STEPS.map((_, i) => `<i class="${i === k ? 'on' : ''}"></i>`).join('')}</div>
+      <div class="tuto-btns"><button class="btn" data-t="skip">Passer</button><button class="btn primary" data-t="next">${k < STEPS.length - 1 ? 'Suivant' : 'C’est parti !'}</button></div></div>`;
+  };
+  const close = () => { try { localStorage.setItem(KEY, '1'); } catch { /* ignore */ } ov.classList.add('out'); setTimeout(() => ov.remove(), 250); };
+  ov.addEventListener('click', (e) => { const t = e.target.closest('[data-t]')?.dataset.t; if (t === 'skip') close(); if (t === 'next') { if (k < STEPS.length - 1) { k++; paint(); } else close(); } });
+  paint(); document.body.appendChild(ov);
+}
+function maybe() {
+  try { if (localStorage.getItem(KEY)) return; } catch { return; }
+  if (!profiles.current || document.querySelector('.gate.show, .tuto') || /^#game-/.test(location.hash)) return;
+  show();
+}
+profiles.addEventListener('change', () => setTimeout(maybe, 900));
+setTimeout(maybe, 2500);
+return { showTuto: show };
 })();
 
 // ---- fx3d.js ----
@@ -12034,6 +12200,7 @@ async function openPlayer(uid, name, { msgId = null } = {}) {
     acts.push('<button class="btn primary" data-value="gift">💸 Envoyer des KE</button><button class="btn" data-value="at">💬 Lui répondre dans le chat</button>');
   }
   else acts.push('<p class="muted small">Crée un compte (ou connecte-toi) pour envoyer des KE ou écrire dans le chat.</p>');
+  if (m && !self) acts.push('<button class="btn" data-value="report">🚩 Signaler ce joueur</button>');
   if (msgId && (admin || self)) acts.push('<button class="btn" data-value="del">🗑️ Supprimer ce message</button>');
   if (admin && !self) acts.push('<button class="btn" data-value="mute">🔇 Rendre muet</button><button class="btn" data-value="unmute">🔈 Enlever le muet</button>');
   const done = modal(`<div class="pc"><div class="pc-head"><span class="pc-badge"></span><div><h3>${esc(name || 'Joueur')}</h3><small class="pc-rank">Chargement du profil…</small></div></div>
@@ -12062,6 +12229,11 @@ async function openPlayer(uid, name, { msgId = null } = {}) {
       else { setTab('chat'); const inp = root.querySelector('.ct-form input'); inp.value = `@${name} `; inp.focus(); }
     }
     if (r === 'del') { await cloud.deleteChat(msgId); toast('Message supprimé'); }
+    if (r === 'report') {
+      const text = msgId ? String(msgs.find((x) => x.id === msgId)?.text || '').slice(0, 300) : '';
+      await cloud.report({ by: m.uid, byName: m.name, uid, name: String(name || '').slice(0, 32), text });
+      toast('Merci : un modérateur va regarder', 'ok');
+    }
     if (r === 'mute') { await cloud.setMute(uid, true, m.uid); toast(`${esc(name)} ne peut plus écrire`); }
     if (r === 'unmute') { await cloud.setMute(uid, false, m.uid); toast(`${esc(name)} peut de nouveau écrire`); }
   } catch (e) { console.error(e); toast('Action impossible', 'warn'); }
@@ -13107,6 +13279,7 @@ const routes = [
   { re: /^(parrainage|parrain-[\w-]+)$/, page: (r) => renderReferral(r), nav: 'ref' },
   { re: /^defi$/, page: (r) => renderChallenge(r), nav: 'defi' },
   { re: /^(special|defi-special)$/, page: (r) => __mods['special.js'].renderSpecial(r), nav: 'special' },
+  { re: /^admin$/, page: (r) => __mods['pages/admin.js'].renderAdmin(r), nav: 'admin' },
 ];
 
 function route() {
@@ -13898,6 +14071,18 @@ html.light .slot small { color: inherit; }
 .ft-pay { width: 54px; height: 54px; } .ft-pay .ft-img { height: 100%; }
 .slot.ft-mega .ft-art { box-shadow: inset 0 0 80px rgba(250, 204, 21, .5); }
 .slot.ft-hold .ft-win { box-shadow: 0 0 0 2px rgba(253, 224, 71, .4), 0 0 40px rgba(253, 224, 71, .35); }
+.adm h2 { font-size: 18px; margin: 26px 0 10px; }
+.adm-days { display: flex; gap: 8px; flex-wrap: wrap; } .adm-days div { padding: 8px 12px; border: 1px solid var(--line); border-radius: 4px; text-align: center; min-width: 74px; }
+.adm-days b { display: block; font-size: 18px; } .adm-days small { color: var(--muted); }
+.adm-t { width: 100%; border-collapse: collapse; font-size: 14px; } .adm-t th, .adm-t td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); } .adm-t td + td, .adm-t th + th { text-align: right; }
+.adm-list { display: grid; gap: 8px; } .adm-item { padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px; font-size: 14px; } .adm-item p { margin: 6px 0; }
+.adm-item pre { white-space: pre-wrap; font-size: 11px; color: var(--muted); max-height: 140px; overflow: auto; margin: 6px 0; }
+.tuto { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: rgba(3, 6, 12, .72); backdrop-filter: blur(4px); animation: ovIn .3s ease both; }
+.tuto.out { animation: ovOut .25s ease both; }
+.tuto-card { width: min(420px, 100%); padding: 26px 22px 20px; border-radius: 8px; text-align: center; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 20px 60px rgba(0, 0, 0, .5); color: var(--text); }
+.tuto-ico { font-size: 54px; } .tuto-card h3 { margin: 8px 0; font-size: 22px; } .tuto-card p { margin: 0 0 14px; color: var(--muted); line-height: 1.55; } .tuto-card p b { color: var(--text); }
+.tuto-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 14px; } .tuto-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); } .tuto-dots i.on { background: var(--green); }
+.tuto-btns { display: flex; gap: 10px; justify-content: center; }
 /* ============ Défi spécial (#special) ============ */
 .side-special { color: #fde68a !important; }
 .side-special > span { font-size: 15px; }

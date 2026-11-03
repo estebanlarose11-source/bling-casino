@@ -289,6 +289,51 @@ service cloud.firestore {
       allow create, update: if isMe(uid) && request.resource.data.keys().hasOnly(['at']) && request.resource.data.at == request.time;
     }
 
+    // ---------- Défi spécial : special/{uid} = { prize, n, ke, at } ----------
+    // Le million n'est versé qu'une fois par compte : le document est créé une seule fois, puis seul le compteur des
+    // nouvelles machines peut monter (100 000 KE par machine, ke suit n).
+    match /special/{uid} {
+      allow read: if isMe(uid) || isAdmin();
+      allow create: if isMe(uid) && request.resource.data.keys().hasOnly(['prize', 'n', 'ke', 'at'])
+        && request.resource.data.prize is int && request.resource.data.prize >= 1000000 && request.resource.data.prize <= 10000000
+        && request.resource.data.n is int && request.resource.data.n > 0 && request.resource.data.n < 500
+        && request.resource.data.ke == request.resource.data.prize && request.resource.data.at == request.time;
+      allow update: if isMe(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['n', 'ke'])
+        && request.resource.data.n > resource.data.n && request.resource.data.n < 500
+        && request.resource.data.ke == resource.data.ke + (request.resource.data.n - resource.data.n) * 100000;
+      allow delete: if isAdmin();
+    }
+
+    // ---------- Suivi du site (lu seulement par les admins, page #admin) ----------
+    // reports/{id} : un joueur signale un autre joueur (pseudo, message éventuel).
+    match /reports/{id} {
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['by', 'byName', 'uid', 'name', 'text', 'at'])
+        && request.resource.data.by == request.auth.uid && request.resource.data.uid is string && request.resource.data.uid.size() < 128
+        && isPseudo(request.resource.data.byName) && request.resource.data.name is string && request.resource.data.name.size() <= 32
+        && request.resource.data.text is string && request.resource.data.text.size() <= 300 && request.resource.data.at == request.time;
+      allow read, delete: if isAdmin();
+    }
+    // errors/{id} : les erreurs JavaScript des joueurs (5 au plus par visite), pour les corriger vite.
+    match /errors/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['msg', 'src', 'stack', 'url', 'game', 'ua', 'uid', 'at'])
+        && request.resource.data.msg is string && request.resource.data.msg.size() <= 300
+        && request.resource.data.src is string && request.resource.data.src.size() <= 300
+        && request.resource.data.stack is string && request.resource.data.stack.size() <= 2000
+        && request.resource.data.url is string && request.resource.data.url.size() <= 300
+        && request.resource.data.game is string && request.resource.data.game.size() <= 40
+        && request.resource.data.ua is string && request.resource.data.ua.size() <= 200
+        && request.resource.data.uid is string && request.resource.data.uid.size() <= 128
+        && request.resource.data.at == request.time;
+      allow read, delete: if isAdmin();
+    }
+    // stats/{AAAA-MM-JJ} = { opens: { jeu: n }, spins: { jeu: n } } : combien de fois chaque jeu est ouvert et joué.
+    match /stats/{day} {
+      allow create, update: if request.resource.data.keys().hasOnly(['opens', 'spins'])
+        && request.resource.data.opens is map && request.resource.data.spins is map
+        && request.resource.data.opens.size() <= 120 && request.resource.data.spins.size() <= 120;
+      allow read: if isAdmin();
+    }
+
     // Tout le reste est fermé.
     match /{document=**} {
       allow read, write: if false;

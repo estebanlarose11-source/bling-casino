@@ -23,6 +23,18 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - `firebase/firestore.rules` : règles Firestore (à recoller dans la console Firebase si elles changent, voir
   `FIREBASE.md`). Toute nouvelle collection Firestore doit y être ajoutée, sinon elle est refusée.
 
+## Suivi et administration
+
+- `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu
+  (`stats/AAAA-MM-JJ`, envoyés chaque minute).
+- Page `#admin` (lien « 🛠️ Admin » du menu, visible des seuls comptes de la collection `admins/`) : jeux les plus
+  joués sur 7 jours, signalements des joueurs (`reports/`, bouton « 🚩 Signaler » de la fiche joueur) avec
+  « rendre muet », dernières erreurs.
+- Défi spécial : le million est inscrit une seule fois par compte dans `special/{uid}` (règles Firestore) ; un bonus
+  ne compte que juste après une vraie mise sur ce jeu.
+- Limite connue : les soldes restent écrits par le navigateur du joueur ; une vraie protection demanderait des
+  Cloud Functions (forfait Blaze de Firebase).
+
 ## Référencement (SEO)
 
 `python3 tools/seo.py` (lancé aussi par `tools/build.py`) fabrique, à partir du catalogue, une page par jeu
