@@ -1,8 +1,5 @@
 /* Le Totem 2.0 (games/pharaon.js): Tailwind utilities (prefix tw-, no preflight) + the pieces Tailwind classes
    cannot reach (cells drawn by the shared grid, totem steps made in JS, overlays). Compiled by build.mjs. */
-/* base = only the --tw-* variables (preflight is off, so no reset of the page) */
-@tailwind base;
-@tailwind utilities;
 
 /* ---------- the cabinet ---------- */
 .slot.g-pharaon > .slot-bg {

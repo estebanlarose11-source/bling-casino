@@ -1,0 +1,6 @@
+/* The Tailwind games (Le Totem, Le Totem Extrême): compiled by build.mjs into <style id="tw-games"> of index.html. */
+@import './pharaon.css';
+@import './totemx.css';
+/* base = only the --tw-* variables (preflight is off, so no reset of the page) */
+@tailwind base;
+@tailwind utilities;

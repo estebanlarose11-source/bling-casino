@@ -5,7 +5,7 @@ __mods['games/impl/pharaon.js'] = (() => {
 // connection, 8 or 12 free spins where the multiplier stays); everything on screen is new: the totem of
 // multipliers beside the grid, the temple frame with its torches, sealed cells, connection pops, suns counter and a
 // night temple for the bonus. Layout and decoration are written with Tailwind classes (prefix tw-), compiled by
-// tools/tailwind/build.mjs into <style id="tw-pharaon"> of index.html (with tools/tailwind/pharaon.css).
+// tools/tailwind/build.mjs into <style id="tw-games"> of index.html (with tools/tailwind/pharaon.css).
 
 const { BaseGame, fmtC, art } = __mods['core/base.js'];
 const { SymbolGrid } = __mods['core/grid.js'];

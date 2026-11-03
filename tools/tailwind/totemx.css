@@ -1,0 +1,126 @@
+/* Le Totem Extrême (games/totemx.js): the temple on fire. Pieces Tailwind classes cannot reach: the cells drawn by
+   the shared grid, the totem steps, the burning numbers, the full screen and the overlays. */
+
+/* ---------- the cabinet ---------- */
+.slot.g-totemx > .slot-bg {
+  background:
+    radial-gradient(70% 55% at 50% 40%, rgba(249, 115, 22, .3), transparent 70%),
+    linear-gradient(180deg, rgba(20, 3, 1, .6), rgba(20, 3, 1, .25) 40%, rgba(12, 2, 1, .85)),
+    url(assets/games/pharaon/bg.webp?v=1) center / cover no-repeat !important;
+  filter: hue-rotate(-18deg) saturate(1.35) !important; transition: filter .8s;
+}
+.slot.g-totemx > .slot-bg::after { display: none; }
+@media (max-aspect-ratio: 4/5) {
+  .slot.g-totemx > .slot-bg { background: radial-gradient(80% 45% at 50% 40%, rgba(249, 115, 22, .28), transparent 70%), linear-gradient(180deg, rgba(20, 3, 1, .55), rgba(20, 3, 1, .2) 40%, rgba(12, 2, 1, .85)), url(assets/games/pharaon/bg-m.webp?v=1) center 30% / cover no-repeat !important; }
+}
+.slot.g-totemx .slot-title { display: none !important; }
+.slot.g-totemx .slot-head { justify-content: center; margin-bottom: 10px; }
+.slot.g-totemx > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.slot.g-totemx > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; }
+.slot.g-totemx .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.slot.g-totemx .win-bar .msg { @apply tw-font-semibold tw-text-orange-50; }
+.slot.g-totemx .win-amt { @apply tw-font-num tw-text-orange-400; text-shadow: 0 0 14px rgba(249, 115, 22, .8); }
+.slot.g-totemx .controls { background: linear-gradient(180deg, rgba(42, 8, 2, .8), rgba(12, 2, 1, .88)) !important; border-color: rgba(249, 115, 22, .4) !important; box-shadow: 0 10px 30px rgba(0, 0, 0, .45), inset 0 1px 0 rgba(254, 215, 170, .18); }
+.slot.g-totemx .controls label { color: rgba(254, 215, 170, .78); }
+.slot.g-totemx .spin-btn { background: radial-gradient(circle at 35% 30%, #fff7c2, #f97316 45%, #991b1b 100%) !important; color: #1a0401 !important; box-shadow: 0 0 0 4px rgba(12, 2, 1, .9), 0 0 0 6px rgba(249, 115, 22, .6), 0 0 30px rgba(249, 115, 22, .65) !important; }
+.slot.g-totemx .round-btn { background: rgba(42, 8, 2, .9); border: 1px solid rgba(249, 115, 22, .4); color: #fed7aa; }
+.slot.g-totemx .feature-banner b { color: #fed7aa; text-shadow: 0 0 12px rgba(249, 115, 22, .95); }
+.game-host.is-full:has(> .slot.g-totemx) { padding: 0; background: #0c0201; }
+.game-host.is-full > .slot.g-totemx { width: 100%; max-width: none !important; min-height: 100%; margin: 0; border-radius: 0; border: 0; }
+
+/* ---------- the grid ---------- */
+.g-totemx .tx-frame .sg { gap: 5px; padding: 4px; width: calc((100vh - var(--chrome) - 70px) * var(--cols) / var(--rows)); max-width: 100%; min-width: 0; }
+.g-totemx .sg-cell {
+  border-radius: 10px;
+  background: radial-gradient(circle at 50% 40%, rgba(254, 215, 170, .12), rgba(12, 2, 1, .75) 75%);
+  box-shadow: inset 0 0 0 1px rgba(249, 115, 22, .25), inset 0 -6px 12px rgba(0, 0, 0, .5);
+  transition: box-shadow .3s, background .3s;
+}
+.g-totemx .sg-cell::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; }
+.g-totemx .ph-img { width: 86%; height: 86%; }
+.g-totemx .sg-cell.scatter { background: radial-gradient(circle, rgba(253, 224, 71, .55), rgba(153, 27, 27, .45) 70%); }
+.g-totemx .sg-cell.scatter .ph-img { animation: sunSpin 10s linear infinite; filter: drop-shadow(0 0 14px rgba(253, 186, 116, .95)); }
+.g-totemx .sg-cell.win { box-shadow: inset 0 0 0 2px #fed7aa, 0 0 24px rgba(249, 115, 22, .95), inset 0 0 22px rgba(249, 115, 22, .5); z-index: 2; }
+.g-totemx .sg-cell.win .ph-img { animation: btImgWin .5s ease-in-out infinite alternate; }
+.g-totemx .sg-cell.lock {
+  background: radial-gradient(circle at 50% 40%, rgba(253, 224, 71, .45), rgba(194, 65, 12, .6) 70%);
+  box-shadow: inset 0 0 0 2px #f97316, inset 0 0 0 4px rgba(12, 2, 1, .55), inset 0 0 24px rgba(249, 115, 22, .6), 0 0 14px rgba(249, 115, 22, .4);
+}
+.g-totemx .sg-cell.lock::after { opacity: 1; background: linear-gradient(110deg, transparent 35%, rgba(255, 237, 213, .55) 50%, transparent 65%); background-size: 250% 100%; animation: tmSweep 2.2s linear infinite; }
+.g-totemx .sg-cell.lock .ph-img { filter: drop-shadow(0 0 1px #fed7aa) drop-shadow(0 0 10px rgba(249, 115, 22, .8)); }
+.g-totemx .sg-cell.seal { animation: tmSeal .55s cubic-bezier(.3, 1.6, .5, 1); }
+.g-totemx .sg-cell.seal::before { content: ''; position: absolute; inset: -2px; z-index: 3; border-radius: 12px; border: 3px solid #fff7c2; box-shadow: 0 0 18px #f97316; pointer-events: none; animation: tmRing .55s ease-out forwards; }
+.g-totemx .sg.tx-respin .sg-cell:not(.lock) { animation: tmRumble .16s linear infinite; }
+.g-totemx .sg.tease { box-shadow: 0 0 0 2px #fde047, 0 0 40px rgba(249, 115, 22, .7), inset 0 0 50px rgba(249, 115, 22, .45); border-radius: 12px; }
+
+/* ---------- the frame, the heat, the embers ---------- */
+.g-totemx .tx-frame.tx-flash { animation: tmFrameFlash .6s ease-out; }
+.g-totemx .tx-heat { background: radial-gradient(120% 80% at 50% 110%, rgba(239, 68, 68, .55), transparent 60%); }
+.slot.g-totemx.tx-hot .tx-heat { opacity: 1; animation: txHeat 1.6s ease-in-out infinite alternate; }
+.slot.g-totemx.tx-hot .tx-frame { border-color: #fb923c !important; box-shadow: 0 0 0 4px rgba(12, 2, 1, .9), 0 0 0 6px rgba(249, 115, 22, .7), 0 0 50px rgba(249, 115, 22, .55), inset 0 0 40px rgba(0, 0, 0, .55) !important; }
+.slot.g-totemx.tx-inferno .tx-frame { box-shadow: 0 0 0 4px rgba(12, 2, 1, .9), 0 0 0 6px #ef4444, 0 0 80px rgba(239, 68, 68, .75), inset 0 0 40px rgba(0, 0, 0, .5) !important; }
+.slot.g-totemx.tx-inferno > .slot-bg { filter: hue-rotate(-30deg) saturate(1.7) brightness(1.08) !important; }
+.g-totemx .tx-ember { background: radial-gradient(circle, #fff7c2, #f97316 60%, transparent 70%); box-shadow: 0 0 8px 2px rgba(249, 115, 22, .7); opacity: 0; }
+.slot.g-totemx:not(.tx-hot) .tx-ember:nth-child(even) { display: none; }
+.g-totemx .tx-rays { background: repeating-conic-gradient(from 0deg, rgba(253, 186, 116, .18) 0deg 6deg, transparent 6deg 20deg); -webkit-mask: radial-gradient(circle, #000 18%, transparent 62%); mask: radial-gradient(circle, #000 18%, transparent 62%); }
+.slot.g-totemx.tx-hot .tx-rays { opacity: .6 !important; }
+.g-totemx .tx-torch { width: 12px; height: 46px; z-index: 5; border-radius: 3px 3px 6px 6px; background: linear-gradient(90deg, #3a0d02, #9a3412 50%, #3a0d02); box-shadow: 0 2px 6px rgba(0, 0, 0, .6); }
+.g-totemx .tx-torch::before { content: ''; position: absolute; left: -6px; right: -6px; top: -4px; height: 8px; border-radius: 3px; background: linear-gradient(180deg, #fed7aa, #c2410c); }
+.g-totemx .tx-torch i { position: absolute; left: 50%; bottom: 100%; width: 30px; height: 48px; margin-left: -15px; transform-origin: 50% 100%; border-radius: 50% 50% 45% 45% / 65% 65% 35% 35%;
+  background: radial-gradient(ellipse at 50% 80%, #fff7c2 0%, #fde047 22%, #f97316 50%, rgba(220, 38, 38, 0) 75%); filter: drop-shadow(0 0 14px rgba(249, 115, 22, .95)); }
+
+/* ---------- the extreme totem: the numbers burn from ×8 ---------- */
+.g-totemx .tx-step { position: relative; flex: none; width: 70px; height: 48px; display: grid; place-items: center; border-radius: 8px;
+  background: linear-gradient(180deg, #3a0d02, #1a0401); border: 1px solid rgba(249, 115, 22, .25); box-shadow: inset 0 -4px 8px rgba(0, 0, 0, .5);
+  transition: background .35s, transform .35s, opacity .35s, box-shadow .35s; opacity: .55; }
+.g-totemx .tx-step span { position: relative; z-index: 1; font: 900 19px/1 KeCoin, Archivo, Impact, sans-serif; color: rgba(254, 215, 170, .75); }
+.g-totemx .tx-step.fire span { background: linear-gradient(0deg, #ef4444, #f97316 45%, #fde047 75%, #fff7c2); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 6px rgba(249, 115, 22, .7)); }
+.g-totemx .tx-step.fire::before { content: ''; position: absolute; left: 10%; right: 10%; bottom: 55%; height: 70%; border-radius: 50% 50% 40% 40% / 70% 70% 30% 30%; opacity: .35;
+  background: radial-gradient(ellipse at 50% 90%, #fde047, #f97316 45%, transparent 72%); transform-origin: 50% 100%; animation: tx-flicker .8s ease-in-out infinite; }
+.g-totemx .tx-step.top { border-color: rgba(253, 224, 71, .6); }
+.g-totemx .tx-step.done { opacity: .9; background: linear-gradient(180deg, #9a3412, #3a0d02); }
+.g-totemx .tx-step.done.fire::before { opacity: .7; }
+.g-totemx .tx-step.on { opacity: 1; transform: scale(1.14); background: radial-gradient(circle at 50% 35%, #fff7c2, #f97316 55%, #991b1b); box-shadow: 0 0 24px rgba(249, 115, 22, .95), inset 0 -4px 8px rgba(127, 29, 29, .5); }
+.g-totemx .tx-step.on span { color: #1a0401; font-size: 23px; background: none; filter: none; -webkit-text-fill-color: currentColor; }
+.g-totemx .tx-step.on.fire { box-shadow: 0 0 34px rgba(239, 68, 68, 1), 0 0 60px rgba(249, 115, 22, .7), inset 0 -4px 8px rgba(127, 29, 29, .5); }
+.g-totemx .tx-step.on.fire::before { opacity: 1; bottom: 70%; height: 95%; }
+.g-totemx .tx-step.tx-bump { animation: tmBump .6s cubic-bezier(.3, 1.8, .5, 1); }
+@media (max-width: 767px) {
+  .g-totemx .tx-frame .sg { width: min(calc(100vw - 48px), calc((100dvh - 330px) * var(--cols) / var(--rows))); gap: 3px; padding: 3px; }
+  .g-totemx .sg-cell { border-radius: 7px; }
+  .g-totemx .tx-step { width: 54px; height: 38px; }
+  .g-totemx .tx-step span { font-size: 15px; }
+  .g-totemx .tx-step.on span { font-size: 18px; }
+}
+
+/* ---------- HUD, words over the grid, FULL SCREEN ---------- */
+.g-totemx .tx-hot.tx-sunchip, .g-totemx .tx-hot.tx-fullchip { border-color: #fde047 !important; box-shadow: 0 0 14px rgba(253, 224, 71, .8); animation: tmBeat .7s ease-in-out infinite alternate; }
+.g-totemx .tx-pop b { background: linear-gradient(180deg, #fff7c2, #fbbf24 50%, #c2410c); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 1px rgba(26, 4, 1, .6); filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .75)) drop-shadow(0 0 18px rgba(249, 115, 22, .7)); }
+.g-totemx .tx-pop small { text-shadow: 0 2px 6px #000, 0 0 12px rgba(249, 115, 22, .9); }
+.g-totemx .tx-pop.fire b { background-image: linear-gradient(0deg, #ef4444, #f97316 40%, #fde047 75%, #fff); filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .75)) drop-shadow(0 0 26px rgba(239, 68, 68, .9)); }
+.g-totemx .tx-pop.go { animation: tmPop 1.4s cubic-bezier(.2, .9, .3, 1) forwards; }
+.g-totemx .tx-pop.full.go { animation-duration: 2.3s; }
+.g-totemx .tx-pop.full b { font-size: clamp(34px, 8vw, 76px); }
+.slot.g-totemx.tx-full .tx-frame { animation: txFull .45s ease-in-out 5 alternate; }
+.slot.g-totemx.tx-full .sg-cell.lock { background: radial-gradient(circle at 50% 40%, #fff7c2, #f97316 60%, #991b1b); }
+
+/* ---------- bonus: the totem on fire at night ---------- */
+.slot.g-totemx.in-free > .slot-bg { filter: hue-rotate(-40deg) saturate(1.6) brightness(.75) !important; }
+.slot.g-totemx.in-free .tx-totem { box-shadow: 0 0 34px rgba(239, 68, 68, .55), inset 0 0 18px rgba(0, 0, 0, .7) !important; border-color: #ef4444 !important; }
+
+/* ---------- overlays ---------- */
+.slot-overlay.tx-ov { background: radial-gradient(circle at 50% 42%, rgba(249, 115, 22, .32), rgba(12, 2, 1, .95) 62%); }
+.slot-overlay.tx-ov h3 { font-family: Cinzel, Georgia, serif; letter-spacing: .06em; background: linear-gradient(0deg, #ef4444, #f97316 40%, #fde047 75%, #fff); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 22px rgba(249, 115, 22, .8)); }
+.slot-overlay.tx-ov .intro-glyph { filter: drop-shadow(0 0 30px rgba(249, 115, 22, .95)); }
+.slot-overlay.tx-ov .bw-amt { color: #fed7aa; text-shadow: 0 0 24px rgba(249, 115, 22, .95); }
+.slot-overlay.tx-ov .intro-glyph .ph-img { width: 130px; height: 130px; animation: none; }
+
+@keyframes txHeat { from { opacity: .55; } to { opacity: 1; } }
+@keyframes txFull { from { filter: brightness(1); transform: scale(1); } to { filter: brightness(1.5) saturate(1.3); transform: scale(1.015); } }
+@keyframes tx-flicker { 0%, 100% { transform: scale(1); } 30% { transform: scale(1.1, .9); } 60% { transform: scale(.92, 1.14); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .g-totemx .tw-animate-tx-rays, .g-totemx .tw-animate-tx-rise, .g-totemx .tw-animate-tx-flicker, .g-totemx .tx-step.fire::before,
+  .g-totemx .sg-cell.lock::after, .g-totemx .sg.tx-respin .sg-cell, .g-totemx .tx-hot, .slot.g-totemx .tx-heat, .slot.g-totemx.tx-full .tx-frame { animation: none !important; }
+  .g-totemx .tx-embers { display: none; }
+}
