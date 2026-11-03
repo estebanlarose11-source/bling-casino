@@ -91,6 +91,11 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   manche (somme des gains en × la mise, achats exclus), la moitié la plus faible éliminée après les manches 1 et 2
   (au moins 2 restent), le meilleur de la finale gagne tout le pot ; seul = remboursé. Firestore
   `battles/{br_<début>}/players/{uid}` (règles). Chaque navigateur se paie lui-même (`profile.br`).
+- **Loto** (`loto.js`, page `#loto`) : un ticket par jour (500 KE), 5 numéros parmi 30. Tirage tous les soirs à 21 h 30
+  (Paris), fait par GitHub (`tools/loto/draw.mjs`, `.github/workflows/loto.yml`, `crypto.randomInt`) et rangé dans
+  `loto/tirages.json` sur la branche **`data`** : personne ne connaît les numéros avant. Gains `PRIZES` : 2 bons = 1 000,
+  3 = 3 000, 4 = 25 000, 5 = 1 500 000 KE (retour ≈ 51 %, calculé). Tickets dans `profile.loto`, payés à la visite
+  suivante ; ticket acheté après 21 h 30 = tirage du lendemain ; pas de tirage 3 jours après = remboursé.
 - **La Course Online** (`robots-online`, `RobotsOnlineGame` dans `games/robots.js`, `withRoom`) : forme des robots
   tirée du numéro de manche (`formOf`), arrivée tirée de la graine partagée. Salon dans `roomGame` des règles.
 

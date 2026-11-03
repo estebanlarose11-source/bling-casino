@@ -4181,6 +4181,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
       <a href="#cashback" data-nav="cashback"><span>💸</span>Cashback<b class="side-badge" data-cb-badge hidden></b></a>
       <a href="#battle" data-nav="battle"><span>⚔️</span>Battle Royale<b class="side-new">NEW</b></a>
       <a href="#paris" data-nav="paris"><span>⚽</span>Paris pour rire<b class="side-new">NEW</b></a>
+      <a href="#loto" data-nav="loto"><span>🎱</span>Loto · 1,5 M<b class="side-new">NEW</b></a>
     </nav>
     <div class="side-label">Récompenses</div>
     <nav class="side-nav">
@@ -15667,6 +15668,174 @@ E.addGamePill((gid, t) => {
 return { renderBattle, battleAt, standing };
 })();
 
+// ---- loto.js ----
+__mods['loto.js'] = (() => {
+// Le Loto (#loto): one ticket a day (TICKET KE), 5 numbers out of 30. Draw every evening at 21 h 30 (Paris time),
+// made by GitHub (tools/loto/draw.mjs, workflow loto.yml) with a real random draw and stored in loto/tirages.json on
+// the « data » branch: nobody can know the numbers before. Tickets in the profile (profile.loto), paid at the next
+// visit after the draw. Prizes PRIZES by good numbers (5 = the 1 500 000 KE jackpot), return ≈ 51 %.
+// A ticket bought after 21 h 30 is for the next day's draw.
+
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { toast } = __mods['ui.js'];
+const { sfx } = __mods['audio.js'];
+const { fx } = __mods['fx.js'];
+const E = __mods['events.js'];
+
+const URL_ = 'https://raw.githubusercontent.com/estebanlarose11-source/bling-casino/data/loto/tirages.json';
+const TICKET = 500, N = 30, K = 5, HOUR = 21, MIN = 30, JACKPOT = 1500000;
+const PRIZES = { 2: 1000, 3: 3000, 4: 25000, 5: JACKPOT };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+// the draw time of a day key, and the draw the tickets bought now go to
+const keyParts = (k) => k.split('-').map(Number);
+const drawTime = (k) => { const [y, m, d] = keyParts(k); return E.at(y, m, d, HOUR) + MIN * 60000; };
+function target(t = Date.now()) {
+  const p = E.paris(t);
+  if (t < drawTime(p.key)) return p.key;
+  return E.paris(E.at(p.y, p.m, p.d + 1, 12)).key;
+}
+const dayName = (k, cap) => {
+  const today = E.paris().key, tm = E.paris(Date.now() + 864e5).key, yd = E.paris(Date.now() - 864e5).key;
+  const s = k === today ? 'ce soir' : k === tm ? 'demain soir' : k === yd ? 'hier soir' : new Date(drawTime(k)).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
+  return cap ? s[0].toUpperCase() + s.slice(1) : s;
+};
+
+/* ---------- the draws (data branch) ---------- */
+let data = null, loading = null, lastLoad = 0;
+function load(force) {
+  if (loading) return loading;
+  if (!force && data && Date.now() - lastLoad < 60000) return Promise.resolve(data);
+  loading = fetch(`${URL_}?t=${Math.floor(Date.now() / 60000)}`, { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null)).then((j) => { if (j?.draws) { data = j; lastLoad = Date.now(); settle(); } return data; })
+    .catch(() => data).finally(() => { loading = null; });
+  return loading;
+}
+const drawOf = (k) => data?.draws?.[k] || null;
+const lastDraws = () => Object.entries(data?.draws || {}).sort(([a], [b]) => (a < b ? 1 : -1));
+
+/* ---------- my tickets ---------- */
+const tickets = () => (Array.isArray(profiles.current?.loto) ? profiles.current.loto : []);
+const save = (fn) => profiles.update('loto', (p) => { p.loto = fn(Array.isArray(p.loto) ? p.loto : []).slice(0, 60); });
+const ticketFor = (k) => tickets().find((x) => x.d === k);
+const hitsOf = (n, draw) => n.filter((x) => draw.includes(x)).length;
+
+function settle() {
+  if (!profiles.current || !data || !tickets().some((x) => x.st === 'open')) return;
+  const pay = [];
+  let back = 0, lost = 0;
+  save((list) => list.map((x) => {
+    if (x.st !== 'open') return x;
+    const D = drawOf(x.d);
+    if (D) {
+      const hits = hitsOf(x.n, D.n), prize = PRIZES[hits] || 0;
+      if (prize) { pay.push([prize, hits, x]); return { ...x, st: 'won', hits, paid: prize, draw: D.n }; }
+      lost++; return { ...x, st: 'lost', hits, draw: D.n };
+    }
+    // no draw 3 days after its date (should never happen): the ticket is given back
+    if (Date.now() > drawTime(x.d) + 3 * 864e5) { back += TICKET; return { ...x, st: 'void' }; }
+    return x;
+  }));
+  pay.forEach(([g, hits, x]) => wallet.credit(g, { game: `Loto · ${hits} bons numéros`, x: g / TICKET }));
+  if (back) { wallet.grant(back); toast(`🎱 Tirage annulé : ${fmt(back)} remboursés`, 'info'); }
+  const best = pay.sort((a, b) => b[0] - a[0])[0];
+  if (best?.[1] === K) { sfx.bigWin?.(); fx.coins?.(90); toast(`🎱💎 JACKPOT DU LOTO ! Les 5 bons numéros : +${fmt(best[0])} !`, 'ok'); }
+  else if (best) { sfx.win?.(); fx.coins?.(best[1] >= 4 ? 50 : 18); toast(`🎱 Loto : ${best[1]} bons numéros, +${fmt(best[0])} !`, 'ok'); }
+  else if (lost) toast('🎱 Loto : pas de chance cette fois… nouveau ticket pour le prochain tirage !', 'info');
+  if (pay.length || lost || back) { fresh = true; paintPage(); }
+}
+
+let pick = new Set(), fresh = false;
+function buy() {
+  if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour jouer au Loto', 'warn');
+  const k = target();
+  if (ticketFor(k)) return toast('Tu as déjà ton ticket pour ce tirage', 'info');
+  if (drawOf(k)) return toast('Ce tirage est déjà fait : rendez-vous au prochain !', 'warn');
+  if (pick.size !== K) return toast(`Choisis ${K} numéros (${pick.size}/${K})`, 'warn');
+  if (!wallet.debit(TICKET)) return toast(`Il faut ${fmt(TICKET)} pour un ticket`, 'warn');
+  const n = [...pick].sort((a, b) => a - b);
+  save((list) => [{ d: k, n, at: Date.now(), st: 'open' }, ...list]);
+  pick = new Set();
+  sfx.coin?.(); fx.coins?.(14);
+  toast(`🎱 Ticket validé : ${n.join(' - ')} · tirage ${dayName(k)} à 21 h 30`, 'ok');
+  paintPage(); E.paint();
+}
+function lucky() {
+  pick = new Set();
+  while (pick.size < K) pick.add(1 + Math.floor(Math.random() * N));
+  sfx.click?.(); paintPage();
+}
+
+/* ---------- the page ---------- */
+const ball = (x, cls = '', i = 0) => `<span class="lo-ball ${cls}" style="--i:${i}">${x}</span>`;
+const balls = (n, draw, anim) => n.map((x, i) => ball(x, `${draw?.includes(x) ? 'hit' : ''}${anim ? ' pop' : ''}`, i)).join('');
+let root = null;
+function renderLoto(r) { root = r; paintPage(); load(true).then(paintPage); }
+function paintPage() {
+  if (!root?.isConnected) return;
+  const t = Date.now(), k = target(t), mine = ticketFor(k), last = lastDraws()[0];
+  const pendKey = E.paris(t).key, pending = t >= drawTime(pendKey) && !drawOf(pendKey) && ticketFor(pendKey);
+  const done = tickets().filter((x) => x.st !== 'open').slice(0, 10), anim = fresh;
+  fresh = false;
+  root.innerHTML = `
+    <section class="panel lo-hero">
+      <span class="eyebrow">🎱 Le Loto SpinBet · un ticket par jour</span>
+      <div class="lo-jack"><small>Le jackpot</small><b>${fmt(JACKPOT)}</b><span>pour les 5 bons numéros</span></div>
+      <p class="lo-when">Tirage <b>${dayName(k)} à 21 h 30</b> · dans <b data-lo-left>${E.left(drawTime(k) - t)}</b></p>
+      ${pending ? '<p class="lo-pending">⏳ Le tirage de ce soir est en cours… les numéros arrivent dans quelques minutes.</p>' : ''}
+    </section>
+    ${last ? `<section class="panel lo-last"><div class="sec-head"><h2>Dernier tirage</h2><small>${dayName(last[0], true)}</small></div>
+      <div class="lo-balls big">${last[1].n.map((x, i) => ball(x, `gold${anim ? ' pop' : ''}`, i)).join('')}</div>
+      ${(() => { const x = ticketFor(last[0]); return x ? `<p class="lo-res ${x.st}">Ton ticket ${balls(x.n, last[1].n)} → <b>${x.hits ?? hitsOf(x.n, last[1].n)} bon${(x.hits ?? 0) > 1 ? 's' : ''} numéro${(x.hits ?? 0) > 1 ? 's' : ''}</b>${x.paid ? ` · <em>+${fmt(x.paid)}</em>` : ''}</p>` : ''; })()}
+    </section>` : ''}
+    <section class="panel lo-play">
+      ${mine ? `<h2>🎟️ Ton ticket pour le tirage ${dayName(k)}</h2>
+        <div class="lo-balls big">${balls(mine.n)}</div>
+        <p class="muted">Bonne chance ! Résultat ${dayName(k)} à 21 h 30, et tes gains arrivent tout seuls. Un seul ticket par jour : reviens demain pour le suivant.</p>`
+      : `<div class="sec-head"><h2>Choisis tes ${K} numéros</h2><small><b data-lo-n>${pick.size}</b> / ${K}</small></div>
+        <div class="lo-grid">${Array.from({ length: N }, (_, i) => i + 1).map((x) => `<button class="lo-num${pick.has(x) ? ' on' : ''}" data-lo="${x}" ${!pick.has(x) && pick.size >= K ? 'disabled' : ''}>${x}</button>`).join('')}</div>
+        <div class="lo-acts"><button class="btn ghost" data-lo-lucky>🎲 Au hasard</button><button class="btn ghost" data-lo-clear ${pick.size ? '' : 'disabled'}>Effacer</button>
+          <button class="btn primary lg" data-lo-buy ${pick.size === K ? '' : 'disabled'}>🎟️ Valider mon ticket · ${fmt(TICKET)}</button></div>
+        <p class="muted small">Ticket pour le tirage ${dayName(k)} à 21 h 30. Un ticket par jour.</p>`}
+    </section>
+    <section class="panel"><h2>Les gains</h2><ul class="lo-prizes">
+      ${[5, 4, 3, 2].map((h) => `<li class="${h === K ? 'lo-top' : ''}"><span>${'●'.repeat(h)}${'○'.repeat(K - h)}</span><b>${h} bons numéros</b><em>${fmt(PRIZES[h])}</em></li>`).join('')}</ul>
+      <p class="muted small">5 numéros tirés au hasard parmi 30, tous les soirs à 21 h 30 (heure de Paris), pareil pour tout le monde. Personne ne connaît les numéros avant le tirage. Jeu en argent fictif.</p></section>
+    ${done.length ? `<section class="panel"><h2>Mes tickets</h2><ul class="lo-hist">${done.map((x) => `<li class="${x.st}"><small>${dayName(x.d, true)}</small><span class="lo-balls">${balls(x.n, x.draw)}</span><em>${x.st === 'won' ? `✅ +${fmt(x.paid)}` : x.st === 'void' ? '↩️ remboursé' : `${x.hits || 0} bon${(x.hits || 0) > 1 ? 's' : ''}`}</em></li>`).join('')}</ul></section>` : ''}
+    ${lastDraws().length > 1 ? `<section class="panel"><h2>Tirages précédents</h2><ul class="lo-hist">${lastDraws().slice(1, 8).map(([d, D]) => `<li><small>${dayName(d, true)}</small><span class="lo-balls">${D.n.map((x) => ball(x, 'gold')).join('')}</span></li>`).join('')}</ul></section>` : ''}`;
+}
+document.addEventListener('click', (e) => {
+  if (!root?.isConnected) return;
+  const n = e.target.closest('[data-lo]');
+  if (n) { const x = +n.dataset.lo; pick.has(x) ? pick.delete(x) : pick.size < K && pick.add(x); sfx.click?.(); paintPage(); return; }
+  if (e.target.closest('[data-lo-lucky]')) return lucky();
+  if (e.target.closest('[data-lo-clear]')) { pick = new Set(); return paintPage(); }
+  if (e.target.closest('[data-lo-buy]')) buy();
+});
+// countdown every second; the draw is looked for every minute around 21 h 30 (and every 10 min otherwise)
+setInterval(() => {
+  if (!root?.isConnected) return;
+  const el = root.querySelector('[data-lo-left]');
+  if (el) el.textContent = E.left(drawTime(target()) - Date.now());
+}, 1000);
+let lastKey = target();
+setInterval(() => {
+  const k = target(), t = Date.now(), p = E.paris(t), near = t >= drawTime(p.key) && !drawOf(p.key);
+  if (k !== lastKey) { lastKey = k; paintPage(); }
+  if (near || Date.now() - lastLoad > 600000) load(true).then(() => paintPage());
+}, 60000);
+profiles.ready?.then(() => setTimeout(() => load(), 3000));
+profiles.addEventListener('change', () => setTimeout(settle, 1500));
+
+E.addHome((t) => {
+  const k = target(t), mine = profiles.current && ticketFor(k);
+  return `<a class="ev-card ev-loto" href="#loto"><span class="ev-ico">🎱</span><div><small>LOTO · TIRAGE ${dayName(k).toUpperCase()} À 21 H 30</small><b>${fmt(JACKPOT)} à gagner</b><em>${mine ? `ton ticket : ${mine.n.join(' - ')}` : `5 numéros sur 30 · ticket ${fmt(TICKET)}`} · dans ${E.left(drawTime(k) - t)}</em></div><span class="ev-go">${mine ? 'Voir ›' : 'Jouer ›'}</span></a>`;
+});
+
+return { renderLoto, load, settle, target, PRIZES };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -15717,6 +15886,7 @@ const routes = [
   { re: /^cashback$/, page: (r) => __mods['cashback.js'].renderCashback(r), nav: 'cashback' },
   { re: /^battle$/, page: (r) => __mods['battle.js'].renderBattle(r), nav: 'battle' },
   { re: /^paris$/, page: (r) => __mods['paris.js'].renderParis(r), nav: 'paris' },
+  { re: /^loto$/, page: (r) => __mods['loto.js'].renderLoto(r), nav: 'loto' },
   { re: /^@(.+)$/, page: (r, m) => __mods['extras.js'].renderPlayer(r, decodeURIComponent(m[1])), nav: 'top' },
 ];
 
@@ -17276,6 +17446,44 @@ html.light .btn.primary { color: #fff !important; background: linear-gradient(18
 .pr-note { margin-top: 6px; }
 .ev-paris { background: linear-gradient(90deg, rgba(34, 197, 94, .2), rgba(59, 130, 246, .12)) !important; border-color: rgba(34, 197, 94, .5) !important; }
 @media (max-width: 520px) { .pr-grid { grid-template-columns: 1fr; } }
+
+/* ---------- le loto (#loto) ---------- */
+.lo-hero { text-align: center; background: radial-gradient(520px 240px at 50% 0%, rgba(251, 191, 36, .22), transparent 70%), var(--fin-panel) padding-box, var(--fin-edge) border-box !important; }
+.lo-jack { display: grid; gap: 2px; margin: 14px 0 10px; }
+.lo-jack small { text-transform: uppercase; letter-spacing: .12em; color: var(--muted); font-weight: 800; font-size: 12px; }
+.lo-jack b { font: 900 clamp(38px, 9vw, 64px)/1 KeCoin, Archivo, sans-serif; background: linear-gradient(180deg, #fff6c8, #fbbf24 55%, #d97706); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 4px 18px rgba(251, 191, 36, .35)); }
+.lo-jack span { color: var(--muted); font-size: 13px; }
+.lo-when { margin: 4px 0 0; } .lo-when b { color: #fde68a; }
+.lo-pending { margin: 10px 0 0; padding: 8px 12px; border-radius: 10px; background: rgba(251, 191, 36, .12); }
+.lo-balls { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.lo-balls.big { display: flex; justify-content: center; gap: 10px; margin: 10px 0; }
+.lo-ball { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font: 900 13px KeCoin, Archivo, sans-serif; color: #0b1220; background: radial-gradient(circle at 35% 30%, #fff, #cbd5e1 60%, #94a3b8); box-shadow: inset 0 -3px 6px rgba(0, 0, 0, .25), 0 2px 6px rgba(0, 0, 0, .35); }
+.lo-balls.big .lo-ball { width: 52px; height: 52px; font-size: 22px; }
+.lo-ball.gold, .lo-ball.hit { background: radial-gradient(circle at 35% 30%, #fffbe6, #fbbf24 55%, #b45309); box-shadow: inset 0 -4px 8px rgba(0, 0, 0, .25), 0 0 14px rgba(251, 191, 36, .45); }
+.lo-ball.hit { outline: 2px solid #4ade80; outline-offset: 2px; }
+.lo-ball.pop { animation: loPop .5s cubic-bezier(.2, 1.6, .4, 1) both; animation-delay: calc(var(--i) * .35s); }
+@keyframes loPop { from { transform: scale(0) rotate(-180deg); opacity: 0; } }
+.lo-res { text-align: center; margin: 8px 0 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; }
+.lo-res em { font-style: normal; font-weight: 900; color: #4ade80; }
+.lo-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; max-width: 460px; margin: 10px auto; }
+.lo-num { aspect-ratio: 1; border-radius: 50%; font: 900 17px KeCoin, Archivo, sans-serif; color: var(--text); background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02)); box-shadow: inset 0 0 0 1px rgba(124, 200, 255, .25); transition: transform .12s, box-shadow .2s; }
+.lo-num:hover:not(:disabled) { transform: scale(1.06); box-shadow: inset 0 0 0 1px #7cc8ff; }
+.lo-num.on { color: #0b1220; background: radial-gradient(circle at 35% 30%, #fffbe6, #fbbf24 55%, #b45309); box-shadow: 0 0 14px rgba(251, 191, 36, .5); transform: scale(1.04); }
+.lo-num:disabled { opacity: .35; }
+.lo-acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0 6px; }
+.lo-play h2, .lo-play > p { text-align: center; }
+.lo-prizes { list-style: none; margin: 8px 0 10px; padding: 0; display: grid; gap: 6px; }
+.lo-prizes li { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; border-radius: 10px; background: rgba(255, 255, 255, .04); }
+.lo-prizes li span { color: #fbbf24; letter-spacing: 2px; font-size: 13px; }
+.lo-prizes li em { font-style: normal; font-weight: 900; }
+.lo-prizes li.lo-top { background: linear-gradient(90deg, rgba(251, 191, 36, .22), rgba(251, 191, 36, .05)); box-shadow: inset 0 0 0 1px rgba(251, 191, 36, .5); }
+.lo-prizes li.lo-top em { color: #fde68a; font-size: 18px; }
+.lo-hist { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
+.lo-hist li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px; border-radius: 10px; background: rgba(255, 255, 255, .04); }
+.lo-hist li small { min-width: 120px; color: var(--muted); } .lo-hist li em { margin-left: auto; font-style: normal; font-weight: 800; }
+.lo-hist li.won em { color: #4ade80; } .lo-hist li.lost em { color: var(--muted); }
+.ev-loto { background: linear-gradient(90deg, rgba(251, 191, 36, .22), rgba(124, 58, 237, .12)) !important; border-color: rgba(251, 191, 36, .5) !important; }
+@media (max-width: 420px) { .lo-grid { gap: 6px; } .lo-balls.big .lo-ball { width: 44px; height: 44px; font-size: 19px; } }
 
 /* ---------- profil public (#@pseudo) and événements flash ---------- */
 .pp { text-align: center; max-width: 640px; margin: 0 auto; padding: 28px 20px !important; background: radial-gradient(420px 220px at 50% 0%, color-mix(in srgb, var(--rk, #7cc8ff) 26%, transparent), transparent 70%), var(--fin-panel) padding-box, var(--fin-edge) border-box !important; }

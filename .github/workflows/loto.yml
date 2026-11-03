@@ -1,0 +1,44 @@
+# Le tirage du Loto (loto.js) : tools/loto/draw.mjs, rangé sur la branche « data » (loto/tirages.json), lu par le site
+# sur raw.githubusercontent.com. 21 h 30 à Paris = 20 h 30 UTC l'hiver, 19 h 30 UTC l'été : plusieurs passages, le
+# script ne tire qu'une fois par jour (et rattrape un jour oublié si GitHub est en retard).
+name: Loto
+
+on:
+  schedule:
+    - cron: '32,47 19,20,21 * * *'
+    - cron: '15 0,6,12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: loto
+  cancel-in-progress: false
+
+jobs:
+  draw:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: site
+      - name: Branche data
+        run: |
+          git clone --depth 1 --branch data "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" data 2>/dev/null || {
+            mkdir data && cd data && git init -q -b data && git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"; }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Tirage
+        run: node site/tools/loto/draw.mjs data/loto/tirages.json
+      - name: Enregistrer
+        working-directory: data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add loto/tirages.json
+          git commit -qm "Loto $(date -u +%Y-%m-%dT%H:%M)" || { echo "Rien de nouveau"; exit 0; }
+          for i in 1 2 3 4; do git push -q origin HEAD:data && exit 0; sleep $((i * 3)); git pull -q --rebase origin data || true; done
+          exit 1
