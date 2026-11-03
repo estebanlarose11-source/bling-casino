@@ -312,6 +312,22 @@ section { margin-bottom: 28px; }
 .upd-tag.new { background: linear-gradient(90deg, #22c55e, #14b8a6); }
 @media (max-width: 520px) { .vx-ladder { gap: 3px; padding: 6px 4px 2px; } .vx-ladder span { font-size: 9px; height: 26px; letter-spacing: -.3px; } }
 @media (max-width: 760px) { .upd-hero .hero-copy { max-width: none; } .upd-hero h1 { font-size: 26px; } .upd-list { font-size: 13px; } }
+/* phones: the update poster becomes a banner, the other updates are hidden, so the games come first */
+.upd-thumb { display: none; }
+@media (max-width: 760px) {
+  .hero.upd-wrap { display: block; }
+  .hero.upd-wrap .hero-side, .hero .upd-hero .hero-art, .hero .upd-hero .upd-list { display: none; }
+  .hero .hero-main.upd-hero { min-height: 0; padding: 12px; gap: 12px; }
+  .upd-thumb { display: block; position: relative; z-index: 2; flex: 0 0 76px; width: 76px; height: 76px; border-radius: 4px; overflow: hidden; box-shadow: 0 6px 18px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 255, 255, .15); }
+  .upd-thumb svg { width: 100%; height: 100%; display: block; }
+  .hero .upd-hero .hero-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; transform: none; }
+  .hero .upd-hero .upd-eye { margin: 0; font-size: 9.5px; padding: 3px 7px; letter-spacing: .6px; }
+  .hero .upd-hero h1 { font-size: 18px; line-height: 1.15; }
+  .hero .upd-hero h1 br { display: none; }
+  .hero .upd-hero h1 em, .hero .upd-hero h1 em .ml-word { display: block; font-size: 13px; background: none; color: #dbeafe; -webkit-text-fill-color: currentColor; }
+  .hero .upd-hero h1 em .ml-word { display: inline-block; background: none; -webkit-text-fill-color: currentColor; color: #dbeafe; }
+  .hero .upd-hero .hero-cta .btn { padding: 7px 12px; font-size: 13px; min-height: 0; }
+}
 .promo-tile {
   display: flex; align-items: center; gap: 14px; padding: 18px; border-radius: 4px;
   border: 1px solid var(--line); background: var(--panel); transition: transform .2s, border-color .2s, box-shadow .2s;
@@ -867,6 +883,15 @@ body.gated { overflow: hidden; }
 .gate-or::before, .gate-or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
 .gate-guest { width: 100%; }
 .gate-guest-note { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+.gate-card { position: relative; }
+.gate-x { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 3px; color: var(--muted); font-size: 16px; }
+.gate-x:hover { color: var(--text); background: var(--panel-2); }
+.gate-title { font: 900 22px/1.2 KeCoin, Archivo, sans-serif; margin: -4px 0 14px; color: var(--gold); }
+/* guests: "save your KE" card after a big win or a few rounds (same place as the rewarded-ad offer) */
+.signup-link { color: var(--green); font-weight: 700; text-decoration: underline; }
+.save-nudge { border-color: color-mix(in srgb, var(--green) 55%, var(--line)); }
+.save-nudge > b { font: 900 17px KeCoin, Archivo, sans-serif; }
+.save-nudge .sn-x { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; color: var(--muted); }
 .locked-game { text-align: center; padding: 60px 20px; }
 
 .me-chip { display: flex; align-items: center; gap: 10px; padding: 4px 12px 4px 4px; border-radius: 3px; background: var(--panel); border: 1px solid var(--line); position: relative; transition: border-color .2s; }
@@ -5146,6 +5171,13 @@ class Profiles extends EventTarget {
     const isNew = !data;
     if (isNew) {
       data = blank(pseudo || user.email.split('@')[0], false);
+      // An account created while playing as a guest keeps what the guest won: balance, stats, level, missions…
+      const guest = this.mode === 'guest' && this.current;
+      if (guest) {
+        guest.bal = wallet.cents;
+        guest.stats = wallet.state;
+        data = { ...JSON.parse(JSON.stringify(guest)), name: data.name, created: data.created, lastSeen: data.lastSeen };
+      }
       data.email = user.email;
       await cloud.save(user.uid, data);
     }
@@ -6197,7 +6229,7 @@ async function renderReferral(root) {
         <div class="ref-stats"><div><b>${paid}</b><small>filleul${paid > 1 ? 's' : ''} validé${paid > 1 ? 's' : ''}</small></div><div><b>${fmt(paid * REF_PARRAIN)}</b><small>gagnés</small></div></div>
         <div class="ref-wait" data-wait></div>
         <button class="btn ghost" data-check>🔄 Vérifier mes filleuls</button>`
-      : '<p class="ref-need">Le parrainage demande un <b>compte</b> (e-mail et mot de passe) : déconnecte-toi du mode invité et crée ton compte depuis l’écran d’accueil.</p>'}
+      : '<p class="ref-need">Le parrainage demande un <b>compte</b> (e-mail et mot de passe). Crée le tien : tu gardes ce que tu as gagné en invité.</p><button class="btn primary" data-signup="💾 Crée ton compte">Créer mon compte</button>'}
       <h4>Comment ça marche ?</h4>
       <ol class="app-list"><li>Copie ton lien et envoie-le (WhatsApp, Snap, Discord…).</li><li>Ton ami ouvre le lien et crée son compte : il reçoit <b>${fmt(REF_KE)} de plus</b> tout de suite.</li><li>Dès qu’il atteint le niveau ${REF_LEVEL}, tu reçois <b>${fmt(REF_PARRAIN)}</b> et <b>${REF_SPINS} tours offerts</b> sur Le Loup 2.0 (à ${fmt(1)} la mise), ici ou à ta prochaine connexion.</li></ol>
     </section>`;
@@ -6386,7 +6418,7 @@ async function renderChallenge(root) {
           <div class="defi-live" data-me-live><span class="live-dot"></span>Chargement du classement…</div>
           <div class="ref-stats"><div><b>${best ? xs(best) : '—'}</b><small>ton record</small></div><div><b data-my-rank>—</b><small>ta place</small></div><div><b>${dd} j ${hh} h</b><small>avant la fin</small></div></div>
           <a class="btn primary lg" href="#game-${g.id}">${cat === 'B' && !old ? 'Acheter un bonus' : 'Jouer au défi'}</a>
-          ${!uid() ? '<p class="muted small">En invité, ton record compte pour toi mais n’apparaît pas au classement : crée un compte pour y figurer et être payé.</p>' : ''}
+          ${!uid() ? '<p class="muted small">En invité, ton record compte pour toi mais n’apparaît pas au classement : <a href="#" class="signup-link" data-signup>crée un compte</a> pour y figurer et être payé.</p>' : ''}
         </div>
       </div>
       <div class="defi-boards defi-one"><div><h4>Classement en direct</h4><ol class="defi-list" data-board><li class="muted">Chargement…</li></ol></div></div>
@@ -6432,7 +6464,7 @@ document.addEventListener('click', (e) => {
   shareSite(b.dataset.shareSite ? { id: b.dataset.shareSite, name: b.dataset.shareName } : null);
 });
 
-return { renderReferral, renderChallenge, challengeGame, challengeOf, gameOf, CHALLENGES: CATS, shareSite };
+return { renderReferral, renderChallenge, challengeGame, challengeOf, gameOf, CHALLENGES: CATS, shareSite, REF_KE };
 })();
 
 // ---- brand.js ----
@@ -6472,12 +6504,12 @@ function closeGate() {
 function welcome(profile, isNew) {
   sfx.win();
   if (profiles.guest) toast('Mode invité : ta progression ne sera pas sauvegardée', 'info');
-  else toast(isNew ? `Bienvenue ${esc(profile.name)} ! Ton profil est créé` : `Bon retour ${esc(profile.name)} !`, 'ok');
+  else toast(isNew ? `Bienvenue ${esc(profile.name)} ! Ton compte est créé, tes ${fmt(wallet.balance)} sont sauvegardés` : `Bon retour ${esc(profile.name)} !`, 'ok');
   if (dailyStatus().ready) setTimeout(() => toast('🎁 Ton bonus du jour t’attend dans ton profil', 'info'), 1200);
 }
 
-function showGate() {
-  if (cloud.enabled) return showAccountGate();
+function showGate(opts) {
+  if (cloud.enabled) return showAccountGate(opts);
   if (document.querySelector('.gate')) return;
   const list = profiles.list().slice(0, 6);
   const g = el('div', 'gate', `<div class="gate-card">
@@ -6510,13 +6542,17 @@ function showGate() {
   setTimeout(() => input.focus(), 350);
 }
 
-// E-mail + password, with a guest option whose progress is never saved.
-function showAccountGate() {
+// E-mail + password, with a guest option whose progress is never saved. Opened by the player (signUp()) while
+// already playing as a guest, it can be closed and the guest keeps playing; a new account keeps the guest's progress.
+function showAccountGate({ tab: firstTab = 'in', title = '' } = {}) {
   if (document.querySelector('.gate')) return;
+  const asGuest = profiles.guest;
   const g = el('div', 'gate', `<div class="gate-card">
+      ${asGuest ? '<button type="button" class="gate-x" data-close aria-label="Fermer">✕</button>' : ''}
       <div class="gate-logo"><span class="logo-mark">${BRAND.mark}</span><span>${BRAND.logo[0]}<em>${BRAND.logo[1]}</em></span></div>
+      ${title ? `<h2 class="gate-title">${title}</h2>` : ''}
       <div class="gate-tabs" role="tablist"><button type="button" class="on" data-tab="in">Se connecter</button><button type="button" data-tab="up">Créer un compte</button></div>
-      <p class="muted">Ton solde, ton niveau et tes bonus sont sauvegardés dans ton compte, sur tous tes appareils.</p>
+      <p class="muted" data-gate-lead>Ton solde, ton niveau et tes bonus sont sauvegardés dans ton compte, sur tous tes appareils.</p>
       <form class="gate-form" novalidate>
         <input class="gate-input" name="pseudo" maxlength="${NAME_MAX}" placeholder="Ton pseudo" aria-label="Pseudo" autocapitalize="off" spellcheck="false" hidden>
         <input class="gate-input" name="email" type="email" placeholder="Adresse e-mail" aria-label="Adresse e-mail" autocomplete="email" autocapitalize="off" spellcheck="false">
@@ -6526,7 +6562,7 @@ function showAccountGate() {
         <button type="button" class="gate-link" data-forgot>Mot de passe oublié ?</button>
       </form>
       <div class="gate-or"><span>ou</span></div>
-      <button type="button" class="btn ghost lg gate-guest" data-guest>Jouer en tant qu’invité</button>
+      <button type="button" class="btn ghost lg gate-guest" data-guest>${asGuest ? 'Continuer en invité' : 'Jouer en tant qu’invité'}</button>
       <small class="gate-guest-note">En invité, ta progression n’est pas sauvegardée : tout repart à zéro quand tu quittes le site.</small>
       <p class="gate-note">Démo de divertissement · argent fictif · 18+</p>
     </div>`);
@@ -6540,8 +6576,10 @@ function showAccountGate() {
     err.textContent = msg;
     if (input) { input.classList.remove('bad'); void input.offsetWidth; input.classList.add('bad'); input.focus(); }
   };
+  const lead = g.querySelector('[data-gate-lead]');
   const setTab = (t) => {
     tab = t;
+    if (asGuest) lead.innerHTML = t === 'up' ? `Ton compte garde tes <b>${fmt(wallet.balance)}</b>, ton niveau et tes succès, sur tous tes appareils. C’est gratuit.` : 'Attention : en te connectant à un compte existant, ce que tu as gagné en invité n’est pas ajouté à ce compte.';
     g.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('on', b.dataset.tab === t));
     pseudo.hidden = t === 'in';
     g.querySelector('[data-forgot]').hidden = t === 'up';
@@ -6588,12 +6626,29 @@ function showAccountGate() {
   };
   g.querySelector('[data-guest]').onclick = () => {
     sfx.unlock();
+    if (profiles.guest) return closeGate(); // already playing as a guest: keep the balance
     const { profile, isNew } = profiles.playAsGuest();
     closeGate();
     welcome(profile, isNew);
   };
-  setTimeout(() => email.focus(), 350);
+  g.querySelector('[data-close]')?.addEventListener('click', closeGate);
+  if (firstTab === 'up') setTab('up');
+  else if (asGuest) setTab('in');
+  setTimeout(() => (firstTab === 'up' ? pseudo : email).focus(), 350);
 }
+
+// Opens the "create an account" screen (the guest keeps playing if they close it). [data-signup] buttons call it.
+function signUp(title) {
+  if (!cloud.enabled) return showGate();
+  if (profiles.online) return;
+  showAccountGate({ tab: 'up', title });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-signup]');
+  if (!b) return;
+  e.preventDefault();
+  signUp(b.dataset.signup || '');
+});
 
 /* ---------- header chip + sidebar card ---------- */
 function renderChip() {
@@ -6602,9 +6657,10 @@ function renderChip() {
   const p = progress.info(), d = dailyStatus();
   if (chip) {
     chip.style.setProperty('--rk', p.rank.color);
+    if (profiles.guest && cloud.enabled) chip.dataset.signup = '💾 Sauvegarde ta partie'; else delete chip.dataset.signup;
     const look = __mods['shop.js']?.publicLook?.(me), S = __mods['shop.js'];
     chip.innerHTML = `<span class="lvl-ring" style="--p:${(p.pct * 100).toFixed(1)}%"><b>${p.level}</b></span>${S?.lookHTML?.(look, 'sm') || ''}
-      <span class="me-name"><b ${S?.nameStyle?.(look) || ''}>${esc(me.name)}</b><small>${profiles.guest ? 'Non sauvegardé' : p.rank.name}${p.boosted ? ' · ⚡ XP ×2' : ''}</small></span>
+      <span class="me-name"><b ${S?.nameStyle?.(look) || ''}>${esc(me.name)}</b><small>${profiles.guest && cloud.enabled ? '💾 Sauvegarder' : profiles.guest ? 'Non sauvegardé' : p.rank.name}${p.boosted ? ' · ⚡ XP ×2' : ''}</small></span>
       ${d.ready ? '<i class="gift-dot" title="Bonus du jour disponible">🎁</i>' : ''}`;
   }
   if (side) {
@@ -6655,10 +6711,55 @@ function mountHud() {
   wallet.addEventListener('change', redraw);
   setInterval(redraw, 30000); // the daily gift dot appears when the 24 h are over
   redraw();
-  profiles.ready.then(() => { if (!profiles.current) showGate(); });
+  // A new visitor lands straight in the casino as a guest (no login screen first); the account is offered later
+  // (nudge below). A visitor who came from a friend's referral link is shown the sign-up screen with the gift.
+  profiles.ready.then(() => {
+    if (profiles.current) return;
+    if (!cloud.enabled) return showGate();
+    profiles.playAsGuest();
+    const refKE = __mods['social.js']?.REF_KE;
+    if (pendingRef() && refKE) signUp(`🎁 Ton ami t’offre ${fmt(refKE)}`);
+  });
 }
 
-return { showGate, mountHud };
+/* ---------- guests: save your KE ---------- */
+// Offered at the right moment: right after a big win (≥ NUDGE.bigX × the bet), or after NUDGE.rounds rounds,
+// never twice within NUDGE.gapMs and never on top of the sign-up screen.
+const NUDGE = { bigX: 25, rounds: [20, 60, 150, 300], gapMs: 3 * 60000 };
+let nudgedAt = 0, rounds = 0, step = 0;
+const pendingRef = () => { try { return localStorage.getItem('spinbet_ref'); } catch { return null; } };
+
+function nudge(d, tries = 0) {
+  if (!profiles.guest || document.querySelector('.gate, .save-nudge')) return;
+  if (document.querySelector('.win-share, .bw-box') && tries < 15) return setTimeout(() => nudge(d, tries + 1), 4000); // the big-win picture first
+  const refKE = pendingRef() && __mods['social.js']?.REF_KE;
+  const x = d ? Math.round(d.x).toLocaleString('fr-FR') : '';
+  const card = el('div', 'ad-offer save-nudge', `<button class="sn-x" data-x aria-label="Fermer">✕</button>
+    <b>${d ? `🎉 Gros gain ×${x} !` : '💾 Garde tes gains'}</b>
+    <p>Sauvegarde tes <b>${fmt(wallet.balance)}</b> : en invité, tout repart à zéro quand tu quittes le site. Avec un compte gratuit, tu gardes ton solde, ton niveau et tes succès${refKE ? `, et ton ami t’offre <b>+${fmt(refKE)}</b>` : ''}.</p>
+    <div><button class="btn primary" data-go>Créer mon compte</button><button class="btn ghost" data-x>Plus tard</button></div>`);
+  document.body.appendChild(card);
+  card.querySelectorAll('[data-x]').forEach((b) => { b.onclick = () => card.remove(); });
+  card.querySelector('[data-go]').onclick = () => { card.remove(); signUp(`💾 Sauvegarde tes ${fmt(wallet.balance)}`); };
+  setTimeout(() => card.remove(), 20000);
+}
+const nudgeLater = (d) => {
+  if (!profiles.guest || !cloud.enabled || Date.now() - nudgedAt < NUDGE.gapMs) return false;
+  nudgedAt = Date.now();
+  setTimeout(() => nudge(d), d ? 3200 : 1200); // after the win celebration
+  return true;
+};
+wallet.addEventListener('wager', () => {
+  if (!profiles.guest) return;
+  rounds++;
+  if (step < NUDGE.rounds.length && rounds >= NUDGE.rounds[step] && nudgeLater(null)) step++;
+});
+addEventListener('sb:roundend', (e) => {
+  const d = e.detail || {};
+  if (profiles.guest && !d.bought && d.x >= NUDGE.bigX) nudgeLater(d);
+});
+
+return { showGate, mountHud, signUp };
 })();
 
 // ---- likes.js ----
@@ -6964,7 +7065,7 @@ ${__mods['achievements.js']?.trophiesHTML?.() || ''}
       </section>
     </div>`;
 
-  root.querySelector('[data-switch]').onclick = () => profiles.logout();
+  root.querySelector('[data-switch]').onclick = () => (profiles.guest && __mods['cloud.js'].cloud.enabled ? __mods['hud.js'].signUp('💾 Sauvegarde ta partie') : profiles.logout());
   root.querySelector('[data-claim]')?.addEventListener('click', (e) => {
     const r = claimDaily();
     if (!r) return;
@@ -8577,7 +8678,13 @@ function coverSVG0(game, { cls = 'cover', badge = true, square = false } = {}) {
 // Wide banner version for the lobby hero: the cover art on the right, lit background on the left.
 function heroArtSVG(game) { return coverSVG(game, { cls: 'cover hero-cover', badge: false }); }
 
-return { coverSVG, heroArtSVG };
+// The painted cover of a game, for the big-win picture (bigwin.js): { src, crop: [top, bottom] } or null.
+function coverPhoto(id) {
+  const sp = SPECS[id];
+  return sp?.photo ? { src: photoSrc(sp.photo), crop: CROP[sp.photo] || [0, 1], colors: CARD[id] || null } : { src: null, crop: [0, 1], colors: CARD[id] || null };
+}
+
+return { coverSVG, heroArtSVG, coverPhoto };
 })();
 
 // ---- updates.js ----
@@ -8588,19 +8695,19 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'big-bad-wolf', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
-  { game: 'fortune', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
-  { game: 'labo', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
-  { game: 'billets', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
-  { game: 'chasse', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
-  { game: 'huff', date: '2026-11-03', title: 'Rouleaux en WebGL', items: ['Les rouleaux tournent maintenant en WebGL (PixiJS) : vrai flou de mouvement, étirement à pleine vitesse et éclat à l’arrêt de chaque rouleau', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
-  { game: 'zeus', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
-  { game: 'candy', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
-  { game: 'cosmic', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
-  { game: 'anubis', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
-  { game: 'bling', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
-  { game: 'pharaon', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
-  { game: 'dragons', date: '2026-11-03', title: 'Chute des symboles en WebGL', items: ['Les symboles tombent maintenant en WebGL (PixiJS), avec un vrai flou de mouvement', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'big-bad-wolf', date: '2026-11-03', title: 'Rouleaux plus spectaculaires', items: ['Rouleaux plus fluides et plus spectaculaires : ils filent à toute vitesse et chaque rouleau s’arrête dans un éclat de lumière', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'fortune', date: '2026-11-03', title: 'Rouleaux plus spectaculaires', items: ['Rouleaux plus fluides et plus spectaculaires : ils filent à toute vitesse et chaque rouleau s’arrête dans un éclat de lumière', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'labo', date: '2026-11-03', title: 'Rouleaux plus spectaculaires', items: ['Rouleaux plus fluides et plus spectaculaires : ils filent à toute vitesse et chaque rouleau s’arrête dans un éclat de lumière', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'billets', date: '2026-11-03', title: 'Rouleaux plus spectaculaires', items: ['Rouleaux plus fluides et plus spectaculaires : ils filent à toute vitesse et chaque rouleau s’arrête dans un éclat de lumière', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'chasse', date: '2026-11-03', title: 'Rouleaux plus spectaculaires', items: ['Rouleaux plus fluides et plus spectaculaires : ils filent à toute vitesse et chaque rouleau s’arrête dans un éclat de lumière', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'huff', date: '2026-11-03', title: 'Rouleaux plus spectaculaires', items: ['Rouleaux plus fluides et plus spectaculaires : ils filent à toute vitesse et chaque rouleau s’arrête dans un éclat de lumière', 'Rayons de lumière et étincelles sur les rouleaux qui font durer le suspense', 'Cadres lumineux, reflet et étincelles autour des symboles gagnants', 'Les gains ne changent pas'] },
+  { game: 'zeus', date: '2026-11-03', title: 'Chute des symboles plus spectaculaire', items: ['Les symboles tombent plus vite et plus fluide, comme dans un vrai casino', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'candy', date: '2026-11-03', title: 'Chute des symboles plus spectaculaire', items: ['Les symboles tombent plus vite et plus fluide, comme dans un vrai casino', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'cosmic', date: '2026-11-03', title: 'Chute des symboles plus spectaculaire', items: ['Les symboles tombent plus vite et plus fluide, comme dans un vrai casino', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'anubis', date: '2026-11-03', title: 'Chute des symboles plus spectaculaire', items: ['Les symboles tombent plus vite et plus fluide, comme dans un vrai casino', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'bling', date: '2026-11-03', title: 'Chute des symboles plus spectaculaire', items: ['Les symboles tombent plus vite et plus fluide, comme dans un vrai casino', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'pharaon', date: '2026-11-03', title: 'Chute des symboles plus spectaculaire', items: ['Les symboles tombent plus vite et plus fluide, comme dans un vrai casino', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
+  { game: 'dragons', date: '2026-11-03', title: 'Chute des symboles plus spectaculaire', items: ['Les symboles tombent plus vite et plus fluide, comme dans un vrai casino', 'Rayons de lumière sur les colonnes qui font durer le suspense', 'Explosions d’étincelles quand les grappes disparaissent, cadres lumineux sur les gains', 'Les gains ne changent pas'] },
   { game: 'mines', date: '2026-11-03', title: 'Graphismes 3D', items: ['Nouvelle couverture dessinée en 3D', 'La gemme et la bombe sont maintenant dessinés en 3D', 'Les gains ne changent pas'] },
   { game: 'pileface', date: '2026-11-03', title: 'Graphismes 3D', items: ['Nouvelle couverture dessinée en 3D', 'Les deux faces de la pièce sont maintenant dessinés en 3D', 'Les gains ne changent pas'] },
   { game: 'casse', date: '2026-11-03', title: 'Graphismes 3D', items: ['Nouvelle couverture dessinée en 3D', 'Les portes de coffre, les billets et les lingots sont maintenant dessinés en 3D', 'Les gains ne changent pas'] },
@@ -8780,7 +8887,7 @@ const UPDATES = [
   { game: 'robots', date: '2026-10-31', title: 'Nouveau nom : La Course', items: ['Course de Robots s’appelle maintenant La Course', 'Nouvelle affiche avec le nouveau nom'] },
   {
     game: 'billets', date: '2026-10-31', title: 'Cascades de billets', isNew: true,
-    items: ['Les billets gagnants disparaissent et de nouveaux billets tombent', 'Les cascades continuent tant qu’il y a de nouveaux gains', 'Les billets cash restent : la mallette collecte tout à la fin', 'Gains ré-équilibrés (RTP ≈ 92 %)'],
+    items: ['Les billets gagnants disparaissent et de nouveaux billets tombent', 'Les cascades continuent tant qu’il y a de nouveaux gains', 'Les billets cash restent : la mallette collecte tout à la fin', 'Gains ré-équilibrés'],
   },
   {
     game: 'anubis', date: '2026-10-31', title: 'Jugement : cubes multiplicateurs',
@@ -8941,10 +9048,12 @@ function renderLobby(root, params = {}) {
       <span class="tile-art">${thumbArt(g, { square: true })}</span>
       <div><b>${g.name}</b><small>${u.isNew ? 'Nouveau' : 'Mise à jour'} · ${fmtDate(u.date)}</small><small class="upd-sub">${u.title}</small></div></a>`;
   };
+  // On phones the poster shrinks to a banner (small cover, title, button) so the games show on the first screen.
   const hero = upd ? `
-    <section class="hero">
+    <section class="hero upd-wrap">
       <div class="hero-main upd-hero" style="--ua:${ug.colors[0]};--ub:${ug.colors[1]}">
         <div class="upd-bg" aria-hidden="true">${coverSVG(ug, { cls: 'cover upd-bg-art', badge: false }).replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ')}</div>
+        <a class="upd-thumb" href="#game-${ug.id}" aria-hidden="true" tabindex="-1">${coverSVG(ug, { square: true, badge: false })}</a>
         <div class="hero-copy">
           <span class="eyebrow upd-eye">${upd.isNew ? '✨ Nouveau jeu' : '🆕 Mise à jour'} · ${fmtDate(upd.date)}</span>
           <h1>${ug.name}<br><em>${upd.title}</em></h1>
@@ -11773,7 +11882,7 @@ function renderLeaderboard(root) {
   const me = profiles.online ? profiles.store.current : null;
   root.innerHTML = `
     <section class="panel lb">
-      <div class="lb-head"><h1>🏆 Classement</h1><p class="muted">Les ${TOP} meilleurs joueurs inscrits. ${profiles.online ? 'Ta ligne est mise en avant.' : 'Crée un compte pour apparaître dans le classement.'}</p></div>
+      <div class="lb-head"><h1>🏆 Classement</h1><p class="muted">Les ${TOP} meilleurs joueurs inscrits. ${profiles.online ? 'Ta ligne est mise en avant.' : '<a href="#" class="signup-link" data-signup>Crée un compte</a> pour apparaître dans le classement.'}</p></div>
       <div class="lb-tabs" role="tablist">${BOARDS.map((b) => `<button type="button" data-lb="${b.id}" class="${b.id === tab ? 'on' : ''}"><span>${b.icon}</span>${b.label}</button>`).join('')}</div>
       <ol class="lb-list"><li class="lb-msg">Chargement…</li></ol>
     </section>`;
@@ -12212,7 +12321,7 @@ function renderSpecial(root) {
   }).join('');
   const action = s.done
     ? `<div class="sp-won">🏆 Défi terminé ! Tu as déjà touché <b>${fmt(s.paid)}</b>. Chaque nouvelle machine te rapporte encore <b>+${fmt(PER_NEW)}</b>, automatiquement.</div>`
-    : s.all ? `<button class="btn primary lg sp-claim" data-sp-claim>🏆 Toucher mes ${fmt(s.prize)}</button>${profiles.online ? '' : '<p class="muted small">Crée un compte (ou connecte-toi) pour toucher la récompense.</p>'}`
+    : s.all ? `<button class="btn primary lg sp-claim" data-sp-claim>🏆 Toucher mes ${fmt(s.prize)}</button>${profiles.online ? '' : '<p class="muted small"><a href="#" class="signup-link" data-signup>Crée un compte</a> (ou connecte-toi) pour toucher la récompense.</p>'}`
       : `<a class="btn primary lg" href="#lobby-slot">Je relève le défi</a>`;
   root.innerHTML = `
     <section class="panel sp-page">
@@ -12755,7 +12864,7 @@ async function openPlayer(uid, name, { msgId = null } = {}) {
       : '<button class="btn primary" data-value="friend">➕ Ajouter en ami</button>');
     acts.push('<button class="btn primary" data-value="gift">💸 Envoyer des KE</button><button class="btn" data-value="at">💬 Lui répondre dans le chat</button>');
   }
-  else acts.push('<p class="muted small">Crée un compte (ou connecte-toi) pour envoyer des KE ou écrire dans le chat.</p>');
+  else acts.push('<p class="muted small"><a href="#" class="signup-link" data-signup>Crée un compte</a> (ou connecte-toi) pour envoyer des KE ou écrire dans le chat.</p>');
   if (m && !self) acts.push('<button class="btn" data-value="report">🚩 Signaler ce joueur</button>');
   if (msgId && (admin || self)) acts.push('<button class="btn" data-value="del">🗑️ Supprimer ce message</button>');
   if (admin && !self) acts.push('<button class="btn" data-value="mute">🔇 Rendre muet</button><button class="btn" data-value="unmute">🔈 Enlever le muet</button>');
@@ -12800,7 +12909,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Enter') pick(e); })
 
 async function renderSend(toUid, toName) {
   const box = root.querySelector('.ct-body.send'), m = me();
-  if (!m) { box.innerHTML = '<p class="ct-empty">Crée un compte (ou connecte-toi) pour envoyer des KE à un autre joueur.</p>'; return; }
+  if (!m) { box.innerHTML = '<p class="ct-empty"><a href="#" class="signup-link" data-signup>Crée un compte</a> (ou connecte-toi) pour envoyer des KE à un autre joueur.</p>'; return; }
   box.innerHTML = '<p class="ct-empty">Chargement…</p>';
   const hist = await cloud.giftHistory(m.uid).catch(() => []);
   box.innerHTML = `
@@ -13289,7 +13398,7 @@ async function addByName(name) {
 /* ---------- the « Amis » tab of the chat panel ([data-friends]) ---------- */
 function panelHTML() {
   const m = me();
-  if (!m) return '<p class="ct-empty">Crée un compte (ou connecte-toi) pour ajouter des amis et voir à quoi ils jouent.</p>';
+  if (!m) return '<p class="ct-empty"><a href="#" class="signup-link" data-signup>Crée un compte</a> (ou connecte-toi) pour ajouter des amis et voir à quoi ils jouent.</p>';
   const online = __mods['live.js']?.online?.() || [];
   const game = (id) => __mods['games/index.js'].getGame(id);
   const ins = incoming.filter((r) => r.status === 'pending');
@@ -13660,14 +13769,14 @@ function tableHTML(id) {
   return `<div class="lt-head"><span class="live-dot"></span><b>🪑 Table multijoueur · ${esc(g.name)}</b><small>${here.length || (me ? 1 : 0)} / ${SEATS} joueurs assis</small></div>
     <div class="lt-seats">${seats.map((p, i) => (p ? `<div class="lt-seat${p.uid === me ? ' me' : ''}${p.win && Date.now() - p.win.t < 15000 ? ' won' : ''}"><i>Place ${i + 1}</i>${avatar(p, 'md')}<span>${pname(p)}</span><small>${winTxt(p) || (p.uid === me ? 'Toi' : `Niv. ${p.level || 1}`)}</small></div>`
       : '<div class="lt-seat free"><i>Place libre</i><span class="lk-av lk-md lk-none">＋</span><button class="btn ghost" data-invite>Inviter un ami</button></div>')).join('')}</div>
-    <p class="muted small">Chacun joue sa propre main contre la banque, à la même table : les gains de tous les joueurs assis s’affichent ici en direct.${me ? '' : ' Crée un compte pour t’asseoir à la table.'}</p>`;
+    <p class="muted small">Chacun joue sa propre main contre la banque, à la même table : les gains de tous les joueurs assis s’affichent ici en direct.${me ? '' : ' <a href="#" class="signup-link" data-signup>Crée un compte</a> pour t’asseoir à la table.'}</p>`;
 }
 const winTxt = (p) => (p.win && Date.now() - p.win.t < 120000 ? `💰 +${fmt(p.win.a)}${p.win.x >= 2 ? ` ×${String(p.win.x).replace('.', ',')}` : ''}` : '');
 
 function gameWinsHTML(id) {
   const list = wallet.state.gameHist?.[id] || [];
   const ago = (t) => { const m = Math.floor((Date.now() - t) / 60000); return m < 1 ? 'à l’instant' : m < 60 ? `il y a ${m} min` : m < 1440 ? `il y a ${Math.floor(m / 60)} h` : `il y a ${Math.floor(m / 1440)} j`; };
-  return list.length ? list.map((w) => `<li><b>+${fmt(w.amount)}</b>${w.x >= 1.01 ? `<em>×${String(w.x).replace('.', ',')}</em>` : ''}<span>${esc((w.label || '').split(' · ').slice(1).join(' · ') || 'Gain')}</span><small>${ago(w.t)}</small></li>`).join('')
+  return list.length ? list.map((w) => `<li><b>+${fmt(w.amount)}</b>${w.x >= 1.01 ? `<em>×${String(w.x).replace('.', ',')}</em>` : ''}<span>${esc((w.label || '').split(' · ').slice(1).join(' · ') || 'Gain')}</span><small>${ago(w.t)}</small>${__mods['bigwin.js']?.shareBtn?.(id, w) || ''}</li>`).join('')
     : '<li class="muted">Pas encore de gain sur ce jeu : à toi de jouer !</li>';
 }
 
@@ -14088,7 +14197,7 @@ function renderTournois(root) {
           <div class="defi-prize">🏆 ${prizes}<br>🎟️ Participation : <b>${fmt(K.part.ke)}</b> pour tous ceux qui jouent au moins <b>${K.part.spins} tours</b> sur ${esc(g.name)} pendant le tournoi. Payé automatiquement à la fin.</div>
           <div class="ref-stats"><div><b>${r?.best ? xs(r.best) : '—'}</b><small>ton record</small></div><div><b data-tour-rank>—</b><small>ta place</small></div><div><b>${r?.spins || 0} / ${K.part.spins}</b><small>tours joués</small></div><div><b data-cd-to="${live ? T.end : T.start}">${left((live ? T.end : T.start) - t)}</b><small>${live ? 'avant la fin' : 'avant le début'}</small></div></div>
           <a class="btn primary lg" href="#game-${g.id}">${live ? 'Jouer au tournoi' : 'S’entraîner sur ce jeu'}</a>
-          ${!uid() ? '<p class="muted small">En invité, tu ne figures pas au classement : crée un compte pour jouer le tournoi et être payé.</p>' : ''}
+          ${!uid() ? '<p class="muted small">En invité, tu ne figures pas au classement : <a href="#" class="signup-link" data-signup>crée un compte</a> pour jouer le tournoi et être payé.</p>' : ''}
         </div>
       </div>
       <div class="ev-cols">
@@ -14570,6 +14679,206 @@ function renderCashback(root) {
 return { renderCashback };
 })();
 
+// ---- bigwin.js ----
+__mods['bigwin.js'] = (() => {
+// Big-win picture to share (TikTok, Snap, Insta…): after a win of at least SHARE_X × the bet (bought bonuses
+// excluded), a card offers "📸 Créer mon image". The picture (1080×1920 PNG, drawn on a canvas) shows the game's
+// cover, the × multiplier, the amount, the pseudo, the logo and the site's address with the player's referral
+// link (accounts only). Phones open the share sheet with the picture; elsewhere it is downloaded.
+// The 📸 buttons of "Mes derniers gains" under each game ([data-share-win]) make the same picture later.
+
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { getGame } = __mods['games/index.js'];
+const { coverPhoto } = __mods['covers.js'];
+const { toast, modal, el } = __mods['ui.js'];
+
+const SHARE_X = 50; // auto-offer from this multiplier
+const LIST_X = 10; // 📸 button in "Mes derniers gains" from this multiplier
+const SITE = 'https://www.spinbetcaz.com/';
+const W = 1080, H = 1920;
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const uid = () => (profiles.mode === 'cloud' ? profiles.store.current : null);
+const refLink = () => (uid() ? `${SITE}?ref=${uid()}` : SITE);
+// outside the site, the KE logo is written in letters
+const ke = (n) => fmt(n).replace('', 'KE');
+const xTxt = (x) => `×${(x >= 100 ? Math.round(x) : Math.round(x * 10) / 10).toLocaleString('fr-FR')}`;
+
+function loadImg(src) {
+  return new Promise((resolve) => {
+    if (!src) return resolve(null);
+    const i = new Image();
+    i.crossOrigin = 'anonymous';
+    i.onload = () => resolve(i);
+    i.onerror = () => resolve(null);
+    i.src = src;
+  });
+}
+
+function rounded(c, x, y, w, h, r) {
+  c.beginPath();
+  c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+}
+
+// Shrinks the font until the text fits maxW.
+function fit(c, text, font, size, maxW) {
+  let s = size;
+  do { c.font = font.replace('%', `${s}px`); s -= 4; } while (c.measureText(text).width > maxW && s > 20);
+}
+
+async function draw({ game, x, amount, name }) {
+  const cv = document.createElement('canvas');
+  cv.width = W; cv.height = H;
+  const c = cv.getContext('2d');
+  const cover = coverPhoto(game.id);
+  const [c0, c1] = cover.colors || game.colors || ['#7cc8ff', '#1e293b'];
+  try { await Promise.all(['400 100px "Bebas Neue"', '900 60px Archivo', '800 40px Inter'].map((f) => document.fonts.load(f))); } catch { /* fallback fonts */ }
+  const img = await loadImg(cover.src);
+
+  // background: the game's colours, a glow behind the cover, rays
+  let g = c.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, c0); g.addColorStop(0.55, c1); g.addColorStop(1, '#05040a');
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+  c.fillStyle = 'rgba(0,0,0,.35)'; c.fillRect(0, 0, W, H);
+  c.save(); c.translate(W / 2, 760); c.globalAlpha = 0.09; c.fillStyle = '#fff';
+  for (let k = 0; k < 18; k++) { c.rotate(Math.PI / 9); c.beginPath(); c.moveTo(0, 0); c.lineTo(-70, -1400); c.lineTo(70, -1400); c.fill(); }
+  c.restore();
+  g = c.createRadialGradient(W / 2, 760, 50, W / 2, 760, 700);
+  g.addColorStop(0, 'rgba(255,255,255,.28)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  c.fillStyle = g; c.fillRect(0, 0, W, H);
+
+  // logo
+  c.textBaseline = 'middle'; c.textAlign = 'left';
+  c.font = '900 64px Archivo, Impact, sans-serif';
+  const w1 = c.measureText('SPINBET').width, w2 = c.measureText('CASINO').width, lx = (W - (84 + 20 + w1 + w2)) / 2;
+  g = c.createRadialGradient(lx + 34, 104, 6, lx + 42, 120, 50);
+  g.addColorStop(0, '#d8efff'); g.addColorStop(1, '#2f86d6');
+  c.fillStyle = g; c.beginPath(); c.arc(lx + 42, 120, 42, 0, Math.PI * 2); c.fill();
+  c.fillStyle = '#fff'; c.textAlign = 'center'; c.fillText('S', lx + 42, 123);
+  c.textAlign = 'left'; c.fillText('SPINBET', lx + 104, 123);
+  c.fillStyle = '#7cc8ff'; c.fillText('CASINO', lx + 104 + w1, 123);
+
+  // cover (3:4), cropped like the lobby posters
+  const fw = 680, fh = 860, fx = (W - fw) / 2, fy = 230;
+  c.save(); c.shadowColor = c0; c.shadowBlur = 90; c.fillStyle = '#000'; rounded(c, fx, fy, fw, fh, 30); c.fill(); c.restore();
+  c.save(); rounded(c, fx, fy, fw, fh, 30); c.clip();
+  if (img) {
+    const [t, b] = cover.crop, sy = img.naturalHeight * t, sh = img.naturalHeight * (b - t), sw = img.naturalWidth;
+    const k = Math.max(fw / sw, fh / sh), dw = sw * k, dh = sh * k;
+    c.drawImage(img, 0, sy, sw, sh, fx + (fw - dw) / 2, fy, dw, dh);
+  } else {
+    g = c.createLinearGradient(0, fy, 0, fy + fh); g.addColorStop(0, c0); g.addColorStop(1, c1);
+    c.fillStyle = g; c.fillRect(fx, fy, fw, fh);
+  }
+  g = c.createLinearGradient(0, fy + fh * 0.62, 0, fy + fh);
+  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.85)');
+  c.fillStyle = g; c.fillRect(fx, fy, fw, fh);
+  c.fillStyle = '#fff'; c.textAlign = 'center';
+  fit(c, game.name.toUpperCase(), '400 % "Bebas Neue", Impact, sans-serif', 110, fw - 60);
+  c.fillText(game.name.toUpperCase(), W / 2, fy + fh - 70);
+  c.restore();
+  c.lineWidth = 4; c.strokeStyle = 'rgba(255,255,255,.35)'; rounded(c, fx, fy, fw, fh, 30); c.stroke();
+
+  // GROS GAIN · ×523 · +12 345 KE · par pseudo
+  c.textAlign = 'center';
+  c.font = '800 44px Inter, Arial, sans-serif'; c.fillStyle = '#fde68a';
+  c.fillText(x >= 1000 ? '🔥  MÉGA GAIN  🔥' : x >= 100 ? '🔥  ÉNORME GAIN  🔥' : '🎉  GROS GAIN  🎉', W / 2, 1170);
+  const xs = xTxt(x);
+  fit(c, xs, '400 % "Bebas Neue", Impact, sans-serif', 330, W - 120);
+  g = c.createLinearGradient(0, 1220, 0, 1500);
+  g.addColorStop(0, '#fff7d6'); g.addColorStop(0.5, '#fbbf24'); g.addColorStop(1, '#b45309');
+  c.save(); c.shadowColor = 'rgba(251,191,36,.7)'; c.shadowBlur = 50; c.fillStyle = g; c.fillText(xs, W / 2, 1365); c.restore();
+  c.lineWidth = 6; c.strokeStyle = 'rgba(0,0,0,.35)'; c.strokeText(xs, W / 2, 1365); c.fillStyle = g; c.fillText(xs, W / 2, 1365);
+  c.fillStyle = '#fff';
+  fit(c, `+${ke(amount)}`, '900 % Archivo, Impact, sans-serif', 96, W - 120);
+  c.fillText(`+${ke(amount)}`, W / 2, 1560);
+  c.fillStyle = 'rgba(255,255,255,.8)';
+  fit(c, `par ${name}`, '700 % Inter, Arial, sans-serif', 50, W - 160);
+  c.fillText(`par ${name}`, W / 2, 1650);
+
+  // bottom band: the site and the referral link
+  g = c.createLinearGradient(0, 1730, 0, H); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.6)');
+  c.fillStyle = g; c.fillRect(0, 1730, W, H - 1730);
+  c.fillStyle = 'rgba(255,255,255,.75)'; c.font = '700 36px Inter, Arial, sans-serif';
+  c.fillText('Joue gratuitement sur', W / 2, 1765);
+  c.fillStyle = '#7cc8ff'; c.font = '900 64px Archivo, Impact, sans-serif';
+  c.fillText('www.spinbetcaz.com', W / 2, 1830);
+  if (uid()) {
+    c.fillStyle = 'rgba(255,255,255,.6)';
+    fit(c, `Mon lien : ${refLink().replace('https://', '')}`, '600 % Inter, Arial, sans-serif', 30, W - 80);
+    c.fillText(`Mon lien : ${refLink().replace('https://', '')}`, W / 2, 1888);
+  }
+  return new Promise((resolve) => cv.toBlob((b) => resolve(b), 'image/png'));
+}
+
+// Opens the picture: preview, share (phones), download, copy the link.
+async function openShare(win) {
+  const game = getGame(win.game);
+  if (!game) return;
+  const name = profiles.current?.name || 'Invité';
+  const box = await (async () => {
+    const wait = el('div', 'bw-wait', '<span class="bw-spin"></span> Création de ton image…');
+    document.body.appendChild(wait);
+    try { return await draw({ game, x: win.x, amount: win.amount, name }); } finally { wait.remove(); }
+  })().catch((e) => { console.error(e); return null; });
+  if (!box) return toast('Impossible de créer l’image sur cet appareil', 'warn');
+  const url = URL.createObjectURL(box), file = `spinbet-${game.id}-x${Math.round(win.x)}.png`;
+  const text = `${xTxt(win.x)} sur ${game.name} ! 🎰 Joue gratuitement sur SpinBet Casino : ${refLink()}`;
+  const f = new File([box], file, { type: 'image/png' });
+  const canFiles = !!navigator.canShare?.({ files: [f] });
+  const p = modal(`<div class="bw-modal"><h3>📸 Ton image de gros gain</h3>
+      <img class="bw-img" src="${url}" alt="Image de ton gain ${esc(xTxt(win.x))} sur ${esc(game.name)}">
+      <p class="muted small">Poste-la sur TikTok, Snap ou Insta${uid() ? ' : ton lien de parrainage est dessus, chaque ami qui s’inscrit te rapporte des KE.' : '.'}</p>
+      <div class="bw-acts">${canFiles ? '<button class="btn primary" data-bw-share>Partager</button>' : ''}<a class="btn ${canFiles ? 'ghost' : 'primary'}" href="${url}" download="${file}">Télécharger</a><button class="btn ghost" data-bw-copy>Copier mon lien</button></div>
+      ${uid() ? '' : '<p class="muted small">Crée un compte pour ajouter ton lien de parrainage sur l’image. <a href="#" class="signup-link" data-signup="💾 Crée ton compte" data-value="">Créer mon compte</a></p>'}
+    </div>`, { cls: 'bw-box' });
+  const root = document.querySelector('.bw-modal');
+  root?.querySelector('[data-bw-share]')?.addEventListener('click', async () => {
+    try { await navigator.share({ files: [f], text }); } catch (e) { if (e?.name !== 'AbortError') toast('Partage impossible : télécharge l’image', 'warn'); }
+  });
+  root?.querySelector('[data-bw-copy]')?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(text); toast('Lien copié : colle-le sous ta vidéo ou ta photo !', 'ok'); } catch { prompt('Copie ce texte :', text); }
+  });
+  await p;
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// The card shown after a big win.
+function offer(win) {
+  if (document.querySelector('.gate, .win-share')) return;
+  const game = getGame(win.game);
+  if (!game) return;
+  const card = el('div', 'ad-offer win-share', `<button class="sn-x" data-x aria-label="Fermer">✕</button>
+    <b>📸 ${esc(xTxt(win.x))} sur ${esc(game.name)} !</b>
+    <p>Fais-en une image à partager sur TikTok, Snap ou Insta.</p>
+    <div><button class="btn primary" data-go>Créer mon image</button><button class="btn ghost" data-x>Non merci</button></div>`);
+  document.body.appendChild(card);
+  card.querySelectorAll('[data-x]').forEach((b) => { b.onclick = () => card.remove(); });
+  card.querySelector('[data-go]').onclick = () => { card.remove(); openShare(win); };
+  setTimeout(() => card.remove(), 15000);
+}
+
+let last = 0;
+addEventListener('sb:roundend', (e) => {
+  const d = e.detail || {};
+  if (d.bought || !(d.x >= SHARE_X) || !(d.win > 0) || Date.now() - last < 30000) return;
+  last = Date.now();
+  setTimeout(() => offer({ game: d.game, x: d.x, amount: d.win }), 2800); // after the win celebration
+});
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-share-win]');
+  if (!b) return;
+  e.preventDefault();
+  openShare({ game: b.dataset.shareWin, x: +b.dataset.x, amount: +b.dataset.a });
+});
+const shareBtn = (gid, w) => (w.x >= LIST_X ? `<button class="gw-share" data-share-win="${esc(gid)}" data-x="${w.x}" data-a="${w.amount}" title="Créer une image à partager" aria-label="Créer une image à partager">📸</button>` : '');
+
+return { openShare, shareBtn, SHARE_X };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -14785,6 +15094,10 @@ body:not(.ml-off) .hero-art { transform: translate3d(calc(var(--mx) * 18px), cal
 body:not(.ml-off) .hero-copy { transform: translate3d(calc(var(--mx) * -6px), calc(var(--my) * -4px), 0); transition: transform .25s ease-out; }
 body:not(.ml-off) .hero-copy h1 em { background: linear-gradient(90deg, currentColor 20%, #fff7c2 50%, currentColor 80%); background-size: 250% 100%;
   -webkit-background-clip: text; background-clip: text; }
+/* the hero subtitle's words are animated one by one (inline blocks): each word carries the gradient, otherwise the
+   subtitle stays invisible */
+.hero-copy h1 em .ml-word { background: linear-gradient(90deg, var(--gold), #f97316); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.upd-hero .hero-copy h1 em .ml-word { background: linear-gradient(90deg, #fff, color-mix(in srgb, var(--ua) 55%, #fff)); -webkit-background-clip: text; background-clip: text; }
 @keyframes mlTextShine { from { background-position: 150% 0; } to { background-position: -100% 0; } }
 .ml-word { display: inline-block; opacity: 0; transform: translateY(.6em) rotate(4deg); filter: blur(6px); animation: mlWord .7s cubic-bezier(.2, .8, .2, 1) forwards; }
 @keyframes mlWord { to { opacity: 1; transform: none; filter: none; } }
@@ -15840,12 +16153,26 @@ body.fs-on .live-tick { display: none; }
 .lt-seat.free .btn { height: 28px; padding: 0 10px; font-size: 11px; border-radius: 999px; }
 .game-wins { margin-top: 14px; }
 .gw-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.gw-list li { display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: var(--panel-2); }
+.gw-list li { display: grid; grid-template-columns: auto auto 1fr auto auto; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: var(--panel-2); }
 .gw-list li.muted { display: block; }
 .gw-list b { font: 800 15px KeCoin, Inter, sans-serif; color: var(--gold); }
 .gw-list em { font-style: normal; font-weight: 800; font-size: 12px; padding: 1px 7px; border-radius: 999px; background: rgba(124, 200, 255, .15); color: #bfe6ff; }
 .gw-list span { color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gw-list small { color: var(--muted); font-size: 12px; }
+.gw-share { width: 32px; height: 32px; border-radius: 3px; background: var(--panel-3); font-size: 16px; line-height: 1; }
+.gw-share:hover { background: var(--panel); transform: scale(1.08); }
+/* big-win picture (bigwin.js) */
+.win-share { border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); }
+.win-share > b { font: 900 17px KeCoin, Archivo, sans-serif; padding-right: 26px; }
+.bw-box { width: min(440px, 100%); }
+.bw-modal h3 { margin: 0 0 12px; }
+.bw-img { display: block; width: min(100%, 300px); aspect-ratio: 9 / 16; margin: 0 auto 12px; border-radius: 6px; box-shadow: 0 12px 30px rgba(0, 0, 0, .5); background: #000; }
+.bw-modal p { margin: 0 0 12px; }
+.bw-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.bw-acts .btn { flex: 1 1 auto; justify-content: center; text-align: center; }
+.bw-wait { position: fixed; z-index: 450; left: 50%; bottom: 120px; transform: translateX(-50%); padding: 12px 18px; border-radius: 4px; background: var(--panel); border: 1px solid var(--line); box-shadow: var(--shadow); font-weight: 700; display: flex; gap: 10px; align-items: center; }
+.bw-spin { width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--green); animation: bwSpin .8s linear infinite; }
+@keyframes bwSpin { to { transform: rotate(360deg); } }
 .wh-boost { margin-top: 10px; border-radius: 999px; }
 .wh-mult { font-style: normal; margin-left: 6px; padding: 1px 8px; border-radius: 999px; background: #fbbf24; color: #1a1205; font-weight: 900; }
 .wh-modal .btn + .btn { margin-top: 8px; }

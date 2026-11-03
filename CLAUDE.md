@@ -51,6 +51,17 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - `duels.js` (page `#duels`) : duels entre amis sur une machine à sous (20/50/100 tours, mise de duel, 24 h).
 - `cashback.js` (page `#cashback`) : chaque jour, 5 à 25 % des pertes de la veille selon le total misé.
 
+## Arrivée des visiteurs et partage
+
+- **Pas d'écran de connexion à l'arrivée** (`hud.js`) : un nouveau visiteur joue tout de suite en invité. La création
+  de compte est proposée au bon moment (carte « Garde tes gains » après un gain ≥ ×25 ou après 20, 60, 150, 300
+  parties, `NUDGE`), par la puce du joueur en haut (« 💾 Sauvegarder ») et par tout bouton `[data-signup]`. Un compte
+  créé depuis le mode invité garde le solde et la progression de l'invité (`openAccount` dans `profile.js`).
+  Un visiteur venu d'un lien de parrainage voit directement l'écran « Créer un compte ».
+- **Image de gros gain** (`bigwin.js`) : après un gain ≥ ×50 la mise (bonus achetés exclus), et par les boutons 📸 de
+  « Mes gains récents » sous chaque jeu (dès ×10) : image 1080×1920 (couverture du jeu, ×, montant, pseudo, logo,
+  adresse du site et lien de parrainage des comptes) à partager ou télécharger.
+
 ## Suivi et administration
 
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu
@@ -81,7 +92,8 @@ Chaque fois qu'un jeu est modifié ou ajouté à la demande du propriétaire, aj
 
 La page de la catégorie du jeu (Machines à sous, Roues & tables, Jeux rapides) affiche alors cette mise à jour en
 grande affiche, et la vignette du jeu porte l'étiquette « MISE À JOUR » ou « NOUVEAU » pendant 14 jours.
-Textes en français, pour les joueurs.
+Textes en français, pour les joueurs : pas de mots techniques (WebGL, PixiJS, RTP…), dire ce que le joueur voit
+(« Rouleaux plus fluides et plus spectaculaires »).
 
 ## Gains
 
