@@ -1,0 +1,42 @@
+# Les vrais matchs des paris pour rire (paris.js) : tools/matchs/fetch.mjs, rangés sur la branche « data »
+# (paris/matchs.json). Le site les lit sur raw.githubusercontent.com : pas de redéploiement à chaque score.
+name: Matchs
+
+on:
+  schedule:
+    - cron: '*/30 11-23 * * *'
+    - cron: '0 0-10 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: matchs
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: site
+      - name: Branche data
+        run: |
+          git clone --depth 1 --branch data "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" data 2>/dev/null || {
+            mkdir data && cd data && git init -q -b data && git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"; }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Lire les matchs
+        run: node site/tools/matchs/fetch.mjs data/paris/matchs.json
+      - name: Enregistrer
+        working-directory: data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add paris/matchs.json
+          git commit -qm "Matchs $(date -u +%Y-%m-%dT%H:%M)" || { echo "Rien de nouveau"; exit 0; }
+          git push -q origin HEAD:data
