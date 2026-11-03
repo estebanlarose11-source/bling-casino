@@ -15334,7 +15334,7 @@ const { sfx } = __mods['audio.js'];
 const { fx } = __mods['fx.js'];
 
 const URL_ = 'https://raw.githubusercontent.com/estebanlarose11-source/bling-casino/data/paris/matchs.json';
-const MAX_BET = 10000, CLOSE_MS = 60000;
+const MAX_BET = 10000, CLOSE_MS = 60000, FIN_MAX = 10;
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const ox = (o) => o.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const hm = (t) => new Date(t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -15444,7 +15444,9 @@ function matchHTML(m) {
 }
 function paintPage() {
   if (!root?.isConnected) return;
-  const list = (data?.matches || []).filter((m) => m.state !== 'post' || Date.now() - m.start < 864e5);
+  const all = data?.matches || [], dk = (t) => new Date(t).toDateString(), days = [0, 1, 2].map((k) => dk(Date.now() + k * 864e5));
+  const fin = all.filter((m) => m.state === 'post' && Date.now() - m.start < 36 * 3600e3).sort((a, b) => b.start - a.start).slice(0, FIN_MAX);
+  const list = [...all.filter((m) => m.state === 'in' || (m.state === 'pre' && days.includes(dk(m.start)))).sort((a, b) => a.start - b.start), ...fin];
   const leagues = [...new Set(list.map((m) => m.league))];
   const shown = list.filter((m) => league === 'all' || m.league === league);
   const groups = {};
@@ -15466,7 +15468,8 @@ function paintPage() {
 function renderParis(r) {
   root = r;
   paintPage();
-  load(true).then(paintPage);
+  const u = data?.updated;
+  load(true).then(() => { if (data?.updated !== u || !u) paintPage(); });
 }
 document.addEventListener('click', (e) => {
   if (!root?.isConnected) return;
@@ -15477,7 +15480,7 @@ document.addEventListener('click', (e) => {
   const l = e.target.closest('[data-league]');
   if (l) { e.preventDefault(); league = l.dataset.league; paintPage(); }
 });
-setInterval(() => { if (root?.isConnected) load(true).then(paintPage); }, 120000);
+setInterval(() => { if (!root?.isConnected) return; const u = data?.updated; load(true).then(() => { if (data?.updated !== u) paintPage(); }); }, 120000);
 // pay the bets of finished matches on arrival, and show tonight's matches on the home page
 profiles.ready?.then(() => setTimeout(() => load(), 2500));
 profiles.addEventListener('change', () => setTimeout(settle, 1500));
@@ -15656,7 +15659,7 @@ setInterval(settle, 120000);
 E.addHome((t) => {
   const B = battleAt(t), g = getGame(B.game), joined = !!local()[B.bid]?.joined;
   if (B.m === 4 || (B.m === 0 && B.start - t > 30 * 60000)) return '';
-  return `<a class="ev-card ev-br" href="#battle" style="--ac:${g.colors[0]}"><span class="ev-ico">⚔️</span><div><small>${B.m ? '<i class="ev-dot"></i>' : ''}BATTLE ROYALE${B.m ? ` · MANCHE ${B.m}/3` : ''}</small><b>${esc(g.name)}</b><em>${B.m ? `fin de manche dans ${E.left(B.start + B.m * MANCHE - t)}` : `début dans ${E.left(B.start - t)}`} · ${joined ? 'tu es inscrit' : `entrée ${fmt(ENTRY)}`}</em></div><span class="ev-go">${joined ? 'Voir ›' : 'Entrer ›'}</span></a>`;
+  return `<a class="ev-card ev-br" href="#battle" style="--ac:${g.colors[0]}"><span class="ev-ico">⚔️</span><div><small>${B.m ? '<i class="ev-dot"></i>' : ''}BATTLE ROYALE${B.m ? ` · ${B.m}/3` : ''}</small><b>${esc(g.name)}</b><em>${B.m ? `fin de manche dans ${E.left(B.start + B.m * MANCHE - t)}` : `début dans ${E.left(B.start - t)}`} · ${joined ? 'tu es inscrit' : `entrée ${fmt(ENTRY)}`}</em></div><span class="ev-go">${joined ? 'Voir ›' : 'Entrer ›'}</span></a>`;
 });
 E.addGamePill((gid, t) => {
   const B = battleAt(t);
@@ -15830,7 +15833,7 @@ profiles.addEventListener('change', () => setTimeout(settle, 1500));
 
 E.addHome((t) => {
   const k = target(t), mine = profiles.current && ticketFor(k);
-  return `<a class="ev-card ev-loto" href="#loto"><span class="ev-ico">🎱</span><div><small>LOTO · TIRAGE ${dayName(k).toUpperCase()} À 21 H 30</small><b>${fmt(JACKPOT)} à gagner</b><em>${mine ? `ton ticket : ${mine.n.join(' - ')}` : `5 numéros sur 30 · ticket ${fmt(TICKET)}`} · dans ${E.left(drawTime(k) - t)}</em></div><span class="ev-go">${mine ? 'Voir ›' : 'Jouer ›'}</span></a>`;
+  return `<a class="ev-card ev-loto" href="#loto"><span class="ev-ico">🎱</span><div><small>LOTO · ${dayName(k).toUpperCase()} 21 H 30</small><b>${fmt(JACKPOT)}</b><em>${mine ? `ton ticket : ${mine.n.join(' - ')}` : `à gagner · ticket ${fmt(TICKET)}`} · dans ${E.left(drawTime(k) - t)}</em></div><span class="ev-go">${mine ? 'Voir ›' : 'Jouer ›'}</span></a>`;
 });
 
 return { renderLoto, load, settle, target, PRIZES };
@@ -16560,15 +16563,15 @@ html.light .slot small { color: inherit; }
 <style id="events-css">
 /* ---------- Événements : tournois, happy hour, jackpot commun, duels, cashback ---------- */
 .ev-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; margin-right: 6px; vertical-align: 1px; box-shadow: 0 0 0 0 rgba(239, 68, 68, .7); animation: liveDot 1.4s infinite; }
-.ev-home { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.ev-home { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 10px; margin-bottom: 14px; }
 .ev-home:empty { display: none; }
 .ev-card { --ac: #7cc8ff; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 6px; color: var(--text); text-decoration: none; min-width: 0;
   background: linear-gradient(120deg, color-mix(in srgb, var(--ac) 22%, var(--panel)), var(--panel)); border: 1px solid color-mix(in srgb, var(--ac) 45%, var(--line)); }
 .ev-card:hover { border-color: var(--ac); }
 .ev-card > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .ev-card small { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); }
-.ev-card b { font: 900 clamp(17px, 2.2vw, 21px) 'Bebas Neue', Impact, sans-serif; letter-spacing: .5px; line-height: 1.1; overflow-wrap: anywhere; }
-.ev-card em { font-style: normal; font-size: 12.5px; color: var(--muted); }
+.ev-card b { font: 900 clamp(17px, 2.2vw, 21px) 'Bebas Neue', Impact, sans-serif; letter-spacing: .5px; line-height: 1.1; overflow-wrap: normal; }
+.ev-card em { font-style: normal; font-size: 12.5px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .ev-ico { font-size: 30px; flex: none; }
 .ev-go { flex: none; font-weight: 800; font-size: 13px; padding: 6px 10px; border-radius: 4px; background: color-mix(in srgb, var(--ac) 30%, transparent); }
 .ev-card.ev-live { box-shadow: 0 0 0 1px color-mix(in srgb, var(--ac) 40%, transparent), 0 8px 24px color-mix(in srgb, var(--ac) 22%, transparent); }
