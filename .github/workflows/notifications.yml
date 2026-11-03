@@ -1,0 +1,41 @@
+# Notifications SpinBet sur les téléphones (gratuit) : voir tools/push/send.mjs.
+# Pour envoyer un message à tout le monde : onglet Actions → « Notifications » → Run workflow.
+name: Notifications
+
+on:
+  schedule:
+    - cron: '35 11,12 * * *'   # roue du jour, 13 h 35 à Paris (heure d'été / d'hiver)
+    - cron: '35 18,19 * * *'   # tournoi du soir, 20 h 35 à Paris
+    - cron: '35 9,10 * * 6'    # tournoi du week-end, samedi 11 h 35 à Paris
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Titre (ex. 🎄 La machine de Noël est arrivée !)'
+        required: true
+        default: 'SpinBet Casino'
+      body:
+        description: 'Message'
+        required: true
+      url:
+        description: 'Page à ouvrir (ex. https://www.spinbetcaz.com/#game-noel)'
+        required: false
+        default: 'https://www.spinbetcaz.com/'
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+        working-directory: tools/push
+      - run: node tools/push/send.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          PUSH_TITLE: ${{ github.event.inputs.title }}
+          PUSH_BODY: ${{ github.event.inputs.body }}
+          PUSH_URL: ${{ github.event.inputs.url }}

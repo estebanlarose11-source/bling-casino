@@ -1,6 +1,6 @@
 // SpinBet Casino service worker: makes the site installable and opens it even on a weak connection.
 // Pages are network-first (updates show up right away), the app's own images are cache-first.
-const CACHE = 'spinbet-v32';
+const CACHE = 'spinbet-v33';
 const CORE = ['./', './index.html', './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -32,4 +32,29 @@ self.addEventListener('fetch', (e) => {
     if (res.ok) { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(req, copy)); }
     return res;
   })));
+});
+
+// Phone notifications (push.js on the site, sent by tools/push/send.mjs): { title, body, url, tag }.
+self.addEventListener('push', (e) => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data && e.data.text() }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'SpinBet Casino', {
+    body: d.body || '',
+    icon: './assets/icon-192.png',
+    badge: './assets/icon-192.png',
+    tag: d.tag || 'spinbet',
+    renotify: !!d.tag,
+    data: { url: d.url || './' },
+  }));
+});
+
+// A tap on the notification: brings the open site forward on the right page, or opens it.
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const url = new URL(e.notification.data?.url || './', self.registration.scope).href;
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+    const open = list.find((c) => c.url.startsWith(self.registration.scope));
+    if (open) return open.focus().then((c) => (c && 'navigate' in c ? c.navigate(url) : c));
+    return self.clients.openWindow(url);
+  }));
 });

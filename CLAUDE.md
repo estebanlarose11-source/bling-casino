@@ -69,6 +69,17 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   « Mes gains récents » sous chaque jeu (dès ×10) : image 1080×1920 (couverture du jeu, ×, montant, pseudo, logo,
   adresse du site et lien de parrainage des comptes) à partager ou télécharger.
 
+## Notifications sur le téléphone (gratuit)
+
+- Site : `push.js` (bouton sur la page `#appli`, carte « 🔔 On te prévient ? » après 15 parties ou 30 s dans l'appli
+  installée, une fois par semaine au plus) → abonnement enregistré dans Firestore `push/{sha256 de l'adresse}`.
+  `sw.js` affiche les notifications et ouvre la bonne page. iPhone : seulement depuis l'icône de l'écran d'accueil.
+- Envoi : `tools/push/send.mjs`, lancé par GitHub Actions (`.github/workflows/notifications.yml`) : roue du jour
+  13 h 35, tournoi du soir 20 h 35 (avec la machine du jour, lue dans `ROT`), tournoi du week-end samedi 11 h 35
+  (heure de Paris). Message libre : Actions → « Notifications » → Run workflow.
+- Secrets GitHub nécessaires : `FIREBASE_SERVICE_ACCOUNT` (clé JSON du compte de service Firebase) et
+  `VAPID_PRIVATE_KEY` (jamais dans le dépôt ; la clé publique est `VAPID_PUBLIC` dans `push.js` et `send.mjs`).
+
 ## Suivi et administration
 
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu

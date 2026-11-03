@@ -889,6 +889,9 @@ body.gated { overflow: hidden; }
 .gate-title { font: 900 22px/1.2 KeCoin, Archivo, sans-serif; margin: -4px 0 14px; color: var(--gold); }
 /* guests: "save your KE" card after a big win or a few rounds (same place as the rewarded-ad offer) */
 .signup-link { color: var(--green); font-weight: 700; text-decoration: underline; }
+.push-offer { border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); }
+.push-offer > b { font: 900 17px KeCoin, Archivo, sans-serif; }
+.app-push .btn { margin-top: 4px; }
 .save-nudge { border-color: color-mix(in srgb, var(--green) 55%, var(--line)); }
 .save-nudge > b { font: 900 17px KeCoin, Archivo, sans-serif; }
 .save-nudge .sn-x { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; color: var(--muted); }
@@ -4852,6 +4855,10 @@ const cloud = {
   // JSON round trip: Firestore refuses undefined values.
   async save(uid, data) { await (await users()).doc(uid).set(JSON.parse(JSON.stringify(data))); },
   // Public leaderboard: one small entry per account (leaderboard/{uid}), readable by everyone.
+  // Phone notifications (push.js): push/{sha-256 of the address} = { endpoint, p256dh, auth, at, uid? }; nobody reads them
+  // from the site, only the sender (tools/push/send.mjs, admin access).
+  async savePush(id, doc) { await (await init()).db.collection('push').doc(id).set(doc); },
+  async deletePush(id) { await (await init()).db.collection('push').doc(id).delete(); },
   async saveBoard(uid, entry) { await (await init()).db.collection('leaderboard').doc(uid).set(entry); },
   async top(field, n) {
     const q = await (await init()).db.collection('leaderboard').orderBy(field, 'desc').limit(n).get();
@@ -11822,6 +11829,8 @@ function renderApp(root) {
       </div>
     </section>
 
+    <section class="panel app-push" data-push-panel></section>
+
     <section class="panel app-guide${ios ? ' mine' : ''}" id="iphone">
       <h2>📱 Sur iPhone et iPad</h2>
       <p class="muted">Ouvre le site dans <b>Safari</b>, puis :</p>
@@ -11846,6 +11855,8 @@ function renderApp(root) {
       <h2>💻 Sur ordinateur</h2>
       <p class="muted">Dans Chrome ou Edge, clique sur l’icône d’installation à droite de la barre d’adresse, ou sur le bouton <b>Installer l’application</b> ci-dessus.</p>
     </section>`;
+  const pp = root.querySelector('[data-push-panel]');
+  if (pp) __mods['push.js'].paintPanel(pp);
   root.querySelector('[data-install]')?.addEventListener('click', async () => {
     if (deferred) {
       deferred.prompt();
@@ -14697,6 +14708,126 @@ function renderCashback(root) {
 }
 
 return { renderCashback };
+})();
+
+// ---- push.js ----
+__mods['push.js'] = (() => {
+// Notifications on the phone (Web Push, free): the player turns them on (#appli page, or the card offered after a
+// few rounds); the browser gives a subscription that is saved in Firestore push/{sha-256 of its address}. The
+// sender (tools/push/send.mjs, run by GitHub Actions, .github/workflows/notifications.yml) sends at set times:
+// roue du jour 13 h 35, tournoi du soir 20 h 35, tournoi du week-end samedi 11 h 35 (heure de Paris), plus the
+// messages the owner types in GitHub ("Run workflow"). sw.js shows them and opens the site on a tap.
+// iPhone: only once the site is added to the home screen and opened from there (iOS 16.4 and later).
+
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet } = __mods['wallet.js'];
+const { toast, el } = __mods['ui.js'];
+
+const VAPID_PUBLIC = 'BP746E-M7ljwxT2b21kU4_8qfdP7kRak9DpN4tVX-RQWdmulewPHld68wLN067Dz8l6CLRUixse-3XM4r4Anv8c';
+const ASK_KEY = 'spinbet_push_ask'; // last time the card was dismissed
+const ASK_AFTER = 15; // rounds played in this visit before the card
+const ASK_GAP = 7 * 864e5;
+
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const standalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const get = (k) => { try { return +localStorage.getItem(k) || 0; } catch { return 0; } };
+const put = (k, v) => { try { localStorage.setItem(k, String(v)); } catch { /* ignore */ } };
+
+const b64ToBytes = (s) => { const p = '='.repeat((4 - (s.length % 4)) % 4), raw = atob((s + p).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(raw, (c) => c.charCodeAt(0)); };
+const sha256 = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
+const reg = async () => ('serviceWorker' in navigator ? navigator.serviceWorker.getRegistration() : null);
+
+// 'on' | 'off' | 'denied' | 'install' (iPhone: add to the home screen first) | 'unsupported'
+async function state() {
+  if (!cloud.enabled || !window.isSecureContext || !('serviceWorker' in navigator)) return 'unsupported';
+  if (!('PushManager' in window) || !('Notification' in window)) return isIOS() && !standalone() ? 'install' : 'unsupported';
+  if (Notification.permission === 'denied') return 'denied';
+  const r = await reg().catch(() => null);
+  if (!r) return 'unsupported';
+  const sub = await r.pushManager.getSubscription().catch(() => null);
+  return sub && Notification.permission === 'granted' ? 'on' : 'off';
+}
+
+async function save(sub) {
+  const j = sub.toJSON(), id = await sha256(j.endpoint);
+  const doc = { endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, at: Date.now() };
+  const uid = profiles.mode === 'cloud' ? profiles.store.current : null;
+  if (uid) doc.uid = uid;
+  await cloud.savePush(id, doc);
+  put('spinbet_push_saved', Date.now());
+}
+
+// Must run from a tap (iPhone asks for it).
+async function enable() {
+  const st = await state();
+  if (st === 'install') { location.hash = 'appli'; toast('Sur iPhone : ajoute d’abord SpinBet à ton écran d’accueil, puis ouvre-le depuis l’icône', 'info'); return false; }
+  if (st === 'unsupported') { toast('Ce navigateur ne reçoit pas les notifications', 'warn'); return false; }
+  if (st === 'denied') { toast('Les notifications sont bloquées : autorise-les dans les réglages du navigateur pour SpinBet', 'warn'); return false; }
+  try {
+    if ((await Notification.requestPermission()) !== 'granted') { toast('Notifications non autorisées', 'warn'); return false; }
+    const r = await reg();
+    const sub = (await r.pushManager.getSubscription()) || await r.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(VAPID_PUBLIC) });
+    await save(sub);
+    toast('🔔 Notifications activées : on te prévient du tournoi du soir et de ta roue du jour', 'ok');
+    return true;
+  } catch (e) {
+    console.error(e);
+    toast('Impossible d’activer les notifications sur cet appareil', 'warn');
+    return false;
+  }
+}
+
+async function disable() {
+  try {
+    const sub = await (await reg())?.pushManager.getSubscription();
+    if (sub) { const id = await sha256(sub.endpoint); await sub.unsubscribe(); await cloud.deletePush(id).catch(() => {}); }
+    toast('🔕 Notifications coupées', 'info');
+  } catch (e) { console.error(e); }
+}
+
+// The panel of the #appli page ([data-push-panel]).
+async function paintPanel(box) {
+  const st = await state();
+  const txt = {
+    on: ['✅ Les notifications sont activées sur cet appareil.', '<button class="btn ghost" data-push-off>Couper les notifications</button>'],
+    off: ['On te prévient quand le <b>tournoi du soir</b> commence, quand ta <b>roue du jour</b> est prête et des grandes nouveautés. Une ou deux par jour, pas plus.', '<button class="btn primary lg" data-push-on>🔔 Activer les notifications</button>'],
+    denied: ['Les notifications sont bloquées pour SpinBet. Autorise-les dans les réglages du navigateur (le cadenas à côté de l’adresse, ou Réglages → Notifications sur le téléphone), puis reviens ici.', ''],
+    install: ['Sur iPhone, les notifications marchent quand SpinBet est <b>sur ton écran d’accueil</b> : suis les 3 étapes ci-dessous, ouvre SpinBet depuis son icône, puis reviens sur cette page pour les activer.', ''],
+    unsupported: ['Ce navigateur ne peut pas recevoir les notifications. Sur Android, ouvre le site dans Chrome ; sur iPhone, ajoute-le à l’écran d’accueil (iOS 16.4 ou plus récent).', ''],
+  }[st];
+  box.innerHTML = `<h2>🔔 Notifications</h2><p class="muted">${txt[0]}</p>${txt[1]}`;
+  box.querySelector('[data-push-on]')?.addEventListener('click', async () => { await enable(); paintPanel(box); });
+  box.querySelector('[data-push-off]')?.addEventListener('click', async () => { await disable(); paintPanel(box); });
+}
+
+// The card offered once per week at most, after ASK_AFTER rounds (or in the installed app after 30 s).
+async function offer() {
+  if (document.querySelector('.gate, .ad-offer') || Date.now() - get(ASK_KEY) < ASK_GAP) return;
+  if ((await state()) !== 'off') return;
+  const card = el('div', 'ad-offer push-offer', `<button class="sn-x" data-x aria-label="Fermer">✕</button>
+    <b>🔔 On te prévient ?</b>
+    <p>Une notification quand le tournoi du soir commence et quand ta roue du jour est prête. Une ou deux par jour, pas plus.</p>
+    <div><button class="btn primary" data-go>Activer</button><button class="btn ghost" data-x>Non merci</button></div>`);
+  document.body.appendChild(card);
+  const close = () => { card.remove(); put(ASK_KEY, Date.now()); };
+  card.querySelectorAll('[data-x]').forEach((b) => { b.onclick = close; });
+  card.querySelector('[data-go]').onclick = async () => { close(); await enable(); };
+}
+let rounds = 0;
+wallet.addEventListener('wager', () => { if (++rounds === ASK_AFTER) setTimeout(offer, 4000); });
+if (standalone()) setTimeout(offer, 30000);
+
+// Already on: refresh the saved subscription once a day (it can change, and an account may have logged in since).
+async function refresh() {
+  if ((await state()) !== 'on' || Date.now() - get('spinbet_push_saved') < 864e5) return;
+  const sub = await (await reg())?.pushManager.getSubscription();
+  if (sub) save(sub).catch((e) => console.error(e));
+}
+setTimeout(() => refresh().catch(() => {}), 8000);
+profiles.addEventListener('change', () => { put('spinbet_push_saved', 0); setTimeout(() => refresh().catch(() => {}), 3000); });
+
+return { state, enable, disable, paintPanel };
 })();
 
 // ---- bigwin.js ----

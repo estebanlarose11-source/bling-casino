@@ -68,6 +68,22 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Notifications sur le téléphone : push/{sha256 de l'adresse} = { endpoint, p256dh, auth, at, uid? }.
+    // Écrit par le navigateur du joueur (même invité) ; l'id doit être le SHA-256 de l'adresse, donc impossible
+    // d'écrire n'importe quoi. Personne ne les lit depuis le site : seul l'envoyeur (compte de service) les lit.
+    match /push/{id} {
+      allow create, update: if request.resource.data.keys().hasOnly(['endpoint', 'p256dh', 'auth', 'at', 'uid'])
+        && request.resource.data.endpoint is string && request.resource.data.endpoint.size() < 1000
+        && request.resource.data.endpoint.matches('https://.+')
+        && hashing.sha256(request.resource.data.endpoint).toHexString().lower() == id
+        && request.resource.data.p256dh is string && request.resource.data.p256dh.size() < 200
+        && request.resource.data.auth is string && request.resource.data.auth.size() < 100
+        && request.resource.data.at is int
+        && (!('uid' in request.resource.data) || (signedIn() && request.resource.data.uid == request.auth.uid));
+      allow delete: if true;
+      allow read: if false;
+    }
+
     // Codes cadeaux : codes/{sha256 du code} = { uid, code, at }. Créé une seule fois, par le compte qui
     // utilise le code ; le document doit contenir le vrai code (son SHA-256 = l'id), donc impossible de
     // « griller » un code sans le connaître. Une 2e utilisation serait une modification : refusée.
