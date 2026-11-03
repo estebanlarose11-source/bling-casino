@@ -1,0 +1,39 @@
+// SpinBet Android: a full-screen window on www.spinbetcaz.com. The games come from the site, so every update of the
+// site reaches the app at once; this shell is only rebuilt when its own code changes (.github/workflows/android.yml).
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.spinbetcaz.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.spinbetcaz.app'
+        minSdk 24
+        targetSdk 34
+        versionCode Integer.parseInt(System.getenv('VERSION_CODE') ?: '1')
+        versionName "1.0.${System.getenv('VERSION_CODE') ?: '1'}"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(System.getenv('KEYSTORE_FILE') ?: 'missing.jks')
+            storePassword System.getenv('KEYSTORE_PASSWORD') ?: ''
+            keyAlias 'spinbet'
+            keyPassword System.getenv('KEYSTORE_PASSWORD') ?: ''
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}

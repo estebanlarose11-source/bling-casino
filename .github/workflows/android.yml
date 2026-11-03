@@ -1,0 +1,70 @@
+# Builds the SpinBet Android app (android/) and puts it on the site: app/spinbet.apk (www.spinbetcaz.com/app/spinbet.apk).
+# The app shows the site, so site updates need no new APK: this only runs when android/ changes, or by hand
+# (Actions → « Appli Android » → Run workflow).
+# Secret needed (Settings → Secrets and variables → Actions): ANDROID_KEYSTORE = the signing key, in base64.
+# Always the same key: phones only accept an update signed like the installed app.
+name: Appli Android
+
+on:
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clé de signature
+        id: key
+        env:
+          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+        run: |
+          if [ -z "$ANDROID_KEYSTORE" ]; then
+            echo "::warning::Pas de secret ANDROID_KEYSTORE : APK d'essai seulement, non publié sur le site."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "$ANDROID_KEYSTORE" | base64 -d > "$RUNNER_TEMP/spinbet.jks"
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Fabriquer l'APK
+        working-directory: android
+        env:
+          KEYSTORE_FILE: ${{ runner.temp }}/spinbet.jks
+          KEYSTORE_PASSWORD: spinbet-app
+          VERSION_CODE: ${{ github.run_number }}
+        run: gradle --no-daemon ${{ steps.key.outputs.ok == 'true' && 'assembleRelease' || 'assembleDebug' }}
+      - name: APK d'essai (sans clé)
+        if: steps.key.outputs.ok != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: spinbet-essai
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Mettre l'APK sur le site
+        if: steps.key.outputs.ok == 'true'
+        run: |
+          mkdir -p app
+          cp android/app/build/outputs/apk/release/app-release.apk app/spinbet.apk
+          ls -la app/spinbet.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/spinbet.apk
+          git commit -m "Appli Android : nouvelle version (${{ github.run_number }})" || exit 0
+          for i in 1 2 3; do git pull --rebase origin main && git push origin HEAD:main && exit 0; sleep 5; done
+          exit 1

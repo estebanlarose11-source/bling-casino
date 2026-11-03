@@ -4199,7 +4199,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
       <a href="#parrainage" data-nav="ref"><span><svg class="ico"><use href="#ui-ref"/></svg></span>Parrainage</a>
       <a href="https://www.tiktok.com/@spinbet_casino" data-tiktok-link target="_blank" rel="noopener"><span><svg class="ico"><use href="#ui-tiktok"/></svg></span>Notre TikTok<b class="side-new">+10K</b></a>
       <a href="#" data-share-site><span><svg class="ico"><use href="#ui-share"/></svg></span>Partager le site</a>
-      <a href="#appli" data-nav="app"><span><svg class="ico"><use href="#ui-app"/></svg></span>Application</a>
+      <a href="#appli" data-nav="app"><span><svg class="ico"><use href="#ui-app"/></svg></span>Télécharger l’appli</a>
       <a href="#admin" data-nav="admin" data-admin-link hidden><span>🛠️</span>Admin</a>
       <a href="#" data-theme-toggle><span class="th-ico"><b class="th-sun">☀️</b><b class="th-moon">🌙</b></span><em class="th-sun">Mode clair</em><em class="th-moon">Mode sombre</em></a>
     </nav>
@@ -9115,7 +9115,7 @@ function renderLobby(root, params = {}) {
     ${filter === 'all' && profilesReady() ? (() => { const m = missionStatus(), n = m.rows.filter((r) => r.claimed).length; return m.chest ? '' : `<a class="app-promo ms-promo" href="#missions">${bgArt(getGame((m.rows.find((r) => !r.claimed && r.game) || UPDATES[0] || {}).game))}<span class="wp-ico">🎯</span><span><b>Missions du jour · ${n} / 3</b><small>${m.toClaim ? `${m.toClaim} récompense${m.toClaim > 1 ? 's' : ''} à récupérer !` : m.rows.map((r) => r.text).join(' · ')}</small></span><em>${m.toClaim ? 'Récupérer' : 'Voir'}</em></a>`; })() : ''}
     ${filter === 'all' ? `<a class="app-promo defi-promo" href="#defi">${bgArt(getGame(challengeGame()))}<span class="wp-ico">🏁</span><span><b>3 Défis de la semaine · machines à sous : ${getGame(challengeGame()).name}</b><small data-leader>100 000\u00a0\uE1E0 au n°1</small></span><em>Participer</em></a>` : ''}
     ${filter === 'all' && wheelReady() ? `<a class="app-promo wheel-promo" href="#roue">${bgArt(getGame('roueor'))}<span class="wp-ico">🎡</span><span><b>Ta Roue du jour est prête !</b><small>Un tour gratuit : KE, XP ou bonus offert</small></span><em>Tourner</em></a>` : ''}
-    ${filter === 'all' && !(matchMedia('(display-mode: standalone)').matches || navigator.standalone) ? `<a class="app-promo" href="#appli"><img src="assets/icon-192.png" alt="" width="44" height="44"><span><b>Installe l’appli SpinBet</b><small>Plein écran, sur ton écran d’accueil · iPhone et Android</small></span><em>Installer</em></a>` : ''}
+    ${filter === 'all' && !__mods['pages/app.js'].installed() ? `<a class="app-promo" href="#appli" data-get-app><img src="assets/icon-192.png" alt="" width="44" height="44"><span><b>Télécharge l’appli SpinBet</b><small>Gratuit, plein écran · iPhone et Android</small></span><em>Télécharger</em></a>` : ''}
     </div>
 
     <div class="chips">${FILTERS.map((x) => `<a class="chip${x.id === filter ? ' on' : ''}" href="#${x.id === 'all' ? 'accueil' : `lobby-${x.id}`}">${x.icon} ${x.label}</a>`).join('')}</div>
@@ -11798,6 +11798,19 @@ addEventListener('appinstalled', () => { deferred = null; document.body.classLis
 const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
 const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const isAndroid = () => /android/i.test(navigator.userAgent);
+const UA = navigator.userAgent;
+// The Android app (android/, a full-screen window on the site) adds "SpinBetApp" to its user agent.
+const isApp = () => /SpinBetApp/.test(UA);
+const installed = () => isStandalone() || isApp();
+// Browsers inside TikTok, Insta, Snap, Facebook…: they cannot install anything, the link must be opened outside.
+const inAppBrowser = () => /Instagram|FBAN|FBAV|FB_IAB|TikTok|musical_ly|Bytedance|Snapchat|Line\/|Twitter|LinkedInApp|GSA\//i.test(UA);
+const iosSafari = () => isIOS() && /Safari/.test(UA) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(UA) && !inAppBrowser();
+// The Android file, built by GitHub (.github/workflows/android.yml); its button shows once the file is online.
+const APK = location.protocol === 'file:' ? 'https://www.spinbetcaz.com/app/spinbet.apk' : 'app/spinbet.apk';
+let apkOK = null;
+const apkReady = () => apkOK || (apkOK = fetch(APK, { method: 'HEAD', cache: 'no-store' })
+  .then((r) => r.ok && !/text\/html/.test(r.headers.get('content-type') || '')).catch(() => false));
+const LINK = 'https://www.spinbetcaz.com/#appli';
 
 const SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5H16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 const PLUS = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 8.5v7M8.5 12h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -11815,8 +11828,97 @@ const phone = (step) => `<div class="ph">
     <div class="ph-addr"><img src="assets/apple-touch-icon.png" alt=""><div><b>SpinBet</b><small>www.spinbetcaz.com</small></div></div></div>`}
 </div>`;
 
+/* ---------- « Télécharger l'appli » : one button, the right way for each phone ---------- */
+const copyLink = async () => {
+  try { await navigator.clipboard.writeText(LINK); toast('Lien copié : colle-le dans Chrome ou Safari', 'ok'); } catch { prompt('Copie ce lien :', LINK); }
+};
+const sheet = (html) => {
+  document.querySelector('.ga-back')?.remove();
+  const back = document.createElement('div');
+  back.className = 'ga-back';
+  back.innerHTML = `<div class="ga-sheet" role="dialog" aria-label="Télécharger l’appli"><button class="ga-x" aria-label="Fermer">✕</button>
+    <div class="ga-head"><img src="assets/icon-192.png" alt="" width="56" height="56"><div><b>SpinBet</b><small>Gratuit · plein écran · mises à jour automatiques</small></div></div>${html}</div>`;
+  document.body.appendChild(back);
+  requestAnimationFrame(() => back.classList.add('show'));
+  const close = () => { back.classList.remove('show'); setTimeout(() => back.remove(), 250); };
+  back.addEventListener('click', (e) => { if (e.target === back || e.target.closest('.ga-x, [data-ga-close]')) close(); });
+  back.querySelector('[data-ga-copy]')?.addEventListener('click', copyLink);
+  return { back, close };
+};
+async function prompt2() {
+  if (!deferred) return false;
+  deferred.prompt();
+  const r = await deferred.userChoice.catch(() => null);
+  deferred = null;
+  return r?.outcome === 'accepted';
+}
+
+async function getApp() {
+  if (installed()) return toast(isApp() ? 'Tu es déjà dans l’appli SpinBet 🎉' : 'L’appli SpinBet est déjà installée 🎉', 'ok');
+  // inside TikTok / Insta / Snap: open the link in the real browser first
+  if (inAppBrowser()) {
+    return sheet(`<h3>Ouvre SpinBet dans ton navigateur</h3>
+      <p class="muted">Tu es dans ${/TikTok|musical_ly|Bytedance/i.test(UA) ? 'TikTok' : /Instagram/i.test(UA) ? 'Instagram' : /Snapchat/i.test(UA) ? 'Snapchat' : 'une appli'} : d’ici, on ne peut pas installer d’appli.</p>
+      ${isAndroid() ? `<a class="btn primary lg ga-wide" href="intent://www.spinbetcaz.com/#appli#Intent;scheme=https;package=com.android.chrome;end">Ouvrir dans Chrome</a>`
+        : `<ol class="ga-steps"><li>Touche <b>•••</b> (ou ↗︎) en haut ou en bas de l’écran</li><li>Choisis <b>« Ouvrir dans le navigateur »</b> ou <b>« Ouvrir dans Safari »</b></li><li>Reviens sur cette page et touche <b>Télécharger l’appli</b></li></ol>`}
+      <button class="btn ghost lg ga-wide" data-ga-copy>Copier le lien</button>`);
+  }
+  if (isIOS()) {
+    if (!iosSafari()) {
+      return sheet(`<h3>Ouvre SpinBet dans Safari</h3>
+        <p class="muted">Sur iPhone, l’appli s’installe depuis <b>Safari</b>. Copie le lien, ouvre Safari et colle-le dans la barre d’adresse.</p>
+        <button class="btn primary lg ga-wide" data-ga-copy>Copier le lien</button>`);
+    }
+    const ipad = /ipad/i.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    const { back } = sheet(`<h3>Ajoute SpinBet à ton écran d’accueil</h3>
+      <ol class="ga-steps big">
+        <li><i class="ga-ico">${SHARE}</i><span>Touche le bouton <b>Partager</b> ${ipad ? 'en haut à droite' : 'en bas de l’écran'}</span></li>
+        <li><i class="ga-ico">${PLUS}</i><span>Choisis <b>« Sur l’écran d’accueil »</b> (fais défiler la liste si besoin)</span></li>
+        <li><i class="ga-ico"><img src="assets/apple-touch-icon.png" alt=""></i><span>Touche <b>« Ajouter »</b> : l’icône SpinBet apparaît, ouvre-la !</span></li>
+      </ol>
+      <p class="muted small">C’est l’appli complète, en plein écran, avec les notifications. Elle se met à jour toute seule.</p>`);
+    const arrow = document.createElement('div');
+    arrow.className = `ga-arrow${ipad ? ' top' : ''}`;
+    arrow.innerHTML = '<span>Partager</span><b>⬇</b>';
+    back.appendChild(arrow);
+    return;
+  }
+  if (isAndroid()) {
+    const apk = await apkReady();
+    const { back, close } = sheet(`<h3>Télécharge l’appli</h3>
+      <div class="ga-opt"><b>⭐ Avec Chrome</b> <em class="ga-tag">Recommandé</em>
+        <p class="muted small">Le plus simple et le plus sûr : un clic, avec les notifications.</p>
+        <button class="btn primary lg ga-wide" data-ga-chrome>📲 Installer avec Chrome</button>
+        <ol class="ga-steps" data-ga-chrome-help hidden><li>Touche le menu <b>⋮</b> de Chrome, en haut à droite</li><li>Choisis <b>« Installer l’application »</b> (ou <b>« Ajouter à l’écran d’accueil »</b>)</li><li>Confirme : SpinBet arrive avec tes autres applis</li></ol>
+      </div>
+      ${apk ? `<div class="ga-opt"><b>📦 Fichier APK</b>
+        <p class="muted small">L’appli Android à télécharger, sans passer par le Play Store.</p>
+        <a class="btn ghost lg ga-wide" href="${APK}" download="SpinBet.apk" data-ga-apk>Télécharger l’APK</a>
+        <ol class="ga-steps" data-ga-apk-help hidden><li>Ouvre le fichier <b>SpinBet.apk</b> téléchargé (notification ou dossier Téléchargements)</li><li>Si Android le demande, autorise <b>« Installer des applis inconnues »</b> pour Chrome</li><li>Touche <b>Installer</b>. Si Play Protect prévient que l’appli ne vient pas du Play Store, touche <b>« Installer quand même »</b></li></ol>
+      </div>` : ''}`);
+    back.querySelector('[data-ga-chrome]').onclick = async () => {
+      if (await prompt2()) return close();
+      back.querySelector('[data-ga-chrome-help]').hidden = false;
+    };
+    back.querySelector('[data-ga-apk]')?.addEventListener('click', () => { back.querySelector('[data-ga-apk-help]').hidden = false; });
+    return;
+  }
+  // computer
+  if (await prompt2()) return;
+  sheet(`<h3>SpinBet sur ton téléphone</h3>
+    <p class="muted">Ouvre <b>www.spinbetcaz.com/#appli</b> sur ton téléphone et touche <b>Télécharger l’appli</b>.</p>
+    <p class="muted small">Sur cet ordinateur : dans Chrome ou Edge, l’icône d’installation est à droite de la barre d’adresse.</p>
+    <button class="btn ghost lg ga-wide" data-ga-copy>Copier le lien</button>`);
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-get-app]');
+  if (!b) return;
+  e.preventDefault();
+  getApp();
+});
+
 function renderApp(root) {
-  const installed = isStandalone(), ios = isIOS(), android = isAndroid();
+  const installed0 = installed(), ios = isIOS(), android = isAndroid();
   root.innerHTML = `
     <section class="panel app-hero">
       <img class="app-icon" src="assets/icon-192.png" alt="Icône SpinBet" width="96" height="96">
@@ -11824,9 +11926,9 @@ function renderApp(root) {
         <span class="eyebrow">📲 Application</span>
         <h1>SpinBet sur ton téléphone</h1>
         <p class="muted">Ajoute SpinBet Casino à ton écran d’accueil : il s’ouvre en plein écran comme une vraie appli, sans passer par le navigateur. C’est gratuit et ça prend 10 secondes.</p>
-        ${installed ? '<p class="app-ok">✅ L’application est déjà installée sur cet appareil.</p>' : `
+        ${installed0 ? `<p class="app-ok">✅ ${isApp() ? 'Tu utilises l’appli SpinBet.' : 'L’application est déjà installée sur cet appareil.'}</p>` : `
         <div class="app-cta">
-          <button class="btn primary lg" data-install>📥 Installer l’application</button>
+          <button class="btn primary lg" data-get-app>📲 Télécharger l’appli</button>
           <span class="store-soon">${PLAY}<span><small>Bientôt sur</small><b>Google Play</b></span><em>Prochainement</em></span>
         </div>`}
       </div>
@@ -11851,6 +11953,7 @@ function renderApp(root) {
         <li>Touche le bouton <b>Installer l’application</b> en haut de cette page, ou le menu <i class="ico">${DOTS}</i> puis <b>« Installer l’application »</b> (ou <b>« Ajouter à l’écran d’accueil »</b>).</li>
         <li>Confirme : SpinBet apparaît avec tes autres applis.</li>
       </ol>
+      <div class="app-apk" data-apk-box hidden><b>📦 Ou le fichier APK</b><span>Télécharge l’appli Android directement, sans le Play Store. Elle se met à jour toute seule avec le site.</span><a class="btn ghost" href="${APK}" download="SpinBet.apk">Télécharger l’APK</a></div>
       <div class="store-card">${PLAY}<div><b>Google Play Store</b><span>La version Play Store arrive prochainement. En attendant, l’installation ci-dessus te donne déjà l’appli complète.</span></div><em>Bientôt</em></div>
     </section>
 
@@ -11860,17 +11963,8 @@ function renderApp(root) {
     </section>`;
   const pp = root.querySelector('[data-push-panel]');
   if (pp) __mods['push.js'].paintPanel(pp);
-  root.querySelector('[data-install]')?.addEventListener('click', async () => {
-    if (deferred) {
-      deferred.prompt();
-      const r = await deferred.userChoice.catch(() => null);
-      deferred = null;
-      if (r?.outcome === 'accepted') renderApp(root);
-      return;
-    }
-    if (ios) { root.querySelector('#iphone').scrollIntoView({ behavior: 'smooth' }); toast('Sur iPhone : Partager puis « Sur l’écran d’accueil »'); return; }
-    toast(android ? 'Ouvre le menu ⋮ de Chrome puis « Installer l’application »' : 'Utilise l’icône d’installation de la barre d’adresse (Chrome ou Edge)');
-  });
+  apkReady().then((ok) => { const b = root.querySelector('[data-apk-box]'); if (b) b.hidden = !ok; });
+  if (/^#telecharger/.test(location.hash) && !installed0) setTimeout(getApp, 300);
 }
 
 function registerSW() {
@@ -11878,7 +11972,7 @@ function registerSW() {
   addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch((e) => console.error(e)));
 }
 
-return { renderApp, registerSW, isStandalone };
+return { renderApp, registerSW, isStandalone, isApp, getApp, installed };
 })();
 
 // ---- pages/leaderboard.js ----
@@ -14799,7 +14893,7 @@ async function paintPanel(box) {
     off: ['On te prévient quand le <b>tournoi du soir</b> commence, quand ta <b>roue du jour</b> est prête et des grandes nouveautés. Une ou deux par jour, pas plus.', '<button class="btn primary lg" data-push-on>🔔 Activer les notifications</button>'],
     denied: ['Les notifications sont bloquées pour SpinBet. Autorise-les dans les réglages du navigateur (le cadenas à côté de l’adresse, ou Réglages → Notifications sur le téléphone), puis reviens ici.', ''],
     install: ['Sur iPhone, les notifications marchent quand SpinBet est <b>sur ton écran d’accueil</b> : suis les 3 étapes ci-dessous, ouvre SpinBet depuis son icône, puis reviens sur cette page pour les activer.', ''],
-    unsupported: ['Ce navigateur ne peut pas recevoir les notifications. Sur Android, ouvre le site dans Chrome ; sur iPhone, ajoute-le à l’écran d’accueil (iOS 16.4 ou plus récent).', ''],
+    unsupported: /SpinBetApp/.test(navigator.userAgent) ? ['Les notifications ne sont pas encore dans l’appli Android. Pour les recevoir, installe aussi SpinBet avec Chrome (bouton Télécharger l’appli, « Avec Chrome »).', ''] : ['Ce navigateur ne peut pas recevoir les notifications. Sur Android, ouvre le site dans Chrome ; sur iPhone, ajoute-le à l’écran d’accueil (iOS 16.4 ou plus récent).', ''],
   }[st];
   box.innerHTML = `<h2>🔔 Notifications</h2><p class="muted">${txt[0]}</p>${txt[1]}`;
   box.querySelector('[data-push-on]')?.addEventListener('click', async () => { await enable(); paintPanel(box); });
@@ -14983,15 +15077,20 @@ async function openShare(win) {
   const url = URL.createObjectURL(box), file = `spinbet-${game.id}-x${Math.round(win.x)}.png`;
   const text = `${xTxt(win.x)} sur ${game.name} ! 🎰 Joue gratuitement sur SpinBet Casino : ${refLink()}`;
   const f = new File([box], file, { type: 'image/png' });
-  const canFiles = !!navigator.canShare?.({ files: [f] });
+  const canFiles = !!navigator.canShare?.({ files: [f] }), inApp = !!window.SpinBetApp; // Android app: native share
   const p = modal(`<div class="bw-modal"><h3>📸 Ton image de gros gain</h3>
       <img class="bw-img" src="${url}" alt="Image de ton gain ${esc(xTxt(win.x))} sur ${esc(game.name)}">
       <p class="muted small">Poste-la sur TikTok, Snap ou Insta${uid() ? ' : ton lien de parrainage est dessus, chaque ami qui s’inscrit te rapporte des KE.' : '.'}</p>
-      <div class="bw-acts">${canFiles ? '<button class="btn primary" data-bw-share>Partager</button>' : ''}<a class="btn ${canFiles ? 'ghost' : 'primary'}" href="${url}" download="${file}">Télécharger</a><button class="btn ghost" data-bw-copy>Copier mon lien</button></div>
+      <div class="bw-acts">${canFiles || inApp ? '<button class="btn primary" data-bw-share>Partager</button>' : ''}${inApp ? '' : `<a class="btn ${canFiles ? 'ghost' : 'primary'}" href="${url}" download="${file}">Télécharger</a>`}<button class="btn ghost" data-bw-copy>Copier mon lien</button></div>
       ${uid() ? '' : '<p class="muted small">Crée un compte pour ajouter ton lien de parrainage sur l’image. <a href="#" class="signup-link" data-signup="💾 Crée ton compte" data-value="">Créer mon compte</a></p>'}
     </div>`, { cls: 'bw-box' });
   const root = document.querySelector('.bw-modal');
   root?.querySelector('[data-bw-share]')?.addEventListener('click', async () => {
+    if (inApp) {
+      const data = await new Promise((r) => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(box); });
+      try { window.SpinBetApp.share(data, text); } catch { toast('Partage impossible', 'warn'); }
+      return;
+    }
     try { await navigator.share({ files: [f], text }); } catch (e) { if (e?.name !== 'AbortError') toast('Partage impossible : télécharge l’image', 'warn'); }
   });
   root?.querySelector('[data-bw-copy]')?.addEventListener('click', async () => {
@@ -15071,7 +15170,7 @@ const routes = [
   { re: /^classement$/, page: (r) => renderLeaderboard(r), nav: 'top' },
   { re: /^(recharger|daily)$/, page: (r) => renderRefill(r), nav: 'refill' },
   { re: /^responsable$/, page: (r) => renderResponsible(r), nav: 'resp' },
-  { re: /^(appli|application)$/, page: (r) => renderApp(r), nav: 'app' },
+  { re: /^(appli|application|telecharger)$/, page: (r) => renderApp(r), nav: 'app' },
   { re: /^roue$/, page: (r) => renderWheel(r), nav: 'wheel' },
   { re: /^boutique$/, page: (r) => __mods['shop.js'].renderShop(r), nav: 'shop' },
   { re: /^missions$/, page: (r) => renderMissions(r), nav: 'missions' },
@@ -16576,6 +16675,42 @@ html.light .panel { border-radius: var(--fin-r) !important; background: linear-g
 html.light .side-nav a.on { background: linear-gradient(90deg, rgba(47, 143, 224, .16), transparent) !important; box-shadow: inset 3px 0 0 #2f8fe0 !important; color: #0e1a2b !important; }
 html.light .side-label { background: linear-gradient(90deg, #2f8fe0, #7c3aed); -webkit-background-clip: text; background-clip: text; }
 html.light .btn.primary { color: #fff !important; background: linear-gradient(180deg, #5fb4f2, #2f8fe0 60%, #1d6dbd) !important; }
+
+/* ---------- « Télécharger l'appli » (pages/app.js getApp) ---------- */
+.ga-back { position: fixed; inset: 0; z-index: 420; display: flex; align-items: flex-end; justify-content: center; padding: 12px; background: rgba(3, 6, 12, .66); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; transition: opacity .25s; }
+.ga-back.show { opacity: 1; }
+@media (min-width: 761px) { .ga-back { align-items: center; } }
+.ga-sheet { position: relative; width: min(440px, 100%); max-height: 86vh; overflow-y: auto; padding: 22px 18px 18px; border-radius: 20px; color: var(--text);
+  background: linear-gradient(180deg, #161c27, #0d1118) padding-box, var(--fin-edge) border-box; border: 1px solid transparent; box-shadow: 0 30px 70px rgba(0, 0, 0, .6);
+  transform: translateY(24px); transition: transform .3s cubic-bezier(.2, .9, .3, 1.1); }
+.ga-back.show .ga-sheet { transform: none; }
+html.light .ga-sheet { background: #fff; border-color: var(--line); }
+.ga-x { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border-radius: 10px; color: var(--muted); }
+.ga-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.ga-head img { border-radius: 14px; box-shadow: 0 6px 18px rgba(0, 0, 0, .4); }
+.ga-head b { display: block; font: 900 20px KeCoin, Archivo, sans-serif; }
+.ga-head small { color: var(--muted); font-size: 12.5px; }
+.ga-sheet h3 { margin: 4px 0 8px; font: 900 19px KeCoin, Archivo, sans-serif; }
+.ga-sheet p { margin: 0 0 12px; }
+.ga-wide { width: 100%; justify-content: center; text-align: center; margin-top: 8px; display: flex; }
+.ga-opt { padding: 14px; margin-top: 10px; border-radius: 14px; background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .015)); box-shadow: inset 0 0 0 1px rgba(124, 200, 255, .16); }
+.ga-opt > b { font-size: 15px; }
+.ga-tag { font-style: normal; font-size: 11px; font-weight: 800; padding: 2px 8px; margin-left: 6px; border-radius: 999px; background: linear-gradient(90deg, #22c55e, #14b8a6); color: #fff; }
+.ga-steps { margin: 10px 0 4px; padding-left: 20px; display: grid; gap: 7px; font-size: 14px; }
+.ga-steps[hidden] { display: none; }
+.ga-steps.big { list-style: none; padding: 0; gap: 10px; }
+.ga-steps.big li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; background: rgba(124, 200, 255, .07); }
+.ga-ico { flex: none; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 10px; background: #fff; color: #0a84ff; }
+.ga-ico svg { width: 24px; height: 24px; } .ga-ico img { width: 38px; height: 38px; border-radius: 10px; }
+.ga-arrow { position: fixed; left: 50%; bottom: 6px; z-index: 421; translate: -50% 0; display: flex; flex-direction: column; align-items: center; color: #fff; font-weight: 800; text-shadow: 0 2px 8px #000; pointer-events: none; animation: gaBob 1s ease-in-out infinite; }
+.ga-arrow b { font-size: 34px; line-height: 1; color: #7cc8ff; }
+.ga-arrow.top { top: 6px; bottom: auto; right: 70px; left: auto; translate: none; flex-direction: column-reverse; }
+.ga-arrow.top b { transform: rotate(180deg); }
+.ga-back:has(.ga-arrow:not(.top)) { padding-bottom: 70px; }
+@keyframes gaBob { 50% { transform: translateY(8px); } }
+.app-apk { display: grid; gap: 6px; margin: 12px 0; padding: 14px; border-radius: 12px; background: rgba(124, 200, 255, .07); box-shadow: inset 0 0 0 1px rgba(124, 200, 255, .18); }
+.app-apk span { color: var(--muted); font-size: 14px; } .app-apk .btn { justify-self: start; }
+@media (prefers-reduced-motion: reduce) { .ga-arrow { animation: none; } }
 
 /* ---------- phones: the home poster stays a compact card ---------- */
 @media (max-width: 760px) {

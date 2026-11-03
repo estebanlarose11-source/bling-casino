@@ -95,6 +95,19 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - Secrets GitHub nécessaires : `FIREBASE_SERVICE_ACCOUNT` (clé JSON du compte de service Firebase) et
   `VAPID_PRIVATE_KEY` (jamais dans le dépôt ; la clé publique est `VAPID_PUBLIC` dans `push.js` et `send.mjs`).
 
+## Appli (téléchargement)
+
+- Bouton « 📲 Télécharger l'appli » (`[data-get-app]`, `getApp()` dans `pages/app.js`, lien direct
+  www.spinbetcaz.com/#telecharger) : Android → installation par Chrome (recommandé) ou fichier APK ; iPhone Safari →
+  guide « Partager → Sur l'écran d'accueil » avec flèche ; iPhone hors Safari ou navigateur de TikTok / Insta / Snap →
+  « ouvre dans Safari / Chrome » ; ordinateur → lien à ouvrir sur le téléphone.
+- **APK Android** (`android/`, Java, WebView sur le site, sans dépendance) : fabriqué par GitHub Actions
+  (`.github/workflows/android.yml`) quand `android/` change, publié dans `app/spinbet.apk` (le bouton APK n'apparaît
+  que si ce fichier existe). Les mises à jour du site arrivent toutes seules dans l'appli. Secret GitHub
+  `ANDROID_KEYSTORE` (clé de signature en base64, mot de passe `spinbet-app`) : toujours la même clé, sinon les
+  téléphones refusent la mise à jour. L'appli se signale par « SpinBetApp » dans le user agent et partage les
+  images de gros gain par `window.SpinBetApp.share(dataUrl, texte)`. Pas de notifications dans l'APK.
+
 ## Suivi et administration
 
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu

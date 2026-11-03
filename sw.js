@@ -1,6 +1,6 @@
 // SpinBet Casino service worker: makes the site installable and opens it even on a weak connection.
 // Pages are network-first (updates show up right away), the app's own images are cache-first.
-const CACHE = 'spinbet-v33';
+const CACHE = 'spinbet-v34';
 const CORE = ['./', './index.html', './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -17,6 +17,7 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== location.origin) return; // Firebase, fonts: straight to the network
   const home = url.pathname === '/' || url.pathname.endsWith('/index.html');
+  if (url.pathname.endsWith('.apk')) return; // the Android app: always the latest file, straight from the site
   if (url.pathname.endsWith('.mp4')) return; // videos are read in pieces (Range): the browser handles them itself
   // other pages (jeux/ for Google, google…html, ads/): straight to the network, never kept as the home page
   if (!home && (req.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('/'))) return;
