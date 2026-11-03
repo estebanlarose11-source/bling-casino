@@ -231,7 +231,7 @@ service cloud.firestore {
     // Le Texas Online : une manche dure LEN ms sur l'horloge du serveur (manche r = temps / LEN) ; seeds/{r}-{k}
     // écrit après la fermeture des mises (ou des décisions), bets/{r}-{uid} écrit avant la limite.
     // chat : le chat de chaque table, mêmes règles que le chat général.
-    function roomGame(g) { return g in ['storm-online', 'bj-online', 'madwheel-online', 'plateau-online', 'peche-online', 'roueor-online']; }
+    function roomGame(g) { return g in ['storm-online', 'bj-online', 'madwheel-online', 'plateau-online', 'peche-online', 'roueor-online', 'robots-online']; }
     function tableLen(g) { return {'holdem-online': 30000}.get(g, 0); }
     function seedAt(g, k) { return {'holdem-online': {'a': 9000, 'b': 21000}}.get(g, {}).get(k, 999999); }
     function betUntil(g) { return {'holdem-online': 21000}.get(g, 0); }

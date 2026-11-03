@@ -8085,6 +8085,7 @@ const ORIGINALS = [
   {"id": "bj-online", "name": "Le 21 Online", "cat": "table", "tag": "En ligne", "sub": "Blackjack multijoueur : les cartes partent quand tout le salon est prêt", "colors": ["#11a05f", "#06301f"], "description": "Le blackjack en multijoueur : chacun mise et appuie sur PRÊT, les cartes partent dès que tout le salon est prêt (tout de suite si tu es seul). La même croupière pour tous, les mains des autres joueurs à côté de la tienne, et un chat pour le salon.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Blackjack 6 pour 5", "Chat du salon"], "rtp": "≈ 97,5 %", "vol": 1, "max": "×2,2"},
   {"id": "holdem-online", "name": "Le Texas Online", "cat": "table", "tag": "En ligne", "sub": "Texas Hold’em multijoueur contre la croupière", "colors": ["#10b981", "#06301f"], "description": "Le Texas Hold’em en multijoueur : une main toutes les 30 secondes. Chaque joueur reçoit ses 2 cartes, toute la table voit le même flop, puis chacun suit ou se couche contre la croupière. Quinte flush royale payée 100 pour 1. La table a son propre chat.", "features": ["Multijoueur en direct", "Une main toutes les 30 s", "Quinte flush royale ×100", "Chat de la table"], "rtp": "≈ 97,4 %", "vol": 2, "max": "×100 l’ante"},
   {"id": "madwheel-online", "name": "La Roue Folle Online", "cat": "table", "tag": "En ligne", "sub": "La grande roue en multijoueur : elle part quand tout le salon est prêt", "colors": ["#ff3d6e", "#5a1bff"], "description": "La Roue Folle en multijoueur : chacun pose ses jetons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). Le Boost, la roue et les 4 bonus sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Boost ×2 à ×50", "4 bonus pour tout le salon", "Chat du salon"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
+  {"id": "robots-online", "name": "La Course Online", "cat": "table", "tag": "En ligne", "sub": "Les 6 robots en multijoueur : la course part quand tout le salon est prêt", "colors": ["#22d3ee", "#0a1020"], "description": "La Course en multijoueur : chacun choisit son robot (vainqueur ou podium) et sa mise, puis appuie sur PRÊT. La course part dès que tout le salon est prêt (tout de suite si tu es seul) : mêmes formes, même course pour tout le monde, avec les paris des autres et le chat du salon.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Vainqueur ou podium", "Chat du salon"], "rtp": "≈ 95 %", "vol": 2},
   {"id": "plateau-online", "name": "Le Plateau Online", "cat": "table", "tag": "En ligne", "sub": "Roue et plateau aux dés en multijoueur", "colors": ["#22c55e", "#0c1a14"], "description": "Le Plateau en multijoueur : chacun mise sur 1, 2, 5, 10 ou les bonus et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La roue, la case Chance et les lancers de dés du plateau sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Plateau jusqu’à ×200 par case", "Case Chance ×10", "Chat du salon"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
   {"id": "peche-online", "name": "La Pêche Online", "cat": "table", "tag": "En ligne", "sub": "La roue à éclairs et la pêche en multijoueur", "colors": ["#38bdf8", "#071a2e"], "description": "La Pêche en multijoueur : chacun mise sur les ×2 ou les poissons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). Les éclairs, la roue et le poisson pêché sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "4 éclairs à chaque lancer", "Poisson rouge jusqu’à ×5 000", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
   {"id": "roueor-online", "name": "La Roue d’Or Online", "cat": "table", "tag": "En ligne", "sub": "Une roue pour tout le salon, chacun son niveau", "colors": ["#fbbf24", "#14110a"], "description": "La Roue d’Or en multijoueur : chacun choisit son niveau et sa mise puis appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La même roue tombe dans l’or pour certains niveaux : ces joueurs jouent leur bonus des 24 cubes. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "3 niveaux", "Bonus des 24 cubes jusqu’à ×5 000", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×5 000"},
@@ -8613,7 +8614,7 @@ const CARD = {
   chasse: ['#65a30d', '#14532d'], noel: ['#ef4444', '#1e3a8a'], totemx: ['#f97316', '#7f1d1d'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
 };
 // the wheel games' salons wear their game's poster, with the ONLINE ribbon
-['madwheel', 'plateau', 'peche', 'roueor'].forEach((id) => { SPECS[`${id}-online`] = { ...SPECS[id], online: true, tag: 'ONLINE' }; if (CARD[id]) CARD[`${id}-online`] = CARD[id]; });
+['madwheel', 'plateau', 'peche', 'roueor', 'robots'].forEach((id) => { SPECS[`${id}-online`] = { ...SPECS[id], online: true, tag: 'ONLINE' }; if (CARD[id]) CARD[`${id}-online`] = CARD[id]; });
 
 // One poster template for every game (lobby tiles, headers, lists): the art fills the card, then the same studio
 // finish everywhere — vignette, top gloss, a dark title plate in the card colour, the title in Bebas Neue with a
@@ -8717,6 +8718,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'robots-online', date: '2026-11-03', title: 'Nouveau : La Course Online', isNew: true, items: ['Les 6 robots en multijoueur : la même course pour tout le salon', 'Choisis ton robot (vainqueur ou podium) et appuie sur PRÊT', 'La course part dès que tout le monde est prêt, tout de suite si tu es seul', 'Les paris des autres joueurs et le chat du salon'] },
   { game: 'totemx', date: '2026-11-03', title: 'Le totem s’embrase jusqu’à ×100', isNew: true, items: ['Le grand frère du Totem, en feu : grille 6×5 et 30 cases à sceller', 'Le totem s’emballe : ×1 ×2 ×3 ×4 ×5, puis les chiffres brûlent : ×8 ×10 ×15 ×20 ×30 ×50 ×100', 'FULL SCREEN : scelle les 30 cases, 21 fois la mise × le totem', 'Bonus de feu et Feu Royal : le totem ne redescend jamais', 'Gain maximum ×2 000 la mise'] },
   { game: 'pharaon', date: '2026-11-03', title: 'Le Totem refait à neuf', items: ['Un vrai totem à côté de la grille : il monte d’un cran à chaque connexion (×1, ×2, ×3…)', 'Les cases gagnantes se scellent à la feuille d’or, avec un anneau de lumière', 'Torches, rayons de soleil et poussière dorée dans le temple', 'Le bonus se joue de nuit, dans le temple bleuté', 'Compteurs des cases scellées, des connexions et des soleils', 'Les gains ne changent pas'] },
   { game: 'noel', date: '2026-11-03', title: 'Nouvelle machine de Noël', isNew: true, items: ['Une grande machine de 7 rangées devant une plaine enneigée qui défile, avec des flocons qui tombent', 'La Tournée : 3 lettres au Père Noël, des tours gratuits de nuit sous les aurores boréales', 'Le traîneau WILD tombe et monte jusqu’en haut de sa colonne : ×2 à ×8, et les multiplicateurs se multiplient', 'Boules de neige : elles restent, le lutin double tout, le Père Noël ramasse tout, la grille pleine paie ×1 000'] },
@@ -9053,7 +9055,7 @@ function renderLobby(root, params = {}) {
   const body = filter === 'all'
     ? '<div data-ev-home></div>' + `<a class="sp-banner" href="#special"><span>🏆</span><div><b>DÉFI SPÉCIAL · ${fmt(__mods['special.js'].specialStatus().prize)}</b><small>Débloque tous les bonus du casino en jouant : ${__mods['special.js'].specialStatus().have} / ${__mods['special.js'].specialStatus().total}</small></div><em>Voir le défi ›</em></a>`
       + '<section class="panel live-now" data-live-now></section>'
-      + row('🟢 En ligne · joue avec les autres', ['storm-online', 'bj-online', 'holdem-online', 'madwheel-online', 'plateau-online', 'peche-online', 'roueor-online'].map(getGame))
+      + row('🟢 En ligne · joue avec les autres', ['storm-online', 'bj-online', 'holdem-online', 'madwheel-online', 'plateau-online', 'peche-online', 'roueor-online', 'robots-online'].map(getGame))
       + row('Populaires', ['fortune', 'cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
       + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
       + '<div class="hta-slot" data-hta=""></div>'
@@ -11532,7 +11534,7 @@ const FILES = {
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '9621261bab'],
-  robots: ['robots', 'games/impl/robots.js', 'RobotsGame', 'efd42e420a'],
+  robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '620d0b9f44'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'b3c63b68ca'],
   chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', '14b7bec1aa'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', 'e3a4bec1eb'],
@@ -11542,6 +11544,7 @@ const FILES = {
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', '17ab6a334a'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
+  'robots-online': ['robots', 'games/impl/robots.js', 'RobotsOnlineGame', '620d0b9f44'],
   'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', '9e528dfdf5'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
   'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '17ab6a334a'],
@@ -13325,7 +13328,7 @@ function withRoom(Game, spec) {
   const { fmtC } = __mods['core/base.js'], { wallet } = __mods['wallet.js'];
   const seedOf = (d) => `${d.rnd}:${d.atMs}`;
   const memo = new Map();
-  const outcomeOf = (seed) => { if (!memo.has(seed)) { if (memo.size > 20) memo.clear(); memo.set(seed, spec.outcome(rng(seed), seed)); } return memo.get(seed); };
+  const outcomeOf = (seed, n) => { if (!memo.has(seed)) { if (memo.size > 20) memo.clear(); memo.set(seed, spec.outcome(rng(seed), seed, n)); } return memo.get(seed); };
   const sum = (d) => Object.values(d || {}).reduce((a, b) => a + (+b || 0), 0);
   return class extends Game {
     constructor(root, game) {
@@ -13344,9 +13347,9 @@ function withRoom(Game, spec) {
       const p = a.p || [], seats = this.room?.seats || {};
       if (p.length && p.every((x) => seats[x.u] && seats[x.u].n === a.n && seats[x.u].done)) {
         this.allDone = this.allDone?.n === a.n ? this.allDone : { n: a.n, at: now() };
-        return Math.min(spec.resultMs(outcomeOf(seedOf(a)), a), this.allDone.at + 5000 - a.atMs); // 5 s to see everyone's result
+        return Math.min(spec.resultMs(outcomeOf(seedOf(a), a.n), a), this.allDone.at + 5000 - a.atMs); // 5 s to see everyone's result
       }
-      return spec.resultMs(outcomeOf(seedOf(a)), a);
+      return spec.resultMs(outcomeOf(seedOf(a), a.n), a);
     }
     // the stake of this round: the chips (or the stake) once PRÊT is pressed
     myBets() { return spec.bets ? spec.bets.call(this) : { ...(this.board?.bets || {}) }; }
@@ -13393,7 +13396,7 @@ function withRoom(Game, spec) {
     }
     async reveal(seed, doc, n) {
       if (n !== this.n || this.playing) return;
-      const O = outcomeOf(seed);
+      const O = outcomeOf(seed, n);
       const inIt = (doc.p || []).some((p) => p.u === this.room.me);
       if (this.placed && !inIt) { wallet.grant(sum(this.placed) / 100); this.placed = null; this.msg('Ton PRÊT est arrivé trop tard pour ce tour : ta mise t’est rendue.'); }
       this.playing = true; this.phase = 'result'; this.busy = true; this.slotEl?.classList.add('busy'); this.updateMeters();
@@ -13411,7 +13414,7 @@ function withRoom(Game, spec) {
     }
     // everybody's result, once my own round is shown
     paintResults(doc) {
-      const O = outcomeOf(seedOf(doc));
+      const O = outcomeOf(seedOf(doc), doc.n);
       this.paintPlayers((doc.p || []).map((p) => {
         const seat = this.room.seats[p.u];
         const res = spec.payout(O, p.d || {}, { uid: p.u, seed: seedOf(doc), seat: seat && seat.n === doc.n ? seat : null });

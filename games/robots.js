@@ -11,10 +11,11 @@ const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
 const { toast } = __mods['ui.js'];
+const { mergeOpts, withRoom, rng } = __mods['online.js'];
 
 /* ===ENGINE */
 const RTP = 0.95, STRENGTH = [0.3, 0.22, 0.17, 0.13, 0.1, 0.08];
-function shuffled(a) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function shuffled(a, R = Math.random) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 // Chance of finishing in the top 3 for each robot (exact, over the 120 possible podiums).
 function podiumChances(p) {
   const q = p.map(() => 0), n = p.length;
@@ -25,20 +26,25 @@ function podiumChances(p) {
   }
   return q;
 }
-function newRace() {
-  const p = shuffled(STRENGTH), q = podiumChances(p);
+function newRace(R = Math.random) {
+  const p = shuffled(STRENGTH, R), q = podiumChances(p);
   return { p, win: p.map((x) => Math.floor((RTP / x) * 100) / 100), podium: q.map((x) => Math.floor((RTP / x) * 100) / 100) };
 }
-function finishOrder(p) {
+function finishOrder(p, R = Math.random) {
   const left = p.map((_, i) => i), out = [];
   while (left.length) {
     let t = 0; left.forEach((i) => { t += p[i]; });
-    let r = Math.random() * t, k = 0;
+    let r = R() * t, k = 0;
     for (; k < left.length - 1; k++) { r -= p[left[k]]; if (r < 0) break; }
     out.push(left.splice(k, 1)[0]);
   }
   return out;
 }
+// La Course Online: the form of race n is the same for the whole salon (known before the bets), the finish comes
+// from the shared seed.
+const formOf = (n) => newRace(rng(`robots-online|form|${n}`));
+// race visuals (finish gaps, speed wobble), from a random source
+const looks = (R) => ({ jit: [0, 1, 2, 3, 4, 5].map(() => R()), wob: [0, 1, 2, 3, 4, 5].map(() => [R() * 6.28, 0.05 + R() * 0.05, 1.5 + R() * 2]) });
 /* ===END ENGINE */
 
 const BOTS = [
@@ -54,9 +60,9 @@ const botSVG = (c, k) => `<svg viewBox="0 0 64 48" aria-hidden="true">
   <circle cx="30" cy="30" r="6" fill="#0f172a" stroke="${c}" stroke-width="1.5"/><text x="30" y="32.6" text-anchor="middle" font-family="KeCoin,Archivo,sans-serif" font-weight="900" font-size="7.5" fill="#fff">${k + 1}</text></svg>`;
 
 class RobotsGame extends BaseGame {
-  constructor(root, game) {
-    super(root, game, {
-      music: EXTRA_THEMES.robots, autoplay: false, mainLabel: 'LANCER LA COURSE',
+  constructor(root, game, ov) {
+    super(root, game, mergeOpts(ov, {
+      music: EXTRA_THEMES.robots, autoplay: false, mainLabel: 'LANCER LA COURSE', below: '',
       cls: 'table-game robots',
       head: '<div class="head-meters"><div class="meter rb-bet-m"><small>Ton pari</small><b>—</b></div><div class="meter rb-pay-m"><small>Gain possible</small><b>—</b></div></div>',
       stage: `<div class="rb-arena">
@@ -64,17 +70,17 @@ class RobotsGame extends BaseGame {
           <div class="rb-board"></div>
         </div>`,
       hello: 'Choisis un robot et ton pari, puis lance la course.',
-    });
+    }));
     this.sel = null;
     this.race = newRace();
-    this.board();
+    this.paintBoard();
     this.root.addEventListener('click', (e) => {
       const b = e.target.closest('[data-bet]');
       if (!b || this.busy) return;
       const [k, t] = b.dataset.bet.split(':');
       this.sel = { k: +k, t };
       sfx.click();
-      this.board();
+      this.paintBoard();
     });
   }
 
@@ -89,7 +95,7 @@ class RobotsGame extends BaseGame {
     this.q('.rb-pay-m b').textContent = s ? fmtC(Math.round(this.bet * this.race[s.t][s.k])) : '—';
   }
 
-  board() {
+  paintBoard() {
     const r = this.race, s = this.sel;
     const order = BOTS.map((_, k) => k).sort((a, b) => r.p[b] - r.p[a]);
     this.q('.rb-board').innerHTML = `<div class="rb-head"><span>Robot</span><span>Forme</span><span>Vainqueur</span><span>Podium (top 3)</span></div>${order.map((k) => {
@@ -126,11 +132,33 @@ class RobotsGame extends BaseGame {
       sfx.tick(); await this.wait(t === 'GO !' ? 350 : 650);
     }
     cnt.textContent = '';
-    const order = finishOrder(r.p), rank = []; order.forEach((k, i) => { rank[k] = i; });
-    const T = this.turbo ? 6000 : 15000;
+    const order = finishOrder(r.p);
+    const rank = await this.animate(order, looks(Math.random), this.turbo ? 6000 : 15000);
+    if (this.dead) return;
+    const ok = s.t === 'win' ? rank[s.k] === 0 : rank[s.k] <= 2;
+    const podium = order.slice(0, 3).map((k, i) => `${i + 1}. ${BOTS[k].name}`).join(' · ');
+    if (ok) {
+      const won = Math.round(bet * r[s.t][s.k]);
+      this.win(won); this.setLast(won);
+      this.slotEl.classList.add('rb-won');
+      this.msg(`Gagné ! ${BOTS[s.k].name} ${s.t === 'win' ? 'remporte la course' : 'monte sur le podium'} · ${podium}`);
+      await this.celebrate(won);
+    } else {
+      this.msg(`Perdu · ${podium}`);
+      await this.wait(900);
+    }
+    // next race: new form ratings, same robot and bet type kept selected
+    this.race = newRace();
+    this.paintBoard();
+    this.qa('.rb-bot').forEach((b) => { b.style.transform = ''; });
+  }
+
+  // The race on screen: order = finishing order, L = looks() (finish gaps and wobble), T = duration. Returns the ranks.
+  async animate(order, L, T) {
+    const rank = []; order.forEach((k, i) => { rank[k] = i; });
     // finish times: the winner first, then about 0,35 s per place; each robot gets its own speed wobble
-    const fin = BOTS.map((_, k) => T * (0.86 + rank[k] * 0.028 + Math.random() * 0.01));
-    const wob = BOTS.map(() => [Math.random() * 6.28, 0.05 + Math.random() * 0.05, 1.5 + Math.random() * 2]);
+    const fin = BOTS.map((_, k) => T * (0.86 + rank[k] * 0.028 + L.jit[k] * 0.01));
+    const wob = L.wob;
     const bots = this.qa('.rb-bot'), lanes = this.qa('.rb-lane');
     const track = this.q('.rb-track');
     const span = () => track.clientWidth - 92;
@@ -168,23 +196,7 @@ class RobotsGame extends BaseGame {
     removeEventListener('resize', onR);
     lanes.forEach((l) => { delete l.dataset.done; });
     this.slotEl.classList.remove('rb-racing');
-    if (this.dead) return;
-    const ok = s.t === 'win' ? rank[s.k] === 0 : rank[s.k] <= 2;
-    const podium = order.slice(0, 3).map((k, i) => `${i + 1}. ${BOTS[k].name}`).join(' · ');
-    if (ok) {
-      const won = Math.round(bet * r[s.t][s.k]);
-      this.win(won); this.setLast(won);
-      this.slotEl.classList.add('rb-won');
-      this.msg(`Gagné ! ${BOTS[s.k].name} ${s.t === 'win' ? 'remporte la course' : 'monte sur le podium'} · ${podium}`);
-      await this.celebrate(won);
-    } else {
-      this.msg(`Perdu · ${podium}`);
-      await this.wait(900);
-    }
-    // next race: new form ratings, same robot and bet type kept selected
-    this.race = newRace();
-    this.board();
-    BOTS.forEach((_, k) => { bots[k].style.transform = ''; });
+    return rank;
   }
 
   info() {
@@ -193,5 +205,60 @@ class RobotsGame extends BaseGame {
   }
 }
 
-return { RobotsGame };
+// La Course Online: the same race for the whole salon (online.js, withRoom). Each player picks a robot and a bet
+// (stake from the stepper), presses PRÊT; the race starts when everybody is ready. Same odds as the solo game.
+const payout = (O, d) => {
+  let ret = 0;
+  for (const [key, st] of Object.entries(d || {})) {
+    const [k, t] = key.split(':'), kk = +k;
+    if (!(st > 0) || !O.race[t]) continue;
+    if (t === 'win' ? O.rank[kk] === 0 : O.rank[kk] <= 2) ret += Math.round(st * O.race[t][kk]);
+  }
+  return ret;
+};
+const RobotsOnlineGame = withRoom(RobotsGame, {
+  cls: 'g-robots',
+  outcome: (R, seed, n) => {
+    const race = formOf(n), order = finishOrder(race.p, R), rank = []; order.forEach((k, i) => { rank[k] = i; });
+    return { n, race, order, rank, looks: looks(R) };
+  },
+  payout: (O, d) => payout(O, d),
+  resultMs: () => 26000,
+  bets() { return this.sel ? { [`${this.sel.k}:${this.sel.t}`]: this.bet } : {}; },
+  reset() {
+    this.race = formOf(this.n);
+    this.paintBoard();
+    this.qa('.rb-lane').forEach((l) => { l.classList.remove('mine', 'p1', 'p2', 'p3'); l.querySelector('.rb-place').textContent = ''; });
+    this.qa('.rb-bot').forEach((b) => { b.style.transform = ''; });
+    this.slotEl.classList.remove('rb-won');
+  },
+  hello: 'Choisis un robot et ton pari, puis appuie sur PRÊT : la course part quand tout le salon est prêt.',
+  rules: '<p>Les formes des robots sont les mêmes pour tout le salon. Chacun choisit son robot et sa mise ; la course est la même pour tous.</p>',
+});
+// the race for the salon (called by withRoom with the shared outcome)
+RobotsGame.prototype.play = async function play(O, placed) {
+  const key = Object.keys(placed)[0], mine = key ? +key.split(':')[0] : -1;
+  this.qa('.rb-lane').forEach((l) => { l.classList.remove('mine', 'p1', 'p2', 'p3'); l.querySelector('.rb-place').textContent = ''; });
+  if (mine >= 0) this.q(`.rb-lane[data-k="${mine}"]`).classList.add('mine');
+  this.slotEl.classList.add('rb-racing');
+  const cnt = this.q('.rb-count');
+  for (const t of ['3', '2', '1', 'GO !']) {
+    if (this.dead) return 0;
+    cnt.textContent = t; cnt.classList.remove('pop'); void cnt.offsetWidth; cnt.classList.add('pop');
+    sfx.tick(); await this.wait(t === 'GO !' ? 350 : 650);
+  }
+  cnt.textContent = '';
+  await this.animate(O.order, O.looks, 15000);
+  if (this.dead) return 0;
+  const podium = O.order.slice(0, 3).map((k, i) => `${i + 1}. ${BOTS[k].name}`).join(' · ');
+  const ret = payout(O, placed), tt = Object.values(placed).reduce((a, b) => a + b, 0);
+  if (ret > 0) {
+    this.win(ret); this.setLast(ret); this.slotEl.classList.add('rb-won');
+    this.msg(`Gagné ! +${fmtC(ret)} · ${podium}`);
+    await this.celebrate(ret, { quick: true });
+  } else this.msg(tt ? `Perdu · ${podium}` : podium);
+  return ret;
+};
+
+return { RobotsGame, RobotsOnlineGame };
 })();
