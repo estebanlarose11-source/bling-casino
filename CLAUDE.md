@@ -86,6 +86,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   achetés exclus), prix `KINDS` payés automatiquement à la visite suivante. Happy Hour 22 h → 23 h : gains ×2 sur la
   machine du tournoi (`HH`, plafond par joueur). Encarts de l'accueil (`[data-ev-home]`) et sous les jeux
   (`[data-ev-game]`) : les autres modules s'y ajoutent avec `addHome` / `addGamePill`.
+- **Tournois, aide aux joueurs** : sous une autre machine à sous pendant un tournoi en direct, une pastille dit « ce jeu-ci
+  ne compte pas » avec un lien vers la bonne machine ; un message prévient que les bonus achetés ne comptent pas et qu'en
+  invité le score n'entre pas au classement. Outil GitHub **Actions → « Tournoi »** (`tools/admin/tournoi.mjs`, `verifier` /
+  `reparer`) : compare les records des profils (`users/{uid}.tour`) au classement et remet les scores manquants.
 - **Max win** : chaque machine à sous a un gain maximum par tour, bonus compris (`max` du catalogue → `maxX`),
   appliqué par `core/base.js` (`win()`) et `slot/machine.js` (`payOut()`). Fin de chaque tour payé : événement
   `sb:roundend` ; max win atteint : `sb:maxwin`. **Nouvelle machine à sous : lui donner un `max` atteignable**

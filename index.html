@@ -15901,9 +15901,13 @@ function queueSave(T) {
   }, 2500);
 }
 
+const warned = {};
 function onRound(d) {
-  if (!profiles.current || d.bought) return;
+  if (!profiles.current) return;
   const t = Date.now();
+  // a bought bonus never counts: say it once per tournament, when it is on the tournament's machine
+  if (d.bought) { for (const T of liveFor(d.game, t)) if (!warned[T.tid]) { warned[T.tid] = 1; toast(`${KINDS[T.kind].icon} Les bonus achetés ne comptent pas pour le ${KINDS[T.kind].label.toLowerCase()} : seuls les tours joués (bonus gagnés compris) comptent.`, 'info'); } return; }
+  if (!uid()) for (const T of liveFor(d.game, t)) if (!warned['g' + T.tid]) { warned['g' + T.tid] = 1; toast(`${KINDS[T.kind].icon} En invité, ton score reste sur cet appareil : crée ton compte gratuit pour entrer dans le classement du ${KINDS[T.kind].label.toLowerCase()} <button class="btn sm" data-signup>Créer</button>`, 'warn'); }
   for (const T of liveFor(d.game, t)) {
     const x = Math.min(10000, Math.round((d.x || 0) * 100) / 100), K = KINDS[T.kind];
     const r = profiles.update('tour', (p) => {
@@ -16042,6 +16046,12 @@ function gameHTML(gid) {
   }
   const h = hhNow(t);
   if (h && h.games.includes(gid)) out.push(`<span class="ev-pill hh">🍹 <b>Happy Hour ×${HH.mult}</b> · encore ${left(h.end - t)} · bonus touché ${fmt(hhUsed(h))} / ${fmt(HH.cap)}</span>`);
+  // on another slot while a tournament is live: say clearly that this game does not count, and where to go
+  if (getGame(gid)?.cat === 'slot') for (const T of current(t)) {
+    if (!isLive(T, t) || T.game === gid) continue;
+    const K = KINDS[T.kind], g = getGame(T.game);
+    out.push(`<a class="ev-pill live" href="#game-${T.game}"><i class="ev-dot"></i>${K.icon} <b>${K.label}</b> en direct sur <b>${g?.name || T.game}</b> · ce jeu-ci ne compte pas · y aller ›</a>`);
+  }
   pillParts.forEach((fn) => { const x = fn(gid, t); if (x) out.push(x); });
   return out.join('');
 }
