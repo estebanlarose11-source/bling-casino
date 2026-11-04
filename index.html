@@ -896,6 +896,15 @@ body.gated { overflow: hidden; }
 .save-nudge > b { font: 900 17px KeCoin, Archivo, sans-serif; }
 .save-nudge .sn-x { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; color: var(--muted); }
 .locked-game { text-align: center; padding: 60px 20px; }
+.wip-big { font-size: 56px; line-height: 1; margin-bottom: 10px; }
+.wip-page .btn { margin-top: 14px; }
+.game-card.wip { cursor: not-allowed; }
+.game-card.wip:hover { transform: none !important; }
+.game-card.wip .thumb > svg, .game-card.wip .thumb > img, .game-card.wip .thumb > .cover { filter: grayscale(.75) brightness(.5) blur(1px); }
+.wip-lock { position: absolute; inset: 0; z-index: 3; display: grid; place-content: center; justify-items: center; gap: 2px; text-align: center; background: repeating-linear-gradient(135deg, rgba(0, 0, 0, .35) 0 14px, rgba(251, 191, 36, .1) 14px 28px); }
+.wip-lock .wip-ico { position: static; font-style: normal; font-size: clamp(28px, 5vw, 44px); line-height: 1; filter: drop-shadow(0 3px 6px #000); }
+.wip-lock b { padding: 3px 10px; border-radius: 4px; font: 900 clamp(11px, 1.4vw, 14px)/1.2 KeCoin, Archivo, sans-serif; letter-spacing: 1.5px; color: #1a1205; background: #fbbf24; box-shadow: 0 2px 8px rgba(0, 0, 0, .6); }
+.wip-lock small { font: 700 11px/1.2 Archivo, sans-serif; color: #fde68a; text-shadow: 0 1px 3px #000; }
 
 .me-chip { display: flex; align-items: center; gap: 10px; padding: 4px 12px 4px 4px; border-radius: 3px; background: var(--panel); border: 1px solid var(--line); position: relative; transition: border-color .2s; }
 .me-chip:empty { display: none; }
@@ -8119,7 +8128,7 @@ const ORIGINALS = [
   {"id": "chasse", "name": "The Hunt", "cat": "slot", "tag": "Machine à sous", "sub": "Cartouches, chasse et cerf doré", "colors": ["#84cc16", "#1a2e05"], "description": "The Hunt : la saison de chasse est ouverte sur 5 rouleaux et 243 façons de gagner ! Lapins, canards, faisans, sangliers et cerfs paient en ligne, le cerf doré est WILD. 3 cartouches de fusil ouvrent la chasse avec 3 tirs, 4 cartouches la grande chasse avec 5 tirs : chaque animal touché paie ×2 à ×250 la mise, et le cerf doré vaut ×500.", "features": ["5 rouleaux · 243 façons", "3 cartouches : la chasse, 3 tirs", "4 cartouches : la grande chasse, 5 tirs", "Animaux ×2 à ×250, cerf doré ×500", "Achat de la chasse"], "rtp": "≈ 92,6 %", "vol": 4, "max": "×5 000"},
   {"id": "noel", "name": "La Tournée du Père Noël", "cat": "slot", "tag": "Machine à sous", "sub": "Traîneau WILD qui monte jusqu’à ×8", "colors": ["#ef4444", "#1e3a8a"], "description": "Le Père Noël part pour sa tournée au-dessus des plaines enneigées ! Une grande machine de 5 rouleaux et 7 rangées, 16 807 façons de gagner. 3 lettres au Père Noël lancent La Tournée : de nuit, sous les aurores boréales, le traîneau WILD tombe et monte jusqu’en haut de sa colonne, de ×2 à ×8, et les multiplicateurs se multiplient. 6 boules de neige lancent le bonus Boules de neige : elles restent, le lutin double tout, le Père Noël ramasse tout, et la grille pleine paie le GRAND ×1 000.", "features": ["5 × 7 · 16 807 façons", "Traîneau WILD qui monte : ×2 à ×8", "Multiplicateurs qui se multiplient", "Boules de neige : lutin, Père Noël, MINI, MAXI, GRAND", "2 achats de bonus"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
   {"id": "totemx", "name": "Le Totem Extrême", "cat": "slot", "tag": "Machine à sous", "sub": "Totem jusqu’à ×100 et full screen", "colors": ["#f97316", "#450a0a"], "description": "Le grand frère du Totem, en feu : grille 6×5, les cases gagnantes se scellent et le totem monte à chaque connexion. Au-dessus de ×5, les chiffres brûlent : ×8, ×10, ×15… jusqu’à ×100. Scelle les 30 cases pour le FULL SCREEN, payé 21 fois la mise × le totem.", "features": ["Totem ×1 à ×100", "Full screen", "Cases scellées", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×2 000"},
-  {"id": "volcan", "name": "Le Volcan", "cat": "slot", "tag": "Machine à sous", "sub": "Volatilité extrême · jusqu’à ×25 000", "colors": ["#f97316", "#1c0a05"], "description": "Pour les vrais joueurs : une île volcanique qui peut ne rien payer… ou tout faire exploser. 8 symboles identiques n’importe où sur la grille 6×5 paient et explosent en cascade, et chaque explosion fait monter la pression du volcan : ×2, ×4, ×8, ×16. Des pierres de lave de ×2 à ×500 s’additionnent et multiplient le gain. 4 cratères lancent l’ÉRUPTION : 10 tours gratuits où la pression ne redescend jamais.", "features": ["Volatilité extrême", "Grille 6×5 Pay Anywhere", "Cascades", "Pression ×2 à ×16", "Pierres de lave ×2 à ×500", "Éruption : 10 tours gratuits", "2 achats de bonus", "Max ×25 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×25 000"},
+  {"id": "volcan", "name": "Le Volcan", "wip": true, "cat": "slot", "tag": "Machine à sous", "sub": "Volatilité extrême · jusqu’à ×25 000", "colors": ["#f97316", "#1c0a05"], "description": "Pour les vrais joueurs : une île volcanique qui peut ne rien payer… ou tout faire exploser. 8 symboles identiques n’importe où sur la grille 6×5 paient et explosent en cascade, et chaque explosion fait monter la pression du volcan : ×2, ×4, ×8, ×16. Des pierres de lave de ×2 à ×500 s’additionnent et multiplient le gain. 4 cratères lancent l’ÉRUPTION : 10 tours gratuits où la pression ne redescend jamais.", "features": ["Volatilité extrême", "Grille 6×5 Pay Anywhere", "Cascades", "Pression ×2 à ×16", "Pierres de lave ×2 à ×500", "Éruption : 10 tours gratuits", "2 achats de bonus", "Max ×25 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×25 000"},
   {"id": "barillet", "name": "La Roulette Russe", "cat": "slot", "tag": "Machine à sous", "sub": "576 façons · le revolver met le feu aux gains", "colors": ["#f59e0b", "#1c0f05"], "description": "Un vieux saloon, un revolver chargé à bloc. 5 rouleaux de 3, 4, 4, 4 et 3 cases, 576 façons de gagner et le cow-boy WILD qui couvre tout son rouleau. Une balle d’or et une connexion : le revolver tire 1 à 3 balles sur les cases gagnantes, qui prennent feu avec ×2 à ×10, et les multiplicateurs d’une ligne se multiplient. 3 avis de recherche lancent LE DUEL : des grosses balles à chaque gain, et les cases en feu restent jusqu’à la fin. Puis la roulette russe : 1 à 5 balles pour multiplier ton gain… ou tout perdre.", "features": ["Volatilité extrême", "576 façons de gagner", "WILD qui couvre le rouleau", "Balle d’or : le revolver tire", "Cases en feu ×2 à ×50", "Le Duel : les cases restent en feu", "Roulette russe", "2 achats de bonus", "Max ×20 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×20 000"},
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Chaque cube posé multiplie ta mise, mais gare aux cubes ratés et aux coups de vent.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Bonus PARFAIT", "Encaisse quand tu veux"], "rtp": "96 % (visée parfaite)", "vol": 4, "max": "×125,8"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
@@ -8139,7 +8148,7 @@ const getGame = (id) => ALL_GAMES.find((g) => g.id === id);
 const isSlot = (g) => !!g && (!g.original || g.cat === 'slot');
 ALL_GAMES.forEach((g) => { if (!g.colors) g.colors = ['#7cc8ff', '#1e293b']; }); // posters and accents read g.colors
 ALL_GAMES.forEach((g) => { if (isSlot(g)) g.maxX = parseInt(String(g.max || '').replace(/\D/g, ''), 10) || 5000; });
-const SLOTS = ALL_GAMES.filter(isSlot);
+const SLOTS = ALL_GAMES.filter((g) => isSlot(g) && !g.wip); // a game "en travaux" (wip) is shown locked and counts nowhere
 
 return { GAMES, ORIGINALS, ALL_GAMES, getGame, isSlot, SLOTS };
 })();
@@ -9056,6 +9065,9 @@ const volLabel = (g) => (g.original ? VOL[g.vol] : g.volatility);
 const thumbArt = (g, opts) => coverSVG(g, opts);
 
 function gameCard(g) {
+  if (g.wip) return `<div class="game-card wip" aria-label="${g.name} · en travaux" title="${g.name} · en travaux, bientôt disponible" style="--accent:${g.colors[0]}">
+    <div class="thumb">${thumbArt(g, { square: true })}<div class="wip-lock"><i class="wip-ico">🔒</i><b>EN TRAVAUX</b><small>Bientôt disponible</small></div></div>
+  </div>`;
   const u = recent(g.id);
   return `<a class="game-card" href="#game-${g.id}" aria-label="${g.name} · ${BRAND.provider}" style="--accent:${g.original ? g.colors[0] : '#f59e0b'}">
     <div class="thumb">
@@ -11692,6 +11704,10 @@ ${liveHTML(game)}
 function renderGame(root, { id }) {
   const game = getGame(id);
   if (!game) { location.hash = '#accueil'; return; }
+  if (game.wip) {
+    root.innerHTML = `<section class="panel locked-game wip-page"><div class="wip-big">🔒</div><h2>${game.name}</h2><p><b>En travaux</b> : cette machine arrive bientôt.</p><a class="btn primary" href="#lobby-slot">Voir les autres machines</a></section>`;
+    return;
+  }
   if (!profiles.current) {
     root.innerHTML = `<section class="panel locked-game"><h2>${game.name}</h2><p class="muted">Choisis ton pseudo pour lancer le jeu.</p></section>`;
     return;
@@ -12152,7 +12168,7 @@ function tiersFor(p) {
 }
 const masterFor = (p) => ({ ...MASTER, ke: Math.round(MASTER.ke * P_REW(p)), xp: Math.round(MASTER.xp * P_REW(p)) });
 
-const SLOTS = ALL_GAMES.filter((g) => !g.original || g.cat === 'slot');
+const SLOTS = ALL_GAMES.filter((g) => (!g.original || g.cat === 'slot') && !g.wip);
 const isSlot = (id) => SLOTS.some((g) => g.id === id);
 const gameNow = () => (location.hash.match(/^#game-([\w-]+)/) || [])[1] || null;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -12409,7 +12425,7 @@ const LIST = [
   ['plateau', [['b2', 'Bonus 2 lancers'], ['b4', 'Bonus 4 lancers']]],
   ['peche', [['fb', 'Poisson bleu'], ['fo', 'Poisson orange'], ['fr', 'Poisson rouge']]],
   ['roueor', [['or', 'Bonus des 24 cubes']]],
-].filter(([g]) => getGame(g));
+].filter(([g]) => getGame(g) && !getGame(g).wip); // a game en travaux counts again (and pays its 100 000) once opened
 const BASE_GAMES = 17; // machines at the launch of the défi (Fortune included): the prize is 1 000 000 for them
 const PRIZE = () => 1000000 + 100000 * Math.max(0, LIST.length - BASE_GAMES);
 const PER_NEW = 100000;
@@ -13751,7 +13767,7 @@ function equip(id) {
 }
 
 /* ---------- page ---------- */
-const SLOT_IDS = () => __mods['games/index.js'].ALL_GAMES.filter((g) => g.cat === 'slot');
+const SLOT_IDS = () => __mods['games/index.js'].ALL_GAMES.filter((g) => g.cat === 'slot' && !g.wip);
 
 function preview(it, kind) {
   if (kind === 'avatar') return lookHTML({ a: it.id }, 'lg');

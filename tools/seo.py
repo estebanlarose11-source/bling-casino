@@ -20,6 +20,7 @@ esc = lambda s: html.escape(str(s), quote=True)
 # ---- the catalogue: ORIGINALS (one JSON object per line) + the classic slot of GAMES ----
 block = src[src.index('const ORIGINALS = ['):src.index('].map((g) => ({ ...g, original: true }))')]
 games = [json.loads(l.strip().rstrip(',')) for l in block.splitlines() if l.strip().startswith('{"id"')]
+games = [g for g in games if not g.get('wip')]  # a game en travaux gets no page until it opens
 wolf = src[src.index("id: 'big-bad-wolf'"):]
 games.insert(0, {'id': 'big-bad-wolf', 'name': re.search(r"name: '([^']+)'", wolf).group(1), 'cat': 'slot', 'tag': 'Machine à sous',
                  'sub': 'Hold & Spin, free spins et le grand méchant loup', 'description': re.search(r'description: "([^"]+)"', wolf).group(1),

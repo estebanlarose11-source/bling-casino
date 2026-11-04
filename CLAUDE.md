@@ -48,6 +48,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   explosion = 1 point, seuils `TUNE.press` en jeu normal, `TUNE.pressFree` dans l'ÉRUPTION où elle ne redescend jamais),
   pierres de lave ×2 à ×500. Réglages vérifiés par simulation (6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 5, Éruption
   1 tour sur 325 (≈ ×130), achats 150 et 500 fois la mise (≈ 88 / 87 %), max ×25 000 atteignable.
+- **Jeu « en travaux »** : `"wip": true` dans sa ligne du catalogue `ORIGINALS` → vignette grisée avec cadenas
+  « EN TRAVAUX », page du jeu fermée, absent de `SLOTS`, du Défi spécial (`LIST`), des duels, du jackpot et des pages
+  SEO. Pour l'ouvrir : retirer `"wip": true` puis `python3 tools/build.py`. **Le Volcan est en travaux** (demande du
+  propriétaire) jusqu'à ce qu'il demande de le finir.
 - **La Roulette Russe** (`games/barillet.js`, id `barillet`, volatilité extrême, images du propriétaire dans
   `assets/games/barillet/` : symboles découpés de sa planche, `wildtall.webp` pour le WILD étendu, fond `bg.webp`,
   couverture). Mise en page voulue par le propriétaire (d'après sa référence, couleurs changées) : rouleaux de
