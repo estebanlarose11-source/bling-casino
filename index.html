@@ -5028,6 +5028,12 @@ const cloud = {
     const q = await (await init()).db.collection('battles').doc(bid).collection('players').limit(200).get({ source: 'server' });
     return q.docs.map((d) => ({ uid: d.id, ...d.data(), at: d.data().at?.toMillis?.() || 0 }));
   },
+  /* ---------- Loto (loto.js): loto/{jour}/players/{uid} = { name, look, n: [5 numéros], at }, écrit une fois à l'achat ---------- */
+  async saveLoto(day, uid, entry) { await (await init()).db.collection('loto').doc(day).collection('players').doc(uid).set({ ...JSON.parse(JSON.stringify(entry)), at: firebase.firestore.FieldValue.serverTimestamp() }); },
+  async lotoPlayers(day) {
+    const q = await (await init()).db.collection('loto').doc(day).collection('players').limit(300).get();
+    return q.docs.map((d) => ({ uid: d.id, ...d.data(), at: d.data().at?.toMillis?.() || 0 }));
+  },
   async saveTour(tid, uid, entry) { await (await init()).db.collection('tournois').doc(tid).collection('scores').doc(uid).set(JSON.parse(JSON.stringify(entry))); },
   async watchTour(tid, n, cb) {
     return (await init()).db.collection('tournois').doc(tid).collection('scores').orderBy('best', 'desc').limit(n)
@@ -15822,6 +15828,7 @@ __mods['loto.js'] = (() => {
 
 const { wallet, fmt } = __mods['wallet.js'];
 const { profiles } = __mods['profile.js'];
+const { cloud } = __mods['cloud.js'];
 const { toast } = __mods['ui.js'];
 const { sfx } = __mods['audio.js'];
 const { fx } = __mods['fx.js'];
@@ -15890,6 +15897,40 @@ function settle() {
   if (pay.length || lost || back) { fresh = true; paintPage(); }
 }
 
+/* ---------- who played (Firestore loto/{day}/players/{uid}, accounts only) ----------
+   Each account writes its ticket once when it buys it (numbers kept for the results, never shown); everybody sees
+   the names of the players of a draw, then, after the draw, how many good numbers each one had and who won. */
+const me = () => (profiles.online && profiles.current ? { uid: profiles.store.current, name: String(profiles.current.name || 'Joueur').slice(0, 16) } : null);
+const who = {}; // day -> { list, t }
+function loadWho(day, force) {
+  const w = who[day];
+  if (w?.busy || (!force && w && Date.now() - w.t < 60000)) return Promise.resolve(w?.list);
+  who[day] = { ...(w || { list: null }), busy: true, t: Date.now() };
+  return cloud.lotoPlayers(day).then((list) => { who[day] = { list, t: Date.now() }; return list; })
+    .catch((e) => { console.warn(e); who[day] = { list: w?.list || null, err: !w?.list, t: Date.now() }; return who[day].list; });
+}
+const published = new Set();
+function publish(x) {
+  const m = me();
+  if (!m || !x || published.has(x.d) || Date.now() >= drawTime(x.d)) return;
+  published.add(x.d);
+  const look = __mods['shop.js']?.publicLook?.();
+  cloud.saveLoto(x.d, m.uid, { name: m.name, ...(look ? { look } : {}), n: x.n })
+    .then(() => { const w = who[x.d]; if (w?.list && !w.list.some((p) => p.uid === m.uid)) w.list.push({ uid: m.uid, name: m.name, look, n: x.n, at: Date.now() }); paintPage(); })
+    .catch((e) => console.warn(e));
+}
+const pname = (p, extra = '') => `<span class="lo-who${p.uid === me()?.uid ? ' me' : ''}">${__mods['shop.js']?.lookHTML?.(p.look, 'sm') || ''}<b class="pname" data-player="${esc(p.uid)}" data-pname="${esc(p.name)}">${esc(p.name)}</b>${extra}</span>`;
+function whoBlock(day, draw) {
+  const list = who[day]?.list;
+  if (!list) return `<p class="muted small">${who[day]?.err ? 'Liste des joueurs indisponible pour le moment.' : 'Chargement des joueurs…'}</p>`;
+  if (!list.length) return `<p class="muted small">Personne n'a encore pris de ticket${draw ? '' : ' : sois le premier !'}</p>`;
+  if (!draw) return `<div class="lo-whos">${[...list].sort((a, b) => a.at - b.at).map((p) => pname(p)).join('')}</div>`;
+  const res = list.map((p) => { const h = Array.isArray(p.n) ? hitsOf(p.n, draw) : 0; return { p, h, g: PRIZES[h] || 0 }; }).sort((a, b) => b.h - a.h || a.p.at - b.p.at);
+  const win = res.filter((r) => r.g), rest = res.filter((r) => !r.g);
+  return `${win.length ? `<ul class="lo-winners">${win.map((r) => `<li class="${r.h === K ? 'jack' : ''}">${pname(r.p)}<span>${r.h} bons numéros</span><em>+${fmt(r.g)}</em></li>`).join('')}</ul>` : '<p class="muted small">Aucun gagnant à ce tirage.</p>'}
+    ${rest.length ? `<div class="lo-whos">${rest.map((r) => pname(r.p, `<small>${r.h} bon${r.h > 1 ? 's' : ''}</small>`)).join('')}</div>` : ''}`;
+}
+
 let pick = new Set(), fresh = false;
 function buy() {
   if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour jouer au Loto', 'warn');
@@ -15900,6 +15941,7 @@ function buy() {
   if (!wallet.debit(TICKET)) return toast(`Il faut ${fmt(TICKET)} pour un ticket`, 'warn');
   const n = [...pick].sort((a, b) => a - b);
   save((list) => [{ d: k, n, at: Date.now(), st: 'open' }, ...list]);
+  publish({ d: k, n });
   pick = new Set();
   sfx.coin?.(); fx.coins?.(14);
   toast(`🎱 Ticket validé : ${n.join(' - ')} · tirage ${dayName(k)} à 21 h 30`, 'ok');
@@ -15916,13 +15958,19 @@ const ball = (x, cls = '', i = 0) => `<span class="lo-ball ${cls}" style="--i:${
 const balls = (n, draw, anim) => n.map((x, i) => ball(x, `${draw?.includes(x) ? 'hit' : ''}${anim ? ' pop' : ''}`, i)).join('');
 let root = null;
 const here = () => root?.isConnected && location.hash.replace(/^#\/?/, '') === 'loto'; // the view is shared by every page
-function renderLoto(r) { root = r; paintPage(); load(true).then(paintPage); }
+function renderLoto(r) {
+  root = r; paintPage();
+  load(true).then(() => { paintPage(); const L = lastDraws()[0]; if (L) loadWho(L[0], true).then(paintPage); });
+  loadWho(target(), true).then(paintPage);
+}
 function paintPage() {
   if (!here()) return;
   const t = Date.now(), k = target(t), mine = ticketFor(k), last = lastDraws()[0];
   const pendKey = E.paris(t).key, pending = t >= drawTime(pendKey) && !drawOf(pendKey) && ticketFor(pendKey);
   const done = tickets().filter((x) => x.st !== 'open').slice(0, 10), anim = fresh;
   fresh = false;
+  if (mine && who[k]?.list && !who[k].list.some((p) => p.uid === me()?.uid)) publish(mine); // ticket bought before the list existed
+  const nk = who[k]?.list?.length, nl = last && who[last[0]]?.list?.length;
   root.innerHTML = `
     <section class="panel lo-hero">
       <span class="eyebrow">🎱 Le Loto SpinBet · un ticket par jour</span>
@@ -15933,6 +15981,8 @@ function paintPage() {
     ${last ? `<section class="panel lo-last"><div class="sec-head"><h2>Dernier tirage</h2><small>${dayName(last[0], true)}</small></div>
       <div class="lo-balls big">${last[1].n.map((x, i) => ball(x, `gold${anim ? ' pop' : ''}`, i)).join('')}</div>
       ${(() => { const x = ticketFor(last[0]); return x ? `<p class="lo-res ${x.st}">Ton ticket ${balls(x.n, last[1].n)} → <b>${x.hits ?? hitsOf(x.n, last[1].n)} bon${(x.hits ?? 0) > 1 ? 's' : ''} numéro${(x.hits ?? 0) > 1 ? 's' : ''}</b>${x.paid ? ` · <em>+${fmt(x.paid)}</em>` : ''}</p>` : ''; })()}
+      <h3 class="lo-h3">🏆 Les joueurs de ce tirage${nl ? ` <small>${nl} ticket${nl > 1 ? 's' : ''}</small>` : ''}</h3>
+      ${whoBlock(last[0], last[1].n)}
     </section>` : ''}
     <section class="panel lo-play">
       ${mine ? `<h2>🎟️ Ton ticket pour le tirage ${dayName(k)}</h2>
@@ -15943,6 +15993,10 @@ function paintPage() {
         <div class="lo-acts"><button class="btn ghost" data-lo-lucky>🎲 Au hasard</button><button class="btn ghost" data-lo-clear ${pick.size ? '' : 'disabled'}>Effacer</button>
           <button class="btn primary lg" data-lo-buy ${pick.size === K ? '' : 'disabled'}>🎟️ Valider mon ticket · ${fmt(TICKET)}</button></div>
         <p class="muted small">Ticket pour le tirage ${dayName(k)} à 21 h 30. Un ticket par jour.</p>`}
+    </section>
+    <section class="panel lo-players"><div class="sec-head"><h2>🎟️ Ils ont pris leur ticket</h2><small>tirage ${dayName(k)}${nk ? ` · ${nk} joueur${nk > 1 ? 's' : ''}` : ''}</small></div>
+      ${whoBlock(k)}
+      <p class="muted small">On voit qui joue, jamais les numéros. Les comptes seulement (les invités n'apparaissent pas). Après le tirage, les gagnants s'affichent ici.</p>
     </section>
     <section class="panel"><h2>Les gains</h2><ul class="lo-prizes">
       ${[5, 4, 3, 2].map((h) => `<li class="${h === K ? 'lo-top' : ''}"><span>${'●'.repeat(h)}${'○'.repeat(K - h)}</span><b>${h} bons numéros</b><em>${fmt(PRIZES[h])}</em></li>`).join('')}</ul>
@@ -15969,6 +16023,7 @@ setInterval(() => {
   const k = target(), t = Date.now(), p = E.paris(t), near = t >= drawTime(p.key) && !drawOf(p.key);
   if (k !== lastKey) { lastKey = k; paintPage(); }
   if (near || Date.now() - lastLoad > 600000) load(true).then(() => paintPage());
+  if (here()) { const L = lastDraws()[0]; Promise.all([loadWho(k), L && loadWho(L[0])]).then(() => paintPage()); }
 }, 60000);
 profiles.ready?.then(() => setTimeout(() => load(), 3000));
 profiles.addEventListener('change', () => setTimeout(settle, 1500));
@@ -17800,6 +17855,16 @@ html.light .btn.primary { color: #fff !important; background: linear-gradient(18
 .lo-prizes li em { font-style: normal; font-weight: 900; }
 .lo-prizes li.lo-top { background: linear-gradient(90deg, rgba(251, 191, 36, .22), rgba(251, 191, 36, .05)); box-shadow: inset 0 0 0 1px rgba(251, 191, 36, .5); }
 .lo-prizes li.lo-top em { color: #fde68a; font-size: 18px; }
+.lo-h3 { margin: 16px 0 6px; font-size: 16px; } .lo-h3 small { color: var(--muted); font-weight: 600; margin-left: 6px; }
+.lo-whos { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.lo-who { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: rgba(255, 255, 255, .06); font-size: 14px; }
+.lo-who.me { background: color-mix(in srgb, var(--ac) 30%, transparent); }
+.lo-who small { color: var(--muted); font-weight: 700; }
+.lo-who .pname { cursor: pointer; }
+.lo-winners { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 6px; }
+.lo-winners li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px; border-radius: 10px; background: rgba(74, 222, 128, .1); border: 1px solid rgba(74, 222, 128, .3); }
+.lo-winners li.jack { background: rgba(250, 204, 21, .15); border-color: rgba(250, 204, 21, .5); }
+.lo-winners li span { color: var(--muted); font-size: 14px; } .lo-winners li em { margin-left: auto; font-style: normal; font-weight: 900; color: #4ade80; }
 .lo-hist { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 6px; }
 .lo-hist li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px; border-radius: 10px; background: rgba(255, 255, 255, .04); }
 .lo-hist li small { min-width: 120px; color: var(--muted); } .lo-hist li em { margin-left: auto; font-style: normal; font-weight: 800; }

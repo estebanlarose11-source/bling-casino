@@ -116,6 +116,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `loto/tirages.json` sur la branche **`data`** : personne ne connaît les numéros avant. Gains `PRIZES` : 2 bons = 1 000,
   3 = 3 000, 4 = 25 000, 5 = 1 500 000 KE (retour ≈ 51 %, calculé). Tickets dans `profile.loto`, payés à la visite
   suivante ; ticket acheté après 21 h 30 = tirage du lendemain ; pas de tirage 3 jours après = remboursé.
+  Liste des joueurs : chaque compte inscrit son ticket à l'achat dans Firestore `loto/{AAAA-MM-JJ}/players/{uid}`
+  (pseudo + numéros, jamais modifié) ; la page montre qui a pris un ticket (jamais les numéros) puis, après le tirage,
+  les gagnants et les bons numéros de chacun. Les invités n'y sont pas.
 - **La Course Online** (`robots-online`, `RobotsOnlineGame` dans `games/robots.js`, `withRoom`) : forme des robots
   tirée du numéro de manche (`formOf`), arrivée tirée de la graine partagée. Salon dans `roomGame` des règles.
 
