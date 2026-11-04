@@ -8760,7 +8760,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'barillet', date: '2026-11-04', title: 'Un vrai barillet et un décor plus net', items: ['Le barillet du revolver est maintenant une vraie photo, chargé de vraies balles', 'Les balles partent une à une du barillet et il se recharge sous tes yeux', 'Rouleaux en vieilles planches de bois, plus nettes', 'Nouveau cadre en bois usé, aux couleurs de SpinBet'] },
+  { game: 'barillet', date: '2026-11-04', title: 'Un vrai barillet et un décor plus net', items: ['Le barillet du revolver est maintenant une vraie photo, chargé de vraies balles', 'Les balles partent une à une du barillet et il se recharge sous tes yeux', 'Rouleaux en vieilles planches de bois, plus nettes', 'Nouveau cadre en bois usé, aux couleurs de SpinBet', 'La machine est posée directement dans le saloon, sans cadre autour', 'Les rouleaux du bord sont plus petits : on voit tout de suite leurs 3 cases'] },
   { game: 'barillet', date: '2026-11-04', title: 'Nouvelle machine : le revolver met le feu', isNew: true, items: ['Nouveau décor : un vieux saloon, de nouveaux symboles peints et 576 façons de gagner', 'Une balle d’or + une connexion : le revolver tire 1 à 3 balles sur les cases gagnantes', 'Les cases touchées prennent feu et multiplient la ligne (les multiplicateurs se multiplient)', 'Le Duel : grosses balles à chaque gain, les cases en feu restent jusqu’à la fin', 'Toujours la roulette russe à la fin du bonus'] },
   { game: 'volcan', date: '2026-11-04', title: 'Nouvelle machine : volatilité extrême', isNew: true, items: ['Une machine à volatilité extrême : ça paie peu… ou énormément', 'Chaque explosion fait monter la pression : ×2, ×4, ×8, ×16', 'Pierres de lave de ×2 à ×500 et l’ÉRUPTION où la pression ne redescend jamais', 'Jusqu’à ×25 000 la mise'] },
   { game: 'robots-online', date: '2026-11-03', title: 'Nouveau : La Course Online', isNew: true, items: ['Les 6 robots en multijoueur : la même course pour tout le salon', 'Choisis ton robot (vainqueur ou podium) et appuie sur PRÊT', 'La course part dès que tout le monde est prêt, tout de suite si tu es seul', 'Les paris des autres joueurs et le chat du salon'] },
@@ -17099,21 +17099,22 @@ html.light .slot small { color: inherit; }
 .g-barillet .win-bar { text-shadow: 0 1px 3px #000, 0 0 10px #000, 0 0 2px #000; }
 .g-barillet .controls { background: rgba(12, 5, 1, .62); border-color: rgba(192, 138, 74, .3); }
 .game-host:not(.is-full):has(> .g-barillet) { max-width: 920px; }
-.rr-frame { padding: 7px; border-radius: 8px; background: linear-gradient(145deg, #a0703c, #5a3414 22%, #2e1a0a 50%, #6b4220 78%, #c08a4a); box-shadow: inset 0 0 0 1px rgba(255, 230, 180, .35), 0 0 0 1px #120802, 0 22px 50px rgba(0, 0, 0, .65); }
-.rr-frame > .slot-stage { border-radius: 5px; background: rgba(18, 9, 3, .55); overflow: hidden; }
+.g-barillet > .slot-head { display: none; }
+.rr-frame { padding: 0; border-radius: 0; background: none !important; box-shadow: none !important; }
+.rr-frame > .slot-stage { border-radius: 0; background: none !important; box-shadow: none !important; overflow: visible; }
 .rr-stage { position: relative; padding: 8px; }
-.g-barillet.in-free .rr-frame { background: linear-gradient(145deg, #f59e0b, #9a3412 22%, #3b0d04 50%, #c2410c 78%, #fde68a); box-shadow: 0 0 30px rgba(249, 115, 22, .55), 0 22px 50px rgba(0, 0, 0, .65); }
+.g-barillet.in-free .rr-machine { outline: 2px solid rgba(251, 146, 60, .8); outline-offset: 2px; filter: drop-shadow(0 0 18px rgba(249, 115, 22, .55)); }
 .rr-board { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
 /* the machine, laid out like the owner's reference: a stone and wood cabinet, wooden reels, the outer reels set apart */
-.rr-machine { justify-self: center; width: min(100%, calc((100vh - var(--chrome, 300px) + 150px) * 1.25 + 28px)); box-sizing: border-box; position: relative; padding: clamp(30px, 4.6vw, 44px) clamp(8px, 1.4vw, 14px) clamp(16px, 2.4vw, 24px); border-radius: 12px;
+.rr-machine { justify-self: center; width: min(100%, calc((100vh - var(--chrome, 300px) + 150px) * 1.1 + 28px)); box-sizing: border-box; position: relative; padding: clamp(30px, 4.6vw, 44px) clamp(8px, 1.4vw, 14px) clamp(16px, 2.4vw, 24px); border-radius: 12px;
   background: radial-gradient(120% 80% at 50% 0%, rgba(255, 240, 210, .14), transparent 60%), linear-gradient(180deg, rgba(0, 0, 0, .05), rgba(0, 0, 0, .3)), var(--rr-wood, none) center / cover, #4a463f;
   box-shadow: inset 0 0 0 2px #b4ad9c, inset 0 0 0 4px #1c1a16, inset 0 0 0 6px #6f6a5e, inset 0 2px 0 7px rgba(255, 255, 255, .08), inset 0 0 44px rgba(0, 0, 0, .6), 0 20px 50px rgba(0, 0, 0, .65); }
 .rr-machine::before, .rr-machine::after { content: ''; position: absolute; top: 8px; width: 10px; height: 10px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #f3e0bf, #8a6a46 60%, #3a2614); box-shadow: 0 1px 2px #000; }
 .rr-machine::before { left: 10px; } .rr-machine::after { right: 10px; }
-.rr-top { position: absolute; left: 22px; right: 22px; top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 8px; pointer-events: none; }
+.rr-top { position: absolute; left: 22px; right: 22px; top: 4px; display: flex; align-items: center; justify-content: space-between; gap: 6px; pointer-events: none; }
 .rr-ways { flex: none; display: grid; line-height: .9; text-align: center; font: 900 clamp(18px, 3vw, 30px) Cinzel, Georgia, serif; color: #f5ead6; text-shadow: 0 2px 0 #1a0f07, 0 0 6px #000; letter-spacing: 1px; }
 .rr-ways small { font: 800 clamp(8px, 1.1vw, 11px) Archivo, sans-serif; letter-spacing: 3px; color: #e9d5b0; }
-.rr-plaque { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; padding: 3px 14px; border-radius: 4px; font: 900 clamp(10px, 1.5vw, 15px)/1.4 'Bebas Neue', Impact, sans-serif; letter-spacing: 1.5px; color: #3b2509;
+.rr-plaque { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; padding: 3px 10px; border-radius: 4px; font: 900 clamp(10px, 1.5vw, 15px)/1.4 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; color: #3b2509;
   background: linear-gradient(180deg, #f7e3b5, #c9a064 55%, #8a6334); box-shadow: inset 0 0 0 1px #fff3d0, 0 0 0 2px #3a2614, 0 3px 6px rgba(0, 0, 0, .6); }
 .rr-brand { flex: none; display: flex; align-items: center; gap: 6px; }
 .rr-brand .logo-mark { width: clamp(18px, 2.6vw, 26px); height: clamp(18px, 2.6vw, 26px); font: 900 clamp(11px, 1.6vw, 15px)/1 Archivo, sans-serif; font-style: normal; border-radius: 4px; box-shadow: 0 0 0 1px rgba(255, 255, 255, .35), 0 2px 4px rgba(0, 0, 0, .6); }
@@ -17124,11 +17125,13 @@ html.light .slot small { color: inherit; }
 .rr-corner.l { left: 8px; transform: rotate(-30deg); } .rr-corner.r { right: 8px; transform: rotate(30deg); }
 .rr-corner .rr-img { width: 100%; height: 100%; }
 .rr-reels { position: relative; }
-.g-barillet .rr-reels .rs { width: 100%; min-width: 0; gap: 0; column-gap: 5px; padding: 5px; border-radius: 6px; box-sizing: border-box; background: #120f0c; box-shadow: inset 0 0 0 2px #0a0806, 0 0 0 1px rgba(255, 255, 255, .12), inset 0 0 18px rgba(0, 0, 0, .8); }
+.g-barillet .rr-reels .rs { grid-template-columns: .7fr 1fr 1fr 1fr .7fr; align-items: center; aspect-ratio: 4.4 / 4; width: 100%; min-width: 0; gap: 0; column-gap: 5px; padding: 5px; border-radius: 6px; box-sizing: border-box; background: #120f0c; box-shadow: inset 0 0 0 2px #0a0806, 0 0 0 1px rgba(255, 255, 255, .12), inset 0 0 18px rgba(0, 0, 0, .8); }
 .g-barillet .rs-reel { border-radius: 3px; background: linear-gradient(180deg, rgba(0, 0, 0, .55), transparent 16%, transparent 84%, rgba(0, 0, 0, .55)), var(--rr-planks, none) center / 100% 100%, #2a241e;
   box-shadow: inset 0 0 0 1px rgba(160, 124, 82, .35), inset 0 0 22px rgba(0, 0, 0, .55); }
 .g-barillet .rs-reel.rr-r0, .g-barillet .rs-reel.rr-r4 { box-shadow: inset 0 0 0 3px #9c968a, inset 0 0 0 5px #1a1814, inset 0 0 24px rgba(0, 0, 0, .6); }
 .g-barillet .rs-reel.rr-r0 { margin-right: 7px; } .g-barillet .rs-reel.rr-r4 { margin-left: 7px; }
+.g-barillet .rr-reels .rs-reel { align-self: stretch; }
+.g-barillet .rr-reels .rs-reel.rr-r0, .g-barillet .rr-reels .rs-reel.rr-r4 { height: 62%; align-self: center; }
 .g-barillet .rs-reel::before, .g-barillet .rs-reel::after { display: none; }
 .rr-img { width: 86%; height: 86%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .65)); pointer-events: none; user-select: none; }
 .g-barillet .rs-cell.scat .rr-img, .g-barillet .rs-cell.wild .rr-img { width: 94%; height: 94%; }
