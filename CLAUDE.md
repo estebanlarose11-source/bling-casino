@@ -202,8 +202,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Plus aucune bannière dans les pages du site** (demande du propriétaire : pas de pubs pour adultes sur le site) : `BANNERS = false` dans `hta.js`, les emplacements `[data-hta]` restent cachés. Les pubs ne s'affichent
   que quand le joueur en demande une (pubs récompensées de `ads.js` : +500 KE, recharge, roue ×5/×15, 50 tours…), dans
   une fenêtre avec croix ; chaque pub se charge dans `ads/banner.html` (sa propre petite page, dans une iframe).
-  **Pub après 1 minute** (demande du propriétaire, pas à l'arrivée) : une fois par visite (`sessionStorage spinbet_arrival_ad`),
-  `DELAY` = 60 s après l'ouverture, petite fenêtre avec la bannière 300×250 et sa croix tout de suite (+ « Fermer et jouer ») ;
+  **Pub après 30 secondes** (demande du propriétaire, pas à l'arrivée) : une fois par visite (`sessionStorage spinbet_arrival_ad`),
+  `DELAY` = 30 s après l'ouverture, petite fenêtre avec la bannière 300×250 et sa croix tout de suite (+ « Fermer et jouer ») ;
   jamais par-dessus une autre fenêtre ni pendant un tour de jeu (elle attend), ni onglet caché ; fermée toute seule si la
   régie n'envoie rien en 6 s (code juste après `mountHta()`).
   La page `ads/` (« Nos partenaires », lien du pied de page) garde sa bannière. Le propriétaire et les appareils

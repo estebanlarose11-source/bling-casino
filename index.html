@@ -18412,7 +18412,7 @@ __mods['hta.js'].mountHta();
   const KEY = 'spinbet_arrival_ad';
   try { if (sessionStorage.getItem(KEY)) return; } catch { /* ignore */ }
   const { adPolicy } = __mods['adpolicy.js'], H = __mods['hta.js'];
-  const DELAY = 60000; // 1 minute on the site
+  const DELAY = 30000; // 30 s on the site (owner's choice)
   const busy = () => document.querySelector('.modal-back, .aads-modal, .jc-scene, .tuto, [class*="tuto-"], .slot.busy, .featurebox, .fi-over') || document.hidden;
   const show = () => {
     if (adPolicy.noAds()) return;
