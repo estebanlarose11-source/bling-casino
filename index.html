@@ -5111,6 +5111,7 @@ html.light .slot small { color: inherit; }
 .hta-slot > small { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); }
 .hta-box { width: 300px; max-width: 100%; display: grid; place-items: center; overflow: hidden; border-radius: 8px; }
 .hta-slot.hta-on .hta-box { min-height: 250px; }
+.hta-slot.hta-off .hta-frame { height: 0 !important; }
 /* ============ Looks (shop): photo de profil, cadres, badges ============ */
 .lk-av { display: inline-grid; place-items: center; flex: none; border-radius: 50%; line-height: 1; position: relative; box-shadow: 0 0 0 2px rgba(255, 255, 255, .12); vertical-align: middle; }
 .lk-xs { width: 20px; height: 20px; font-size: 12px; margin-right: 4px; }
@@ -15670,7 +15671,7 @@ const { adPolicy } = __mods['adpolicy.js'];
 const { profiles } = __mods['profile.js'];
 const { progress } = __mods['progress.js'];
 
-const SRC = 'https://narrowefficiency.com/b.XIV/sQdZGAlE0wYvWycN/IeNmu9/uoZ/U/l/kOPtTucT1/OMDbgz4HMaT/MytPNYzOU/4iOMDig/xYNfwC';
+// the network's code itself is in ads/banner.html (and ads/index.html)
 
 const allowed = () => !adPolicy.noAds(); // every player, whatever their level (only the owner / ?nopub devices are left out)
 
@@ -15681,10 +15682,13 @@ function fill(slot) {
   slot.innerHTML = '<small>Publicité</small><div class="hta-box"></div>';
   const box = slot.querySelector('.hta-box');
   inject(box);
-  // the slot stays flat (no empty dark box) until the banner is really there; never served → it stays folded
-  watchShown(box, () => slot.classList.add('hta-on'));
+  // the banner's frame keeps its place 15 s; nothing served by then → the slot folds away (and opens if it comes later)
+  watchShown(box, () => slot.classList.remove('hta-off') || slot.classList.add('hta-on'), 90000);
+  setTimeout(() => { if (!slot.classList.contains('hta-on')) slot.classList.add('hta-off'); }, 15000);
 }
-const isShown = (box) => [...box.querySelectorAll('iframe, img, ins, a, div')].some((n) => n.offsetHeight > 20 && n.offsetWidth > 20);
+// something the network really drew (in the page, or inside the banner's own frame)
+const drawn = (root) => [...root.querySelectorAll('iframe:not(.hta-frame), img, ins, a, div:not(#ad)')].some((n) => n.offsetHeight > 20 && n.offsetWidth > 20);
+const isShown = (box) => [...box.querySelectorAll('iframe.hta-frame')].some((f) => { try { return drawn(f.contentDocument); } catch { return true; } }) || drawn(box);
 function watchShown(box, cb, ms = 15000) {
   const t0 = Date.now();
   const iv = setInterval(() => {
@@ -15693,11 +15697,21 @@ function watchShown(box, cb, ms = 15000) {
   }, 300);
 }
 
-// the network's loader, unchanged: it puts the banner script right before itself, inside box
+// Each banner is loaded in its own little page (ads/banner.html, the same code as the « Nos partenaires » page) inside
+// an <iframe>. Put straight into the site, the network's code ran only once per visit: the site never reloads when
+// the player changes page, and the home page draws its banner slot twice, so the next banners stayed empty.
+const SITE = /(^|\.)spinbetcaz\.com$|^localhost$|^127\.0\.0\.1$/.test(location.hostname);
+const BANNER = SITE ? '/ads/banner.html' : 'https://www.spinbetcaz.com/ads/banner.html';
 function inject(box) {
-  const loader = document.createElement('script');
-  loader.text = `(function(sdbhdr){var d=document,s=d.createElement('script'),l=d.currentScript||d.scripts[d.scripts.length-1];s.settings=sdbhdr||{};s.src=${JSON.stringify(SRC)};s.async=true;s.referrerPolicy='no-referrer-when-downgrade';l.parentNode.insertBefore(s,l);})({})`;
-  box.appendChild(loader);
+  const f = document.createElement('iframe');
+  f.className = 'hta-frame';
+  f.src = `${BANNER}?t=${Date.now().toString(36)}`;
+  f.width = '300'; f.height = '250';
+  f.title = 'Publicité';
+  f.loading = 'eager';
+  f.setAttribute('scrolling', 'no');
+  f.style.cssText = 'border:0;display:block;width:300px;max-width:100%;height:250px;background:transparent';
+  box.appendChild(f);
 }
 
 function scan() { document.querySelectorAll('[data-hta=""]').forEach(fill); }
