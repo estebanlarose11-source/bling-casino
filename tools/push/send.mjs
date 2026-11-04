@@ -27,7 +27,7 @@ const FLASH = { per: 3, from: 12, to: 21, minutes: 30 };
 const POOL = ['fortune', 'cosmic', 'zeus', 'huff', 'candy', 'anubis', 'bling', 'pharaon', 'taco', 'billets', 'dragons', 'labo', 'chasse', 'big-bad-wolf', 'noel', 'totemx'];
 const seedOf = (s) => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) / 4294967296); };
 function flashesOf(p) {
-  const rnd = seedOf(`flash-${p.y}-${p.m}-${p.d}`), hours = [];
+  const rnd = seedOf(`flash-${p.key}`), hours = []; // p.key = AAAA-MM-JJ, like the site (extras.js)
   while (hours.length < FLASH.per) { const h = FLASH.from + Math.floor(rnd() * (FLASH.to - FLASH.from + 1)); if (!hours.includes(h)) hours.push(h); }
   return hours.sort((a, b) => a - b).map((h) => { const half = rnd() < 0.5 ? 30 : 0; return { h, mi: half, game: POOL[Math.floor(rnd() * POOL.length)] }; });
 }

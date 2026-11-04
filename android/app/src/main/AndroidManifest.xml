@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- notifications (Notifs.java): show them (Android 13+ asks the player) and set them again after a restart -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:label="@string/app_name"
@@ -26,5 +29,12 @@
                 <data android:scheme="https" android:host="www.spinbetcaz.com" />
             </intent-filter>
         </activity>
+        <receiver android:name=".Notifs$Receiver" android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="com.spinbetcaz.app.TICK" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

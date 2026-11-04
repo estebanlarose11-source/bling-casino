@@ -1,0 +1,47 @@
+LE VOLCAN — ce qu'il faut pour le finir (images à envoyer à Claude)
+=====================================================================
+Le jeu marche déjà (règles, gains réglés par simulation, bonus ÉRUPTION). Il est « en travaux »
+parce que tout est encore dessiné par le code. Comme pour La Roulette Russe, il faut tes images.
+
+Format : PNG ou WEBP, fond transparent pour les symboles, le plus grand possible (je redécoupe).
+Une planche avec tous les symboles, c'est très bien aussi : je les découpe.
+
+1. LES SYMBOLES (13 images, fond transparent, carrés)
+   Petits symboles (paient peu) :
+   - s0  Cristal violet
+   - s1  Cristal bleu
+   - s2  Cristal vert
+   - s3  Cristal jaune
+   - s4  Cristal rouge
+   Gros symboles (paient beaucoup) :
+   - s5  Coquillage fossile
+   - s6  Ammonite (fossile en spirale)
+   - s7  Masque tribal
+   - s8  Idole de lave (le meilleur symbole)
+   Spéciaux :
+   - scat  Le CRATÈRE (symbole BONUS : 4 cratères = ÉRUPTION)
+   - lava  La PIERRE DE LAVE (porte un multiplicateur ×2 à ×500, le chiffre est écrit par le jeu)
+   - (option) lava-hot : la même pierre en version « brûlante » pour les gros multiplicateurs (×50 et plus)
+
+2. LE DÉCOR
+   - bg     Fond du jeu : île volcanique, de nuit, en format portrait (téléphone), environ 1080×1920
+   - bg-eruption (option) : le même fond pendant l'ÉRUPTION (volcan en éruption, ciel rouge)
+   - frame (option) : un cadre autour de la grille 6 colonnes × 5 lignes (roche + lave)
+
+3. LE LOGO / TITRE
+   - logo   « LE VOLCAN » en lettres de lave/pierre, fond transparent
+
+4. LA JAUGE DE PRESSION (option, sinon je la dessine)
+   - un thermomètre / manomètre de volcan avec les paliers ×1 ×2 ×4 ×8 ×16
+
+5. LA COUVERTURE (vignette du jeu dans le casino)
+   - cover  Image carrée ou portrait du volcan, SANS texte (le titre est ajouté par le site),
+            ou avec le titre peint en haut/bas (dis-le-moi, je le recadre)
+
+6. TES CHOIX (réponds simplement)
+   - Le nom reste « Le Volcan » ?
+   - Les couleurs : rouge/orange lave (comme maintenant) ou autre ?
+   - Tu veux une musique ou des sons particuliers ? (sinon je garde ceux d'aujourd'hui)
+
+Quand j'ai les images : je les découpe, je les mets dans le jeu, je retire « EN TRAVAUX »,
+je vérifie que tout marche sur téléphone et ordinateur, et je mets l'affiche « NOUVEAU ».

@@ -58,7 +58,10 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <!-- Polices Google chargées sans bloquer le premier affichage (le texte s'affiche tout de suite, la police arrive après) -->
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@600;700;800;900&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cinzel:wght@700;900&family=Inter:wght@400;500;600;700;800;900&family=Archivo:wght@600;700;800;900&display=swap"></noscript>
   <style>
 /* Currency logo: the KE coin (a K with a bar in a coin) is the private character U+E1E0, drawn by a tiny font added to
    every family the site uses, so it shows wherever an amount is written (fmt() in wallet.js ends with it). */
@@ -4028,7 +4031,7 @@ body::after { content: ''; position: fixed; inset: 0; z-index: -1; pointer-event
 @keyframes proBreath { 50% { transform: scale(1.05); } }
 
 /* game cards: 3D tilt that follows the pointer, with a glare, and a reveal when they scroll in */
-.game-card .thumb { transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .3s, border-color .3s; will-change: transform; }
+.game-card .thumb { transform: perspective(800px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .35s cubic-bezier(.2, .8, .2, 1), box-shadow .3s, border-color .3s; } /* no will-change: one graphics layer per card (100+) was heavy on phones, and the cards no longer tilt */
 .game-card.tilting .thumb { transition: transform .08s linear, box-shadow .3s; }
 .game-card .glare { position: absolute; inset: 0; z-index: 4; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .3s;
   background: radial-gradient(circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, .38), transparent 55%); mix-blend-mode: overlay; }
@@ -5770,6 +5773,32 @@ body::before { will-change: transform; }
 html:not(.light) .top { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: linear-gradient(180deg, rgba(14, 18, 26, .97), rgba(10, 13, 19, .94)) !important; }
 html:not(.light) .bottom-nav, .side, .side-scrim { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 .toast { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+
+/* Série de connexion sur l'accueil (bonus du jour, data-daily-home) */
+.dh-card { margin: 0 0 16px; padding: 14px 16px 10px; border-radius: 12px; background: linear-gradient(135deg, rgba(251, 191, 36, .14), rgba(124, 200, 255, .06)); border: 1px solid rgba(251, 191, 36, .35); }
+.dh-card:not(.ready) { background: linear-gradient(135deg, rgba(124, 200, 255, .10), rgba(124, 200, 255, .03)); border-color: rgba(124, 200, 255, .28); }
+.dh-top { display: flex; align-items: center; gap: 12px; }
+.dh-gift { font-size: 34px; line-height: 1; }
+.dh-card.ready .dh-gift { animation: float 2.4s ease-in-out infinite; filter: drop-shadow(0 0 14px rgba(251, 191, 36, .55)); }
+.dh-txt { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.dh-txt > b { font: 900 17px/1.15 KeCoin, Archivo, sans-serif; }
+.dh-txt small { color: var(--muted); font-size: 12.5px; line-height: 1.35; }
+.dh-txt small b { color: var(--gold, #fbbf24); }
+.dh-go { flex: none; padding: 10px 18px; font-weight: 900; }
+.dh-card.ready .dh-go { animation: sdPulse 1.6s ease-in-out infinite; }
+.dh-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 12px; }
+.dh-d { padding: 6px 2px; border-radius: 8px; text-align: center; background: rgba(255, 255, 255, .04); border: 1px solid rgba(255, 255, 255, .08); }
+.dh-d small { display: block; font-size: 10.5px; color: var(--muted); font-weight: 800; }
+.dh-d b { font: 900 13px KeCoin, Archivo, sans-serif; }
+.dh-d.done { background: rgba(124, 200, 255, .12); border-color: rgba(124, 200, 255, .35); }
+.dh-d.done b { color: var(--green); }
+.dh-d.now { background: rgba(251, 191, 36, .16); border-color: var(--gold, #fbbf24); box-shadow: 0 0 14px rgba(251, 191, 36, .35); }
+.dh-d.now b { color: var(--gold, #fbbf24); }
+.dh-d.chest { background: linear-gradient(180deg, rgba(251, 191, 36, .16), rgba(251, 191, 36, .04)); }
+.dh-warn { display: block; margin-top: 6px; font-size: 11px; color: var(--muted); text-align: center; }
+.dh-warn:empty { display: none; }
+html.light .dh-card { background: linear-gradient(135deg, #fff7e0, #eef6ff); }
+html.light .dh-d { background: #fff; border-color: #e3e8ef; }
 </style>
 </head>
 <body>
@@ -6442,6 +6471,7 @@ const enabled = !!FIREBASE_CONFIG.apiKey;
 
 const loadScript = (src) => new Promise((ok, ko) => {
   const s = document.createElement('script');
+  s.async = false; // keeps the order of several scripts added together
   s.src = src;
   s.onload = ok;
   s.onerror = () => ko(new Error(`Cannot load ${src}`));
@@ -6452,7 +6482,8 @@ let fb = null;
 function init() {
   if (!fb) {
     fb = (async () => {
-      for (const part of ['app', 'auth', 'firestore']) await loadScript(`${SDK}firebase-${part}-compat.js`);
+      // the 3 files download together and still run in order (async = false): one wait instead of three in a row
+      await Promise.all(['app', 'auth', 'firestore'].map((part) => loadScript(`${SDK}firebase-${part}-compat.js`)));
       const app = firebase.initializeApp(FIREBASE_CONFIG);
       const auth = app.auth();
       auth.languageCode = 'fr';
@@ -7173,9 +7204,11 @@ return { MAX_LEVEL, RANKS, MAX_LEVEL_BONUS, XP, xpToNext, rankOf, rankIndex, lev
 
 // ---- daily.js ----
 __mods['daily.js'] = (() => {
-// Daily bonus: claimable once every 24 h, saved in the active profile (profile.daily).
-// Claiming again within 48 h of the last claim keeps the streak going; the amount grows with the streak up to
-// day 7 (capped), plus a small bonus per rank. Missing a day starts the streak over.
+// Daily bonus (series of daily logins): claimable once every 24 h, saved in the active profile (profile.daily).
+// Claiming again within 48 h of the last claim keeps the streak going. Owner's request: a real amount every day, but
+// reasonable. Week 1 climbs from 1 000 to 10 000 KE (day 7 = the big chest), then each following week pays
+// WEEK2 (3 000 → 10 000 KE), plus a small bonus per rank. Missing a day starts the streak over at day 1.
+// Week 1 = 26 500 KE, each next week = 34 000 KE (a refill with 2 ads gives 10 000 KE, 3 times a day).
 
 const { wallet } = __mods['wallet.js'];
 const { profiles } = __mods['profile.js'];
@@ -7184,7 +7217,8 @@ const { progress, rankIndex } = __mods['progress.js'];
 const DAILY = {
   cooldownMs: 24 * 3600e3,
   streakMs: 48 * 3600e3,
-  amounts: [50, 60, 70, 85, 100, 120, 150], // KE for streak day 1..7 (day 7+ stays at the cap)
+  amounts: [1000, 1500, 2000, 3000, 4000, 5000, 10000], // KE for streak days 1..7 (first week)
+  week2: [3000, 3000, 4000, 4000, 5000, 5000, 10000], // KE for days 8..14, 15..21… (every next week)
   perRank: 0.1, // +10 % per rank above Bronze (Diamant: +40 %)
   xp: 40,
 };
@@ -7192,8 +7226,17 @@ const DAILY = {
 const state = () => ({ last: 0, streak: 0, lastAmount: 0, doubled: true, ...profiles.current?.daily });
 
 function amountFor(streak, level = progress.state.level) {
-  const base = DAILY.amounts[Math.min(streak, DAILY.amounts.length) - 1];
+  const n = Math.max(1, streak), base = n <= 7 ? DAILY.amounts[n - 1] : DAILY.week2[(n - 1) % 7];
   return Math.round(base * (1 + DAILY.perRank * rankIndex(level)));
+}
+
+// The 7 days of the week the player is in (for the streak boxes): [{ day, amount, done, now }].
+function weekDays(st = dailyStatus(), level = progress.state.level) {
+  const cur = st.ready ? st.next : Math.max(1, st.streak), first = Math.floor((cur - 1) / 7) * 7 + 1;
+  return Array.from({ length: 7 }, (_, k) => {
+    const day = first + k;
+    return { day, amount: amountFor(day, level), done: day < cur || (!st.ready && day === cur), now: st.ready && day === cur, chest: k === 6 };
+  });
 }
 
 // { ready, waitMs, streak (current), next (streak if claimed now), amount (if claimed now), canDouble }
@@ -7213,8 +7256,19 @@ function claimDaily() {
   profiles.update('daily', (me) => { me.daily = { last: Date.now(), streak: st.next, lastAmount: st.amount, doubled: false }; });
   wallet.grant(st.amount);
   progress.gain(DAILY.xp);
+  tellApp();
   return { amount: st.amount, streak: st.next };
 }
+
+// The Android app reminds the player when the next gift is ready and before the series is lost (Notifs.java).
+// Only for saved profiles: a guest starts over on every visit.
+function tellApp() {
+  const A = window.SpinBetApp;
+  if (typeof A?.daily !== 'function' || !profiles.current || profiles.guest) return;
+  const d = state();
+  try { A.daily(String(d.last || 0), String(d.streak || 0)); } catch { /* old app */ }
+}
+profiles.addEventListener('change', tellApp);
 
 // Ad reward: pays today's bonus a second time (once per claim).
 function doubleDaily() {
@@ -7230,7 +7284,7 @@ const fmtWait = (ms) => {
   return `${h}h ${String(m).padStart(2, '0')}m ${String(x).padStart(2, '0')}s`;
 };
 
-return { DAILY, amountFor, dailyStatus, claimDaily, doubleDaily, fmtWait };
+return { DAILY, amountFor, dailyStatus, claimDaily, doubleDaily, fmtWait, weekDays };
 })();
 
 // ---- ui.js ----
@@ -8203,7 +8257,7 @@ function welcome(profile, isNew) {
   sfx.win();
   if (profiles.guest) toast('Mode invité : ta progression ne sera pas sauvegardée', 'info');
   else toast(isNew ? `Bienvenue ${esc(profile.name)} ! Ton compte est créé, tes ${fmt(wallet.balance)} sont sauvegardés` : `Bon retour ${esc(profile.name)} !`, 'ok');
-  if (dailyStatus().ready) setTimeout(() => toast('🎁 Ton bonus du jour t’attend dans ton profil', 'info'), 1200);
+  if (dailyStatus().ready) setTimeout(() => toast(`🎁 Ton bonus du jour t’attend sur l’accueil : +${fmt(dailyStatus().amount)}`, 'info'), 1200);
 }
 
 function showGate(opts) {
@@ -8736,7 +8790,7 @@ __mods['pages/profile.js'] = (() => {
 
 const { profiles } = __mods['profile.js'];
 const { progress, RANKS, MAX_LEVEL, MAX_LEVEL_BONUS, XP, rankBadge, levelReward } = __mods['progress.js'];
-const { DAILY, dailyStatus, claimDaily, amountFor, fmtWait } = __mods['daily.js'];
+const { DAILY, dailyStatus, claimDaily, amountFor, fmtWait, weekDays } = __mods['daily.js'];
 const { ads, PLACEMENTS } = __mods['ads.js'];
 const { wallet, fmt } = __mods['wallet.js'];
 const { toast } = __mods['ui.js'];
@@ -8783,11 +8837,8 @@ ${__mods['achievements.js']?.trophiesHTML?.() || ''}
 
     <section class="panel daily-card${d.ready ? ' ready' : ''}">
       <div class="dc-head"><div class="dc-gift">🎁</div><div><h2>Bonus du jour</h2>
-        <p class="muted">Une fois toutes les 24 h. Reviens chaque jour pour faire monter ta série (max au jour 7).</p></div></div>
-      <div class="streak">${DAILY.amounts.map((_, k) => {
-        const day = k + 1, cur = d.ready ? d.next : d.streak, done = day < cur || (!d.ready && day === cur), now = d.ready && day === Math.min(cur, 7);
-        return `<div class="sd${done ? ' done' : ''}${now ? ' now' : ''}"><small>Jour ${day}${day === 7 ? '+' : ''}</small><b>${amountFor(day, p.level)}\u00a0\uE1E0</b></div>`;
-      }).join('')}</div>
+        <p class="muted">Une fois toutes les 24 h. Reviens chaque jour : le bonus monte jusqu’au coffre du 7e jour, et chaque nouvelle semaine paie encore plus.</p></div></div>
+      <div class="streak">${weekDays(d, p.level).map((w) => `<div class="sd${w.done ? ' done' : ''}${w.now ? ' now' : ''}${w.chest ? ' chest' : ''}"><small>Jour ${w.day}${w.chest ? ' 🧰' : ''}</small><b>${fmt(w.amount)}</b></div>`).join('')}</div>
       <div class="dc-act">${d.ready
         ? `<button class="btn primary lg" data-claim>Récupérer ${fmt(d.amount)}</button><small class="muted">Série : jour ${d.next}${d.next > 1 ? ' 🔥' : ''} · +${DAILY.xp} XP</small>`
         : `<div class="dc-wait"><small>Prochain bonus dans</small><b data-wait>${fmtWait(d.waitMs)}</b></div><small class="muted">Série en cours : ${d.streak} jour${d.streak > 1 ? 's' : ''} 🔥 · ne la casse pas : reviens avant 48 h</small>${d.canDouble ? adBtn('daily_x2') : ''}`}
@@ -10792,12 +10843,80 @@ const { UPDATES, latestFor, recent, fmtDate } = __mods['updates.js'];
 const { wheelReady } = __mods['wheel.js'];
 const { missionStatus } = __mods['missions.js'];
 const profilesReady = () => !!__mods['profile.js'].profiles.current;
+const { dailyStatus, claimDaily, fmtWait, weekDays } = __mods['daily.js'];
+
+/* Daily login series, at the top of the home page (owner's request: visible, a real amount every day). The 7 days
+   of the week, today's gift in gold, a button to take it, then the countdown to tomorrow's and the next amount. */
+function dailyHomeHTML() {
+  if (!profilesReady()) return '';
+  const d = dailyStatus(), days = weekDays(d), x2 = d.canDouble && __mods['ads.js']?.ads.status('daily_x2').ok;
+  const next = d.ready ? null : days.find((w) => w.day === d.streak + 1) || { day: d.streak + 1, amount: __mods['daily.js'].amountFor(d.streak + 1) };
+  return `<section class="dh-card${d.ready ? ' ready' : ''}" data-daily-home>
+    <div class="dh-top"><span class="dh-gift">${d.ready ? '🎁' : '🔥'}</span><div class="dh-txt">
+      <b>${d.ready ? `Cadeau du jour\u00a0: +${fmt(d.amount)}` : `Série de ${d.streak} jour${d.streak > 1 ? 's' : ''} 🔥`}</b>
+      <small>${d.ready ? (d.next > 1 ? `Jour ${d.next} de ta série · reviens chaque jour, ça monte` : `Reviens chaque jour : le cadeau monte jusqu’au coffre de ${fmt(10000)}`) : `Demain (jour ${next.day}) : <b>${fmt(next.amount)}</b> · dans <span data-dh-wait>${fmtWait(d.waitMs)}</span>`}</small>
+    </div>${d.ready ? `<button class="btn primary dh-go" data-dh-claim>Prendre</button>` : x2 ? '<button class="btn ghost dh-go" data-dh-x2>📺 ×2</button>' : ''}</div>
+    <div class="dh-days">${days.map((w) => `<div class="dh-d${w.done ? ' done' : ''}${w.now ? ' now' : ''}${w.chest ? ' chest' : ''}"><small>${w.chest ? '🧰' : `J${w.day}`}</small><b>${w.amount >= 1000 ? `${w.amount / 1000 % 1 ? (w.amount / 1000).toFixed(1).replace('.', ',') : w.amount / 1000}k` : w.amount}</b></div>`).join('')}</div>
+    <small class="dh-warn">${d.ready || !d.streak ? '' : 'Reviens avant 48 h sinon la série repart au jour 1'}</small>
+  </section>`;
+}
+let dhTimer = 0;
+function mountDailyHome(root) {
+  clearInterval(dhTimer);
+  const box = root.querySelector('[data-daily-home]');
+  if (!box) return;
+  const redraw = () => { const n = root.querySelector('[data-daily-home]'); if (n) { n.outerHTML = dailyHomeHTML(); mountDailyHome(root); } };
+  box.querySelector('[data-dh-claim]')?.addEventListener('click', (e) => {
+    const r = claimDaily();
+    if (!r) return;
+    const { sfx } = __mods['audio.js'], { fx } = __mods['fx.js'];
+    sfx.unlock(); sfx.bigWin(); fx.coins(70, e.currentTarget); fx.confetti(60);
+    __mods['ui.js'].toast(`Cadeau du jour : +${fmt(r.amount)} · série jour ${r.streak} 🔥`, 'ok');
+    redraw();
+  });
+  box.querySelector('[data-dh-x2]')?.addEventListener('click', async (e) => {
+    e.currentTarget.disabled = true;
+    const r = await __mods['ads.js'].ads.watch('daily_x2');
+    __mods['ui.js'].toast(r.message, r.ok ? 'ok' : 'warn');
+    redraw();
+  });
+  const wait = box.querySelector('[data-dh-wait]');
+  if (wait) dhTimer = setInterval(() => {
+    if (!wait.isConnected) return clearInterval(dhTimer);
+    const s = dailyStatus();
+    if (s.ready) redraw(); else wait.textContent = fmtWait(s.waitMs);
+  }, 1000);
+}
 const { challengeGame } = __mods['social.js'];
 
 const VOL = ['', 'Très basse', 'Basse', 'Moyenne', 'Haute', 'Très haute'];
 const volLabel = (g) => (g.original ? VOL[g.vol] : g.volatility);
 
 const thumbArt = (g, opts) => coverSVG(g, opts);
+
+/* Covers drawn when they come on screen (speed: the home page held 240 cover drawings, ≈ 7 400 elements and
+   320 SVG filters, built and painted on arrival even for the cards far to the right of each row). A card first holds
+   an empty .cover box of the same size; the drawing replaces it when the card gets near the screen. */
+let cvIO = null, cvScan = 0;
+const fillCover = (n) => {
+  const g = getGame(n.dataset.cv);
+  if (cvIO) cvIO.unobserve(n);
+  if (n.isConnected && g) { n.insertAdjacentHTML('beforebegin', coverSVG(g, { square: true })); n.remove(); }
+};
+function scanCovers() {
+  cvScan = 0;
+  const list = document.querySelectorAll('i.cv-lazy:not([data-cvw])');
+  if (!list.length) return;
+  if (!cvIO) {
+    if (!('IntersectionObserver' in window)) { list.forEach(fillCover); return; }
+    cvIO = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && fillCover(e.target)), { rootMargin: '300px 400px' });
+  }
+  list.forEach((n) => { n.dataset.cvw = '1'; cvIO.observe(n); });
+}
+const lazyThumb = (g) => {
+  if (!cvScan) { cvScan = requestAnimationFrame(scanCovers); setTimeout(scanCovers, 600); } // the card is in the page by then
+  return `<i class="cover cv-lazy" data-cv="${g.id}" aria-hidden="true"></i>`;
+};
 
 function gameCard(g) {
   if (g.wip) return `<div class="game-card wip" aria-label="${g.name} · en travaux" title="${g.name} · en travaux, bientôt disponible" style="--accent:${g.colors[0]}">
@@ -10806,7 +10925,7 @@ function gameCard(g) {
   const u = recent(g.id);
   return `<a class="game-card" href="#game-${g.id}" aria-label="${g.name} · ${BRAND.provider}" style="--accent:${g.original ? g.colors[0] : '#f59e0b'}">
     <div class="thumb">
-      ${thumbArt(g, { square: true })}
+      ${lazyThumb(g)}
       ${u ? `<span class="upd-tag${u.isNew ? ' new' : ''}">${u.isNew ? 'NOUVEAU' : 'MISE À JOUR'}</span>` : ''}
       <div class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></div>
       ${likeButton(g.id)}
@@ -10890,7 +11009,7 @@ function renderLobby(root, params = {}) {
       </div>
     </section>` : '';
 
-  root.innerHTML = `
+  root.innerHTML = `${filter === 'all' ? dailyHomeHTML() : ''}
     ${hero || `<section class="hero">
       <div class="hero-main theme-wolf has-bg">${bgArt(wolf, 'upd-bg')}
         <div class="hero-copy">
@@ -10936,6 +11055,7 @@ function renderLobby(root, params = {}) {
         </div>
       </div>
     </section>`;
+  mountDailyHome(root);
 }
 
 return { volLabel, thumbArt, gameCard, FILTERS, renderLobby };
@@ -16624,7 +16744,10 @@ const sha256 = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-2
 const reg = async () => ('serviceWorker' in navigator ? navigator.serviceWorker.getRegistration() : null);
 
 // 'on' | 'off' | 'denied' | 'install' (iPhone: add to the home screen first) | 'unsupported'
+// The Android app has its own notifications (android/…/Notifs.java), switched on and off through window.SpinBetApp.
+const appN = () => (typeof window.SpinBetApp?.notifStatus === 'function' ? window.SpinBetApp : null);
 async function state() {
+  if (appN()) { try { return appN().notifStatus(); } catch { return 'unsupported'; } }
   if (!cloud.enabled || !window.isSecureContext || !('serviceWorker' in navigator)) return 'unsupported';
   if (!('PushManager' in window) || !('Notification' in window)) return isIOS() && !standalone() ? 'install' : 'unsupported';
   if (Notification.permission === 'denied') return 'denied';
@@ -16645,6 +16768,12 @@ async function save(sub) {
 
 // Must run from a tap (iPhone asks for it).
 async function enable() {
+  if (appN()) {
+    if ((await state()) === 'denied') { toast('Les notifications sont bloquées : autorise-les dans Réglages → Applis → SpinBet → Notifications', 'warn'); return false; }
+    appN().notifOn();
+    toast('🔔 C’est noté : on te prévient (roue du jour, cadeau du jour, tournois, événements flash)', 'ok');
+    return true;
+  }
   const st = await state();
   if (st === 'install') { location.hash = 'appli'; toast('Sur iPhone : ajoute d’abord SpinBet à ton écran d’accueil, puis ouvre-le depuis l’icône', 'info'); return false; }
   if (st === 'unsupported') { toast('Ce navigateur ne reçoit pas les notifications', 'warn'); return false; }
@@ -16664,6 +16793,7 @@ async function enable() {
 }
 
 async function disable() {
+  if (appN()) { appN().notifOff(); toast('🔕 Notifications coupées', 'info'); return; }
   try {
     const sub = await (await reg())?.pushManager.getSubscription();
     if (sub) { const id = await sha256(sub.endpoint); await sub.unsubscribe(); await cloud.deletePush(id).catch(() => {}); }
@@ -16677,12 +16807,12 @@ async function paintPanel(box) {
   const txt = {
     on: ['✅ Les notifications sont activées sur cet appareil.', '<button class="btn ghost" data-push-off>Couper les notifications</button>'],
     off: ['On te prévient quand le <b>tournoi du soir</b> commence, quand ta <b>roue du jour</b> est prête et des grandes nouveautés. Une ou deux par jour, pas plus.', '<button class="btn primary lg" data-push-on>🔔 Activer les notifications</button>'],
-    denied: ['Les notifications sont bloquées pour SpinBet. Autorise-les dans les réglages du navigateur (le cadenas à côté de l’adresse, ou Réglages → Notifications sur le téléphone), puis reviens ici.', ''],
+    denied: appN() ? ['Les notifications sont bloquées pour l’appli SpinBet. Autorise-les dans Réglages → Applis → SpinBet → Notifications, puis reviens ici.', ''] : ['Les notifications sont bloquées pour SpinBet. Autorise-les dans les réglages du navigateur (le cadenas à côté de l’adresse, ou Réglages → Notifications sur le téléphone), puis reviens ici.', ''],
     install: ['Sur iPhone, les notifications marchent quand SpinBet est <b>sur ton écran d’accueil</b> : suis les 3 étapes ci-dessous, ouvre SpinBet depuis son icône, puis reviens sur cette page pour les activer.', ''],
     unsupported: /SpinBetApp/.test(navigator.userAgent) ? ['Les notifications ne sont pas encore dans l’appli Android. Pour les recevoir, installe aussi SpinBet avec Chrome (bouton Télécharger l’appli, « Avec Chrome »).', ''] : ['Ce navigateur ne peut pas recevoir les notifications. Sur Android, ouvre le site dans Chrome ; sur iPhone, ajoute-le à l’écran d’accueil (iOS 16.4 ou plus récent).', ''],
   }[st];
   box.innerHTML = `<h2>🔔 Notifications</h2><p class="muted">${txt[0]}</p>${txt[1]}`;
-  box.querySelector('[data-push-on]')?.addEventListener('click', async () => { await enable(); paintPanel(box); });
+  box.querySelector('[data-push-on]')?.addEventListener('click', async () => { await enable(); paintPanel(box); if (appN()) setTimeout(() => paintPanel(box), 3000); }); // the app: Android's answer comes a moment later
   box.querySelector('[data-push-off]')?.addEventListener('click', async () => { await disable(); paintPanel(box); });
 }
 
@@ -18337,13 +18467,16 @@ function route() {
   view.classList.remove('enter');
   hit.page(view, path.match(hit.re) || []);
   __mods['events.js'].paint(); // tournaments, happy hour, jackpot and duels boxes
-  void view.offsetWidth;
+  // No forced style/layout pass here (offsetWidth cost ≈ 0.5 s on a phone): the new page's blocks are new elements,
+  // so their entry animation (.view.enter > *) plays anyway. Same for the scroll: only when not already at the top.
   view.classList.add('enter');
   const nav = typeof hit.nav === 'function' ? hit.nav(path.match(hit.re) || []) : hit.nav;
   document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('on', a.dataset.nav === nav));
   document.body.classList.remove('side-open');
-  scrollTo({ top: 0, behavior: 'instant' });
+  if (pageScrolled) { pageScrolled = false; scrollTo({ top: 0, behavior: 'instant' }); } // reading scrollY would force a layout
 }
+let pageScrolled = false;
+addEventListener('scroll', () => { pageScrolled = scrollY > 0; }, { passive: true });
 
 /* ---------- ads ----------
    The only ad network is Adsterra (ads/banner.html; banners: hta.js, switched off; rewarded ads: ads.js). Nobody sees ads when adPolicy.noAds()

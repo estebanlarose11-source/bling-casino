@@ -3,10 +3,12 @@ package com.spinbetcaz.app;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -86,6 +88,15 @@ public class MainActivity extends Activity {
             if (url.startsWith("http")) openOutside(Uri.parse(url), true);
         });
 
+        // notifications (Notifs.java): first launch = remember the day (no old message shown), ask Android 13+ once
+        if (Notifs.prefs(this).getLong("installed", 0) == 0) Notifs.prefs(this).edit().putLong("installed", System.currentTimeMillis()).apply();
+        Notifs.channel(this);
+        Notifs.schedule(this, System.currentTimeMillis());
+        if (Build.VERSION.SDK_INT >= 33 && !Notifs.prefs(this).getBoolean("asked", false)) {
+            Notifs.prefs(this).edit().putBoolean("asked", true).apply();
+            web.postDelayed(() -> requestPermissions(new String[] { "android.permission.POST_NOTIFICATIONS" }, 7), 4000);
+        }
+
         Uri link = getIntent() != null ? getIntent().getData() : null;
         if (state != null) web.restoreState(state);
         else web.loadUrl(link != null ? link.toString() : HOME);
@@ -138,8 +149,36 @@ public class MainActivity extends Activity {
         web.onResume();
     }
 
-    /** Called by the page (bigwin.js): shares the big-win picture with TikTok, Snap, WhatsApp… */
+    /** Called by the page (bigwin.js, push.js, daily.js). */
     class Bridge {
+        /** Notifications of the app: "on", "off" (switched off in the site) or "denied" (refused in Android). */
+        @JavascriptInterface
+        public String notifStatus() {
+            if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED)
+                return Notifs.prefs(MainActivity.this).getBoolean("asked", false) && !shouldShowRequestPermissionRationale("android.permission.POST_NOTIFICATIONS") ? "denied" : "off";
+            return Notifs.prefs(MainActivity.this).getBoolean("on", true) ? "on" : "off";
+        }
+
+        @JavascriptInterface
+        public void notifOn() {
+            Notifs.prefs(MainActivity.this).edit().putBoolean("on", true).putBoolean("asked", true).apply();
+            if (Build.VERSION.SDK_INT >= 33) runOnUiThread(() -> requestPermissions(new String[] { "android.permission.POST_NOTIFICATIONS" }, 7));
+            Notifs.schedule(MainActivity.this, System.currentTimeMillis());
+        }
+
+        @JavascriptInterface
+        public void notifOff() { Notifs.prefs(MainActivity.this).edit().putBoolean("on", false).apply(); }
+
+        /** The daily gift was taken at {@code last} (ms), series of {@code streak} days: sets the reminders. */
+        @JavascriptInterface
+        public void daily(String last, String streak) {
+            try {
+                Notifs.prefs(MainActivity.this).edit().putLong("dailyLast", Long.parseLong(last)).putInt("dailyStreak", Integer.parseInt(streak)).apply();
+                Notifs.schedule(MainActivity.this, System.currentTimeMillis());
+            } catch (NumberFormatException ignored) { /* bad values from the page */ }
+        }
+
+        /** Shares the big-win picture with TikTok, Snap, WhatsApp… */
         @JavascriptInterface
         public void share(String dataUrl, String text) {
             runOnUiThread(() -> {

@@ -163,6 +163,16 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 
 ## Arrivée des visiteurs et partage
 
+- **Cadeau du jour = série de connexion** (`daily.js`, carte en haut de l'accueil `dailyHomeHTML` dans `pages/lobby.js`,
+  et page Profil) : 1re semaine 1 000 → 10 000 KE (coffre du 7e jour, `DAILY.amounts`), puis chaque semaine suivante
+  3 000 → 10 000 KE (`DAILY.week2`), +10 % par rang ; une journée ratée (plus de 48 h) = retour au jour 1.
+  Voulu par le propriétaire : « de l'argent tous les jours pour jouer, mais raisonnable ».
+- **Vitesse d'arrivée** (mesurée sur téléphone simulé, 4G lente) : les couvertures des cartes de jeux se dessinent
+  quand elles arrivent à l'écran (`lazyThumb` / `scanCovers` dans `pages/lobby.js` : l'accueil en avait 240 d'un coup,
+  ≈ 7 400 éléments) ; `route()` ne force plus de mise en page (`offsetWidth`, `scrollTo` quand la page est déjà en
+  haut) ; pas de `will-change` sur les cartes ; polices Google chargées sans bloquer l'affichage ; les 3 fichiers
+  Firebase se téléchargent ensemble. Ne pas remettre de dessin SVG complet dans `gameCard`.
+
 - **Pas d'écran de connexion à l'arrivée** (`hud.js`) : un nouveau visiteur joue tout de suite en invité. La création
   de compte est proposée au bon moment (carte « Garde tes gains » après un gain ≥ ×25 ou après 20, 60, 150, 300
   parties, `NUDGE`), par la puce du joueur en haut (« 💾 Sauvegarder ») et par tout bouton `[data-signup]`. Un compte
@@ -194,7 +204,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   que si ce fichier existe). Les mises à jour du site arrivent toutes seules dans l'appli. Secret GitHub
   `APK` (ou `ANDROID_KEYSTORE`, `SPINBET` ; clé de signature en base64, mot de passe `spinbet-app`) : toujours la même clé, sinon les
   téléphones refusent la mise à jour. L'appli se signale par « SpinBetApp » dans le user agent et partage les
-  images de gros gain par `window.SpinBetApp.share(dataUrl, texte)`. Pas de notifications dans l'APK.
+  images de gros gain par `window.SpinBetApp.share(dataUrl, texte)`.
+- **Notifications de l'APK** (`android/…/Notifs.java`, gratuites, sans serveur) : le téléphone se réveille lui-même
+  (AlarmManager) aux heures des notifications du site (roue 13 h 35, tournoi 20 h 35, week-end samedi 11 h 35, les 3
+  événements flash : même tirage que `flashesOf`, **garder les 3 copies identiques** : `extras.js`, `send.mjs`,
+  `Notifs.java`), plus le cadeau du jour (prêt 24 h après le dernier, « ta série va se perdre » 4 h avant 48 h ; la page
+  le dit à l'appli par `SpinBetApp.daily`). Message libre (Actions → « Notifications » → Run workflow) : aussi écrit dans
+  `push/annonce.json` sur la branche `data`, lu par l'appli à chaque réveil (au moins toutes les 3 h, jamais la nuit).
+  Android 13+ demande l'autorisation une fois ; la page `#appli` les allume / coupe (`notifStatus`, `notifOn`, `notifOff`).
 
 ## Mot de passe oublié
 

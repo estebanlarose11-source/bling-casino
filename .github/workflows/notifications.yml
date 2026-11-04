@@ -22,6 +22,9 @@ on:
         required: false
         default: 'https://www.spinbetcaz.com/'
 
+permissions:
+  contents: write # the free message is also put on the data branch for the Android app
+
 jobs:
   send:
     runs-on: ubuntu-latest
@@ -40,3 +43,23 @@ jobs:
           PUSH_TITLE: ${{ github.event.inputs.title }}
           PUSH_BODY: ${{ github.event.inputs.body }}
           PUSH_URL: ${{ github.event.inputs.url }}
+      # Free message (Run workflow): also written to push/annonce.json on the data branch, where the Android app
+      # (android/…/Notifs.java) reads it at each wake-up (it cannot receive the site's notifications).
+      - name: Message pour l'appli Android
+        if: ${{ !cancelled() && github.event_name == 'workflow_dispatch' }}
+        env:
+          PUSH_TITLE: ${{ github.event.inputs.title }}
+          PUSH_BODY: ${{ github.event.inputs.body }}
+          PUSH_URL: ${{ github.event.inputs.url }}
+        run: |
+          git clone --depth 1 --branch data "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" data 2>/dev/null || {
+            mkdir data && cd data && git init -q -b data && git remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" && cd ..; }
+          mkdir -p data/push
+          node -e "const e=process.env; require('fs').writeFileSync('data/push/annonce.json', JSON.stringify({ id: '${{ github.run_id }}', t: Date.now(), title: e.PUSH_TITLE || 'SpinBet Casino', body: e.PUSH_BODY || '', url: e.PUSH_URL || 'https://www.spinbetcaz.com/' }))"
+          cd data
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add push/annonce.json
+          git commit -qm "Annonce $(date -u +%Y-%m-%dT%H:%M)" || exit 0
+          for i in 1 2 3 4; do git push -q origin HEAD:data && exit 0; sleep $((i * 3)); git pull -q --rebase origin data || true; done
+          exit 1
