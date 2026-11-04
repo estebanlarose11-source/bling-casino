@@ -44,11 +44,19 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Le Totem Extrême** (`games/totemx.js`) : grille 6×5, totem ×1 ×2 ×3 ×4 ×5 puis en feu ×8 … ×100, FULL SCREEN
   (30 cases scellées) = 21 × la mise × le totem. Réglages vérifiés par simulation : RTP ≈ 92,3 %, achats 43 et 99 fois
   la mise (≈ 87,4 / 88,2 %), full screen ≈ 1 tour sur 1 700, max win ×2 000 ≈ 1 tour sur 55 000.
+- **Le Volcan** (`games/volcan.js`, volatilité extrême) : grille 6×5 Pay Anywhere, cascades, pression ×1 → ×16 (chaque
+  explosion = 1 point, seuils `TUNE.press` en jeu normal, `TUNE.pressFree` dans l'ÉRUPTION où elle ne redescend jamais),
+  pierres de lave ×2 à ×500. Réglages vérifiés par simulation (6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 5, Éruption
+  1 tour sur 325 (≈ ×130), achats 150 et 500 fois la mise (≈ 88 / 87 %), max ×25 000 atteignable.
+- **La Roulette Russe** (`games/barillet.js`, id `barillet`, volatilité extrême) : 5×4, 20 lignes, WILD crâne. LE DUEL
+  (3+ avis de recherche) : chaque balle d'or double le barillet (×2 … ×64). Gains du bonus gardés jusqu'à la fin
+  (`pendingC`, payés si le joueur quitte), puis la roulette russe : 1 à 5 balles, `GAMBLE` ×1,15 … ×5,76 (retour 96 %,
+  hors RTP). RTP ≈ 92 %, Duel 1 tour sur 375 (≈ ×135), achats 150 / 500 (≈ 88 / 87 %), max ×20 000 (surtout par la roulette).
 - **Finition** (`<style id="finition">`, dernière couche de style de `index.html`) : fond de nuit à deux lumières,
   panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
   en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en
   priorité pour retoucher l'allure générale. Le mode clair a ses propres lignes en bas de cette couche.
-- **Vérification complète** : un robot Playwright parcourt les 20 pages et les 44 jeux sur ordinateur et téléphone,
+- **Vérification complète** : un robot Playwright parcourt les 20 pages et les 46 jeux sur ordinateur et téléphone,
   lance une partie dans chaque jeu et relève erreurs, images cassées, débordements et textes « undefined ».
   À relancer après une grosse modification.
 - **Couvertures** (`covers.js`, `poster()`) : un seul gabarit pour tous les jeux (plaque de titre, Bebas Neue, marque).
