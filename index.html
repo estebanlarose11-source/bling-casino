@@ -18404,18 +18404,19 @@ __mods['chat.js'].mountChat();
 __mods['friends.js'].mountFriends();
 __mods['live.js'].mountLive();
 __mods['hta.js'].mountHta();
-// Ad on arrival (owner's request): once per visit, a little window with the Adsterra 300 × 250 banner and its ✕ at
-// once. Never for the owner / ?nopub devices (adPolicy), never on top of another window (tutorial, sign-up…), and it
-// closes by itself when the network sends nothing (no empty box).
+// Ad after a while on the site (owner's request): once per visit, after DELAY of the visit, a little window with the
+// Adsterra 300 × 250 banner and its ✕ at once (not on arrival: Google dislikes ads that cover a page as it opens).
+// Never for the owner / ?nopub devices (adPolicy), never on top of another window (tutorial, sign-up…) nor during a
+// spin (it waits for the round to end), and it closes by itself when the network sends nothing (no empty box).
 (() => {
   const KEY = 'spinbet_arrival_ad';
   try { if (sessionStorage.getItem(KEY)) return; } catch { /* ignore */ }
   const { adPolicy } = __mods['adpolicy.js'], H = __mods['hta.js'];
-  const busy = () => document.querySelector('.modal-back, .aads-modal, .jc-scene, .tuto, [class*="tuto-"]') || /^#?game-/.test(location.hash.replace(/^#\//, '#'));
-  const t0 = Date.now();
+  const DELAY = 60000; // 1 minute on the site
+  const busy = () => document.querySelector('.modal-back, .aads-modal, .jc-scene, .tuto, [class*="tuto-"], .slot.busy, .featurebox, .fi-over') || document.hidden;
   const show = () => {
     if (adPolicy.noAds()) return;
-    if (busy()) { if (Date.now() - t0 < 60000) setTimeout(show, 1500); return; }
+    if (busy()) { setTimeout(show, 2000); return; }
     try { sessionStorage.setItem(KEY, '1'); } catch { /* ignore */ }
     const box = document.createElement('div');
     box.className = 'aads-modal arrival-ad';
@@ -18430,7 +18431,7 @@ __mods['hta.js'].mountHta();
     // nothing from the network after 6 s: the window goes away by itself
     setTimeout(() => { if (box.isConnected && !H.isShown(rw)) close(); }, 6000);
   };
-  setTimeout(show, 2500);
+  setTimeout(show, DELAY);
 })();
 registerSW();
 // Starts downloading a game as soon as the player points at (or touches) its card.
