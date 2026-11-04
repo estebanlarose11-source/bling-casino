@@ -38,6 +38,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # nothing drawn yet (before the very first draw): no file, nothing to save, no error
+          [ -f loto/tirages.json ] || { echo "Pas encore de tirage"; exit 0; }
           git add loto/tirages.json
           git commit -qm "Loto $(date -u +%Y-%m-%dT%H:%M)" || { echo "Rien de nouveau"; exit 0; }
           for i in 1 2 3 4; do git push -q origin HEAD:data && exit 0; sleep $((i * 3)); git pull -q --rebase origin data || true; done
