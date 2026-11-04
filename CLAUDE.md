@@ -64,6 +64,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`pendingC`, payés si le joueur quitte), après la roulette russe (`GAMBLE` ×1,15 … ×5,76, retour 96 %, hors RTP).
   Simulation (3,6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 4 (surtout petits), Duel 1 tour sur 385 (≈ ×130),
   achats 150 / 500 (≈ 88 %).
+- **Tous les `<style>` sont dans le `<head>`** (avant `<body>`), sinon le navigateur affiche d'abord l'ancien style
+  (rouge, icônes géantes) pendant la lecture du code. Ne jamais ajouter de `<style>` plus bas dans la page.
 - **Finition** (`<style id="finition">`, dernière couche de style de `index.html`) : fond de nuit à deux lumières,
   panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
   en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en
@@ -162,7 +164,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - Écran « 🔑 Mot de passe oublié » (`forgotPassword` dans `hud.js`) : e-mail Firebase avec lien de retour vers
   `#connexion` (écran de connexion), conseils (spams, expéditeur noreply@cazbabs-a52be.firebaseapp.com), renvoi après
   60 s. « J'ai oublié mon e-mail / rien reçu » → demande d'aide dans Firestore `support/` (même sans compte), visible
-  sur la page Admin.
+  dans la console Firebase.
 - Pour donner un nouveau mot de passe : GitHub → Actions → « Mot de passe » (`.github/workflows/mot-de-passe.yml`,
   `tools/admin/password.mjs`) avec le pseudo et le nouveau mot de passe (masqué dans le journal ; l'e-mail du compte
   s'affiche masqué). Secret `FIREBASE_SERVICE_ACCOUNT` nécessaire.
@@ -171,9 +173,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu
   (`stats/AAAA-MM-JJ`, envoyés chaque minute).
-- Page `#admin` (lien « 🛠️ Admin » du menu, visible des seuls comptes de la collection `admins/`) : jeux les plus
-  joués sur 7 jours, signalements des joueurs (`reports/`, bouton « 🚩 Signaler » de la fiche joueur) avec
-  « rendre muet », dernières erreurs.
+- **Plus de page Admin** (supprimée à la demande du propriétaire : il gère tout en passant par Claude). Les données
+  restent dans Firestore (`support/`, `reports/`, `errors/`, `stats/`), lisibles dans la console Firebase. Les comptes
+  de `admins/` gardent seulement, dans le chat, « supprimer un message » et « rendre muet ».
 - Défi spécial : le million est inscrit une seule fois par compte dans `special/{uid}` (règles Firestore) ; un bonus
   ne compte que juste après une vraie mise sur ce jeu.
 - Limite connue : les soldes restent écrits par le navigateur du joueur ; une vraie protection demanderait des
