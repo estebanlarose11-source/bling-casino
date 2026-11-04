@@ -15,7 +15,7 @@ const { fx, center } = __mods['fx.js'];
 
 /* ===ENGINE (original) */
 const SYM = [['👑', 8, 3], ['🦅', 6, 4], ['☥', 4, 6], ['🐍', 3, 8], ['🪲', 2, 10], ['🏺', 1, 12]];
-const SC = '☀️', SCW = 1.1, TOT = SYM.reduce((a, s) => a + s[2], SCW);
+const SC = '☀️', SCW = 1.05, TOT = SYM.reduce((a, s) => a + s[2], SCW);
 const N = 20, ROWS = 4, COLS = 5, BUYN = 22, BUYB = 62;
 function rnd() { let r = Math.random() * TOT; if (r < SCW) return SC; r -= SCW; for (let i = 0; i < SYM.length; i++) { if (r < SYM[i][2]) return SYM[i][0]; r -= SYM[i][2]; } return SYM[5][0]; }
 function val(s) { for (const x of SYM) if (x[0] === s) return x[1]; return 0; }
@@ -203,10 +203,17 @@ class PharaonGame extends BaseGame {
           if (v !== SC) return;
           sfx.land(); this.grid.bump(this.grid.cells[i]);
           if (round === 0) this.hud(locked.size, round, g.slice(0, i + 1).filter((s) => s === SC).length);
+          else { const n = g.filter((s, k) => s === SC && (k <= i || locked.has(k))).length; if (n > scat) this.hud(locked.size, round, n); }
         },
       });
       this.grid.el.classList.remove('tm-respin');
-      if (round === 0) { scat = g.filter((s) => s === SC).length; this.hud(locked.size, round, scat); }
+      // the suns count at every fall of the round, respins included: the most suns on screen at the same time
+      // (simulation 2 M spins with SCW 1,05: RTP ≈ 91,8 %, bonus 1 spin in 76, buys ≈ 88 %)
+      const sunsNow = g.filter((s) => s === SC).length;
+      if (round === 0 || sunsNow > scat) {
+        const was = scat; scat = Math.max(scat, sunsNow); this.hud(locked.size, round, scat);
+        if (round > 0 && scat >= 3 && was < 3) { this.pop('☀️ 3 SOLEILS !', isFree ? '+3 tours à la fin du tour' : 'Bonus à la fin du tour', 'hot'); sfx.land(); await this.wait(700); }
+      }
       const cl = clusters(g);
       let paid = 0, fresh = false;
       const newIdx = [];
@@ -285,7 +292,7 @@ class PharaonGame extends BaseGame {
       </div>`).join('');
     return this.rules(`<h4>Symboles</h4><div class="tw-grid tw-grid-cols-1 sm:tw-grid-cols-2 tw-gap-2">${rows}</div>
       <h4>Les cases scellées</h4><p>Grille 5×4. Une grappe de <b>5 symboles identiques ou plus</b> qui se touchent paie (mise × valeur × 0,0675 × (taille − 2), au prorata des nouvelles cases), puis <b>se scelle</b>. Les cases libres sont relancées, et chaque nouvelle connexion fait <b>monter le totem d’un cran</b> (×1, ×2, ×3…), jusqu’à 15 connexions par tour.</p>
-      <h4>Bonus</h4><p>3 soleils : 8 tours gratuits, le totem part de ×4. 4 soleils ou plus : le Bonus Royal, 12 tours à partir de ×10. Pendant le bonus, <b>le totem ne redescend jamais</b> d’un tour à l’autre. 3 soleils de plus : +3 tours.</p>
+      <h4>Bonus</h4><p>3 soleils : 8 tours gratuits, le totem part de ×4. 4 soleils ou plus : le Bonus Royal, 12 tours à partir de ×10. Pendant le bonus, <b>le totem ne redescend jamais</b> d’un tour à l’autre. 3 soleils de plus : +3 tours, même au dernier tour. <b>Les soleils comptent à chaque chute du tour</b>, relances comprises : 3 soleils en même temps sur la grille suffisent.</p>
       <h4>Achats</h4><p>Bonus ×${BUYN} la mise · Bonus Royal ×${BUYB} la mise.</p>`);
   }
 }
