@@ -5750,6 +5750,26 @@ html.light .ga-sheet { background: #fff; border-color: var(--line); }
 .snap-box b { font-size: 16px; font-weight: 900; } .snap-box small { font-size: 13px; color: #333; line-height: 1.35; } .snap-box strong { color: #000; }
 .snap-box em { margin-left: auto; flex: none; font-style: normal; font-weight: 900; background: #111; color: #fffc00; padding: 8px 14px; border-radius: 999px; font-size: 14px; }
 @media (max-width: 520px) { .snap-box { flex-wrap: wrap; } .snap-box div { flex: 1 1 calc(100% - 60px); } .snap-box em { margin-left: 58px; } }
+
+/* ---------- Fluidité sur ordinateur (demande du propriétaire : « pas fluide sur PC ») ----------
+   1) the night background is painted once on its own fixed layer (a « background: … fixed » makes the browser repaint
+      the whole page at every scroll); 2) no live blur behind the top bar, menus and bottom bar (blurring what is under
+      them is recomputed at every frame, the costliest effect on a big screen): same colours, a bit more opaque. */
+html:not(.light) body { background: #070910; }
+html:not(.light) body::after {
+  display: block !important; content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 1; animation: none;
+  background:
+    radial-gradient(900px 520px at 12% -6%, rgba(47, 134, 214, .20), transparent 62%),
+    radial-gradient(760px 520px at 104% 18%, rgba(139, 92, 246, .13), transparent 60%),
+    radial-gradient(900px 600px at 70% 112%, rgba(251, 191, 36, .08), transparent 60%),
+    linear-gradient(180deg, #0a0d13 0%, #070910 100%);
+  transform: translateZ(0);
+}
+html.light body { background-attachment: scroll; }
+body::before { will-change: transform; }
+html:not(.light) .top { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; background: linear-gradient(180deg, rgba(14, 18, 26, .97), rgba(10, 13, 19, .94)) !important; }
+html:not(.light) .bottom-nav, .side, .side-scrim { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+.toast { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
 </style>
 </head>
 <body>
