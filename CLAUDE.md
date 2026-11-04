@@ -49,13 +49,17 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   pierres de lave ×2 à ×500. Réglages vérifiés par simulation (6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 5, Éruption
   1 tour sur 325 (≈ ×130), achats 150 et 500 fois la mise (≈ 88 / 87 %), max ×25 000 atteignable.
 - **La Roulette Russe** (`games/barillet.js`, id `barillet`, volatilité extrême, images du propriétaire dans
-  `assets/games/barillet/` : symboles découpés de sa planche, fond du saloon `bg.webp`, couverture) : 5×4, 20 lignes,
-  WILD cow-boy. Une balle d'or + une connexion → le revolver (barillet de 6 balles à côté, qui se vide et se recharge)
-  tire 1 à 3 balles sur les cases gagnantes : elles prennent feu (×2 à ×10, couche `.rr-fire`) et les multiplicateurs
-  d'une ligne se multiplient (plafond `lineCap`). LE DUEL : grosses balles ×2 à ×50 à chaque gain, cases en feu
-  gardées jusqu'à la fin (plafonds `capFree`, `lineCapFree`). Gains du bonus payés à la fin (`pendingC`, payés si le
-  joueur quitte), après la roulette russe (1 à 5 balles, `GAMBLE` ×1,15 … ×5,76, retour 96 %, hors RTP).
-  Simulation : RTP ≈ 92 %, un gain 1 tour sur 5, Duel 1 tour sur 365 (≈ ×135), achats 150 / 500 (≈ 88 / 90 %).
+  `assets/games/barillet/` : symboles découpés de sa planche, `wildtall.webp` pour le WILD étendu, fond `bg.webp`,
+  couverture). Mise en page voulue par le propriétaire (d'après sa référence, couleurs changées) : rouleaux de
+  3-4-4-4-3 cases = 576 façons (`ShapedReels`, cellule i = `OFF[c]` + rangée), planches de bois, rouleaux du bord à
+  part, plaques « 576 FAÇONS » / titre / MAX, WILD (rouleaux 2 à 4) qui couvre tout son rouleau avec ses badges.
+  Une balle d'or + une connexion → le revolver (barillet de 6 balles à côté, qui se vide et se recharge) tire 1 à 3
+  balles sur les cases gagnantes : elles prennent feu (×2 à ×10, `.rr-fire` dans chaque rouleau). Gain d'un symbole
+  = paiement × façons × multiplicateur moyen de ses façons (Π Σ mult / Π cases, plafond `lineCap`). LE DUEL : grosses
+  balles ×2 à ×50, cases en feu gardées jusqu'à la fin (`capFree`, `lineCapFree`). Gains du bonus payés à la fin
+  (`pendingC`, payés si le joueur quitte), après la roulette russe (`GAMBLE` ×1,15 … ×5,76, retour 96 %, hors RTP).
+  Simulation (3,6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 4 (surtout petits), Duel 1 tour sur 385 (≈ ×130),
+  achats 150 / 500 (≈ 88 %).
 - **Finition** (`<style id="finition">`, dernière couche de style de `index.html`) : fond de nuit à deux lumières,
   panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
   en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en

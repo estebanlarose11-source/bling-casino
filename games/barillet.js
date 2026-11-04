@@ -2,51 +2,47 @@
 // ---- games/impl/barillet-engine.js ----
 __mods['games/impl/barillet-engine.js'] = (() => {
 // La Roulette Russe math (pure, no DOM, so the simulator can check the RTP). Extreme volatility.
-// 5 reels × 4 rows, 20 lines (left to right, 3+ in a row). WILD outlaw on reels 2 to 5.
-// SHOTS: when a spin has a line win and a golden bullet anywhere on the reels, the revolver fires 1 to 3 bullets
-// (+1 per extra golden bullet) at cells of the winning lines. Each hit cell catches fire with a multiplier (×2 to ×10);
-// the multipliers of the burning cells of a line MULTIPLY each other and the line pay (line multiplier capped: TUNE.lineCap).
+// 5 reels of 3-4-4-4-3 cells = 576 ways (a symbol on adjacent reels from the left, any row, 3+ reels).
+// The WILD outlaw lands on reels 2 to 4 and covers its whole reel (expanding wild).
+// SHOTS: when a spin has a win and a golden bullet anywhere on the reels, the revolver fires 1 to 3 bullets
+// (+1 per extra golden bullet) at cells of the winning ways. Each hit cell catches fire with a multiplier (×2 to ×10).
+// A symbol's win = pay × ways × the mean multiplier of its ways (on each reel the multipliers of its cells are summed,
+// then the reels multiply: Π Σ mult / Π count), capped at TUNE.lineCap: so the multipliers of a connection multiply.
 // LE DUEL (3+ WANTED posters, 10 / 12 / 15 free spins): every winning spin fires BIG bullets (×2 to ×50) and the
-// burning cells stay on fire (and keep their multiplier) until the end; a cell hit again multiplies its multiplier (up to TUNE.capFree).
-// Extreme buy: more spins and cells already burning. After a bonus the player may play the Russian roulette on the
-// bonus win (GAMBLE, return 96 %: not in the RTP).
+// burning cells stay on fire (and keep their multiplier) until the end; a cell hit again multiplies its multiplier
+// (up to TUNE.capFree). Extreme buy: more spins and cells already burning. After a bonus the player may play the
+// Russian roulette on the bonus win (GAMBLE, return 96 %: not in the RTP).
 
-const COLS = 5, ROWS = 4, N = 20, CAPX = 20000;
+const COLS = 5, RO = [3, 4, 4, 4, 3], OFF = [0, 3, 7, 11, 15], N = 18, CAPX = 20000, WAYS = 576;
 const NS = 11, WILD = 11, SC = 12, BULLET = 13;
+const colOf = (i) => (i < 3 ? 0 : i < 7 ? 1 : i < 11 ? 2 : i < 15 ? 3 : 4);
 // 0 ten, 1 jack, 2 queen, 3 king, 4 ace, 5 whiskey, 6 pocket watch, 7 gold bars, 8 sheriff star, 9 revolver, 10 cowboy
-// pays per line, in multiples of the total bet, for 3, 4 and 5 in a row
+// pays per way, in multiples of the total bet, for 3, 4 and 5 reels
 const PAYS = [
   [0.1, 0.25, 1], [0.1, 0.25, 1], [0.12, 0.3, 1.2], [0.15, 0.4, 1.5], [0.15, 0.4, 1.5],
   [0.25, 1, 4], [0.3, 1.2, 5], [0.4, 1.5, 6], [0.6, 2.5, 10], [0.8, 3.5, 15], [1, 5, 25],
-];
-// rows of each line on the 5 reels (0 = top row)
-const LINES = [
-  [1, 1, 1, 1, 1], [2, 2, 2, 2, 2], [0, 0, 0, 0, 0], [3, 3, 3, 3, 3], [0, 1, 2, 1, 0],
-  [3, 2, 1, 2, 3], [1, 0, 0, 0, 1], [2, 3, 3, 3, 2], [1, 2, 3, 2, 1], [2, 1, 0, 1, 2],
-  [0, 1, 1, 1, 0], [3, 2, 2, 2, 3], [1, 1, 0, 1, 1], [2, 2, 3, 2, 2], [0, 1, 0, 1, 0],
-  [3, 2, 3, 2, 3], [1, 2, 1, 2, 1], [2, 1, 2, 1, 2], [0, 0, 1, 0, 0], [3, 3, 2, 3, 3],
 ];
 const FS_FOR = { 3: 10, 4: 12, 5: 15 }, RETRIGGER = 4;
 const BUY_COST = 150, BUY_X_COST = 500;
 // the Russian roulette: k bullets of 6 in the barrel → the win × GAMBLE[k] if the shot is blank (≈ 96 % each)
 const GAMBLE = { 1: 1.15, 2: 1.45, 3: 1.92, 4: 2.88, 5: 5.76 };
-// tuned by simulation: RTP ≈ 92 %, a win 1 spin in 5, LE DUEL 1 spin in 360 (≈ ×125 on average), buys ≈ 88 %,
-// max win ×20 000 reachable (rare: the line multiplier is capped at ×500, a cell at ×50 in the duel)
+// tuned by simulation (3.6 M spins): RTP ≈ 92 %, a win 1 spin in 4 (mostly small), LE DUEL 1 spin in 385 (≈ ×130),
+// buys ≈ 88 % (×150) and ≈ 89 % (×500), max win ×20 000 reachable
 const TUNE = {
-  payScale: 4.3, payScaleFree: 6.8,
-  w: [13, 13, 12, 12, 11, 9, 8, 7, 5.5, 4.5, 3.5], wFree: [13, 13, 12, 12, 11, 9, 8, 7, 5.5, 4.5, 3.5],
-  wild: 1.0, wildFree: 1.4, sc: 1.45, scFree: 1.0, bullet: 1.2, bulletFree: 1.2,
+  payScale: 0.57, payScaleFree: 0.67,
+  w: [10, 10, 10, 10, 10, 9, 9, 9, 8, 8, 8], wFree: [13, 13, 12, 12, 11, 9, 8, 7, 5.5, 4.5, 3.5],
+  wild: 0.6, wildFree: 1.4, sc: 1.65, scFree: 1.0, bullet: 1.2, bulletFree: 1.2,
   shots: [[1, 60], [2, 30], [3, 10]], shotsFree: [[1, 65], [2, 28], [3, 7]],
   small: [[2, 50], [3, 28], [5, 15], [10, 7]],
   big: [[2, 30], [3, 30], [5, 22], [10, 12], [25, 5], [50, 1]],
-  cap: 100, capFree: 50, lineCap: 100, lineCapFree: 500, // the most a cell's / a line's multiplier can reach
-  xSpins: 13, xBurn: [[10, 1], [5, 2]], // extreme buy: 13 free spins, 3 cells already burning (×10, ×5, ×5)
+  cap: 100, capFree: 25, lineCap: 100, lineCapFree: 200, // the most a cell's / a connection's multiplier can reach
+  xSpins: 13, xBurn: [[5, 2], [3, 1]], // extreme buy: 13 free spins, 3 cells already burning (×5, ×5, ×3)
 };
 
 const wpick = (l) => { let t = 0; for (const x of l) t += x[1]; let r = Math.random() * t; for (const x of l) { if (r < x[1]) return x[0]; r -= x[1]; } return l[l.length - 1][0]; };
 const SW = (w) => w.reduce((a, b) => a + b, 0);
 function draw(c, free) {
-  const w = free ? TUNE.wFree : TUNE.w, sw = SW(w), wd = c > 0 ? (free ? TUNE.wildFree : TUNE.wild) : 0, sc = free ? TUNE.scFree : TUNE.sc, bu = free ? TUNE.bulletFree : TUNE.bullet;
+  const w = free ? TUNE.wFree : TUNE.w, sw = SW(w), wd = c > 0 && c < 4 ? (free ? TUNE.wildFree : TUNE.wild) : 0, sc = free ? TUNE.scFree : TUNE.sc, bu = free ? TUNE.bulletFree : TUNE.bullet;
   let x = Math.random() * (sw + wd + sc + bu);
   if (x >= sw + wd + sc) return BULLET;
   if (x >= sw + wd) return SC;
@@ -55,29 +51,39 @@ function draw(c, free) {
   return 0;
 }
 
-// the line wins of a grid: [{ line, s, len, pay, cells }] (reel 1 has no wild, so a line always starts on a symbol)
-function lineWins(grid, free) {
+// the ways wins of a grid: [{ s, len, ways, cells, perReel }] (reel 1 has no wild)
+function wayWins(grid, free) {
   const out = [];
-  LINES.forEach((L, li) => {
-    const s = grid[L[0]];
-    if (s >= NS) return;
-    let len = 1;
-    while (len < COLS) { const v = grid[len * ROWS + L[len]]; if (v === s || v === WILD) len++; else break; }
-    if (len >= 3) out.push({ line: li, s, len, cells: L.slice(0, len).map((r, c) => c * ROWS + r), pay: PAYS[s][len - 3] * (free ? TUNE.payScaleFree : TUNE.payScale) });
-  });
+  for (let s = 0; s < NS; s++) {
+    const perReel = [];
+    for (let c = 0; c < COLS; c++) {
+      const hit = [];
+      for (let r = 0; r < RO[c]; r++) { const i = OFF[c] + r, v = grid[i]; if (v === s || (v === WILD && c > 0)) hit.push(i); }
+      if (!hit.length) break;
+      perReel.push(hit);
+    }
+    if (perReel.length >= 3) out.push({ s, len: perReel.length, perReel, cells: perReel.flat(), ways: perReel.reduce((a, h) => a * h.length, 1), pay: PAYS[s][perReel.length - 3] * (free ? TUNE.payScaleFree : TUNE.payScale) });
+  }
   return out;
 }
 
 // One paid or free spin. state.burn = { cell: multiplier } of the burning cells (kept between free spins).
 function spin({ free = false, forceScatters = 0, state = { burn: {} } } = {}) {
   const grid = [];
-  for (let c = 0; c < COLS; c++) for (let r = 0; r < ROWS; r++) grid.push(draw(c, free));
+  for (let c = 0; c < COLS; c++) for (let r = 0; r < RO[c]; r++) grid.push(draw(c, free));
   if (forceScatters) {
     for (let i = 0; i < N; i++) if (grid[i] === SC) grid[i] = 0;
-    [...Array(COLS).keys()].sort(() => Math.random() - 0.5).slice(0, forceScatters).forEach((c) => { grid[c * ROWS + Math.floor(Math.random() * ROWS)] = SC; });
+    [...Array(COLS).keys()].sort(() => Math.random() - 0.5).slice(0, forceScatters).forEach((c) => { grid[OFF[c] + Math.floor(Math.random() * RO[c])] = SC; });
+  }
+  // a WILD on reels 2 to 4 covers its whole reel
+  const expanded = [];
+  for (let c = 1; c < 4; c++) {
+    let w = false;
+    for (let r = 0; r < RO[c]; r++) if (grid[OFF[c] + r] === WILD) w = true;
+    if (w) { expanded.push(c); for (let r = 0; r < RO[c]; r++) grid[OFF[c] + r] = WILD; }
   }
   const burn = state.burn;
-  const wins = lineWins(grid, free);
+  const wins = wayWins(grid, free);
   const bullets = grid.filter((v) => v === BULLET).length;
   // the revolver fires at the winning cells (always in the duel, with a golden bullet in the base game)
   const shots = [];
@@ -90,11 +96,15 @@ function spin({ free = false, forceScatters = 0, state = { burn: {} } } = {}) {
       shots.push({ i, m, to: burn[i] });
     }
   }
-  wins.forEach((w) => { w.mult = Math.min(free ? TUNE.lineCapFree : TUNE.lineCap, w.cells.reduce((a, i) => a * (burn[i] || 1), 1)); w.won = w.pay * w.mult; });
+  wins.forEach((w) => {
+    const weighted = w.perReel.reduce((a, h) => a * h.reduce((b, i) => b + (burn[i] || 1), 0), 1);
+    w.mult = Math.min(free ? TUNE.lineCapFree : TUNE.lineCap, Math.round(weighted / w.ways * 100) / 100);
+    w.won = w.pay * w.ways * w.mult;
+  });
   const line = wins.reduce((a, w) => a + w.won, 0);
   const scat = grid.filter((v) => v === SC).length;
   const total = Math.min(CAPX, line);
-  return { grid, wins, shots, bullets, line, scat, total, burn: { ...burn } };
+  return { grid, expanded, wins, shots, bullets, line, scat, total, burn: { ...burn } };
 }
 
 // the burning cells an extreme buy starts with
@@ -117,12 +127,13 @@ function freeRound(spins = 10, extreme = false) {
   return total;
 }
 
-return { COLS, ROWS, N, CAPX, NS, WILD, SC, BULLET, PAYS, LINES, FS_FOR, RETRIGGER, BUY_COST, BUY_X_COST, GAMBLE, TUNE, draw, lineWins, spin, startBurn, freeRound };
+return { COLS, RO, OFF, N, CAPX, WAYS, NS, WILD, SC, BULLET, PAYS, FS_FOR, RETRIGGER, BUY_COST, BUY_X_COST, GAMBLE, TUNE, colOf, draw, wayWins, spin, startBurn, freeRound };
 })();
 
 // ---- games/impl/barillet.js ----
 __mods['games/impl/barillet.js'] = (() => {
-// La Roulette Russe: an old saloon, 5 reels × 4 rows, 20 lines, the owner's painted symbols (assets/games/barillet).
+// La Roulette Russe: an old saloon, 5 reels of 3-4-4-4-3 cells (576 ways, laid out like the owner's reference: wooden
+// reels, the two outer reels set apart, the WILD covering its reel), the owner's painted symbols (assets/games/barillet).
 // Beside the reels, a full revolver barrel: every shot takes one bullet out (it reloads when empty). A line win with a
 // golden bullet on the reels makes the revolver fire 1 to 3 bullets at the winning cells: they catch fire with a
 // multiplier, and the multipliers of a line multiply each other. LE DUEL: big bullets, the burning cells stay on fire.
@@ -133,10 +144,11 @@ const { BaseGame, fmtC } = __mods['core/base.js'];
 const { Reels } = __mods['core/reels.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const E = __mods['games/impl/barillet-engine.js'];
-const { COLS, ROWS, N, NS, WILD, SC, BULLET, PAYS, LINES, FS_FOR, RETRIGGER, BUY_COST, BUY_X_COST, GAMBLE, TUNE, CAPX, draw, spin, startBurn } = E;
+const { COLS, RO, OFF, N, WAYS, NS, WILD, SC, BULLET, PAYS, FS_FOR, RETRIGGER, BUY_COST, BUY_X_COST, GAMBLE, TUNE, CAPX, colOf, draw, spin, startBurn } = E;
 const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el } = __mods['ui.js'];
+const { warm } = __mods['core/pixi.js'];
 
 /* ---------- the owner's symbols ---------- */
 const IMG_V = 1;
@@ -165,6 +177,86 @@ const barrelSVG = (cls = '') => `<svg class="rr-barrel-svg ${cls}" viewBox="0 0 
 const FLAMES = '<i class="rr-fl f1"></i><i class="rr-fl f2"></i><i class="rr-fl f3"></i><i class="rr-sm"></i><b class="rr-fm"></b>';
 const xs = (m) => `×${m.toLocaleString('fr-FR')}`;
 
+// Reels with a different number of cells per reel (3-4-4-4-3): cell i = OFF[c] + row, like the engine.
+class ShapedReels extends Reels {
+  constructor(host, opts) {
+    super(host, { ...opts, rows: 4 });
+    this.reelEls.forEach((r, c) => { r.style.setProperty('--rows', RO[c]); r.classList.add(`rr-r${c}`); });
+    this.values = new Array(N).fill(null);
+  }
+  colVals(vals, c) { return vals.slice(OFF[c], OFF[c] + RO[c]); }
+  setAll(vals) {
+    this.values = vals.slice();
+    for (let c = 0; c < this.cols; c++) {
+      const strip = this.reelEls[c].firstChild;
+      strip.innerHTML = this.colVals(vals, c).map((v, r) => this.cellHTML(v, OFF[c] + r)).join('');
+      strip.style.transform = 'translate3d(0,0,0)';
+    }
+    requestAnimationFrame(() => warm(this.el.querySelectorAll('.rs-cell')));
+  }
+  set(i, v) { this.values[i] = v; const c = colOf(i), node = this.reelEls[c].firstChild.children[i - OFF[c]]; if (node) node.outerHTML = this.cellHTML(v, i); }
+  cell(i) { const c = colOf(i); return this.reelEls[c].firstChild.children[i - OFF[c]]; }
+  async spin(vals, { tease = () => false, onStop = null } = {}) {
+    const t = this.game?.turbo;
+    const base = (t ? 300 : 620) * this.durK, step = (t ? 70 : 160) * this.durK;
+    let extra = 0;
+    const jobs = [];
+    for (let c = 0; c < this.cols; c++) {
+      const slow = !t && tease(c, vals);
+      if (slow) extra += 850;
+      jobs.push(this.spinCol(c, this.colVals(vals, c), base + c * step + extra, slow).then(() => onStop?.(c)));
+    }
+    await Promise.all(jobs);
+    this.values = vals.slice();
+  }
+  spinCol(c, finalCol, dur, slow) {
+    const R = RO[c], reel = this.reelEls[c], strip = reel.firstChild;
+    const h = reel.clientHeight / R;
+    const current = this.colVals(this.values, c);
+    const filler = Array.from({ length: Math.max(8, Math.floor(dur / 38)) }, () => this.random(c));
+    const cells = [this.random(c), ...finalCol, ...filler, ...current.map((v) => (v == null ? this.random(c) : v))];
+    const html = cells.map((v, k) => this.cellHTML(v, k >= 1 && k <= R ? OFF[c] + k - 1 : -1));
+    const end = -h, start = -(cells.length - R) * h, bounce = h * 0.22;
+    const px = this.px, col = px?.column(reel, html, R);
+    if (col) { strip.innerHTML = ''; strip.style.visibility = 'hidden'; col.set(start); } else strip.innerHTML = html.join('');
+    strip.style.transform = `translate3d(0,${start}px,0)`;
+    reel.classList.add('spinning');
+    let unTease = null;
+    if (slow) { reel.classList.add('tease'); setTimeout(() => sfx.tease(), dur - 900); unTease = px?.tease(reel); }
+    return new Promise((resolve) => {
+      const t0 = performance.now(), mainDur = dur * 0.9;
+      const frame = (now) => {
+        if (this.game?.dead) { col?.end(); unTease?.(); return resolve(); }
+        const tt = now - t0;
+        let y;
+        if (tt < mainDur) {
+          const p = tt / mainDur;
+          const e = p < 0.08 ? -0.015 * Math.sin((p / 0.08) * Math.PI) : 1 - Math.pow(1 - (p - 0.08) / 0.92, 2.6);
+          y = start + (end + bounce - start) * e;
+          if (p > 0.82) reel.classList.remove('spinning');
+        } else {
+          const q = Math.min(1, (tt - mainDur) / (dur - mainDur));
+          y = end + bounce * Math.pow(1 - q, 2);
+        }
+        if (col) col.set(y); else strip.style.transform = `translate3d(0,${y}px,0)`;
+        if (tt < dur) return requestAnimationFrame(frame);
+        strip.innerHTML = finalCol.map((v, r) => this.cellHTML(v, OFF[c] + r)).join('');
+        strip.style.transform = 'translate3d(0,0,0)';
+        if (col) { col.end(); strip.style.visibility = ''; }
+        unTease?.();
+        px?.land(reel, slow);
+        warm(strip.children);
+        reel.classList.remove('spinning', 'tease', 'landed');
+        void reel.offsetWidth;
+        reel.classList.add('landed');
+        sfx.reelStop(c);
+        resolve();
+      };
+      requestAnimationFrame(frame);
+    });
+  }
+}
+
 class BarilletGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
@@ -172,7 +264,11 @@ class BarilletGame extends BaseGame {
       frameCls: 'rr-frame',
       stage: `<div class="rr-stage">
         <div class="rr-board">
-          <div class="rr-reels"><div class="rr-fire">${Array.from({ length: N }, (_, i) => `<div class="rr-fc" style="grid-column:${Math.floor(i / ROWS) + 1};grid-row:${(i % ROWS) + 1}">${FLAMES}</div>`).join('')}</div></div>
+          <div class="rr-machine">
+            <div class="rr-top"><span class="rr-ways">${WAYS}<small>FAÇONS</small></span><span class="rr-plaque">ROULETTE RUSSE</span><span class="rr-max">MAX<b>×${CAPX.toLocaleString('fr-FR')}</b></span></div>
+            <div class="rr-reels"></div>
+            <i class="rr-corner l">${img('bullet')}</i><i class="rr-corner r">${img('bullet')}</i>
+          </div>
           <div class="rr-side"><div class="rr-barrel">${barrelSVG()}<i class="rr-muzzle"></i></div><div class="rr-mult"><small>Barillet</small><b>6</b><em>balles</em></div></div>
         </div>
       </div>`,
@@ -180,14 +276,21 @@ class BarilletGame extends BaseGame {
         { id: 'fs', icon: '🔫', label: 'LE DUEL · 10 tours', desc: 'Grosses balles à chaque gain : les cases en feu restent jusqu’à la fin', cost: (b) => b * BUY_COST },
         { id: 'fsx', icon: '💀', label: `LE DUEL EXTRÊME · ${TUNE.xSpins} tours`, desc: `${TUNE.xBurn.reduce((a, x) => a + x[1], 0)} cases déjà en feu (${TUNE.xBurn.flatMap(([m, n]) => Array(n).fill(xs(m))).join(', ')})`, cost: (b) => b * BUY_X_COST },
       ],
-      hello: '20 lignes · une balle d’or + une connexion = le revolver tire',
+      hello: `${WAYS} façons de gagner · une balle d’or + une connexion = le revolver tire`,
     });
     this.slotEl.style.setProperty('--rr-bg', `url("${asset('assets/games/barillet/bg.webp')}")`);
-    [...FILE, 'wild', 'scat', 'bullet'].forEach((f) => { new Image().src = asset(`assets/games/barillet/${f}.webp`); });
-    this.reels = new Reels(this.q('.rr-reels'), { cols: COLS, rows: ROWS, game: this, art: cellArt, cls: cellCls, random: (c) => draw(c, false) });
-    this.q('.rr-reels').appendChild(this.q('.rr-fire')); // the fire layer lies over the reels
-    this.reels.setAll(Array.from({ length: N }, (_, i) => draw(Math.floor(i / ROWS), false)));
-    this.fire = this.qa('.rr-fc');
+    [...FILE, 'wild', 'wildtall', 'scat', 'bullet'].forEach((f) => { new Image().src = asset(`assets/games/barillet/${f}.webp`); });
+    this.reels = new ShapedReels(this.q('.rr-reels'), { cols: COLS, game: this, art: cellArt, cls: cellCls, random: (c) => (c === 0 || c === 4 ? draw(c, false) : (() => { const v = draw(c, false); return v === WILD ? 0 : v; })()) });
+    // over each reel: its fire cells and the expanding WILD panel
+    this.fire = [];
+    this.reels.reelEls.forEach((reel, c) => {
+      const f = el('div', 'rr-fire');
+      f.innerHTML = Array.from({ length: RO[c] }, () => `<div class="rr-fc">${FLAMES}</div>`).join('');
+      reel.appendChild(f);
+      this.fire.push(...f.children);
+      if (c > 0 && c < 4) reel.insertAdjacentHTML('beforeend', `<div class="rr-xw">${img('wildtall', 'xw')}<b class="rr-xb top">WILD</b><b class="rr-xb bot">×1</b></div>`);
+    });
+    this.reels.setAll(Array.from({ length: N }, (_, i) => { const v = draw(colOf(i), false); return v === WILD ? 0 : v; }));
     this.ammo = 6;
     this.pendingC = 0;
     this.setAmmo(6);
@@ -215,6 +318,20 @@ class BarilletGame extends BaseGame {
     if (fresh) { f.classList.remove('hit'); void f.offsetWidth; f.classList.add('hit'); }
   }
   clearFire() { this.fire.forEach((f) => f.classList.remove('on', 'hot', 'hit')); }
+  // the WILD panels over the expanded reels, with the reel's mean multiplier at the bottom
+  setWilds(cols, burn = {}, grow = false) {
+    this.reels.reelEls.forEach((reel, c) => {
+      const p = reel.querySelector('.rr-xw');
+      if (!p) return;
+      const on = cols.includes(c);
+      if (on && grow && !p.classList.contains('on')) { p.classList.remove('grow'); void p.offsetWidth; p.classList.add('grow'); }
+      p.classList.toggle('on', on);
+      let sum = 0;
+      for (let r = 0; r < RO[c]; r++) sum += burn[OFF[c] + r] || 1;
+      const m = Math.round(sum / RO[c] * 100) / 100;
+      p.querySelector('.bot').textContent = `×${m.toLocaleString('fr-FR')}`;
+    });
+  }
   showBurn(burn) { this.clearFire(); Object.entries(burn).forEach(([i, m]) => this.setFire(+i, m)); }
 
   // one shot: a bullet leaves the barrel, flies to the cell, the cell catches fire
@@ -256,11 +373,12 @@ class BarilletGame extends BaseGame {
     const r = spin({ free, state });
     this.setLast(0); this.winAmt.textContent = '';
     this.reels.unmark();
+    this.setWilds([]);
     this.msg(free ? 'Le duel continue…' : 'Les rouleaux tournent…');
     let sc = 0;
     await this.reels.spin(r.grid, {
-      tease: (c, vals) => { const t = sc >= 2; for (let k = 0; k < ROWS; k++) if (vals[c * ROWS + k] === SC) sc++; return t; },
-      onStop: (c) => { for (let k = 0; k < ROWS; k++) { const v = r.grid[c * ROWS + k]; if (v === SC || v === BULLET) { sfx.land(); const p = center(this.reels.cell(c * ROWS + k)); fx.burst(p.x, p.y, 14, v === SC ? ['#f2dfb4', '#a16207'] : ['#fde047', '#fff']); } } },
+      tease: (c, vals) => { const t = sc >= 2; for (let k = 0; k < RO[c]; k++) if (vals[OFF[c] + k] === SC) sc++; return t; },
+      onStop: (c) => { if (r.expanded.includes(c)) { this.setWilds(r.expanded.filter((x) => x <= c), r.burn, true); sfx.feature(); this.shake(); } for (let k = 0; k < RO[c]; k++) { const v = r.grid[OFF[c] + k]; if (v === SC || v === BULLET) { sfx.land(); const p = center(this.reels.cell(OFF[c] + k)); fx.burst(p.x, p.y, 14, v === SC ? ['#f2dfb4', '#a16207'] : ['#fde047', '#fff']); } } },
     });
     if (this.dead) return r;
     if (r.wins.length) {
@@ -273,10 +391,11 @@ class BarilletGame extends BaseGame {
         sfx.feature();
         await this.wait(450);
         for (const s of r.shots) { if (this.dead) return r; await this.shoot(s, free); }
+        this.setWilds(r.expanded, r.burn);
       }
       const best = r.wins.slice().sort((a, b) => b.won - a.won)[0];
       const multi = r.wins.filter((w) => w.mult > 1);
-      this.msg(`${r.wins.length} ligne${r.wins.length > 1 ? 's' : ''} · ${best.len} × ${NAMES[best.s]}${best.mult > 1 ? ` · ${fmtC(Math.round(best.pay * bet))} × ${best.mult.toLocaleString('fr-FR')}` : ''}${multi.length > 1 ? ` · ${multi.length} lignes en feu` : ''} : <b>+${fmtC(Math.round(r.total * bet))}</b>`);
+      this.msg(`${best.ways} façon${best.ways > 1 ? 's' : ''} × ${NAMES[best.s]} sur ${best.len} rouleaux${best.mult > 1 ? ` · ×${best.mult.toLocaleString('fr-FR')} 🔥` : ''}${r.wins.length > 1 ? ` · ${r.wins.length} symboles` : ''} : <b>+${fmtC(Math.round(r.total * bet))}</b>`);
       if (multi.length) this.floatAt(this.q('.rr-reels'), `×${Math.max(...multi.map((w) => w.mult)).toLocaleString('fr-FR')}`, '#fdba74', 46);
       sfx.win();
       this.setLast(Math.round(r.total * bet));
@@ -310,6 +429,7 @@ class BarilletGame extends BaseGame {
     this.setBanner('');
     this.reels.unmark();
     this.clearFire();
+    this.setWilds([]);
     // the Russian roulette on the bonus win, then the win is paid
     const final = total > 0 && total < cap ? await this.roulette(total, cap) : total;
     this.pendingC = 0;
@@ -388,16 +508,16 @@ class BarilletGame extends BaseGame {
 
   info() {
     const f = (x) => (x * TUNE.payScale).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
-    const rows = FILE.map((a, s) => `<div class="pay-item"><div class="pay-sym">${img(a)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>3 : ×${f(PAYS[s][0])} · 4 : ×${f(PAYS[s][1])} · 5 : ×${f(PAYS[s][2])}</span></div></div>`).reverse().join('');
+    const rows = FILE.map((a, s) => `<div class="pay-item"><div class="pay-sym">${img(a)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>3 rouleaux : ×${f(PAYS[s][0])} · 4 : ×${f(PAYS[s][1])} · 5 : ×${f(PAYS[s][2])}</span></div></div>`).reverse().join('');
     const sm = TUNE.small.map((x) => xs(x[0])).join(', '), bg = TUNE.big.map((x) => xs(x[0])).join(', ');
-    return this.rules(`<h4>Table des gains (× la mise, par ligne)</h4><div class="paytable">${rows}
-      <div class="pay-item"><div class="pay-sym">${img('wild')}</div><div class="pay-vals"><b>WILD</b><br><span>Sur les rouleaux 2 à 5, remplace tous les symboles sauf l’avis de recherche et la balle d’or</span></div></div>
+    return this.rules(`<h4>Table des gains (× la mise, par façon)</h4><div class="paytable">${rows}
+      <div class="pay-item"><div class="pay-sym">${img('wild')}</div><div class="pay-vals"><b>WILD</b><br><span>Sur les rouleaux 2 à 4, couvre tout le rouleau et remplace tous les symboles sauf l’avis de recherche et la balle d’or</span></div></div>
       <div class="pay-item"><div class="pay-sym">${img('bullet')}</div><div class="pay-vals"><b>Balle d’or</b><br><span>Avec une connexion, le revolver tire sur les cases gagnantes</span></div></div>
       <div class="pay-item"><div class="pay-sym">${img('scat')}</div><div class="pay-vals"><b>Avis de recherche</b><br><span>3 : ${FS_FOR[3]} tours · 4 : ${FS_FOR[4]} tours · 5 : ${FS_FOR[5]} tours</span></div></div></div>
       <h4>Volatilité extrême</h4><p>Beaucoup de tours ne paient rien, mais une partie peut payer jusqu’à <b>×${CAPX.toLocaleString('fr-FR')} la mise</b>.</p>
-      <h4>${LINES.length} lignes</h4><p>3 symboles identiques ou plus, côte à côte en partant du premier rouleau, sur une des ${LINES.length} lignes.</p>
-      <h4>Le revolver</h4><p>Une <b>balle d’or</b> n’importe où + une connexion : le revolver tire <b>1 à 3 balles</b> (une de plus par balle d’or en plus) sur les cases de la connexion. Chaque case touchée <b>prend feu</b> avec un multiplicateur (${sm}). Les multiplicateurs des cases en feu d’une ligne <b>se multiplient entre eux</b> (jusqu’à ×${TUNE.lineCap.toLocaleString('fr-FR')} par ligne). Le barillet a 6 balles et se recharge quand il est vide.</p>
-      <h4>Le Duel</h4><p>3 avis de recherche ou plus : tours gratuits. À chaque gain, le revolver tire des <b>grosses balles</b> (${bg}). Les cases en feu <b>restent en feu</b> jusqu’à la fin, et une case touchée à nouveau multiplie encore son multiplicateur (jusqu’à ×${TUNE.capFree} par case, ×${TUNE.lineCapFree.toLocaleString('fr-FR')} par ligne). 3 avis de recherche : +${RETRIGGER} tours.</p>
+      <h4>${WAYS} façons de gagner</h4><p>Rouleaux de 3, 4, 4, 4 et 3 cases. Un symbole paie quand il est sur 3 rouleaux côte à côte ou plus, en partant de la gauche, <b>sur n’importe quelle rangée</b> : chaque combinaison de cases compte (2 symboles sur un rouleau = 2 fois plus de façons). Le <b>WILD</b> tombe sur les rouleaux 2 à 4 et <b>couvre tout son rouleau</b>.</p>
+      <h4>Le revolver</h4><p>Une <b>balle d’or</b> n’importe où + une connexion : le revolver tire <b>1 à 3 balles</b> (une de plus par balle d’or en plus) sur les cases de la connexion. Chaque case touchée <b>prend feu</b> avec un multiplicateur (${sm}). Les multiplicateurs des cases en feu d’une ligne <b>se multiplient entre eux</b> (jusqu’à ×${TUNE.lineCap.toLocaleString('fr-FR')} par connexion). Le barillet a 6 balles et se recharge quand il est vide.</p>
+      <h4>Le Duel</h4><p>3 avis de recherche ou plus : tours gratuits. À chaque gain, le revolver tire des <b>grosses balles</b> (${bg}). Les cases en feu <b>restent en feu</b> jusqu’à la fin, et une case touchée à nouveau multiplie encore son multiplicateur (jusqu’à ×${TUNE.capFree} par case, ×${TUNE.lineCapFree.toLocaleString('fr-FR')} par connexion). 3 avis de recherche : +${RETRIGGER} tours.</p>
       <h4>La roulette russe</h4><p>À la fin du duel, tu peux jouer ton gain : choisis combien de balles mettre dans le barillet (1 à 5), puis tire. Si la chambre est vide, ton gain est multiplié (${[1, 2, 3, 4, 5].map((k) => `${k} balle${k > 1 ? 's' : ''} ×${GAMBLE[k].toLocaleString('fr-FR')}`).join(', ')}) et tu peux rejouer. Si le coup part, <b>tout est perdu</b>. Ou ramasse ton gain quand tu veux.</p>
       <h4>Achats</h4><p>Le Duel ×${BUY_COST} la mise (10 tours). Le Duel extrême ×${BUY_X_COST} la mise : ${TUNE.xSpins} tours et des cases déjà en feu (${TUNE.xBurn.flatMap(([m, n]) => Array(n).fill(xs(m))).join(', ')}). Gain maximum ×${CAPX.toLocaleString('fr-FR')}.</p>`);
   }
