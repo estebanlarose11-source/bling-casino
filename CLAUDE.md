@@ -48,10 +48,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   explosion = 1 point, seuils `TUNE.press` en jeu normal, `TUNE.pressFree` dans l'ÉRUPTION où elle ne redescend jamais),
   pierres de lave ×2 à ×500. Réglages vérifiés par simulation (6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 5, Éruption
   1 tour sur 325 (≈ ×130), achats 150 et 500 fois la mise (≈ 88 / 87 %), max ×25 000 atteignable.
-- **La Roulette Russe** (`games/barillet.js`, id `barillet`, volatilité extrême) : 5×4, 20 lignes, WILD crâne. LE DUEL
-  (3+ avis de recherche) : chaque balle d'or double le barillet (×2 … ×64). Gains du bonus gardés jusqu'à la fin
-  (`pendingC`, payés si le joueur quitte), puis la roulette russe : 1 à 5 balles, `GAMBLE` ×1,15 … ×5,76 (retour 96 %,
-  hors RTP). RTP ≈ 92 %, Duel 1 tour sur 375 (≈ ×135), achats 150 / 500 (≈ 88 / 87 %), max ×20 000 (surtout par la roulette).
+- **La Roulette Russe** (`games/barillet.js`, id `barillet`, volatilité extrême, images du propriétaire dans
+  `assets/games/barillet/` : symboles découpés de sa planche, fond du saloon `bg.webp`, couverture) : 5×4, 20 lignes,
+  WILD cow-boy. Une balle d'or + une connexion → le revolver (barillet de 6 balles à côté, qui se vide et se recharge)
+  tire 1 à 3 balles sur les cases gagnantes : elles prennent feu (×2 à ×10, couche `.rr-fire`) et les multiplicateurs
+  d'une ligne se multiplient (plafond `lineCap`). LE DUEL : grosses balles ×2 à ×50 à chaque gain, cases en feu
+  gardées jusqu'à la fin (plafonds `capFree`, `lineCapFree`). Gains du bonus payés à la fin (`pendingC`, payés si le
+  joueur quitte), après la roulette russe (1 à 5 balles, `GAMBLE` ×1,15 … ×5,76, retour 96 %, hors RTP).
+  Simulation : RTP ≈ 92 %, un gain 1 tour sur 5, Duel 1 tour sur 365 (≈ ×135), achats 150 / 500 (≈ 88 / 90 %).
 - **Finition** (`<style id="finition">`, dernière couche de style de `index.html`) : fond de nuit à deux lumières,
   panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
   en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en
