@@ -138,9 +138,12 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   découpées dans `assets/games/jcc/` (`{ img: 'dossier/fichier' }` sans `.webp`, ≈ 480 px de large), puis changer
   `CACHE` dans `sw.js`. Les paquets s'ouvrent dans la série choisie (la plus récente par défaut) et chaque série a son
   album et ses 100 000 KE. La 1re série « Les Origines » (78 cartes : par élément 14 communes, 7 rares, 4 épiques,
-  1 légendaire) : les 3 légendaires sont les 3 cartes du propriétaire (phénix, golem, danseuse), les 75 autres sont dessinées par le site (emoji sur fond d'élément) en attendant ses images.
-  Liste des cartes à dessiner pour le propriétaire : `notes/jcc-les-origines-cartes-a-dessiner.txt` (dossier `notes/` = ses
-  notes) ; cocher `[x]` chaque carte quand sa vraie image est mise, et faire une liste pareille pour chaque nouvelle série.
+  1 légendaire) : les 3 légendaires sont les 3 cartes du propriétaire (phénix, golem, danseuse), les 75 autres viennent de ses 3 planches
+  de 25 dessins (Feu, Terre, Éther), découpées dans `assets/games/jcc/o/` (`f01`…`e25` = place sur la planche, ligne par
+  ligne ; suffixe `c` = dessin sans fond rendu transparent, `cut: 1` → affiché entier) ; chaque carte porte le nom de son
+  dessin. Le site sait encore afficher une carte « emoji » (art en texte) pour une série pas encore dessinée.
+  Liste des cartes pour le propriétaire : `notes/jcc-les-origines-cartes.txt` (dossier `notes/` = ses notes) ; en faire
+  une pareille pour chaque nouvelle série.
 
 ## Arrivée des visiteurs et partage
 
