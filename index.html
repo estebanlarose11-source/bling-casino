@@ -5416,6 +5416,18 @@ body.fs-on .live-tick { display: none; }
 .jc-scene-acts { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
 .ev-jcc { --ac: #a78bfa; background: linear-gradient(90deg, rgba(167, 139, 250, .22), rgba(56, 189, 248, .1)) !important; border-color: rgba(167, 139, 250, .5) !important; }
 .ev-pill.jcc { border-color: rgba(167, 139, 250, .6); }
+.jc-shop { margin-top: 14px; padding: 12px; border-radius: 12px; background: rgba(255, 255, 255, .03); border: 1px dashed rgba(251, 191, 36, .45); }
+.jc-shop-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px; margin-bottom: 10px; }
+.jc-shop-h span { font-size: 13px; color: var(--muted); } .jc-shop-h span b { color: var(--gold); }
+.jc-shop-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.jc-shop-btn { --p1: #38bdf8; --p2: #1e3a8a; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px; border-radius: 10px; cursor: pointer; font: inherit; color: #fff;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--p1) 45%, transparent), color-mix(in srgb, var(--p2) 55%, transparent)); border: 1px solid color-mix(in srgb, var(--p1) 70%, transparent); }
+.jc-shop-btn.p-v { --p1: #c084fc; --p2: #6d28d9; } .jc-shop-btn.p-o { --p1: #fde68a; --p2: #b45309; }
+.jc-shop-btn b { font-size: 13px; } .jc-shop-btn em { font-style: normal; font-weight: 800; color: var(--gold); font-size: 14px; }
+.jc-shop-btn:hover:not(:disabled) { filter: brightness(1.15); }
+.jc-shop-btn:disabled { opacity: .45; cursor: not-allowed; filter: grayscale(.6); }
+.jc-shop-dot { width: 14px; height: 18px; border-radius: 3px; background: linear-gradient(160deg, var(--p1), var(--p2)); box-shadow: 0 0 8px var(--p1); }
+.jc-sell .jc-pack { flex: none; }
 @media (prefers-reduced-motion: reduce) { .jc-pack::after, .jc-card.holo, .jc-card.holo .jc-in::after, .jc-card.r-L .jc-in::before, .jc-pack.big { animation: none !important; } }
 </style>
 <style id="finition">
@@ -17638,6 +17650,10 @@ const PACKS = {
   o: { name: 'Paquet doré', sub: 'Très rare', odds: { C: 0, R: 0.55, E: 0.38, L: 0.07 }, floor: 'E' },
 };
 const PACK_ODDS = { o: 0.03, v: 0.17 }, PITY = { v: 10, o: 40 }, FORGE = 100;
+// Packs bought with KE (owner's choice: 2 a day at most, the player picks the kind, so playing stays the main way).
+// Prices a bit above what the 5 cards are worth on average (≈ 5 800 / 12 300 / 31 000 KE): buying is a shortcut,
+// never a way to make KE. Paid with wallet.spend (no bet: it does not fill the bar).
+const SHOP = { b: 6000, v: 15000, o: 40000 }, SHOP_DAY = 2;
 
 /* ---------- the series (newest last). A card: [id, élément, rareté, nom, emoji ou image, texte] ----------
    New theme from the owner: add a series with its pictures in assets/games/jcc/<serie>/ (img: 'serie/fichier'). */
@@ -17859,6 +17875,30 @@ function cardHTML(c, o = {}) {
 }
 const packHTML = (t, o = {}) => `<div class="jc-pack p-${t} ${o.cls || ''}" ${o.attr || ''}><div class="jc-pack-in"><small>SPINBET · JCC</small><span class="jc-pack-ico">🃏</span><b>${PACKS[t].sub.toUpperCase()}</b><em>5 cartes</em></div></div>`;
 
+/* ---------- buying a pack (SHOP_DAY a day, Paris day) ---------- */
+const shopToday = (s = st()) => (s.shop?.d === E.paris().key ? s.shop.n || 0 : 0);
+function shopHTML(s) {
+  const left = Math.max(0, SHOP_DAY - shopToday(s));
+  return `<div class="jc-shop"><div class="jc-shop-h"><b>🛒 Acheter un paquet</b><span>${left ? `encore <b>${left}</b> aujourd’hui` : 'plus d’achat aujourd’hui · reviens demain'}</span></div>
+    <div class="jc-shop-row">${['b', 'v', 'o'].map((t) => `<button class="jc-shop-btn p-${t}" data-jc-buy-pack="${t}" ${left ? '' : 'disabled'}><span class="jc-shop-dot"></span><b>${PACKS[t].name}</b><em>${fmt(SHOP[t])}</em></button>`).join('')}</div>
+    <p class="muted small">${SHOP_DAY} paquets par jour au maximum, au choix. Les autres se gagnent en jouant.</p></div>`;
+}
+async function buyPack(t) {
+  if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour jouer aux cartes', 'warn');
+  if (!SHOP[t]) return;
+  if (shopToday() >= SHOP_DAY) return toast(`Tu as déjà acheté tes ${SHOP_DAY} paquets aujourd’hui : reviens demain !`, 'info');
+  const v = await modal(`<h3>Acheter un ${PACKS[t].name.toLowerCase()} ?</h3><div class="jc-sell">${packHTML(t)}<div>
+      <p>${PACKS[t].sub} · 5 cartes${PACKS[t].floor ? ` · au moins une ${RAR[PACKS[t].floor].name.toLowerCase()}` : ''}</p><p class="jc-price">${fmt(SHOP[t])}</p>
+      <p class="muted small">Encore ${SHOP_DAY - shopToday()} achat${SHOP_DAY - shopToday() > 1 ? 's' : ''} possible${SHOP_DAY - shopToday() > 1 ? 's' : ''} aujourd’hui.</p></div></div>
+    <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Acheter</button></div>`, { cls: 'jc-modal' });
+  if (v !== 'ok' || shopToday() >= SHOP_DAY) return;
+  if (!wallet.spend(SHOP[t])) return toast(`Il te faut ${fmt(SHOP[t])}`, 'warn');
+  const d = E.paris().key;
+  save((s) => { s.shop = { d, n: (s.shop?.d === d ? s.shop.n || 0 : 0) + 1 }; s.packs[t] = (s.packs[t] || 0) + 1; });
+  sfx.coin?.(); paintBadge(); paintPage();
+  openPack(t);
+}
+
 /* ---------- the opening scene ---------- */
 let scene = null;
 function showOpening(t, hand, S) {
@@ -18065,6 +18105,7 @@ function paintPage() {
     <section class="panel jc-packs"><div class="sec-head"><h2>Mes paquets</h2><small>${np ? `${np} à ouvrir` : 'joue pour en gagner'}</small></div>
       <div class="jc-pack-row">${['b', 'v', 'o'].map((t) => `<div class="jc-pack-slot">${packHTML(t, { cls: s.packs[t] ? '' : 'none' })}<b>${PACKS[t].name}</b><span>${s.packs[t] || 0} paquet${(s.packs[t] || 0) > 1 ? 's' : ''}</span>
         <button class="btn ${s.packs[t] ? 'primary' : 'ghost'} sm" data-jc-open="${t}" ${s.packs[t] ? '' : 'disabled'}>Ouvrir</button></div>`).join('')}</div>
+      ${shopHTML(s)}
       ${SERIES.length > 1 ? `<p class="jc-pick">Ouvrir les paquets dans la série : ${SERIES.map((x) => `<button class="chip${pickSerie === x.id ? ' on' : ''}" data-jc-serie="${x.id}">${esc(x.name)}</button>`).join('')}</p>` : ''}
     </section>
     <nav class="jc-tabs">${[['album', '📖 Album'], ['market', '🏪 Marché'], ['forge', '🔥 Forge'], ['sales', `🏷️ Mes ventes${sales.length ? ` (${sales.length})` : ''}`], ['rules', '❔ Règles']].map(([k, l]) => `<button class="${tab === k ? 'on' : ''}" data-jc-tab="${k}">${l}</button>`).join('')}</nav>
@@ -18117,6 +18158,7 @@ function rulesHTML() {
       <li>🃏 <b>Trois paquets</b> : bleu (classique), violet (rare, au moins une carte rare) et doré (très rare, au moins une épique). Au moins un violet tous les ${PITY.v} paquets, un doré tous les ${PITY.o} paquets.</li>
       <li>✨ <b>Cartes brillantes</b> : ${pc(HOLO)} des cartes sortent en version brillante, qui vaut 3 fois sa cote.</li>
       <li>🏪 <b>Doubles</b> : vends-les aux autres joueurs dans le Marché, à la valeur de la carte, ou recycle-les dans la Forge.</li>
+      <li>🛒 <b>Acheter un paquet</b> : ${SHOP_DAY} paquets par jour au maximum, au choix (bleu ${fmt(SHOP.b)}, violet ${fmt(SHOP.v)}, doré ${fmt(SHOP.o)}). Pour le reste, il faut jouer !</li>
       <li>🔒 <b>Pas de boutique de cartes</b> : une carte s’obtient seulement dans les paquets, ou en l’achetant à un autre joueur (à sa valeur).</li>
       <li>🏆 <b>Album complet</b> : les ${NOW.list.length} cartes de la série = <b>${fmt(ALBUM)}</b>, une fois par série. Une nouvelle série arrive régulièrement avec de nouvelles cartes.</li>
     </ul>
@@ -18148,6 +18190,7 @@ document.addEventListener('click', (e) => {
   const q = (sel) => e.target.closest(sel);
   let b;
   if ((b = q('[data-jc-open]'))) return openPack(b.dataset.jcOpen);
+  if ((b = q('[data-jc-buy-pack]'))) return buyPack(b.dataset.jcBuyPack);
   if ((b = q('[data-jc-tab]'))) { tab = b.dataset.jcTab; if (tab === 'market') loadOffers(); return paintPage(); }
   if ((b = q('[data-jc-el]'))) { elf = b.dataset.jcEl; return paintPage(); }
   if ((b = q('[data-jc-serie]'))) { pickSerie = b.dataset.jcSerie; return paintPage(); }

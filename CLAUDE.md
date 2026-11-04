@@ -134,6 +134,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   une offre à un autre prix). Doubles : vendus aux autres joueurs au Marché (comptes seulement, Firestore `market/{id}`,
   la carte quitte la collection pendant la vente ; open → sold par l'acheteur, puis le navigateur du vendeur se paie
   et passe l'offre en paid) ou recyclés dans la Forge (100 points = un paquet violet). Données : `profile.jcc`.
+  **Achat de paquets** (demande du propriétaire) : `SHOP_DAY` = 2 paquets par jour (jour de Paris) au maximum, au choix,
+  `SHOP` bleu 6 000 / violet 15 000 / doré 40 000 KE (un peu au-dessus de la valeur moyenne des 5 cartes ≈ 5 800 /
+  12 300 / 31 000), payés par `wallet.spend` (ne remplit pas la barre), compteur `profile.jcc.shop = { d, n }`.
   Simulation (seul, avec la Forge, 78 cartes) : l'album demande ≈ 140 paquets (médiane), 85 à 250 selon la chance.
   **Nouvelle série (le propriétaire envoie des images tous les 1 à 3 mois)** : ajouter une entrée à la fin de `SERIES`
   (id court, nom, saison, éléments `els`, **75 à 80 cartes** (voulu par le propriétaire) `[id, élément, rareté, nom, emoji ou { img }, texte]`), images
