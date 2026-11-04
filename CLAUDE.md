@@ -192,6 +192,15 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `tools/admin/password.mjs`) avec le pseudo et le nouveau mot de passe (masqué dans le journal ; l'e-mail du compte
   s'affiche masqué). Secret `FIREBASE_SERVICE_ACCOUNT` nécessaire.
 
+## Publicités
+
+- **Plus aucune bannière dans les pages du site** (demande du propriétaire : le réseau HilltopAds peut montrer des pubs
+  pour adultes) : `BANNERS = false` dans `hta.js`, les emplacements `[data-hta]` restent cachés. Les pubs ne s'affichent
+  que quand le joueur en demande une (pubs récompensées de `ads.js` : +500 KE, recharge, roue ×5/×15, 50 tours…), dans
+  une fenêtre avec croix ; chaque pub se charge dans `ads/banner.html` (sa propre petite page, dans une iframe).
+  La page `ads/` (« Nos partenaires », lien du pied de page) garde sa bannière. Le propriétaire et les appareils
+  `?nopub` ne voient aucune pub (`adpolicy.js`).
+
 ## Suivi et administration
 
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu

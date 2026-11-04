@@ -15675,9 +15675,12 @@ const { progress } = __mods['progress.js'];
 
 const allowed = () => !adPolicy.noAds(); // every player, whatever their level (only the owner / ?nopub devices are left out)
 
+// No banner in the site's pages any more (owner's choice: the network may show adult ads): ads only appear when a
+// player asks for one (rewarded ads of ads.js, « +500 KE », roue ×5…). Set BANNERS to true to bring them back.
+const BANNERS = false;
 function fill(slot) {
   slot.dataset.hta = 'on';
-  if (!allowed()) { slot.hidden = true; return; }
+  if (!BANNERS || !allowed()) { slot.hidden = true; slot.innerHTML = ''; return; }
   slot.hidden = false;
   slot.innerHTML = '<small>Publicité</small><div class="hta-box"></div>';
   const box = slot.querySelector('.hta-box');
