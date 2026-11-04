@@ -36,14 +36,18 @@ function clusters(grid) {
   }
   return out;
 }
-// A column that reaches the top piles onto its last cube and keeps going (JPC retuned: same bonus value, ≈ ×130).
-const JW = [['cube', 62], ['sk', 12], ['g', 0.2], ['red', 3]], JPC = 0.176;
-// Judgment skulls add +2 to +500 to the value of the next cubes; a very rare 10 000 skull is an instant max win.
+// Owner's rules: a column that reaches the top stays full (no automatic fusion); only a lava cube piles its cubes onto
+// one and frees the column. Fewer drops (the bonus is shorter: ≈ 12 respins instead of 27) but many more skulls and
+// golden skulls. Simulation 600 000 bonuses: same value as before, ≈ ×127 the bet on average (median ×8: often small,
+// sometimes huge), ×1 000 or more 1 bonus in 48.
+const JW = [['cube', 40], ['sk', 20], ['g', 3], ['red', 4]], JPC = 0.12, SKX = 4;
+// Judgment skulls add +8 to +2 000 to the value of the next cubes (SKV × SKX); a very rare 10 000 skull is an instant max win.
 const SKV = [[2, 30], [3, 22], [4, 16], [5, 12], [6, 9], [8, 7], [10, 5], [15, 4], [20, 2.5], [25, 2], [40, 1.3], [60, 0.9], [100, 0.5], [150, 0.3], [250, 0.12], [500, 0.04], [10000, 0.0003]];
 const SK_MAX = 10000;
-function skVal() { let t = 0; SKV.forEach((x) => { t += x[1]; }); let r = Math.random() * t; for (const x of SKV) { if (r < x[1]) return x[0]; r -= x[1]; } return SKV[0][0]; }
+function skVal() { let t = 0; SKV.forEach((x) => { t += x[1]; }); let r = Math.random() * t; for (const x of SKV) { if (r < x[1]) return x[0] >= 10000 ? x[0] : x[0] * SKX; r -= x[1]; } return SKV[0][0] * SKX; }
 function pickItem(cubes) {
-  const ws = JW.filter((w) => !(w[0] === 'cube' && cubes >= R) && !(w[0] === 'red' && cubes === 0) && !(w[0] === 'g' && cubes === 0));
+  // a full column only takes a lava cube or a golden skull (no room for a cube, and a black skull would be useless)
+  const ws = JW.filter((w) => !((w[0] === 'cube' || w[0] === 'sk') && cubes >= R) && !(w[0] === 'red' && cubes === 0) && !(w[0] === 'g' && cubes === 0));
   let t = 0; ws.forEach((w) => { t += w[1]; }); let r = Math.random() * t;
   for (const w of ws) { if (r < w[1]) return w[0]; r -= w[1]; }
   return ws[ws.length - 1][0];
@@ -509,7 +513,7 @@ class AnubisGame extends BaseGame {
       await this.land(i, cart('cbb'), 'cube blue', landed ? 0 : -1, BLACK(v), 'cube');
       draw();
       const p = center(this.grid.cells[i]); fx.burst(p.x, p.y + 10, 10, ['#7dd3fc', '#fbbf24', '#fff'], 3);
-      if (x.n >= R) await this.pile(c, x, 'full'); // the column reached the top: everything piles onto the last cube
+      if (x.n >= R) { this.label(c, 'COLONNE PLEINE', 'ls'); this.msg('Colonne pleine : seul un cube de lave peut la faire redescendre'); } // no automatic fusion any more
     };
     const showAt = async (c, x, id, txt, cls, landed) => {
       const i = this.cubeCell(c, x.n);
@@ -544,24 +548,32 @@ class AnubisGame extends BaseGame {
         if (big) { this.flash('rgba(226,232,240,.6)'); sfx.jackpot(); } else sfx.upgrade();
         await this.wait(300); this.lava(i3);
       } else if (k === 'g') {
-        const kk = gkVal(), i4 = await showAt(c, x, 'cbg', '×' + kk, 'gsk', landed);
+        // a full column has no free cell: the golden skull strikes its top cube
+        const kk = gkVal(), full = x.n >= R, i4 = full ? -1 : await showAt(c, x, 'cbg', '×' + kk, 'gsk', landed);
+        if (full) { const tp = center(this.grid.cells[this.cubeCell(c, R - 1)]); fx.burst(tp.x, tp.y, 40, ['#fde047', '#fff', '#f59e0b'], 9); }
         await this.wait(420);
         x.T *= kk; x.vals = x.vals.map((v) => v * kk); this.label(c, '×' + kk, 'lg'); draw();
         this.flash('rgba(253,224,71,.6)'); sfx.jackpot();
         for (let j = 0; j < x.n; j++) { const gi = this.cubeCell(c, j); this.paint(gi, BLACK(x.vals[j]), 'cube'); this.grid.cells[gi].classList.add('win', 'golden'); }
-        await this.grid.shatter([i4], ['#fde047', '#fff', '#f59e0b']);
+        if (i4 >= 0) await this.grid.shatter([i4], ['#fde047', '#fff', '#f59e0b']);
         await this.wait(700);
         for (let j = 0; j < x.n; j++) this.grid.cells[this.cubeCell(c, j)].classList.remove('win', 'golden');
         this.lava(i4);
       } else if (k === 'red') {
-        const ri = await showAt(c, x, 'cbr', '', 'rc', landed);
         this.msg('Cube de lave : tous les cubes s’accumulent sur le dernier !');
-        await this.wait(350);
-        const p = center(this.grid.cells[ri]);
-        fx.burst(p.x, p.y, 20, ['#f87171', '#fb923c', '#fde047'], 6);
-        this.grid.sym(ri).animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(40%) scale(.6)', opacity: 0 }], { duration: 300, fill: 'forwards' });
-        await this.wait(250);
-        this.lava(ri);
+        if (x.n >= R) { // full column: the lava falls on its top cube
+          const tp = center(this.grid.cells[this.cubeCell(c, R - 1)]);
+          this.label(c, 'LAVE !', 'lr'); fx.burst(tp.x, tp.y, 30, ['#f87171', '#fb923c', '#fde047'], 7);
+          await this.wait(450);
+        } else {
+          const ri = await showAt(c, x, 'cbr', '', 'rc', landed);
+          await this.wait(350);
+          const p = center(this.grid.cells[ri]);
+          fx.burst(p.x, p.y, 20, ['#f87171', '#fb923c', '#fde047'], 6);
+          this.grid.sym(ri).animate([{ transform: 'none', opacity: 1 }, { transform: 'translateY(40%) scale(.6)', opacity: 0 }], { duration: 300, fill: 'forwards' });
+          await this.wait(250);
+          this.lava(ri);
+        }
         await this.pile(c, x, 'red');
       }
     };
@@ -605,7 +617,7 @@ class AnubisGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym svg">${symArt(SC)}</div><div class="pay-vals"><b>Scatter</b><br><span>3 = Monde souterrain · 4+ = Jugement</span></div></div></div>
       <h4>Cascades</h4><p>Grille 5×6. Une grappe de <b>5 symboles ou plus</b> paie mise × valeur × 0,33 × (taille − 4) × multiplicateur, disparaît et les symboles tombent.</p>
       <h4>Monde souterrain</h4><p>10 tours. Chaque colonne a son multiplicateur, qui monte de +3 à chaque gain qui la touche. Un <b>crâne doré</b> multiplie sa colonne (×2 à ×100).</p>
-      <h4>Jugement</h4><p>Chaque colonne a un multiplicateur, affiché tout en haut. Un <b>cube de pierre</b> tombe dans la colonne et devient un <b>cube noir et or</b> marqué du multiplicateur de la colonne au moment où il tombe : il garde cette valeur, même si la colonne monte ensuite. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne noir</b> : ajoute de <b>+2 à +500</b> au multiplicateur de sa colonne (pour les prochains cubes). Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie tous les cubes de la colonne. <b>Cube de lave</b> : tous les cubes de sa colonne s’accumulent sur le dernier, qui garde la somme et redescend en bas pour libérer de la place. <b>Fusion</b> : quand une colonne atteint le haut, ses cubes s’accumulent de la même façon. À la fin, tu gagnes la somme de tous les cubes × la mise.</p>
+      <h4>Jugement</h4><p>Chaque colonne a un multiplicateur, affiché tout en haut. Un <b>cube de pierre</b> tombe dans la colonne et devient un <b>cube noir et or</b> marqué du multiplicateur de la colonne au moment où il tombe : il garde cette valeur, même si la colonne monte ensuite. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne noir</b> : ajoute de <b>+8 à +2 000</b> au multiplicateur de sa colonne (pour les prochains cubes). Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie tous les cubes de la colonne. <b>Cube de lave</b> : tous les cubes de sa colonne s’accumulent sur le dernier, qui garde la somme et redescend en bas pour libérer de la place. <b>Colonne pleine</b> : quand une colonne atteint le haut, elle ne prend plus de cube ; seul un <b>cube de lave</b> peut la faire redescendre, et un crâne doré peut encore la multiplier. À la fin, tu gagnes la somme de tous les cubes × la mise.</p>
       <h4>Achats</h4><p>Monde souterrain ×${BUYU} · Jugement ×${BUYJ}. Gain maximum ×10 000.</p>`);
   }
 }
