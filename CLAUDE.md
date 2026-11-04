@@ -132,13 +132,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`profile.jcc.done`). Doubles : vendus aux autres joueurs au Marché (comptes seulement, Firestore `market/{id}`,
   la carte quitte la collection pendant la vente ; open → sold par l'acheteur, puis le navigateur du vendeur se paie
   et passe l'offre en paid) ou recyclés dans la Forge (100 points = un paquet violet). Données : `profile.jcc`.
-  Simulation (seul, avec la Forge) : l'album demande ≈ 120 paquets (médiane), 55 à 250 selon la chance.
+  Simulation (seul, avec la Forge, 78 cartes) : l'album demande ≈ 140 paquets (médiane), 85 à 250 selon la chance.
   **Nouvelle série (le propriétaire envoie des images tous les 1 à 3 mois)** : ajouter une entrée à la fin de `SERIES`
-  (id court, nom, saison, éléments `els`, 30 cartes `[id, élément, rareté, nom, emoji ou { img }, texte]`), images
+  (id court, nom, saison, éléments `els`, **75 à 80 cartes** (voulu par le propriétaire) `[id, élément, rareté, nom, emoji ou { img }, texte]`), images
   découpées dans `assets/games/jcc/` (`{ img: 'dossier/fichier' }` sans `.webp`, ≈ 480 px de large), puis changer
   `CACHE` dans `sw.js`. Les paquets s'ouvrent dans la série choisie (la plus récente par défaut) et chaque série a son
-  album et ses 100 000 KE. La 1re série « Les Origines » : les 3 légendaires sont les 3 cartes du propriétaire
-  (phénix, golem, danseuse), les 27 autres sont dessinées par le site (emoji sur fond d'élément) en attendant ses images.
+  album et ses 100 000 KE. La 1re série « Les Origines » (78 cartes : par élément 14 communes, 7 rares, 4 épiques,
+  1 légendaire) : les 3 légendaires sont les 3 cartes du propriétaire (phénix, golem, danseuse), les 75 autres sont dessinées par le site (emoji sur fond d'élément) en attendant ses images.
 
 ## Arrivée des visiteurs et partage
 
