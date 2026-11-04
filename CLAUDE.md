@@ -129,7 +129,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (classique), violet (rare, ≥ 1 rare), doré (très rare, ≥ 1 épique), chances `PACKS` / `PACK_ODDS`, garantis `PITY`
   (violet tous les 10, doré tous les 40). Raretés `RAR` (Commune, Rare, Épique, Légendaire, avec leur cote en KE),
   3 % de cartes brillantes (cote ×3). Album d'une série complet = `ALBUM` (100 000 KE), une fois par série
-  (`profile.jcc.done`). Doubles : vendus aux autres joueurs au Marché (comptes seulement, Firestore `market/{id}`,
+  (`profile.jcc.done`). Une carte s'obtient **seulement** dans les paquets ou en l'achetant à un autre joueur (voulu par le propriétaire :
+  pas de boutique de cartes), **toujours à sa valeur** (`cote()` : cote de sa rareté, ×3 si brillante ; le Marché ignore
+  une offre à un autre prix). Doubles : vendus aux autres joueurs au Marché (comptes seulement, Firestore `market/{id}`,
   la carte quitte la collection pendant la vente ; open → sold par l'acheteur, puis le navigateur du vendeur se paie
   et passe l'offre en paid) ou recyclés dans la Forge (100 points = un paquet violet). Données : `profile.jcc`.
   Simulation (seul, avec la Forge, 78 cartes) : l'album demande ≈ 140 paquets (médiane), 85 à 250 selon la chance.

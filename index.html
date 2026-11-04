@@ -17607,7 +17607,7 @@ const { sfx } = __mods['audio.js'];
 const { fx } = __mods['fx.js'];
 const E = __mods['events.js'];
 
-const BAR = 500, ALBUM = 100000, HOLO = 0.03, MAXSALE = 10, MAXPRICE = 500000;
+const BAR = 500, ALBUM = 100000, HOLO = 0.03, MAXSALE = 10;
 const RAR = {
   C: { name: 'Commune', cote: 500, forge: 1, pow: 120 },
   R: { name: 'Rare', cote: 2000, forge: 3, pow: 380 },
@@ -17961,12 +17961,11 @@ async function sell(id, h) {
   const v = await modal(`<h3>Vendre ${esc(c.name)}${h ? ' (brillante)' : ''}</h3>
     <div class="jc-sell">${cardHTML(c, { holo: h, cls: 'sm' })}<div>
       <p>Les autres joueurs pourront l’acheter dans le Marché. La carte quitte ta collection pendant la vente (tu peux la retirer quand tu veux).</p>
-      <label>Ton prix<input type="number" inputmode="numeric" min="1" max="${MAXPRICE}" step="1" value="${cote(c, h)}" data-jc-price></label>
-      <p class="muted small">Cote de la carte : ${fmt(cote(c, h))}. Tu reçois le prix dès qu’un joueur l’achète.</p></div></div>
+      <p class="jc-price">${fmt(cote(c, h))}</p>
+      <p class="muted small">Chaque carte se vend à sa valeur (${RAR[c.r].name.toLowerCase()}${h ? ', brillante = 3 fois plus' : ''}). Tu reçois cette somme dès qu’un joueur l’achète.</p></div></div>
     <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Mettre en vente</button></div>`, { cls: 'jc-modal' });
   if (v !== 'ok') return;
-  const p = Math.floor(Number(document.querySelector('[data-jc-price]')?.value) || 0);
-  if (!(p >= 1 && p <= MAXPRICE)) return toast(`Prix entre 1 et ${fmt(MAXPRICE)}`, 'warn');
+  const p = cote(c, h); // a card is always sold at its value
   if (owned(st(), id) < 2 || !(st().cards[id]?.[h] > 0)) return;
   save((x) => { const k = [...x.cards[id]]; k[h]--; x.cards[id] = k; });
   try {
@@ -17997,7 +17996,7 @@ async function buy(oid) {
   const m = me();
   if (!m) return askAccount();
   const o = (offers || []).find((x) => x.id === oid), c = o && CARD[o.c];
-  if (!o || !c || buying) return;
+  if (!o || !c || buying || o.p !== cote(c, o.h)) return;
   if (o.s === m.uid) return cancel(oid);
   const v = await modal(`<h3>Acheter ${esc(c.name)}${o.h ? ' (brillante)' : ''} ?</h3><div class="jc-sell">${cardHTML(c, { holo: o.h, cls: 'sm' })}<div>
       <p>Vendue par <b>${esc(o.sn)}</b></p><p class="jc-price">${fmt(o.p)}</p>
@@ -18064,7 +18063,7 @@ function albumHTML(s, S) {
 function marketHTML(s, m) {
   if (!m) return `<section class="panel jc-empty"><h2>🏪 Le Marché</h2><p>Achète les cartes qui te manquent à d’autres joueurs, et vends tes doubles.</p><p>Le Marché est réservé aux comptes (gratuit). Ton album et tes paquets sont gardés.</p><button class="btn primary" data-signup>Créer mon compte</button></section>`;
   if (!offers) return `<section class="panel"><h2>🏪 Le Marché</h2><p class="muted">${offersErr ? 'Le Marché est indisponible pour le moment.' : 'Chargement des offres…'}</p></section>`;
-  let L = offers.filter((o) => CARD[o.c]);
+  let L = offers.filter((o) => CARD[o.c] && o.p === cote(CARD[o.c], o.h)); // only offers at the card's value
   const miss = (o) => !owned(s, o.c);
   if (missOnly) L = L.filter(miss);
   L.sort((a, b) => miss(b) - miss(a) || RANK.indexOf(CARD[b.c].r) - RANK.indexOf(CARD[a.c].r) || a.p - b.p);
@@ -18100,7 +18099,8 @@ function rulesHTML() {
       <li>🎰 <b>Joue à n’importe quel jeu</b> : chaque mise remplit la barre (plus la mise est grosse, plus elle avance). Barre pleine = un paquet de 5 cartes.</li>
       <li>🃏 <b>Trois paquets</b> : bleu (classique), violet (rare, au moins une carte rare) et doré (très rare, au moins une épique). Au moins un violet tous les ${PITY.v} paquets, un doré tous les ${PITY.o} paquets.</li>
       <li>✨ <b>Cartes brillantes</b> : ${pc(HOLO)} des cartes sortent en version brillante, qui vaut 3 fois sa cote.</li>
-      <li>🏪 <b>Doubles</b> : vends-les aux autres joueurs au prix que tu veux (Marché), ou recycle-les dans la Forge.</li>
+      <li>🏪 <b>Doubles</b> : vends-les aux autres joueurs dans le Marché, à la valeur de la carte, ou recycle-les dans la Forge.</li>
+      <li>🔒 <b>Pas de boutique de cartes</b> : une carte s’obtient seulement dans les paquets, ou en l’achetant à un autre joueur (à sa valeur).</li>
       <li>🏆 <b>Album complet</b> : les ${NOW.list.length} cartes de la série = <b>${fmt(ALBUM)}</b>, une fois par série. Une nouvelle série arrive régulièrement avec de nouvelles cartes.</li>
     </ul>
     <h3 class="jc-h3">Chances par carte</h3>
@@ -18113,7 +18113,7 @@ function rulesHTML() {
 // one card, big, with its copies and the sale buttons
 function showCard(id) {
   const c = CARD[id], s = st(), x = s.cards[id] || [0, 0], n = x[0] + x[1], m = me();
-  const forSale = (offers || []).filter((o) => o.c === id && o.s !== m?.uid).sort((a, b) => a.p - b.p);
+  const forSale = (offers || []).filter((o) => o.c === id && o.s !== m?.uid && o.p === cote(c, o.h)).sort((a, b) => a.p - b.p);
   modal(`<div class="jc-detail">${cardHTML(c, { locked: !n, holo: x[1] > 0, cls: 'lg' })}<div>
       <h3>${n ? esc(c.name) : 'Carte à trouver'}</h3>
       <p class="muted">${RAR[c.r].name} · n° ${c.num}/${c.total} · cote ${fmt(cote(c))}</p>
