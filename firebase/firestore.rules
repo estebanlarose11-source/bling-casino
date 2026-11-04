@@ -329,6 +329,16 @@ service cloud.firestore {
         && request.resource.data.text is string && request.resource.data.text.size() <= 300 && request.resource.data.at == request.time;
       allow read, delete: if isAdmin();
     }
+    // support/{id} : demandes d'aide (mot de passe perdu), envoyées depuis l'écran de connexion, même sans compte.
+    match /support/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['pseudo', 'contact', 'email', 'text', 'at'])
+        && request.resource.data.pseudo is string && request.resource.data.pseudo.size() >= 2 && request.resource.data.pseudo.size() <= 16
+        && request.resource.data.contact is string && request.resource.data.contact.size() >= 3 && request.resource.data.contact.size() <= 80
+        && request.resource.data.email is string && request.resource.data.email.size() <= 100
+        && request.resource.data.text is string && request.resource.data.text.size() <= 300
+        && request.resource.data.at == request.time;
+      allow read, delete: if isAdmin();
+    }
     // errors/{id} : les erreurs JavaScript des joueurs (5 au plus par visite), pour les corriger vite.
     match /errors/{id} {
       allow create: if request.resource.data.keys().hasOnly(['msg', 'src', 'stack', 'url', 'game', 'ua', 'uid', 'at'])

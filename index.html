@@ -4855,7 +4855,15 @@ const cloud = {
   async signUp(email, password) { return (await (await init()).auth.createUserWithEmailAndPassword(email, password)).user; },
   async signIn(email, password) { return (await (await init()).auth.signInWithEmailAndPassword(email, password)).user; },
   async signOut() { await (await init()).auth.signOut(); },
-  async resetPassword(email) { await (await init()).auth.sendPasswordResetEmail(email); },
+  // The e-mail's link opens Firebase's page to choose the new password, then comes back to the site (when the domain
+  // is allowed in Firebase; otherwise the plain e-mail is sent).
+  async resetPassword(email) {
+    const { auth } = await init();
+    try { await auth.sendPasswordResetEmail(email, { url: 'https://www.spinbetcaz.com/#connexion' }); }
+    catch (e) { if (/continue-uri|unauthorized-domain|missing-continue/.test(e?.code || '')) await auth.sendPasswordResetEmail(email); else throw e; }
+  },
+  // A player who lost access asks the admins for help: support/{id} = { pseudo, contact, email, text, at } (read by admins).
+  async helpRequest(data) { await (await init()).db.collection('support').add({ ...data, at: firebase.firestore.FieldValue.serverTimestamp() }); },
   async load(uid) { const d = await (await users()).doc(uid).get(); return d.exists ? d.data() : null; },
   // JSON round trip: Firestore refuses undefined values.
   async save(uid, data) { await (await users()).doc(uid).set(JSON.parse(JSON.stringify(data))); },
@@ -6649,14 +6657,7 @@ function showAccountGate({ tab: firstTab = 'in', title = '' } = {}) {
       fail(cloud.message(ex));
     }
   });
-  g.querySelector('[data-forgot]').onclick = async () => {
-    const mail = email.value.trim();
-    if (!mail) return fail('Entre ton adresse e-mail, puis clique sur « Mot de passe oublié ? »', email);
-    try {
-      await cloud.resetPassword(mail);
-      toast('E-mail envoyé : suis le lien reçu pour choisir un nouveau mot de passe', 'ok');
-    } catch (ex) { fail(cloud.message(ex)); }
-  };
+  g.querySelector('[data-forgot]').onclick = () => forgotPassword(email.value.trim());
   g.querySelector('[data-guest]').onclick = () => {
     sfx.unlock();
     if (profiles.guest) return closeGate(); // already playing as a guest: keep the balance
@@ -6668,6 +6669,78 @@ function showAccountGate({ tab: firstTab = 'in', title = '' } = {}) {
   if (firstTab === 'up') setTab('up');
   else if (asGuest) setTab('in');
   setTimeout(() => (firstTab === 'up' ? pseudo : email).focus(), 350);
+}
+
+/* ---------- mot de passe oublié ---------- */
+// 1. the e-mail with the link (Firebase never says whether the address has an account: the screen explains what to
+//    check); 2. nothing received or e-mail forgotten: a help request to the admins (support/), who can set a new
+//    password with the « Mot de passe » GitHub action (tools/admin/password.mjs).
+function forgotPassword(prefill = '') {
+  document.querySelector('.fp-back')?.remove();
+  const back = el('div', 'modal-back fp-back', `<div class="modal fp"><button class="modal-x" data-x aria-label="Fermer">✕</button>
+    <div data-step="mail">
+      <h3>🔑 Mot de passe oublié</h3>
+      <p class="muted">Entre l’adresse e-mail de ton compte : on t’envoie un lien pour choisir un nouveau mot de passe.</p>
+      <input class="gate-input" type="email" placeholder="Adresse e-mail" autocomplete="email" autocapitalize="off" spellcheck="false" value="${esc(prefill)}" data-mail>
+      <small class="gate-err" data-err></small>
+      <button class="btn primary lg ga-wide" data-send>Envoyer le lien</button>
+      <button class="gate-link" data-help>J’ai oublié mon adresse e-mail</button>
+    </div>
+    <div data-step="sent" hidden>
+      <h3>📩 Regarde tes e-mails</h3>
+      <p>Si un compte existe avec <b data-to></b>, un e-mail de <b>noreply@cazbabs-a52be.firebaseapp.com</b> arrive dans les 5 minutes.</p>
+      <ol class="fp-steps"><li>Regarde aussi dans les <b>Spams</b> (ou « Courrier indésirable », « Promotions »).</li><li>Ouvre le lien de l’e-mail et choisis ton nouveau mot de passe (6 caractères minimum).</li><li>Reviens ici et connecte-toi avec ce nouveau mot de passe.</li></ol>
+      <button class="btn ghost lg ga-wide" data-again disabled>Renvoyer l’e-mail</button>
+      <button class="gate-link" data-help>Je n’ai rien reçu · demander de l’aide</button>
+    </div>
+    <div data-step="help" hidden>
+      <h3>🙋 Demander de l’aide</h3>
+      <p class="muted">Un admin va retrouver ton compte et te donner un nouveau mot de passe. Dis-nous comment te contacter.</p>
+      <input class="gate-input" placeholder="Ton pseudo sur SpinBet" maxlength="16" data-pseudo autocapitalize="off" spellcheck="false">
+      <input class="gate-input" placeholder="Snap, Insta, TikTok ou e-mail pour te répondre" maxlength="80" data-contact autocapitalize="off" spellcheck="false">
+      <input class="gate-input" type="email" placeholder="L’adresse e-mail du compte, si tu t’en souviens" maxlength="100" data-hmail autocapitalize="off" spellcheck="false">
+      <textarea class="gate-input fp-text" placeholder="Un mot pour l’admin (facultatif)" maxlength="300" data-text></textarea>
+      <small class="gate-err" data-herr></small>
+      <button class="btn primary lg ga-wide" data-ask>Envoyer ma demande</button>
+    </div>
+    <div data-step="done" hidden><h3>✅ Demande envoyée</h3><p>Un admin va te contacter avec un nouveau mot de passe. Pense à vérifier tes messages.</p><button class="btn primary lg ga-wide" data-x>OK</button></div>
+  </div>`);
+  document.body.appendChild(back);
+  requestAnimationFrame(() => back.classList.add('show'));
+  const q = (s) => back.querySelector(s);
+  const step = (k) => back.querySelectorAll('[data-step]').forEach((d) => { d.hidden = d.dataset.step !== k; });
+  const close = () => { back.classList.remove('show'); setTimeout(() => back.remove(), 200); };
+  back.addEventListener('click', (e) => { if (e.target === back || e.target.closest('[data-x]')) close(); });
+  back.querySelectorAll('[data-help]').forEach((b) => { b.onclick = () => { q('[data-hmail]').value = q('[data-mail]').value.trim(); step('help'); q('[data-pseudo]').focus(); }; });
+  let mail = '';
+  const send = async (btn) => {
+    mail = q('[data-mail]').value.trim();
+    const err = q('[data-err]');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { err.textContent = 'Entre une adresse e-mail valide'; return; }
+    btn.disabled = true;
+    try {
+      await cloud.resetPassword(mail);
+      q('[data-to]').textContent = mail;
+      step('sent');
+      const again = q('[data-again]'); let n = 60; again.disabled = true;
+      const iv = setInterval(() => { n--; again.textContent = n > 0 ? `Renvoyer l’e-mail (${n} s)` : 'Renvoyer l’e-mail'; if (n <= 0) { clearInterval(iv); again.disabled = false; } }, 1000);
+    } catch (ex) { err.textContent = cloud.message(ex); }
+    btn.disabled = false;
+  };
+  q('[data-send]').onclick = (e) => send(e.currentTarget);
+  q('[data-mail]').addEventListener('keydown', (e) => { if (e.key === 'Enter') send(q('[data-send]')); });
+  q('[data-again]').onclick = async (e) => { const b = e.currentTarget; b.disabled = true; try { await cloud.resetPassword(mail); toast('E-mail renvoyé', 'ok'); } catch (ex) { toast(cloud.message(ex), 'warn'); b.disabled = false; } };
+  q('[data-ask]').onclick = async (e) => {
+    const pseudo = q('[data-pseudo]').value.trim(), contact = q('[data-contact]').value.trim(), herr = q('[data-herr]');
+    if (pseudo.length < 2) { herr.textContent = 'Entre ton pseudo'; return; }
+    if (contact.length < 3) { herr.textContent = 'Dis-nous comment te contacter (Snap, Insta, e-mail…)'; return; }
+    e.currentTarget.disabled = true;
+    try {
+      await cloud.helpRequest({ pseudo: pseudo.slice(0, 16), contact: contact.slice(0, 80), email: q('[data-hmail]').value.trim().slice(0, 100), text: q('[data-text]').value.trim().slice(0, 300) });
+      step('done');
+    } catch (ex) { console.error(ex); herr.textContent = 'Envoi impossible pour le moment, réessaie plus tard'; e.currentTarget.disabled = false; }
+  };
+  setTimeout(() => (prefill ? q('[data-send]') : q('[data-mail]')).focus(), 250);
 }
 
 // Opens the "create an account" screen (the guest keeps playing if they close it). [data-signup] buttons call it.
@@ -6792,7 +6865,7 @@ addEventListener('sb:roundend', (e) => {
   if (profiles.guest && !d.bought && d.x >= NUDGE.bigX) nudgeLater(d);
 });
 
-return { showGate, mountHud, signUp };
+return { showGate, mountHud, signUp, forgotPassword };
 })();
 
 // ---- likes.js ----
@@ -12617,7 +12690,7 @@ async function renderAdmin(root) {
   const me = uid();
   if (!me || !cloud.enabled || !(await cloud.isAdmin(me).catch(() => false))) { root.querySelector('.adm').innerHTML = '<h1>🛠️ Admin</h1><p class="muted">Cette page est réservée aux administrateurs.</p>'; return; }
   const days = Array.from({ length: 7 }, (_, k) => new Date(Date.now() - k * 864e5).toISOString().slice(0, 10));
-  const [stats, reports, errors] = await Promise.all([cloud.adminStats(days).catch(() => []), cloud.adminList('reports', 60).catch(() => []), cloud.adminList('errors', 80).catch(() => [])]);
+  const [stats, reports, errors, help] = await Promise.all([cloud.adminStats(days).catch(() => []), cloud.adminList('reports', 60).catch(() => []), cloud.adminList('errors', 80).catch(() => []), cloud.adminList('support', 60).catch(() => [])]);
   const tot = {};
   stats.forEach((d) => { for (const k in d.opens || {}) (tot[k] = tot[k] || { o: 0, s: 0 }).o += d.opens[k]; for (const k in d.spins || {}) (tot[k] = tot[k] || { o: 0, s: 0 }).s += d.spins[k]; });
   const rows = Object.entries(tot).sort((a, b) => b[1].s - a[1].s || b[1].o - a[1].o);
@@ -12628,6 +12701,11 @@ async function renderAdmin(root) {
     <h2>Tours joués par jour</h2><div class="adm-days">${perDay}</div>
     <h2>Jeux des 7 derniers jours</h2>
     <table class="adm-t"><tr><th>Jeu</th><th>Ouvertures</th><th>Tours joués</th></tr>${rows.map(([k, v]) => `<tr><td>${esc(getGame(k)?.name || k)}</td><td>${v.o.toLocaleString('fr-FR')}</td><td>${v.s.toLocaleString('fr-FR')}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">Pas encore de données.</td></tr>'}</table>
+    <h2>🔑 Demandes d’aide · mot de passe (${help.length})</h2>
+    <p class="muted small">Pour donner un nouveau mot de passe : GitHub → onglet <b>Actions</b> → <b>Mot de passe</b> → <b>Run workflow</b>, avec le pseudo du joueur et le nouveau mot de passe. Puis envoie-le au joueur par son contact.</p>
+    <div class="adm-list adm-help">${help.map((h) => `<div class="adm-item"><b>${esc(h.pseudo)}</b> · <small>${when(h.atMs)}</small>
+      <p>📞 ${esc(h.contact)}${h.email ? ` · ✉️ ${esc(h.email)}` : ''}</p>${h.text ? `<p>« ${esc(h.text)} »</p>` : ''}
+      <div><button class="btn" data-del="support" data-id="${esc(h.id)}">✓ Traité</button></div></div>`).join('') || '<p class="muted">Aucune demande.</p>'}</div>
     <h2>Signalements (${reports.length})</h2>
     <div class="adm-list">${reports.map((r) => `<div class="adm-item" data-id="${esc(r.id)}"><b>${esc(r.name)}</b> signalé par ${esc(r.byName)} · <small>${when(r.atMs)}</small>${r.text ? `<p>« ${esc(r.text)} »</p>` : ''}
       <div><button class="btn" data-mute="${esc(r.uid)}" data-name="${esc(r.name)}">🔇 Rendre muet</button> <button class="btn" data-del="reports" data-id="${esc(r.id)}">✓ Traité</button></div></div>`).join('') || '<p class="muted">Aucun signalement.</p>'}</div>
@@ -15951,6 +16029,7 @@ const routes = [
   { re: /^jackpot$/, page: (r) => __mods['jackpot.js'].renderJackpot(r), nav: 'jackpot' },
   { re: /^duels?$/, page: (r) => __mods['duels.js'].renderDuels(r), nav: 'duels' },
   { re: /^cashback$/, page: (r) => __mods['cashback.js'].renderCashback(r), nav: 'cashback' },
+  { re: /^connexion$/, page: (r) => { renderLobby(r); setTimeout(() => (profiles.online ? toast('Tu es connecté 👍', 'ok') : __mods['hud.js'].showGate({ tab: 'in', title: '🔑 Connecte-toi avec ton nouveau mot de passe' })), 300); }, nav: 'home' },
   { re: /^battle$/, page: (r) => __mods['battle.js'].renderBattle(r), nav: 'battle' },
   { re: /^paris$/, page: (r) => __mods['paris.js'].renderParis(r), nav: 'paris' },
   { re: /^loto$/, page: (r) => __mods['loto.js'].renderLoto(r), nav: 'loto' },
@@ -17742,6 +17821,15 @@ html.light .btn.primary { color: #fff !important; background: linear-gradient(18
 .ev-flash { background: linear-gradient(90deg, rgba(250, 204, 21, .22), rgba(249, 115, 22, .12)) !important; border-color: rgba(250, 204, 21, .6) !important; }
 .ev-pill.flash { background: linear-gradient(90deg, rgba(250, 204, 21, .25), rgba(249, 115, 22, .15)); border-color: rgba(250, 204, 21, .6); }
 .side-more [data-vibe] em { font-style: normal; }
+
+/* ---------- mot de passe oublié (hud.js forgotPassword) ---------- */
+.fp-back { z-index: 450; }
+.fp h3 { margin: 0 0 8px; }
+.fp .gate-input { margin-top: 8px; font-size: 16px; text-align: left; }
+.fp .gate-link { display: block; margin: 12px auto 0; }
+.fp-steps { margin: 10px 0 6px; padding-left: 20px; display: grid; gap: 6px; font-size: 14px; }
+.fp-text { min-height: 70px; resize: vertical; font: 600 15px Inter, sans-serif !important; }
+.adm-help .adm-item p { margin: 4px 0; }
 
 /* ---------- « Télécharger l'appli » (pages/app.js getApp) ---------- */
 .ga-back { position: fixed; inset: 0; z-index: 420; display: flex; align-items: flex-end; justify-content: center; padding: 12px; background: rgba(3, 6, 12, .66); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); opacity: 0; transition: opacity .25s; }

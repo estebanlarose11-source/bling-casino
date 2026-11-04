@@ -154,6 +154,16 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   téléphones refusent la mise à jour. L'appli se signale par « SpinBetApp » dans le user agent et partage les
   images de gros gain par `window.SpinBetApp.share(dataUrl, texte)`. Pas de notifications dans l'APK.
 
+## Mot de passe oublié
+
+- Écran « 🔑 Mot de passe oublié » (`forgotPassword` dans `hud.js`) : e-mail Firebase avec lien de retour vers
+  `#connexion` (écran de connexion), conseils (spams, expéditeur noreply@cazbabs-a52be.firebaseapp.com), renvoi après
+  60 s. « J'ai oublié mon e-mail / rien reçu » → demande d'aide dans Firestore `support/` (même sans compte), visible
+  sur la page Admin.
+- Pour donner un nouveau mot de passe : GitHub → Actions → « Mot de passe » (`.github/workflows/mot-de-passe.yml`,
+  `tools/admin/password.mjs`) avec le pseudo et le nouveau mot de passe (masqué dans le journal ; l'e-mail du compte
+  s'affiche masqué). Secret `FIREBASE_SERVICE_ACCOUNT` nécessaire.
+
 ## Suivi et administration
 
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu

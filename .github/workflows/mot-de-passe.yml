@@ -1,0 +1,36 @@
+# Donner un nouveau mot de passe à un joueur (tools/admin/password.mjs).
+# Onglet Actions → « Mot de passe » → Run workflow → pseudo du joueur + nouveau mot de passe.
+# Le mot de passe est masqué dans le journal (le dépôt est public). Secret nécessaire : FIREBASE_SERVICE_ACCOUNT.
+name: Mot de passe
+
+on:
+  workflow_dispatch:
+    inputs:
+      pseudo:
+        description: 'Pseudo du joueur (exactement comme dans le jeu)'
+        required: true
+      nouveau_mot_de_passe:
+        description: 'Nouveau mot de passe (6 caractères minimum) à donner ensuite au joueur'
+        required: true
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Cacher le mot de passe dans le journal
+        run: |
+          PW="$(jq -r '.inputs.nouveau_mot_de_passe' "$GITHUB_EVENT_PATH")"
+          echo "::add-mask::$PW"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+        working-directory: tools/push
+      - name: Nouveau mot de passe
+        run: cp tools/admin/password.mjs tools/push/password.mjs && node tools/push/password.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PSEUDO: ${{ github.event.inputs.pseudo }}
+          NEW_PASSWORD: ${{ github.event.inputs.nouveau_mot_de_passe }}
