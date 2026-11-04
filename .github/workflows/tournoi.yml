@@ -1,0 +1,29 @@
+# Tournois : remettre dans le classement les records gardés dans les profils mais absents du classement public
+# (tools/admin/tournoi.mjs). Onglet Actions → « Tournoi » → Run workflow → verifier ou reparer.
+# Secret nécessaire : FIREBASE_SERVICE_ACCOUNT.
+name: Tournoi
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'verifier (liste seulement) ou reparer (remet les scores manquants)'
+        required: true
+        default: 'verifier'
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+        working-directory: tools/push
+      - name: Scores des tournois
+        run: cp tools/admin/tournoi.mjs tools/push/tournoi.mjs && node tools/push/tournoi.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          MODE: ${{ github.event.inputs.mode }}
