@@ -151,7 +151,7 @@ const { el } = __mods['ui.js'];
 const { warm } = __mods['core/pixi.js'];
 
 /* ---------- the owner's symbols ---------- */
-const IMG_V = 1;
+const IMG_V = 2;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const FILE = ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10'];
 const NAMES = ['10', 'Valet', 'Dame', 'Roi', 'As', 'Whisky', 'Montre à gousset', 'Lingots d’or', 'Étoile du shérif', 'Revolver', 'Le Cow-boy'];
@@ -160,20 +160,14 @@ const fileOf = (v) => (v === WILD ? 'wild' : v === SC ? 'scat' : v === BULLET ? 
 const cellArt = (v) => img(fileOf(v));
 const cellCls = (v) => (v === WILD ? 'wild' : v === SC ? 'scat' : v === BULLET ? 'bullet' : v >= 8 ? 'hi' : '');
 
-// the revolver barrel seen from the back (after the owner's photo): 6 chambers around the ejector star (chamber 0 on top)
-const CH = Array.from({ length: 6 }, (_, k) => { const a = (k * 60 - 90) * Math.PI / 180; return [50 + 28 * Math.cos(a), 50 + 28 * Math.sin(a)]; });
-const barrelSVG = (cls = '') => `<svg class="rr-barrel-svg ${cls}" viewBox="0 0 100 100" aria-hidden="true"><defs>
-  <radialGradient id="rrBl" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#9aa6b8"/><stop offset=".45" stop-color="#4b5563"/><stop offset=".85" stop-color="#1f2937"/><stop offset="1" stop-color="#0b0f17"/></radialGradient>
-  <radialGradient id="rrPr" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff6cf"/><stop offset=".35" stop-color="#e9c46a"/><stop offset=".75" stop-color="#b8860b"/><stop offset="1" stop-color="#6b4a06"/></radialGradient>
-  <radialGradient id="rrHole" cx=".5" cy=".45" r=".6"><stop offset="0" stop-color="#000"/><stop offset=".8" stop-color="#05070b"/><stop offset="1" stop-color="#2b3340"/></radialGradient></defs>
-  <g class="rr-rot"><circle cx="50" cy="50" r="48" fill="url(#rrBl)" stroke="#05070b" stroke-width="1.5"/>
-  <circle cx="50" cy="50" r="44" fill="none" stroke="#ffffff" stroke-opacity=".08" stroke-width="1"/>
-  ${CH.map(([x, y], k) => `<g class="rr-ch" data-k="${k}"><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="12" fill="url(#rrHole)" stroke="#111827" stroke-width="1.2"/>
-    <g class="rr-pr"><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="10.6" fill="url(#rrPr)" stroke="#5c3d03" stroke-width=".8"/><circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="8" fill="none" stroke="#7a5306" stroke-width=".6" opacity=".7"/>
-    <circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="3.6" fill="url(#rrPr)" stroke="#6b4a06" stroke-width=".7"/><path d="M${(x - 6).toFixed(2)} ${(y - 3).toFixed(2)} a7 7 0 0 1 6 -4" stroke="#fff" stroke-opacity=".7" stroke-width="1.2" fill="none"/></g></g>`).join('')}
-  <circle cx="50" cy="50" r="9" fill="#374151" stroke="#0b0f17" stroke-width="1"/>
-  ${[0, 1, 2, 3, 4, 5].map((k) => { const a = k * 60 * Math.PI / 180; return `<path d="M50 50 L${(50 + 8 * Math.cos(a - 0.35)).toFixed(2)} ${(50 + 8 * Math.sin(a - 0.35)).toFixed(2)} L${(50 + 8 * Math.cos(a + 0.35)).toFixed(2)} ${(50 + 8 * Math.sin(a + 0.35)).toFixed(2)}Z" fill="#9ca3af" stroke="#1f2937" stroke-width=".5"/>`; }).join('')}
-  <circle cx="50" cy="50" r="2.2" fill="#d1d5db"/></g></svg>`;
+// the revolver barrel: the owner's photo (tools/art/barillet.py cuts the cylinder and the cartridge out of it),
+// 6 chambers around the ejector star (chamber 0 on top), each one filled with the photo's cartridge when loaded
+const CH = Array.from({ length: 6 }, (_, k) => { const a = (k * 60 - 90) * Math.PI / 180; return [50 + 31.66 * Math.cos(a), 50 + 31.66 * Math.sin(a)]; });
+const PR = 14.6;
+const barrelSVG = (cls = '') => `<svg class="rr-barrel-svg ${cls}" viewBox="0 0 100 100" aria-hidden="true">
+  <g class="rr-rot"><image href="${asset('assets/games/barillet/barrel.webp')}" x="0" y="0" width="100" height="100"/>
+  ${CH.map(([x, y], k) => `<g class="rr-ch" data-k="${k}"><image class="rr-pr" href="${asset('assets/games/barillet/prime.webp')}" x="${(x - PR).toFixed(2)}" y="${(y - PR).toFixed(2)}" width="${2 * PR}" height="${2 * PR}" transform="rotate(${k * 60 - 60} ${x.toFixed(2)} ${y.toFixed(2)})"/></g>`).join('')}
+  </g></svg>`;
 const FLAMES = '<i class="rr-fl f1"></i><i class="rr-fl f2"></i><i class="rr-fl f3"></i><i class="rr-sm"></i><b class="rr-fm"></b>';
 const xs = (m) => `×${m.toLocaleString('fr-FR')}`;
 
@@ -265,7 +259,7 @@ class BarilletGame extends BaseGame {
       stage: `<div class="rr-stage">
         <div class="rr-board">
           <div class="rr-machine">
-            <div class="rr-top"><span class="rr-ways">${WAYS}<small>FAÇONS</small></span><span class="rr-plaque">ROULETTE RUSSE</span><span class="rr-max">MAX<b>×${CAPX.toLocaleString('fr-FR')}</b></span></div>
+            <div class="rr-top"><span class="rr-ways">${WAYS}<small>FAÇONS</small></span><span class="rr-plaque">ROULETTE RUSSE</span><span class="rr-brand"><i class="logo-mark">S</i><span class="rr-max">MAX<b>×${CAPX.toLocaleString('fr-FR')}</b></span></span></div>
             <div class="rr-reels"></div>
             <i class="rr-corner l">${img('bullet')}</i><i class="rr-corner r">${img('bullet')}</i>
           </div>
@@ -279,7 +273,9 @@ class BarilletGame extends BaseGame {
       hello: `${WAYS} façons de gagner · une balle d’or + une connexion = le revolver tire`,
     });
     this.slotEl.style.setProperty('--rr-bg', `url("${asset('assets/games/barillet/bg.webp')}")`);
-    [...FILE, 'wild', 'wildtall', 'scat', 'bullet'].forEach((f) => { new Image().src = asset(`assets/games/barillet/${f}.webp`); });
+    this.slotEl.style.setProperty('--rr-planks', `url("${asset('assets/games/barillet/planks.webp')}")`);
+    this.slotEl.style.setProperty('--rr-wood', `url("${asset('assets/games/barillet/frame.webp')}")`);
+    [...FILE, 'wild', 'wildtall', 'scat', 'bullet', 'barrel', 'prime'].forEach((f) => { new Image().src = asset(`assets/games/barillet/${f}.webp`); });
     this.reels = new ShapedReels(this.q('.rr-reels'), { cols: COLS, game: this, art: cellArt, cls: cellCls, random: (c) => (c === 0 || c === 4 ? draw(c, false) : (() => { const v = draw(c, false); return v === WILD ? 0 : v; })()) });
     // over each reel: its fire cells and the expanding WILD panel
     this.fire = [];
