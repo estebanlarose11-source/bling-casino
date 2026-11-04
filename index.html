@@ -604,7 +604,10 @@ section { margin-bottom: 28px; }
 /* Huff bonus: empty cells spin like little reels while the scatters fall */
 .hc-strip { position: absolute; left: 50%; top: 0; width: 62cqh; margin-left: -31cqh; display: flex; flex-direction: column; opacity: 0; transition: opacity .2s; }
 .hc-strip svg, .hc-strip .hf-img { width: 62cqh; height: 62cqh; flex: none; margin: 10cqh 0; }
-.hc-board.spin .hcell:not(.locked) .hc-strip { opacity: .5; filter: blur(1.4px); animation: hcReel .26s linear infinite; }
+.hc-board.spin .hcell:not(.locked) .hc-strip { opacity: .65; filter: blur(2.4px); animation: hcReel .26s linear infinite; transition: opacity .08s; }
+.hc-board.spin .hcell.stopped:not(.locked) .hc-strip { animation: none; opacity: 0; transition: opacity .12s; }
+.hc-board.spin .hcell.stopped:not(.locked) { animation: hcLand .22s ease-out; }
+@keyframes hcLand { 40% { transform: translateY(4%); } }
 @keyframes hcReel { from { transform: translateY(-50%); } to { transform: translateY(0); } }
 .mega-wheel .mseg { stroke: #1a0f05; stroke-width: 1.2; }
 .mega-wheel .m-five { fill: #1d4ed8; } .mega-wheel .m-gold { fill: #d97706; } .mega-wheel .m-major { fill: #be123c; } .mega-wheel .m-grand { fill: #111827; stroke: #fbbf24; stroke-width: 2; }
@@ -5051,6 +5054,12 @@ html.light .slot small { color: inherit; }
 .g-noel .rs-cell.globe.elf::before { box-shadow: inset 0 0 0 2px #4ade80, 0 0 14px rgba(74, 222, 128, .7); } .g-noel .rs-cell.globe.santa::before { box-shadow: inset 0 0 0 2px #f87171, 0 0 14px rgba(248, 113, 113, .7); }
 .nl-frost { width: 58%; aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle at 40% 35%, rgba(255, 255, 255, .2), rgba(255, 255, 255, .04) 70%); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18); }
 .g-noel .rs-cell.rolling .nl-frost { animation: nlRoll .25s linear infinite; }
+.g-noel .rs-cell.rolling .nl-frost { opacity: 0; animation: none; }
+.g-noel .nl-strip { position: absolute; left: 0; right: 0; top: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; opacity: 0; pointer-events: none; }
+.g-noel .nl-strip .nl-sg { width: 70%; aspect-ratio: 1; object-fit: contain; flex: none; margin: 8% 0; }
+.g-noel .rs-cell.rolling { overflow: hidden; }
+.g-noel .rs-cell.rolling .nl-strip { opacity: .75; filter: blur(2px); animation: nlStrip .22s linear infinite; }
+@keyframes nlStrip { from { transform: translateY(-50%); } to { transform: translateY(0); } }
 @keyframes nlRoll { 50% { opacity: .2; transform: translateY(-12%) scale(.8); } }
 .g-noel .rs-cell.counted::before { box-shadow: inset 0 0 0 2px #fde047, 0 0 14px rgba(253, 224, 71, .7); }
 .nl-flake { position: fixed; z-index: 1200; width: 18px; height: 18px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle, #fff, #bfdbfe 60%, transparent 70%); box-shadow: 0 0 10px #fff; }
@@ -10467,6 +10476,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'huff', date: '2026-11-04', title: 'Bonus plus clair', items: ['Les cases vides tournent comme de vrais rouleaux dès le premier tour du bonus', 'Les colonnes s’arrêtent l’une après l’autre', 'Le compteur de tours baisse à chaque tour et remonte à 3 quand un scatter tombe'] },
+  { game: 'noel', date: '2026-11-04', title: 'Boules de neige plus spectaculaires', items: ['Les cases vides font tourner des boules de neige dès la première relance', 'Les colonnes s’arrêtent l’une après l’autre', 'Le compteur de relances baisse à chaque tour et remonte à 3 avec chaque nouvelle boule'] },
   { game: 'barillet', date: '2026-11-04', title: 'Un vrai barillet et un décor plus net', items: ['Le barillet du revolver est maintenant une vraie photo, chargé de vraies balles', 'Les balles partent une à une du barillet et il se recharge sous tes yeux', 'Rouleaux en vieilles planches de bois, plus nettes', 'Nouveau cadre en bois usé, aux couleurs de SpinBet', 'La machine est posée directement dans le saloon, sans cadre autour', 'Les rouleaux du bord sont plus petits : on voit tout de suite leurs 3 cases'] },
   { game: 'barillet', date: '2026-11-04', title: 'Nouvelle machine : le revolver met le feu', isNew: true, items: ['Nouveau décor : un vieux saloon, de nouveaux symboles peints et 576 façons de gagner', 'Une balle d’or + une connexion : le revolver tire 1 à 3 balles sur les cases gagnantes', 'Les cases touchées prennent feu et multiplient la ligne (les multiplicateurs se multiplient)', 'Le Duel : grosses balles à chaque gain, les cases en feu restent jusqu’à la fin', 'Toujours la roulette russe à la fin du bonus'] },
   { game: 'volcan', date: '2026-11-04', title: 'Nouvelle machine : volatilité extrême', isNew: true, items: ['Une machine à volatilité extrême : ça paie peu… ou énormément', 'Chaque explosion fait monter la pression : ×2, ×4, ×8, ×16', 'Pierres de lave de ×2 à ×500 et l’ÉRUPTION où la pression ne redescend jamais', 'Jusqu’à ×25 000 la mise'] },
@@ -13270,7 +13281,7 @@ const FILES = {
   'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '3357f3e2c8'],
   'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '3f67cd2454'],
-  huff: ['huff', 'games/impl/huff.js', 'HuffGame', '8bdf0c0cce'],
+  huff: ['huff', 'games/impl/huff.js', 'HuffGame', '779625004b'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '0b6becec24'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '018d2c0112'],
@@ -13309,7 +13320,7 @@ const FILES = {
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '234dd4780f'],
   totemx: ['totemx', 'games/impl/totemx.js', 'TotemXGame', '9ed53a6ac8'],
-  noel: ['noel', 'games/impl/noel.js', 'NoelGame', '494e5d3f25'],
+  noel: ['noel', 'games/impl/noel.js', 'NoelGame', '30948faeb5'],
   volcan: ['volcan', 'games/impl/volcan.js', 'VolcanGame', 'e6c05773cc'],
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
 };

@@ -157,6 +157,13 @@ const MUSIC = { sd: 0.21, len: 16, root: 196, lead: { wave: 'square', vol: 0.03,
 const LINE_COLORS = ['#ff4a4a', '#4aa8ff', '#ffd23f', '#6aff7a', '#d27aff', '#ff9a3a', '#3affd2', '#ff6ac8'];
 const xs = (n) => String(n).replace('.', ',');
 
+// Decodes the pictures of the little reels (empty cells of the bonus) once, at most ~1,5 s.
+let stripReady = null;
+function preloadStrip(g) {
+  stripReady ||= Promise.all(['hsc', 'hs', 'hw', 'hb'].map((id) => { const i = new Image(); i.src = src(id); return i.decode().catch(() => {}); }));
+  return Promise.race([stripReady, g.wait(1500)]);
+}
+
 class HuffGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
@@ -188,6 +195,7 @@ class HuffGame extends BaseGame {
     this.q('.slot-stage').style.setProperty('--hf-bg', `url("${asset('assets/games/huff/bg.webp')}")`);
     this.onBetChange();
     this.resume();
+    preloadStrip(this);
   }
 
   onBetChange() {
@@ -469,22 +477,34 @@ class HuffGame extends BaseGame {
     this.slotEl.classList.add('in-hold');
     for (let i = 0; i < NC; i++) { this.paint(i, st.lv[i]); if (st.lv[i]) setTimeout(() => this.hsCells[i].classList.add('pop'), i * 50); }
     this.hud(st);
+    // the little reels of the empty cells must be drawn before the first spin, or the first spin shows nothing
+    await preloadStrip(this);
     const spins = st.spins || BONUS_SPINS;
     if (!resumed) { this.msg(st.gold ? `Maisons en or : chaque scatter devient une maison en or · ${spins} tours` : `Bonus : ${spins} tours, remis à ${spins} à chaque scatter`); await this.wait(1100); }
     this.saveState(st, b);
     while (!bonusDone(st) && !this.dead) {
-      this.hud(st);
+      // each spin uses one of the remaining spins (the counter drops now, and goes back up if a scatter lands)
+      this.hud({ ...st, left: Math.max(0, st.left - 1) });
       this.msg('Les scatters tombent…');
-      board.classList.remove('spin'); void board.offsetWidth; board.classList.add('spin');
+      board.querySelectorAll('.stopped').forEach((n) => n.classList.remove('stopped'));
+      board.classList.remove('spin'); void board.offsetWidth;
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      board.classList.add('spin');
       sfx.spin();
-      await this.wait(900);
+      await this.wait(this.turbo ? 450 : 750);
       const { hits } = stepBonus(st);
+      // the columns stop one after the other, left to right
+      for (let c = 0; c < COLS; c++) {
+        for (let r = 0; r < ROWS; r++) this.hsCells[c * ROWS + r].classList.add('stopped');
+        sfx.tick?.();
+        await this.wait(this.turbo ? 45 : 95);
+      }
       board.classList.remove('spin');
       if (!hits.length) sfx.tick();
       for (const h of hits) { if (this.dead) return; await this.landScatter(h, st); }
       this.saveState(st, b);
       this.hud(st);
-      if (hits.length) { this.msg(`${hits.length} scatter${hits.length > 1 ? 's' : ''} ! Les tours repartent à ${spins}`); this.banner.querySelector('.respins')?.classList.add('reset'); }
+      if (hits.length) { this.msg(`${hits.length} scatter${hits.length > 1 ? 's' : ''} ! Les tours repartent à ${spins}`); const rp = this.banner.querySelector('.respins'); rp?.classList.remove('reset'); void rp?.offsetWidth; rp?.classList.add('reset'); }
       else this.msg(st.left ? `Rien… ${st.left} tour${st.left > 1 ? 's' : ''} restant${st.left > 1 ? 's' : ''}` : 'Derniers tours terminés');
       await this.wait(hits.length ? 450 : 350);
     }

@@ -160,6 +160,9 @@ const IMG_V = 1;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images and video are inlined
 const src = (n) => asset(`assets/games/noel/${n}.webp`);
 const img = (n, cls = 'nl-img') => `<img class="${cls}" src="${src(n)}" alt="" draggable="false" decoding="async">`;
+// The globe picture, decoded once (the spinning cells of the BOULES DE NEIGE use it from the first respin on).
+let globeP = null;
+const globeReady = () => (globeP ||= (() => { const i = new Image(); i.src = src('globe'); return i.decode().catch(() => {}); })());
 const CARDS = ['10', 'J', 'Q', 'K', 'A'];
 const NAMES = ['10', 'Valet', 'Dame', 'Roi', 'As', 'Sucre d’orge', 'Boule de Noël', 'Chaussette', 'Houx', 'Cloche dorée', 'Bonhomme de neige', 'Renne', 'Lutin', 'Père Noël'];
 const SNOW = ['#ffffff', '#dbeafe', '#bfdbfe', '#fde68a'];
@@ -412,11 +415,18 @@ class NoelGame extends BaseGame {
     const banner = (left) => this.setBanner(`<b>BOULES DE NEIGE</b><span class="pill">Relances ${left}</span><span class="pill gold">${fmtC(Math.round(Math.min(sumNow() * b, capLeft)))}</span>`);
     banner(3);
     this.msg('Les boules de neige restent : 3 relances');
-    await this.wait(700);
+    await Promise.race([globeReady(), this.wait(1500)]); // the spinning globes must be ready for the very first respin
+    await this.wait(500);
+    let left = 3;
     for (const st of run.steps) {
       if (this.dead) return 0;
+      // each respin uses one relance (the counter drops now, and goes back to 3 if a new globe lands)
+      banner(Math.max(0, left - 1));
+      this.msg('Relance…');
       await this.respin(st.add, b);
+      left = st.left;
       banner(st.left);
+      if (st.add.length) { const pl = this.banner?.querySelector('.pill'); pl?.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.35)', boxShadow: '0 0 18px #93c5fd' }, { transform: 'scale(1)' }], { duration: 600, easing: 'ease-out' }); }
       const nb = `${Object.keys(this.gvals).length} / ${N} boules`;
       this.msg(st.add.length ? `${nb} · ${st.add.length} nouvelle${st.add.length > 1 ? 's' : ''} boule${st.add.length > 1 ? 's' : ''} : les relances repartent à 3 !` : st.left ? `Pas de nouvelle boule · encore ${st.left} relance${st.left > 1 ? 's' : ''}` : 'Dernière relance terminée');
       if (!st.add.length) this.msg(`${nb} · ${this.msgEl.innerHTML}`);
@@ -452,10 +462,20 @@ class NoelGame extends BaseGame {
   async respin(add, b) {
     const empties = [];
     for (let i = 0; i < N; i++) if (!(i in this.gvals)) empties.push(i);
+    // every empty cell turns like a little reel of blurred globes, then the columns stop one after the other
+    const strip = `<div class="nl-strip">${img('globe', 'nl-sg')}${img('globe', 'nl-sg')}${img('globe', 'nl-sg')}${img('globe', 'nl-sg')}</div>`;
+    empties.forEach((i) => { const n = this.reels.cell(i); if (!n) return; n.querySelector('.nl-strip')?.remove(); n.insertAdjacentHTML('beforeend', strip); });
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     empties.forEach((i) => this.reels.cell(i)?.classList.add('rolling'));
     sfx.spin?.();
-    await this.wait(this.turbo ? 260 : 560);
-    empties.forEach((i) => this.reels.cell(i)?.classList.remove('rolling'));
+    await this.wait(this.turbo ? 380 : 700);
+    for (let c = 0; c < COLS; c++) {
+      if (this.dead) return;
+      const col = empties.filter((i) => Math.floor(i / ROWS) === c);
+      col.forEach((i) => { const n = this.reels.cell(i); if (!n) return; n.classList.remove('rolling'); n.querySelector('.nl-strip')?.remove(); n.animate([{ transform: 'translateY(-5%)' }, { transform: 'translateY(3%)' }, { transform: 'none' }], { duration: 200, easing: 'ease-out' }); });
+      if (col.length) sfx.tick?.();
+      await this.wait(this.turbo ? 40 : 90);
+    }
     for (const a of add) {
       if (this.dead) return;
       const n0 = this.reels.cell(a.i);
