@@ -195,7 +195,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 ## Publicités
 
 - **Régie : Adsterra** (bannière 300×250, clé `afa82242bb42a0ea2f0431433f3c7947`, site en mainstream, pubs pour adultes
-  désactivées), code dans `ads/banner.html` et `ads/index.html`. HilltopAds abandonné (site bloqué en Non-Mainstream 18+).
+  désactivées), code dans `ads/banner.html` et `ads/index.html`. HilltopAds supprimé du code (il était bloqué en Non-Mainstream 18+).
 - **Plus aucune bannière dans les pages du site** (demande du propriétaire : pas de pubs pour adultes sur le site) : `BANNERS = false` dans `hta.js`, les emplacements `[data-hta]` restent cachés. Les pubs ne s'affichent
   que quand le joueur en demande une (pubs récompensées de `ads.js` : +500 KE, recharge, roue ×5/×15, 50 tours…), dans
   une fenêtre avec croix ; chaque pub se charge dans `ads/banner.html` (sa propre petite page, dans une iframe).

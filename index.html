@@ -3937,7 +3937,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 @media (max-width: 900px) { .ad-offer { right: 16px; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); } }
 .share-btn { margin-top: 12px; }
 
-/* ============ Rewarded ad popup (HilltopAds) ============ */
+/* ============ Rewarded ad popup (Adsterra) ============ */
 .aads-modal { position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, .75); }
 .aads-card { width: min(560px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; display: grid; gap: 14px; }
 .aads-head { display: flex; justify-content: space-between; align-items: center; }
@@ -5103,7 +5103,7 @@ html.light .slot small { color: inherit; }
 .tr-cover > * { width: 100%; height: 100%; display: block; object-fit: cover; }
 .tr-item small { font-size: 12px; font-weight: 700; }
 .tr-item.p7 { border-color: #fde047; box-shadow: 0 0 22px rgba(253, 224, 71, .35); }
-/* HilltopAds 300 × 250 */
+/* Adsterra 300 × 250 */
 .hta-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 18px auto; max-width: 100%; }
 .hta-slot[hidden] { display: none; }
 .hta-slot:not(.hta-on) { margin: 0 auto; }
@@ -8600,11 +8600,11 @@ const PLACEMENTS = {
 };
 
 const demoProvider = { name: 'demo', show: async () => ({ completed: true }) };
-// HilltopAds (300 × 250 zone, same code as the banners of hta.js): the rewarded ad opens in a popup only when the player asks for it.
+// Adsterra (300 × 250 banner, ads/banner.html): the rewarded ad opens in a popup only when the player asks for it.
 // The reward is paid once the countdown is over; closing the popup earlier cancels it.
 const AD_SECONDS = 15;
 const htaProvider = {
-  name: 'hilltopads',
+  name: 'adsterra',
   show: (id, o = {}) => new Promise((resolve) => {
     const box = document.createElement('div');
     box.className = 'aads-modal';
@@ -15663,7 +15663,7 @@ return { mountLive, TABLE_GAMES, online: () => players };
 
 // ---- hta.js ----
 __mods['hta.js'] = (() => {
-// HilltopAds banner 300 × 250 (zone « SpinBet - Banniere 300x250 », code hta-code-7588813). Every element
+// Adsterra banner 300 × 250 (code in ads/banner.html). Every element
 // <div data-hta></div> on a page gets one banner. Same audience as the other banners: nobody when adPolicy.noAds()
 // (the owner, a ?nopub device); every other player gets it, whatever their level. A slot the network
 // leaves empty folds away after a few seconds.
@@ -18256,7 +18256,7 @@ function route() {
 }
 
 /* ---------- ads ----------
-   The only ad network is HilltopAds (banners: hta.js; rewarded ads: ads.js). Nobody sees ads when adPolicy.noAds()
+   The only ad network is Adsterra (ads/banner.html; banners: hta.js, switched off; rewarded ads: ads.js). Nobody sees ads when adPolicy.noAds()
    (the owner, or a ?nopub device). A player under 150 KE in a game is offered a rewarded ad (+1 000\u00a0\uE1E0)
    or the 2-ad refill, at most once every 5 min. */
 function mountAdBar() {
