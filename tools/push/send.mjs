@@ -76,7 +76,9 @@ async function main() {
   const p = paris(), list = messages(p);
   if (!list.length) { console.log(`Rien à envoyer à ${p.h} h ${p.mi} (Paris).`); return; }
   if (!process.env.FIREBASE_SERVICE_ACCOUNT || !process.env.VAPID_PRIVATE_KEY) throw new Error('Secrets FIREBASE_SERVICE_ACCOUNT et VAPID_PRIVATE_KEY manquants');
-  admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
+  let key;
+  try { key = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT); } catch { throw new Error('Secret FIREBASE_SERVICE_ACCOUNT invalide : il doit contenir tout le fichier .json du compte de service Firebase'); }
+  admin.initializeApp({ credential: admin.credential.cert(key) });
   const db = admin.firestore();
   webpush.setVapidDetails(SITE, VAPID_PUBLIC, process.env.VAPID_PRIVATE_KEY);
   for (const msg of list) await send(db, p, msg);

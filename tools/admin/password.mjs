@@ -11,7 +11,11 @@ async function main() {
   if (!process.env.FIREBASE_SERVICE_ACCOUNT) throw new Error('Secret FIREBASE_SERVICE_ACCOUNT manquant (voir FIREBASE.md / CLAUDE.md)');
   if (pseudo.length < 2) throw new Error('Pseudo manquant');
   if (pass.length < 6) throw new Error('Le nouveau mot de passe doit faire au moins 6 caractères');
-  admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)) });
+  let sa;
+  // never print the secret, even in an error (the logs are public)
+  try { sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT); } catch { throw new Error('Le secret FIREBASE_SERVICE_ACCOUNT n’est pas le bon : il doit contenir tout le fichier .json téléchargé dans Firebase (Paramètres du projet → Comptes de service), qui commence par {'); }
+  if (!sa.private_key || !sa.client_email) throw new Error('Le secret FIREBASE_SERVICE_ACCOUNT n’est pas le fichier .json du compte de service Firebase');
+  admin.initializeApp({ credential: admin.credential.cert(sa) });
   const db = admin.firestore(), key = pseudo.toLocaleLowerCase('fr');
   // the pseudo is in the public leaderboard and in the player's document; exact match first, then any case
   const found = new Map();
