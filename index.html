@@ -5258,6 +5258,164 @@ body.fs-on .live-tick { display: none; }
 .side-vip { border: 1px solid #7cc8ff !important; border-radius: 10px !important; margin: 16px 4px 0; background: linear-gradient(180deg, rgba(124, 200, 255, .1), rgba(124, 200, 255, .02)); box-shadow: inset 0 0 0 3px rgba(124, 200, 255, .08), 0 0 18px rgba(124, 200, 255, .12); }
 .side-vip:empty { display: none; }
 </style>
+<style id="jcc">
+/* ---------- Cartes à collectionner (#jcc, jcc.js) ---------- */
+.btn.sm { padding: 7px 12px; font-size: 13px; }
+.jc-hero h1 { margin: 6px 0 12px; font-size: clamp(24px, 4vw, 34px); }
+.jc-hero h1 small { display: block; font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .04em; }
+.jc-hero-row { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: stretch; }
+.jc-goal, .jc-next { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, .04); border: 1px solid var(--line); }
+.jc-goal small, .jc-next small { font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.jc-goal b { font-size: 26px; color: var(--gold); text-shadow: 0 0 18px rgba(251, 191, 36, .35); }
+.jc-goal span, .jc-next span { font-size: 13px; color: var(--muted); }
+.jc-next span b { color: var(--text); }
+.jc-bar { position: relative; height: 14px; border-radius: 99px; background: rgba(0, 0, 0, .35); border: 1px solid var(--line); overflow: hidden; margin: 4px 0; }
+.jc-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 99px; background: linear-gradient(90deg, #38bdf8, #a78bfa, #fbbf24); box-shadow: 0 0 14px rgba(167, 139, 250, .6); transition: width .5s; }
+.jc-album-bar { position: relative; height: 22px; margin-top: 14px; border-radius: 99px; background: rgba(0, 0, 0, .35); border: 1px solid rgba(251, 191, 36, .35); overflow: hidden; }
+.jc-album-bar i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, #b45309, #fbbf24, #fde68a); }
+.jc-album-bar span { position: relative; display: block; text-align: center; font-weight: 800; font-size: 12px; line-height: 22px; color: #fff; text-shadow: 0 1px 2px #000; }
+@media (max-width: 640px) { .jc-hero-row { grid-template-columns: 1fr; } }
+
+.jc-tabs { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 4px 0 14px; }
+.jc-tabs button { flex: none; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; }
+.jc-tabs button.on { color: #fff; border-color: #a78bfa; background: linear-gradient(180deg, rgba(167, 139, 250, .25), rgba(167, 139, 250, .06)); }
+.jc-pick { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 14px; }
+.jc-pick .chip { padding: 7px 12px; font-size: 13px; border-radius: 99px; }
+.jc-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.jc-h3 { margin: 18px 0 8px; font-size: 16px; }
+
+/* the packs */
+.jc-pack-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.jc-pack-slot { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; padding: 12px 6px; border-radius: 12px; background: rgba(255, 255, 255, .03); border: 1px solid var(--line); }
+.jc-pack-slot > b { font-size: 14px; } .jc-pack-slot > span { font-size: 12px; color: var(--muted); }
+.jc-pack { --p1: #38bdf8; --p2: #1e3a8a; --p3: #0b1530; position: relative; width: 92px; aspect-ratio: 5 / 7; border-radius: 10px; padding: 5px; margin-bottom: 6px;
+  background: linear-gradient(135deg, var(--p1), var(--p2) 55%, var(--p3)); box-shadow: 0 10px 24px rgba(0, 0, 0, .45), 0 0 18px color-mix(in srgb, var(--p1) 45%, transparent), inset 0 1px 0 rgba(255, 255, 255, .5); overflow: hidden; }
+.jc-pack.p-v { --p1: #c084fc; --p2: #6d28d9; --p3: #1e0b3b; }
+.jc-pack.p-o { --p1: #fde68a; --p2: #d97706; --p3: #451a03; }
+.jc-pack::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(115deg, rgba(255, 255, 255, 0) 0 14px, rgba(255, 255, 255, .1) 14px 16px); }
+.jc-pack::after { content: ''; position: absolute; inset: -50% -120%; background: linear-gradient(100deg, transparent 42%, rgba(255, 255, 255, .55) 50%, transparent 58%); animation: jcShine 3.2s ease-in-out infinite; }
+.jc-pack-in { position: relative; z-index: 1; height: 100%; border-radius: 7px; border: 1px solid rgba(255, 255, 255, .45); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 6px 2px; color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, .6); }
+.jc-pack-in small { font-size: 8px; font-weight: 900; letter-spacing: .12em; }
+.jc-pack-ico { font-size: 34px; filter: drop-shadow(0 0 10px var(--p1)); }
+.jc-pack-in b { font-size: 11px; letter-spacing: .08em; } .jc-pack-in em { font-size: 9px; font-style: normal; opacity: .85; }
+.jc-pack.none { filter: grayscale(.85) brightness(.55); } .jc-pack.none::after { display: none; }
+.jc-pack.big { width: min(220px, 56vw); cursor: pointer; animation: jcFloat 2.4s ease-in-out infinite; }
+.jc-pack.big .jc-pack-in small { font-size: 13px; } .jc-pack.big .jc-pack-ico { font-size: 80px; } .jc-pack.big .jc-pack-in b { font-size: 20px; } .jc-pack.big .jc-pack-in em { font-size: 14px; }
+@keyframes jcShine { 0%, 55% { transform: translateX(-40%); } 100% { transform: translateX(40%); } }
+@keyframes jcFloat { 50% { transform: translateY(-8px) rotate(-1.5deg); } }
+
+/* a card (sizes follow the card's own width: container queries) */
+.jc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+@media (max-width: 640px) { .jc-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
+@media (max-width: 380px) { .jc-grid { grid-template-columns: repeat(2, 1fr); } }
+.jc-card { --c1: #f97316; --c2: #7c1d0b; --rc: #cbd5e1; position: relative; container-type: inline-size; aspect-ratio: 63 / 88; border-radius: 6% / 4.3%; padding: 0;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--c1) 85%, #fff), var(--c1) 30%, var(--c2) 75%, #050308); box-shadow: 0 8px 20px rgba(0, 0, 0, .5), 0 0 0 1px rgba(0, 0, 0, .6), inset 0 0 0 2px color-mix(in srgb, var(--rc) 70%, transparent);
+  cursor: pointer; transition: transform .2s, box-shadow .2s; user-select: none; }
+.jc-card:hover { transform: translateY(-3px); }
+.jc-card.r-R { --rc: #60a5fa; } .jc-card.r-E { --rc: #c084fc; } .jc-card.r-L { --rc: #fbbf24; }
+.jc-card.r-E { box-shadow: 0 8px 22px rgba(0, 0, 0, .5), 0 0 16px rgba(192, 132, 252, .45), inset 0 0 0 2px rgba(192, 132, 252, .8); }
+.jc-card.r-L { box-shadow: 0 8px 22px rgba(0, 0, 0, .5), 0 0 22px rgba(251, 191, 36, .6), inset 0 0 0 2px rgba(251, 191, 36, .9); }
+.jc-in { position: absolute; inset: 3.2cqw; display: flex; flex-direction: column; gap: 1.6cqw; border-radius: 4cqw; padding: 2.2cqw; overflow: hidden;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c2) 70%, #000), #0b0a10); border: .8cqw solid color-mix(in srgb, var(--c1) 60%, #000); }
+.jc-top { display: flex; align-items: center; justify-content: space-between; gap: 2cqw; }
+.jc-el { width: 13cqw; height: 13cqw; display: grid; place-items: center; font-size: 7.5cqw; border-radius: 50%; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--c1) 60%, #fff), var(--c2)); border: .8cqw solid var(--rc); }
+.jc-ribbon { flex: 1; text-align: center; font: 800 6.4cqw/1.7 Georgia, serif; color: #fff7e6; background: linear-gradient(180deg, color-mix(in srgb, var(--c1) 70%, #000), var(--c2)); border: .6cqw solid var(--rc); border-radius: 3cqw; text-shadow: 0 1px 2px #000; }
+.jc-gem { width: 11cqw; height: 11cqw; transform: rotate(45deg); border-radius: 2cqw; background: radial-gradient(circle at 30% 30%, #fff, var(--rc) 45%, color-mix(in srgb, var(--rc) 40%, #000)); box-shadow: 0 0 3cqw var(--rc); flex: none; margin: 0 1.5cqw; }
+.jc-art { position: relative; flex: 0 0 auto; aspect-ratio: 10 / 7.3; border-radius: 3cqw; overflow: hidden; border: .8cqw solid var(--rc);
+  background: radial-gradient(circle at 50% 58%, color-mix(in srgb, var(--c1) 75%, #fff) 0, var(--c1) 18%, var(--c2) 58%, #07050c 100%); display: grid; place-items: center; }
+.jc-art::before { content: ''; position: absolute; inset: 0; background: radial-gradient(1.2cqw 1.2cqw at 18% 22%, #fff9 50%, transparent), radial-gradient(.9cqw .9cqw at 78% 30%, #fff8 50%, transparent), radial-gradient(1.1cqw 1.1cqw at 64% 78%, #fff7 50%, transparent), radial-gradient(.8cqw .8cqw at 30% 70%, #fff6 50%, transparent), radial-gradient(.8cqw .8cqw at 88% 64%, #fff6 50%, transparent), repeating-conic-gradient(from 0deg at 50% 60%, rgba(255, 255, 255, .07) 0 6deg, transparent 6deg 18deg); }
+.jc-art::after { content: ''; position: absolute; left: 15%; right: 15%; bottom: 6%; height: 12%; border-radius: 50%; background: rgba(0, 0, 0, .45); filter: blur(2cqw); }
+.jc-card.el-t .jc-art::before { background: radial-gradient(1cqw 1cqw at 20% 30%, #d9f99d88 50%, transparent), radial-gradient(1cqw 1cqw at 80% 40%, #d9f99d77 50%, transparent), radial-gradient(1.2cqw 1.2cqw at 60% 80%, #bef26466 50%, transparent), linear-gradient(180deg, transparent 60%, rgba(30, 50, 10, .5)); }
+.jc-card.el-e .jc-art::before { background: radial-gradient(.7cqw .7cqw at 12% 18%, #fff 50%, transparent), radial-gradient(.6cqw .6cqw at 30% 40%, #fff 50%, transparent), radial-gradient(.8cqw .8cqw at 84% 22%, #fff 50%, transparent), radial-gradient(.6cqw .6cqw at 70% 70%, #fff 50%, transparent), radial-gradient(.7cqw .7cqw at 22% 80%, #fff 50%, transparent), radial-gradient(.5cqw .5cqw at 50% 12%, #fff 50%, transparent), radial-gradient(60% 30% at 50% 60%, rgba(244, 114, 182, .25), transparent); }
+.jc-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+.jc-emo { position: relative; z-index: 1; font-size: 34cqw; line-height: 1; filter: drop-shadow(0 0 4cqw color-mix(in srgb, var(--c1) 80%, #fff)) drop-shadow(0 2cqw 2cqw rgba(0, 0, 0, .6)); }
+.jc-q { position: relative; z-index: 1; font: 900 30cqw/1 Georgia, serif; color: rgba(255, 255, 255, .25); }
+.jc-name { text-align: center; font: 800 6.6cqw/1.1 Georgia, serif; text-transform: uppercase; color: #fff4dc; padding: 1.6cqw 1cqw; border-radius: 2.5cqw; letter-spacing: .02em;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c1) 45%, #1a0f08), color-mix(in srgb, var(--c2) 80%, #000)); border: .6cqw solid color-mix(in srgb, var(--rc) 80%, #000); text-shadow: 0 1px 2px #000;
+  display: grid; place-items: center; }
+.jc-text { flex: 1; min-height: 0; overflow: hidden; font-size: 5.3cqw; line-height: 1.25; color: #e8e2d6; padding: 1.6cqw 2cqw; border-radius: 2cqw; background: rgba(0, 0, 0, .35); }
+.jc-text b { display: block; font-size: 5.2cqw; color: var(--rc); text-transform: uppercase; letter-spacing: .06em; }
+.jc-text em { color: var(--muted); }
+.jc-foot { display: flex; align-items: center; justify-content: space-between; gap: 1cqw; font-size: 5.4cqw; font-weight: 800; color: #fde68a; }
+.jc-num { padding: .6cqw 2cqw; border-radius: 99px; background: rgba(0, 0, 0, .45); border: .5cqw solid var(--rc); color: #fff; }
+.jc-cote { color: var(--gold); }
+.jc-count { position: absolute; top: -2.5cqw; right: -2.5cqw; z-index: 3; min-width: 16cqw; padding: 1.5cqw 2.4cqw; border-radius: 99px; font-weight: 900; font-size: 7cqw; line-height: 1; color: #111; background: #fbbf24; box-shadow: 0 2px 8px rgba(0, 0, 0, .5); text-align: center; }
+.jc-tag { position: absolute; left: 50%; top: -2.5cqw; transform: translateX(-50%); z-index: 3; white-space: nowrap; padding: 1.4cqw 3cqw; border-radius: 99px; font-weight: 900; font-size: 5.6cqw; line-height: 1; letter-spacing: .05em; color: #052e16; background: #4ade80; box-shadow: 0 2px 8px rgba(0, 0, 0, .5); }
+.jc-tag.dup { color: #fff; background: #64748b; }
+.jc-card.locked { cursor: pointer; filter: grayscale(.9) brightness(.5); }
+.jc-card.locked .jc-in { background: #0c0c12; }
+.jc-card.locked:hover { filter: grayscale(.6) brightness(.65); }
+/* shiny (holo) cards: rainbow foil that moves */
+.jc-card.holo { background: linear-gradient(135deg, #c7d2fe, #f0abfc, #a5f3fc, #fde68a, #c7d2fe); background-size: 300% 300%; animation: jcHoloBg 6s linear infinite; }
+.jc-card.holo .jc-in::after { content: ''; position: absolute; inset: 0; z-index: 2; pointer-events: none; mix-blend-mode: color-dodge; opacity: .55;
+  background: linear-gradient(115deg, transparent 20%, rgba(255, 0, 170, .35) 32%, rgba(0, 255, 255, .35) 44%, rgba(255, 255, 0, .3) 56%, transparent 70%); background-size: 250% 250%; animation: jcHolo 4s ease-in-out infinite; }
+.jc-card.r-L:not(.locked) .jc-in::before { content: ''; position: absolute; inset: -40% -100%; z-index: 2; pointer-events: none; background: linear-gradient(100deg, transparent 45%, rgba(255, 240, 200, .35) 50%, transparent 55%); animation: jcShine 4s ease-in-out infinite; }
+@keyframes jcHolo { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
+@keyframes jcHoloBg { to { background-position: 300% 300%; } }
+.jc-card.sm { width: 130px; flex: none; } .jc-card.lg { width: min(280px, 70vw); flex: none; cursor: default; } .jc-card.lg:hover { transform: none; }
+
+/* market, forge, rules */
+.jc-offer { display: flex; flex-direction: column; gap: 6px; }
+.jc-offer-b { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; font-size: 13px; }
+.jc-offer-b .pname { color: var(--muted); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 100%; }
+.jc-offer-b b { color: var(--gold); font-size: 15px; }
+.jc-empty { text-align: center; } .jc-empty .btn { margin-top: 6px; }
+.jc-forge-pts { list-style: none; padding: 0; margin: 12px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.jc-forge-pts li { --rc: #cbd5e1; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, .04); border: 1px solid var(--line); font-size: 13px; container-type: inline-size; }
+.jc-forge-pts li.r-R { --rc: #60a5fa; } .jc-forge-pts li.r-E { --rc: #c084fc; } .jc-forge-pts li.r-L { --rc: #fbbf24; }
+.jc-forge-pts li .jc-gem { width: 12px; height: 12px; margin: 0; border-radius: 3px; box-shadow: 0 0 8px var(--rc); }
+.jc-forge-pts li b { margin-left: auto; color: var(--text); }
+.jc-hist { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.jc-hist li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; background: rgba(255, 255, 255, .04); font-size: 14px; }
+.jc-hist li small { color: var(--muted); flex: 1; } .jc-hist li b { color: #4ade80; }
+.jc-steps { padding-left: 0; list-style: none; display: grid; gap: 10px; margin: 10px 0; }
+.jc-steps li { padding: 10px 12px; border-radius: 10px; background: rgba(255, 255, 255, .04); line-height: 1.45; font-size: 14px; }
+.jc-odds { width: 100%; border-collapse: collapse; font-size: 13px; }
+.jc-odds th, .jc-odds td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--line); }
+.jc-odds td:first-child { text-align: left; font-weight: 700; }
+.jc-odds th.r-R { color: #60a5fa; } .jc-odds th.r-E { color: #c084fc; } .jc-odds th.r-L { color: #fbbf24; }
+
+/* modals */
+.jc-modal.wide { max-width: 640px; }
+.jc-detail { display: flex; gap: 18px; align-items: flex-start; }
+.jc-detail h3 { margin: 4px 0 6px; }
+.jc-sell { display: flex; gap: 14px; align-items: flex-start; }
+.jc-sell label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; margin: 8px 0; }
+.jc-sell input { font: inherit; font-size: 18px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); color: var(--text); width: 100%; box-sizing: border-box; }
+.jc-price { font-size: 26px; font-weight: 900; color: var(--gold); margin: 6px 0; }
+.jc-miss { color: #4ade80; font-weight: 700; }
+@media (max-width: 560px) { .jc-detail, .jc-sell { flex-direction: column; align-items: center; text-align: center; } .jc-detail .jc-acts, .jc-sell + .jc-acts { justify-content: center; } }
+.jc-done { text-align: center; } .jc-done-ico { font-size: 64px; } .jc-done h2 { color: var(--gold); margin: 6px 0; }
+.jc-done-prize { font-size: 34px; font-weight: 900; color: var(--gold); margin: 10px 0; text-shadow: 0 0 20px rgba(251, 191, 36, .5); }
+
+/* the opening scene */
+.jc-scene [hidden] { display: none !important; }
+.jc-scene { position: fixed; inset: 0; z-index: 9000; display: grid; place-items: center; padding: 16px; background: radial-gradient(circle at 50% 40%, #2a1259, #05030c 70%); opacity: 0; transition: opacity .2s; overflow-y: auto; }
+.jc-scene.show { opacity: 1; }
+.jc-scene-in { width: min(980px, 100%); display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.jc-scene-t { margin: 0; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: #e9d5ff; text-align: center; }
+.jc-scene-pack { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.jc-scene-pack.tear .jc-pack { animation: jcTear .65s ease-in forwards; }
+@keyframes jcTear { 0% { transform: scale(1); } 30% { transform: scale(1.08) rotate(-4deg); } 55% { transform: scale(1.1) rotate(4deg); filter: brightness(1.6); } 100% { transform: scale(1.6); opacity: 0; filter: brightness(3); } }
+.jc-hand { display: grid; grid-template-columns: repeat(5, minmax(0, 170px)); gap: 12px; width: 100%; justify-content: center; }
+@media (max-width: 700px) { .jc-hand { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; } }
+.jc-flip { perspective: 900px; aspect-ratio: 63 / 88; cursor: pointer; animation: jcDeal .45s cubic-bezier(.2, .9, .3, 1.2) both; animation-delay: calc(var(--i) * .09s); }
+.jc-flip > div { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; transition: transform .6s cubic-bezier(.3, .8, .3, 1); }
+.jc-flip { position: relative; }
+.jc-back { display: grid; place-items: center; border-radius: 10px; background: repeating-linear-gradient(45deg, #312e81 0 10px, #3b0764 10px 20px); border: 3px solid #a78bfa; box-shadow: 0 10px 24px rgba(0, 0, 0, .5), inset 0 0 0 4px rgba(0, 0, 0, .35); font-size: 44px; }
+.jc-front { transform: rotateY(180deg); }
+.jc-front .jc-card { width: 100%; height: 100%; }
+.jc-flip.on .jc-back { transform: rotateY(-180deg); }
+.jc-flip.on .jc-front { transform: rotateY(0); }
+.jc-flip:not(.on):hover .jc-back { transform: translateY(-6px); }
+.jc-flip.wow .jc-front { animation: jcWow 1.2s ease-out .4s; }
+@keyframes jcDeal { from { opacity: 0; transform: translateY(60px) scale(.6) rotate(-8deg); } }
+@keyframes jcWow { 0% { filter: brightness(2.2) drop-shadow(0 0 30px #fde68a); } 100% { filter: none; } }
+.jc-scene-acts { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.ev-jcc { --ac: #a78bfa; background: linear-gradient(90deg, rgba(167, 139, 250, .22), rgba(56, 189, 248, .1)) !important; border-color: rgba(167, 139, 250, .5) !important; }
+.ev-pill.jcc { border-color: rgba(167, 139, 250, .6); }
+@media (prefers-reduced-motion: reduce) { .jc-pack::after, .jc-card.holo, .jc-card.holo .jc-in::after, .jc-card.r-L .jc-in::before, .jc-pack.big { animation: none !important; } }
+</style>
 <style id="finition">
 /* ============ Finition : dégradés, reliefs et lumière sur toute l'interface (après toutes les autres couches) ============
    Les écrans des jeux gardent leurs propres couleurs ; le mode clair a ses propres règles plus bas. */
@@ -5603,6 +5761,7 @@ html.light .ga-sheet { background: #fff; border-color: var(--line); }
       <a href="#lobby-slot" data-nav="slots"><span><svg class="ico"><use href="#ui-slots"/></svg></span>Machines à sous</a>
       <a href="#lobby-table" data-nav="tables"><span><svg class="ico"><use href="#ui-tables"/></svg></span>Roues & tables</a>
       <a href="#lobby-quick" data-nav="quick"><span><svg class="ico"><use href="#ui-quick"/></svg></span>Jeux rapides</a>
+      <a href="#jcc" data-nav="jcc"><span>🃏</span>Cartes à collectionner (JCC)<b class="side-badge" data-jc-badge hidden></b><b class="side-new">NEW</b></a>
     </nav>
     <div class="side-label">Défi spécial</div>
     <nav class="side-nav">
@@ -6538,6 +6697,30 @@ const cloud = {
       .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() }))), (e) => console.error(e));
   },
   async claimGift(id) { await (await init()).db.collection('gifts').doc(id).update({ claimed: true }); },
+  /* ---------- Cartes à collectionner (jcc.js): market/{id} = { s, sn, c, h, p, st, at, b, bn, sa } ----------
+     st: 'open' (en vente) → 'sold' (acheté, par l'acheteur) → 'paid' (le vendeur s'est payé), ou 'off' (retirée). */
+  async jccSell(o) { const ref = await (await init()).db.collection('market').add({ ...o, st: 'open', at: firebase.firestore.FieldValue.serverTimestamp() }); return ref.id; },
+  async jccOffers() {
+    const q = await (await init()).db.collection('market').where('st', '==', 'open').limit(400).get();
+    return q.docs.map((d) => ({ id: d.id, ...d.data(), at: d.data().at?.toMillis?.() || 0 }));
+  },
+  async jccMine(uid, cb) {
+    return (await init()).db.collection('market').where('s', '==', uid).limit(150)
+      .onSnapshot((q) => cb(q.docs.map((d) => { const x = d.data({ serverTimestamps: 'estimate' }); return { id: d.id, ...x, at: x.at?.toMillis?.() || 0, sa: x.sa?.toMillis?.() || 0 }; })), (e) => console.error(e));
+  },
+  // one state change in a transaction: true if it was done here, false if somebody was faster
+  async jccMove(id, from, patch) {
+    const { db } = await init(), ref = db.collection('market').doc(id);
+    return db.runTransaction(async (tx) => {
+      const d = await tx.get(ref);
+      if (!d.exists || d.data().st !== from) return false;
+      tx.update(ref, patch);
+      return true;
+    });
+  },
+  jccBuy(id, uid, name) { return this.jccMove(id, 'open', { st: 'sold', b: uid, bn: name, sa: firebase.firestore.FieldValue.serverTimestamp() }); },
+  jccCancel(id) { return this.jccMove(id, 'open', { st: 'off' }); },
+  jccPaid(id) { return this.jccMove(id, 'sold', { st: 'paid' }); },
   async giftHistory(uid) {
     const db = (await init()).db;
     const [a, b] = await Promise.all([db.collection('gifts').where('from', '==', uid).limit(20).get(), db.collection('gifts').where('to', '==', uid).limit(20).get()]);
@@ -17404,6 +17587,537 @@ E.addHome((t) => {
 return { renderLoto, load, settle, target, PRIZES };
 })();
 
+// ---- jcc.js ----
+__mods['jcc.js'] = (() => {
+// Jeu de cartes à collectionner (#jcc). Every bet of any game fills a bar (√mise points, BAR per pack); a full bar
+// gives a pack of 5 cards: bleu (classique), violet (rare, ≥ 1 rare) or doré (très rare, ≥ 1 épique), with pity
+// counters. Cards belong to a series (SERIES, one per theme: the owner sends new pictures every month or two);
+// finishing a series album pays ALBUM KE once. Duplicates: sold to other players on the market (Firestore
+// market/{id}, accounts only, the card leaves the collection while it is on sale, the seller's browser pays itself
+// when it sees its card sold) or recycled in the forge (FORGE points → a violet pack).
+// Saved in profile.jcc = { pts, packs: { b, v, o }, sv, so, n, cards: { id: [normales, brillantes] }, forge, done: { serie: t }, log }.
+// Solo simulation (forge used, no market): the album takes ≈ 120 packs (median), 55 for the lucky 10 %, 250 for the unlucky 10 %.
+
+const { wallet, fmt } = __mods['wallet.js'];
+const { profiles } = __mods['profile.js'];
+const { cloud } = __mods['cloud.js'];
+const { toast, modal } = __mods['ui.js'];
+const { sfx } = __mods['audio.js'];
+const { fx } = __mods['fx.js'];
+const E = __mods['events.js'];
+
+const BAR = 500, ALBUM = 100000, HOLO = 0.03, MAXSALE = 10, MAXPRICE = 500000;
+const RAR = {
+  C: { name: 'Commune', cote: 500, forge: 1, pow: 120 },
+  R: { name: 'Rare', cote: 2000, forge: 3, pow: 380 },
+  E: { name: 'Épique', cote: 8000, forge: 10, pow: 700 },
+  L: { name: 'Légendaire', cote: 25000, forge: 40, pow: 1000 },
+};
+const RANK = 'CREL';
+const PACKS = {
+  b: { name: 'Paquet bleu', sub: 'Classique', odds: { C: 0.753, R: 0.215, E: 0.03, L: 0.002 } },
+  v: { name: 'Paquet violet', sub: 'Rare', odds: { C: 0.448, R: 0.42, E: 0.12, L: 0.012 }, floor: 'R' },
+  o: { name: 'Paquet doré', sub: 'Très rare', odds: { C: 0, R: 0.55, E: 0.38, L: 0.07 }, floor: 'E' },
+};
+const PACK_ODDS = { o: 0.03, v: 0.17 }, PITY = { v: 10, o: 40 }, FORGE = 100;
+
+/* ---------- the series (newest last). A card: [id, élément, rareté, nom, emoji ou image, texte] ----------
+   New theme from the owner: add a series with its pictures in assets/games/jcc/<serie>/ (img: 'serie/fichier'). */
+const SERIES = [
+  {
+    id: 'o', name: 'Les Origines', season: 'Saison 1 · novembre 2026',
+    els: { f: { name: 'Feu', icon: '🔥', c1: '#f97316', c2: '#7c1d0b' }, t: { name: 'Terre', icon: '⛰️', c1: '#84cc16', c2: '#273b12' }, e: { name: 'Éther', icon: '✴️', c1: '#a78bfa', c2: '#1e1b4b' } },
+    cards: [
+      ['f1', 'f', 'C', 'Salamandre des Braises', '🦎', 'Elle dort dans les cheminées et se réveille au premier gain.'],
+      ['f2', 'f', 'C', 'Renard de Cendre', '🦊', 'Rusé comme une mise qui double.'],
+      ['f3', 'f', 'C', 'Lanterne Follette', '🏮', 'Sa petite flamme guide les joueurs perdus.'],
+      ['f4', 'f', 'C', 'Bélier Volcanique', '🐏', 'Il fonce tête baissée, comme toi en mise max.'],
+      ['f5', 'f', 'R', 'Lame Ardente', '🗡️', 'Forgée dans la lave, jamais refroidie.'],
+      ['f6', 'f', 'R', 'Cœur de Magma', '🌋', 'Chaque battement fait trembler la montagne.'],
+      ['f7', 'f', 'R', 'Dragonnet Écarlate', '🐲', 'Petit, mais il crache déjà des pièces.'],
+      ['f8', 'f', 'E', 'Sorcière des Flammes', '🧙‍♀️', 'Elle lit l’avenir dans les braises.'],
+      ['f9', 'f', 'E', 'Dragon du Brasier', '🐉', 'Il dort sur un trésor de pièces fondues.'],
+      ['f10', 'f', 'L', 'Phénix Renaissant', { img: 'phoenix' }, 'Il renaît de ses cendres, plus fort à chaque fois.'],
+      ['t1', 't', 'C', 'Champignon Ancien', '🍄', 'Il pousse là où personne ne regarde.'],
+      ['t2', 't', 'C', 'Tortue Moussue', '🐢', 'Lente, mais elle finit toujours son album.'],
+      ['t3', 't', 'C', 'Sanglier des Ronces', '🐗', 'Rien ne l’arrête, surtout pas les épines.'],
+      ['t4', 't', 'C', 'Hibou Sylvestre', '🦉', 'Il veille sur la forêt toute la nuit.'],
+      ['t5', 't', 'R', 'Ours de Pierre', '🐻', 'Sa fourrure est faite de granit.'],
+      ['t6', 't', 'R', 'Cerf des Racines', '🦌', 'Ses bois portent des fleurs au printemps.'],
+      ['t7', 't', 'R', 'Druide du Chêne', '🧝', 'Il parle aux arbres, et les arbres répondent.'],
+      ['t8', 't', 'E', 'Arbre Millénaire', '🌳', 'Mille ans de patience dans un seul tronc.'],
+      ['t9', 't', 'E', 'Wyrm de Jade', '🐍', 'Il creuse des tunnels pleins d’émeraudes.'],
+      ['t10', 't', 'L', 'Gardien Cœur-de-Pierre', { img: 'golem' }, 'Ses runes s’allument quand un intrus approche.'],
+      ['e1', 'e', 'C', 'Lune Errante', '🌙', 'Elle change de ciel chaque nuit.'],
+      ['e2', 'e', 'C', 'Chat des Étoiles', '🐈', 'Il retombe toujours sur ses pattes, même dans le vide.'],
+      ['e3', 'e', 'C', 'Cristal Chantant', '🔮', 'Il fredonne quand la chance tourne.'],
+      ['e4', 'e', 'C', 'Papillon Prisme', '🦋', 'Ses ailes cassent la lumière en mille couleurs.'],
+      ['e5', 'e', 'R', 'Comète Vagabonde', '☄️', 'Elle ne passe qu’une fois tous les cent ans.'],
+      ['e6', 'e', 'R', 'Licorne Céleste', '🦄', 'Sa corne trace des chemins d’étoiles.'],
+      ['e7', 'e', 'R', 'Mage du Vide', '🧙', 'Il fait apparaître des cartes de nulle part.'],
+      ['e8', 'e', 'E', 'Baleine Cosmique', '🐋', 'Elle nage entre les galaxies.'],
+      ['e9', 'e', 'E', 'Oracle d’Éther', '👁️', 'Il a déjà vu ton prochain tirage.'],
+      ['e10', 'e', 'L', 'Danseuse des Lames d’Éther', { img: 'aether' }, 'Ses lames tranchent la nuit en deux.'],
+    ],
+  },
+];
+// card objects: CARD[id] = { id, sid, el, r, name, art, text, num, total, pow }
+const CARD = {};
+SERIES.forEach((S) => {
+  S.list = S.cards.map(([id, el, r, name, art, text], i) => {
+    const c = { id: `${S.id}-${id}`, sid: S.id, el, r, name, art, text, num: i + 1, total: S.cards.length };
+    c.pow = RAR[r].pow + ((i * 53) % 9) * 10;
+    return (CARD[c.id] = c);
+  });
+  S.by = { C: [], R: [], E: [], L: [] };
+  S.list.forEach((c) => S.by[c.r].push(c));
+});
+const NOW = SERIES[SERIES.length - 1];
+const serie = (sid) => SERIES.find((S) => S.id === sid) || NOW;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const imgSrc = (p) => { const f = `assets/games/jcc/${p}.webp`; return window.__assets?.[f] || `${f}?v=1`; };
+const cote = (c, holo) => RAR[c.r].cote * (holo ? 3 : 1);
+
+/* ---------- the player's data ---------- */
+const blank = () => ({ pts: 0, packs: { b: 0, v: 0, o: 0 }, sv: 0, so: 0, n: 0, cards: {}, forge: 0, done: {}, log: [] });
+const st = () => ({ ...blank(), ...(profiles.current?.jcc || {}) });
+const save = (fn) => profiles.update('jcc', (p) => { const s = { ...blank(), ...(p.jcc || {}) }; s.packs = { ...s.packs }; s.cards = { ...s.cards }; fn(s); p.jcc = s; });
+const owned = (s, id) => { const x = s.cards[id]; return x ? (x[0] || 0) + (x[1] || 0) : 0; };
+const have = (s, S) => S.list.filter((c) => owned(s, c.id) > 0).length;
+const packCount = (s) => (s.packs.b || 0) + (s.packs.v || 0) + (s.packs.o || 0);
+
+/* ---------- the bar: every bet of every game ---------- */
+let pending = 0, saveT = 0;
+wallet.addEventListener('wager', (e) => {
+  if (!profiles.current) return;
+  const a = Number(e.detail?.amount) || 0;
+  if (a <= 0) return;
+  pending += Math.sqrt(a);
+  // several bets a second (autoplay, tables): one save at most every 1,5 s
+  if (!saveT) saveT = setTimeout(flush, 1500);
+  paintPills(st().pts + pending);
+});
+function flush() {
+  saveT = 0;
+  if (!pending || !profiles.current) return;
+  const add = pending; pending = 0;
+  const got = [];
+  save((s) => {
+    s.pts = Math.round((s.pts + add) * 10) / 10;
+    while (s.pts >= BAR) { s.pts = Math.round((s.pts - BAR) * 10) / 10; got.push(earn(s)); }
+  });
+  if (got.length) {
+    sfx.coin?.();
+    const t = got.includes('o') ? 'o' : got.includes('v') ? 'v' : 'b';
+    toast(`🃏 ${got.length > 1 ? `${got.length} nouveaux paquets` : `Nouveau ${PACKS[t].name.toLowerCase()}`} ! <a href="#jcc">Ouvre-le dans Cartes à collectionner ›</a>`, 'ok');
+    paintBadge(); paintPage();
+  }
+  paintPills();
+}
+// which pack the full bar gives (pity: a violet at least every PITY.v packs, a gold one every PITY.o)
+function earn(s) {
+  s.n++; s.sv++; s.so++;
+  const r = Math.random();
+  const t = r < PACK_ODDS.o || s.so >= PITY.o ? 'o' : r < PACK_ODDS.o + PACK_ODDS.v || s.sv >= PITY.v ? 'v' : 'b';
+  if (t === 'o') { s.so = 0; s.sv = 0; } else if (t === 'v') s.sv = 0;
+  s.packs[t] = (s.packs[t] || 0) + 1;
+  return t;
+}
+
+/* ---------- opening a pack ---------- */
+function rarity(t) {
+  const o = PACKS[t].odds;
+  let r = Math.random();
+  for (const k of RANK) { if (r < o[k]) return k; r -= o[k]; }
+  return 'C';
+}
+function draw(t, S) {
+  const rs = Array.from({ length: 5 }, () => rarity(t)), f = PACKS[t].floor;
+  if (f && !rs.some((k) => RANK.indexOf(k) >= RANK.indexOf(f))) {
+    let k; do k = rarity(t); while (RANK.indexOf(k) < RANK.indexOf(f));
+    rs[4] = k;
+  }
+  rs.sort((a, b) => RANK.indexOf(a) - RANK.indexOf(b)); // the best card last
+  return rs.map((k) => { const L = S.by[k]; return { id: L[Math.floor(Math.random() * L.length)].id, h: Math.random() < HOLO ? 1 : 0 }; });
+}
+function openPack(t, fromForge) {
+  if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour jouer aux cartes', 'warn');
+  const s0 = st();
+  if (!fromForge && !(s0.packs[t] > 0)) return;
+  const S = serie(pickSerie), hand = draw(t, S);
+  save((s) => {
+    if (!fromForge) s.packs[t]--;
+    hand.forEach((x) => {
+      const cur = s.cards[x.id] ? [...s.cards[x.id]] : [0, 0];
+      x.isNew = (cur[0] + cur[1]) === 0;
+      cur[x.h] = (cur[x.h] || 0) + 1;
+      s.cards[x.id] = cur;
+    });
+    s.log = [{ t, at: Date.now(), c: hand.map((x) => x.id + (x.h ? '*' : '')) }, ...(s.log || [])].slice(0, 20);
+  });
+  showOpening(t, hand, S);
+  paintBadge();
+}
+// the album is finished: paid once per series
+function checkAlbum() {
+  const s = st();
+  for (const S of SERIES) {
+    if (s.done[S.id] || have(s, S) < S.list.length) continue;
+    save((x) => { x.done = { ...x.done, [S.id]: Date.now() }; });
+    wallet.grant(ALBUM);
+    sfx.bigWin?.(); fx.coins?.(120);
+    modal(`<div class="jc-done"><div class="jc-done-ico">🏆</div><h2>ALBUM COMPLET !</h2><p>Tu as réuni les ${S.list.length} cartes de la série <b>${esc(S.name)}</b>.</p>
+      <div class="jc-done-prize">+${fmt(ALBUM)}</div><p class="muted small">Garde tes cartes : tes doubles se vendent toujours aux autres joueurs.</p>
+      <button class="btn primary lg" data-value="ok">Je récupère</button></div>`, { cls: 'jc-modal' });
+  }
+}
+
+/* ---------- drawing a card ---------- */
+function artHTML(c) {
+  if (c.art?.img) return `<img src="${imgSrc(c.art.img)}" alt="" loading="lazy" decoding="async" draggable="false">`;
+  return `<span class="jc-emo">${c.art}</span>`;
+}
+function cardHTML(c, o = {}) {
+  const S = serie(c.sid), El = S.els[c.el];
+  const cls = ['jc-card', `r-${c.r}`, `el-${c.el}`, o.holo ? 'holo' : '', o.locked ? 'locked' : '', o.cls || ''].filter(Boolean).join(' ');
+  return `<div class="${cls}" style="--c1:${El.c1};--c2:${El.c2}" ${o.attr || ''}>
+    <div class="jc-in">
+      <div class="jc-top"><span class="jc-el">${El.icon}</span><span class="jc-ribbon">${El.name}</span><span class="jc-gem" title="${RAR[c.r].name}"></span></div>
+      <div class="jc-art">${o.locked ? `<span class="jc-q">?</span>` : artHTML(c)}</div>
+      <div class="jc-name">${o.locked ? '???' : esc(c.name)}</div>
+      <div class="jc-text">${o.locked ? `<em>${RAR[c.r].name} · à trouver</em>` : `<b>${RAR[c.r].name}${o.holo ? ' · Brillante' : ''}</b>${esc(c.text)}`}</div>
+      <div class="jc-foot"><span class="jc-num">${String(c.num).padStart(2, '0')}/${c.total}</span><span class="jc-pow">⚔ ${c.pow}</span><span class="jc-cote">${fmt(cote(c, o.holo))}</span></div>
+    </div>
+    ${o.count > 1 ? `<span class="jc-count">×${o.count}</span>` : ''}${o.badge || ''}
+  </div>`;
+}
+const packHTML = (t, o = {}) => `<div class="jc-pack p-${t} ${o.cls || ''}" ${o.attr || ''}><div class="jc-pack-in"><small>SPINBET · JCC</small><span class="jc-pack-ico">🃏</span><b>${PACKS[t].sub.toUpperCase()}</b><em>5 cartes</em></div></div>`;
+
+/* ---------- the opening scene ---------- */
+let scene = null;
+function showOpening(t, hand, S) {
+  scene?.remove();
+  const box = document.createElement('div');
+  box.className = 'jc-scene';
+  box.innerHTML = `<div class="jc-scene-in">
+      <p class="jc-scene-t">${PACKS[t].name} · ${esc(S.name)}</p>
+      <div class="jc-scene-pack">${packHTML(t, { cls: 'big', attr: 'data-jc-tear' })}<p class="muted">Touche le paquet pour l’ouvrir</p></div>
+      <div class="jc-hand" hidden>${hand.map((x, i) => `<div class="jc-flip" data-jc-flip="${i}" style="--i:${i}"><div class="jc-back"><span>🃏</span></div><div class="jc-front">${cardHTML(CARD[x.id], { holo: x.h, badge: x.isNew ? '<span class="jc-tag new">NOUVELLE</span>' : '<span class="jc-tag dup">DOUBLE</span>' })}</div></div>`).join('')}</div>
+      <div class="jc-scene-acts" hidden><button class="btn ghost" data-jc-all>Tout retourner</button><button class="btn primary" data-jc-close hidden>Continuer</button><button class="btn primary" data-jc-next hidden></button></div>
+    </div>`;
+  document.body.appendChild(box);
+  scene = box;
+  requestAnimationFrame(() => box.classList.add('show'));
+  let flipped = 0;
+  const flip = (el) => {
+    if (!el || el.classList.contains('on')) return;
+    el.classList.add('on'); flipped++;
+    const x = hand[+el.dataset.jcFlip], r = CARD[x.id].r;
+    if (r === 'L' || x.h) { sfx.bigWin?.(); fx.coins?.(40); el.classList.add('wow'); } else if (r === 'E') { sfx.win?.(); el.classList.add('wow'); } else sfx.click?.();
+    if (flipped === hand.length) done();
+  };
+  const done = () => {
+    box.querySelector('[data-jc-all]').hidden = true;
+    box.querySelector('[data-jc-close]').hidden = false;
+    const s = st(), nt = ['o', 'v', 'b'].find((k) => s.packs[k] > 0);
+    const nb = box.querySelector('[data-jc-next]');
+    if (nt) { nb.hidden = false; nb.dataset.t = nt; nb.textContent = `Ouvrir le suivant (${PACKS[nt].sub.toLowerCase()})`; }
+    paintPage();
+    setTimeout(checkAlbum, 600);
+  };
+  box.addEventListener('click', (e) => {
+    if (e.target.closest('[data-jc-tear]')) {
+      const p = box.querySelector('.jc-scene-pack');
+      if (p.classList.contains('tear')) return;
+      p.classList.add('tear'); sfx.click?.();
+      setTimeout(() => { p.hidden = true; box.querySelector('.jc-hand').hidden = false; box.querySelector('.jc-scene-acts').hidden = false; }, 650);
+      return;
+    }
+    const f = e.target.closest('[data-jc-flip]');
+    if (f) return flip(f);
+    if (e.target.closest('[data-jc-all]')) { box.querySelectorAll('[data-jc-flip]:not(.on)').forEach((el, i) => setTimeout(() => flip(el), i * 180)); return; }
+    const n = e.target.closest('[data-jc-next]');
+    if (n) { close(); setTimeout(() => openPack(n.dataset.t), 220); return; }
+    if (e.target.closest('[data-jc-close]')) close();
+  });
+  const close = () => { box.classList.remove('show'); setTimeout(() => box.remove(), 200); if (scene === box) scene = null; paintPage(); };
+}
+
+/* ---------- the forge: duplicates (normal copies, one card always kept) → points → a violet pack ---------- */
+function extras(s) {
+  const out = [];
+  for (const id in s.cards) {
+    const [n = 0, h = 0] = s.cards[id];
+    const keep = h > 0 ? 0 : 1, x = n - keep;
+    if (x > 0 && CARD[id]) out.push([id, x]);
+  }
+  return out;
+}
+function recycle() {
+  const ex = extras(st());
+  if (!ex.length) return toast('Aucun double à recycler', 'info');
+  const pts = ex.reduce((a, [id, x]) => a + RAR[CARD[id].r].forge * x, 0), n = ex.reduce((a, [, x]) => a + x, 0);
+  modal(`<h3>🔥 Recycler mes doubles</h3><p>${n} carte${n > 1 ? 's' : ''} en double (les brillantes ne sont jamais recyclées, et tu gardes toujours un exemplaire de chaque carte).</p>
+    <p>Tu gagnes <b>${pts} points de forge</b>.</p><p class="muted small">Astuce : une carte en double peut aussi se vendre aux autres joueurs dans le Marché.</p>
+    <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Recycler</button></div>`, { cls: 'jc-modal' }).then((v) => {
+    if (v !== 'ok') return;
+    save((s) => { extras(s).forEach(([id, x]) => { const c = [...s.cards[id]]; c[0] -= x; s.cards[id] = c; }); s.forge = (s.forge || 0) + pts; });
+    sfx.coin?.(); toast(`🔥 +${pts} points de forge`, 'ok'); paintPage();
+  });
+}
+function forgePack() {
+  if (st().forge < FORGE) return;
+  save((s) => { s.forge -= FORGE; });
+  openPack('v', true);
+}
+
+/* ---------- the market (accounts): market/{id} = { s, sn, c, h, p, st: open → sold → paid | off, at, b, bn, sa } ---------- */
+const me = () => (profiles.online && profiles.current ? { uid: profiles.store.current, name: String(profiles.current.name || 'Joueur').slice(0, 16) } : null);
+let offers = null, offersT = 0, offersBusy = false, offersErr = false, mine = [], stopMine = null, mineFor = null;
+function loadOffers(force) {
+  if (offersBusy || !me() || (!force && offers && Date.now() - offersT < 30000)) return Promise.resolve(offers);
+  offersBusy = true;
+  return cloud.jccOffers().then((l) => { offers = l; offersErr = false; offersT = Date.now(); return l; })
+    .catch((e) => { console.warn(e); offersErr = true; return offers; }).finally(() => { offersBusy = false; paintPage(); });
+}
+async function watchMine() {
+  const m = me();
+  if ((m?.uid || null) === mineFor) return;
+  stopMine?.(); stopMine = null; mine = []; mineFor = m?.uid || null; offers = null;
+  if (!m) return;
+  stopMine = await cloud.jccMine(m.uid, (l) => { mine = l; collect(); paintPage(); }).catch((e) => { console.warn(e); return null; });
+}
+// my cards sold while I was away: each sale is marked « paid » once (transaction), then paid here
+const paying = new Set();
+async function collect() {
+  for (const x of mine.filter((o) => o.st === 'sold' && !paying.has(o.id))) {
+    paying.add(x.id);
+    try {
+      const ok = await cloud.jccPaid(x.id);
+      if (ok) {
+        wallet.grant(x.p);
+        const c = CARD[x.c];
+        sfx.coin?.();
+        toast(`💰 ${esc(x.bn || 'Un joueur')} a acheté ta carte ${esc(c?.name || '')}${x.h ? ' brillante' : ''} : +${fmt(x.p)}`, 'ok');
+      }
+    } catch (e) { console.warn(e); paying.delete(x.id); }
+  }
+}
+async function sell(id, h) {
+  const m = me(), c = CARD[id];
+  if (!m) return askAccount();
+  const s = st();
+  if (owned(s, id) < 2 || !(s.cards[id]?.[h] > 0)) return toast('Tu ne peux vendre que tes cartes en double', 'warn');
+  if (mine.filter((o) => o.st === 'open').length >= MAXSALE) return toast(`${MAXSALE} cartes en vente au maximum`, 'warn');
+  const v = await modal(`<h3>Vendre ${esc(c.name)}${h ? ' (brillante)' : ''}</h3>
+    <div class="jc-sell">${cardHTML(c, { holo: h, cls: 'sm' })}<div>
+      <p>Les autres joueurs pourront l’acheter dans le Marché. La carte quitte ta collection pendant la vente (tu peux la retirer quand tu veux).</p>
+      <label>Ton prix<input type="number" inputmode="numeric" min="1" max="${MAXPRICE}" step="1" value="${cote(c, h)}" data-jc-price></label>
+      <p class="muted small">Cote de la carte : ${fmt(cote(c, h))}. Tu reçois le prix dès qu’un joueur l’achète.</p></div></div>
+    <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Mettre en vente</button></div>`, { cls: 'jc-modal' });
+  if (v !== 'ok') return;
+  const p = Math.floor(Number(document.querySelector('[data-jc-price]')?.value) || 0);
+  if (!(p >= 1 && p <= MAXPRICE)) return toast(`Prix entre 1 et ${fmt(MAXPRICE)}`, 'warn');
+  if (owned(st(), id) < 2 || !(st().cards[id]?.[h] > 0)) return;
+  save((x) => { const k = [...x.cards[id]]; k[h]--; x.cards[id] = k; });
+  try {
+    await cloud.jccSell({ s: m.uid, sn: m.name, c: id, h: !!h, p });
+    toast(`🏷️ ${esc(c.name)} est en vente à ${fmt(p)}`, 'ok');
+    offers = null; loadOffers(true);
+  } catch (e) {
+    console.warn(e);
+    save((x) => { const k = [...(x.cards[id] || [0, 0])]; k[h]++; x.cards[id] = k; });
+    toast('La mise en vente n’a pas marché, réessaie', 'warn');
+  }
+  paintPage();
+}
+async function cancel(oid) {
+  const o = mine.find((x) => x.id === oid);
+  if (!o || o.st !== 'open') return;
+  try {
+    const ok = await cloud.jccCancel(oid);
+    if (!ok) return toast('Trop tard : la carte vient d’être vendue !', 'info');
+    save((x) => { const k = [...(x.cards[o.c] || [0, 0])]; k[o.h ? 1 : 0]++; x.cards[o.c] = k; });
+    toast('Carte retirée de la vente et rangée dans ton album', 'ok');
+    offers = (offers || []).filter((x) => x.id !== oid);
+  } catch (e) { console.warn(e); toast('Impossible pour le moment, réessaie', 'warn'); }
+  paintPage();
+}
+let buying = false;
+async function buy(oid) {
+  const m = me();
+  if (!m) return askAccount();
+  const o = (offers || []).find((x) => x.id === oid), c = o && CARD[o.c];
+  if (!o || !c || buying) return;
+  if (o.s === m.uid) return cancel(oid);
+  const v = await modal(`<h3>Acheter ${esc(c.name)}${o.h ? ' (brillante)' : ''} ?</h3><div class="jc-sell">${cardHTML(c, { holo: o.h, cls: 'sm' })}<div>
+      <p>Vendue par <b>${esc(o.sn)}</b></p><p class="jc-price">${fmt(o.p)}</p>
+      ${owned(st(), c.id) ? '<p class="muted small">Tu as déjà cette carte.</p>' : '<p class="jc-miss">⭐ Il te manque cette carte !</p>'}</div></div>
+    <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Acheter</button></div>`, { cls: 'jc-modal' });
+  if (v !== 'ok') return;
+  if (!wallet.spend(o.p)) return toast(`Il te faut ${fmt(o.p)}`, 'warn');
+  buying = true;
+  try {
+    const ok = await cloud.jccBuy(oid, m.uid, m.name);
+    if (!ok) { wallet.grant(o.p); toast('Trop tard : quelqu’un l’a achetée juste avant toi', 'info'); }
+    else {
+      save((x) => { const k = [...(x.cards[o.c] || [0, 0])]; k[o.h ? 1 : 0]++; x.cards[o.c] = k; });
+      sfx.win?.(); toast(`🃏 ${esc(c.name)} rejoint ton album !`, 'ok');
+      setTimeout(checkAlbum, 500);
+    }
+  } catch (e) { console.warn(e); wallet.grant(o.p); toast('L’achat n’a pas marché, tu n’as rien payé', 'warn'); }
+  buying = false;
+  offers = (offers || []).filter((x) => x.id !== oid);
+  paintPage();
+}
+const askAccount = () => toast('Le Marché est réservé aux comptes : crée ton compte gratuit (tes cartes sont gardées) <button class="btn sm" data-signup>Créer</button>', 'warn');
+
+/* ---------- the page ---------- */
+let root = null, tab = 'album', elf = 'all', missOnly = true, pickSerie = NOW.id, seenAlbum = SERIES[0].id;
+const here = () => root?.isConnected && /^jcc$/.test(location.hash.replace(/^#\/?/, ''));
+function renderJcc(r) {
+  root = r; flush(); watchMine(); paintPage();
+  if (me()) loadOffers(true);
+}
+function barHTML(s) {
+  const p = Math.min(100, ((s.pts + pending) / BAR) * 100);
+  return `<div class="jc-bar"><i style="width:${p.toFixed(1)}%"></i></div>`;
+}
+function paintPage() {
+  if (!here()) return;
+  const s = st(), S = serie(seenAlbum), n = have(s, S), np = packCount(s), m = me();
+  const sales = mine.filter((o) => o.st === 'open');
+  root.innerHTML = `
+    <section class="panel jc-hero">
+      <span class="eyebrow">🃏 Jeu de cartes à collectionner (JCC)</span>
+      <h1>${esc(S.name)} <small>${esc(S.season)}</small></h1>
+      <div class="jc-hero-row">
+        <div class="jc-goal"><small>Album complet</small><b>+${fmt(ALBUM)}</b><span>${s.done[S.id] ? '✅ déjà gagné' : `${n} / ${S.list.length} cartes`}</span></div>
+        <div class="jc-next"><small>Prochain paquet</small>${barHTML(s)}<span><b data-jc-pts>${Math.floor(s.pts + pending)}</b> / ${BAR} · chaque mise, dans n’importe quel jeu, remplit la barre</span></div>
+      </div>
+      <div class="jc-album-bar"><i style="width:${(n / S.list.length) * 100}%"></i><span>${Math.round((n / S.list.length) * 100)} %</span></div>
+    </section>
+    <section class="panel jc-packs"><div class="sec-head"><h2>Mes paquets</h2><small>${np ? `${np} à ouvrir` : 'joue pour en gagner'}</small></div>
+      <div class="jc-pack-row">${['b', 'v', 'o'].map((t) => `<div class="jc-pack-slot">${packHTML(t, { cls: s.packs[t] ? '' : 'none' })}<b>${PACKS[t].name}</b><span>${s.packs[t] || 0} paquet${(s.packs[t] || 0) > 1 ? 's' : ''}</span>
+        <button class="btn ${s.packs[t] ? 'primary' : 'ghost'} sm" data-jc-open="${t}" ${s.packs[t] ? '' : 'disabled'}>Ouvrir</button></div>`).join('')}</div>
+      ${SERIES.length > 1 ? `<p class="jc-pick">Ouvrir les paquets dans la série : ${SERIES.map((x) => `<button class="chip${pickSerie === x.id ? ' on' : ''}" data-jc-serie="${x.id}">${esc(x.name)}</button>`).join('')}</p>` : ''}
+    </section>
+    <nav class="jc-tabs">${[['album', '📖 Album'], ['market', '🏪 Marché'], ['forge', '🔥 Forge'], ['sales', `🏷️ Mes ventes${sales.length ? ` (${sales.length})` : ''}`], ['rules', '❔ Règles']].map(([k, l]) => `<button class="${tab === k ? 'on' : ''}" data-jc-tab="${k}">${l}</button>`).join('')}</nav>
+    ${tab === 'album' ? albumHTML(s, S) : tab === 'market' ? marketHTML(s, m) : tab === 'forge' ? forgeHTML(s) : tab === 'sales' ? salesHTML(m) : rulesHTML()}`;
+}
+function albumHTML(s, S) {
+  const list = S.list.filter((c) => elf === 'all' || c.el === elf);
+  return `<section class="panel"><div class="sec-head"><h2>📖 Mon album</h2><small>touche une carte pour la voir</small></div>
+    ${SERIES.length > 1 ? `<p class="jc-pick">${SERIES.map((x) => `<button class="chip${seenAlbum === x.id ? ' on' : ''}" data-jc-album="${x.id}">${esc(x.name)} · ${have(s, x)}/${x.list.length}</button>`).join('')}</p>` : ''}
+    <p class="jc-pick"><button class="chip${elf === 'all' ? ' on' : ''}" data-jc-el="all">Toutes</button>${Object.entries(S.els).map(([k, El]) => { const L = S.list.filter((c) => c.el === k); return `<button class="chip${elf === k ? ' on' : ''}" data-jc-el="${k}">${El.icon} ${El.name} · ${L.filter((c) => owned(s, c.id)).length}/${L.length}</button>`; }).join('')}</p>
+    <div class="jc-grid">${list.map((c) => { const x = s.cards[c.id] || [0, 0], n = x[0] + x[1]; return cardHTML(c, { locked: !n, holo: x[1] > 0, count: n, attr: `data-jc-card="${c.id}"` }); }).join('')}</div></section>`;
+}
+function marketHTML(s, m) {
+  if (!m) return `<section class="panel jc-empty"><h2>🏪 Le Marché</h2><p>Achète les cartes qui te manquent à d’autres joueurs, et vends tes doubles.</p><p>Le Marché est réservé aux comptes (gratuit). Ton album et tes paquets sont gardés.</p><button class="btn primary" data-signup>Créer mon compte</button></section>`;
+  if (!offers) return `<section class="panel"><h2>🏪 Le Marché</h2><p class="muted">${offersErr ? 'Le Marché est indisponible pour le moment.' : 'Chargement des offres…'}</p></section>`;
+  let L = offers.filter((o) => CARD[o.c]);
+  const miss = (o) => !owned(s, o.c);
+  if (missOnly) L = L.filter(miss);
+  L.sort((a, b) => miss(b) - miss(a) || RANK.indexOf(CARD[b.c].r) - RANK.indexOf(CARD[a.c].r) || a.p - b.p);
+  return `<section class="panel"><div class="sec-head"><h2>🏪 Le Marché</h2><small>${offers.length} carte${offers.length > 1 ? 's' : ''} en vente</small></div>
+    <p class="jc-pick"><button class="chip${missOnly ? ' on' : ''}" data-jc-miss="1">⭐ Celles qui me manquent</button><button class="chip${missOnly ? '' : ' on'}" data-jc-miss="0">Toutes</button><button class="chip" data-jc-reload>↻ Actualiser</button></p>
+    ${L.length ? `<div class="jc-grid">${L.map((o) => `<div class="jc-offer">${cardHTML(CARD[o.c], { holo: o.h, badge: miss(o) ? '<span class="jc-tag new">IL TE MANQUE</span>' : '' })}
+      <div class="jc-offer-b"><span class="pname">${esc(o.sn)}</span><b>${fmt(o.p)}</b>${o.s === m.uid ? `<button class="btn ghost sm" data-jc-cancel="${o.id}">Retirer</button>` : `<button class="btn primary sm" data-jc-buy="${o.id}">Acheter</button>`}</div></div>`).join('')}</div>`
+      : `<p class="muted">${missOnly ? 'Aucune des cartes qui te manquent n’est en vente pour le moment. Reviens plus tard !' : 'Aucune carte en vente pour le moment.'}</p>`}
+    <p class="muted small">Pour vendre : ouvre une carte en double dans ton album → « Vendre ». Le prix est payé tout seul dès qu’un joueur achète.</p></section>`;
+}
+function forgeHTML(s) {
+  const ex = extras(s), pts = ex.reduce((a, [id, x]) => a + RAR[CARD[id].r].forge * x, 0), n = ex.reduce((a, [, x]) => a + x, 0);
+  return `<section class="panel jc-forge"><div class="sec-head"><h2>🔥 La Forge</h2><small>${s.forge || 0} / ${FORGE} points</small></div>
+    <p>Recycle tes cartes en double pour gagner des points de forge. À ${FORGE} points, tu forges un <b>paquet violet</b> (au moins une rare).</p>
+    <div class="jc-bar"><i style="width:${Math.min(100, ((s.forge || 0) / FORGE) * 100)}%"></i></div>
+    <ul class="jc-forge-pts">${RANK.split('').map((k) => `<li class="r-${k}"><span class="jc-gem"></span>${RAR[k].name}<b>${RAR[k].forge} pt${RAR[k].forge > 1 ? 's' : ''}</b></li>`).join('')}</ul>
+    <div class="jc-acts"><button class="btn ghost" data-jc-recycle ${n ? '' : 'disabled'}>Recycler mes ${n || ''} double${n > 1 ? 's' : ''}${n ? ` (+${pts} pts)` : ''}</button>
+      <button class="btn primary" data-jc-forge ${(s.forge || 0) >= FORGE ? '' : 'disabled'}>Forger un paquet violet</button></div>
+    <p class="muted small">Les cartes brillantes ne sont jamais recyclées, et tu gardes toujours un exemplaire de chaque carte.</p></section>`;
+}
+function salesHTML(m) {
+  if (!m) return marketHTML(st(), null);
+  const open = mine.filter((o) => o.st === 'open'), done = mine.filter((o) => o.st === 'sold' || o.st === 'paid').sort((a, b) => b.sa - a.sa).slice(0, 20);
+  return `<section class="panel"><div class="sec-head"><h2>🏷️ Mes cartes en vente</h2><small>${open.length} / ${MAXSALE}</small></div>
+    ${open.length ? `<div class="jc-grid">${open.map((o) => `<div class="jc-offer">${cardHTML(CARD[o.c] || CARD[NOW.list[0].id], { holo: o.h })}<div class="jc-offer-b"><b>${fmt(o.p)}</b><button class="btn ghost sm" data-jc-cancel="${o.id}">Retirer</button></div></div>`).join('')}</div>`
+      : '<p class="muted">Rien en vente. Ouvre une carte en double dans ton album pour la vendre.</p>'}
+    ${done.length ? `<h3 class="jc-h3">Vendues</h3><ul class="jc-hist">${done.map((o) => `<li><span>${esc(CARD[o.c]?.name || o.c)}${o.h ? ' ✨' : ''}</span><small>à ${esc(o.bn || '?')}</small><b>+${fmt(o.p)}</b></li>`).join('')}</ul>` : ''}</section>`;
+}
+function rulesHTML() {
+  const pc = (x) => `${(x * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %`;
+  return `<section class="panel jc-rules"><h2>❔ Comment ça marche</h2>
+    <ul class="jc-steps">
+      <li>🎰 <b>Joue à n’importe quel jeu</b> : chaque mise remplit la barre (plus la mise est grosse, plus elle avance). Barre pleine = un paquet de 5 cartes.</li>
+      <li>🃏 <b>Trois paquets</b> : bleu (classique), violet (rare, au moins une carte rare) et doré (très rare, au moins une épique). Au moins un violet tous les ${PITY.v} paquets, un doré tous les ${PITY.o} paquets.</li>
+      <li>✨ <b>Cartes brillantes</b> : ${pc(HOLO)} des cartes sortent en version brillante, qui vaut 3 fois sa cote.</li>
+      <li>🏪 <b>Doubles</b> : vends-les aux autres joueurs au prix que tu veux (Marché), ou recycle-les dans la Forge.</li>
+      <li>🏆 <b>Album complet</b> : les ${NOW.list.length} cartes de la série = <b>${fmt(ALBUM)}</b>, une fois par série. Une nouvelle série arrive régulièrement avec de nouvelles cartes.</li>
+    </ul>
+    <h3 class="jc-h3">Chances par carte</h3>
+    <table class="jc-odds"><tr><th></th>${RANK.split('').map((k) => `<th class="r-${k}">${RAR[k].name}</th>`).join('')}</tr>
+      ${['b', 'v', 'o'].map((t) => `<tr><td>${PACKS[t].name}</td>${RANK.split('').map((k) => `<td>${PACKS[t].odds[k] ? pc(PACKS[t].odds[k]) : '—'}</td>`).join('')}</tr>`).join('')}</table>
+    <h3 class="jc-h3">Cote des cartes</h3>
+    <ul class="jc-forge-pts">${RANK.split('').map((k) => `<li class="r-${k}"><span class="jc-gem"></span>${RAR[k].name}<b>${fmt(RAR[k].cote)}</b></li>`).join('')}</ul>
+    <p class="muted small">Chaque paquet : ${pc(1 - PACK_ODDS.o - PACK_ODDS.v)} bleu, ${pc(PACK_ODDS.v)} violet, ${pc(PACK_ODDS.o)} doré. Jeu en argent fictif. Le Marché est réservé aux comptes ; en invité, tes cartes sont gardées si tu crées ton compte.</p></section>`;
+}
+// one card, big, with its copies and the sale buttons
+function showCard(id) {
+  const c = CARD[id], s = st(), x = s.cards[id] || [0, 0], n = x[0] + x[1], m = me();
+  const forSale = (offers || []).filter((o) => o.c === id && o.s !== m?.uid).sort((a, b) => a.p - b.p);
+  modal(`<div class="jc-detail">${cardHTML(c, { locked: !n, holo: x[1] > 0, cls: 'lg' })}<div>
+      <h3>${n ? esc(c.name) : 'Carte à trouver'}</h3>
+      <p class="muted">${RAR[c.r].name} · n° ${c.num}/${c.total} · cote ${fmt(cote(c))}</p>
+      <p>${n ? `Tu en as <b>${n}</b>${x[1] ? ` (dont ${x[1]} brillante${x[1] > 1 ? 's' : ''})` : ''}.` : 'Tu ne l’as pas encore.'}</p>
+      ${n >= 2 ? `<div class="jc-acts">${x[0] ? '<button class="btn primary sm" data-value="sell0">🏷️ Vendre un double</button>' : ''}${x[1] ? '<button class="btn primary sm" data-value="sell1">🏷️ Vendre une brillante</button>' : ''}</div>` : n ? '<p class="muted small">Un seul exemplaire : il reste dans ton album.</p>' : ''}
+      ${forSale.length ? `<p class="jc-miss">🏪 ${forSale.length} en vente au Marché, dès ${fmt(forSale[0].p)}</p><div class="jc-acts"><button class="btn ghost sm" data-value="buy">Voir au Marché</button></div>` : ''}
+    </div></div>`, { cls: 'jc-modal wide' }).then((v) => {
+    if (v === 'sell0') sell(id, 0);
+    else if (v === 'sell1') sell(id, 1);
+    else if (v === 'buy') { tab = 'market'; missOnly = false; paintPage(); }
+  });
+}
+document.addEventListener('click', (e) => {
+  if (!here()) return;
+  const q = (sel) => e.target.closest(sel);
+  let b;
+  if ((b = q('[data-jc-open]'))) return openPack(b.dataset.jcOpen);
+  if ((b = q('[data-jc-tab]'))) { tab = b.dataset.jcTab; if (tab === 'market') loadOffers(); return paintPage(); }
+  if ((b = q('[data-jc-el]'))) { elf = b.dataset.jcEl; return paintPage(); }
+  if ((b = q('[data-jc-serie]'))) { pickSerie = b.dataset.jcSerie; return paintPage(); }
+  if ((b = q('[data-jc-album]'))) { seenAlbum = b.dataset.jcAlbum; return paintPage(); }
+  if ((b = q('[data-jc-miss]'))) { missOnly = b.dataset.jcMiss === '1'; return paintPage(); }
+  if (q('[data-jc-reload]')) return loadOffers(true);
+  if ((b = q('[data-jc-card]'))) return showCard(b.dataset.jcCard);
+  if ((b = q('[data-jc-buy]'))) return buy(b.dataset.jcBuy);
+  if ((b = q('[data-jc-cancel]'))) return cancel(b.dataset.jcCancel);
+  if (q('[data-jc-recycle]')) return recycle();
+  if (q('[data-jc-forge]')) return forgePack();
+});
+
+/* ---------- the menu badge, the box on the home page and the pill under the games ---------- */
+function paintBadge() {
+  const n = profiles.current ? packCount(st()) : 0;
+  document.querySelectorAll('[data-jc-badge]').forEach((el) => { el.hidden = !n; el.style.display = n ? '' : 'none'; el.textContent = n; });
+}
+function pillText(pts) {
+  const s = st(), p = Math.min(99, Math.floor(((pts ?? s.pts) / BAR) * 100)), n = packCount(s);
+  return `🃏 <b>Cartes</b> · prochain paquet ${p} %${n ? ` · <b>${n} à ouvrir</b>` : ''}`;
+}
+function paintPills(pts) { document.querySelectorAll('[data-jc-pill]').forEach((el) => { el.innerHTML = pillText(pts); }); }
+E.addGamePill(() => (profiles.current ? `<a class="ev-pill jcc" href="#jcc" data-jc-pill>${pillText(st().pts + pending)}</a>` : ''));
+E.addHome(() => {
+  if (!profiles.current) return '';
+  const s = st(), n = packCount(s);
+  return `<a class="ev-card ev-jcc" href="#jcc"><span class="ev-ico">🃏</span><div><small>CARTES À COLLECTIONNER · ${esc(NOW.name.toUpperCase())}</small><b>${s.done[NOW.id] ? '✅ Album complet !' : `${have(s, NOW)} / ${NOW.list.length} cartes · album = ${fmt(ALBUM)}`}</b><em>${n ? `${n} paquet${n > 1 ? 's' : ''} à ouvrir !` : `prochain paquet à ${Math.floor((s.pts / BAR) * 100)} %`}</em></div><span class="ev-go">${n ? 'Ouvrir ›' : 'Voir ›'}</span></a>`;
+});
+profiles.addEventListener('change', () => { pending = 0; setTimeout(() => { paintBadge(); watchMine(); paintPage(); }, 600); });
+profiles.ready?.then(() => setTimeout(() => { paintBadge(); watchMine(); }, 2500));
+setInterval(() => { if (here() && tab === 'market') loadOffers(); }, 60000);
+
+return { renderJcc, checkAlbum, SERIES, CARD, BAR, ALBUM };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -17455,6 +18169,7 @@ const routes = [
   { re: /^battle$/, page: (r) => __mods['battle.js'].renderBattle(r), nav: 'battle' },
   { re: /^paris$/, page: (r) => __mods['paris.js'].renderParis(r), nav: 'paris' },
   { re: /^loto$/, page: (r) => __mods['loto.js'].renderLoto(r), nav: 'loto' },
+  { re: /^(jcc|cartes)$/, page: (r) => __mods['jcc.js'].renderJcc(r), nav: 'jcc' },
   { re: /^@(.+)$/, page: (r, m) => __mods['extras.js'].renderPlayer(r, decodeURIComponent(m[1])), nav: 'top' },
 ];
 

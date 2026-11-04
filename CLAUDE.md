@@ -124,6 +124,22 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **La Course Online** (`robots-online`, `RobotsOnlineGame` dans `games/robots.js`, `withRoom`) : forme des robots
   tirée du numéro de manche (`formOf`), arrivée tirée de la graine partagée. Salon dans `roomGame` des règles.
 
+- **Cartes à collectionner (JCC)** (`jcc.js`, page `#jcc`, menu « Jouer ») : chaque mise de n'importe quel jeu
+  (événement `wager` du portefeuille) remplit une barre de √mise points ; `BAR` (500) = un paquet de 5 cartes : bleu
+  (classique), violet (rare, ≥ 1 rare), doré (très rare, ≥ 1 épique), chances `PACKS` / `PACK_ODDS`, garantis `PITY`
+  (violet tous les 10, doré tous les 40). Raretés `RAR` (Commune, Rare, Épique, Légendaire, avec leur cote en KE),
+  3 % de cartes brillantes (cote ×3). Album d'une série complet = `ALBUM` (100 000 KE), une fois par série
+  (`profile.jcc.done`). Doubles : vendus aux autres joueurs au Marché (comptes seulement, Firestore `market/{id}`,
+  la carte quitte la collection pendant la vente ; open → sold par l'acheteur, puis le navigateur du vendeur se paie
+  et passe l'offre en paid) ou recyclés dans la Forge (100 points = un paquet violet). Données : `profile.jcc`.
+  Simulation (seul, avec la Forge) : l'album demande ≈ 120 paquets (médiane), 55 à 250 selon la chance.
+  **Nouvelle série (le propriétaire envoie des images tous les 1 à 3 mois)** : ajouter une entrée à la fin de `SERIES`
+  (id court, nom, saison, éléments `els`, 30 cartes `[id, élément, rareté, nom, emoji ou { img }, texte]`), images
+  découpées dans `assets/games/jcc/` (`{ img: 'dossier/fichier' }` sans `.webp`, ≈ 480 px de large), puis changer
+  `CACHE` dans `sw.js`. Les paquets s'ouvrent dans la série choisie (la plus récente par défaut) et chaque série a son
+  album et ses 100 000 KE. La 1re série « Les Origines » : les 3 légendaires sont les 3 cartes du propriétaire
+  (phénix, golem, danseuse), les 27 autres sont dessinées par le site (emoji sur fond d'élément) en attendant ses images.
+
 ## Arrivée des visiteurs et partage
 
 - **Pas d'écran de connexion à l'arrivée** (`hud.js`) : un nouveau visiteur joue tout de suite en invité. La création

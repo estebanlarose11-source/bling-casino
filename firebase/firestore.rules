@@ -495,6 +495,35 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---------- Cartes à collectionner : le Marché (jcc.js) ----------
+    // market/{id} = { s (vendeur), sn, c (carte), h (brillante), p (prix, KE entiers), st, at, b, bn, sa }.
+    // Les comptes connectés lisent tout. Le vendeur crée l'offre à son nom (st 'open'). Ensuite seulement :
+    // achat (open → sold, par un autre compte, à son nom), retrait (open → off, par le vendeur), paiement du vendeur
+    // (sold → paid, par le vendeur). Le vendeur peut effacer une offre terminée (off ou paid).
+    match /market/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['s', 'sn', 'c', 'h', 'p', 'st', 'at'])
+        && request.resource.data.s == request.auth.uid
+        && isPseudo(request.resource.data.sn)
+        && request.resource.data.c is string && request.resource.data.c.size() >= 2 && request.resource.data.c.size() <= 24
+        && request.resource.data.h is bool
+        && request.resource.data.p is int && request.resource.data.p >= 1 && request.resource.data.p <= 500000
+        && request.resource.data.st == 'open'
+        && request.resource.data.at == request.time;
+      allow update: if signedIn() && (
+        (resource.data.st == 'open' && request.resource.data.st == 'sold'
+          && resource.data.s != request.auth.uid && request.resource.data.b == request.auth.uid
+          && isPseudo(request.resource.data.bn) && request.resource.data.sa == request.time
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st', 'b', 'bn', 'sa']))
+        || (resource.data.s == request.auth.uid && resource.data.st == 'open' && request.resource.data.st == 'off'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st']))
+        || (resource.data.s == request.auth.uid && resource.data.st == 'sold' && request.resource.data.st == 'paid'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st']))
+      );
+      allow delete: if signedIn() && resource.data.s == request.auth.uid && resource.data.st in ['off', 'paid'];
+    }
+
     // Tout le reste est fermé.
     match /{document=**} {
       allow read, write: if false;
