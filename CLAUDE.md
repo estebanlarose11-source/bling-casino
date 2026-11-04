@@ -215,6 +215,9 @@ Mises : KE entiers, de 1 à 10 000 KE (`BETS` dans `core/base.js`), plafonnées 
 
 ## Codes cadeaux (page Recharger)
 
+Snapchat du site : **spinbetcazino** (`.snap-box` sur Recharger et l'accueil, menu « Notre Snap · code du jour » et
+« Service client (Snap) », lien sur l'écran d'aide du mot de passe) : le propriétaire y met un code par jour en story.
+
 Quand le propriétaire demande un code : `python3 tools/code.py` (5 000 KE ; `python3 tools/code.py 3 2500` = 3 codes
 à 2 500 KE). Le script ajoute le SHA-256 du code dans `CODES` (`pages/account.js`) et affiche le code : le donner au
 propriétaire, puis commit + push sur `main`. Ne jamais écrire un code en clair dans le dépôt. Chaque code ne sert
