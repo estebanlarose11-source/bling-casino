@@ -139,6 +139,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `CACHE` dans `sw.js`. Les paquets s'ouvrent dans la série choisie (la plus récente par défaut) et chaque série a son
   album et ses 100 000 KE. La 1re série « Les Origines » (78 cartes : par élément 14 communes, 7 rares, 4 épiques,
   1 légendaire) : les 3 légendaires sont les 3 cartes du propriétaire (phénix, golem, danseuse), les 75 autres sont dessinées par le site (emoji sur fond d'élément) en attendant ses images.
+  Liste des cartes à dessiner pour le propriétaire : `notes/jcc-les-origines-cartes-a-dessiner.txt` (dossier `notes/` = ses
+  notes) ; cocher `[x]` chaque carte quand sa vraie image est mise, et faire une liste pareille pour chaque nouvelle série.
 
 ## Arrivée des visiteurs et partage
 
