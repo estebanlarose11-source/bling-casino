@@ -1,0 +1,63 @@
+# Les Shorts de chaque jour (tools/shorts/make.js) : 2 vidéos verticales d'un bonus de machine à sous, filmées par un
+# robot, rangées sur la branche « shorts » (les 7 derniers jours, un seul commit à chaque fois) et à récupérer sur
+# www.spinbetcaz.com/#shorts. Envoi sur YouTube en plus si les secrets YT_CLIENT_ID, YT_CLIENT_SECRET et
+# YT_REFRESH_TOKEN existent (tools/shorts/youtube.mjs). À la main : Actions → « Shorts » → Run workflow.
+name: Shorts
+
+on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+    inputs:
+      jeux:
+        description: 'Machines à filmer (ids séparés par des espaces), vide = celles du jour'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shorts
+  cancel-in-progress: false
+
+jobs:
+  shorts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Outils (navigateur, ffmpeg, emojis)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-noto-color-emoji > /dev/null
+          npm i --no-save --no-package-lock --prefix tools/shorts playwright@1.63.0
+          npx --prefix tools/shorts playwright install --with-deps chromium
+      - name: Filmer
+        run: |
+          python3 -m http.server 8123 > /dev/null 2>&1 &
+          sleep 2
+          node tools/shorts/make.js "$(date -u +%F)" ${{ github.event.inputs.jeux }}
+      - name: Ranger sur la branche shorts
+        run: |
+          REPO="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+          git clone -q --depth 1 --branch shorts "$REPO" store 2>/dev/null || mkdir -p store
+          node tools/shorts/store.mjs store
+          cd store
+          rm -rf .git
+          git init -q -b shorts
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "Shorts du $(date -u +%F)"
+          git push -qf "$REPO" shorts
+      - name: YouTube (ne fait rien tant que les clés ne sont pas dans les secrets)
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
+          YT_PRIVACY: ${{ vars.YT_PRIVACY || 'private' }}
+        run: node tools/shorts/youtube.mjs

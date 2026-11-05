@@ -228,6 +228,29 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   « Mes gains récents » sous chaque jeu (dès ×10) : image 1080×1920 (couverture du jeu, ×, montant, pseudo, logo,
   adresse du site et lien de parrainage des comptes) à partager ou télécharger.
 
+## Shorts : vidéos de chaque jour (Snap, TikTok, YouTube)
+
+- **Fabrication** (`tools/shorts/make.js`, GitHub Actions **« Shorts »** `.github/workflows/shorts.yml`, chaque jour
+  vers 4 h 17 UTC, ou à la main avec un champ « jeux ») : un robot Playwright ouvre 2 machines à sous du jour (tirées
+  de la date parmi les machines du catalogue), en plein écran au format téléphone (fenêtre 1080 × 1920 à l'échelle 2 =
+  écran 540 × 960 filmé en HD par le « screencast » du navigateur), lance le bonus avec `freeBonus()` et filme ; il
+  garde le meilleur de 3 essais (arrêt dès ×40). Bandeau « 🔥 BONUS · <jeu> » en haut, adresse + « jeu gratuit ·
+  argent fictif · 18+ » en bas, image de fin (logo, ×, « Joue gratuitement », adresse). Musique : le thème du jeu
+  rendu hors ligne dans la page (`OfflineAudioContext`). ffmpeg : 1080 × 1920, 30 images/s, H.264 + AAC,
+  58 s au plus (accéléré si le bonus est plus long), ≈ 1 à 3 Mbit/s. Sortie `tools/shorts/out/` (ignoré par git).
+- **Rangement** (`tools/shorts/store.mjs`) : branche **`shorts`** du dépôt (pas déployée par Vercel :
+  `git.deploymentEnabled`), réécrite en un seul commit chaque jour (pas d'historique qui grossit), 7 derniers jours,
+  `index.json` (titre, légende, ×, gain, durée, image d'aperçu).
+- **Page `#shorts`** (`shorts.js`, pas dans les menus : adresse à donner au propriétaire,
+  www.spinbetcaz.com/#shorts) : lit `index.json` sur raw.githubusercontent.com ; aperçu, « 📤 Partager » (feuille de
+  partage du téléphone avec le fichier vidéo : Snap, TikTok…), « ⬇️ Enregistrer », « 📋 Copier le texte ».
+  `?shortsbase=<adresse>` pour lire un autre dossier (essais en local).
+- **YouTube** (`tools/shorts/youtube.mjs`, dernière étape de la tâche) : envoi par l'API YouTube Data v3 quand les
+  secrets `YT_CLIENT_ID`, `YT_CLIENT_SECRET`, `YT_REFRESH_TOKEN` existent ; en privé tant que la variable du dépôt
+  `YT_PRIVACY` n'est pas `public` (YouTube met de toute façon en privé les vidéos d'une appli pas encore vérifiée
+  par Google). Marche à suivre pour le propriétaire : `notes/youtube-mise-en-route.md`. Politique de confidentialité
+  demandée par Google : `confidentialite.html` (lien dans les pieds de page).
+
 ## Notifications sur le téléphone (gratuit)
 
 - Site : `push.js` (bouton sur la page `#appli`, carte « 🔔 On te prévient ? » après 15 parties ou 30 s dans l'appli

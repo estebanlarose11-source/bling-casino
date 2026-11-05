@@ -5988,6 +5988,22 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .aads-take { font-family: KeCoin, Inter, sans-serif; } .aads-take span { display: inline !important; margin: 0 !important; font: inherit !important; }
 .lo-ad, .br-ad { border-color: rgba(251, 191, 36, .5); }
 @media (max-width: 700px) { .rw-hero-ico { font-size: 36px; } .rw-offer { padding: 10px; gap: 10px; } }
+
+/* Shorts du jour (shorts.js, page #shorts) */
+.sh-page { display: grid; gap: 14px; }
+.sh-head { display: flex; gap: 14px; align-items: flex-start; } .sh-head > span { font-size: 44px; }
+.sh-head h1 { margin: 0 0 4px; font: 900 clamp(30px, 4.6vw, 42px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: .6px; } .sh-head p { margin: 0; }
+.sh-day { margin: 8px 0 0; font: 900 22px 'Bebas Neue', Impact, sans-serif; letter-spacing: .6px; text-transform: capitalize; }
+.sh-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 12px; }
+.sh-card { display: grid; grid-template-columns: 150px 1fr; gap: 12px; padding: 12px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+.sh-media { position: relative; aspect-ratio: 9 / 16; border-radius: 10px; overflow: hidden; background: #000; }
+.sh-media img, .sh-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sh-play { position: absolute; inset: 0; margin: auto; width: 54px; height: 54px; border-radius: 50%; border: 0; background: rgba(0, 0, 0, .55); color: #fff; font-size: 22px; cursor: pointer; }
+.sh-media small { position: absolute; right: 6px; bottom: 6px; padding: 1px 6px; border-radius: 6px; background: rgba(0, 0, 0, .6); color: #fff; font-size: 11px; font-weight: 700; }
+.sh-body { display: flex; flex-direction: column; gap: 8px; min-width: 0; } .sh-body b { font-size: 16px; }
+.sh-cap { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.4; user-select: all; }
+.sh-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; } .sh-acts .btn { font-size: 13px; padding: 8px 12px; }
+@media (max-width: 520px) { .sh-card { grid-template-columns: 112px 1fr; padding: 10px; } .sh-acts .btn { flex: 1 1 auto; } }
 </style>
 </head>
 <body>
@@ -6089,7 +6105,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 
   <footer class="foot">
     <!-- seo-links (fabriqué par tools/seo.py : ne pas modifier à la main) --><section class="seo-foot" aria-label="Tous les jeux de SpinBet Casino"><p><b>SpinBet Casino</b>, casino gratuit en ligne : 46 jeux de casino gratuits sans téléchargement ni dépôt, en argent fictif (KE). Machines à sous avec bonus et jackpots, roulettes, blackjack, poker Texas Hold’em, roues de la fortune, tables multijoueurs et jeux rapides (mines, crash, plinko), sur téléphone comme sur ordinateur. Aucun vrai pari, aucun gain réel.</p><div class="seo-cols"><div><b>Machines à sous gratuites</b><a href="jeux/big-bad-wolf.html">Le Loup</a><a href="jeux/cosmic.html">Le Cosmique</a><a href="jeux/zeus.html">L’Olympe</a><a href="jeux/huff.html">Le Loup 2.0</a><a href="jeux/candy.html">La Sweety</a><a href="jeux/anubis.html">L’Anubis</a><a href="jeux/bling.html">La Tour Bling</a><a href="jeux/pharaon.html">Le Totem</a><a href="jeux/chasse.html">The Hunt</a><a href="jeux/noel.html">La Tournée du Père Noël</a><a href="jeux/totemx.html">Le Totem Extrême</a><a href="jeux/barillet.html">La Roulette Russe</a><a href="jeux/taco.html">La Pizza Yo-Yo</a><a href="jeux/billets.html">Le Coffre-Fort</a><a href="jeux/dragons.html">L’Hydre</a><a href="jeux/labo.html">Le Labo</a><a href="jeux/fortune.html">La Fortune</a></div><div><b>Roulette, blackjack, poker et roues</b><a href="jeux/madwheel.html">La Roue Folle</a><a href="jeux/storm.html">L’Éclair</a><a href="jeux/doublespin.html">La Double Bille</a><a href="jeux/plateau.html">Le Plateau</a><a href="jeux/peche.html">La Pêche</a><a href="jeux/roueor.html">La Roue d’Or</a><a href="jeux/blackjack.html">Le 21</a><a href="jeux/lightningbj.html">Le 21 Électrique</a><a href="jeux/poker.html">Le Texas</a></div><div><b>Tables multijoueurs</b><a href="jeux/storm-online.html">L’Éclair Online</a><a href="jeux/bj-online.html">Le 21 Online</a><a href="jeux/holdem-online.html">Le Texas Online</a><a href="jeux/madwheel-online.html">La Roue Folle Online</a><a href="jeux/robots-online.html">La Course Online</a><a href="jeux/plateau-online.html">Le Plateau Online</a><a href="jeux/peche-online.html">La Pêche Online</a><a href="jeux/roueor-online.html">La Roue d’Or Online</a></div><div><b>Jeux rapides gratuits</b><a href="jeux/mines.html">Le Champ de Mines</a><a href="jeux/avion.html">L’Avion</a><a href="jeux/plinko.html">La Cascade</a><a href="jeux/vortex.html">Le Vortex</a><a href="jeux/casse.html">Le Casse</a><a href="jeux/pileface.html">La Pièce</a><a href="jeux/robots.html">La Course</a><a href="jeux/poulet.html">Le Poulet</a><a href="jeux/gratteciel.html">Le Gratte-Ciel</a><a href="jeux/penalty.html">Le Penalty</a><a href="jeux/ticket.html">Le Ticket</a><a href="jeux/billes.html">La Descente</a></div><div><b>Guides et astuces</b><a href="articles/meilleures-machines-a-sous-gratuites-2026.html">Les meilleures machines à sous gratuites en 2026</a><a href="articles/jeux-de-casino-gratuits-sans-telechargement.html">Roulette, blackjack et poker gratuits sans téléchargement</a><a href="articles/jeux-crash-mines-plinko-gratuits.html">Jeux crash, mines et plinko gratuits : le guide 2026</a><a href="articles/rtp-volatilite-machines-a-sous.html">RTP et volatilité : comprendre une machine à sous</a><a href="articles/comment-gagner-aux-machines-a-sous.html">Comment gagner aux machines à sous ? Vrais conseils et idées reçues</a><a href="articles/strategie-blackjack.html">Stratégie de base au blackjack : le tableau complet</a><a href="articles/martingale-roulette.html">Martingale à la roulette : est-ce que ça marche vraiment ?</a><a href="articles/casino-gratuit-sur-telephone.html">Casino gratuit sur téléphone, sans téléchargement (Android et iPhone)</a></div></div></section><!-- /seo-links -->
-    <div><b>SPINBET CASINO</b> · Jeu de divertissement, argent fictif, aucun gain réel. 18+ · <a href="#responsable">Jeu responsable</a> · <a href="jeux/">Tous les jeux</a> · <a href="articles/">Guides et astuces</a> · <a href="ads/">Nos partenaires</a></div>
+    <div><b>SPINBET CASINO</b> · Jeu de divertissement, argent fictif, aucun gain réel. 18+ · <a href="#responsable">Jeu responsable</a> · <a href="jeux/">Tous les jeux</a> · <a href="articles/">Guides et astuces</a> · <a href="confidentialite.html">Confidentialité</a> · <a href="ads/">Nos partenaires</a></div>
   </footer>
 
   <nav class="bottom-nav">
@@ -19486,6 +19502,100 @@ addEventListener('sb:roundend', (e) => {
 return { renderRewards, ready, NOW, LATER };
 })();
 
+// ---- shorts.js ----
+__mods['shorts.js'] = (() => {
+// Les Shorts du jour (page #shorts, pour le propriétaire : pas dans les menus) : chaque matin, GitHub Actions filme
+// 2 bonus de machines à sous (tools/shorts) et les range sur la branche « shorts » du dépôt (7 derniers jours,
+// index.json). Ici : aperçu, légende à copier, « Partager » (feuille de partage du téléphone : Snap, TikTok,
+// YouTube…) et « Enregistrer ». ?shortsbase=<adresse> lit un autre dossier (essais).
+const { toast } = __mods['ui.js'];
+const BASE = (location.search.match(/[?&]shortsbase=([^&]+)/) || [])[1]
+  ? decodeURIComponent(location.search.match(/[?&]shortsbase=([^&]+)/)[1]).replace(/\/?$/, '/')
+  : 'https://raw.githubusercontent.com/estebanlarose11-source/bling-casino/shorts/';
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const dayName = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+const blobs = new Map(); // file → Blob (downloaded once)
+
+async function videoBlob(v) {
+  if (blobs.has(v.file)) return blobs.get(v.file);
+  const r = await fetch(BASE + v.file);
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const b = new Blob([await r.arrayBuffer()], { type: 'video/mp4' });
+  blobs.set(v.file, b);
+  return b;
+}
+const fileName = (v) => `spinbet-${v.game}-${v.date}.mp4`;
+
+let root = null, list = [];
+async function renderShorts(r) {
+  root = r;
+  r.innerHTML = `<section class="sh-page"><div class="panel sh-head"><span>🎬</span><div><h1>Shorts du jour</h1>
+    <p class="muted">Chaque matin, le robot filme 2 bonus de machines à sous en format vertical, avec la musique du jeu et l’adresse du site. Les vidéos des 7 derniers jours sont ici : <b>Partager</b> les envoie directement dans Snap, TikTok ou YouTube, <b>Enregistrer</b> les met dans ton téléphone.</p></div></div>
+    <div class="sh-list"><p class="muted">Chargement des vidéos…</p></div></section>`;
+  try {
+    const r2 = await fetch(`${BASE}index.json?t=${Date.now()}`);
+    if (!r2.ok) throw new Error(`HTTP ${r2.status}`);
+    list = (await r2.json()).videos || [];
+  } catch (e) {
+    console.warn(e);
+    list = [];
+  }
+  paint();
+}
+function paint() {
+  const box = root?.querySelector('.sh-list');
+  if (!box) return;
+  if (!list.length) { box.innerHTML = '<p class="panel muted">Pas encore de vidéo : la première fournée arrive après le prochain passage du robot (chaque matin entre 5 h et 6 h, heure de Paris).</p>'; return; }
+  const days = [...new Set(list.map((v) => v.date))];
+  box.innerHTML = days.map((d) => `<h2 class="sh-day">${dayName(d)}</h2><div class="sh-grid">${list.filter((v) => v.date === d).map((v) => `
+    <article class="sh-card" data-sh="${esc(v.file)}">
+      <div class="sh-media">${v.poster ? `<img src="${BASE + v.poster}" alt="" loading="lazy">` : ''}<button class="sh-play" data-sh-play aria-label="Voir la vidéo">▶</button><small>${Math.round(v.dur || 0)} s</small></div>
+      <div class="sh-body"><b>${esc(v.title)}</b>
+        <p class="sh-cap">${esc(v.caption)}</p>
+        <div class="sh-acts"><button class="btn primary" data-sh-share>📤 Partager</button><button class="btn" data-sh-save>⬇️ Enregistrer</button><button class="btn ghost" data-sh-copy>📋 Copier le texte</button></div>
+      </div></article>`).join('')}</div>`).join('');
+}
+const find = (el) => list.find((v) => v.file === el.closest('[data-sh]')?.dataset.sh);
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-sh-play], [data-sh-share], [data-sh-save], [data-sh-copy]');
+  if (!b || !root?.contains(b)) return;
+  const v = find(b);
+  if (!v) return;
+  if (b.matches('[data-sh-copy]')) {
+    try { await navigator.clipboard.writeText(v.caption); toast('Texte copié : colle-le sous ta vidéo', 'ok'); } catch { toast('Copie impossible : sélectionne le texte à la main', 'warn'); }
+    return;
+  }
+  const label = b.innerHTML;
+  b.disabled = true; b.innerHTML = '⏳';
+  try {
+    const blob = await videoBlob(v);
+    if (b.matches('[data-sh-play]')) {
+      const media = b.closest('.sh-media');
+      media.innerHTML = `<video src="${URL.createObjectURL(blob)}" controls autoplay playsinline></video>`;
+      return;
+    }
+    const file = new File([blob], fileName(v), { type: 'video/mp4' });
+    if (b.matches('[data-sh-share]')) {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], text: v.caption }).catch(() => {});
+      } else toast('Ton navigateur ne sait pas partager une vidéo : utilise « Enregistrer » puis publie-la depuis ta galerie', 'warn');
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = fileName(v);
+      document.body.appendChild(a); a.click(); a.remove();
+      toast('Vidéo enregistrée dans tes téléchargements', 'ok');
+    }
+  } catch (err) {
+    console.warn(err);
+    toast('Vidéo indisponible pour le moment, réessaie', 'warn');
+  } finally {
+    if (b.isConnected) { b.disabled = false; b.innerHTML = label; }
+  }
+});
+
+return { renderShorts };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -19540,6 +19650,7 @@ const routes = [
   { re: /^(jcc|cartes)$/, page: (r) => __mods['jcc.js'].renderJcc(r), nav: 'jcc' },
   { re: /^(avent|calendrier|noel-calendrier)$/, page: (r) => __mods['avent.js'].renderAvent(r), nav: 'avent' },
   { re: /^(recompenses|pubs|recompense)$/, page: (r) => __mods['recompenses.js'].renderRewards(r), nav: 'rewards' },
+  { re: /^shorts$/, page: (r) => __mods['shorts.js'].renderShorts(r), nav: '' },
   { re: /^@(.+)$/, page: (r, m) => __mods['extras.js'].renderPlayer(r, decodeURIComponent(m[1])), nav: 'top' },
 ];
 

@@ -55,7 +55,8 @@
   ],
   "git": {
     "deploymentEnabled": {
-      "data": false
+      "data": false,
+      "shorts": false
     }
   }
 }

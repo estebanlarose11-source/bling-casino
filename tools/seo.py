@@ -184,7 +184,7 @@ def page(path, title, desc, body, jsonld, image=f'{SITE}/assets/og.jpg'):
 <body><div class="w">
 <header><a class="logo" href="/">SPINBET<em>CASINO</em></a><a class="btn" href="/">Jouer gratuitement</a></header>
 {body}
-<footer>SpinBet Casino · jeux de casino gratuits en argent fictif (KE) : aucun dépôt, aucun vrai pari, aucun gain réel. Réservé aux 18 ans et plus. <a href="/#responsable">Jeu responsable</a> · <a href="/jeux/">Tous les jeux</a></footer>
+<footer>SpinBet Casino · jeux de casino gratuits en argent fictif (KE) : aucun dépôt, aucun vrai pari, aucun gain réel. Réservé aux 18 ans et plus. <a href="/#responsable">Jeu responsable</a> · <a href="/jeux/">Tous les jeux</a> · <a href="/confidentialite.html">Confidentialité</a></footer>
 </div></body>
 </html>
 """
