@@ -88,9 +88,11 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   s'arrête au-dessus des boutons). Quitter en plein vol paie quand même un vol qui allait se poser. **Super turbo** (« Bonus & menu », `opts` →
   `optOn` / `onOpt`, localStorage `spinbet_pilote_super`) : vol ≈ 3 fois plus rapide que normal (Turbo : 1,7), presque
   sans ralenti ; ne change pas les gains. Simulation
-  `node tools/sim/pilote.js` (lit le moteur, 20 M vols) : retour ≈ 95,1 % (dont ≈ 9,7 points par le bonus), posé
-  32 %, bonus 1 vol sur 114, ≥ ×10 un vol sur 94, ≥ ×100 un sur 1 540, ×1 000 un sur 23 000, 7 objets en médiane
-  (9 vols sur 10 ≤ 21).
+  `node tools/sim/pilote.js` (lit le moteur, 20 M vols) : **retour ≈ 97 %** (voulu par le propriétaire : « un jeu qui
+  gagne un peu plus que tous les autres », au-dessus des 94–96 % des autres jeux rapides), dont ≈ 8,5 points par le
+  bonus ; environ moitié moins de bombes qu'avant (3,5 par vol, `DOWN` = 5, plus de trous d'air), posé 32 %, bonus
+  1 vol sur 126, ≥ ×10 un vol sur 73, ≥ ×100 un sur 1 520, ×1 000 un sur 63 000, 5 objets en médiane (9 vols sur
+  10 ≤ 12).
 - **Fluidité sur ordinateur** (fin de la couche `finition`) : le fond de nuit est sur sa propre couche fixe (`body::after`),
   jamais `background: … fixed` sur `body` (repeint toute la page à chaque défilement : 4 → 60 images/s mesuré) ; pas de
   `backdrop-filter` (flou en direct) sur la barre du haut, les menus, la barre du bas et les messages. Ne pas les remettre.
@@ -425,7 +427,8 @@ Textes en français, pour les joueurs : pas de mots techniques (WebGL, PixiJS, R
 
 ## Gains
 
-Les RTP visés : machines à sous ≈ 92 %, achats de bonus ≈ 88 %, jeux de table et jeux rapides 94–96 %.
+Les RTP visés : machines à sous ≈ 92 %, achats de bonus ≈ 88 %, jeux de table et jeux rapides 94–96 %. Exception voulue par le
+propriétaire : Le Pilote ≈ 97 % (le jeu qui rend le plus).
 Toute modification qui touche aux gains doit être vérifiée par simulation avant d'être poussée.
 
 ## Monnaie

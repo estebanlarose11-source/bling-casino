@@ -7,24 +7,24 @@ __mods['games/impl/pilote.js'] = (() => {
 // trous d'air (chute d'un coup) et, rarement, le BONUS : tous les porte-avions ×10 jusqu'à la fin du vol. Sans
 // altitude (ou sans carburant, 30 objets au plus), il se pose là où il est : la mer (perdu) ou un porte-avions ×1, ×2,
 // ×5 (doré) qui multiplie le gain. Le vol entier est tiré au décollage (flight), puis animé sur une trajectoire lisse.
-// Simulation : node tools/sim/pilote.js (chiffres dans CLAUDE.md, retour ≈ 95 %).
+// Simulation : node tools/sim/pilote.js (chiffres dans CLAUDE.md, retour ≈ 97 %, voulu par le propriétaire : le jeu qui rend le plus).
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
 
 /* ===ENGINE */
-const A0 = 15, AMAX = 30, UP = 5, DOWN = 4, BOOST = 12, POCKET = 9, MAXN = 30, FLOOR = 1, CAP = 1000, BONUS_X = 10;
+const A0 = 15, AMAX = 30, UP = 5, DOWN = 5, BOOST = 12, POCKET = 9, MAXN = 30, FLOOR = 1, CAP = 1000, BONUS_X = 10;
 // mul ×v · add +v × la mise (l'avion monte de UP) · div ÷v (bombe, descend de DOWN, jamais sous ×FLOOR)
 // boost : monte de BOOST · pocket (trou d'air) : descend de POCKET · bonus : monte de UP, porte-avions ×BONUS_X
 const ITEMS = [
-  { k: 'mul', v: 2, w: 8 }, { k: 'mul', v: 3, w: 2.4 }, { k: 'mul', v: 5, w: 0.8 }, { k: 'mul', v: 10, w: 0.2 },
+  { k: 'mul', v: 2, w: 3.2 }, { k: 'mul', v: 3, w: 0.96 }, { k: 'mul', v: 5, w: 0.32 }, { k: 'mul', v: 10, w: 0.08 },
   { k: 'add', v: 5, w: 2 }, { k: 'add', v: 20, w: 0.5 }, { k: 'add', v: 100, w: 0.05 },
-  { k: 'div', v: 2, w: 30 }, { k: 'div', v: 3, w: 9 }, { k: 'div', v: 5, w: 3 }, { k: 'div', v: 10, w: 1 },
-  { k: 'boost', v: BOOST, w: 4 }, { k: 'pocket', v: POCKET, w: 5 }, { k: 'bonus', v: BONUS_X, w: 0.06 },
+  { k: 'div', v: 2, w: 18 }, { k: 'div', v: 3, w: 5.4 }, { k: 'div', v: 5, w: 1.8 }, { k: 'div', v: 10, w: 0.6 }, // about half the bombs of before (owner's request)
+  { k: 'boost', v: BOOST, w: 4 }, { k: 'pocket', v: POCKET, w: 9 }, { k: 'bonus', v: BONUS_X, w: 0.06 },
 ];
 // where the plane comes down: the sea, or a carrier that multiplies the gain
-const SHIPS = [{ m: 0, w: 169 }, { m: 1, w: 50 }, { m: 2, w: 25 }, { m: 5, w: 6 }];
+const SHIPS = [{ m: 0, w: 176 }, { m: 1, w: 50 }, { m: 2, w: 25 }, { m: 5, w: 6 }];
 const sum = (a) => a.reduce((x, y) => x + y.w, 0), ITEMS_W = sum(ITEMS), SHIPS_W = sum(SHIPS);
 function pick(list, tot) { let r = Math.random() * tot; for (const it of list) { if (r < it.w) return it; r -= it.w; } return list[0]; }
 function flight() {
@@ -181,13 +181,13 @@ class PiloteGame extends BaseGame {
     this.path = spline(pts); this.xl = xl; this.xn = xn;
     // near misses, only for the show (the flight is already drawn): a bomb, a cloud or a multiplier just above or
     // below the path, between two items — no label, the plane just swerves
-    const dz = [['div', 2, 4], ['div', 3, 3], ['div', 5, 2], ['div', 10, 1.6], ['mul', 2, 2], ['mul', 3, 1.6], ['mul', 5, 1.5], ['mul', 10, 1.4], ['add', 100, 1], ['pocket', POCKET, 1.2], ['boost', BOOST, 1], ['bonus', BONUS_X, 0.25]];
+    const dz = [['div', 2, 2], ['div', 3, 1.5], ['div', 5, 1], ['div', 10, 0.8], ['mul', 2, 2], ['mul', 3, 1.6], ['mul', 5, 1.5], ['mul', 10, 1.4], ['add', 100, 1], ['pocket', POCKET, 1.2], ['boost', BOOST, 1], ['bonus', BONUS_X, 0.25]];
     const dzW = dz.reduce((a, d) => a + d[2], 0);
     this.decoys = [];
     for (let i = 1; i < n; i++) {
       if (hump(i - 1)) { // up there: bombs all around the plane, it weaves between them
-        for (let j = 0; j < 5; j++) {
-          const x = xs[i - 1] + S * (0.7 + j * 0.5 + Math.random() * 0.2), y0 = this.path(x)[0] - 9 * s, off = (60 + Math.random() * 70) * s * (j % 2 ? 1 : -1);
+        for (let j = 0; j < 3; j++) {
+          const x = xs[i - 1] + S * (0.8 + j * 0.8 + Math.random() * 0.2), y0 = this.path(x)[0] - 9 * s, off = (60 + Math.random() * 70) * s * (j % 2 ? 1 : -1);
           const d = [['div', 2], ['div', 3], ['div', 5], ['div', 10]][Math.floor(Math.random() * 4)];
           this.decoys.push({ x, y: y0 + off, it: { k: d[0], v: d[1] }, t: Math.random() * 6, passed: false, fade: 1, below: off > 0, wob: 0, sc: 2.2 });
         }
@@ -622,7 +622,7 @@ class PiloteGame extends BaseGame {
       <p>En haut à gauche : ton gain en vol, l’altitude, la vitesse et la distance parcourue. Gain maximum : ×${num(CAP)} la mise.</p>
       <h4>Chances</h4><p>${ITEMS.map((it) => `${name(it)} : ${pct(it.w, ITEMS_W)}`).join(' · ')}</p>
       <p>Arrivée : ${SHIPS.map((sh) => `${sh.m ? `porte-avions ×${sh.m}` : 'mer'} ${pct(sh.w, SHIPS_W)}`).join(' · ')}</p>
-      <h4>Équité</h4><p>Chaque vol est tiré au hasard au décollage ; les objets que l’avion frôle sans les toucher ne changent rien. Sur des millions de vols simulés, le retour au joueur est d’environ 95 %.</p>`);
+      <h4>Équité</h4><p>Chaque vol est tiré au hasard au décollage ; les objets que l’avion frôle sans les toucher ne changent rien. Sur des millions de vols simulés, le retour au joueur est d’environ 97 % : le plus généreux du casino.</p>`);
   }
 }
 
