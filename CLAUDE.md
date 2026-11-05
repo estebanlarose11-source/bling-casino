@@ -83,7 +83,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   haut à gauche (`.pi-hud`) : gain en vol, altitude en mètres (rouge et alarme quand la prochaine bombe serait
   fatale), vitesse, distance ; jauge de carburant. Sur ordinateur le jeu prend toute la largeur et la hauteur libre ;
   en plein écran le ciel couvre tout l'écran et les boutons de mise flottent par-dessus (sur téléphone le ciel
-  s'arrête au-dessus des boutons). Quitter en plein vol paie quand même un vol qui allait se poser. Simulation
+  s'arrête au-dessus des boutons). Quitter en plein vol paie quand même un vol qui allait se poser. **Super turbo** (« Bonus & menu », `opts` →
+  `optOn` / `onOpt`, localStorage `spinbet_pilote_super`) : vol ≈ 3 fois plus rapide que normal (Turbo : 1,7), presque
+  sans ralenti ; ne change pas les gains. Simulation
   `node tools/sim/pilote.js` (lit le moteur, 20 M vols) : retour ≈ 95,1 % (dont ≈ 9,7 points par le bonus), posé
   32 %, bonus 1 vol sur 114, ≥ ×10 un vol sur 94, ≥ ×100 un sur 1 540, ×1 000 un sur 23 000, 7 objets en médiane
   (9 vols sur 10 ≤ 21).
