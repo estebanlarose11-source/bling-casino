@@ -71,7 +71,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10
-  (descend de `DOWN`, le gain ne tombe jamais sous ×1), **boost** (grand bond, `BOOST`), **trou d'air** (chute d'un
+  (descend de `DOWN`, le gain ne tombe jamais sous ×1), **boost** (grand bond, `BOOST` ; à l'écran, voulu par le propriétaire : l'avion file tout là-haut sur un long arc
+  `HUMP`, la caméra dézoome (`zoom`, jusqu'à ×0,28) : porte-avions minuscules, bombes géantes à esquiver tout autour,
+  pour le spectacle seulement), **trou d'air** (chute d'un
   coup, `POCKET`) et le **BONUS** (rare) : tous les porte-avions ×10 jusqu'à l'atterrissage (`BONUS_X`, bandeau doré,
   ciel doré, porte-avions ×10 / ×20 / ×50, musique emballée par `sb:feature` avec `quiet: true` = sans le médaillon 3D
   qui cacherait l'avion). Altitude 0 ou 30 objets (réservoir vide) : il se pose là où il est, tiré dans `SHIPS` : la

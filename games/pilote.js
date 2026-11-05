@@ -108,7 +108,7 @@ class PiloteGame extends BaseGame {
     this.inst = { box: this.q('.pi-inst'), alt: this.q('.pi-altv'), spd: this.q('.pi-spd'), dst: this.q('.pi-dst'), last: {} };
     this.state = 'idle'; this.hist = []; this.parts = []; this.texts = []; this.shakeT = 0;
     this.ships = []; this.items = []; this.decoys = []; this.lines = [];
-    this.jy = 0; this.jv = 0; this.ja = 0; this.spd = 0; this.turbT = 0; this.alarmT = 0; this.clock = 0;
+    this.jy = 0; this.jv = 0; this.ja = 0; this.spd = 0; this.turbT = 0; this.zoom = 1; this.alarmT = 0; this.clock = 0;
     this.clouds = Array.from({ length: 16 }, (_, i) => ({ x: i * 240 + Math.random() * 200, y: 0.08 + Math.random() * 0.42, s: 0.6 + Math.random() * 0.9, p: 0.25 + Math.random() * 0.45 }));
     this.near = Array.from({ length: 4 }, (_, i) => ({ x: i * 700 + Math.random() * 400, y: 0.15 + Math.random() * 0.5, s: 1.4 + Math.random() * 0.8 })); // clouds in front of the plane
     this.onResize = () => this.resize();
@@ -153,7 +153,7 @@ class PiloteGame extends BaseGame {
   idle() {
     this.x0 = -Math.min(this.CL * 0.85, this.vx0 * 0.6);
     this.plane = { x: this.x0, y: this.deckY, ang: 0, on: false };
-    this.camX = this.plane.x - this.W * 0.3;
+    this.camX = this.plane.x - this.W * 0.3; this.zoom = 1;
     this.items = []; this.decoys = []; this.ships = [{ x: -this.CL, m: 0 }]; this.path = null;
     this.draw();
   }
@@ -162,15 +162,20 @@ class PiloteGame extends BaseGame {
   // right away, an air pocket drops it at once, a boost throws it up. Then the sea gets its carriers.
   plan(f) {
     const S = this.SP, s = this.s, pts = [{ x: -S, y: this.deckY }, { x: 0, y: this.deckY }];
+    // a boost (not the last item) throws the plane way up into the sky: a long arc, the camera zooms out (owner's request)
+    const HUMP = 3.4, n = f.steps.length, hump = (i) => f.steps[i].it.k === 'boost' && i < n - 1;
+    const xs = []; f.steps.forEach((st, i) => xs.push((i ? xs[i - 1] : 0) + (i && hump(i - 1) ? S * HUMP : S)));
+    const peak = this.topY - this.H * 1.2;
     this.items = f.steps.map((st, i) => {
-      const x = S * (i + 1), yb = this.yOf(st.A), ya = this.yOf(st.after), k = st.it.k;
+      const x = xs[i], yb = this.yOf(st.A), ya = this.yOf(st.after), k = st.it.k;
       pts.push({ x, y: yb });
       if (k === 'div') pts.push({ x: x + S * 0.3, y: yb + (ya - yb) * 0.8 });
       else if (k === 'pocket') pts.push({ x: x + S * 0.2, y: yb + (ya - yb) * 0.95 });
+      else if (hump(i)) pts.push({ x: x + S * 0.9, y: (this.topY + peak) / 2 }, { x: x + S * 1.7, y: peak }, { x: x + S * 2.5, y: (this.topY + peak) / 2 });
       else if (k === 'boost') pts.push({ x: x + S * 0.32, y: yb + (ya - yb) * 0.9 });
       return { x, y: yb - 9 * s, it: st.it, hit: false, t: Math.random() * 6 };
     });
-    const n = f.steps.length, xn = S * n, xl = xn + S * (f.fuel ? 2.4 : 1.7); // touchdown point
+    const xn = xs[n - 1], xl = xn + S * (f.fuel ? 2.4 : 1.7); // touchdown point
     pts.push({ x: xn + S * (f.fuel ? 1.3 : 0.75), y: Math.max(this.yOf(f.steps[n - 1].after), this.lo) + (f.fuel ? 0 : 10 * s) });
     pts.push({ x: xl, y: f.ok ? this.deckY : this.seaY + 16 * s });
     this.path = spline(pts); this.xl = xl; this.xn = xn;
@@ -180,8 +185,16 @@ class PiloteGame extends BaseGame {
     const dzW = dz.reduce((a, d) => a + d[2], 0);
     this.decoys = [];
     for (let i = 1; i < n; i++) {
+      if (hump(i - 1)) { // up there: bombs all around the plane, it weaves between them
+        for (let j = 0; j < 5; j++) {
+          const x = xs[i - 1] + S * (0.7 + j * 0.5 + Math.random() * 0.2), y0 = this.path(x)[0] - 9 * s, off = (60 + Math.random() * 70) * s * (j % 2 ? 1 : -1);
+          const d = [['div', 2], ['div', 3], ['div', 5], ['div', 10]][Math.floor(Math.random() * 4)];
+          this.decoys.push({ x, y: y0 + off, it: { k: d[0], v: d[1] }, t: Math.random() * 6, passed: false, fade: 1, below: off > 0, wob: 0, sc: 2.2 });
+        }
+        continue;
+      }
       if (Math.random() > 0.65) continue;
-      const x = S * (i + 0.45 + Math.random() * 0.3), y0 = this.path(x)[0] - 9 * s;
+      const x = xs[i - 1] + (xs[i] - xs[i - 1]) * (0.45 + Math.random() * 0.3), y0 = this.path(x)[0] - 9 * s;
       let off = (30 + Math.random() * 22) * s * (Math.random() < 0.5 ? -1 : 1), y = y0 + off;
       if (y < this.topY - 20 * s || y > this.lo + 10 * s) { off = -off; y = y0 + off; }
       let r = Math.random() * dzW, d = dz[0]; for (const z of dz) { if (r < z[2]) { d = z; break; } r -= z[2]; }
@@ -280,7 +293,10 @@ class PiloteGame extends BaseGame {
     }
     if (this.phase === 'air' && Math.random() < dt * (this.boostT > 0 ? 70 : 30)) this.parts.push({ x: p.x - 30 * s, y: p.y - 7 * s + this.jy, vx: -20, vy: 0, life: 0.6, max: 0.6, c: this.boostT > 0 ? 'rgba(125,211,252,.7)' : 'rgba(255,255,255,.55)', r: 3 + Math.random() * 3 });
     const lead = this.phase === 'brake' || this.k >= this.items.length || this.boostT > 0 ? 0.42 : 0.3;
-    this.camX += (p.x - this.W * lead - this.camX) * Math.min(1, dt * 4);
+    // high in the sky the camera zooms out: the carriers far below become tiny
+    const zt = Math.max(0.28, Math.min(1, (this.seaY - this.topY * 0.9) / Math.max(1, this.seaY - p.y + 110 * s)));
+    this.zoom += (zt - this.zoom) * Math.min(1, dt * (zt < this.zoom ? 7 : 3)); // zooms out fast, comes back gently
+    this.camX += (p.x - (this.W * lead) / this.zoom - this.camX) * Math.min(1, dt * 4);
     this.instruments(shown);
   }
 
@@ -307,7 +323,7 @@ class PiloteGame extends BaseGame {
       this.burst(item.x, item.y, ['#7dd3fc', '#e0f2fe', '#fff'], 40);
       this.text(item.x, item.y - 30 * s, 'BOOST', '#7dd3fc', 34);
       sfx.spin(); sfx.upgrade();
-      this.say('🚀 BOOST ! L’avion fait un bond vers le ciel');
+      this.say(i < f.steps.length - 1 ? '🚀 BOOST ! L’avion file tout là-haut… attention aux bombes !' : '🚀 BOOST ! L’avion fait un bond vers le ciel');
     } else if (it.k === 'bonus') {
       this.burst(item.x, item.y, ['#fde047', '#f59e0b', '#fff', '#f0abfc'], 90); this.shakeT = 0.5; this.jv -= 300 * s;
       if (!this.bonusOn) {
@@ -460,11 +476,12 @@ class PiloteGame extends BaseGame {
     g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 2;
     for (const l of this.lines) { g.globalAlpha = Math.min(1, l.life * 2); g.beginPath(); g.moveTo(l.x, l.y); g.lineTo(l.x + l.l, l.y); g.stroke(); }
     g.globalAlpha = 1;
-    g.save(); g.translate(-this.camX + shake, shake * 0.5);
-    const L = this.camX - 20, R = this.camX + W + 20;
+    const z = this.zoom || 1;
+    g.save(); g.translate(shake, this.seaY + shake * 0.5); g.scale(z, z); g.translate(-this.camX, -this.seaY);
+    const L = this.camX - 20 / z, R = this.camX + (W + 20) / z;
     const sea = g.createLinearGradient(0, this.seaY, 0, H);
     sea.addColorStop(0, '#1e6fb8'); sea.addColorStop(1, '#062a4f');
-    g.fillStyle = sea; g.fillRect(L, this.seaY, R - L, H - this.seaY + 10);
+    g.fillStyle = sea; g.fillRect(L, this.seaY, R - L, (H - this.seaY) / z + 10);
     g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 1.5;
     for (let row = 0; row < 4; row++) {
       const y = this.seaY + 6 + row * (H - this.seaY) / 4.5, x0 = Math.floor(L / 24) * 24;
@@ -525,6 +542,7 @@ class PiloteGame extends BaseGame {
     const { s } = this, k = it.it.k, r = 19 * s, big = isBig(it.it), lab = label(it.it), wob = it.wob ? Math.sin(now * 40) * it.wob * 4 * s : 0;
     const y = it.y + Math.sin(now * 2.2 + it.t) * 4 * s;
     g.save(); g.translate(it.x + wob, y);
+    if (it.sc) g.scale(it.sc, it.sc);
     if (big && k !== 'bonus') g.scale(1.3, 1.3);
     if (k === 'div') {
       if (big) { g.shadowColor = '#ef4444'; g.shadowBlur = 22 * s; }
@@ -577,7 +595,7 @@ class PiloteGame extends BaseGame {
     // turbulence: a light constant shiver, strong in an air pocket
     const amp = (this.state === 'fly' && this.phase === 'air' ? 1.3 : 0) + this.turbT * 7;
     const tb = amp * s * (Math.sin(t * 7.3) + Math.sin(t * 11.7 + 1.3) * 0.6 + Math.sin(t * 3.1 + 2) * 0.8) / 2.4;
-    g.save(); g.translate(p.x, p.y - 9 * s + this.jy + tb); g.rotate(p.ang + this.ja + tb * 0.004); g.scale(s, s);
+    g.save(); g.translate(p.x, p.y - 9 * s + this.jy + tb); g.rotate(p.ang + this.ja + tb * 0.004); g.scale(s / (this.zoom || 1) ** 0.6, s / (this.zoom || 1) ** 0.6);
     if (p.on) {
       const boost = this.boostT > 0, fl = boost ? 34 : 12;
       g.fillStyle = boost ? `rgba(125,211,252,${0.7 + Math.random() * 0.3})` : `rgba(253,186,116,${0.6 + Math.random() * 0.4})`;
