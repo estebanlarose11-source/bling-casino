@@ -63,6 +63,8 @@ function message(p) {
   if (process.env.PUSH_BODY) {
     return { key: null, title: process.env.PUSH_TITLE || 'SpinBet Casino', body: process.env.PUSH_BODY, url: process.env.PUSH_URL || SITE, tag: 'annonce' };
   }
+  // du 1er au 24 décembre, la notification de 13 h 35 annonce la case du calendrier de l'Avent (avent.js)
+  if (p.h === 13 && p.mi >= 30 && p.m === 12 && p.d <= 24) return { key: 'roue', title: `🎄 Case n° ${p.d} du calendrier de l’Avent`, body: p.d === 24 ? 'La dernière case : le plus gros cadeau t’attend ! Et ta roue du jour est prête.' : 'Ton cadeau du jour t’attend, et ta roue du jour est prête. Ne rate aucune case !', url: SITE + '#avent', tag: 'roue', ttl: 6 * 3600 };
   if (p.h === 13 && p.mi >= 30) return { key: 'roue', title: '🎡 Ta roue du jour est prête', body: 'Un tour gratuit : des KE, de l’XP ou un bonus. Ton bonus du jour t’attend aussi !', url: SITE + '#roue', tag: 'roue', ttl: 6 * 3600 };
   if (p.h === 20 && p.mi >= 30) {
     const g = eveningGame(p);

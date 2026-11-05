@@ -5818,6 +5818,144 @@ html.light .dh-d { background: #fff; border-color: #e3e8ef; }
 .ct-msg.win { max-width: 94%; background: linear-gradient(135deg, rgba(251, 191, 36, .22), rgba(234, 88, 12, .14)); border: 1px solid rgba(251, 191, 36, .45); }
 .ct-win { display: flex; flex-direction: column; gap: 1px; } .ct-win b { font: 900 15px 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; color: #fbbf24; }
 .ct-win span { font-family: KeCoin, Inter, sans-serif; } .ct-win a { color: #fde68a; font-weight: 800; }
+
+/* pied de page : liens réels vers les fiches des jeux et les guides (pour Google, fabriqué par tools/seo.py) */
+.seo-foot { margin: 0 0 16px; font-size: 12.5px; line-height: 1.5; color: var(--muted); }
+.seo-foot > p { margin: 0 0 12px; max-width: 900px; }
+.seo-cols { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px 22px; }
+.seo-cols > div { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.seo-cols b { color: var(--text); font-size: 12.5px; margin-bottom: 2px; }
+.foot .seo-cols a { color: var(--muted); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.foot .seo-cols a:hover { color: var(--text); text-decoration: underline; }
+
+/* écran d'ouverture des jeux (pages/game.js, showIntro) et écran de chargement à l'affiche du jeu */
+.gi-back { z-index: 420; background: #03050a; overflow: hidden; backdrop-filter: none; transition: opacity .26s; }
+.gi-back.out { opacity: 0; }
+.gi-bg { position: absolute; inset: -30px; opacity: .55; filter: blur(14px) saturate(1.2); transform: scale(1.06); animation: giDrift 18s ease-in-out infinite alternate; }
+.gi-bg svg { width: 100%; height: 100%; display: block; }
+.gi-back::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, transparent 0%, rgba(3, 5, 10, .55) 55%, rgba(3, 5, 10, .92) 100%); pointer-events: none; }
+@keyframes giDrift { to { transform: scale(1.14) translate(-12px, -8px); } }
+.gi-card { position: relative; z-index: 1; width: min(860px, 100%); display: grid; grid-template-columns: minmax(0, 300px) 1fr; gap: 26px; align-items: center; padding: 26px;
+  border-radius: 20px; background: linear-gradient(160deg, color-mix(in srgb, var(--ga) 22%, rgba(12, 16, 26, .92)), rgba(8, 11, 18, .94)); border: 1px solid color-mix(in srgb, var(--ga) 55%, transparent);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6), 0 0 60px color-mix(in srgb, var(--ga) 28%, transparent); animation: giIn .45s cubic-bezier(.2, 1.3, .4, 1); }
+@keyframes giIn { from { transform: translateY(24px) scale(.96); opacity: 0; } }
+.gi-art { border-radius: 16px; overflow: hidden; box-shadow: 0 16px 40px rgba(0, 0, 0, .55); animation: giFloat 4s ease-in-out infinite; }
+.gi-art svg { display: block; width: 100%; height: auto; }
+@keyframes giFloat { 50% { transform: translateY(-6px); } }
+.gi-main { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.gi-eye { font-size: 11.5px; font-weight: 800; letter-spacing: 1.4px; text-transform: uppercase; color: color-mix(in srgb, var(--ga) 60%, #fff); }
+.gi-main h2 { margin: 0; font: 900 clamp(34px, 5vw, 52px)/.95 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; color: #fff; text-shadow: 0 4px 24px color-mix(in srgb, var(--ga) 60%, transparent); }
+.gi-sub { margin: 0; color: #cbd5e1; font-weight: 600; }
+.gi-desc { margin: 0; color: var(--muted); font-size: 14px; }
+.gi-feats { margin: 2px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.gi-feats li { position: relative; padding: 7px 10px 7px 30px; border-radius: 10px; background: rgba(255, 255, 255, .05); font-size: 14px; line-height: 1.35; }
+.gi-feats li::before { content: '✦'; position: absolute; left: 10px; top: 7px; color: color-mix(in srgb, var(--ga) 70%, #fde68a); }
+.gi-stats { display: flex; flex-wrap: wrap; gap: 8px; }
+.gi-stats span { display: flex; flex-direction: column; padding: 6px 10px; border-radius: 10px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(255, 255, 255, .08); }
+.gi-stats small { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; } .gi-stats b { font-size: 14px; }
+.gi-acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.gi-play { min-width: 190px; font-size: 18px; letter-spacing: .5px; }
+.gi-back.ready .gi-play { animation: giPulse 1.6s ease-in-out infinite; }
+@keyframes giPulse { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--ga) 30%, transparent), 0 0 34px color-mix(in srgb, var(--ga) 55%, transparent); } }
+.gi-bar, .gl-bar { display: block; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.gi-bar > i, .gl-bar > i { display: block; height: 100%; width: 40%; border-radius: 4px; background: linear-gradient(90deg, transparent, var(--ga, #7cc8ff), transparent); animation: giLoad 1.1s ease-in-out infinite; }
+.gi-back.ready .gi-bar > i { width: 100%; animation: none; background: var(--ga); }
+@keyframes giLoad { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.gi-x { position: absolute; top: 10px; right: 12px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .08); color: #fff; font-size: 16px; cursor: pointer; }
+@media (max-width: 700px) {
+  .gi-back { padding: 10px; align-content: center; }
+  .gi-card { grid-template-columns: 1fr; gap: 10px; padding: 16px 14px 0; max-height: calc(100dvh - 20px); overflow-y: auto; }
+  .gi-art { width: min(118px, 34vw); justify-self: center; border-radius: 12px; }
+  .gi-main { text-align: center; gap: 8px; } .gi-main h2 { font-size: 34px; } .gi-sub { font-size: 14px; }
+  .gi-feats li { text-align: left; font-size: 13px; padding: 6px 8px 6px 26px; } .gi-feats li::before { left: 8px; top: 6px; }
+  .gi-stats { flex-wrap: nowrap; justify-content: center; gap: 6px; } .gi-stats span { flex: 1 1 0; min-width: 0; padding: 5px 6px; }
+  .gi-stats small { font-size: 9px; letter-spacing: .3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .gi-stats b { font-size: 13px; }
+  .gi-acts { position: sticky; bottom: 0; margin: 0 -14px; padding: 10px 14px 14px; justify-content: center; flex-wrap: nowrap;
+    background: linear-gradient(180deg, transparent, rgba(8, 11, 18, .96) 30%); }
+  .gi-play { flex: 1 1 auto; min-width: 0; } .gi-full { flex: none; }
+  .gi-bar { display: none; }
+}
+.game-loading.gl-brand { gap: 12px; color: var(--text); }
+.gl-brand .gl-art { width: 140px; border-radius: 14px; overflow: hidden; box-shadow: 0 0 40px color-mix(in srgb, var(--ga) 40%, transparent); animation: giFloat 2.4s ease-in-out infinite; }
+.gl-brand .gl-art svg { display: block; width: 100%; height: auto; }
+.gl-brand b { font: 900 30px 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; }
+.gl-brand .gl-bar { width: 180px; } .gl-brand small { color: var(--muted); font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .gi-bg, .gi-art, .gl-brand .gl-art, .gi-back.ready .gi-play { animation: none; } }
+
+/* neige de l'hiver (ambiance.js) : petits flocons animés par transform seulement, au-dessus du fond, sous tout le reste */
+.snowfall { position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.snowfall i { position: absolute; top: -10px; border-radius: 50%; background: radial-gradient(circle, #fff 0%, rgba(255, 255, 255, .7) 45%, transparent 70%); animation: snowFall linear infinite; will-change: transform; }
+@keyframes snowFall { from { transform: translate3d(0, -12px, 0); } to { transform: translate3d(var(--dx, 0), 105vh, 0); } }
+html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(148, 163, 184, .6) 45%, transparent 70%); }
+.side-more [data-lounge] em { font-style: normal; }
+
+/* calendrier de l'Avent (avent.js) */
+.ev-card.ev-avent { --ac: #22c55e; } .ev-card.ev-avent small { color: #86efac; } .ev-card.ev-avent.ev-live small { color: #fca5a5; }
+.av-page { display: grid; gap: 16px; }
+.av-hero { position: relative; display: flex; align-items: center; gap: 18px; padding: 22px; border-radius: 18px; overflow: hidden;
+  background: radial-gradient(circle at 15% 20%, rgba(250, 204, 21, .22), transparent 40%), linear-gradient(135deg, #7f1d1d, #14532d); border: 1px solid rgba(250, 204, 21, .35); }
+.av-hero h1 { margin: 2px 0 6px; font: 900 clamp(32px, 5vw, 48px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; color: #fff; }
+.av-hero small { font-size: 11.5px; font-weight: 800; letter-spacing: 1.4px; color: #fde68a; }
+.av-hero > div:nth-child(2) { flex: 1; min-width: 0; }
+.av-tree { font-size: clamp(54px, 9vw, 84px); filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .4)); }
+.av-lead { margin: 0; color: #f1f5f9; font-size: 15px; line-height: 1.45; }
+.av-prog { display: flex; flex-direction: column; align-items: center; padding: 10px 14px; border-radius: 14px; background: rgba(0, 0, 0, .28); }
+.av-prog b { font: 900 34px/1 'Bebas Neue', Impact, sans-serif; color: #fde68a; } .av-prog small { letter-spacing: 0; color: #e2e8f0; font-weight: 600; }
+.av-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; perspective: 900px; }
+.av-door { position: relative; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 6px; border-radius: 14px; cursor: pointer; color: #fff;
+  background: linear-gradient(145deg, hsl(var(--h) 62% 36%), hsl(var(--h) 58% 20%)); border: 2px dashed rgba(255, 255, 255, .28);
+  box-shadow: inset 0 0 0 3px rgba(0, 0, 0, .15), 0 6px 16px rgba(0, 0, 0, .35); transition: transform .2s; transform-style: preserve-3d; }
+.av-door:hover { transform: translateY(-2px); }
+.av-num { font: 900 clamp(30px, 4.6vw, 46px)/1 'Bebas Neue', Impact, sans-serif; color: #fde68a; text-shadow: 0 2px 0 rgba(0, 0, 0, .35); }
+.av-door small { font-size: 11px; font-weight: 700; text-align: center; line-height: 1.2; color: rgba(255, 255, 255, .85); }
+.av-door.s-locked { opacity: .62; cursor: default; }
+.av-door.s-today { border-style: solid; border-color: #fde68a; animation: avGlow 1.5s ease-in-out infinite; }
+.av-door.s-today .av-call { color: #fde68a; font-weight: 900; }
+@keyframes avGlow { 50% { box-shadow: 0 0 0 4px rgba(253, 230, 138, .35), 0 0 34px rgba(253, 230, 138, .55); transform: scale(1.04); } }
+.av-door.s-missed { filter: saturate(.55); } .av-door.s-missed .av-ad { color: #fde68a; }
+.av-door.s-open { background: linear-gradient(145deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .03)); border-style: solid; border-color: hsl(var(--h) 60% 45%); }
+.av-door.s-open .av-num { font-size: 18px; position: absolute; top: 6px; left: 8px; } .av-ico { font-size: clamp(24px, 3.6vw, 34px); }
+.av-door.big .av-num { color: #fff; } .av-door.big { background: linear-gradient(145deg, #b45309, #7c2d12); }
+.av-door.flip { animation: avFlip .5s ease-in forwards; }
+@keyframes avFlip { to { transform: rotateY(-100deg); opacity: .2; } }
+.av-rules p { margin: 0 0 8px; font-size: 14px; } .av-rules p:last-child { margin: 0; }
+.av-won { text-align: center; display: grid; gap: 8px; justify-items: center; }
+.av-won-num { font: 900 64px/1 'Bebas Neue', Impact, sans-serif; color: #fde68a; text-shadow: 0 0 24px rgba(253, 230, 138, .6); }
+.av-won small { font-weight: 800; letter-spacing: 1.4px; color: #86efac; } .av-won-ico { font-size: 52px; animation: mysPop .6s cubic-bezier(.3, 1.5, .5, 1); }
+.av-won h2 { margin: 0; font: 900 30px 'Bebas Neue', Impact, sans-serif; letter-spacing: .5px; font-family: KeCoin, 'Bebas Neue', Impact, sans-serif; }
+.av-won p { margin: 0; } .av-next { font-weight: 700; color: #fde68a; }
+.av-won-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+@media (max-width: 700px) {
+  .av-hero { display: block; padding: 16px 16px 14px; } .av-tree { position: absolute; right: 12px; top: 8px; font-size: 44px; }
+  .av-hero > div:nth-child(2) { padding-right: 44px; } .av-hero h1 { font-size: 34px; } .av-lead { font-size: 14px; }
+  .av-prog { flex-direction: row; gap: 6px; align-items: baseline; display: inline-flex; margin-top: 10px; padding: 6px 12px; } .av-prog b { font-size: 26px; }
+  .av-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; } .av-door small { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .av-door.s-today { animation: none; } }
+
+/* « Aujourd'hui sur SpinBet » et cadeau « Bon retour » (retour.js) */
+.ag-card { grid-column: 1 / -1; padding: 12px 14px; border-radius: 14px; background: linear-gradient(160deg, rgba(124, 200, 255, .1), rgba(255, 255, 255, .02)); border: 1px solid rgba(124, 200, 255, .25); }
+.ag-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; } .ag-head b { font: 900 19px 'Bebas Neue', Impact, sans-serif; letter-spacing: .6px; }
+.ag-head small { color: var(--muted); font-size: 11.5px; } .ag-bell { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--text); text-decoration: none; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, .07); }
+.ag-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.ag-list a { display: grid; grid-template-columns: 112px 22px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: 13.5px; cursor: pointer; }
+.ag-list a:hover { background: rgba(255, 255, 255, .05); }
+.ag-list time { color: var(--muted); font-weight: 700; font-size: 12.5px; white-space: nowrap; } .ag-list i { font-style: normal; text-align: center; }
+.ag-list span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: KeCoin, Inter, sans-serif; }
+.ag-list em { font-style: normal; font-size: 11.5px; color: var(--muted); white-space: nowrap; } .ag-list em.on { color: #4ade80; font-weight: 800; }
+.ag-list li.live a { background: rgba(74, 222, 128, .08); }
+@media (max-width: 700px) {
+  .ag-list a { grid-template-columns: 22px minmax(0, 1fr) auto; grid-template-areas: 'i s e' 'i t t'; row-gap: 0; padding: 6px 4px; }
+  .ag-list i { grid-area: i; } .ag-list span { grid-area: s; } .ag-list em { grid-area: e; } .ag-list time { grid-area: t; font-size: 11.5px; font-weight: 600; }
+  .ag-head small, .ag-bell span { display: none; }
+}
+.bk-card { text-align: center; display: grid; gap: 8px; justify-items: center; } .bk-ico { font-size: 54px; animation: mysPop .6s cubic-bezier(.3, 1.5, .5, 1); }
+.bk-card h2 { margin: 0; font: 900 32px 'Bebas Neue', Impact, sans-serif; letter-spacing: .6px; } .bk-card p { margin: 0; }
+.bk-gift { display: flex; flex-direction: column; align-items: center; font: 900 42px/1 KeCoin, 'Bebas Neue', Impact, sans-serif; color: #fbbf24; text-shadow: 0 0 24px rgba(251, 191, 36, .5); }
+.bk-gift small { font: 700 14px Inter, sans-serif; color: #e2e8f0; margin-top: 6px; text-shadow: none; }
+.bk-card h4 { margin: 8px 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.bk-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; width: 100%; text-align: left; font-size: 14px; }
+.bk-list li { padding: 6px 10px; border-radius: 8px; background: rgba(255, 255, 255, .05); font-family: KeCoin, Inter, sans-serif; } .bk-list a { color: var(--text); text-decoration: none; }
 </style>
 </head>
 <body>
@@ -5871,6 +6009,7 @@ html.light .dh-d { background: #fff; border-color: #e3e8ef; }
       <a href="#battle" data-nav="battle"><span>⚔️</span>Battle Royale<b class="side-new">NEW</b></a>
       <a href="#paris" data-nav="paris"><span>⚽</span>Sport<b class="side-new">NEW</b></a>
       <a href="#loto" data-nav="loto"><span>🎱</span>Loto · 1,5 M<b class="side-new">NEW</b></a>
+      <a href="#avent" data-nav="avent" data-avent-nav hidden style="display:none"><span>🎄</span>Calendrier de l’Avent<b class="side-badge" data-avent-badge hidden style="display:none">1</b><b class="side-new">NEW</b></a>
     </nav>
     <div class="side-label">Récompenses</div>
     <nav class="side-nav">
@@ -5894,6 +6033,7 @@ html.light .dh-d { background: #fff; border-color: #e3e8ef; }
       <a href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><span>💬</span>Service client (Snap)</a>
       <a href="#" data-share-site><span><svg class="ico"><use href="#ui-share"/></svg></span>Partager le site</a>
       <a href="#appli" data-nav="app"><span><svg class="ico"><use href="#ui-app"/></svg></span>Télécharger l’appli</a>
+      <a href="#" data-lounge><span>🎵</span><em>Musique d’ambiance : non</em></a>
       <a href="#" data-vibe hidden><span>📳</span><em>Vibrations : oui</em></a>
       <a href="#" data-theme-toggle><span class="th-ico"><b class="th-sun">☀️</b><b class="th-moon">🌙</b></span><em class="th-sun">Mode clair</em><em class="th-moon">Mode sombre</em></a>
     </nav>
@@ -5915,6 +6055,7 @@ html.light .dh-d { background: #fff; border-color: #e3e8ef; }
   <main id="view" class="view"></main>
 
   <footer class="foot">
+    <!-- seo-links (fabriqué par tools/seo.py : ne pas modifier à la main) --><section class="seo-foot" aria-label="Tous les jeux de SpinBet Casino"><p><b>SpinBet Casino</b>, casino gratuit en ligne : 46 jeux de casino gratuits sans téléchargement ni dépôt, en argent fictif (KE). Machines à sous avec bonus et jackpots, roulettes, blackjack, poker Texas Hold’em, roues de la fortune, tables multijoueurs et jeux rapides (mines, crash, plinko), sur téléphone comme sur ordinateur. Aucun vrai pari, aucun gain réel.</p><div class="seo-cols"><div><b>Machines à sous gratuites</b><a href="jeux/big-bad-wolf.html">Le Loup</a><a href="jeux/cosmic.html">Le Cosmique</a><a href="jeux/zeus.html">L’Olympe</a><a href="jeux/huff.html">Le Loup 2.0</a><a href="jeux/candy.html">La Sweety</a><a href="jeux/anubis.html">L’Anubis</a><a href="jeux/bling.html">La Tour Bling</a><a href="jeux/pharaon.html">Le Totem</a><a href="jeux/chasse.html">The Hunt</a><a href="jeux/noel.html">La Tournée du Père Noël</a><a href="jeux/totemx.html">Le Totem Extrême</a><a href="jeux/barillet.html">La Roulette Russe</a><a href="jeux/taco.html">La Pizza Yo-Yo</a><a href="jeux/billets.html">Le Coffre-Fort</a><a href="jeux/dragons.html">L’Hydre</a><a href="jeux/labo.html">Le Labo</a><a href="jeux/fortune.html">La Fortune</a></div><div><b>Roulette, blackjack, poker et roues</b><a href="jeux/madwheel.html">La Roue Folle</a><a href="jeux/storm.html">L’Éclair</a><a href="jeux/doublespin.html">La Double Bille</a><a href="jeux/plateau.html">Le Plateau</a><a href="jeux/peche.html">La Pêche</a><a href="jeux/roueor.html">La Roue d’Or</a><a href="jeux/blackjack.html">Le 21</a><a href="jeux/lightningbj.html">Le 21 Électrique</a><a href="jeux/poker.html">Le Texas</a></div><div><b>Tables multijoueurs</b><a href="jeux/storm-online.html">L’Éclair Online</a><a href="jeux/bj-online.html">Le 21 Online</a><a href="jeux/holdem-online.html">Le Texas Online</a><a href="jeux/madwheel-online.html">La Roue Folle Online</a><a href="jeux/robots-online.html">La Course Online</a><a href="jeux/plateau-online.html">Le Plateau Online</a><a href="jeux/peche-online.html">La Pêche Online</a><a href="jeux/roueor-online.html">La Roue d’Or Online</a></div><div><b>Jeux rapides gratuits</b><a href="jeux/mines.html">Le Champ de Mines</a><a href="jeux/avion.html">L’Avion</a><a href="jeux/plinko.html">La Cascade</a><a href="jeux/vortex.html">Le Vortex</a><a href="jeux/casse.html">Le Casse</a><a href="jeux/pileface.html">La Pièce</a><a href="jeux/robots.html">La Course</a><a href="jeux/poulet.html">Le Poulet</a><a href="jeux/gratteciel.html">Le Gratte-Ciel</a><a href="jeux/penalty.html">Le Penalty</a><a href="jeux/ticket.html">Le Ticket</a><a href="jeux/billes.html">La Descente</a></div><div><b>Guides et astuces</b><a href="articles/meilleures-machines-a-sous-gratuites-2026.html">Les meilleures machines à sous gratuites en 2026</a><a href="articles/jeux-de-casino-gratuits-sans-telechargement.html">Roulette, blackjack et poker gratuits sans téléchargement</a><a href="articles/jeux-crash-mines-plinko-gratuits.html">Jeux crash, mines et plinko gratuits : le guide 2026</a><a href="articles/rtp-volatilite-machines-a-sous.html">RTP et volatilité : comprendre une machine à sous</a><a href="articles/comment-gagner-aux-machines-a-sous.html">Comment gagner aux machines à sous ? Vrais conseils et idées reçues</a><a href="articles/strategie-blackjack.html">Stratégie de base au blackjack : le tableau complet</a><a href="articles/martingale-roulette.html">Martingale à la roulette : est-ce que ça marche vraiment ?</a><a href="articles/casino-gratuit-sur-telephone.html">Casino gratuit sur téléphone, sans téléchargement (Android et iPhone)</a></div></div></section><!-- /seo-links -->
     <div><b>SPINBET CASINO</b> · Jeu de divertissement, argent fictif, aucun gain réel. 18+ · <a href="#responsable">Jeu responsable</a> · <a href="jeux/">Tous les jeux</a> · <a href="articles/">Guides et astuces</a> · <a href="ads/">Nos partenaires</a></div>
   </footer>
 
@@ -7512,21 +7653,52 @@ __mods['audio.js'] = (() => {
 // Tiny WebAudio synth: every sound is generated, no asset files needed.
 
 let ctx = null;
-let master = null;
+let master = null, musicBus = null;
 let muted = false;
 try { muted = localStorage.getItem('bling.muted') === '1'; } catch { /* ignore */ }
+
+// Room reverb: a short stereo impulse (noise that fades out), generated once.
+function impulse(c, sec, decay) {
+  const n = Math.floor(c.sampleRate * sec), b = c.createBuffer(2, n, c.sampleRate);
+  for (let ch = 0; ch < 2; ch++) { const d = b.getChannelData(ch); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, decay); }
+  return b;
+}
 
 function ac() {
   if (!ctx) {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return null;
     ctx = new AC();
+    // The site's sound chain (immersion): every sound and the music go through a soft compressor (fuller, never
+    // saturated when several sounds play at once) with a touch of room reverb. The music has its own bus, lowered
+    // for a moment during big wins (duck).
+    let bus = ctx.destination;
+    try {
+      const comp = ctx.createDynamicsCompressor();
+      comp.threshold.value = -18; comp.knee.value = 14; comp.ratio.value = 3.5; comp.attack.value = 0.004; comp.release.value = 0.25;
+      const out = ctx.createGain(); out.gain.value = 1.15;
+      comp.connect(out).connect(ctx.destination);
+      bus = ctx.createGain();
+      bus.connect(comp);
+      const rev = ctx.createConvolver(), wet = ctx.createGain();
+      rev.buffer = impulse(ctx, 1.3, 3);
+      wet.gain.value = 0.16;
+      bus.connect(rev).connect(wet).connect(comp);
+    } catch { bus = ctx.destination; }
     master = ctx.createGain();
     master.gain.value = 0.35;
-    master.connect(ctx.destination);
+    master.connect(bus);
+    musicBus = ctx.createGain();
+    musicBus.connect(bus);
   }
   if (ctx.state === 'suspended') ctx.resume();
   return ctx;
+}
+// lowers the music for a moment (big wins, jackpots), then brings it back
+function duck(level = 0.3, sec = 2.4) {
+  if (!ctx || !musicBus) return;
+  const t = ctx.currentTime, g = musicBus.gain;
+  g.cancelScheduledValues(t); g.setTargetAtTime(level, t, 0.06); g.setTargetAtTime(1, t + sec, 0.5);
 }
 
 function tone(freq, dur = 0.12, type = 'sine', vol = 0.5, when = 0, slideTo) {
@@ -7575,17 +7747,17 @@ const sfx = {
   reelStop: (i = 0) => { tone(140 + i * 18, 0.09, 'triangle', 0.5); tone(70, 0.08, 'sine', 0.4); },
   tease: () => tone(220, 0.9, 'sawtooth', 0.08, 0, 880),
   win: () => [523, 659, 784].forEach((f, i) => tone(f, 0.18, 'triangle', 0.3, i * 0.07)),
-  bigWin: () => [523, 659, 784, 1046, 1318].forEach((f, i) => tone(f, 0.35, 'square', 0.18, i * 0.11)),
+  bigWin: () => { duck(0.3, 2.6); [523, 659, 784, 1046, 1318].forEach((f, i) => tone(f, 0.35, 'square', 0.18, i * 0.11)); },
   coin: () => { tone(1320, 0.08, 'square', 0.15); tone(1760, 0.12, 'square', 0.12, 0.05); },
   land: () => { tone(330, 0.15, 'triangle', 0.4); tone(660, 0.2, 'sine', 0.25, 0.04); },
   tick: () => tone(1500, 0.03, 'square', 0.06),
-  feature: () => [392, 523, 659, 784, 1046].forEach((f, i) => tone(f, 0.25, 'sawtooth', 0.15, i * 0.09)),
+  feature: () => { duck(0.4, 1.2); [392, 523, 659, 784, 1046].forEach((f, i) => tone(f, 0.25, 'sawtooth', 0.15, i * 0.09)); },
   huff: () => noise(0.7, 0.5, 200, 900),
   puff: () => { noise(1.1, 0.7, 2400, 200); tone(90, 0.6, 'sawtooth', 0.2, 0, 40); },
   growl: () => tone(110, 0.6, 'sawtooth', 0.22, 0, 70),
   upgrade: () => { tone(440, 0.1, 'square', 0.2); tone(880, 0.25, 'triangle', 0.25, 0.08); },
   oink: () => { tone(500, 0.12, 'sawtooth', 0.2, 0, 300); tone(520, 0.12, 'sawtooth', 0.2, 0.15, 320); },
-  jackpot: () => [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.5, 'square', 0.2, i * 0.12)),
+  jackpot: () => { duck(0.25, 3); [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.5, 'square', 0.2, i * 0.12)); },
 };
 
 const isMuted = () => muted;
@@ -7594,10 +7766,11 @@ function setMuted(v) {
   try { localStorage.setItem('bling.muted', v ? '1' : '0'); } catch { /* ignore */ }
 }
 
-// Shared context for the background music (js/core/music.js).
+// Shared context for the background music (js/core/music.js), and the bus the music plays into.
 const audioContext = () => ac();
+const musicOut = () => (ac() && musicBus) || null;
 
-return { sfx, isMuted, setMuted, audioContext };
+return { sfx, isMuted, setMuted, audioContext, musicOut, duck };
 })();
 
 // ---- wheel.js ----
@@ -8718,6 +8891,8 @@ const PLACEMENTS = {
   bonus_replay: { label: 'Rejouer mon bonus', dailyCap: 1, cooldownMin: 0, when: () => !!__mods['mystere.js']?.canReplay(), whenMsg: 'Reste sur la machine, à la même mise ou moins', reward: () => __mods['mystere.js'].replay() },
   // A tournament prize (top 10): one ad → the prize once more (events.js), twice a day at most.
   tour_x2: { label: 'Doubler mon gain de tournoi', dailyCap: 2, cooldownMin: 0, reward: (o) => { const a = Math.round(o?.amount || 0); if (!(a > 0)) return 'Rien à doubler'; wallet.grant(a); return `Gain de tournoi doublé : +${a.toLocaleString('fr-FR')}\u00a0\uE1E0`; } },
+  // Calendrier de l'Avent: one ad → a missed door (avent.js), 3 a day.
+  avent_catchup: { label: 'Rattraper une case', dailyCap: 3, cooldownMin: 0, when: () => (__mods['avent.js']?.missed() || []).length > 0, whenMsg: 'Aucune case à rattraper', reward: (o) => __mods['avent.js'].open(o?.day, true) },
   // Cartes à collectionner: one ad → one more blue pack, once a day (jcc.js).
   jcc_pack: { label: 'Un paquet de cartes en plus', dailyCap: 1, cooldownMin: 0, reward: () => __mods['jcc.js'].adPack() },
   xp_boost: { label: 'XP ×2 pendant 15 min', dailyCap: 3, cooldownMin: 60, reward: () => { progress.boost(15); return 'XP ×2 activé pendant 15 minutes'; } },
@@ -11611,9 +11786,14 @@ __mods['core/music.js'] = (() => {
 // Step sequencer for each game's background loop (same theme format as the original games:
 // lead / bass / comp / pad patterns in semitones from `root`, plus kick and hat steps).
 
-const { audioContext } = __mods['audio.js'];
+const { audioContext, musicOut } = __mods['audio.js'];
 
 const KEY = 'casino_music';
+// During a bonus (sb:feature … sb:featureend, 2 min at most) the music gets going: a little faster, two semitones
+// higher, with a hat on every step and a kick on every beat.
+let hype = 0;
+addEventListener('sb:feature', (e) => { if (!e.detail?.re) hype = Date.now() + 120000; });
+addEventListener('sb:featureend', () => { hype = 0; });
 let enabled = true;
 try { enabled = localStorage.getItem(KEY) !== '0'; } catch { /* ignore */ }
 
@@ -11635,7 +11815,7 @@ class Music {
     if (v) this.start(); else this.stop();
   }
 
-  hz(n) { return this.T.root * Math.pow(2, n / 12); }
+  hz(n) { return this.T.root * Math.pow(2, (n + (this.up || 0)) / 12); }
 
   note(f, t, d, type, vol, det) {
     const ac = this.ac;
@@ -11686,15 +11866,17 @@ class Music {
     for (const part of [T.comp, T.pad]) {
       if (part?.map[k]) part.map[k].forEach((n) => this.note(this.hz(n), t, part.dur, part.wave, part.vol));
     }
-    if (T.kick?.includes(k)) this.kick(t, T.kv || 0.2);
-    if (T.hat?.includes(k)) this.hat(t, T.hv || 0.03);
+    const hot = this.up > 0;
+    if (T.kick?.includes(k) || (hot && k % 4 === 0)) this.kick(t, T.kv || 0.2);
+    if (T.hat?.includes(k) || hot) this.hat(t, T.hv || 0.03);
   }
 
   sched() {
-    const ahead = this.ac.currentTime + 0.5;
+    const ahead = this.ac.currentTime + 0.5, hot = !this.calm && hype > Date.now();
+    this.up = hot ? 2 : 0;
     while (this.nextT < ahead) {
       this.play(this.step, this.nextT);
-      this.nextT += this.T.sd;
+      this.nextT += this.T.sd * (hot ? 0.86 : 1);
       this.step++;
     }
   }
@@ -11706,8 +11888,8 @@ class Music {
     this.ac = ac;
     if (!this.master) {
       this.master = ac.createGain();
-      this.master.gain.value = 0.32;
-      this.master.connect(ac.destination);
+      this.master.gain.value = this.vol ?? 0.32;
+      this.master.connect(musicOut() || ac.destination);
     }
     this.playing = true;
     this.nextT = ac.currentTime + 0.1;
@@ -13562,7 +13744,79 @@ const { challengeGame, challengeOf } = __mods['social.js'];
 
 let current = null;
 
+/* ---------- opening screen of a game (immersion) ----------
+   The game's poster, its name, 3 highlights (or what is new after an update) and « Jouer » / « Plein écran »,
+   while the game loads behind. Shown the first time a player opens a game and after each update of it
+   (localStorage spinbet_intro = { id: day seen }); « Jouer » also unlocks the sound and starts the music.
+   ?nointro skips it (screenshots). */
+const INTRO_KEY = 'spinbet_intro';
+const introSeen = () => { try { return JSON.parse(localStorage.getItem(INTRO_KEY) || '{}') || {}; } catch { return {}; } };
+function markIntro(id) { const s = introSeen(); s[id] = new Date().toISOString().slice(0, 10); try { localStorage.setItem(INTRO_KEY, JSON.stringify(s)); } catch { /* ignore */ } }
+function introFor(game) {
+  if (location.search.includes('nointro')) return null;
+  const seen = introSeen()[game.id], U = __mods['updates.js'], up = U.UPDATES.find((u) => u.game === game.id);
+  if (!seen) return { up: up && U.recent(game.id) ? up : null };
+  return up && up.date > seen ? { up } : null;
+}
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+let introEl = null;
+function closeIntro() { introEl?.remove(); introEl = null; }
+addEventListener('hashchange', closeIntro);
+function showIntro(game, host) {
+  const it = introFor(game);
+  if (!it) return;
+  closeIntro();
+  const { coverSVG } = __mods['covers.js'], { fmtDate } = __mods['updates.js'], up = it.up;
+  const feats = (up?.items || game.features || []).slice(0, 3);
+  const stats = [game.rtp && ['Retour au joueur', game.rtp], ['Volatilité', volLabel(game)], game.max && ['Gain maximum', game.max]].filter(Boolean);
+  introEl = document.createElement('div');
+  introEl.className = 'modal-back show gi-back';
+  introEl.style.cssText = `--ga:${game.colors?.[0] || '#7cc8ff'};--gb:${game.colors?.[1] || '#1e293b'}`;
+  introEl.innerHTML = `<div class="gi-bg" aria-hidden="true">${coverSVG(game, { cls: 'cover', badge: false }).replace('<svg ', '<svg preserveAspectRatio="xMidYMid slice" ')}</div>
+    <div class="gi-card" role="dialog" aria-label="${esc(game.name)}">
+      <button class="gi-x" aria-label="Fermer">✕</button>
+      <div class="gi-art">${coverSVG(game, { square: true, badge: false })}</div>
+      <div class="gi-main">
+        <small class="gi-eye">${up ? `${up.isNew ? '✨ Nouveau jeu' : '🆕 Mise à jour'} · ${fmtDate(up.date)}` : esc(game.tag || 'Machine à sous')}</small>
+        <h2>${esc(game.name)}</h2><p class="gi-sub">${esc(up ? up.title : game.sub || game.subtitle || '')}</p>
+        ${feats.length ? `<ul class="gi-feats">${feats.map((f) => `<li>${esc(f)}</li>`).join('')}</ul>` : `<p class="gi-desc">${esc(game.description || '')}</p>`}
+        <div class="gi-stats">${stats.map(([k, v]) => `<span><small>${k}</small><b>${esc(v)}</b></span>`).join('')}</div>
+        <div class="gi-acts"><button class="btn primary lg gi-play" disabled>Chargement…</button><button class="btn ghost gi-full" disabled>⛶ Plein écran</button></div>
+        <i class="gi-bar"><i></i></i>
+      </div>
+    </div>`;
+  document.body.appendChild(introEl);
+  const el = introEl, play = el.querySelector('.gi-play'), full = el.querySelector('.gi-full');
+  const ready = setInterval(() => {
+    if (!el.isConnected) return clearInterval(ready);
+    if (!current) return;
+    clearInterval(ready);
+    el.classList.add('ready');
+    play.disabled = full.disabled = false;
+    play.textContent = '▶ JOUER';
+  }, 120);
+  const go = (fs) => {
+    markIntro(game.id);
+    try { __mods['audio.js'].sfx.unlock?.(); } catch { /* ignore */ }
+    if (current) {
+      current.music?.start?.();
+      if (fs && current.root) __mods['core/chrome.js'].setFull(current.root, true);
+    }
+    el.classList.add('out');
+    setTimeout(() => { if (introEl === el) closeIntro(); else el.remove(); }, 260);
+  };
+  play.onclick = () => go(false);
+  full.onclick = () => go(true);
+  el.querySelector('.gi-x').onclick = () => go(false);
+  el.addEventListener('click', (e) => { if (e.target === el || e.target.closest('.gi-bg')) go(false); });
+  const onKey = (e) => { if (!el.isConnected) return removeEventListener('keydown', onKey, true); if (e.key === 'Escape' || (e.key === 'Enter' && current)) { e.preventDefault(); removeEventListener('keydown', onKey, true); go(false); } };
+  addEventListener('keydown', onKey, true);
+}
+// the loading screen of every game: its poster and name instead of a bare spinner
+const loadingHTML = (game) => `<div class="game-loading gl-brand" style="--ga:${game.colors?.[0] || '#7cc8ff'}"><span class="gl-art">${__mods['covers.js'].coverSVG(game, { square: true, badge: false })}</span><b>${esc(game.name)}</b><i class="gl-bar"><i></i></i><small>Chargement du jeu…</small></div>`;
+
 function leaveGame() {
+  closeIntro();
   current?.destroy?.();
   current = null;
   wallet.sync();
@@ -13585,16 +13839,16 @@ ${liveHTML(game)}
         <div class="feat-chips">${game.features.map((f) => `<span>${f}</span>`).join('')}</div>
         <button class="btn primary share-btn" data-share-site="${game.id}" data-share-name="${game.name}">📤 Partager ce jeu</button></div>
       <div class="side-stats about-stats">
-        <div><small>Retour au joueur</small><b>${game.rtp}</b></div>
+        ${game.rtp ? `<div><small>Retour au joueur</small><b>${game.rtp}</b></div>` : ''}
         <div><small>Volatilité</small><b>${volLabel(game)} ${dots(game.vol)}</b></div>
-        <div><small>Gain maximum</small><b>${game.max}</b></div>
+        ${game.max ? `<div><small>Gain maximum</small><b>${game.max}</b></div>` : ''}
       </div>
     </section>
     <section><div class="sec-head"><h2>Autres jeux</h2></div>
       <div class="game-row">${ALL_GAMES.filter((g) => g.id !== game.id).map(gameCard).join('')}</div></section>`;
   const host = root.querySelector('.game-host');
   const start = () => {
-    host.innerHTML = '<div class="game-loading"><span class="gl-spin"></span>Chargement du jeu…</div>';
+    host.innerHTML = loadingHTML(game);
     loadImpl(game.id).then((Impl) => {
       if (!host.isConnected || current) return; // the player left before the game arrived
       host.innerHTML = '';
@@ -13608,6 +13862,7 @@ ${liveHTML(game)}
     });
   };
   start();
+  showIntro(game, host);
 }
 
 function renderGame(root, { id }) {
@@ -13637,6 +13892,7 @@ ${liveHTML(game)}
       <div class="game-row">${ALL_GAMES.filter((g) => g.id !== id).map(gameCard).join('')}</div></section>`;
   current = new SlotMachine(root.querySelector('.game-host'), game);
   if (location.search.includes('debug')) window.__slot = current;
+  showIntro(game, root.querySelector('.game-host'));
 }
 
 const currentGame = () => current;
@@ -15754,7 +16010,7 @@ const { wallet, fmt } = __mods['wallet.js'];
 const { progress, rankBadge, rankOf } = __mods['progress.js'];
 const { el } = __mods['ui.js'];
 
-const ONLINE_MS = 150000, BEAT_MS = 60000, SEATS = 6;
+const ONLINE_MS = 150000, BEAT_MS = 60000, SEATS = 6, BIG_X = 50;
 const TABLE_GAMES = ['blackjack', 'lightningbj', 'poker', 'storm', 'doublespin'];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const shop = () => __mods['shop.js'];
@@ -15802,6 +16058,8 @@ function onList(list) {
     if (!first && p.uid !== me) {
       if (p.game && (!was || was.game !== p.game) && isFriend(p.uid)) tick(`${shop()?.badgeIcon?.(p.look) || '🟢'} <b>${esc(p.name)}</b> joue à <a href="#game-${p.game}">${esc(game(p.game)?.name || 'un jeu')}</a> actuellement`);
       if (p.win && p.game && p.game === gameNow() && ms(p.win.t) !== was?.winT && now - p.win.t < 30000) tick(`💰 <b>${esc(p.name)}</b> gagne ${fmt(p.win.a)}${p.win.x >= 2 ? ` (×${String(p.win.x).replace('.', ',')})` : ''} à ta table !`, true);
+      // a big win anywhere on the site (≥ BIG_X × the stake, as in the chat): everyone sees it go by
+      else if (p.win && p.game && game(p.game) && ms(p.win.t) !== was?.winT && now - p.win.t < 30000 && p.win.x >= BIG_X) tick(`💥 <b>${esc(p.name)}</b> gagne ${fmt(p.win.a)} (×${Math.round(p.win.x).toLocaleString('fr-FR')}) sur <a href="#game-${p.game}">${esc(game(p.game).name)}</a> !`, true);
     }
     prev.set(p.uid, { game: p.game, winT: p.win ? ms(p.win.t) : 0 });
   }
@@ -16232,8 +16490,9 @@ async function payout() {
 }
 
 /* ---------- encarts : accueil, sous les jeux, menu ---------- */
-const homeParts = [], pillParts = [];
-const addHome = (fn) => homeParts.push(fn);
+const homeParts = [], pillParts = [], topParts = [];
+// addHome(fn, { top: true }) puts the box before the tournaments (the « Aujourd'hui sur SpinBet » agenda)
+const addHome = (fn, o) => (o?.top ? topParts : homeParts).push(fn);
 const addGamePill = (fn) => pillParts.push(fn);
 
 function tourCard(T, t) {
@@ -16257,7 +16516,7 @@ function homeHTML() {
   const tours = [S, W].filter((T) => isLive(T, t));
   if (!isLive(S, t)) tours.push(S); // tonight's, not started yet (it always ends at midnight)
   if (!isLive(W, t) && W.start - t < 2 * 864e5) tours.push(W);
-  return `<div class="ev-home">${hhCard(t)}${tours.map((T) => tourCard(T, t)).join('')}${homeParts.map((fn) => fn(t)).join('')}</div>`;
+  return `<div class="ev-home">${topParts.map((fn) => fn(t)).join('')}${hhCard(t)}${tours.map((T) => tourCard(T, t)).join('')}${homeParts.map((fn) => fn(t)).join('')}</div>`;
 }
 function gameHTML(gid) {
   const t = Date.now(), out = [];
@@ -18145,6 +18404,12 @@ function shopHTML(s) {
     ${__mods['ads.js'].ads.status('jcc_pack').ok ? `<button class="btn primary jc-ad-btn" data-jc-ad-pack>▶ Regarde une pub : un ${PACKS.b.name.toLowerCase()} en plus (1 par jour)</button>` : ''}
     <p class="muted small">${SHOP_DAY} paquets par jour au maximum, au choix. Les autres se gagnent en jouant.</p></div>`;
 }
+// packs given by the site (Calendrier de l'Avent…): added to the player's packs, opened from the JCC page
+function givePack(t, n = 1) {
+  if (!profiles.current || !PACKS[t]) return;
+  save((s) => { s.packs[t] = (s.packs[t] || 0) + n; });
+  paintBadge(); paintPage();
+}
 // rewarded ad (ads.js, jcc_pack): one more blue pack, opened right away
 function adPack() {
   if (!profiles.current) return 'Ouvre une partie d’abord';
@@ -18500,7 +18765,7 @@ profiles.addEventListener('change', () => { pending = 0; setTimeout(() => { pain
 profiles.ready?.then(() => setTimeout(() => { paintBadge(); watchMine(); }, 2500));
 setInterval(() => { if (here() && tab === 'market') loadOffers(); }, 60000);
 
-return { renderJcc, checkAlbum, adPack, SERIES, CARD, BAR, ALBUM };
+return { renderJcc, checkAlbum, adPack, givePack, SERIES, CARD, BAR, ALBUM };
 })();
 
 // ---- mystere.js ----
@@ -18649,6 +18914,358 @@ setInterval(() => {
 return { MYST, mysteryOf, liveNow, cardHTML, canReplay, replay: doReplay };
 })();
 
+// ---- ambiance.js ----
+__mods['ambiance.js'] = (() => {
+// Immersion outside the games (demande du propriétaire : « l'immersion à fond ») :
+// 1) Musique d'ambiance : une musique lounge douce sur l'accueil et les pages du site (jamais dans les jeux, qui ont
+//    la leur). Allumée par défaut dans l'appli installée, éteinte dans un onglet de navigateur ; interrupteur
+//    « 🎵 Musique d'ambiance » dans le menu (localStorage spinbet_lounge). Elle démarre au premier toucher (les
+//    navigateurs n'autorisent le son qu'après), s'arrête dans les jeux et suit les boutons Musique et Son des jeux.
+// 2) L'hiver : la neige tombe sur les pages du site du 1er décembre au 6 janvier (heure de Paris), jamais dans les
+//    jeux, et pas si le téléphone demande moins d'animations. ?neige la montre à toute date (essais).
+const { Music, musicOn } = __mods['core/music.js'];
+const { isMuted } = __mods['audio.js'];
+const E = __mods['events.js'];
+const { toast } = __mods['ui.js'];
+
+const get = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+const put = (k, v) => { try { localStorage.setItem(k, v); } catch { /* ignore */ } };
+const inGame = () => /^#game-/.test(location.hash);
+
+/* ---------- 1. musique d'ambiance ---------- */
+const LOUNGE = {
+  sd: 0.27, len: 32, root: 130.81,
+  pad: { wave: 'triangle', vol: 0.011, dur: 2.2, map: { 0: [0, 4, 7, 11], 8: [-3, 0, 4, 7], 16: [2, 5, 9, 12], 24: [-5, -1, 2, 5] } },
+  bass: { wave: 'sine', vol: 0.11, dur: 0.55, pat: [-12, null, null, null, -8, null, null, null, -15, null, null, null, -12, null, null, null, -10, null, null, null, -7, null, null, null, -17, null, null, null, -13, null, null, null] },
+  lead: { wave: 'sine', vol: 0.035, dur: 0.6, pat: [null, null, 19, null, null, 16, 14, null, null, null, 12, null, null, null, 16, null, null, null, 17, null, null, 21, 19, null, null, null, 14, null, null, 11, null, null] },
+  hat: [2, 6, 10, 14, 18, 22, 26, 30], hv: 0.01,
+};
+const KEY = 'spinbet_lounge';
+const standalone = () => matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true || /SpinBetApp/.test(navigator.userAgent);
+const wanted = () => { const v = get(KEY); return v ? v === '1' : standalone(); };
+const lounge = new Music(LOUNGE);
+lounge.vol = 0.22; lounge.calm = true;
+let touched = false;
+function sync() {
+  const on = touched && wanted() && musicOn() && !isMuted() && !inGame() && !document.hidden;
+  if (on) lounge.start(); else lounge.stop();
+}
+const first = () => { touched = true; sync(); };
+addEventListener('pointerdown', first, { once: true, capture: true });
+addEventListener('keydown', first, { once: true, capture: true });
+addEventListener('hashchange', () => setTimeout(sync, 50));
+document.addEventListener('visibilitychange', sync);
+setInterval(sync, 4000); // follows the game's Musique / Son switches
+function paint() {
+  document.querySelectorAll('[data-lounge] em').forEach((n) => { n.textContent = `Musique d’ambiance : ${wanted() ? 'oui' : 'non'}`; });
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-lounge]');
+  if (!b) return;
+  e.preventDefault();
+  const on = !wanted();
+  put(KEY, on ? '1' : '0');
+  if (on && !musicOn()) lounge.setEnabled(true); // the game's music switch was off: the player asks for music
+  touched = true; paint(); sync();
+  toast(on ? '🎵 Musique d’ambiance activée' : 'Musique d’ambiance coupée', 'info');
+});
+paint();
+
+/* ---------- 2. la neige de l'hiver ---------- */
+function winter(t = Date.now()) {
+  if (location.search.includes('neige')) return true;
+  const p = E.paris(t);
+  return (p.m === 12) || (p.m === 1 && p.d <= 6);
+}
+let snow = null;
+function paintSnow() {
+  const want = winter() && !inGame() && !matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  if (!want) { snow?.remove(); snow = null; return; }
+  if (snow) return;
+  snow = document.createElement('div');
+  snow.className = 'snowfall';
+  snow.setAttribute('aria-hidden', 'true');
+  const n = matchMedia('(max-width: 900px)').matches ? 18 : 34;
+  let h = '';
+  for (let i = 0; i < n; i++) {
+    const size = 3 + Math.random() * 5, dur = 9 + Math.random() * 12, x = Math.random() * 100, drift = (Math.random() * 60 - 30).toFixed(0);
+    h += `<i style="left:${x.toFixed(1)}%;width:${size.toFixed(1)}px;height:${size.toFixed(1)}px;opacity:${(0.35 + Math.random() * 0.5).toFixed(2)};--dx:${drift}px;animation-duration:${dur.toFixed(1)}s;animation-delay:-${(Math.random() * dur).toFixed(1)}s"></i>`;
+  }
+  snow.innerHTML = h;
+  document.body.appendChild(snow);
+}
+addEventListener('hashchange', () => setTimeout(paintSnow, 60));
+setInterval(paintSnow, 60000);
+paintSnow();
+
+return { winter, sync };
+})();
+
+// ---- avent.js ----
+__mods['avent.js'] = (() => {
+// Calendrier de l'Avent (#avent ; demande du propriétaire : « que les gens restent et aient envie de revenir ») :
+// du 1er au 24 décembre (heure de Paris), une case par jour avec un cadeau, le même pour tout le monde (DAYS). La
+// case du jour s'ouvre gratuitement ; une case ratée se rattrape avec une pub récompensée (ads.js, avent_catchup,
+// 3 par jour), jusqu'au 6 janvier. Annoncé dès le 1er novembre (encart de l'accueil, page avec compte à rebours).
+// Cases ouvertes : profile.avent = { y: année du calendrier, o: [jours ouverts] }. ?avent=JJ = faire comme si on
+// était le JJ décembre (essais).
+const E = __mods['events.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { toast, modal } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const { getGame } = __mods['games/index.js'];
+
+// [kind, value, game or pack] ; day 24 also gives a gold pack
+const DAYS = [
+  ['ke', 5000], ['spins', 30, 'noel'], ['pack', 1, 'b'], ['ke', 7500], ['xp', 30], ['ke', 15000], ['spins', 40, 'fortune'], ['pack', 1, 'v'],
+  ['ke', 10000], ['spins', 40, 'zeus'], ['xp', 30], ['ke', 12000], ['pack', 1, 'v'], ['spins', 50, 'noel'], ['ke', 15000], ['pack', 2, 'b'],
+  ['spins', 50, 'candy'], ['ke', 20000], ['pack', 1, 'o'], ['xp', 60], ['ke', 25000], ['spins', 60, 'noel'], ['ke', 30000], ['ke', 50000, 'o'],
+];
+// the doors are mixed up, as on a real calendar
+const ORDER = [7, 14, 3, 22, 10, 1, 18, 5, 24, 12, 8, 16, 2, 20, 11, 23, 6, 15, 9, 19, 4, 13, 21, 17];
+const PACK = { b: 'paquet bleu', v: 'paquet violet', o: 'paquet doré' };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+/* ---------- the calendar's day ---------- */
+function clock(t = Date.now()) {
+  const p = E.paris(t), q = location.search.match(/[?&]avent=(\d+)/);
+  const m = q ? 12 : p.m, d = q ? +q[1] : p.d, y = m === 1 ? p.y - 1 : p.y;
+  const phase = m === 11 ? 'soon' : m === 12 && d <= 24 ? 'live' : (m === 12 || (m === 1 && d <= 6)) ? 'after' : 'off';
+  return { y, m, d, phase, today: phase === 'live' ? d : phase === 'after' ? 25 : 0, start: E.at(p.y, 12, 1, 0) };
+}
+const opened = () => { const a = profiles.current?.avent, c = clock(); return a && a.y === c.y ? a.o || [] : []; };
+function state(day, c = clock()) {
+  if (opened().includes(day)) return 'open';
+  if (c.phase === 'live' && day === c.today) return 'today';
+  if ((c.phase === 'live' || c.phase === 'after') && day < c.today) return 'missed';
+  return 'locked';
+}
+const missed = () => { const c = clock(); return Array.from({ length: 24 }, (_, i) => i + 1).filter((d) => state(d, c) === 'missed'); };
+
+function rewardText(day, short) {
+  const [k, v, x] = DAYS[day - 1];
+  if (k === 'ke') return `${fmt(v)}${x ? ` + ${PACK[x]}` : ''}`;
+  if (k === 'spins') return short ? `${v} tours offerts` : `${v} tours offerts sur ${getGame(x)?.name || 'une machine'}`;
+  if (k === 'pack') return v > 1 ? `${v} ${PACK[x].replace('paquet', 'paquets')}s` : PACK[x];
+  return `XP ×2 pendant ${v} min`;
+}
+const icon = (day) => ({ ke: '💰', spins: '🎰', pack: '🃏', xp: '⚡' }[DAYS[day - 1][0]]);
+function grant(day) {
+  const [k, v, x] = DAYS[day - 1];
+  if (k === 'ke') { wallet.grant(v); if (x) __mods['jcc.js'].givePack(x, 1); }
+  if (k === 'spins') __mods['wheel.js'].gifts.addRounds(x, v);
+  if (k === 'pack') __mods['jcc.js'].givePack(x, v);
+  if (k === 'xp') __mods['progress.js'].progress.boost(v);
+}
+
+// opens a door: today's for free, a missed one with an ad (viaAd). Returns the message for the player.
+function open(day, viaAd) {
+  if (!profiles.current) return 'Ouvre une partie d’abord';
+  const c = clock(), st = state(day, c);
+  if (st === 'open') return 'Case déjà ouverte';
+  if (st === 'locked') return `Patience : cette case s’ouvre le ${day} décembre`;
+  if (st === 'missed' && !viaAd) return 'Case ratée : rattrape-la avec une pub';
+  profiles.update('avent', (p) => { const a = p.avent?.y === c.y ? p.avent : { y: c.y, o: [] }; p.avent = { y: c.y, o: [...new Set([...(a.o || []), day])] }; });
+  grant(day);
+  setTimeout(() => reveal(day), 380);
+  paintAll();
+  return `🎄 Case n° ${day} : ${rewardText(day)} !`;
+}
+function reveal(day) {
+  sfx.bigWin?.(); fx.confetti?.(day === 24 ? 180 : 90); if (DAYS[day - 1][0] === 'ke') fx.coins?.(40);
+  const [k, , x] = DAYS[day - 1];
+  modal(`<div class="av-won"><div class="av-won-num">${day}</div><small>DÉCEMBRE · CALENDRIER DE L’AVENT</small><div class="av-won-ico">${icon(day)}</div>
+    <h2>${esc(rewardText(day))}</h2><p class="muted">${k === 'spins' ? `Tes tours t’attendent sur ${esc(getGame(x)?.name || 'la machine')} (mise de 1 ).` : k === 'pack' || x ? 'Ton paquet t’attend dans Cartes à collectionner.' : k === 'xp' ? 'Toute l’XP gagnée compte double.' : 'Ajouté à ton solde.'}</p>
+    <p class="av-next">${day < 24 ? `Demain : la case n° ${day + 1}. Reviens l’ouvrir !` : 'Joyeux Noël de toute l’équipe SpinBet 🎅'}</p>
+    <div class="av-won-acts">${k === 'spins' ? `<a class="btn primary" data-value="" href="#game-${x}">Jouer mes tours</a>` : (k === 'pack' || x) ? '<a class="btn primary" data-value="" href="#jcc">Ouvrir mon paquet</a>' : ''}<button class="btn ghost" data-value="">Fermer</button></div></div>`, { cls: 'av-modal' });
+}
+
+/* ---------- the page ---------- */
+function doorHTML(day, c) {
+  const st = state(day, c), hue = [352, 145, 38, 212][day % 4];
+  const inner = st === 'open' ? `<span class="av-ico">${icon(day)}</span><small>${esc(rewardText(day, true))}</small>`
+    : st === 'today' ? '<small class="av-call">Ouvre-moi !</small>'
+    : st === 'missed' ? '<small class="av-ad">📺 Rattraper</small>'
+    : `<small>🔒 ${day} déc.</small>`;
+  return `<button class="av-door s-${st}${day === 24 ? ' big' : ''}" data-av="${day}" style="--h:${hue}" aria-label="Case ${day}"><span class="av-num">${day}</span>${inner}</button>`;
+}
+function headHTML(c) {
+  const left = c.start - Date.now();
+  if (c.phase === 'soon') return `<p class="av-lead">24 cases, 24 cadeaux : une case à ouvrir chaque jour du 1er au 24 décembre. Ouverture dans <b data-av-left>${E.left(left)}</b>.</p>`;
+  if (c.phase === 'live') {
+    const st = state(c.today, c), m = missed().length;
+    return `<p class="av-lead">${st === 'today' ? `🎁 <b>Ta case n° ${c.today} est prête !</b> Touche-la pour l’ouvrir.` : `✅ Case n° ${c.today} ouverte. Reviens demain pour la n° ${Math.min(24, c.today + 1)}.`}${m ? ` · <b>${m}</b> case${m > 1 ? 's' : ''} ratée${m > 1 ? 's' : ''} à rattraper avec une pub.` : ''}</p>`;
+  }
+  const m = missed().length;
+  return `<p class="av-lead">Le calendrier est terminé ! ${m ? `Il te reste <b>${m}</b> case${m > 1 ? 's' : ''} à rattraper avec une pub, jusqu’au 6 janvier.` : 'Tu as tout ouvert : bravo et joyeuses fêtes !'}</p>`;
+}
+let root = null;
+function renderAvent(r) {
+  root = r;
+  const c = clock();
+  const n = opened().length;
+  r.innerHTML = `<section class="av-page">
+    <div class="av-hero"><span class="av-tree" aria-hidden="true">🎄</span><div><small>DU 1ER AU 24 DÉCEMBRE</small><h1>Calendrier de l’Avent</h1>${headHTML(c)}</div>
+      <div class="av-prog"><b>${n}</b><small>/ 24 cases</small></div></div>
+    <div class="av-grid">${ORDER.map((d) => doorHTML(d, c)).join('')}</div>
+    <div class="av-rules panel"><p><b>Comment ça marche ?</b> Chaque jour à minuit (heure de Paris), une nouvelle case s’ouvre : des KE, des tours offerts, des paquets de cartes, de l’XP double… et un gros cadeau le 24. Les cadeaux sont les mêmes pour tout le monde.</p>
+      <p>Une case ratée se rattrape avec une pub (3 par jour), jusqu’au 6 janvier. <a href="#appli">Active les notifications</a> pour ne rater aucune case.</p>
+      ${profiles.online ? '' : '<p class="muted small">En invité, tes cases restent sur cet appareil. <a href="#" class="signup-link" data-signup>Crée ton compte</a> pour les garder partout.</p>'}</div>
+  </section>`;
+}
+function paintAll() {
+  if (root?.isConnected && root.querySelector('.av-page')) renderAvent(root);
+  const c = clock(), show = c.phase !== 'off', ready = c.phase === 'live' && state(c.today, c) === 'today';
+  // (the menu's CSS sets display: the hidden attribute alone would not hide them)
+  document.querySelectorAll('[data-avent-nav]').forEach((n) => { n.hidden = !show; n.style.display = show ? '' : 'none'; });
+  document.querySelectorAll('[data-avent-badge]').forEach((n) => { n.hidden = !ready; n.style.display = ready ? '' : 'none'; n.textContent = '1'; });
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-av]');
+  if (!b) return;
+  const day = +b.dataset.av, st = state(day);
+  if (st === 'today') { b.classList.add('flip'); const m = open(day); if (!/^🎄/.test(m)) toast(m, 'warn'); return; }
+  if (st === 'missed') {
+    const r = await __mods['ads.js'].ads.watch('avent_catchup', { day });
+    if (!r.ok) toast(r.message, 'warn');
+    return;
+  }
+  if (st === 'open') return toast(`Case n° ${day} : ${rewardText(day)}`, 'info');
+  toast(clock().phase === 'soon' ? 'Le calendrier commence le 1er décembre !' : `Patience : cette case s’ouvre le ${day} décembre`, 'info');
+});
+setInterval(() => { const n = document.querySelector('[data-av-left]'); if (n) n.textContent = E.left(clock().start - Date.now()); }, 1000);
+setInterval(paintAll, 60000);
+profiles.addEventListener('change', () => setTimeout(paintAll, 300));
+
+/* ---------- the home page ---------- */
+E.addHome(() => {
+  const c = clock();
+  if (c.phase === 'off') return '';
+  if (c.phase === 'soon') return `<a class="ev-card ev-avent soon" href="#avent"><span class="ev-ico">🎄</span><div><small>CALENDRIER DE L’AVENT · DÈS LE 1ER DÉCEMBRE</small><b>24 cases, 24 cadeaux, un par jour</b><em>Ouverture dans ${E.left(c.start - Date.now())} · jusqu’à ${fmt(50000)} le 24</em></div><span class="ev-go">Voir ›</span></a>`;
+  const m = missed().length;
+  if (c.phase === 'live') {
+    const ready = state(c.today, c) === 'today';
+    return `<a class="ev-card ev-avent${ready ? ' ev-live' : ''}" href="#avent"><span class="ev-ico">🎄</span><div><small>${ready ? '<i class="ev-dot"></i>' : ''}CALENDRIER DE L’AVENT · ${c.today} DÉCEMBRE</small><b>${ready ? `Ta case n° ${c.today} est prête !` : `Case n° ${c.today} ouverte · demain la n° ${Math.min(24, c.today + 1)}`}</b><em>${opened().length} / 24 cases ouvertes${m ? ` · ${m} à rattraper` : ''}</em></div><span class="ev-go">${ready ? 'Ouvrir ›' : 'Voir ›'}</span></a>`;
+  }
+  return m ? `<a class="ev-card ev-avent" href="#avent"><span class="ev-ico">🎄</span><div><small>CALENDRIER DE L’AVENT</small><b>${m} case${m > 1 ? 's' : ''} à rattraper</b><em>Avec une pub, jusqu’au 6 janvier</em></div><span class="ev-go">Voir ›</span></a>` : '';
+});
+setTimeout(paintAll, 500);
+
+return { renderAvent, open, missed, clock, DAYS, ORDER };
+})();
+
+// ---- retour.js ----
+__mods['retour.js'] = (() => {
+// Donner envie de revenir (demande du propriétaire) :
+// 1) « Aujourd'hui sur SpinBet » : en tête des encarts de l'accueil, le programme du jour à l'heure de Paris
+//    (machine mystère, 3 événements flash, Battle Royale, tournoi du soir, tirage du Loto, Happy Hour, calendrier
+//    de l'Avent), ce qui est en cours et ce qui arrive, pour savoir quand revenir.
+// 2) Cadeau « Bon retour » : un joueur absent depuis au moins 3 jours reçoit BACK (KE + un paquet de cartes après
+//    une semaine), au plus une fois par semaine, avec ce qui a changé depuis sa dernière visite (nouveaux jeux et
+//    mises à jour) et le programme du jour. Dernière visite : profile.back = { last, paid }, mis à jour toutes les
+//    5 minutes quand la page est ouverte.
+const E = __mods['events.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { modal } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const { getGame } = __mods['games/index.js'];
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const name = (id) => getGame(id)?.name || 'une machine';
+const hm = (t) => { const p = E.paris(t); return p.h === 0 && p.mi === 0 ? 'minuit' : `${p.h} h${p.mi ? ' ' + String(p.mi).padStart(2, '0') : ''}`; };
+const short = (ms) => { const m = Math.max(1, Math.round(ms / 60000)), h = Math.floor(m / 60); return h ? `${h} h ${String(m % 60).padStart(2, '0')}` : `${m} min`; };
+
+/* ---------- 1. le programme du jour ---------- */
+function agenda(t = Date.now()) {
+  const p = E.paris(t), out = [];
+  const add = (x) => { if (x && x.end > t) out.push(x); };
+  const M = __mods['mystere.js']?.mysteryOf?.(t);
+  if (M?.game) add({ ico: '❓', txt: 'Machine mystère : bonus 3× plus fréquents', start: M.start, end: M.end, attr: t >= M.start ? 'data-mystery href="#accueil"' : 'href="#lobby-slot"' });
+  (__mods['extras.js']?.flashesOf?.(t) || []).forEach((f) => add({ ico: '⚡', txt: `Gains ×2 sur ${esc(name(f.game))}`, start: f.start, end: f.end, attr: `href="#game-${f.game}"` }));
+  const B = __mods['battle.js']?.battleAt?.(t);
+  if (B && E.paris(B.start).key === p.key) add({ ico: '⚔️', txt: `Battle Royale sur ${esc(name(B.game))}`, start: B.start, end: B.end, attr: 'href="#battle"' });
+  const S = E.soirNow(t);
+  add({ ico: '🌙', txt: `Tournoi du soir sur ${esc(name(S.game))} · ${fmt(E.KINDS.soir.prizes[0])} au n°1`, start: S.start, end: S.end, attr: 'href="#tournois"' });
+  const W = E.weNow(t);
+  if (E.isLive(W, t)) add({ ico: '🏆', txt: `Tournoi du week-end sur ${esc(name(W.game))}`, start: W.start, end: W.end, attr: 'href="#tournois"', allDay: true });
+  const loto = E.at(p.y, p.m, p.d, 21) + 30 * 60000;
+  add({ ico: '🎱', txt: `Tirage du Loto · ${fmt(1500000)} pour 5 bons numéros`, start: loto, end: loto + 60000, attr: 'href="#loto"', point: true });
+  const hh = E.at(p.y, p.m, p.d, E.HH.hour);
+  add({ ico: '🍹', txt: `Happy Hour : gains ×2 sur ${esc(name(S.game))}`, start: hh, end: hh + 3600e3, attr: `href="#game-${S.game}"` });
+  const A = __mods['avent.js']?.clock?.(t);
+  if (A?.phase === 'live') add({ ico: '🎄', txt: `Case n° ${A.today} du calendrier de l’Avent`, start: E.at(p.y, p.m, p.d, 0), end: E.at(p.y, p.m, p.d + 1, 0), attr: 'href="#avent"', allDay: true });
+  return out.sort((a, b) => a.start - b.start);
+}
+function agendaHTML(t) {
+  const list = agenda(t).slice(0, 6);
+  if (!list.length) return '';
+  const row = (x) => {
+    const live = t >= x.start && !x.point;
+    const when = x.allDay ? 'aujourd’hui' : x.point ? `à ${hm(x.start)}` : `${hm(x.start)} – ${hm(x.end)}`;
+    const status = live ? `<em class="on">EN COURS${x.allDay ? '' : ` · ${short(x.end - t)}`}</em>` : `<em>dans ${short(x.start - t)}</em>`;
+    return `<li class="${live ? 'live' : ''}"><a ${x.attr}><time>${when}</time><i>${x.ico}</i><span>${x.txt}</span>${status}</a></li>`;
+  };
+  return `<div class="ag-card"><div class="ag-head"><span>🗓️</span><b>Aujourd’hui sur SpinBet</b><small>heure de Paris</small><a href="#appli" class="ag-bell" title="Être prévenu par notification">🔔<span> Me prévenir</span></a></div><ol class="ag-list">${list.map(row).join('')}</ol></div>`;
+}
+E.addHome((t) => agendaHTML(t), { top: true });
+
+/* ---------- 2. le cadeau « Bon retour » ---------- */
+const BACK = { minDays: 3, everyDays: 7, gifts: [[14, 20000, 'v'], [7, 10000, 'b'], [3, 5000, null]] }; // [days away ≥, KE, pack]
+const keyOf = () => (profiles.current ? `${profiles.mode}:${profiles.store?.current}` : '');
+// a guest's profile is new on every visit: its dates live in localStorage (spinbet_back) instead
+const guest = () => profiles.mode === 'guest';
+function readBack() {
+  if (!guest()) return profiles.current?.back || {};
+  try { return JSON.parse(localStorage.getItem('spinbet_back') || '{}') || {}; } catch { return {}; }
+}
+function writeBack(b) {
+  if (guest()) { try { localStorage.setItem('spinbet_back', JSON.stringify(b)); } catch { /* ignore */ } return; }
+  profiles.update('back', (p) => { p.back = b; });
+}
+let checked = '';
+function touch() {
+  if (!profiles.current || document.hidden || checked !== keyOf()) return;
+  writeBack({ ...readBack(), last: Date.now() });
+}
+function checkBack() {
+  const me = profiles.current, k = keyOf();
+  if (!me || checked === k) return;
+  checked = k;
+  const b = readBack(), now = Date.now(), prev = b.last || 0, days = (now - prev) / 864e5;
+  const g0 = prev && now - (b.paid || 0) >= BACK.everyDays * 864e5 ? BACK.gifts.find(([d]) => days >= d) : null;
+  if (!g0) return touch();
+  const g = guest() ? [g0[0], g0[1], null] : g0; // a guest's cards are not kept: KE only
+  writeBack({ last: now, paid: now });
+  wallet.grant(g[1]);
+  if (g[2]) __mods['jcc.js']?.givePack?.(g[2], 1);
+  profiles.flush?.();
+  setTimeout(() => welcome(Math.floor(days), prev, g), 2200);
+}
+function welcome(days, prev, g) {
+  const since = new Date(prev).toISOString().slice(0, 10), U = __mods['updates.js'];
+  const news = U.UPDATES.filter((u) => u.date > since && getGame(u.game)).slice(0, 4);
+  const next = agenda().slice(0, 3);
+  sfx.bigWin?.(); fx.confetti?.(110); fx.coins?.(40);
+  modal(`<div class="bk-card"><div class="bk-ico">👋</div><h2>Bon retour${guest() ? '' : `, ${esc(profiles.current?.name || '')}`} !</h2>
+    <p class="muted">Ça faisait ${days} jours. Pour fêter ton retour :</p>
+    <div class="bk-gift">+${fmt(g[1])}${g[2] ? `<small>+ un paquet de cartes ${g[2] === 'v' ? 'violet' : 'bleu'}</small>` : ''}</div>
+    ${news.length ? `<h4>Quoi de neuf depuis ta dernière visite</h4><ul class="bk-list">${news.map((u) => `<li><a href="#game-${u.game}" data-value="">${u.isNew ? '✨ Nouveau jeu' : '🆕'} <b>${esc(getGame(u.game).name)}</b> · ${esc(u.title)}</a></li>`).join('')}</ul>` : ''}
+    ${next.length ? `<h4>Aujourd’hui</h4><ul class="bk-list">${next.map((x) => `<li>${x.ico} ${x.txt} · ${Date.now() >= x.start && !x.point ? '<b>en cours</b>' : `à ${hm(x.start)}`}</li>`).join('')}</ul>` : ''}
+    ${guest() ? '<p class="muted small"><a href="#" class="signup-link" data-signup>Crée ton compte gratuit</a> pour garder tes KE, tes cartes et ta progression sur tous tes appareils.</p>' : ''}
+    <button class="btn primary lg" data-value="ok">C’est parti !</button></div>`, { cls: 'bk-modal' });
+}
+profiles.ready?.then(() => setTimeout(checkBack, 1500));
+profiles.addEventListener('change', () => setTimeout(checkBack, 1500));
+setInterval(touch, 5 * 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) touch(); });
+
+return { agenda, BACK, checkBack };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -18701,6 +19318,7 @@ const routes = [
   { re: /^paris$/, page: (r) => __mods['paris.js'].renderParis(r), nav: 'paris' },
   { re: /^loto$/, page: (r) => __mods['loto.js'].renderLoto(r), nav: 'loto' },
   { re: /^(jcc|cartes)$/, page: (r) => __mods['jcc.js'].renderJcc(r), nav: 'jcc' },
+  { re: /^(avent|calendrier|noel-calendrier)$/, page: (r) => __mods['avent.js'].renderAvent(r), nav: 'avent' },
   { re: /^@(.+)$/, page: (r, m) => __mods['extras.js'].renderPlayer(r, decodeURIComponent(m[1])), nav: 'top' },
 ];
 

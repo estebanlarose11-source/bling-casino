@@ -77,14 +77,31 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
   en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en
   priorité pour retoucher l'allure générale. Le mode clair a ses propres lignes en bas de cette couche.
-- **Vérification complète** : un robot Playwright parcourt les 20 pages et les 46 jeux sur ordinateur et téléphone,
-  lance une partie dans chaque jeu et relève erreurs, images cassées, débordements et textes « undefined ».
-  À relancer après une grosse modification.
+- **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 25 pages et les 46 jeux sur
+  ordinateur et téléphone, lance une partie dans chaque jeu et relève erreurs, débordements et textes « undefined ».
+  `python3 -m http.server 8123` puis `node tools/verif/robot.js`. À relancer après une grosse modification.
 - **Couvertures** (`covers.js`, `poster()`) : un seul gabarit pour tous les jeux (plaque de titre, Bebas Neue, marque).
   Une image avec un titre peint dedans se déclare dans `CROP` (partie gardée, au-dessus du titre).
 - **Dessins par code en 3D** (`tools/render3d/`, Three.js) : couvertures des jeux sans image peinte et pièces des
   jeux rapides (`SPRITES`). `cd tools/render3d && npm i three@0.160.0 && node render.js` (couvertures) ou
   `node render.js --pieces` → `assets/games/<id>/…webp` (puis changer `CACHE` dans `sw.js`).
+
+## Immersion
+
+- **Écran d'ouverture des jeux** (`showIntro` dans `pages/game.js`) : affiche du jeu en fond flou, titre, 3 points forts
+  (ou les nouveautés de sa dernière entrée `UPDATES`), retour / volatilité / gain max, boutons « JOUER » et « Plein
+  écran » (débloquent le son et lancent la musique). À la 1re ouverture de chaque jeu et après chaque mise à jour du jeu
+  (localStorage `spinbet_intro` = { id: jour vu }). `?nointro` le saute (captures d'écran). Le chargement d'un jeu
+  montre aussi son affiche (`loadingHTML`).
+- **Son** (`audio.js`) : tout passe par un compresseur doux + une petite réverbération ; la musique a son propre bus,
+  baissé un instant pendant les gros gains, bonus et jackpots (`duck`). Pendant un bonus (`sb:feature` →
+  `sb:featureend`), la musique du jeu s'emballe (`hype` dans `core/music.js` : plus rapide, +2 demi-tons, charleston
+  et grosse caisse).
+- **Ambiance** (`ambiance.js`) : musique lounge sur les pages du site (jamais dans les jeux), allumée par défaut dans
+  l'appli installée, éteinte dans un navigateur, interrupteur « 🎵 Musique d'ambiance » du menu (`spinbet_lounge`) ;
+  neige sur les pages du site du 1er décembre au 6 janvier (`?neige` pour la voir à toute date).
+- **Gros gains en direct** (`live.js`, `BIG_X` = 50) : un gain ≥ ×50 de n'importe quel joueur en ligne passe en
+  bandeau chez tout le monde (données de présence déjà lues : aucune lecture Firestore en plus).
 
 ## Événements (tournois, jackpot, duels, cashback)
 
@@ -176,6 +193,19 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Gros gains dans le chat** (`chat.js`) : après un tour ≥ ×50 la mise ou ≥ 100 000 KE (bonus achetés exclus), le compte
   poste tout seul « 🎰 GROS GAIN ! +… KE (×…) sur <jeu> » (message normal, mêmes règles Firestore, 1 par minute au plus),
   affiché en carte dorée avec le lien du jeu.
+
+- **Calendrier de l'Avent** (`avent.js`, page `#avent`, menu Événements de novembre au 6 janvier) : du 1er au 24 décembre
+  (Paris), une case par jour, cadeau `DAYS` le même pour tous (KE, tours offerts, paquets, XP ×2 ; le 24 : 50 000 KE +
+  paquet doré, ≈ 190 000 KE en tout). Case ratée = pub récompensée `avent_catchup` (3 par jour, jusqu'au 6 janvier).
+  Annonce + compte à rebours en novembre. `profile.avent = { y, o }`. En décembre, la notification de 13 h 35
+  (`send.mjs`) annonce la case du jour. `?avent=JJ` simule le JJ décembre.
+- **« Aujourd'hui sur SpinBet »** (`retour.js`, 1er encart de l'accueil : `addHome(fn, { top: true })`) : le programme du
+  jour à l'heure de Paris (machine mystère, événements flash, Battle Royale, tournoi du soir, Loto, Happy Hour,
+  calendrier de l'Avent), en cours / dans combien de temps, lien « 🔔 Me prévenir » vers `#appli`.
+- **Cadeau « Bon retour »** (`retour.js`, `BACK`) : absent ≥ 3 jours → 5 000 KE, ≥ 7 jours → 10 000 KE + paquet bleu,
+  ≥ 14 jours → 20 000 KE + paquet violet (invités : KE seulement), une fois par semaine au plus, avec « Quoi de neuf
+  depuis ta dernière visite » (`UPDATES`) et le programme du jour. Dernière visite : `profile.back = { last, paid }`
+  (localStorage `spinbet_back` pour les invités, dont le profil est neuf à chaque visite), mise à jour toutes les 5 min.
 
 ## Arrivée des visiteurs et partage
 
@@ -275,6 +305,23 @@ données Google `FAQPage`) et 2 captures d'écran `assets/shots/<id>.webp` + `<i
 `python3 -m http.server 8123` puis `node tools/seo/shots.js <id>`, puis changer `CACHE` dans `sw.js`). Guides dans
 `articles/` (liste `ARTICLES` de `seo.py` : « Les meilleures machines à sous gratuites en 2026 », jeux de table, jeux
 rapides, RTP et volatilité ; lien « Guides et astuces » en pied de page). Nouvelle machine à sous : l'ajouter à `ORDER`.
+- **Titres Google** : `KW` dans `seo.py` = ce que les gens tapent pour chaque jeu (« machine à sous gratuite des dieux
+  grecs », « jeu des mines gratuit »…), utilisé dans le titre, le H1, la description et le texte des images. Mots
+  génériques seulement (jamais le nom d'un jeu ou d'une marque d'un autre éditeur). Nouveau jeu : lui ajouter son `KW`.
+- **8 guides** (`ARTICLES`, `art_for()` : un guide peut viser des jeux précis avec `games`) : meilleures machines à
+  sous 2026, jeux de table, jeux rapides, RTP et volatilité, comment gagner aux machines à sous, stratégie de base au
+  blackjack (tableau calculé pour les règles du 21 : 6 jeux, croupier reste à 17, doubler après séparation), martingale
+  (chiffres calculés : roulette à un zéro), casino gratuit sur téléphone.
+- **Liens pour Google sur l'accueil** : `seo.py` écrit entre `<!-- seo-links … -->` et `<!-- /seo-links -->` du pied de
+  page d'`index.html` un court texte et les liens réels vers toutes les fiches `jeux/` et les guides (Google ne suit pas
+  les `#game-…`). Ne pas modifier ce bloc à la main.
+- **Sitemap** : avec les images (couverture + captures) de chaque jeu ; `<lastmod>` ne change que si la page change
+  vraiment (`tools/seo/lastmod.json` = chemin → empreinte, date ; à garder dans le dépôt).
+- **IndexNow** (Bing, et donc Ecosia, Qwant, DuckDuckGo, Yahoo ; aussi Yandex, Seznam…) : clé = fichier
+  `5fba72ec40e4b90febc9cac4f38ce8b3.txt` à la racine (à garder en ligne), `tools/seo/indexnow.py`, lancé par GitHub
+  Actions **« IndexNow »** (`.github/workflows/indexnow.yml`) après chaque mise en ligne qui change `sitemap.xml` (il
+  attend que Vercel ait publié). À la main : Actions → IndexNow → Run workflow (« tout » = tout le site). Google ne lit
+  pas IndexNow : pour lui, le sitemap dans Search Console.
 
 ## Affiche « Mise à jour » (à faire à chaque mise à jour d'un jeu)
 

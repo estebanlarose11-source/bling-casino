@@ -19,7 +19,7 @@ async function shoot(browser, opts, id, file, phone) {
   const ctx = await browser.newContext(opts);
   await ctx.addInitScript(() => { try { localStorage.setItem('spinbet_tuto_v1', '1'); } catch {} });
   const p = await ctx.newPage();
-  await p.goto(`${BASE}?nopub#game-${id}`);
+  await p.goto(`${BASE}?nopub&nointro#game-${id}`);
   await p.waitForSelector('.game-host > *:not(.game-loading)', { timeout: 20000 }).catch(() => {});
   await p.waitForTimeout(4500);
   await p.addStyleTag({ content: '.ct-fab,.toasts,.ad-offer,.live-tick,.tuto,.bw-offer{display:none!important}' });

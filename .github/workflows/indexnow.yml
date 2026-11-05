@@ -1,0 +1,37 @@
+# IndexNow (tools/seo/indexnow.py) : après chaque mise en ligne qui change sitemap.xml, prévient Bing et les moteurs
+# qui s'en servent (Ecosia, Qwant, DuckDuckGo, Yahoo, Yandex…) des pages nouvelles ou modifiées. Google, lui, lit le
+# sitemap. Lancement à la main : Actions → « IndexNow » → Run workflow (cocher « tout » pour envoyer tout le site).
+name: IndexNow
+
+on:
+  push:
+    branches: [main]
+    paths: ['sitemap.xml']
+  workflow_dispatch:
+    inputs:
+      tout:
+        description: 'Envoyer toutes les pages du site'
+        type: boolean
+        default: false
+
+concurrency:
+  group: indexnow
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Attendre que Vercel ait mis le site à jour
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fsS "https://www.spinbetcaz.com/sitemap.xml" -o online.xml && cmp -s online.xml sitemap.xml; then echo "Site à jour"; exit 0; fi
+            sleep 15
+          done
+          echo "Le site en ligne n'a pas encore le nouveau sitemap : envoi quand même"
+      - name: Envoyer à IndexNow
+        run: python3 tools/seo/indexnow.py ${{ github.event.inputs.tout == 'true' && '--tout' || '' }}
