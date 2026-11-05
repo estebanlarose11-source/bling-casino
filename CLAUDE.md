@@ -224,6 +224,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   parties, `NUDGE`), par la puce du joueur en haut (« 💾 Sauvegarder ») et par tout bouton `[data-signup]`. Un compte
   créé depuis le mode invité garde le solde et la progression de l'invité (`openAccount` dans `profile.js`).
   Un visiteur venu d'un lien de parrainage voit directement l'écran « Créer un compte ».
+- **Parrainage** (`social.js`, page `#parrainage`) : l'ami reçoit `REF_KE` = **10 000 KE** à l'inscription (c'est
+  l'accroche de chaque lien partagé), le parrain `REF_PARRAIN` 50 000 KE + 50 tours quand l'ami atteint le niveau 2
+  (50 filleuls au plus). Encart « 🤝 Invite tes amis » sur l'accueil (`retour.js`).
 - **Image de gros gain** (`bigwin.js`) : après un gain ≥ ×50 la mise (bonus achetés exclus), et par les boutons 📸 de
   « Mes gains récents » sous chaque jeu (dès ×10) : image 1080×1920 (couverture du jeu, ×, montant, pseudo, logo,
   adresse du site et lien de parrainage des comptes) à partager ou télécharger.
@@ -250,6 +253,25 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `YT_PRIVACY` n'est pas `public` (YouTube met de toute façon en privé les vidéos d'une appli pas encore vérifiée
   par Google). Marche à suivre pour le propriétaire : `notes/youtube-mise-en-route.md`. Politique de confidentialité
   demandée par Google : `confidentialite.html` (lien dans les pieds de page).
+
+## Faire venir des joueurs (visibilité)
+
+- **Liens de partage avec grande image** : `j/<id>.html` (fabriqué par `tools/seo.py`, `noindex`) = balises d'aperçu
+  du jeu (WhatsApp, Snap, Discord, Messenger, X…) puis envoi immédiat vers `/#game-<id>` en gardant `?ref=` et `?src=`.
+  Images 1200 × 630 `assets/share/<id>.jpg` (`node tools/seo/share-images.js [id]`, police `tools/seo/bebas.woff2` ;
+  nouveau jeu : la refaire, puis changer `CACHE` dans `sw.js`). Les boutons « Partager ce jeu » (`shareSite`) et le
+  texte de l'image de gros gain (`bigwin.js`) utilisent ces liens.
+- **D'où viennent les joueurs** (`monitor.js`) : une fois par visite, dans le même document `stats/AAAA-MM-JJ` (pas de
+  nouvelle règle Firestore) : `opens._visit`, `opens._new` (1re visite sur l'appareil), `opens._compte` (compte créé),
+  `opens._src_<source>` (le `?src=` d'un lien, sinon le site d'origine, sinon parrainage / appli / direct ; sources
+  connues seulement : `SOURCES`, le reste = « autre »). Bilan : GitHub Actions **« Stats »** (`tools/admin/stats.mjs`,
+  chaque matin ou à la main, nombre de jours au choix) → résumé de la tâche (secret `FIREBASE_SERVICE_ACCOUNT`).
+- **Kit de lancement** pour le propriétaire : `lancement.html` (page privée, `noindex`, dans aucun menu) : routine du
+  jour / de la semaine (cases cochées gardées sur son téléphone), liens suivis `?src=`, textes prêts à copier
+  (WhatsApp, story Snap, TikTok, Facebook, Discord, forums, créateurs, Reddit), marche à suivre itch.io, règles.
+- **itch.io / Game Jolt** : `node tools/itch/make.js` (après `python3 tools/bundle.py`, serveur local lancé) →
+  `dist/itch/spinbet-itch.zip` (le site en un fichier, sans pub, pastille « Joue sur www.spinbetcaz.com » `?src=itch`),
+  `cover.png` 630 × 500 et 5 captures, à envoyer au propriétaire.
 
 ## Notifications sur le téléphone (gratuit)
 

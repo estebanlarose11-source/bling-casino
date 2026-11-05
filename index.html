@@ -6004,6 +6004,8 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .sh-cap { margin: 0; font-size: 13px; color: var(--muted); line-height: 1.4; user-select: all; }
 .sh-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; } .sh-acts .btn { font-size: 13px; padding: 8px 12px; }
 @media (max-width: 520px) { .sh-card { grid-template-columns: 112px 1fr; padding: 10px; } .sh-acts .btn { flex: 1 1 auto; } }
+
+.ev-card.ev-invite { --ac: #f59e0b; } .ev-card.ev-invite small { color: #fcd34d; } .ev-card.ev-invite b { font-family: KeCoin, 'Bebas Neue', Impact, sans-serif; }
 </style>
 </head>
 <body>
@@ -8144,7 +8146,8 @@ return { renderMissions, missionStatus: status };
 // ---- social.js ----
 __mods['social.js'] = (() => {
 // Referral (#parrainage) and the weekly challenge (#defi), both on Firestore (see firebase/firestore.rules).
-// Referral: a link ?ref=<uid>; a new account opened from it gets REF_KE and writes referrals/{newUid} = { by };
+// Referral: a link ?ref=<uid>; a new account opened from it gets REF_KE (10 000 KE: the hook of every shared link)
+// and writes referrals/{newUid} = { by };
 // once that friend reaches level REF_LEVEL (read from their public leaderboard entry), the referrer collects
 // REF_PARRAIN KE + REF_SPINS free spins on Huff la Puff, from the parrainage page or at login.
 // Challenge: one imposed game per week; the score is the biggest win in × the stake on that game (so every bet
@@ -8158,7 +8161,7 @@ const { toast } = __mods['ui.js'];
 const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
-const REF_KE = 1000, REF_PARRAIN = 50000, REF_SPINS = 50, REF_GAME = 'huff', REF_LEVEL = 2, REF_MAX = 50, REF_KEY = 'spinbet_ref';
+const REF_KE = 10000, REF_PARRAIN = 50000, REF_SPINS = 50, REF_GAME = 'huff', REF_LEVEL = 2, REF_MAX = 50, REF_KEY = 'spinbet_ref';
 // The site's official address: every referral and share link points there, wherever the player opened the site.
 const SITE = 'https://www.spinbetcaz.com/';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -8443,7 +8446,8 @@ async function renderChallenge(root) {
 // Share the site, or one game, with the player's referral link when they have an account (their friends then
 // count as referrals). Native share sheet on phones, otherwise the link is copied.
 async function shareSite(game) {
-  const url = (uid() ? `${SITE}?ref=${uid()}` : SITE) + (game ? `#game-${game.id}` : '');
+  // a game is shared through its page j/<id>.html: the apps show the game's big picture, then it opens the game
+  const url = game ? `${SITE}j/${game.id}.html${uid() ? `?ref=${uid()}` : ''}` : (uid() ? `${SITE}?ref=${uid()}` : SITE);
   const text = game ? `Viens jouer à ${game.name} sur SpinBet Casino 🎰 C’est gratuit !` : 'Viens jouer sur SpinBet Casino 🎰 Machines à sous, roues et jackpots, gratuit !';
   if (navigator.share) {
     try { await navigator.share({ title: 'SpinBet Casino', text, url }); return; } catch (e) { if (e?.name === 'AbortError') return; }
@@ -8457,7 +8461,7 @@ document.addEventListener('click', (e) => {
   shareSite(b.dataset.shareSite ? { id: b.dataset.shareSite, name: b.dataset.shareName } : null);
 });
 
-return { renderReferral, renderChallenge, challengeGame, challengeOf, gameOf, CHALLENGES: CATS, shareSite, REF_KE };
+return { renderReferral, renderChallenge, challengeGame, challengeOf, gameOf, CHALLENGES: CATS, shareSite, REF_KE, REF_PARRAIN };
 })();
 
 // ---- brand.js ----
@@ -14845,6 +14849,35 @@ setInterval(flush, 60000);
 addEventListener('pagehide', flush);
 document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
 
+// Where the players come from (owner's goal: bring players; report: GitHub Actions « Stats », tools/admin/stats.mjs).
+// Once per visit, in the same stats/AAAA-MM-JJ document (no new Firestore rule): opens._visit, opens._new (first visit
+// on this device), opens._compte (account created) and opens._src_<source> : the ?src= of a link (the launch kit's
+// links: lancement.html), else the site the visitor came from, else « parrainage » / « appli » / « direct ».
+// Known sources only (SOURCES), anything else counts as « autre » (the stats map holds 120 keys at most).
+const SOURCES = { tiktok: 'tiktok', tt: 'tiktok', snap: 'snap', snapchat: 'snap', insta: 'insta', instagram: 'insta', ig: 'insta', facebook: 'facebook', fb: 'facebook',
+  youtube: 'youtube', yt: 'youtube', short: 'youtube', google: 'google', bing: 'bing', ecosia: 'ecosia', qwant: 'qwant', duckduckgo: 'duckduckgo', yahoo: 'yahoo',
+  reddit: 'reddit', discord: 'discord', whatsapp: 'whatsapp', wa: 'whatsapp', telegram: 'telegram', x: 'x', twitter: 'x', itch: 'itch', gamejolt: 'gamejolt',
+  newgrounds: 'newgrounds', forum: 'forum', bio: 'bio', story: 'story', spotlight: 'spotlight', qr: 'qr', sms: 'sms', mail: 'mail', ami: 'ami', partage: 'partage' };
+const fromReferrer = () => {
+  let h = '';
+  try { h = new URL(document.referrer).hostname.replace(/^www\./, ''); } catch { return ''; }
+  if (!h || /spinbetcaz\.com$|^localhost$/.test(h)) return '';
+  const k = Object.keys(SOURCES).find((x) => x.length > 2 && h.includes(x)) || (/^t\.co$/.test(h) ? 'x' : /^(l|lm|m)\.facebook|fb\.me/.test(h) ? 'facebook' : '');
+  return k ? SOURCES[k] : 'autre';
+};
+(() => {
+  try { if (sessionStorage.getItem('spinbet_visit')) return; sessionStorage.setItem('spinbet_visit', '1'); } catch { return; }
+  const q = (location.search.match(/[?&](?:src|utm_source)=([\w-]{1,30})/i) || [])[1]?.toLowerCase();
+  const app = /SpinBetApp/.test(navigator.userAgent) || matchMedia?.('(display-mode: standalone)').matches;
+  const src = q ? SOURCES[q] || 'autre' : fromReferrer() || (/[?&]ref=/.test(location.search) ? 'parrainage' : app ? 'appli' : 'direct');
+  let first = false;
+  try { first = !localStorage.getItem('spinbet_seen'); localStorage.setItem('spinbet_seen', String(Date.now())); } catch { /* ignore */ }
+  opens._visit = (opens._visit || 0) + 1;
+  if (first) opens._new = (opens._new || 0) + 1;
+  opens[`_src_${src}`] = (opens[`_src_${src}`] || 0) + 1;
+})();
+profiles.addEventListener('change', (e) => { if (e.detail?.isNew && profiles.online) opens._compte = (opens._compte || 0) + 1; });
+
 return { logError };
 })();
 
@@ -17421,7 +17454,7 @@ async function openShare(win) {
   })().catch((e) => { console.error(e); return null; });
   if (!box) return toast('Impossible de créer l’image sur cet appareil', 'warn');
   const url = URL.createObjectURL(box), file = `spinbet-${game.id}-x${Math.round(win.x)}.png`;
-  const text = `${xTxt(win.x)} sur ${game.name} ! 🎰 Joue gratuitement sur SpinBet Casino : ${refLink()}`;
+  const text = `${xTxt(win.x)} sur ${game.name} ! 🎰 Joue gratuitement sur SpinBet Casino : ${SITE}j/${game.id}.html${uid() ? `?ref=${uid()}` : ''}`;
   const f = new File([box], file, { type: 'image/png' });
   const canFiles = !!navigator.canShare?.({ files: [f] }), inApp = !!window.SpinBetApp; // Android app: native share
   const p = modal(`<div class="bw-modal"><h3>📸 Ton image de gros gain</h3>
@@ -19312,6 +19345,12 @@ function agendaHTML(t) {
   return `<div class="ag-card"><div class="ag-head"><span>🗓️</span><b>Aujourd’hui sur SpinBet</b><small>heure de Paris</small><a href="#appli" class="ag-bell" title="Être prévenu par notification">🔔<span> Me prévenir</span></a></div><ol class="ag-list">${list.map(row).join('')}</ol></div>`;
 }
 E.addHome((t) => agendaHTML(t), { top: true });
+// invite your friends: the referral (social.js) on the home page, for everyone (a guest is asked to open an account)
+E.addHome(() => {
+  const S = __mods['social.js'];
+  if (!S?.REF_KE || !profiles.current) return '';
+  return `<a class="ev-card ev-invite" href="#parrainage"><span class="ev-ico">🤝</span><div><small>INVITE TES AMIS</small><b>+${fmt(S.REF_KE)} pour eux, +${fmt(S.REF_PARRAIN)} pour toi</b><em>${profiles.online ? 'Envoie ton lien sur WhatsApp, Snap ou Discord' : 'Crée ton compte gratuit pour avoir ton lien'}</em></div><span class="ev-go">Inviter ›</span></a>`;
+});
 
 /* ---------- 2. le cadeau « Bon retour » ---------- */
 const BACK = { minDays: 3, everyDays: 7, gifts: [[14, 20000, 'v'], [7, 10000, 'b'], [3, 5000, null]] }; // [days away ≥, KE, pack]

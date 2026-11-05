@@ -1,0 +1,31 @@
+# Bilan des visites (tools/admin/stats.mjs) : visites, nouveaux visiteurs, comptes créés, sources (TikTok, Snap,
+# Google…) et jeux les plus joués. Chaque matin, ou à la main : Actions → « Stats » → Run workflow. Le bilan est
+# dans le résumé de la tâche. Secret nécessaire : FIREBASE_SERVICE_ACCOUNT.
+name: Stats
+
+on:
+  schedule:
+    - cron: '41 6 * * *'
+  workflow_dispatch:
+    inputs:
+      jours:
+        description: 'Nombre de jours (1 à 60)'
+        required: false
+        default: '14'
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+        working-directory: tools/push
+      - name: Bilan des visites
+        run: cp tools/admin/stats.mjs tools/push/stats.mjs && node tools/push/stats.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          DAYS: ${{ github.event.inputs.jours || '14' }}

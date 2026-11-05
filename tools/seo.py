@@ -440,6 +440,41 @@ emit('articles/index.html', page('articles/', 'Guides et astuces : machines à s
                                          'Les guides de SpinBet Casino : meilleures machines à sous gratuites 2026, roulette et blackjack gratuits, jeux crash et mines, RTP et volatilité expliqués.', intro,
                                          {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': 'Guides SpinBet Casino', 'url': f'{SITE}/articles/'}))
 
+# ---- share pages j/<id>.html: what the site's « Partager » buttons send (WhatsApp, Snap, Discord, X…). The apps read
+# their tags and show the game's big picture (assets/share/<id>.jpg, tools/seo/share-images.js); a person is sent
+# straight into the game, with the link's ?ref= (referral) and ?src= (where the visit comes from). noindex: Google
+# keeps the jeux/ pages.
+share_dir = root / 'j'
+share_dir.mkdir(exist_ok=True)
+for old_page in share_dir.glob('*.html'):
+    old_page.unlink()
+for g in [{'id': x['id'], 'name': x['name'], 'cat': x['cat'], 'sub': x.get('sub', '')} for x in games]:
+    img = f'/assets/share/{g["id"]}.jpg' if (root / f'assets/share/{g["id"]}.jpg').exists() else '/assets/og.jpg'
+    t = f"🎰 {g['name']} · joue gratuitement sur SpinBet Casino"
+    d = f"{cap(kw_of(g))} : {plain(g['sub'])}. Sans téléchargement, en argent fictif. 18+"
+    (share_dir / f'{g["id"]}.html').write_text(f"""<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{esc(t)}</title>
+<meta name="robots" content="noindex, follow">
+<meta name="description" content="{esc(d)}">
+<meta property="og:type" content="website"><meta property="og:site_name" content="SpinBet Casino"><meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="{esc(t)}"><meta property="og:description" content="{esc(d)}">
+<meta property="og:url" content="{SITE}/j/{g['id']}.html">
+<meta property="og:image" content="{SITE}{img}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="{esc(g['name'])}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{SITE}{img}">
+<meta name="theme-color" content="#0b0f17">
+<script>location.replace('/' + location.search + '#game-{g['id']}');</script>
+<noscript><meta http-equiv="refresh" content="0;url=/#game-{g['id']}"></noscript>
+</head>
+<body style="background:#0b0f17;color:#fff;font:16px system-ui,sans-serif;text-align:center;padding:40px">
+<p><a style="color:#7cc8ff" href="/#game-{g['id']}">Jouer à {esc(g['name'])}</a></p>
+</body>
+</html>
+""", encoding='utf8')
+
 # ---- the home page (index.html): a block of real links in its footer, for Google (it does not follow #game-…) ----
 groups = [('Machines à sous gratuites', [g for g in games if g['cat'] == 'slot']),
           ('Roulette, blackjack, poker et roues', [g for g in games if g['cat'] == 'table' and not g['id'].endswith('-online')]),
