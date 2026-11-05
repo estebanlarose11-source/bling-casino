@@ -77,7 +77,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
   en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en
   priorité pour retoucher l'allure générale. Le mode clair a ses propres lignes en bas de cette couche.
-- **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 25 pages et les 46 jeux sur
+- **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 26 pages et les 46 jeux sur
   ordinateur et téléphone, lance une partie dans chaque jeu et relève erreurs, débordements et textes « undefined ».
   `python3 -m http.server 8123` puis `node tools/verif/robot.js`. À relancer après une grosse modification.
 - **Couvertures** (`covers.js`, `poster()`) : un seul gabarit pour tous les jeux (plaque de titre, Bebas Neue, marque).
@@ -282,6 +282,21 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   régie n'envoie rien en 6 s (code juste après `mountHta()`).
   La page `ads/` (« Nos partenaires », lien du pied de page) garde sa bannière. Le propriétaire et les appareils
   `?nopub` ne voient aucune pub (`adpolicy.js`).
+- **Règle du propriétaire : une pub = un échange** (jamais forcée, toujours contre une récompense, « Non merci »
+  toujours là). Le but est d'en faire voir le plus possible de cette façon :
+  - **Coin des récompenses** (`recompenses.js`, page `#recompenses`, menu « 📺 Récompenses vidéo », lien sur
+    `#recharger`) : toutes les pubs disponibles tout de suite (`NOW` : +500, recharge, cadeau du jour ×2, roue ×5/×15,
+    50 tours, XP ×2, paquet de cartes) et celles qui viennent au bon moment (`LATER`). Pastille rouge sur le
+    porte-monnaie du haut = nombre de pubs disponibles tout de suite.
+  - **Coffre des pubs** (`ads.js`, `CHEST`) : tous les 5 pubs vues dans la journée (toutes confondues, la fenêtre des
+    30 s comprise), un coffre de 2 500 KE, 3 par jour (`profile.ads.views` / `chests`, remis à zéro chaque jour).
+  - **Au bon moment** (une carte en bas d'écran, une seule à la fois, 2 min au moins entre deux) : niveau supérieur →
+    récompense ×2 (`lvl_x2`, 3/jour) ; gain ≥ ×25 la mise, achats exclus → +50 % jusqu'à 5 000 KE (`win_boost`,
+    5/jour) ; bonus rejoué (`bonus_replay`) ; prix de tournoi ×2 (`tour_x2`) ; solde bas (`rescue`). Boutons
+    « offert avec une pub » : ticket de Loto (`loto_ticket`) et entrée de la Battle Royale (`br_entry`), 1 par jour.
+  - **La fenêtre des 30 secondes** est devenue un cadeau : +200 KE si la pub reste 10 s (« Non merci » et ✕ tout de
+    suite, sans cadeau) ; elle compte pour le coffre.
+  - Ne jamais récompenser un clic sur une pub (interdit par les régies) : on récompense le temps d'affichage.
 
 ## Suivi et administration
 

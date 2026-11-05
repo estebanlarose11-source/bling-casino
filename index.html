@@ -5956,6 +5956,38 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .bk-card h4 { margin: 8px 0 0; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
 .bk-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; width: 100%; text-align: left; font-size: 14px; }
 .bk-list li { padding: 6px 10px; border-radius: 8px; background: rgba(255, 255, 255, .05); font-family: KeCoin, Inter, sans-serif; } .bk-list a { color: var(--text); text-decoration: none; }
+
+/* récompenses vidéo (recompenses.js, ads.js) */
+.top-wallet { position: relative; }
+.rw-dot { position: absolute; top: -7px; right: -7px; z-index: 6; text-decoration: none; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px; background: #ef4444; color: #fff;
+  font: 800 11px/19px Inter, sans-serif; font-style: normal; text-align: center; box-shadow: 0 0 0 2px var(--bg), 0 0 12px rgba(239, 68, 68, .6); animation: rwDot 2.4s ease-in-out infinite; }
+@keyframes rwDot { 50% { transform: scale(1.12); } }
+.rw-page { display: grid; gap: 14px; }
+.rw-hero { display: flex; align-items: center; gap: 16px; } .rw-hero-ico { font-size: 48px; }
+.rw-hero h1 { margin: 0 0 4px; font: 900 clamp(30px, 4.6vw, 42px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: .6px; } .rw-hero p { margin: 0; }
+.rw-chest-bar { display: grid; gap: 8px; } .rw-chest-bar b { font-size: 16px; } .rw-chest-bar small { display: block; color: var(--muted); font-family: KeCoin, Inter, sans-serif; }
+.rw-bar { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.rw-bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #f59e0b, #fde68a); transition: width .4s; }
+.rw-h { margin: 6px 0 0; font: 900 22px 'Bebas Neue', Impact, sans-serif; letter-spacing: .6px; } .rw-h small { font: 700 12px Inter, sans-serif; color: #4ade80; margin-left: 8px; }
+.rw-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 10px; }
+.rw-offer { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+.rw-offer.on { border-color: rgba(74, 222, 128, .45); box-shadow: 0 0 0 1px rgba(74, 222, 128, .15) inset; }
+.rw-offer > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.rw-offer b { font-family: KeCoin, Inter, sans-serif; font-size: 15px; } .rw-offer small { color: var(--muted); font-size: 12.5px; font-family: KeCoin, Inter, sans-serif; }
+.rw-offer small em { font-style: normal; color: var(--text); font-weight: 700; white-space: nowrap; }
+.rw-offer .btn { flex: none; max-width: 46%; white-space: normal; font-size: 13px; }
+.rw-ico { font-size: 28px; flex: none; width: 36px; text-align: center; }
+.rw-tag { flex: none; max-width: 42%; font-size: 11.5px; font-weight: 700; color: var(--muted); padding: 4px 10px; border-radius: 12px; background: rgba(255, 255, 255, .06); text-align: center; font-family: KeCoin, Inter, sans-serif; }
+@media (max-width: 700px) { .rw-hero { align-items: flex-start; } .rw-hero h1 { font-size: 30px; } .rw-hero p { font-size: 13.5px; } }
+.rw-pick { margin-top: 6px; max-width: 100%; padding: 6px 8px; border-radius: 8px; background: var(--panel-2); color: var(--text); border: 1px solid var(--line); font: 600 13px Inter, sans-serif; }
+.rw-chest { text-align: center; display: grid; gap: 8px; justify-items: center; } .rw-chest-ico { font-size: 60px; animation: mysPop .6s cubic-bezier(.3, 1.5, .5, 1); }
+.rw-chest small { font-weight: 800; letter-spacing: 1.4px; color: #fde68a; } .rw-chest h2 { margin: 0; font: 900 44px/1 KeCoin, 'Bebas Neue', Impact, sans-serif; color: #fbbf24; } .rw-chest p { margin: 0; }
+.rw-pop { border-color: rgba(251, 191, 36, .55) !important; } .rw-pop p { font-family: KeCoin, Inter, sans-serif; }
+.aads-why { margin: 0 0 8px; font-size: 13.5px; color: var(--muted); font-family: KeCoin, Inter, sans-serif; } .aads-head b { font-family: KeCoin, Inter, sans-serif; }
+.aads-acts { display: flex; gap: 8px; margin-top: 10px; } .aads-acts .btn { flex: 1; white-space: nowrap; justify-content: center; }
+.aads-take { font-family: KeCoin, Inter, sans-serif; } .aads-take span { display: inline !important; margin: 0 !important; font: inherit !important; }
+.lo-ad, .br-ad { border-color: rgba(251, 191, 36, .5); }
+@media (max-width: 700px) { .rw-hero-ico { font-size: 36px; } .rw-offer { padding: 10px; gap: 10px; } }
 </style>
 </head>
 <body>
@@ -6024,6 +6056,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
       <a href="#boutique" data-nav="shop"><span><svg class="ico"><use href="#ui-shop"/></svg></span>Boutique<b class="side-new">NEW</b></a>
       <a href="#classement" data-nav="top"><span><svg class="ico"><use href="#ui-top"/></svg></span>Classement</a>
       <a href="#recharger" data-nav="refill"><span><svg class="ico"><use href="#ui-refill"/></svg></span>Recharger</a>
+      <a href="#recompenses" data-nav="rewards"><span>📺</span>Récompenses vidéo<b class="side-badge" data-rw-badge hidden style="display:none"></b></a>
     </nav>
     <div class="side-label">Plus</div>
     <nav class="side-nav side-more">
@@ -8875,6 +8908,12 @@ const { progress, today } = __mods['progress.js'];
 const { doubleDaily, dailyStatus } = __mods['daily.js'];
 const { adPolicy } = __mods['adpolicy.js'];
 
+const ke = (n) => `${Math.round(n).toLocaleString('fr-FR')}\u00a0\uE1E0`;
+const WIN_BOOST_MAX = 5000;
+// The ads chest: every CHEST.every ads watched in a day (any placement, the 30 s window too) opens a chest of
+// CHEST.ke KE, CHEST.max times a day (profile.ads.views / chests, reset every day).
+const CHEST = { every: 5, max: 3, ke: 2500 };
+
 const PLACEMENTS = {
   credits: { label: '+500\u00a0\uE1E0', dailyCap: 20, cooldownMin: 0, reward: () => { wallet.grant(500); return '+500\u00a0\uE1E0 ajoutés'; } },
   // Refill to REFILL_TO (10 000 KE): only under REFILL_BELOW, 3 times a day, after 2 ads of 15 s in a row.
@@ -8895,6 +8934,12 @@ const PLACEMENTS = {
   avent_catchup: { label: 'Rattraper une case', dailyCap: 3, cooldownMin: 0, when: () => (__mods['avent.js']?.missed() || []).length > 0, whenMsg: 'Aucune case à rattraper', reward: (o) => __mods['avent.js'].open(o?.day, true) },
   // Cartes à collectionner: one ad → one more blue pack, once a day (jcc.js).
   jcc_pack: { label: 'Un paquet de cartes en plus', dailyCap: 1, cooldownMin: 0, reward: () => __mods['jcc.js'].adPack() },
+  // Natural moments (recompenses.js): a level-up reward doubled, a boost after a big win (+50 %, at most WIN_BOOST_MAX),
+  // the Battle Royale entry and the Loto ticket offered.
+  lvl_x2: { label: 'Doubler ma récompense de niveau', dailyCap: 3, cooldownMin: 0, reward: (o) => { const a = Math.round(o?.amount || 0); if (!(a > 0)) return 'Rien à doubler'; wallet.grant(a); return `Récompense de niveau doublée : +${ke(a)}`; } },
+  win_boost: { label: 'Coup de pouce sur un gros gain', dailyCap: 5, cooldownMin: 0, reward: (o) => { const a = Math.min(WIN_BOOST_MAX, Math.round((o?.win || 0) * 0.5)); if (!(a > 0)) return 'Rien à ajouter'; wallet.grant(a); return `🚀 Coup de pouce : +${ke(a)}`; } },
+  br_entry: { label: 'Entrée de la Battle Royale offerte', dailyCap: 1, cooldownMin: 0, reward: () => { wallet.grant(500); return `⚔️ Entrée offerte : +${ke(500)}`; } },
+  loto_ticket: { label: 'Ticket de Loto offert', dailyCap: 1, cooldownMin: 0, reward: () => { wallet.grant(500); return `🎟️ Ticket offert : +${ke(500)}`; } },
   xp_boost: { label: 'XP ×2 pendant 15 min', dailyCap: 3, cooldownMin: 60, reward: () => { progress.boost(15); return 'XP ×2 activé pendant 15 minutes'; } },
 };
 
@@ -8936,10 +8981,31 @@ const htaProvider = {
 let provider = htaProvider;
 
 const record = () => {
-  const a = { day: '', counts: {}, last: {}, ...profiles.current?.ads };
-  if (a.day !== today()) { a.day = today(); a.counts = {}; }
+  const a = { day: '', counts: {}, last: {}, views: 0, chests: 0, ...profiles.current?.ads };
+  if (a.day !== today()) { a.day = today(); a.counts = {}; a.views = 0; a.chests = 0; }
   return a;
 };
+const bus = new EventTarget();
+// counts watched ads; returns true when this one opens the chest
+function countViews(n, id) {
+  let chest = false;
+  profiles.update('ads', (me) => {
+    const a = record();
+    if (id) { a.counts[id] = (a.counts[id] || 0) + 1; a.last[id] = Date.now(); }
+    a.views = (a.views || 0) + n;
+    if (a.chests < CHEST.max && Math.floor(a.views / CHEST.every) > a.chests) { a.chests++; chest = true; }
+    me.ads = a;
+  });
+  return chest;
+}
+function openChest() {
+  wallet.grant(CHEST.ke);
+  const { modal } = __mods['ui.js'], { fx } = __mods['fx.js'], { sfx } = __mods['audio.js'], a = record();
+  sfx.bigWin?.(); fx.confetti?.(110); fx.coins?.(50);
+  modal(`<div class="rw-chest"><div class="rw-chest-ico">🧰</div><small>COFFRE DES PUBS</small><h2>+${ke(CHEST.ke)}</h2>
+    <p class="muted">Merci ! Tu as regardé ${a.views} pubs aujourd’hui.${a.chests < CHEST.max ? ` Prochain coffre dans ${CHEST.every - (a.views % CHEST.every)} pub${CHEST.every - (a.views % CHEST.every) > 1 ? 's' : ''}.` : ' C’était le dernier coffre du jour : reviens demain !'}</p>
+    <button class="btn primary lg" data-value="ok">Je récupère</button></div>`, { cls: 'rw-modal' });
+}
 
 const ads = {
   setProvider(p) { provider = p || demoProvider; },
@@ -8971,17 +9037,21 @@ const ads = {
       }
     }
     if (!res?.completed) return { ok: false, message: 'Pub interrompue : pas de récompense' };
-    profiles.update('ads', (me) => {
-      const a = record();
-      a.counts[id] = (a.counts[id] || 0) + 1;
-      a.last[id] = Date.now();
-      me.ads = a;
-    });
-    return { ok: true, message: PLACEMENTS[id].reward(opts) };
+    const chest = countViews(views, id);
+    const message = PLACEMENTS[id].reward(opts);
+    if (chest) setTimeout(openChest, 1300);
+    bus.dispatchEvent(new Event('change'));
+    return { ok: true, message };
   },
+
+  // an ad seen outside watch() (the 30 s window): counted for the chest
+  addView() { if (!profiles.current) return; if (countViews(1)) setTimeout(openChest, 900); bus.dispatchEvent(new Event('change')); },
+  // { views today, chests opened, next: ads before the next chest (0 = no more today) }
+  chest() { const a = record(); return { views: a.views || 0, chests: a.chests || 0, next: a.chests >= CHEST.max ? 0 : CHEST.every - ((a.views || 0) % CHEST.every), ...CHEST }; },
+  on(fn) { bus.addEventListener('change', fn); },
 };
 
-return { PLACEMENTS, ads };
+return { PLACEMENTS, ads, WIN_BOOST_MAX };
 })();
 
 // ---- pages/profile.js ----
@@ -13972,6 +14042,7 @@ function renderRefill(root) {
       <div class="sep"></div>
       <button class="btn lg ad-btn" data-ad ${ad.ok ? '' : 'disabled'}>▶ Regarder une pub de 15 s <span>${PLACEMENTS.credits.label}</span></button>
       <p class="muted small">${ad.ok ? `Encore ${ad.left} pub${ad.left > 1 ? 's' : ''} récompensée${ad.left > 1 ? 's' : ''} aujourd’hui, quel que soit ton solde.` : ad.reason}</p>
+      <a class="btn ghost" href="#recompenses">📺 Toutes les récompenses vidéo${__mods['recompenses.js']?.ready?.() ? ` · ${__mods['recompenses.js'].ready()} disponible${__mods['recompenses.js'].ready() > 1 ? 's' : ''}` : ''}</a>
       <a class="btn ghost" href="#profil">${daily.ready ? '🎁 Ton bonus du jour est disponible' : '🎁 Bonus du jour et niveaux'}</a>
     </section>
     <div class="hta-slot" data-hta=""></div>
@@ -17882,7 +17953,7 @@ function paintPage() {
         <h1>${esc(g.name)}</h1><p class="br-status">${statusLine(B, t)}</p>
         <div class="br-pot"><small>Le pot</small><b>${fmt(pot)}</b><span>${players.length} joueur${players.length > 1 ? 's' : ''} · entrée ${fmt(ENTRY)}</span></div>
         <div class="br-acts">${joined ? (B.m >= 1 && B.m <= 3 ? `<a class="btn primary lg" href="#game-${g.id}">🎰 Jouer ma manche (${p?.n?.[i] || 0}/${SPINS})</a>` : '<span class="br-ok">✅ Inscrit</span>')
-          : openNow(B, t) ? `<button class="btn primary lg" data-br-join>⚔️ Entrer · ${fmt(ENTRY)}</button>` : `<span class="muted">${B.m === 0 ? `Inscriptions dès ${hm(B.start - 3600e3)}` : 'Inscriptions fermées pour cette Battle'}</span>`}</div>
+          : openNow(B, t) ? `<button class="btn primary lg" data-br-join>⚔️ Entrer · ${fmt(ENTRY)}</button>${me() && __mods['ads.js'].ads.status('br_entry').ok ? '<button class="btn lg br-ad" data-br-join-ad>▶ Entrée offerte avec une pub</button>' : ''}` : `<span class="muted">${B.m === 0 ? `Inscriptions dès ${hm(B.start - 3600e3)}` : 'Inscriptions fermées pour cette Battle'}</span>`}</div>
       </div>
       <div class="br-poster">${covers[g.id] ||= __mods['covers.js'].coverSVG(g, { square: true })}</div>
     </section>
@@ -17898,6 +17969,12 @@ function paintPage() {
   if (key === shown) return;
   shown = key; root.innerHTML = html;
   root.querySelector('[data-br-join]')?.addEventListener('click', join);
+  // rewarded ad (ads.js, br_entry, 1 a day): the ad pays the entry, then the player joins as usual
+  root.querySelector('[data-br-join-ad]')?.addEventListener('click', async (e) => {
+    e.currentTarget.disabled = true;
+    const r = await __mods['ads.js'].ads.watch('br_entry');
+    if (r.ok) join(); else toast(r.message, 'warn');
+  });
 }
 function paintAll() { paintPage(); E.paint(); }
 setInterval(() => { const B = battleAt(); if (here() || local()[B.bid]?.joined) watch(B); paintPage(); }, 5000);
@@ -18092,7 +18169,8 @@ function paintPage() {
       : `<div class="sec-head"><h2>Choisis tes ${K} numéros</h2><small><b data-lo-n>${pick.size}</b> / ${K}</small></div>
         <div class="lo-grid">${Array.from({ length: N }, (_, i) => i + 1).map((x) => `<button class="lo-num${pick.has(x) ? ' on' : ''}" data-lo="${x}" ${!pick.has(x) && pick.size >= K ? 'disabled' : ''}>${x}</button>`).join('')}</div>
         <div class="lo-acts"><button class="btn ghost" data-lo-lucky>🎲 Au hasard</button><button class="btn ghost" data-lo-clear ${pick.size ? '' : 'disabled'}>Effacer</button>
-          <button class="btn primary lg" data-lo-buy ${pick.size === K ? '' : 'disabled'}>🎟️ Valider mon ticket · ${fmt(TICKET)}</button></div>
+          <button class="btn primary lg" data-lo-buy ${pick.size === K ? '' : 'disabled'}>🎟️ Valider mon ticket · ${fmt(TICKET)}</button>
+          ${__mods['ads.js'].ads.status('loto_ticket').ok ? `<button class="btn lg lo-ad" data-lo-buy-ad ${pick.size === K ? '' : 'disabled'}>▶ Ticket offert avec une pub</button>` : ''}</div>
         <p class="muted small">Ticket pour le tirage ${dayName(k)} à 21 h 30. Un ticket par jour.</p>`}
     </section>
     <section class="panel lo-players"><div class="sec-head"><h2>🎟️ Ils ont pris leur ticket</h2><small>tirage ${dayName(k)}${nk ? ` · ${nk} joueur${nk > 1 ? 's' : ''}` : ''}</small></div>
@@ -18112,6 +18190,12 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-lo-lucky]')) return lucky();
   if (e.target.closest('[data-lo-clear]')) { pick = new Set(); return paintPage(); }
   if (e.target.closest('[data-lo-buy]')) buy();
+  if (e.target.closest('[data-lo-buy-ad]')) {
+    // rewarded ad (ads.js, loto_ticket, 1 a day): the ad pays the ticket, then it is validated as usual
+    if (pick.size !== K) return toast(`Choisis ${K} numéros (${pick.size}/${K})`, 'warn');
+    if (ticketFor(target())) return toast('Tu as déjà ton ticket pour ce tirage', 'info');
+    __mods['ads.js'].ads.watch('loto_ticket').then((r) => { if (r.ok) buy(); else toast(r.message, 'warn'); });
+  }
 });
 // countdown every second; the draw is looked for every minute around 21 h 30 (and every 10 min otherwise)
 setInterval(() => {
@@ -19266,6 +19350,142 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) touc
 return { agenda, BACK, checkBack };
 })();
 
+// ---- recompenses.js ----
+__mods['recompenses.js'] = (() => {
+// Pubs récompensées, toujours au choix du joueur (demande du propriétaire : « un échange de bons procédés », jamais
+// forcé) :
+// 1) Le coin des récompenses (#recompenses, menu « 📺 Récompenses vidéo », pastille sur le bouton Recharger) : toutes
+//    les pubs disponibles tout de suite, ce qu'elles rapportent et combien il en reste, plus celles qui arrivent au
+//    bon moment ; le coffre des pubs (ads.js, CHEST : tous les 5 pubs vues dans la journée).
+// 2) Les propositions au bon moment (carte en bas d'écran, « Non merci » toujours là, une seule à la fois, GAP entre
+//    deux) : niveau supérieur → récompense ×2 ; gain ≥ BOOST_X × la mise (bonus achetés exclus) → +50 % jusqu'à
+//    5 000 KE. La Battle Royale et le Loto ont leur bouton « offert avec une pub » sur leur page.
+const { ads, PLACEMENTS, WIN_BOOST_MAX } = __mods['ads.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { toast } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const { getGame, SLOTS } = __mods['games/index.js'];
+const { progress } = __mods['progress.js'];
+
+const BOOST_X = 25, GAP = 120000;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+
+// watchable right away from the page
+const NOW = [
+  { id: 'credits', ico: '💰', title: `+${fmt(500)}`, text: 'Une pub de 15 secondes.' },
+  { id: 'refill', ico: '🔋', title: `Solde rechargé à ${fmt(10000)}`, text: `2 pubs, quand ton solde passe sous ${fmt(1000)}.` },
+  { id: 'daily_x2', ico: '🎁', title: 'Cadeau du jour doublé', text: 'Après avoir pris ton cadeau du jour.' },
+  { id: 'wheel_x5', ico: '🎡', title: 'Roue du jour ×5', text: 'Après ton tour de roue gratuit.' },
+  { id: 'wheel_x15', ico: '🎡', title: 'Roue du jour ×15', text: 'Après la pub ×5.' },
+  { id: 'spins50', ico: '🎰', title: '50 tours offerts', text: '3 pubs, sur la machine de ton choix.', pick: true },
+  { id: 'xp_boost', ico: '⚡', title: 'XP ×2 pendant 15 min', text: 'Monte de niveau deux fois plus vite.' },
+  { id: 'jcc_pack', ico: '🃏', title: 'Un paquet de cartes en plus', text: '5 cartes à collectionner.' },
+];
+// offered at the right moment, elsewhere on the site
+const LATER = [
+  { id: 'bonus_replay', ico: '🔁', title: 'Rejoue ton bonus', text: 'Après un bonus gagné en jouant, bien payé ou pas.' },
+  { id: 'win_boost', ico: '🚀', title: 'Coup de pouce +50 %', text: `Après un gain de ${BOOST_X} fois la mise ou plus (jusqu’à ${fmt(WIN_BOOST_MAX)}).` },
+  { id: 'lvl_x2', ico: '⭐', title: 'Niveau supérieur ×2', text: 'Quand tu passes un niveau.' },
+  { id: 'tour_x2', ico: '🏆', title: 'Prix de tournoi ×2', text: 'Quand tu gagnes un prix de tournoi.' },
+  { id: 'br_entry', ico: '⚔️', title: 'Entrée de la Battle Royale offerte', text: 'Sur la page de la Battle Royale.', href: '#battle' },
+  { id: 'loto_ticket', ico: '🎱', title: 'Ticket de Loto offert', text: 'Sur la page du Loto.', href: '#loto' },
+  { id: 'avent_catchup', ico: '🎄', title: 'Case de l’Avent rattrapée', text: 'Une case ratée du calendrier.', href: '#avent' },
+  { id: 'rescue', ico: '🆘', title: `+${fmt(1000)} quand ton solde est bas`, text: `Dans un jeu, sous ${fmt(150)}.` },
+];
+const ready = () => (profiles.current ? NOW.filter((o) => ads.status(o.id).ok).length : 0);
+
+/* ---------- the page ---------- */
+let root = null;
+function renderRewards(r) {
+  root = r;
+  const c = ads.chest(), st = (id) => ads.status(id);
+  const pct = c.next ? ((c.every - c.next) / c.every) * 100 : 100;
+  const card = (o, later) => {
+    const s = st(o.id), cap = PLACEMENTS[o.id]?.dailyCap || 0;
+    const btn = later ? (o.href ? `<a class="btn ghost" href="${o.href}">Y aller</a>` : `<span class="rw-tag">${s.left ? 'au bon moment' : 'demain'}</span>`)
+      : s.ok ? `<button class="btn primary" data-rw="${o.id}">▶ ${PLACEMENTS[o.id].views > 1 ? `${PLACEMENTS[o.id].views} pubs` : 'Regarder'}</button>` : `<span class="rw-tag">${s.reason}</span>`;
+    return `<div class="rw-offer${!later && s.ok ? ' on' : ''}"><span class="rw-ico">${o.ico}</span><div><b>${o.title}</b><small>${o.text} ${cap ? `<em>${s.left} / ${cap} aujourd’hui</em>` : ''}</small>
+      ${o.pick && s.ok ? `<select class="rw-pick" data-rw-pick aria-label="Machine">${SLOTS.filter((g) => g.original || g.id === 'big-bad-wolf').map((g) => `<option value="${g.id}">${esc(g.name)}</option>`).join('')}</select>` : ''}</div>${btn}</div>`;
+  };
+  r.innerHTML = `<section class="rw-page">
+    <div class="rw-hero panel"><span class="rw-hero-ico">📺</span><div><h1>Récompenses vidéo</h1>
+      <p class="muted">Une pub de 15 secondes contre des KE, des tours, des cartes… C’est toi qui choisis, quand tu veux : jamais de pub imposée en plein jeu.</p></div></div>
+    <div class="rw-chest-bar panel"><div><b>🧰 Coffre des pubs</b><small>${c.next ? `Encore ${c.next} pub${c.next > 1 ? 's' : ''} pour ouvrir un coffre de ${fmt(c.ke)}` : 'Tous les coffres du jour sont ouverts : reviens demain !'} · ${c.chests} / ${c.max} aujourd’hui</small></div>
+      <div class="rw-bar"><i style="width:${pct.toFixed(0)}%"></i></div></div>
+    <h2 class="rw-h">Tout de suite <small>${ready()} disponible${ready() > 1 ? 's' : ''}</small></h2>
+    <div class="rw-list">${NOW.slice().sort((a, b) => st(b.id).ok - st(a.id).ok).map((o) => card(o)).join('')}</div>
+    <h2 class="rw-h">Au bon moment</h2>
+    <div class="rw-list">${LATER.map((o) => card(o, true)).join('')}</div>
+    ${profiles.online ? '' : '<p class="muted small">En invité, tes compteurs repartent à zéro à chaque visite. <a href="#" class="signup-link" data-signup>Crée ton compte</a> pour garder tes récompenses partout.</p>'}
+  </section>`;
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-rw]');
+  if (!b) return;
+  b.disabled = true;
+  const id = b.dataset.rw, opts = id === 'spins50' ? { game: b.closest('.rw-offer')?.querySelector('[data-rw-pick]')?.value } : undefined;
+  const r = await ads.watch(id, opts);
+  toast(r.message, r.ok ? 'ok' : 'warn');
+  if (r.ok) { sfx.unlock?.(); sfx.win?.(); fx.coins?.(30, b); }
+  if (root?.isConnected && root.querySelector('.rw-page')) renderRewards(root);
+});
+
+/* ---------- the badges: Recharger button and menu ---------- */
+function paintBadges() {
+  const n = ready();
+  document.querySelectorAll('[data-rw-badge]').forEach((x) => { x.textContent = n > 9 ? '9+' : n; x.hidden = !n; x.style.display = n ? '' : 'none'; });
+}
+function mountBadge() {
+  // on the top bar's wallet (the Recharger button itself clips what goes past its edges)
+  const box = document.querySelector('.top-wallet');
+  if (box && !box.querySelector('[data-rw-badge]')) box.insertAdjacentHTML('beforeend', '<a class="rw-dot" href="#recompenses" data-rw-badge hidden style="display:none" title="Récompenses vidéo disponibles" aria-label="Récompenses vidéo disponibles"></a>');
+  paintBadges();
+}
+ads.on(() => { paintBadges(); if (root?.isConnected && root.querySelector('.rw-page')) renderRewards(root); });
+profiles.addEventListener('change', () => setTimeout(paintBadges, 600));
+wallet.addEventListener('change', () => { clearTimeout(mountBadge.t); mountBadge.t = setTimeout(paintBadges, 800); });
+addEventListener('hashchange', () => setTimeout(paintBadges, 300));
+setInterval(paintBadges, 30000);
+setTimeout(mountBadge, 800);
+
+/* ---------- the offers at the right moment ---------- */
+let lastOffer = 0;
+function offer(id, opts, title, text, delay = 3000, tries = 0) {
+  setTimeout(() => {
+    if (!profiles.current || !ads.status(id).ok || Date.now() - lastOffer < GAP) return;
+    if (document.querySelector('.ad-offer, .modal-back, .aads-modal')) { if (tries < 8) offer(id, opts, title, text, 2500, tries + 1); return; }
+    lastOffer = Date.now();
+    const card = document.createElement('div');
+    card.className = 'ad-offer rw-pop';
+    card.innerHTML = `<b>${title}</b><p>${text}</p><div><button class="btn primary" data-go>▶ Regarder une pub</button><button class="btn ghost" data-x>Non merci</button></div>`;
+    document.body.appendChild(card);
+    const t = setTimeout(() => card.remove(), 16000);
+    card.querySelector('[data-x]').onclick = () => { clearTimeout(t); card.remove(); };
+    card.querySelector('[data-go]').onclick = async () => {
+      clearTimeout(t); card.remove();
+      __mods['pages/game.js']?.currentGame?.()?.stopAuto?.();
+      const r = await ads.watch(id, opts);
+      toast(r.message, r.ok ? 'ok' : 'warn');
+      if (r.ok) { sfx.bigWin?.(); fx.coins?.(40); }
+    };
+  }, delay);
+}
+progress.addEventListener('levelup', (e) => {
+  const d = e.detail || {};
+  if (d.reward > 0) offer('lvl_x2', { amount: d.reward }, `⭐ Niveau ${d.level} !`, `Regarde une pub et ta récompense de niveau double : <b>+${fmt(d.reward)}</b> en plus.`, 3200);
+});
+addEventListener('sb:roundend', (e) => {
+  const d = e.detail || {};
+  if (d.bought || !(d.win > 0) || !(d.x >= BOOST_X)) return;
+  const add = Math.min(WIN_BOOST_MAX, Math.round(d.win * 0.5));
+  if (add >= 1) offer('win_boost', { win: d.win }, `🚀 Beau gain : ×${Math.round(d.x).toLocaleString('fr-FR')} !`, `Une pub de 15 s et on ajoute <b>+${fmt(add)}</b> (50 % de ton gain).`, 4200);
+});
+
+return { renderRewards, ready, NOW, LATER };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -19319,6 +19539,7 @@ const routes = [
   { re: /^loto$/, page: (r) => __mods['loto.js'].renderLoto(r), nav: 'loto' },
   { re: /^(jcc|cartes)$/, page: (r) => __mods['jcc.js'].renderJcc(r), nav: 'jcc' },
   { re: /^(avent|calendrier|noel-calendrier)$/, page: (r) => __mods['avent.js'].renderAvent(r), nav: 'avent' },
+  { re: /^(recompenses|pubs|recompense)$/, page: (r) => __mods['recompenses.js'].renderRewards(r), nav: 'rewards' },
   { re: /^@(.+)$/, page: (r, m) => __mods['extras.js'].renderPlayer(r, decodeURIComponent(m[1])), nav: 'top' },
 ];
 
@@ -19447,11 +19668,32 @@ __mods['hta.js'].mountHta();
     try { sessionStorage.setItem(KEY, '1'); } catch { /* ignore */ }
     const box = document.createElement('div');
     box.className = 'aads-modal arrival-ad';
-    box.innerHTML = `<div class="aads-card"><div class="aads-head"><b>Publicité</b><button class="aads-x" aria-label="Fermer">✕</button></div><div class="hta-box rw-box"></div><button class="btn ghost aads-close">Fermer et jouer</button></div>`;
+    // (owner's request: an ad is always an exchange) the window is a small gift: GIFT KE if the ad stays WAIT
+    // seconds; the ✕ and « Non merci » work at once, without the gift. It counts for the ads chest (ads.js).
+    const GIFT = 200, WAIT = 10;
+    box.innerHTML = `<div class="aads-card"><div class="aads-head"><b>🎁 Petit cadeau : +${GIFT}\u00a0\uE1E0</b><button class="aads-x" aria-label="Fermer">✕</button></div>
+      <p class="aads-why">Laisse cette pub ${WAIT} secondes et reçois <b>+${GIFT}\u00a0\uE1E0</b>. Merci, c’est ce qui garde SpinBet gratuit !</p>
+      <div class="hta-box rw-box"></div>
+      <div class="aads-acts"><button class="btn primary aads-take" disabled>Cadeau dans <span>${WAIT}</span> s</button><button class="btn ghost aads-close">Non merci</button></div></div>`;
     document.body.appendChild(box);
-    const rw = box.querySelector('.rw-box');
+    const rw = box.querySelector('.rw-box'), take = box.querySelector('.aads-take');
     H.inject(rw);
-    const close = () => box.remove();
+    let left = WAIT;
+    const tick = setInterval(() => {
+      if (!box.isConnected) return clearInterval(tick);
+      left -= 1;
+      if (left > 0) { take.querySelector('span').textContent = left; return; }
+      clearInterval(tick);
+      take.disabled = false;
+      take.textContent = `Récupérer +${GIFT}\u00a0\uE1E0`;
+    }, 1000);
+    const close = () => { clearInterval(tick); box.remove(); };
+    take.onclick = () => {
+      close();
+      wallet.grant(GIFT);
+      ads.addView?.();
+      toast(`🎁 +${GIFT}\u00a0\uE1E0, merci !`, 'ok');
+    };
     box.querySelector('.aads-x').onclick = close;
     box.querySelector('.aads-close').onclick = close;
     box.addEventListener('click', (e) => { if (e.target === box) close(); });

@@ -7,7 +7,7 @@ const fs = require('fs');
 const src = fs.readFileSync(require('path').resolve(__dirname, '../../index.html'), 'utf8');
 const block = src.slice(src.indexOf('const ORIGINALS = ['), src.indexOf('].map((g) => ({ ...g, original: true }))'));
 const games = ['big-bad-wolf', ...block.split('\n').filter((l) => l.trim().startsWith('{"id"')).map((l) => JSON.parse(l.trim().replace(/,$/, ''))).filter((g) => !g.wip).map((g) => g.id)];
-const pages = ['accueil', 'lobby-slot', 'lobby-table', 'lobby-quick', 'succes', 'profil', 'classement', 'recharger', 'responsable', 'appli', 'roue', 'boutique', 'missions', 'parrainage', 'defi', 'special', 'tournois', 'jackpot', 'duels', 'cashback', 'battle', 'paris', 'loto', 'jcc', 'avent'];
+const pages = ['accueil', 'lobby-slot', 'lobby-table', 'lobby-quick', 'succes', 'profil', 'classement', 'recharger', 'recompenses', 'responsable', 'appli', 'roue', 'boutique', 'missions', 'parrainage', 'defi', 'special', 'tournois', 'jackpot', 'duels', 'cashback', 'battle', 'paris', 'loto', 'jcc', 'avent'];
 const ok = (t) => !/TUNNEL|firebase|Failed to load|ERR_|net::|gstatic|googleapis|adsterra|raw\.githubusercontent|Cannot load/i.test(t);
 (async () => {
   const b = await chromium.launch();
