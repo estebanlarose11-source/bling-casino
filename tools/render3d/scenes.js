@@ -406,6 +406,57 @@ export const SCENES = {
   },
 
   // La Roue d'Or: a golden wheel of dark wedges with one shining BONUS wedge and its pointer
+  // Le Pilote: a white jet climbing away from a carrier deck, a gold coin and a purple star ahead, a spiky bomb below
+  pilote: async () => {
+    const s = studio({ colors: ['#38a6f5', '#0b2a6f'], light: '#fde68a', rim: '#bae6fd', seed: 121, camY: 1.6, dist: 13, lift: 0.12 });
+    const { scene } = s;
+    // sea and the carrier (grey hull, dark deck with white dashes, island tower)
+    const waves = canvasTex(512, 512, (g) => { const gr = g.createLinearGradient(0, 0, 0, 512); gr.addColorStop(0, '#0b4f8a'); gr.addColorStop(1, '#06305a'); g.fillStyle = gr; g.fillRect(0, 0, 512, 512); g.strokeStyle = 'rgba(186,230,253,.45)'; g.lineWidth = 5; for (let j = 0; j < 10; j++) { g.beginPath(); for (let x = 0; x <= 512; x += 16) g.lineTo(x, j * 52 + 20 + Math.sin(x * 0.05 + j) * 6); g.stroke(); } }, { repeat: true });
+    waves.repeat.set(4, 3);
+    scene.add(mesh(new THREE.PlaneGeometry(40, 30), new THREE.MeshPhysicalMaterial({ map: waves, roughness: 0.25, clearcoat: 1, envMapIntensity: 0.4 }), { rx: -Math.PI / 2, y: -2.9, shadow: false }));
+    const ship = new THREE.Group(), grey = M.steel('#64748b', 0.45), deck = M.matte('#334155', 0.8);
+    ship.add(box(7.4, 0.9, 2.3, 0.12, grey));
+    ship.add(mesh(new THREE.BoxGeometry(7.6, 0.12, 2.5), deck, { y: 0.5 }));
+    for (let i = 0; i < 7; i++) ship.add(mesh(new THREE.BoxGeometry(0.5, 0.02, 0.07), M.glow('#ffffff', 1.1), { x: -3.2 + i * 1.0, y: 0.57, shadow: false }));
+    for (let i = 0; i < 8; i++) ship.add(mesh(new THREE.SphereGeometry(0.06, 12, 8), M.glow('#4ade80', 3), { x: -3.5 + i * 0.95, y: 0.6, z: 1.15, shadow: false }));
+    const IX = -2.3, isl = box(0.9, 1.3, 0.8, 0.06, grey); isl.position.set(IX, 1.2, -0.75); ship.add(isl);
+    const top = box(0.5, 0.45, 0.5, 0.05, grey); top.position.set(IX, 2.05, -0.75); ship.add(top);
+    [0, 1, 2].forEach((k) => ship.add(mesh(new THREE.BoxGeometry(0.16, 0.14, 0.02), M.glow('#93c5fd', 1.6), { x: IX - 0.25 + k * 0.25, y: 1.45, z: -0.34, shadow: false })));
+    ship.add(mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.9, 8), M.steel('#cbd5e1'), { x: IX, y: 2.7, z: -0.75 }));
+    ship.position.set(-0.6, -2.6, -0.6); ship.rotation.y = rad(22);
+    scene.add(ship);
+    // the jet (white with a blue stripe and a red tail)
+    const jet = new THREE.Group(), white = M.plastic('#f8fafc', 0.22), red = M.plastic('#dc2626', 0.22), blue = M.plastic('#2563eb', 0.2), glass = M.plastic('#0ea5e9', 0.05);
+    jet.add(mesh(new THREE.CapsuleGeometry(0.4, 2.5, 16, 32), white, { rz: Math.PI / 2 }));
+    [-1, 1].forEach((k) => jet.add(mesh(new THREE.BoxGeometry(2.3, 0.1, 0.04), blue, { x: -0.1, y: -0.02, z: k * 0.39 })));
+    jet.add(mesh(new THREE.SphereGeometry(0.32, 32, 24, 0, Math.PI * 2, 0, Math.PI / 2), glass, { x: 0.9, y: 0.22, rz: rad(-20), s: [1.4, 0.8, 0.9] }));
+    const wing = new THREE.Shape(); wing.moveTo(0.5, 0); wing.lineTo(-0.5, 0); wing.lineTo(-1.1, 1.9); wing.lineTo(-0.6, 1.9); wing.closePath();
+    const wGeo = new THREE.ExtrudeGeometry(wing, { depth: 0.08, bevelEnabled: true, bevelSize: 0.03, bevelThickness: 0.03, bevelSegments: 2 });
+    jet.add(mesh(wGeo, white, { rx: Math.PI / 2, y: 0.02 }), mesh(wGeo, white, { rx: -Math.PI / 2, y: -0.02 }));
+    const fin = new THREE.Shape(); fin.moveTo(-0.95, 0); fin.lineTo(-1.7, 0); fin.lineTo(-1.95, 1.05); fin.lineTo(-1.6, 1.05); fin.closePath();
+    jet.add(mesh(new THREE.ExtrudeGeometry(fin, { depth: 0.07, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02 }), red, { y: 0.15, z: -0.035 }));
+    jet.add(mesh(new THREE.CylinderGeometry(0.28, 0.34, 0.25, 32), M.steel('#334155', 0.3), { x: -1.7, rz: Math.PI / 2 }));
+    jet.add(mesh(new THREE.ConeGeometry(0.22, 0.9, 24), M.glow('#ffb15c', 4), { x: -2.2, rz: Math.PI / 2, shadow: false }));
+    jet.rotation.set(rad(-14), rad(-30), rad(24)); jet.position.set(0.5, 1.3, 0.6); jet.scale.setScalar(0.95);
+    scene.add(jet);
+    // its trail from the deck
+    const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(-4.4, -1.95, -0.4), new THREE.Vector3(-2.6, -1.5, 0), new THREE.Vector3(-1.3, -0.1, 0.3), new THREE.Vector3(-0.9, 0.55, 0.45)]);
+    scene.add(mesh(new THREE.TubeGeometry(curve, 64, 0.09, 16), M.glow('#e0f2fe', 2.2), { shadow: false }));
+    scene.add(mesh(new THREE.TubeGeometry(curve, 64, 0.26, 16), new THREE.MeshBasicMaterial({ color: '#bae6fd', transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, depthWrite: false }), { shadow: false }));
+    // a gold coin and a purple star ahead
+    const c = coin(0.62, 0.16, M.gold('#ffc53d', 0.2), coinFace('k')); c.rotation.set(rad(80), 0, rad(-12)); c.position.set(2.6, 2.6, 0); scene.add(c);
+    const st = new THREE.Shape(); for (let i = 0; i < 10; i++) { const a = Math.PI / 2 + (i / 10) * Math.PI * 2, r = i % 2 ? 0.32 : 0.75; if (i) st.lineTo(Math.cos(a) * r, Math.sin(a) * r); else st.moveTo(Math.cos(a) * r, Math.sin(a) * r); } st.closePath();
+    scene.add(mesh(new THREE.ExtrudeGeometry(st, { depth: 0.22, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.06, bevelSegments: 3 }), new THREE.MeshPhysicalMaterial({ color: '#d946ef', metalness: 0.2, roughness: 0.15, clearcoat: 1, emissive: '#a21caf', emissiveIntensity: 0.6 }), { x: -2.3, y: 2.4, z: -0.4, rz: rad(12), ry: rad(18) }));
+    // the spiky bomb with its red light
+    const bomb = new THREE.Group(), blk = M.plastic('#111827', 0.3);
+    bomb.add(mesh(new THREE.SphereGeometry(0.62, 48, 32), blk));
+    for (let i = 0; i < 14; i++) { const v = new THREE.Vector3().setFromSphericalCoords(1, Math.acos(1 - 2 * (i + 0.5) / 14), i * 2.4); const sp = mesh(new THREE.ConeGeometry(0.1, 0.42, 12), M.steel('#475569', 0.3)); sp.position.copy(v.clone().multiplyScalar(0.7)); sp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), v); bomb.add(sp); }
+    bomb.add(mesh(new THREE.SphereGeometry(0.11, 16, 12), M.glow('#ef4444', 4), { y: 0.25, z: 0.55, shadow: false }));
+    bomb.position.set(2.5, -0.9, 0.4); scene.add(bomb);
+    scene.add(sparkles(28, 123, { spread: [8, 7, 3], center: [0, 0.8, -0.5], colors: ['#ffffff', '#fde68a', '#bae6fd'] }));
+    return s;
+  },
+
   roueor: async () => {
     const s = studio({ colors: ['#e0a526', '#2a1f06'], light: '#fde68a', rim: '#fff0b0', seed: 111, camY: 1.2, dist: 15.5, lift: 0.11 });
     const { scene } = s;

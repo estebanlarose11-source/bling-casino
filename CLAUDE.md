@@ -68,6 +68,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`pendingC`, payés si le joueur quitte), après la roulette russe (`GAMBLE` ×1,15 … ×5,76, retour 96 %, hors RTP).
   Simulation (3,6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 4 (surtout petits), Duel 1 tour sur 385 (≈ ×130),
   achats 150 / 500 (≈ 88 %).
+- **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : un avion décolle d'un porte-avions
+  et rencontre 10 objets (pièces +0,1 à +3 × la mise, étoiles ×2 / ×5 : l'avion monte d'un cran ; bombes ÷2 : il
+  ralentit et descend de 2 crans). Altitude de départ 3 sur 6 ; à 0 = la mer, mise perdue ; sinon il se pose sur le
+  porte-avions d'arrivée et paie le gain ramassé (plafond ×500). Tout le vol est tiré au décollage (`flight()`, bloc
+  `===ENGINE`), puis animé dans un canvas 2D (ralenti quand une bombe de plus serait fatale, alerte rouge, approche
+  finale). Le signe ÷ est dessiné à la main (`say2`), il ressemblait à un + dans certaines polices. Quitter en plein vol
+  paie quand même un vol qui allait se poser. Simulation `node tools/sim/pilote.js` (lit le moteur du jeu, 10 M vols) :
+  retour ≈ 95,0 %, atterrissage 55 %, gain ≥ ×1 32 %, ≥ ×10 un vol sur 210, ≥ ×100 un sur 80 000.
 - **Fluidité sur ordinateur** (fin de la couche `finition`) : le fond de nuit est sur sa propre couche fixe (`body::after`),
   jamais `background: … fixed` sur `body` (repeint toute la page à chaque défilement : 4 → 60 images/s mesuré) ; pas de
   `backdrop-filter` (flou en direct) sur la barre du haut, les menus, la barre du bas et les messages. Ne pas les remettre.
@@ -77,7 +85,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
   en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en
   priorité pour retoucher l'allure générale. Le mode clair a ses propres lignes en bas de cette couche.
-- **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 26 pages et les 46 jeux sur
+- **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 26 pages et les 47 jeux sur
   ordinateur et téléphone, lance une partie dans chaque jeu et relève erreurs, débordements et textes « undefined ».
   `python3 -m http.server 8123` puis `node tools/verif/robot.js`. À relancer après une grosse modification.
 - **Couvertures** (`covers.js`, `poster()`) : un seul gabarit pour tous les jeux (plaque de titre, Bebas Neue, marque).

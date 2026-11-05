@@ -76,7 +76,7 @@ KW = {
     'mines': 'jeu des mines gratuit', 'avion': 'jeu crash de l’avion gratuit', 'plinko': 'plinko gratuit en ligne',
     'vortex': 'jeu du vortex gratuit', 'casse': 'jeu du coffre-fort gratuit', 'pileface': 'pile ou face en ligne gratuit',
     'robots': 'course de robots gratuite', 'poulet': 'jeu du poulet gratuit', 'gratteciel': 'jeu de cubes à empiler gratuit',
-    'penalty': 'jeu de penalty gratuit', 'ticket': 'ticket à gratter gratuit en ligne', 'billes': 'course de billes gratuite',
+    'penalty': 'jeu de penalty gratuit', 'ticket': 'ticket à gratter gratuit en ligne', 'billes': 'course de billes gratuite', 'pilote': 'jeu d’avion gratuit avec multiplicateurs',
 }
 KW_CAT = {'slot': 'machine à sous gratuite', 'table': 'jeu de casino gratuit', 'quick': 'jeu rapide gratuit'}
 kw_of = lambda g: KW.get(g['id']) or KW_CAT.get(g['cat'], 'jeu de casino gratuit')
