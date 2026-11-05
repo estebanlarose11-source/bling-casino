@@ -11555,7 +11555,8 @@ __mods['slot/holdspin.js'] = (() => {
 
 const { weightedPick, symbolById } = __mods['slot/math.js'];
 const { sfx } = __mods['audio.js'];
-const { fx, sleep, center } = __mods['fx.js'];
+const { fx, sleep: fxSleep, center } = __mods['fx.js'];
+const sleep = (ms) => fxSleep(globalThis.__sbSuper ? Math.max(10, ms * 0.3) : ms); // super turbo of the slots: every pause much shorter
 const { el, animateNumber, fmtShort } = __mods['ui.js'];
 const { fmt, round } = __mods['wallet.js'];
 
@@ -12121,7 +12122,8 @@ const { runHoldSpin } = __mods['slot/holdspin.js'];
 const { wallet, fmt, round } = __mods['wallet.js'];
 const { BRAND } = __mods['brand.js'];
 const { sfx, isMuted, setMuted } = __mods['audio.js'];
-const { fx, sleep, center } = __mods['fx.js'];
+const { fx, sleep: fxSleep, center } = __mods['fx.js'];
+const sleep = (ms) => fxSleep(globalThis.__sbSuper ? Math.max(10, ms * 0.3) : ms); // super turbo of the slots: every pause much shorter
 const { el, toast, modal, animateNumber, fmtShort } = __mods['ui.js'];
 const { coverSVG } = __mods['covers.js'];
 const { gameMenu, toggleFull, setFull, isFull, MENU_BTN, FULL_BTN, autoFit } = __mods['core/chrome.js'];
@@ -12143,6 +12145,9 @@ class SlotMachine {
     this.game = game;
     this.betIdx = 0;
     this.turbo = false;
+    try { this.superT = localStorage.getItem(`${game.id}_super`) === '1'; } catch { this.superT = false; } // super turbo (owner's request)
+    if (this.superT) this.turbo = true;
+    globalThis.__sbSuper = this.superT;
     this.auto = 0;
     this.busy = false;
     this.free = null;
@@ -12249,6 +12254,7 @@ class SlotMachine {
   }
 
   destroy() {
+    globalThis.__sbSuper = false;
     this.dead = true;
     this.auto = 0;
     if (isFull(this.root)) setFull(this.root, false);
@@ -12296,8 +12302,8 @@ class SlotMachine {
     const g = this.game;
     const teaseIds = [g.freeSpins?.scatter].filter(Boolean);
     let scSoFar = 0, coinSoFar = 0, extra = 0;
-    const base = this.turbo ? 300 : 620;
-    const step = this.turbo ? 70 : 160;
+    const sup = this.superT ? 0.45 : 1, base = (this.turbo ? 300 : 620) * sup;
+    const step = (this.turbo ? 70 : 160) * sup;
     const jobs = [];
     for (let r = 0; r < g.reels; r++) {
       const tease = !this.turbo && r > 1 && (scSoFar >= 2 || (g.holdSpin && mode === 'base' && coinSoFar >= 4));
@@ -12538,7 +12544,7 @@ class SlotMachine {
     if (this.auto > 0 && !this.dead) {
       this.auto--;
       this.updateMeters();
-      if (this.auto > 0) setTimeout(() => this.play(), this.turbo ? 150 : 400);
+      if (this.auto > 0) setTimeout(() => this.play(), this.superT ? 30 : this.turbo ? 150 : 400);
       else this.stopAuto();
     }
   }
@@ -12699,6 +12705,7 @@ class SlotMachine {
       autoplay: true, auto: this.auto, busy: this.busy || !!this.free,
       toggles: [
         { icon: '⚡', label: 'Turbo', on: this.turbo, toggle: () => (this.turbo = !this.turbo) },
+        { icon: '🚀', label: 'Super turbo', on: this.superT, toggle: () => { this.superT = !this.superT; globalThis.__sbSuper = this.superT; if (this.superT) this.turbo = true; try { localStorage.setItem(`${this.game.id}_super`, this.superT ? '1' : '0'); } catch { /* private mode */ } return this.superT; } },
         { icon: '🎵', label: 'Musique', on: musicOn(), toggle: () => { this.music.setEnabled(!musicOn()); return musicOn(); } },
         { icon: '🔊', label: 'Effets sonores', on: !isMuted(), toggle: () => { setMuted(!isMuted()); return !isMuted(); } },
       ],
@@ -12807,7 +12814,8 @@ __mods['core/base.js'] = (() => {
 const { wallet, fmt: fmtEuro } = __mods['wallet.js'];
 const { BRAND } = __mods['brand.js'];
 const { sfx, isMuted, setMuted } = __mods['audio.js'];
-const { fx, sleep, center } = __mods['fx.js'];
+const { fx, sleep: fxSleep, center } = __mods['fx.js'];
+const sleep = (ms) => fxSleep(globalThis.__sbSuper ? Math.max(10, ms * 0.3) : ms); // super turbo of the slots: every pause much shorter
 const { el, toast, modal, animateNumber } = __mods['ui.js'];
 const { Music, musicOn } = __mods['core/music.js'];
 const { coverSVG } = __mods['covers.js'];
@@ -12851,6 +12859,10 @@ class BaseGame {
     this.betKey = `${game.id}_bet1`; // new key: the old index meant another stake ladder
     this.bi = this.loadNum(this.betKey, this.cfg.defaultBet ?? 0, 0, this.cfg.bets.length - 1);
     this.turbo = this.loadFlag(`${game.id}_turbo`);
+    // Super turbo (slots only, owner's request): turbo + every pause, reel and cascade much shorter (globalThis.__sbSuper)
+    this.superT = game.cat === 'slot' && this.loadFlag(`${game.id}_super`);
+    if (this.superT) this.turbo = true;
+    globalThis.__sbSuper = this.superT;
     this.auto = 0;
     this.busy = false;
     this.dead = false;
@@ -12990,6 +13002,7 @@ class BaseGame {
 
   destroy() {
     this.dead = true;
+    globalThis.__sbSuper = false;
     this.auto = 0;
     if (isFull(this.root)) setFull(this.root, false);
     this.unfit?.();
@@ -13072,7 +13085,7 @@ class BaseGame {
     if (this.auto > 0) {
       this.auto--;
       this.updateMeters();
-      if (this.auto > 0) setTimeout(() => { if (!this.dead && this.auto) this.onMain(); }, this.turbo ? 150 : 420);
+      if (this.auto > 0) setTimeout(() => { if (!this.dead && this.auto) this.onMain(); }, this.superT ? 30 : this.turbo ? 150 : 420);
       else this.stopAuto();
     }
   }
@@ -13082,6 +13095,7 @@ class BaseGame {
     const c = this.cfg;
     const toggles = [];
     if (c.turbo) toggles.push({ icon: '⚡', label: 'Turbo', on: this.turbo, toggle: () => { this.turbo = !this.turbo; this.saveKey(`${this.game.id}_turbo`, this.turbo ? 1 : 0); return this.turbo; } });
+    if (c.turbo && this.game.cat === 'slot') toggles.push({ icon: '🚀', label: 'Super turbo', on: this.superT, toggle: () => { this.superT = !this.superT; globalThis.__sbSuper = this.superT; this.saveKey(`${this.game.id}_super`, this.superT ? 1 : 0); if (this.superT && !this.turbo) { this.turbo = true; this.saveKey(`${this.game.id}_turbo`, 1); } return this.superT; } });
     c.opts.forEach((o) => toggles.push({ icon: o.icon, label: o.label, on: !!this.optOn?.(o.id), toggle: () => { this.onOpt?.(o.id); return !!this.optOn?.(o.id); } }));
     toggles.push({ icon: '🎵', label: 'Musique', on: musicOn(), toggle: () => { this.music.setEnabled(!musicOn()); return musicOn(); } });
     toggles.push({ icon: '🔊', label: 'Effets sonores', on: !isMuted(), toggle: () => { setMuted(!isMuted()); return !isMuted(); } });
@@ -13161,7 +13175,7 @@ class BaseGame {
     const ov = this.overlay(`<div class="intro-glyph">${glyph}</div><h3>${title}</h3><p>${sub}</p><small>Touchez pour continuer</small>`, 'intro');
     return new Promise((resolve) => {
       const done = () => { ov.classList.add('out'); setTimeout(() => { ov.remove(); resolve(); }, 300); };
-      const t = setTimeout(done, this.turbo ? dur / 2 : dur);
+      const t = setTimeout(done, this.superT ? dur / 4 : this.turbo ? dur / 2 : dur);
       ov.addEventListener('click', () => { clearTimeout(t); done(); }, { once: true });
     });
   }
@@ -13176,7 +13190,7 @@ class BaseGame {
       sfx.win();
       const c = center(this.winAmt);
       fx.burst(c.x, c.y, 16, ['#fde68a', '#fbbf24', '#fff']);
-      await animateNumber(this.winAmt, 0, amountC, this.turbo || quick ? 250 : 650, fmtC);
+      await animateNumber(this.winAmt, 0, amountC, this.superT ? 120 : this.turbo || quick ? 250 : 650, fmtC);
       return;
     }
     if (tier) { sfx.bigWin(); fx.coins(40); } else sfx.win();
@@ -13186,13 +13200,13 @@ class BaseGame {
     const amt = ov.querySelector('.bw-amt');
     const rain = tier ? setInterval(() => fx.coins(12), 260) : null;
     ov.addEventListener('click', () => { amt._skip = true; }, { once: true });
-    await animateNumber(amt, 0, amountC, this.turbo ? 900 : tier ? Math.min(5200, 1800 + x * 20) : 1300, fmtC);
+    await animateNumber(amt, 0, amountC, this.superT ? 350 : this.turbo ? 900 : tier ? Math.min(5200, 1800 + x * 20) : 1300, fmtC);
     clearInterval(rain);
     if (tier) fx.confetti(90);
     this.winAmt.textContent = fmtC(amountC);
     await new Promise((resolve) => {
       const done = () => { ov.classList.add('out'); setTimeout(() => { ov.remove(); resolve(); }, 300); };
-      const t = setTimeout(done, this.turbo ? 700 : 1600);
+      const t = setTimeout(done, this.superT ? 300 : this.turbo ? 700 : 1600);
       ov.addEventListener('click', () => { clearTimeout(t); done(); }, { once: true });
     });
   }
@@ -13285,7 +13299,7 @@ class Reels {
 
   async spin(vals, { tease = () => false, onStop = null } = {}) {
     const t = this.game?.turbo;
-    const base = (t ? 300 : 620) * this.durK, step = (t ? 70 : 160) * this.durK;
+    const sup = globalThis.__sbSuper ? 0.45 : 1, base = (t ? 300 : 620) * this.durK * sup, step = (t ? 70 : 160) * this.durK * sup;
     let extra = 0;
     const jobs = [];
     for (let c = 0; c < this.cols; c++) {
@@ -13357,7 +13371,8 @@ __mods['core/grid.js'] = (() => {
 // Tumbling symbol grid for the cluster / cascade games. Cell index i = col * rows + row,
 // the same layout the original games use, so their math plugs in unchanged.
 
-const { fx, sleep, center } = __mods['fx.js'];
+const { fx, sleep: fxSleep, center } = __mods['fx.js'];
+const sleep = (ms) => fxSleep(globalThis.__sbSuper ? Math.max(10, ms * 0.3) : ms); // super turbo of the slots: every pause much shorter
 const { sfx } = __mods['audio.js'];
 const { stageFor, warm, prepare, bezier } = __mods['core/pixi.js'];
 const BOUNCE_F = bezier(0.3, 1.35, 0.55, 1);
@@ -13472,7 +13487,7 @@ class SymbolGrid {
     idxs.forEach((i, k) => {
       const s = this.sym(i);
       s.animate([{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.35)', opacity: 1, offset: 0.4 }, { transform: 'scale(0)', opacity: 0 }],
-        { duration: this.turbo ? 200 : 340, easing: 'ease-in', fill: 'forwards' });
+        { duration: (this.turbo ? 200 : 340) * (globalThis.__sbSuper ? 0.5 : 1), easing: 'ease-in', fill: 'forwards' });
       const px = this.px;
       if (px) { const r = px.rectOf(this.cells[i]); px.sparks(r.x + r.w / 2, r.y + r.h / 2, k < 24 ? 10 : 4, colors, r.w * 0.8); } else if (k % 2 === 0) { const p = center(this.cells[i]); fx.burst(p.x, p.y, 8, colors, 5); }
     });
@@ -13495,7 +13510,7 @@ class SymbolGrid {
         const d = (from - r) * h;
         if (!d) continue;
         jobs.push(this.sym(i).animate([{ transform: `translateY(${d}px)` }, { transform: 'translateY(0)' }],
-          { duration: (this.turbo ? 180 : 300) + Math.abs(d / h) * 35, delay: c * (this.turbo ? 10 : 25), easing: BOUNCE, fill: 'forwards' }).finished);
+          { duration: ((this.turbo ? 180 : 300) + Math.abs(d / h) * 35) * (globalThis.__sbSuper ? 0.5 : 1), delay: c * (this.turbo ? 10 : 25) * (globalThis.__sbSuper ? 0.5 : 1), easing: BOUNCE, fill: 'forwards' }).finished);
       }
     }
     await Promise.all(jobs);

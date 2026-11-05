@@ -139,6 +139,12 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   ne compte pas » avec un lien vers la bonne machine ; un message prévient que les bonus achetés ne comptent pas et qu'en
   invité le score n'entre pas au classement. Outil GitHub **Actions → « Tournoi »** (`tools/admin/tournoi.mjs`, `verifier` /
   `reparer`) : compare les records des profils (`users/{uid}.tour`) au classement et remet les scores manquants.
+- **Super turbo des machines à sous** (demande du propriétaire, « chasse au bonus ») : bouton 🚀 Super turbo dans « Bonus &
+  menu » de toutes les machines à sous (les deux moteurs, `core/base.js` et `slot/machine.js`, localStorage
+  `<id>_super`). Il allume aussi le Turbo et met `globalThis.__sbSuper` : `sleep` des moteurs (`core/base.js`,
+  `core/grid.js`, `slot/machine.js`, `slot/holdspin.js`) ×0,3, rouleaux ×0,45, cascades ×0,5, comptage des gains et
+  tours auto plus courts. Remis à zéro en quittant le jeu. Ne change pas les gains. Mesuré : Le Loup 1,8 s → 0,57 s
+  par tour, L'Olympe 2,0 → 1,15 s.
 - **Max win** : chaque machine à sous a un gain maximum par tour, bonus compris (`max` du catalogue → `maxX`),
   appliqué par `core/base.js` (`win()`) et `slot/machine.js` (`payOut()`). Fin de chaque tour payé : événement
   `sb:roundend` ; max win atteint : `sb:maxwin`. **Nouvelle machine à sous : lui donner un `max` atteignable**
