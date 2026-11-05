@@ -143,7 +143,7 @@ class PiloteGame extends BaseGame {
     // on a narrow screen the plane flies under the instruments (top left), not behind them
     const hud = this.q('.pi-hud');
     if (hud && W * 0.3 - 40 * s < hud.offsetLeft + hud.offsetWidth) this.topY = Math.max(this.topY, Math.min(this.lo - 120 * s, hud.offsetTop + hud.offsetHeight + 26 * s));
-    this.SP = Math.max(170 * s, Math.min(W * 0.3, 250 * s)); this.CL = 300 * s; this.vx0 = this.SP / 0.95;
+    this.SP = Math.max(260 * s, Math.min(W * 0.46, 380 * s)); this.CL = 300 * s; this.vx0 = this.SP / 0.95; // wide gaps: few objects on screen at once (owner's request)
     if (this.state !== 'fly' && !this.f) this.idle();
   }
   yOf(A) { return this.lo - (Math.max(0, Math.min(AMAX, A)) / AMAX) * (this.lo - this.topY); }
@@ -163,7 +163,7 @@ class PiloteGame extends BaseGame {
   plan(f) {
     const S = this.SP, s = this.s, pts = [{ x: -S, y: this.deckY }, { x: 0, y: this.deckY }];
     // a boost (not the last item) throws the plane way up into the sky: a long arc, the camera zooms out (owner's request)
-    const HUMP = 3.4, n = f.steps.length, hump = (i) => f.steps[i].it.k === 'boost' && i < n - 1;
+    const HUMP = 6.2, n = f.steps.length, hump = (i) => f.steps[i].it.k === 'boost' && i < n - 1;
     const xs = []; f.steps.forEach((st, i) => xs.push((i ? xs[i - 1] : 0) + (i && hump(i - 1) ? S * HUMP : S)));
     const peak = this.topY - this.H * 1.2;
     this.items = f.steps.map((st, i) => {
@@ -171,7 +171,7 @@ class PiloteGame extends BaseGame {
       pts.push({ x, y: yb });
       if (k === 'div') pts.push({ x: x + S * 0.3, y: yb + (ya - yb) * 0.8 });
       else if (k === 'pocket') pts.push({ x: x + S * 0.2, y: yb + (ya - yb) * 0.95 });
-      else if (hump(i)) pts.push({ x: x + S * 0.9, y: (this.topY + peak) / 2 }, { x: x + S * 1.7, y: peak }, { x: x + S * 2.5, y: (this.topY + peak) / 2 });
+      else if (hump(i)) pts.push({ x: x + S * 0.9, y: (this.topY + peak) / 2 }, { x: x + S * 1.6, y: peak }, { x: x + S * 4.4, y: peak + 12 * s }, { x: x + S * 5.3, y: (this.topY + peak) / 2 }); // up there for a while
       else if (k === 'boost') pts.push({ x: x + S * 0.32, y: yb + (ya - yb) * 0.9 });
       return { x, y: yb - 9 * s, it: st.it, hit: false, t: Math.random() * 6 };
     });
@@ -186,14 +186,14 @@ class PiloteGame extends BaseGame {
     this.decoys = [];
     for (let i = 1; i < n; i++) {
       if (hump(i - 1)) { // up there: bombs all around the plane, it weaves between them
-        for (let j = 0; j < 3; j++) {
-          const x = xs[i - 1] + S * (0.8 + j * 0.8 + Math.random() * 0.2), y0 = this.path(x)[0] - 9 * s, off = (60 + Math.random() * 70) * s * (j % 2 ? 1 : -1);
+        for (let j = 0; j < 2; j++) {
+          const x = xs[i - 1] + S * (2.2 + j * 1.4 + Math.random() * 0.2), y0 = this.path(x)[0] - 9 * s, off = (60 + Math.random() * 70) * s * (j % 2 ? 1 : -1);
           const d = [['div', 2], ['div', 3], ['div', 5], ['div', 10]][Math.floor(Math.random() * 4)];
           this.decoys.push({ x, y: y0 + off, it: { k: d[0], v: d[1] }, t: Math.random() * 6, passed: false, fade: 1, below: off > 0, wob: 0, sc: 2.2 });
         }
         continue;
       }
-      if (Math.random() > 0.65) continue;
+      if (Math.random() > 0.22) continue; // only now and then
       const x = xs[i - 1] + (xs[i] - xs[i - 1]) * (0.45 + Math.random() * 0.3), y0 = this.path(x)[0] - 9 * s;
       let off = (30 + Math.random() * 22) * s * (Math.random() < 0.5 ? -1 : 1), y = y0 + off;
       if (y < this.topY - 20 * s || y > this.lo + 10 * s) { off = -off; y = y0 + off; }
