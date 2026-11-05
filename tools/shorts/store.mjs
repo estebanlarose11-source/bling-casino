@@ -28,7 +28,7 @@ for (const f of readdirSync(V).filter((x) => x.endsWith('.json'))) {
 // files left without their .json (a failed day): removed too
 const keep = new Set(videos.flatMap((m) => [m.file, m.poster]).filter(Boolean).map((x) => x.slice(2)));
 for (const f of readdirSync(V)) if (!f.endsWith('.json') && !keep.has(f)) rmSync(join(V, f), { force: true });
-videos.sort((a, b) => (b.date + b.game).localeCompare(a.date + a.game));
+videos.sort((a, b) => b.date.localeCompare(a.date) || (b.x || 0) - (a.x || 0)); // newest day first, best bonus first
 writeFileSync(join(store, 'index.json'), JSON.stringify({ updated: new Date().toISOString(), videos }, null, 1));
 writeFileSync(join(store, 'README.md'), `# Shorts SpinBet\n\nVidéos du jour fabriquées par GitHub Actions (tools/shorts). À regarder et télécharger sur https://www.spinbetcaz.com/#shorts\n`);
 console.log(`Shorts : ${videos.length} vidéo(s) sur ${KEEP} jours`);

@@ -19530,7 +19530,7 @@ let root = null, list = [];
 async function renderShorts(r) {
   root = r;
   r.innerHTML = `<section class="sh-page"><div class="panel sh-head"><span>🎬</span><div><h1>Shorts du jour</h1>
-    <p class="muted">Chaque matin, le robot filme 2 bonus de machines à sous en format vertical, avec la musique du jeu et l’adresse du site. Les vidéos des 7 derniers jours sont ici : <b>Partager</b> les envoie directement dans Snap, TikTok ou YouTube, <b>Enregistrer</b> les met dans ton téléphone.</p></div></div>
+    <p class="muted">Chaque matin, 2 bonus filmés en vertical (7 derniers jours). <b>📤 Partager</b> : direct dans Snap, TikTok, YouTube. <b>⬇️ Enregistrer</b> : dans ton téléphone.</p></div></div>
     <div class="sh-list"><p class="muted">Chargement des vidéos…</p></div></section>`;
   try {
     const r2 = await fetch(`${BASE}index.json?t=${Date.now()}`);
@@ -19547,7 +19547,7 @@ function paint() {
   if (!box) return;
   if (!list.length) { box.innerHTML = '<p class="panel muted">Pas encore de vidéo : la première fournée arrive après le prochain passage du robot (chaque matin entre 5 h et 6 h, heure de Paris).</p>'; return; }
   const days = [...new Set(list.map((v) => v.date))];
-  box.innerHTML = days.map((d) => `<h2 class="sh-day">${dayName(d)}</h2><div class="sh-grid">${list.filter((v) => v.date === d).map((v) => `
+  box.innerHTML = days.map((d) => `<h2 class="sh-day">${dayName(d)}</h2><div class="sh-grid">${list.filter((v) => v.date === d).sort((a, b) => (b.x || 0) - (a.x || 0)).map((v) => `
     <article class="sh-card" data-sh="${esc(v.file)}">
       <div class="sh-media">${v.poster ? `<img src="${BASE + v.poster}" alt="" loading="lazy">` : ''}<button class="sh-play" data-sh-play aria-label="Voir la vidéo">▶</button><small>${Math.round(v.dur || 0)} s</small></div>
       <div class="sh-body"><b>${esc(v.title)}</b>

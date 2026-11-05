@@ -90,7 +90,6 @@ async function attempt(browser, id, k) {
     const f = path.join(dir, `f${String(n++).padStart(5, '0')}.jpg`);
     fs.writeFileSync(f, Buffer.from(data, 'base64'));
     frames.push({ f, t: metadata.timestamp });
-    if (process.env.SHORTS_DEBUG && (n === 1 || n % 500 === 0)) console.log('   image', n, JSON.stringify(metadata));
     cdp.send('Page.screencastFrameAck', { sessionId }).catch(() => {});
   });
   await cdp.send('Page.startScreencast', { format: 'jpeg', quality: 88, maxWidth: 1080, maxHeight: 1920, everyNthFrame: 1 });
@@ -146,7 +145,8 @@ function edit(r, file) {
   const args = ['-y', '-f', 'concat', '-safe', '0', '-i', list];
   if (r.music) args.push('-i', path.join(r.dir, 'music.wav'));
   args.push('-vf', vf);
-  if (r.music) args.push('-af', `afade=t=in:st=0:d=0.6,afade=t=out:st=${Math.max(0, dur - 1.6).toFixed(2)}:d=1.5`, '-c:a', 'aac', '-b:a', '128k', '-shortest');
+  // loudness of a social video (≈ -16 LUFS), then fades
+  if (r.music) args.push('-af', `loudnorm=I=-16:TP=-1.5:LRA=11,afade=t=in:st=0:d=0.6,afade=t=out:st=${Math.max(0, dur - 1.6).toFixed(2)}:d=1.5`, '-ar', '44100', '-c:a', 'aac', '-b:a', '128k', '-shortest');
   args.push('-t', dur.toFixed(2), '-c:v', 'libx264', '-preset', 'medium', '-crf', '23', '-maxrate', '2800k', '-bufsize', '5600k', '-profile:v', 'high', '-movflags', '+faststart', file);
   sh('ffmpeg', args);
   const poster = file.replace(/\.mp4$/, '.jpg');
