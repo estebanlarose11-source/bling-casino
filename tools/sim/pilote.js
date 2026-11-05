@@ -4,12 +4,13 @@
 const fs = require('fs'), path = require('path');
 const src = fs.readFileSync(path.join(__dirname, '../../games/pilote.js'), 'utf8');
 const engine = src.split('/* ===ENGINE */')[1].split('/* ===END ENGINE */')[0];
-const { flight, CAP } = new Function(`${engine}; return { flight, CAP };`)();
+const { flight, CAP, isBomb } = new Function(`${engine}; return { flight, CAP, isBomb };`)();
 const n = +process.argv[2] || 1e7;
-let paid = 0, land = 0, ge1 = 0, ge10 = 0, ge100 = 0, cap = 0, bombs = 0;
+let paid = 0, land = 0, ge1 = 0, ge10 = 0, ge100 = 0, cap = 0, bombs = 0, swing = 0;
 for (let j = 0; j < n; j++) {
   const f = flight();
-  bombs += f.steps.filter((s) => s.it.k === 'bomb').length;
+  bombs += f.steps.filter((s) => isBomb(s.it)).length;
+  if (Math.max(...f.steps.map((s) => s.T)) >= 20 && f.T < 5) swing++; // had ×20 on board, ended under ×5 (or in the sea)
   if (!f.ok) continue;
   land++; paid += f.T;
   if (f.T >= 1) ge1++; if (f.T >= 10) ge10++; if (f.T >= 100) ge100++; if (f.T >= CAP) cap++;
@@ -18,4 +19,4 @@ const pct = (x) => `${((x / n) * 100).toFixed(2)} %`, one = (x) => (x ? `1 vol s
 console.log(`${n.toLocaleString('fr-FR')} vols`);
 console.log(`retour au joueur : ${pct(paid)}`);
 console.log(`atterrissage : ${pct(land)} · gain ≥ ×1 : ${pct(ge1)} · ≥ ×10 : ${one(ge10)} · ≥ ×100 : ${one(ge100)} · ×${CAP} : ${one(cap)}`);
-console.log(`bombes par vol : ${(bombs / n).toFixed(2)}`);
+console.log(`bombes par vol : ${(bombs / n).toFixed(2)} · avait ×20 à bord et finit sous ×5 : ${one(swing)}`);

@@ -2,23 +2,29 @@
 // ---- games/impl/pilote.js ----
 __mods['games/impl/pilote.js'] = (() => {
 // Le Pilote (idée du propriétaire) : un avion décolle d'un porte-avions et traverse le ciel. Sur sa route, N objets :
-// des bonus (+0,1 à +3 × la mise, ou ×2 / ×5 sur ce qui est déjà ramassé) qui le font monter d'un cran, et des
-// bombes qui divisent le gain par 2, le ralentissent et le font descendre de 2 crans. S'il touche la mer (altitude 0),
+// des bonus (+0,1 à +100 × la mise, ou ×2 à ×10 sur ce qui est déjà ramassé) qui le font monter d'un cran, et des
+// bombes (−1 à −100 × la mise, ÷2, ÷4) qui le ralentissent et le font descendre de 2 crans : gros écarts voulus
+// par le propriétaire (on croit gagner gros, on peut tout perdre d'un coup, et inversement). S'il touche la mer (altitude 0),
 // tout est perdu ; s'il tient jusqu'au bout, il se pose sur le porte-avions d'arrivée et paie ce qu'il a ramassé.
-// Le vol entier est tiré au départ (flight), puis animé. Simulation (10 millions de vols, tools/sim/pilote.js) :
-// retour ≈ 95,0 %, atterrissage 55 % des vols, ≥ ×1 32 %, ≥ ×10 un vol sur 210, gain plafonné à ×500.
+// Le vol entier est tiré au départ (flight), puis animé. Simulation (20 millions de vols, tools/sim/pilote.js) :
+// retour ≈ 95,1 %, atterrissage 43 %, ≥ ×1 19 %, ≥ ×10 un vol sur 59, ≥ ×100 un sur 1 700, plafond ×1 000 (un sur 300 000).
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
 
 /* ===ENGINE */
-const N = 10, A0 = 3, AMAX = 6, DROP = 2, CAP = 500;
+const N = 10, A0 = 3, AMAX = 6, DROP = 2, CAP = 1000;
+// add: +v × la mise · mul: ×v sur le gain · sub: −v × la mise (jamais sous 0) · div: ÷v. sub et div sont des bombes.
 const ITEMS = [
-  { k: 'add', v: 0.1, w: 30 }, { k: 'add', v: 0.25, w: 18 }, { k: 'add', v: 0.5, w: 9 }, { k: 'add', v: 1, w: 4 }, { k: 'add', v: 3, w: 1.2 },
-  { k: 'mul', v: 2, w: 5 }, { k: 'mul', v: 5, w: 0.6 }, { k: 'bomb', v: 2, w: 31.5 },
+  { k: 'add', v: 0.1, w: 24 }, { k: 'add', v: 0.25, w: 15 }, { k: 'add', v: 0.5, w: 8 }, { k: 'add', v: 1, w: 3.5 }, { k: 'add', v: 2, w: 1.5 },
+  { k: 'add', v: 5, w: 0.5 }, { k: 'add', v: 10, w: 0.3 }, { k: 'add', v: 25, w: 0.09 }, { k: 'add', v: 100, w: 0.015 },
+  { k: 'mul', v: 2, w: 3.5 }, { k: 'mul', v: 3, w: 0.8 }, { k: 'mul', v: 5, w: 0.3 }, { k: 'mul', v: 10, w: 0.05 },
+  { k: 'sub', v: 1, w: 10.08 }, { k: 'sub', v: 5, w: 5.6 }, { k: 'sub', v: 25, w: 2.688 }, { k: 'sub', v: 100, w: 1.12 },
+  { k: 'div', v: 2, w: 10.08 }, { k: 'div', v: 4, w: 3.92 },
 ];
 const TOTAL_W = ITEMS.reduce((a, b) => a + b.w, 0);
+const isBomb = (it) => it.k === 'sub' || it.k === 'div';
 function pick() { let r = Math.random() * TOTAL_W; for (const it of ITEMS) { if (r < it.w) return it; r -= it.w; } return ITEMS[0]; }
 // One flight: the items met (with the altitude before each one and the total after it), and how it ends.
 function flight() {
@@ -26,7 +32,7 @@ function flight() {
   let T = 0, A = A0;
   for (let i = 0; i < N; i++) {
     const it = pick(), before = A;
-    if (it.k === 'bomb') { T /= it.v; A -= DROP; } else { T = it.k === 'add' ? T + it.v : T * it.v; A = Math.min(AMAX, A + 1); }
+    if (isBomb(it)) { T = it.k === 'sub' ? Math.max(0, T - it.v) : T / it.v; A -= DROP; } else { T = it.k === 'add' ? T + it.v : T * it.v; A = Math.min(AMAX, A + 1); }
     steps.push({ it, A: before, after: A, T });
     if (A <= 0) return { steps, T: 0, ok: false };
   }
@@ -35,7 +41,8 @@ function flight() {
 /* ===END ENGINE */
 
 const num = (x) => (Math.round(x * 100) / 100).toLocaleString('fr-FR', { maximumFractionDigits: 2 });
-const label = (it) => (it.k === 'add' ? `+${num(it.v)}` : it.k === 'mul' ? `×${it.v}` : '÷2');
+const label = (it) => ({ add: '+', mul: '×', sub: '−', div: '÷' }[it.k] + num(it.v));
+const isBig = (it) => (it.k === 'add' && it.v >= 10) || (it.k === 'mul' && it.v >= 5) || (it.k === 'sub' && it.v >= 25) || (it.k === 'div' && it.v >= 4);
 const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 // Canvas text where a leading ÷ is drawn by hand (bar + 2 dots): in many fonts it looks like a +.
 function say2(g, t, x, y, size, fill, stroke) {
@@ -107,7 +114,8 @@ class PiloteGame extends BaseGame {
     let slow = 1;
     f.steps.forEach((st, i) => {
       add(S * (i + 1), this.yOf(st.A), (i ? 0.92 : 1.05) * slow * (st.A <= DROP ? 1.35 : 1), { t: 'item', i }); // slow motion when the next bomb would be the last
-      slow = st.it.k === 'bomb' ? 1.45 : 1; // a bomb slows the plane down
+      slow = isBomb(st.it) ? 1.45 : 1; // a bomb slows the plane down
+      if (isBig(st.it) && !isBomb(st.it)) segs[segs.length - 1].dur *= 1.25; // a big bonus ahead: the plane takes its time
       if (st.after <= 0) add(S * (i + 1) + S * 0.85, this.seaY + 14 * this.s, 1.1, { t: 'sea' }, 'fall');
     });
     if (f.ok) {
@@ -179,18 +187,23 @@ class PiloteGame extends BaseGame {
     if (ev.t === 'item') {
       const st = this.f.steps[ev.i], item = this.items[ev.i], it = st.it;
       item.hit = true; this.k = ev.i + 1;
+      const prev = this.T;
       this.T = Math.min(CAP, Math.floor(st.T * 100 + 1e-9) / 100); this.A = st.after; // as it would be paid
-      if (it.k === 'bomb') {
-        this.boom(item.x, item.y, 34); this.shakeT = 0.45;
-        this.text(item.x, item.y - 30 * s, '÷2', '#f87171', 30);
+      const big = isBig(it), lost = prev - this.T;
+      if (isBomb(it)) {
+        this.boom(item.x, item.y, big ? 60 : 34); this.shakeT = big ? 0.8 : 0.45;
+        this.text(item.x, item.y - 30 * s, label(it), '#f87171', big ? 42 : 30);
+        if (big) this.flash('rgba(239,68,68,.45)');
         sfx.puff();
-        this.say(st.after <= 0 ? '💥 Touché ! L’avion pique vers la mer…' : st.after <= DROP ? `💥 Bombe ! ⚠️ Altitude ${st.after} : encore une bombe et c’est la mer !` : `💥 Bombe ! Le gain est divisé par 2 et l’avion descend (altitude ${st.after}).`);
+        const what = lost >= 0.01 ? `${label(it)} : le gain passe de ×${num(prev)} à ×${num(this.T)}` : `${label(it)} (rien à perdre)`;
+        this.say(st.after <= 0 ? `💥 ${what}… et l’avion pique vers la mer !` : `${big && lost >= 5 ? '😱' : '💥'} ${what}${st.after <= DROP ? ` · ⚠️ altitude ${st.after} : encore une bombe et c’est la mer !` : ''}`);
         if (st.after > 0 && st.after <= DROP) sfx.tease();
       } else {
-        this.burst(item.x, item.y, it.k === 'mul' ? ['#f0abfc', '#c084fc', '#fff'] : ['#fde047', '#fbbf24', '#fff'], it.k === 'mul' ? 34 : 22);
-        this.text(item.x, item.y - 30 * s, label(it), it.k === 'mul' ? '#f0abfc' : '#fde047', it.k === 'mul' ? 32 : 26);
-        if (it.k === 'mul') sfx.upgrade(); else sfx.coin();
-        this.say(it.k === 'mul' ? `✨ ×${it.v} sur tout le gain !` : `+${num(it.v)} × la mise${st.A <= DROP ? ' · l’avion remonte !' : ''}`);
+        const mul = it.k === 'mul';
+        this.burst(item.x, item.y, mul ? ['#f0abfc', '#c084fc', '#fff'] : ['#fde047', '#fbbf24', '#fff'], big ? 70 : mul ? 34 : 22);
+        this.text(item.x, item.y - 30 * s, label(it), mul ? '#f0abfc' : '#fde047', big ? 46 : mul ? 32 : 26);
+        if (big) { this.flash(mul ? 'rgba(217,70,239,.4)' : 'rgba(250,204,21,.45)'); this.shakeT = 0.35; sfx.feature(); } else if (mul) sfx.upgrade(); else sfx.coin();
+        this.say(`${big ? '🤑 ÉNORME ! ' : mul ? '✨ ' : ''}${mul ? `×${it.v} sur tout le gain` : `+${num(it.v)} × la mise`} : ×${num(this.T)} à bord${st.A <= DROP ? ' · l’avion remonte !' : ''}`);
       }
       this.paintHud(this.T, this.A, this.k);
       if (ev.i === N - 1 && this.f.ok) setTimeout(() => { if (!this.dead && this.state === 'fly') this.say('🛬 Approche finale… le porte-avions est en vue !'); }, 650);
@@ -353,25 +366,30 @@ class PiloteGame extends BaseGame {
   item(g, it, now) {
     const { s } = this, y = it.y + Math.sin(now * 2.2 + it.t) * 4 * s, k = it.it.k, r = 19 * s;
     g.save(); g.translate(it.x, y);
-    if (k === 'bomb') {
+    const big = isBig(it.it);
+    if (big) g.scale(1.3, 1.3);
+    if (k === 'sub' || k === 'div') {
+      if (big) { g.shadowColor = '#ef4444'; g.shadowBlur = 22 * s; }
       g.strokeStyle = '#0f172a'; g.lineWidth = 3 * s;
       for (let i = 0; i < 8; i++) { const a = (i / 8) * 6.28 + now * 0.6; g.beginPath(); g.moveTo(Math.cos(a) * r * 0.8, Math.sin(a) * r * 0.8); g.lineTo(Math.cos(a) * r * 1.25, Math.sin(a) * r * 1.25); g.stroke(); }
       const gr = g.createRadialGradient(-r * 0.3, -r * 0.3, 2, 0, 0, r);
       gr.addColorStop(0, '#64748b'); gr.addColorStop(1, '#0f172a');
-      g.fillStyle = gr; g.beginPath(); g.arc(0, 0, r, 0, 6.28); g.fill();
+      g.fillStyle = gr; g.beginPath(); g.arc(0, 0, r, 0, 6.28); g.fill(); g.shadowBlur = 0;
       g.fillStyle = Math.floor(now * 4 + it.t) % 2 ? '#ef4444' : '#7f1d1d'; g.beginPath(); g.arc(0, -r * 0.35, 4 * s, 0, 6.28); g.fill();
-      g.fillStyle = '#dc2626'; g.beginPath(); if (g.roundRect) g.roundRect(-17 * s, r + 3 * s, 34 * s, 17 * s, 4 * s); else g.rect(-17 * s, r + 3 * s, 34 * s, 17 * s); g.fill();
-      say2(g, '÷2', 0, r + 11.5 * s, 13 * s, '#fff');
+      const tw = (label(it.it).length * 8 + 12) * s;
+      g.fillStyle = '#dc2626'; g.beginPath(); if (g.roundRect) g.roundRect(-tw / 2, r + 3 * s, tw, 17 * s, 4 * s); else g.rect(-tw / 2, r + 3 * s, tw, 17 * s); g.fill();
+      say2(g, label(it.it), 0, r + 11.5 * s, 13 * s, '#fff');
     } else {
       const mul = k === 'mul';
-      g.shadowColor = mul ? '#e879f9' : '#fbbf24'; g.shadowBlur = 18 * s;
+      if (big) { g.strokeStyle = mul ? 'rgba(240,171,252,.7)' : 'rgba(253,224,71,.75)'; g.lineWidth = 3 * s; for (let i = 0; i < 12; i++) { const a = (i / 12) * 6.28 + now; g.beginPath(); g.moveTo(Math.cos(a) * r * 1.3, Math.sin(a) * r * 1.3); g.lineTo(Math.cos(a) * r * 1.75, Math.sin(a) * r * 1.75); g.stroke(); } }
+      g.shadowColor = mul ? '#e879f9' : '#fbbf24'; g.shadowBlur = (big ? 30 : 18) * s;
       const gr = g.createRadialGradient(-r * 0.3, -r * 0.35, 2, 0, 0, r * 1.1);
       gr.addColorStop(0, mul ? '#fae8ff' : '#fef9c3'); gr.addColorStop(0.5, mul ? '#d946ef' : '#facc15'); gr.addColorStop(1, mul ? '#6b21a8' : '#a16207');
       g.fillStyle = gr; g.beginPath();
       if (mul) { for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + (i / 10) * 6.28, rr = i % 2 ? r * 0.55 : r * 1.15; g.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } g.closePath(); } else g.arc(0, 0, r, 0, 6.28);
       g.fill(); g.shadowBlur = 0;
       if (!mul) { g.strokeStyle = 'rgba(120,53,15,.7)'; g.lineWidth = 2 * s; g.beginPath(); g.arc(0, 0, r * 0.78, 0, 6.28); g.stroke(); }
-      g.fillStyle = mul ? '#fff' : '#78350f'; g.font = `900 ${(mul ? 13 : 12) * s}px KeCoin, Archivo, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillStyle = mul ? '#fff' : '#78350f'; g.font = `900 ${(label(it.it).length > 3 ? 10 : mul ? 13 : 12) * s}px KeCoin, Archivo, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
       g.fillText(label(it.it), 0, 1 * s);
     }
     g.restore();
@@ -397,12 +415,12 @@ class PiloteGame extends BaseGame {
   info() {
     const tot = TOTAL_W, pct = (w) => `${Math.round((w / tot) * 1000) / 10} %`;
     return this.rules(`<h4>Comment jouer</h4><p>Choisis ta mise et appuie sur <b>DÉCOLLER</b>. L’avion part du porte-avions et traverse le ciel : il rencontre ${N} objets sur sa route.</p>
-      <ul class="rules"><li><b>Pièces d’or</b> : +0,1 à +3 fois la mise ajoutés au gain en vol. L’avion monte d’un cran.</li>
-      <li><b>Étoiles</b> : ×2 ou ×5 sur tout le gain déjà ramassé. L’avion monte d’un cran.</li>
-      <li><b>Bombes</b> : le gain est divisé par 2, l’avion ralentit et descend de 2 crans.</li></ul>
+      <ul class="rules"><li><b>Pièces d’or</b> : +0,1 à <b>+100</b> fois la mise ajoutés au gain en vol. L’avion monte d’un cran.</li>
+      <li><b>Étoiles</b> : ×2, ×3, ×5 ou <b>×10</b> sur tout le gain déjà ramassé. L’avion monte d’un cran.</li>
+      <li><b>Bombes</b> : −1 à <b>−100</b> fois la mise (le gain ne descend jamais sous 0), ou ÷2 / ÷4 sur le gain. L’avion ralentit et descend de 2 crans.</li></ul>
       <p>L’avion part à l’altitude ${A0} (sur ${AMAX}). S’il tombe à 0, il finit dans la mer et la mise est perdue. S’il tient jusqu’au bout, il se pose sur le porte-avions d’arrivée et tu gagnes tout ce qu’il a ramassé (jusqu’à ×${CAP} la mise).</p>
-      <h4>Chances de chaque objet</h4><p>${ITEMS.map((it) => `${it.k === 'bomb' ? 'bombe ÷2' : label(it)} : ${pct(it.w)}`).join(' · ')}</p>
-      <h4>Équité</h4><p>Chaque vol est tiré au hasard au décollage. Sur des millions de vols simulés, le retour au joueur est d’environ 95 % ; l’avion se pose une fois sur deux environ.</p>`);
+      <h4>Chances de chaque objet</h4><p>${ITEMS.map((it) => `${label(it)} : ${pct(it.w)}`).join(' · ')}</p>
+      <h4>Équité</h4><p>Chaque vol est tiré au hasard au décollage. Sur des millions de vols simulés, le retour au joueur est d’environ 95 % ; l’avion se pose un peu moins d’une fois sur deux.</p>`);
   }
 }
 

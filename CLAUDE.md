@@ -69,13 +69,15 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Simulation (3,6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 4 (surtout petits), Duel 1 tour sur 385 (≈ ×130),
   achats 150 / 500 (≈ 88 %).
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : un avion décolle d'un porte-avions
-  et rencontre 10 objets (pièces +0,1 à +3 × la mise, étoiles ×2 / ×5 : l'avion monte d'un cran ; bombes ÷2 : il
-  ralentit et descend de 2 crans). Altitude de départ 3 sur 6 ; à 0 = la mer, mise perdue ; sinon il se pose sur le
-  porte-avions d'arrivée et paie le gain ramassé (plafond ×500). Tout le vol est tiré au décollage (`flight()`, bloc
-  `===ENGINE`), puis animé dans un canvas 2D (ralenti quand une bombe de plus serait fatale, alerte rouge, approche
-  finale). Le signe ÷ est dessiné à la main (`say2`), il ressemblait à un + dans certaines polices. Quitter en plein vol
-  paie quand même un vol qui allait se poser. Simulation `node tools/sim/pilote.js` (lit le moteur du jeu, 10 M vols) :
-  retour ≈ 95,0 %, atterrissage 55 %, gain ≥ ×1 32 %, ≥ ×10 un vol sur 210, ≥ ×100 un sur 80 000.
+  et rencontre 10 objets. Pièces +0,1 à +100 × la mise et étoiles ×2 à ×10 (l'avion monte d'un cran) ; bombes −1 à −100
+  × la mise (jamais sous 0) et ÷2 / ÷4 (il ralentit et descend de 2 crans). Gros écarts voulus par le propriétaire : « on
+  croit gagner gros et on peut tout perdre d'un coup, et inversement ». Altitude de départ 3 sur 6 ; à 0 = la mer, mise
+  perdue ; sinon il se pose sur le porte-avions d'arrivée et paie le gain ramassé (plafond ×1 000). Tout le vol est tiré
+  au décollage (`flight()`, bloc `===ENGINE`), puis animé dans un canvas 2D (ralenti quand une bombe de plus serait
+  fatale, alerte rouge, gros objets plus grands avec éclair, approche finale). Le signe ÷ est dessiné à la main (`say2`).
+  Quitter en plein vol paie quand même un vol qui allait se poser. Simulation `node tools/sim/pilote.js` (lit le moteur
+  du jeu, 20 M vols) : retour ≈ 95,1 %, atterrissage 43 %, gain ≥ ×1 19 %, ≥ ×10 un vol sur 59, ≥ ×100 un sur 1 700,
+  ×1 000 un sur 300 000 ; « avait ×20 à bord et finit sous ×5 » un vol sur 255.
 - **Fluidité sur ordinateur** (fin de la couche `finition`) : le fond de nuit est sur sa propre couche fixe (`body::after`),
   jamais `background: … fixed` sur `body` (repeint toute la page à chaque défilement : 4 → 60 images/s mesuré) ; pas de
   `backdrop-filter` (flou en direct) sur la barre du haut, les menus, la barre du bas et les messages. Ne pas les remettre.
