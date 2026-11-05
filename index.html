@@ -5799,6 +5799,25 @@ html:not(.light) .bottom-nav, .side, .side-scrim { -webkit-backdrop-filter: none
 .dh-warn:empty { display: none; }
 html.light .dh-card { background: linear-gradient(135deg, #fff7e0, #eef6ff); }
 html.light .dh-d { background: #fff; border-color: #e3e8ef; }
+
+/* machine mystère (mystere.js), offre « rejoue ton bonus », gros gains dans le chat */
+.mys-card { border-radius: 14px !important; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; aspect-ratio: 1; padding: 12px; text-align: center; text-decoration: none; color: #fff;
+  background: radial-gradient(circle at 50% 35%, #7c3aed, #1e1b4b 70%); border: 2px solid #a78bfa; box-shadow: 0 0 0 1px rgba(167, 139, 250, .4), 0 8px 28px rgba(124, 58, 237, .45); animation: mysGlow 2.4s ease-in-out infinite; }
+.mys-q { font: 900 clamp(54px, 9vw, 86px)/1 'Bebas Neue', Impact, sans-serif; color: #fde68a; text-shadow: 0 0 18px rgba(253, 230, 138, .7); }
+.mys-txt { display: flex; flex-direction: column; gap: 2px; } .mys-txt b { font: 900 17px 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; } .mys-txt small { font-size: 11.5px; color: #ddd6fe; }
+@keyframes mysGlow { 50% { box-shadow: 0 0 0 1px rgba(167, 139, 250, .7), 0 8px 40px rgba(167, 139, 250, .75); } }
+.ev-card.ev-myst { --ac: #a78bfa; cursor: pointer; } .ev-card.ev-myst small { color: #c4b5fd; } .ev-card.ev-myst.soon { cursor: default; opacity: .85; }
+.mys-ico { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: #4c1d95; color: #fde68a; font: 900 28px 'Bebas Neue', Impact, sans-serif; }
+.ev-pill.myst { border-color: rgba(167, 139, 250, .7); background: color-mix(in srgb, #7c3aed 18%, var(--panel-2)); }
+.mys-reveal { text-align: center; display: grid; gap: 10px; justify-items: center; } .mys-reveal small { font-weight: 800; letter-spacing: 1.5px; color: #c4b5fd; }
+.mys-reveal h2 { margin: 0; font: 900 34px 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; } .mys-reveal p { margin: 0; color: var(--muted); }
+.mys-art { width: min(220px, 60vw); border-radius: 14px; overflow: hidden; animation: mysPop .6s cubic-bezier(.3, 1.5, .5, 1); } .mys-art svg { display: block; width: 100%; height: auto; }
+@keyframes mysPop { from { transform: scale(.4) rotate(-8deg); opacity: 0; } }
+.rp-offer { border-color: rgba(251, 191, 36, .6) !important; }
+.jc-ad-btn { width: 100%; margin-top: 8px; }
+.ct-msg.win { max-width: 94%; background: linear-gradient(135deg, rgba(251, 191, 36, .22), rgba(234, 88, 12, .14)); border: 1px solid rgba(251, 191, 36, .45); }
+.ct-win { display: flex; flex-direction: column; gap: 1px; } .ct-win b { font: 900 15px 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; color: #fbbf24; }
+.ct-win span { font-family: KeCoin, Inter, sans-serif; } .ct-win a { color: #fde68a; font-weight: 800; }
 </style>
 </head>
 <body>
@@ -5896,7 +5915,7 @@ html.light .dh-d { background: #fff; border-color: #e3e8ef; }
   <main id="view" class="view"></main>
 
   <footer class="foot">
-    <div><b>SPINBET CASINO</b> · Jeu de divertissement, argent fictif, aucun gain réel. 18+ · <a href="#responsable">Jeu responsable</a> · <a href="jeux/">Tous les jeux</a> · <a href="ads/">Nos partenaires</a></div>
+    <div><b>SPINBET CASINO</b> · Jeu de divertissement, argent fictif, aucun gain réel. 18+ · <a href="#responsable">Jeu responsable</a> · <a href="jeux/">Tous les jeux</a> · <a href="articles/">Guides et astuces</a> · <a href="ads/">Nos partenaires</a></div>
   </footer>
 
   <nav class="bottom-nav">
@@ -8695,6 +8714,12 @@ const PLACEMENTS = {
   // Shop: 3 ads of 15 s in a row → 50 free spins on the slot machine the player chooses (ads.watch('spins50', { game })).
   spins50: { label: '50 tours offerts', views: 3, dailyCap: 3, cooldownMin: 0, reward: (o) => { const g = o?.game; if (!g) return 'Choisis une machine'; __mods['wheel.js'].gifts.addRounds(g, 50); return `50 tours offerts sur ${__mods['games/index.js'].getGame(g)?.name || 'ta machine'} !`; } },
   daily_x2: { label: 'Doubler mon bonus du jour', dailyCap: 1, cooldownMin: 0, when: () => dailyStatus().canDouble, reward: () => `Bonus du jour doublé : +${doubleDaily()}\u00a0\uE1E0` },
+  // After a bonus won by playing on a slot (well paid or not): one ad → the same bonus again, free, once a day (mystere.js).
+  bonus_replay: { label: 'Rejouer mon bonus', dailyCap: 1, cooldownMin: 0, when: () => !!__mods['mystere.js']?.canReplay(), whenMsg: 'Reste sur la machine, à la même mise ou moins', reward: () => __mods['mystere.js'].replay() },
+  // A tournament prize (top 10): one ad → the prize once more (events.js), twice a day at most.
+  tour_x2: { label: 'Doubler mon gain de tournoi', dailyCap: 2, cooldownMin: 0, reward: (o) => { const a = Math.round(o?.amount || 0); if (!(a > 0)) return 'Rien à doubler'; wallet.grant(a); return `Gain de tournoi doublé : +${a.toLocaleString('fr-FR')}\u00a0\uE1E0`; } },
+  // Cartes à collectionner: one ad → one more blue pack, once a day (jcc.js).
+  jcc_pack: { label: 'Un paquet de cartes en plus', dailyCap: 1, cooldownMin: 0, reward: () => __mods['jcc.js'].adPack() },
   xp_boost: { label: 'XP ×2 pendant 15 min', dailyCap: 3, cooldownMin: 60, reward: () => { progress.boost(15); return 'XP ×2 activé pendant 15 minutes'; } },
 };
 
@@ -10942,10 +10967,12 @@ const FILTERS = [
   { id: 'fav', label: 'Mes favoris', icon: '❤️', test: (g) => isLiked(g.id) },
 ];
 
+// the mystery machine (mystere.js): a « ? » card first among the slots, during its hour
+const mysCard = () => __mods['mystere.js']?.cardHTML?.() || '';
 const row = (title, list, more) => `
   <section>
     <div class="sec-head"><h2>${title}</h2>${more ? `<a class="more" href="#lobby-${more}">Tout voir</a>` : ''}</div>
-    <div class="game-row">${list.map(gameCard).join('')}</div>
+    <div class="game-row">${more === 'slot' ? mysCard() : ''}${list.map(gameCard).join('')}</div>
   </section>`;
 
 // A game's cover as the background of a promo block (blurred and darkened under the text).
@@ -10975,7 +11002,7 @@ function renderLobby(root, params = {}) {
       + row('Jeux rapides', ORIGINALS.filter(FILTERS[4].test), 'quick')
     : `<section>
         <div class="sec-head"><h2>${f.label}</h2><small>${ALL_GAMES.filter(f.test).length} jeux</small></div>
-        ${ALL_GAMES.some(f.test) ? `<div class="game-grid">${ALL_GAMES.filter(f.test).map(gameCard).join('')}</div>` : '<p class="muted">Aucun favori pour l’instant : touche le cœur en haut à droite d’une affiche pour l’ajouter ici.</p>'}
+        ${ALL_GAMES.some(f.test) ? `<div class="game-grid">${filter === 'slot' ? mysCard() : ''}${ALL_GAMES.filter(f.test).map(gameCard).join('')}</div>` : '<p class="muted">Aucun favori pour l’instant : touche le cœur en haut à droite d’une affiche pour l’ajouter ici.</p>'}
       </section>`;
 
   // Category pages lead with their latest game update; the home page with the newest game (NOUVEAU for 14 days),
@@ -12336,6 +12363,16 @@ class SlotMachine {
     this.updateMeters();
   }
 
+  // A bonus given by the site (rewarded ad, mystery machine): the first bonus of the list, at the stake, for free.
+  stakeKE() { return this.bet; }
+  freeBonus() {
+    if (this.busy || this.free || this.dead) return false;
+    this.stopAuto();
+    this.forced = this.forcedGrid(this.buyList()[0].id);
+    this.play({ buy: true });
+    return true;
+  }
+
   buyBonus(id) {
     if (this.busy || this.free) return;
     const x = this.buyList().find((b) => b.id === id);
@@ -12736,6 +12773,22 @@ class BaseGame {
       // social.js (Défi des machines à sous): a bought bonus is over, with its total win in × the bet
       dispatchEvent(new CustomEvent('sb:buyend', { detail: { game: this.game.id, buy: id, win: this.roundWin || 0, x: (this.roundWin || 0) / Math.max(1, stake) } }));
     });
+  }
+
+  // A bonus given by the site (rewarded ad « rejoue ton bonus », mystery machine): the first bonus of the buy list,
+  // at the current stake, without paying. Counted as a bought round (tournaments, duels, Défi spécial skip it).
+  stakeKE() { return this.bet / 100; }
+  freeBonus() {
+    const x = this.cfg?.buys?.[0];
+    if (!x || this.busy || this.dead || !this.onBuy) return false;
+    this.stopAuto();
+    this.round(async () => {
+      this.roundBuy = true;
+      this.lastStake = this.bet;
+      this.buyRound = true;
+      try { await this.onBuy(x.id); } finally { this.buyRound = false; }
+    });
+    return true;
   }
 
   showInfo() { modal(this.info(), { cls: 'wide' }); }
@@ -13586,7 +13639,9 @@ ${liveHTML(game)}
   if (location.search.includes('debug')) window.__slot = current;
 }
 
-return { leaveGame, renderGame };
+const currentGame = () => current;
+
+return { leaveGame, renderGame, currentGame };
 })();
 
 // ---- pages/account.js ----
@@ -14799,12 +14854,33 @@ async function watch() {
   }).catch((e) => { console.error(e); list.innerHTML = '<p class="ct-empty">Le chat n’est pas disponible pour le moment.</p>'; return null; });
 }
 
+// Big wins in the chat: after a round of at least WIN_X × the stake (or WIN_KE KE), bought bonuses excluded, the
+// account posts « 🎰 GROS GAIN ! +12 345 KE (×250) sur Le Cosmique » (a normal message: same Firestore rules), at
+// most one every WIN_GAP ms. Shown as a gold card with a « Jouer » link to the game.
+const WIN_X = 50, WIN_KE = 100000, WIN_GAP = 60000, WIN_TAG = '🎰 GROS GAIN ! ';
+let lastWinPost = 0;
+addEventListener('sb:roundend', (e) => {
+  const d = e.detail || {}, m = me(), g = __mods['games/index.js'].getGame(d.game);
+  if (!m || muted || !g || d.bought || !(d.win > 0) || !(d.x >= WIN_X || d.win >= WIN_KE) || Date.now() - lastWinPost < WIN_GAP) return;
+  lastWinPost = Date.now();
+  const x = d.x >= 100 ? Math.round(d.x) : Math.round(d.x * 10) / 10;
+  const text = `${WIN_TAG}+${Math.round(d.win).toLocaleString('fr-FR').replace(/\s/g, ' ')} KE (×${x.toLocaleString('fr-FR')}) sur ${g.name}`;
+  const look = noLook ? null : __mods['shop.js']?.publicLook?.();
+  setTimeout(() => cloud.sendChat(m.uid, m.name, text.slice(0, MAX), look || undefined).catch(() => {}), 3500); // after the celebration (and the 3 s rule)
+});
+function winHTML(x) {
+  const t = String(x.text), at = t.lastIndexOf(' sur '), name = at > 0 ? t.slice(at + 5) : '';
+  const g = name && __mods['games/index.js'].ALL_GAMES.find((y) => y.name === name);
+  const body = esc(t.slice(WIN_TAG.length, at > 0 ? at : undefined)).replace(/ KE\b/g, '\u00a0\uE1E0');
+  return `<p class="ct-win"><b>💥 GROS GAIN</b><span>${body}${g ? ` sur <a href="#game-${g.id}">${esc(g.name)}</a>` : name ? ` sur ${esc(name)}` : ''}</span></p>`;
+}
+
 function renderList() {
   const m = me();
   const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
-  list.innerHTML = msgs.length ? msgs.map((x) => `<div class="ct-msg${m && x.uid === m.uid ? ' mine' : ''}">
+  list.innerHTML = msgs.length ? msgs.map((x) => { const win = String(x.text || '').startsWith(WIN_TAG); return `<div class="ct-msg${m && x.uid === m.uid ? ' mine' : ''}${win ? ' win' : ''}">
       ${shopLook(x.look)}<button class="ct-name" data-uid="${esc(x.uid)}" data-name="${esc(x.name)}" data-id="${esc(x.id)}" ${__mods['shop.js']?.nameStyle?.(x.look) || ''}>${esc(x.name)}</button>${__mods['shop.js']?.badgeIcon?.(x.look) || ''}<span class="ct-time">${hhmm(x.at)}</span>
-      <p>${esc(clean(x.text))}</p></div>`).join('') : '<p class="ct-empty">Aucun message pour l’instant. Dis bonjour 👋</p>';
+      ${win ? winHTML(x) : `<p>${esc(clean(x.text))}</p>`}</div>`; }).join('') : '<p class="ct-empty">Aucun message pour l’instant. Dis bonjour 👋</p>';
   if (atBottom || m) list.scrollTop = list.scrollHeight;
   const form = root.querySelector('.ct-form'), inp = form.querySelector('input');
   inp.disabled = form.querySelector('button').disabled = !m || muted;
@@ -16139,9 +16215,17 @@ async function payout() {
       wallet.grant(prize + part);
       sfx.bigWin(); fx.coins(prize ? 70 : 30); fx.confetti(rank === 0 ? 150 : 70);
       if (prize) {
+        // rewarded ad, the player's choice: the prize once more (ads.js, tour_x2)
+        const A = __mods['ads.js'].ads, can = A.status('tour_x2').ok;
         modal(`<div class="ev-won"><span>${rank === 0 ? '🥇' : rank === 1 ? '🥈' : rank === 2 ? '🥉' : '🏅'}</span><h2>${K.label} : ${place(rank)} !</h2>
           <p>Sur ${esc(gname)}, avec ${xs(top[rank].best)}.</p><b>+${fmt(prize + part)}</b>${part ? `<small>dont ${fmt(part)} de participation</small>` : ''}
-          <button class="btn primary lg" data-value="ok">Je récupère</button></div>`, { cls: 'ev-modal' });
+          ${can ? `<button class="btn primary lg" data-value="x2">▶ Regarde une pub : gain doublé (+${fmt(prize)})</button>` : ''}
+          <button class="btn ${can ? 'ghost' : 'primary lg'}" data-value="ok">Je récupère</button></div>`, { cls: 'ev-modal' }).then(async (v) => {
+          if (v !== 'x2') return;
+          const r = await A.watch('tour_x2', { amount: prize });
+          toast(r.message, r.ok ? 'ok' : 'warn');
+          if (r.ok) { sfx.bigWin(); fx.coins(60); fx.confetti(100); }
+        });
       } else toast(`${K.icon} ${K.label} (${esc(gname)}) : merci d’avoir joué ${r.spins} tours ! +${fmt(part)} de participation`, 'ok');
     }
   } finally { paying = false; }
@@ -18058,7 +18142,21 @@ function shopHTML(s) {
   const left = Math.max(0, SHOP_DAY - shopToday(s));
   return `<div class="jc-shop"><div class="jc-shop-h"><b>🛒 Acheter un paquet</b><span>${left ? `encore <b>${left}</b> aujourd’hui` : 'plus d’achat aujourd’hui · reviens demain'}</span></div>
     <div class="jc-shop-row">${['b', 'v', 'o'].map((t) => `<button class="jc-shop-btn p-${t}" data-jc-buy-pack="${t}" ${left ? '' : 'disabled'}><span class="jc-shop-dot"></span><b>${PACKS[t].name}</b><em>${fmt(SHOP[t])}</em></button>`).join('')}</div>
+    ${__mods['ads.js'].ads.status('jcc_pack').ok ? `<button class="btn primary jc-ad-btn" data-jc-ad-pack>▶ Regarde une pub : un ${PACKS.b.name.toLowerCase()} en plus (1 par jour)</button>` : ''}
     <p class="muted small">${SHOP_DAY} paquets par jour au maximum, au choix. Les autres se gagnent en jouant.</p></div>`;
+}
+// rewarded ad (ads.js, jcc_pack): one more blue pack, opened right away
+function adPack() {
+  if (!profiles.current) return 'Ouvre une partie d’abord';
+  save((s) => { s.packs.b = (s.packs.b || 0) + 1; });
+  paintBadge(); paintPage();
+  setTimeout(() => openPack('b'), 300);
+  return `🃏 Un ${PACKS.b.name.toLowerCase()} en plus !`;
+}
+async function adPackClick() {
+  const r = await __mods['ads.js'].ads.watch('jcc_pack');
+  if (!r.ok) toast(r.message, 'warn');
+  paintPage();
 }
 async function buyPack(t) {
   if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour jouer aux cartes', 'warn');
@@ -18368,6 +18466,7 @@ document.addEventListener('click', (e) => {
   let b;
   if ((b = q('[data-jc-open]'))) return openPack(b.dataset.jcOpen);
   if ((b = q('[data-jc-buy-pack]'))) return buyPack(b.dataset.jcBuyPack);
+  if (q('[data-jc-ad-pack]')) return adPackClick();
   if ((b = q('[data-jc-tab]'))) { tab = b.dataset.jcTab; if (tab === 'market') loadOffers(); return paintPage(); }
   if ((b = q('[data-jc-el]'))) { elf = b.dataset.jcEl; return paintPage(); }
   if ((b = q('[data-jc-serie]'))) { pickSerie = b.dataset.jcSerie; return paintPage(); }
@@ -18401,7 +18500,153 @@ profiles.addEventListener('change', () => { pending = 0; setTimeout(() => { pain
 profiles.ready?.then(() => setTimeout(() => { paintBadge(); watchMine(); }, 2500));
 setInterval(() => { if (here() && tab === 'market') loadOffers(); }, 60000);
 
-return { renderJcc, checkAlbum, SERIES, CARD, BAR, ALBUM };
+return { renderJcc, checkAlbum, adPack, SERIES, CARD, BAR, ALBUM };
+})();
+
+// ---- mystere.js ----
+__mods['mystere.js'] = (() => {
+// 1) La machine mystère (demande du propriétaire) : une fois par jour, pendant MYST.min minutes, une machine à sous
+//    cachée apparaît sur l'accueil et dans les machines à sous, avec une vignette « ? ». On découvre laquelle en
+//    l'ouvrant. Pendant cette heure, le bonus y tombe ≈ 3 fois plus souvent : après chaque tour payé sans bonus,
+//    MYST.extra de chances qu'un BONUS MYSTÈRE parte tout seul (offert, à la mise du tour), au plus MYST.cap par
+//    joueur et par heure (profile.myst). Heure et machine tirées de la date de Paris (mysteryOf), entre 12 h et 21 h.
+// 2) « Rejoue ton bonus » : après un bonus gagné en jouant sur une machine à sous (bien payé ou pas), une pub
+//    récompensée relance le même bonus gratuitement, une fois par jour (ads.js, bonus_replay), à la même mise au plus.
+// Les bonus offerts comptent comme des bonus achetés (tournois, duels, Défi spécial ne les comptent pas).
+const E = __mods['events.js'];
+const { profiles } = __mods['profile.js'];
+const { getGame, SLOTS } = __mods['games/index.js'];
+const { toast, modal } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+const { fmt } = __mods['wallet.js'];
+
+const MYST = { min: 60, from: 12, to: 20, extra: 1 / 160, cap: 4 };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const cur = () => __mods['pages/game.js'].currentGame?.();
+const ads = () => __mods['ads.js'].ads;
+const hash = (s) => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 0; };
+
+/* ---------- the mystery machine of the day ---------- */
+function mysteryOf(t = Date.now()) {
+  const p = E.paris(t), h = hash(`myst-${p.key}`);
+  const list = SLOTS.filter((g) => g.original && !g.wip);
+  const hour = MYST.from + (h % (MYST.to - MYST.from + 1));
+  const start = E.at(p.y, p.m, p.d, hour);
+  return { key: p.key, start, end: start + MYST.min * 60e3, game: list[hash(`g-${p.key}`) % list.length]?.id };
+}
+const liveNow = (t = Date.now()) => { const M = mysteryOf(t); return M.game && t >= M.start && t < M.end ? M : null; };
+const used = (M) => (profiles.current?.myst?.k === M.key ? profiles.current.myst.n || 0 : 0);
+const hhmm = (t) => { const p = E.paris(t); return `${p.h} h${p.mi ? String(p.mi).padStart(2, '0') : ''}`; };
+
+// waits until the game is free (end of the spin, autoplay stopped) then starts its free bonus
+function startFree(gid, tries = 0) {
+  const g = cur();
+  if (!g || g.game?.id !== gid || g.dead) return false;
+  g.stopAuto?.();
+  if (g.freeBonus?.()) return true;
+  if (tries < 40) setTimeout(() => startFree(gid, tries + 1), 250);
+  return true;
+}
+
+/* ---------- what happened this round ---------- */
+let feat = null, replay = null;
+addEventListener('sb:feature', (e) => { const d = e.detail || {}; if (!d.bought && !d.re) feat = d.game; });
+addEventListener('sb:roundend', (e) => {
+  const d = e.detail || {}, g = getGame(d.game), bonus = !d.bought && feat === d.game;
+  feat = null;
+  if (!g || g.cat !== 'slot' && g.original) return;
+  if (bonus) return offerReplay(d);
+  const M = liveNow();
+  if (d.bought || !M || M.game !== d.game || !profiles.current || used(M) >= MYST.cap || Math.random() >= MYST.extra) return;
+  profiles.update('myst', (p) => { p.myst = { k: M.key, n: used(M) + 1 }; });
+  cur()?.stopAuto?.();
+  setTimeout(() => {
+    if (!startFree(d.game)) return;
+    sfx.bigWin?.(); fx.confetti?.(120);
+    toast(`❓ <b>BONUS MYSTÈRE !</b> La machine mystère t’offre son bonus (${used(M)} / ${MYST.cap} cette heure-ci)`, 'ok');
+  }, 900);
+});
+
+/* ---------- « rejoue ton bonus » with a rewarded ad ---------- */
+function offerReplay(d) {
+  if (!profiles.current || !(ads().status('bonus_replay').left > 0)) return;
+  replay = { game: d.game, stake: d.stake, until: Date.now() + 10 * 60e3 };
+  setTimeout(() => {
+    if (!replay || document.querySelector('.ad-offer') || cur()?.game?.id !== d.game) return;
+    const good = d.x >= 20;
+    const card = document.createElement('div');
+    card.className = 'ad-offer rp-offer';
+    card.innerHTML = `<b>🎰 ${good ? 'Beau bonus ! Encore un ?' : 'Bonus décevant ?'}</b><p>Regarde une pub et <b>rejoue ce bonus gratuitement</b>, à ta mise de ${fmt(d.stake)}. Une fois par jour.</p><div><button class="btn primary" data-go>▶ Rejouer</button><button class="btn ghost" data-x>Non</button></div>`;
+    document.body.appendChild(card);
+    const t = setTimeout(() => card.remove(), 20000);
+    card.querySelector('[data-x]').onclick = () => { clearTimeout(t); card.remove(); };
+    card.querySelector('[data-go]').onclick = async () => {
+      clearTimeout(t); card.remove();
+      cur()?.stopAuto?.();
+      const g = cur();
+      if (g?.stakeKE && g.stakeKE() > replay.stake + 1e-9) return toast(`Remets ta mise à ${fmt(replay.stake)} (ou moins) pour rejouer ce bonus`, 'warn');
+      const r = await ads().watch('bonus_replay');
+      toast(r.message, r.ok ? 'ok' : 'warn');
+    };
+  }, 3400);
+}
+function canReplay() {
+  const g = cur();
+  return !!(replay && g && g.game?.id === replay.game && Date.now() < replay.until && g.freeBonus && !(g.stakeKE?.() > replay.stake + 1e-9));
+}
+function doReplay() {
+  const gid = replay?.game;
+  replay = null;
+  if (!gid || !startFree(gid)) return 'Retourne sur la machine pour rejouer ton bonus';
+  fx.confetti?.(80);
+  return '🎰 Ton bonus repart, gratuitement !';
+}
+
+/* ---------- on the site: home card, the « ? » card, the pill under the game ---------- */
+const mysteryHTML = (M, t) => `<span class="mys-q" aria-hidden="true">?</span><span class="mys-txt"><b>MACHINE MYSTÈRE</b><small>Bonus ×3 plus fréquents · encore ${E.left(M.end - t)}</small></span>`;
+function cardHTML() {
+  const t = Date.now(), M = liveNow(t);
+  return M ? `<a class="game-card mys-card" href="#accueil" data-mystery aria-label="Machine mystère">${mysteryHTML(M, t)}</a>` : '';
+}
+E.addHome((t) => {
+  const M = mysteryOf(t);
+  if (!M.game || t >= M.end) return '';
+  if (t >= M.start) return `<a class="ev-card ev-myst" href="#accueil" data-mystery><span class="ev-ico mys-ico">?</span><div><small><i class="ev-dot"></i>MACHINE MYSTÈRE · EN CE MOMENT</small><b>Une machine cachée : le bonus y tombe 3× plus souvent</b><em>Encore ${E.left(M.end - t)} · jusqu’à ${MYST.cap} bonus mystères offerts</em></div><span class="ev-go">Découvrir ›</span></a>`;
+  return `<div class="ev-card ev-myst soon"><span class="ev-ico mys-ico">?</span><div><small>MACHINE MYSTÈRE · AUJOURD’HUI ${hhmm(M.start)} – ${hhmm(M.end)}</small><b>Une machine cachée apparaît pendant 1 h</b><em>Commence dans ${E.left(M.start - t)} · bonus 3× plus fréquents</em></div></div>`;
+});
+E.addGamePill((gid, t) => {
+  const M = liveNow(t);
+  if (!M || M.game !== gid) return '';
+  return `<span class="ev-pill myst">❓ <b>Machine mystère</b> · bonus 3× plus fréquents · encore ${E.left(M.end - t)} · bonus mystères ${used(M)} / ${MYST.cap}</span>`;
+});
+
+async function reveal() {
+  const M = liveNow();
+  if (!M) return toast('La machine mystère est repartie : reviens demain !', 'info');
+  const g = getGame(M.game), { thumbArt } = __mods['pages/lobby.js'];
+  sfx.feature?.(); fx.confetti?.(90);
+  const v = await modal(`<div class="mys-reveal"><small>LA MACHINE MYSTÈRE EST…</small><div class="mys-art">${thumbArt(g, { square: true })}</div><h2>${esc(g.name)} !</h2>
+    <p>Jusqu’à ${hhmm(M.end)}, le bonus y tombe <b>3 fois plus souvent</b> : jusqu’à ${MYST.cap} bonus mystères offerts.</p>
+    <button class="btn primary lg" data-value="go">Jouer</button></div>`, { cls: 'mys-modal' });
+  if (v === 'go') location.hash = `#game-${g.id}`;
+}
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-mystery]');
+  if (!b) return;
+  e.preventDefault();
+  reveal();
+});
+// the moment it starts, a word for the players on the site
+let said = '';
+setInterval(() => {
+  const M = liveNow();
+  if (!M || said === M.key || !profiles.current || Date.now() - M.start > 5 * 60e3) return;
+  said = M.key;
+  toast('❓ <b>La machine mystère est arrivée !</b> Bonus 3× plus fréquents pendant 1 h. <a href="#accueil" data-mystery>La découvrir ›</a>', 'ok');
+}, 20000);
+
+return { MYST, mysteryOf, liveNow, cardHTML, canReplay, replay: doReplay };
 })();
 
 // ---- main.js ----

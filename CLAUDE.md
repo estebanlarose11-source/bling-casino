@@ -161,6 +161,22 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Liste des cartes pour le propriétaire : `notes/jcc-les-origines-cartes.txt` (dossier `notes/` = ses notes) ; en faire
   une pareille pour chaque nouvelle série.
 
+- **Machine mystère** (`mystere.js`, demande du propriétaire) : une fois par jour, 1 h (`MYST`, entre 12 h et 21 h, heure et
+  machine tirées de la date de Paris, `mysteryOf`), une machine à sous cachée apparaît (carte « ? » en tête des machines à
+  sous et encart de l'accueil `[data-mystery]`, on la découvre en l'ouvrant). Bonus ≈ 3× plus fréquent : après chaque tour
+  payé sans bonus, `MYST.extra` (1/160) de chances d'un BONUS MYSTÈRE offert à la mise du tour, au plus `MYST.cap` (4) par
+  joueur et par heure (`profile.myst`). Taux de base des bonus ≈ 1/250 à 1/400 selon la machine : 1/160 en plus ≈ ×3.
+- **Bonus offert** : `freeBonus()` des deux moteurs (`core/base.js`, `slot/machine.js`) lance le 1er bonus de la liste
+  d'achat sans payer ; compté comme un bonus acheté (tournois, duels, Défi spécial ne le comptent pas).
+  `currentGame()` (`pages/game.js`) donne le jeu ouvert.
+- **Pubs récompensées en plus** (`ads.js`, toujours au choix du joueur) : `bonus_replay` (après un bonus gagné en jouant,
+  bien payé ou pas : rejouer ce bonus gratuitement, 1 par jour, à la même mise au plus, carte `.rp-offer` de `mystere.js`),
+  `tour_x2` (doubler un prix de tournoi, bouton dans la fenêtre du prix, 2 par jour), `jcc_pack` (un paquet bleu en plus,
+  bouton dans « Acheter un paquet », 1 par jour).
+- **Gros gains dans le chat** (`chat.js`) : après un tour ≥ ×50 la mise ou ≥ 100 000 KE (bonus achetés exclus), le compte
+  poste tout seul « 🎰 GROS GAIN ! +… KE (×…) sur <jeu> » (message normal, mêmes règles Firestore, 1 par minute au plus),
+  affiché en carte dorée avec le lien du jeu.
+
 ## Arrivée des visiteurs et partage
 
 - **Cadeau du jour = série de connexion** (`daily.js`, carte en haut de l'accueil `dailyHomeHTML` dans `pages/lobby.js`,
@@ -254,6 +270,11 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 `python3 tools/seo.py` (lancé aussi par `tools/build.py`) fabrique, à partir du catalogue, une page par jeu
 (`jeux/<id>.html`), la liste `jeux/index.html`, `sitemap.xml` et `robots.txt` : Google ne lit pas les `#game-…`.
 À relancer après un nouveau jeu ou un changement de description, puis commit des fichiers générés.
+Chaque page de jeu a ses astuces (`tips()`, écrites à partir du catalogue), ses questions fréquentes (`faq()`, aussi en
+données Google `FAQPage`) et 2 captures d'écran `assets/shots/<id>.webp` + `<id>-tel.webp` (nouveau jeu :
+`python3 -m http.server 8123` puis `node tools/seo/shots.js <id>`, puis changer `CACHE` dans `sw.js`). Guides dans
+`articles/` (liste `ARTICLES` de `seo.py` : « Les meilleures machines à sous gratuites en 2026 », jeux de table, jeux
+rapides, RTP et volatilité ; lien « Guides et astuces » en pied de page). Nouvelle machine à sous : l'ajouter à `ORDER`.
 
 ## Affiche « Mise à jour » (à faire à chaque mise à jour d'un jeu)
 
