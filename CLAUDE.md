@@ -264,13 +264,15 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **D'où viennent les joueurs** (`monitor.js`) : une fois par visite, dans le même document `stats/AAAA-MM-JJ` (pas de
   nouvelle règle Firestore) : `opens._visit`, `opens._new` (1re visite sur l'appareil), `opens._compte` (compte créé),
   `opens._src_<source>` (le `?src=` d'un lien, sinon le site d'origine, sinon parrainage / appli / direct ; sources
-  connues seulement : `SOURCES`, le reste = « autre »). Bilan : GitHub Actions **« Stats »** (`tools/admin/stats.mjs`,
+  connues seulement : `SOURCES`, le reste = « autre » ; jamais les appareils `?nopub` du propriétaire ni les robots :
+  `?nostats` = rien n'est compté, utilisé par le robot des Shorts). Bilan : GitHub Actions **« Stats »** (`tools/admin/stats.mjs`,
   chaque matin ou à la main, nombre de jours au choix) → résumé de la tâche (secret `FIREBASE_SERVICE_ACCOUNT`).
 - **Kit de lancement** pour le propriétaire : `lancement.html` (page privée, `noindex`, dans aucun menu) : routine du
   jour / de la semaine (cases cochées gardées sur son téléphone), liens suivis `?src=`, textes prêts à copier
   (WhatsApp, story Snap, TikTok, Facebook, Discord, forums, créateurs, Reddit), marche à suivre itch.io, règles.
 - **itch.io / Game Jolt** : `node tools/itch/make.js` (après `python3 tools/bundle.py`, serveur local lancé) →
-  `dist/itch/spinbet-itch.zip` (le site en un fichier, sans pub, pastille « Joue sur www.spinbetcaz.com » `?src=itch`),
+  `dist/itch/spinbet-itch.zip` (le site en un fichier, sans pub grâce à `window.__SB_ITCH`, pastille « Joue sur
+  www.spinbetcaz.com » `?src=itch`),
   `cover.png` 630 × 500 et 5 captures, à envoyer au propriétaire.
 
 ## Notifications sur le téléphone (gratuit)

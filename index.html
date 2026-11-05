@@ -8908,7 +8908,7 @@ profiles.addEventListener('change', checkOwner);
 checkOwner();
 
 const adPolicy = Object.assign(policy, {
-  noAds: () => owner || nopub(),
+  noAds: () => owner || nopub() || !!window.__SB_ITCH, // (the itch.io version: no ads, tools/itch/make.js)
   get owner() { return owner; },
 });
 
@@ -14840,8 +14840,9 @@ const day = () => new Date().toISOString().slice(0, 10);
 function onRoute() { const g = gameNow(); if (g && g !== lastOpen) opens[g] = (opens[g] || 0) + 1; lastOpen = g; }
 addEventListener('hashchange', onRoute); setTimeout(onRoute, 1500);
 wallet.addEventListener('wager', () => { const g = gameNow(); if (g) spins[g] = (spins[g] || 0) + 1; });
+const robot = /[?&]nostats\b/.test(location.search); // the Shorts robot: nothing counted
 function flush() {
-  if (!cloud.enabled || (!Object.keys(opens).length && !Object.keys(spins).length)) return;
+  if (robot || !cloud.enabled || (!Object.keys(opens).length && !Object.keys(spins).length)) return;
   const o = opens, s = spins; opens = {}; spins = {};
   cloud.bumpStats(day(), o, s).catch(() => { for (const k in o) opens[k] = (opens[k] || 0) + o[k]; for (const k in s) spins[k] = (spins[k] || 0) + s[k]; });
 }
@@ -14866,6 +14867,8 @@ const fromReferrer = () => {
   return k ? SOURCES[k] : 'autre';
 };
 (() => {
+  // the owner's devices and the robots (?nopub, ?nostats: the Shorts robot, the checks) are not players
+  try { if (/[?&](nopub|nostats)\b/.test(location.search) || localStorage.getItem('spinbet_nopub') === '1') return; } catch { /* ignore */ }
   try { if (sessionStorage.getItem('spinbet_visit')) return; sessionStorage.setItem('spinbet_visit', '1'); } catch { return; }
   const q = (location.search.match(/[?&](?:src|utm_source)=([\w-]{1,30})/i) || [])[1]?.toLowerCase();
   const app = /SpinBetApp/.test(navigator.userAgent) || matchMedia?.('(display-mode: standalone)').matches;

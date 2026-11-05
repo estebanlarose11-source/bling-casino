@@ -41,7 +41,7 @@ async function attempt(browser, id, k) {
     } catch { /* ignore */ }
   });
   const page = await ctx.newPage();
-  await page.goto(`${BASE}?nopub&nointro#game-${id}`);
+  await page.goto(`${BASE}?nopub&nointro&nostats#game-${id}`);
   // (__mods is a top-level const of the page, not a property of window)
   await page.waitForFunction(() => typeof __mods !== 'undefined' && !!__mods['pages/game.js']?.currentGame?.()?.freeBonus, null, { timeout: 30000 });
   await page.waitForTimeout(2500); // pictures of the game

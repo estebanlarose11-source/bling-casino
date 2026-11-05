@@ -13,7 +13,7 @@ fs.mkdirSync(OUT, { recursive: true });
 
 // 1. the page: no ads, and the way back to the site
 let html = fs.readFileSync(path.join(DIST, 'spinbet-casino.html'), 'utf8');
-const head = `<script>try { localStorage.setItem('spinbet_nopub', '1'); } catch (e) {} window.__SB_ITCH = 1;</script>
+const head = `<script>window.__SB_ITCH = 1; // no ads (adpolicy.js); its visits still count, as « itch »</script>
 <style>.itch-pill{position:fixed;left:12px;bottom:12px;z-index:300;display:flex;align-items:center;gap:8px;max-width:calc(100% - 24px);padding:9px 14px;border-radius:999px;
 background:linear-gradient(180deg,#7dd3fc,#2563eb);color:#fff;font:800 13px Inter,system-ui,sans-serif;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.45)}
 .itch-pill b{font-weight:900}.itch-pill i{font-style:normal;margin-left:4px;opacity:.8}
