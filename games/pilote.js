@@ -92,6 +92,7 @@ class PiloteGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.pilote, mainLabel: 'DÉCOLLER',
+      opts: [{ id: 'super', icon: '🚀', label: 'Super turbo' }], // faster than the Turbo (owner's request)
       cls: 'table-game pilote',
       head: '<div class="hist pi-hist"></div>',
       stage: `<div class="pi-scene"><canvas class="pi-cv"></canvas>
@@ -102,6 +103,7 @@ class PiloteGame extends BaseGame {
         <div class="pi-say">Prends les multiplicateurs, évite les bombes… et pose-toi sur un porte-avions !</div></div>`,
       hello: 'Choisis ta mise et appuie sur DÉCOLLER.',
     });
+    try { this.superT = localStorage.getItem('spinbet_pilote_super') === '1'; } catch { this.superT = false; }
     this.cv = this.q('.pi-cv'); this.ctx = this.cv.getContext('2d'); this.scene = this.q('.pi-scene');
     this.inst = { box: this.q('.pi-inst'), alt: this.q('.pi-altv'), spd: this.q('.pi-spd'), dst: this.q('.pi-dst'), last: {} };
     this.state = 'idle'; this.hist = []; this.parts = []; this.texts = []; this.shakeT = 0;
@@ -121,6 +123,14 @@ class PiloteGame extends BaseGame {
     if (this.state === 'fly' && this.f?.ok && !this.paid) { this.paid = true; const c = Math.floor(this.stake * this.f.pay); if (c > 0) this.win(c); }
     if (this.bonusOn) dispatchEvent(new CustomEvent('sb:featureend', { detail: { game: this.game.id } }));
     cancelAnimationFrame(this.raf); removeEventListener('resize', this.onResize); super.destroy();
+  }
+
+  // Super turbo, in « Bonus & menu »: the flight goes about 3 times faster than normal (Turbo: 1,7 times)
+  optOn(id) { return id === 'super' && this.superT; }
+  onOpt(id) {
+    if (id !== 'super') return;
+    this.superT = !this.superT;
+    try { localStorage.setItem('spinbet_pilote_super', this.superT ? '1' : '0'); } catch { /* private mode */ }
   }
 
   /* ---------- geometry ---------- */
@@ -206,7 +216,7 @@ class PiloteGame extends BaseGame {
     return new Promise((resolve) => {
       this.f = null; this.idle();
       this.f = f; this.state = 'fly'; this.done = resolve; this.stake = this.bet; this.paid = false;
-      this.phase = 'run'; this.rt = 0; this.runT = this.turbo ? 0.75 : 1.2; this.tm = this.turbo ? 1.7 : 1;
+      this.phase = 'run'; this.rt = 0; this.runT = this.superT ? 0.45 : this.turbo ? 0.75 : 1.2; this.tm = this.superT ? 3 : this.turbo ? 1.7 : 1;
       this.k = 0; this.T = 1; this.A = A0; this.spd = 0; this.slowT = 0; this.boostT = 0; this.slowmoT = 0; this.turbT = 0;
       this.jy = 0; this.jv = 0; this.ja = 0; this.bonusOn = false; this.scene.classList.remove('bonus');
       this.plan(f);
@@ -246,7 +256,8 @@ class PiloteGame extends BaseGame {
       const next = this.items[this.k];
       if (next && this.A <= DOWN && next.x - p.x < this.SP * 0.8) tgt = Math.min(tgt, 0.55); // one more bomb and it is over: slow motion
       if (!next) tgt = Math.min(tgt, 0.78); // final approach
-      if (this.slowmoT > 0) tgt = 0.3;
+      if (this.slowmoT > 0) tgt = this.superT ? 0.6 : 0.3;
+      if (this.superT) tgt = Math.max(tgt, 0.75); // super turbo: almost no slow motion
       this.spd += (tgt - this.spd) * Math.min(1, dt * (tgt > this.spd ? 4 : 2.5));
       p.x += this.vx0 * this.spd * this.tm * dt; shown = this.spd;
       while (this.k < this.items.length && p.x >= this.items[this.k].x) this.hit(this.k);
@@ -370,7 +381,7 @@ class PiloteGame extends BaseGame {
       if (ok && won > 0) await this.celebrate(won);
       if (this.bonusOn) dispatchEvent(new CustomEvent('sb:featureend', { detail: { game: this.game.id } }));
       this.bonusOn = false; this.scene.classList.remove('bonus');
-      await this.wait(ok ? 500 : 900);
+      await this.wait(this.superT ? 200 : ok ? 500 : 900);
       this.state = 'idle';
       const r = this.done; this.done = null; r?.();
     };
