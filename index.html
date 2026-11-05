@@ -3051,48 +3051,62 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 /* big screens: the game takes the whole width and the height that is left (owner's request) */
 .game-host:has(> .g-pilote) { max-width: none; }
 @media (min-width: 900px) { .pi-scene { height: clamp(420px, calc(100vh - 290px), 1100px); } }
-.game-host.is-full:has(> .g-pilote) { padding: 0; overflow: hidden; background: #05060c; }
-/* full screen: the sky fills the whole screen and the bet buttons float over it (owner's request) */
-.game-host.is-full > .slot.g-pilote { display: block !important; position: absolute; inset: 0; width: 100%; height: 100%; max-width: none !important; margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
-.game-host.is-full > .slot.g-pilote > .slot-frame, .game-host.is-full > .slot.g-pilote .slot-stage { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; min-height: 0 !important; margin: 0; padding: 0 !important; border: 0; border-radius: 0; background: none; box-shadow: none; max-width: none; }
-.game-host.is-full > .slot.g-pilote .pi-scene { height: 100% !important; border-radius: 0; }
-.game-host.is-full > .slot.g-pilote > .slot-head { position: absolute; top: calc(max(8px, env(safe-area-inset-top, 0px)) + 40px); left: 50%; transform: translateX(-50%); z-index: 6; margin: 0; pointer-events: none; }
-.game-host.is-full > .slot.g-pilote > .slot-head .slot-title { display: none; }
-.game-host.is-full > .slot.g-pilote > .win-bar { position: absolute; left: 50%; transform: translateX(-50%); top: calc(max(8px, env(safe-area-inset-top, 0px)) + 84px); bottom: auto; z-index: 6; margin: 0; pointer-events: none; text-shadow: 0 1px 3px #000; }
-.game-host.is-full > .slot.g-pilote > .controls { position: absolute; left: 50%; bottom: max(10px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(1000px, calc(100% - 20px)); z-index: 7; margin: 0; background: rgba(8, 15, 35, .78); border: 1px solid rgba(255, 255, 255, .14); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
-.game-host.is-full > .slot.g-pilote .pi-say { bottom: calc(var(--pi-ctl, 104px) + 14px); left: 50%; right: auto; transform: translateX(-50%); width: min(760px, calc(100% - 20px)); }
-.game-host.is-full > .slot.g-pilote .pi-top { top: max(8px, env(safe-area-inset-top, 0px)); }
-@media (max-width: 700px) {
-  .game-host.is-full > .slot.g-pilote > .slot-frame { bottom: 190px !important; height: auto !important; }
-  .game-host.is-full > .slot.g-pilote .pi-say { bottom: 8px; }
-  .game-host.is-full > .slot.g-pilote > .win-bar { top: 150px; }
-  .game-host.is-full > .slot.g-pilote > .controls { background: rgba(8, 15, 35, .92); }
-}
-.pi-top { position: absolute; left: 8px; right: 8px; top: 8px; display: flex; align-items: flex-start; gap: 10px; pointer-events: none; z-index: 2; }
-.pi-total { display: flex; flex-direction: column; align-items: flex-start; min-width: 104px; padding: 5px 12px 6px; border-radius: 4px; background: rgba(8, 15, 35, .72); border: 2px solid rgba(253, 224, 71, .55); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); }
-.pi-total small { font: 800 9px Inter, sans-serif; letter-spacing: 1.5px; text-transform: uppercase; color: #cbd5e1; }
+/* instruments, top left (owner's request): gain in flight, altitude, speed, distance */
+.pi-hud { position: absolute; left: 8px; top: 8px; z-index: 3; display: flex; flex-direction: column; gap: 6px; width: 132px; pointer-events: none; }
+.pi-total { display: flex; flex-direction: column; align-items: flex-start; padding: 5px 12px 6px; border-radius: 4px; background: rgba(8, 15, 35, .74); border: 2px solid rgba(253, 224, 71, .55); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); }
+.pi-total small, .pi-inst small { font: 800 8.5px Inter, sans-serif; letter-spacing: 1.3px; text-transform: uppercase; color: #cbd5e1; }
 .pi-total b { font: 900 24px/1.05 KeCoin, Archivo, sans-serif; color: #fde047; text-shadow: 0 2px 0 rgba(0, 0, 0, .45); }
 .pi-total em { font: 800 12px KeCoin, Archivo, sans-serif; font-style: normal; color: #e2e8f0; }
 .pi-total.bump b { animation: piBump .35s ease-out; }
 @keyframes piBump { 40% { transform: scale(1.25); } }
-.pi-road { position: relative; flex: 1; height: 10px; margin-top: 16px; border-radius: 6px; background: rgba(8, 15, 35, .6); border: 1px solid rgba(255, 255, 255, .25); }
-.pi-road i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 6px; background: linear-gradient(90deg, #38bdf8, #4ade80); transition: width .5s ease; }
-.pi-road span { position: absolute; top: -9px; font-size: 18px; line-height: 1; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .5)); }
-.pi-road span { left: -10px; }
-.pi-alt { position: absolute; right: 8px; top: 62px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 6px 6px 7px; border-radius: 4px; background: rgba(8, 15, 35, .65); z-index: 2; pointer-events: none; }
-.pi-alt small { font: 800 8px Inter, sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #cbd5e1; }
-.pi-bars { display: flex; flex-direction: column; gap: 3px; }
-.pi-bars i { display: block; width: 26px; height: 9px; border-radius: 2px; background: rgba(255, 255, 255, .14); transition: background .25s; }
-.pi-bars i.on { background: linear-gradient(90deg, #4ade80, #16a34a); }
-.pi-bars i.on.danger { background: linear-gradient(90deg, #f87171, #dc2626); animation: piDanger .5s ease-in-out infinite alternate; }
+.pi-inst { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 1px 8px; padding: 6px 10px 7px; border-radius: 4px; background: rgba(8, 15, 35, .74); border: 1px solid rgba(125, 211, 252, .35); box-shadow: 0 4px 14px rgba(0, 0, 0, .3); }
+.pi-inst b, .pi-inst span { justify-self: end; font: 800 12px KeCoin, Archivo, sans-serif; color: #e2e8f0; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pi-inst .pi-altv { font-size: 17px; color: #4ade80; transition: color .2s; }
+.pi-inst .pi-altv i { font-style: normal; font-size: 11px; margin-left: 3px; }
+.pi-inst.warn .pi-altv { color: #fbbf24; }
+.pi-inst.danger { border-color: rgba(248, 113, 113, .9); }
+.pi-inst.danger .pi-altv { color: #f87171; animation: piDanger .35s ease-in-out infinite alternate; }
 @keyframes piDanger { to { opacity: .45; } }
+.pi-fuel { position: absolute; top: 14px; left: 172px; right: 12px; height: 10px; z-index: 3; border-radius: 6px; background: rgba(8, 15, 35, .6); border: 1px solid rgba(255, 255, 255, .25); pointer-events: none; }
+.pi-fuel i { position: absolute; left: 0; top: 0; bottom: 0; width: 100%; border-radius: 6px; background: linear-gradient(90deg, #f97316, #fde047 30%, #4ade80); transition: width .5s ease; }
+.pi-fuel span { position: absolute; left: -24px; top: -6px; font-size: 16px; line-height: 1; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .5)); }
+/* the ×10 bonus: banner, golden frame, and the big announcement */
+.pi-bonus { position: absolute; top: 32px; left: 172px; right: 12px; z-index: 3; display: none; padding: 3px 10px; border-radius: 4px; text-align: center; font: 900 13px KeCoin, Archivo, sans-serif; letter-spacing: .5px; color: #451a03; background: linear-gradient(90deg, #fde047, #f59e0b, #fde047); box-shadow: 0 0 18px rgba(250, 204, 21, .7); pointer-events: none; animation: piGlow .8s ease-in-out infinite alternate; }
+.pi-scene.bonus .pi-bonus { display: block; }
+.pi-scene.bonus::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; box-shadow: inset 0 0 60px 8px rgba(250, 204, 21, .45); animation: piGlow .8s ease-in-out infinite alternate; }
+@keyframes piGlow { to { filter: brightness(1.25); box-shadow: 0 0 30px rgba(250, 204, 21, .9), inset 0 0 60px 8px rgba(250, 204, 21, .55); } }
+.pi-big { position: absolute; left: 50%; top: 42%; z-index: 4; transform: translate(-50%, -50%); text-align: center; pointer-events: none; animation: piBig 2.2s cubic-bezier(.2, .9, .3, 1) forwards; }
+.pi-big b { display: block; font: 900 clamp(38px, 9vw, 92px)/1 Archivo, sans-serif; color: #fde047; letter-spacing: 2px; text-shadow: 0 4px 0 #b45309, 0 0 30px rgba(250, 204, 21, .8); }
+.pi-big span { display: inline-block; margin-top: 8px; padding: 5px 14px; border-radius: 4px; font: 900 clamp(14px, 2.6vw, 24px) KeCoin, Archivo, sans-serif; color: #fff; background: rgba(120, 53, 15, .85); }
+@keyframes piBig { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.3); } 18% { opacity: 1; transform: translate(-50%, -50%) scale(1.12); } 30% { transform: translate(-50%, -50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -62%) scale(.95); } }
 .pi-scene.low::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1; border: 3px solid rgba(239, 68, 68, .9); border-radius: 4px; box-shadow: inset 0 0 50px 14px rgba(220, 38, 38, .6); animation: piDanger .5s ease-in-out infinite alternate; }
-.pi-say { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 2; padding: 6px 10px; border-radius: 4px; background: rgba(8, 15, 35, .72); color: #fff; font-weight: 700; font-size: 13px; text-align: center; pointer-events: none; }
+.pi-say { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 3; padding: 6px 10px; border-radius: 4px; background: rgba(8, 15, 35, .74); color: #fff; font-weight: 700; font-size: 13px; text-align: center; pointer-events: none; }
 .pi-won .pi-say { color: #fde68a; } .pi-lost .pi-say { color: #bae6fd; }
 .pi-hist { max-width: 70%; }
 .pi-hist span { color: #fff; text-shadow: 0 1px 2px #000; background: #334155; }
 .pi-hist span.lo { background: #475569; } .pi-hist span.mid { background: #2563eb; } .pi-hist span.hi { background: linear-gradient(180deg, #f59e0b, #b45309); }
-@media (max-width: 560px) { .pi-scene { height: clamp(300px, 52vh, 420px); } .pi-total b { font-size: 20px; } .pi-say { font-size: 12px; } }
+@media (max-width: 560px) {
+  .pi-scene { height: clamp(340px, 62vh, 560px); }
+  .pi-bonus span { display: none; }
+  .pi-hud { width: 112px; gap: 4px; } .pi-total { padding: 4px 9px 5px; } .pi-total b { font-size: 19px; } .pi-inst { padding: 4px 8px 5px; } .pi-inst .pi-altv { font-size: 14px; } .pi-inst b, .pi-inst span { font-size: 11px; }
+  .pi-fuel, .pi-bonus { left: 148px; } .pi-say { font-size: 12px; }
+}
+/* full screen: the sky fills the whole screen and the bet buttons float over it (owner's request) */
+.game-host.is-full:has(> .g-pilote) { padding: 0; overflow: hidden; background: #05060c; }
+.game-host.is-full > .slot.g-pilote { display: block !important; position: absolute; inset: 0; width: 100%; height: 100%; max-width: none !important; margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+.game-host.is-full > .slot.g-pilote > .slot-frame, .game-host.is-full > .slot.g-pilote .slot-stage { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; min-height: 0 !important; margin: 0; padding: 0 !important; border: 0; border-radius: 0; background: none; box-shadow: none; max-width: none; }
+.game-host.is-full > .slot.g-pilote .pi-scene { height: 100% !important; border-radius: 0; }
+.game-host.is-full > .slot.g-pilote .pi-hud { top: max(8px, env(safe-area-inset-top, 0px)); left: max(8px, env(safe-area-inset-left, 0px)); }
+.game-host.is-full > .slot.g-pilote > .slot-head { position: absolute; top: calc(max(8px, env(safe-area-inset-top, 0px)) + 52px); left: 50%; transform: translateX(-50%); z-index: 6; margin: 0; pointer-events: none; }
+.game-host.is-full > .slot.g-pilote > .slot-head .slot-title { display: none; }
+.game-host.is-full > .slot.g-pilote > .win-bar { display: none; } /* the message bar of the scene and the GAIN of the buttons already say it */
+.game-host.is-full > .slot.g-pilote > .controls { position: absolute; left: 50%; bottom: max(10px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(1000px, calc(100% - 20px)); z-index: 7; margin: 0; background: rgba(8, 15, 35, .78); border: 1px solid rgba(255, 255, 255, .14); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
+.game-host.is-full > .slot.g-pilote .pi-say { bottom: 118px; left: 50%; right: auto; transform: translateX(-50%); width: min(760px, calc(100% - 20px)); }
+@media (max-width: 700px) {
+  .game-host.is-full > .slot.g-pilote > .slot-frame { bottom: 190px !important; height: auto !important; }
+  .game-host.is-full > .slot.g-pilote .pi-say { bottom: 8px; }
+  .game-host.is-full > .slot.g-pilote > .controls { background: rgba(8, 15, 35, .92); }
+}
 
 /* ============ Le Penalty ============ */
 .g-penalty { --slot-bg: radial-gradient(600px 300px at 50% -10%, rgba(255, 255, 255, .18), transparent 70%), radial-gradient(500px 300px at 50% 110%, rgba(34, 197, 94, .3), transparent 70%), linear-gradient(180deg, #071a10 0%, #05060b 100%); }
@@ -10256,7 +10270,7 @@ const ORIGINALS = [
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
   {"id": "billes", "name": "La Descente", "cat": "quick", "tag": "Course", "sub": "Course de billes avec vraie physique", "colors": ["#38bdf8", "#0b1023"], "description": "Cinq billes dévalent un parcours plein de pièges : entonnoirs, plots rebondissants, moulins, bascules, zones turbo et boue. Mise sur une ou plusieurs billes : la première en bas gagne et ta mise est payée selon sa cote !", "features": ["5 billes, cotes qui changent", "Vraie physique, 40 s de suspense", "Mise sur plusieurs billes", "Remise et tours auto"], "rtp": "≈ 95 %", "vol": 3, "max": "×16,8"},
-  {"id": "pilote", "name": "Le Pilote", "cat": "quick", "tag": "Vol", "sub": "Pose-toi sur le bon porte-avions", "colors": ["#38bdf8", "#0b2a6f"], "description": "Ton avion décolle avec ×1 et vole sans fin au-dessus de la mer : prends les multiplicateurs (×2 à ×10, jusqu’à +100), esquive les bombes (÷2 à ÷10) qui le font descendre. Quand il n’a plus d’altitude, il se pose là où il est : dans la mer tu perds tout, sur un porte-avions tu gagnes ×1, ×2 ou ×5 (doré) ton gain !", "features": ["Vol sans fin, jusqu’à 30 secondes", "Multiplicateurs jusqu’à ×10 et +100", "Porte-avions ×1, ×2 et ×5 doré", "Mer ou porte-avions : suspense jusqu’au bout"], "rtp": "≈ 95 %", "vol": 5, "max": "×1 000"},
+  {"id": "pilote", "name": "Le Pilote", "cat": "quick", "tag": "Vol", "sub": "Pose-toi sur le bon porte-avions", "colors": ["#38bdf8", "#0b2a6f"], "description": "Ton avion décolle avec ×1 et vole sans fin au-dessus de la mer : prends les multiplicateurs (×2 à ×10, jusqu’à +100), esquive les bombes (÷2 à ÷10), profite des boosts et tiens bon dans les trous d’air. Quand il n’a plus d’altitude, il se pose là où il est : dans la mer tu perds tout, sur un porte-avions tu gagnes ×1, ×2 ou ×5 ton gain… et avec le BONUS, tous les porte-avions sont ×10 !", "features": ["Vol sans fin, jusqu’à 30 secondes", "Multiplicateurs jusqu’à ×10 et +100", "Boosts et trous d’air", "BONUS : tous les porte-avions ×10", "Altitude, vitesse et distance en direct"], "rtp": "≈ 95 %", "vol": 5, "max": "×1 000"},
   {"id": "taco", "name": "La Pizza Yo-Yo", "cat": "slot", "tag": "Machine à sous", "sub": "La pizza qui tourne", "colors": ["#f97316", "#7c2d12"], "description": "Une pizza ronde qui tourne ! Elle s’arrête avec un quart ouvert où tombent les symboles : 4 identiques qui se touchent gagnent, les autres glissent vers le centre, et les grosses connexions écartent une part de plus. Les food trucks multiplient le gain. Bonus Le Four : chaque 4ᵉ pepperoni ouvre une part et donne +2 tours, jusqu’à la pizza entière.", "features": ["Pizza ronde qui tourne", "Connexions de 4 symboles", "Parts qui s’écartent", "Food trucks multiplicateurs ×2 à ×50", "Bonus Le Four et Super Four", "Pepperonis à collectionner", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
   {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200\u00a0\uE1E0 tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200\u00a0\uE1E0", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
@@ -10552,7 +10566,7 @@ const SPECS = {
       <text x="120" y="170" text-anchor="middle" font-family="KeCoin,${FONTS.orb}" font-weight="900" font-size="46" fill="url(#tit${u})" stroke="#4a0418" stroke-width="2" paint-order="stroke" filter="url(#glow${u})">×1000</text>`,
   },
   plinko: { photo: 'assets/games/plinko/cover.webp',
-    bg: ['#1e1b4b', '#05030f'], light: '#7dd3fc', title: ['LA CASCADE'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: 'PORTE-AVIONS ×5',
+    bg: ['#1e1b4b', '#05030f'], light: '#7dd3fc', title: ['LA CASCADE'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0284c7'], tag: 'BONUS ×10',
     art: (u) => {
       let pegs = '';
       for (let r = 0; r < 7; r++) for (let j = 0; j < r + 3; j++) pegs += `<circle cx="${150 + (j - (r + 2) / 2) * 30}" cy="${70 + r * 26}" r="4.2" fill="#e2e8f0"/>`;
@@ -10564,7 +10578,7 @@ const SPECS = {
     },
   },
   vortex: { photo: 'assets/games/vortex/cover.webp',
-    bg: ['#3a0a10', '#050203'], light: '#ff6b6b', title: ['LE VORTEX'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'PORTE-AVIONS ×5',
+    bg: ['#3a0a10', '#050203'], light: '#ff6b6b', title: ['LE VORTEX'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'BONUS ×10',
     art: (u) => {
       let rings = '';
       for (let i = 0; i < 6; i++) {
@@ -10712,7 +10726,7 @@ const SPECS = {
     },
   },
   pilote: { photo: 'assets/games/pilote/cover.webp',
-    bg: ['#0b2a6f', '#05060d'], light: '#7dd3fc', title: ['LE PILOTE'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0369a1'], tag: 'PORTE-AVIONS ×5',
+    bg: ['#0b2a6f', '#05060d'], light: '#7dd3fc', title: ['LE PILOTE'], font: 'bebas', metal: ['#fff', '#bae6fd', '#0369a1'], tag: 'BONUS ×10',
     art: (u) => `
       <rect x="0" y="230" width="300" height="70" fill="#1e6fb8"/><path d="M20 228 H170 L160 252 H30Z" fill="#475569"/><rect x="40" y="196" width="22" height="32" fill="#64748b"/>
       <path d="M60 220 Q120 200 168 120" stroke="#e0f2fe" stroke-width="5" fill="none" opacity=".7"/>
@@ -10901,7 +10915,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'pilote', date: '2026-11-05', title: 'Vol sans fin et porte-avions ×5', items: ['L’avion vole sans fin au-dessus de la mer, jusqu’à 30 secondes', 'Gros multiplicateurs : ×2, ×3, ×5, ×10, +5, +20, +100', 'Il se pose là où il tombe : la mer… ou un porte-avions ×1, ×2 ou ×5 doré', 'Bombes esquivées de justesse, multis ratés de peu, l’avion rebondit à chaque choc', 'Plein écran : le ciel prend tout l’écran, les boutons flottent par-dessus'] },
+  { game: 'pilote', date: '2026-11-05', title: 'Boosts, trous d’air et BONUS ×10', items: ['L’avion vole sans fin au-dessus de la mer et se pose là où il tombe : la mer… ou un porte-avions ×1, ×2, ×5', 'Nouveau BONUS : tous les porte-avions ×10 (×10, ×20, ×50) jusqu’à l’atterrissage', 'Boosts qui font bondir l’avion, trous d’air qui le font chuter d’un coup, vol plus fluide avec secousses', 'Altitude, vitesse et distance en haut à gauche, plein écran avec les boutons par-dessus'] },
   {
     game: 'pilote', date: '2026-11-05', title: 'Nouveau jeu', isNew: true,
     items: ['Ton avion décolle d’un porte-avions et traverse le ciel', 'Ramasse les pièces (+0,1 à +3) et les étoiles (×2, ×5) : l’avion remonte', 'Les bombes divisent ton gain par 2 et font descendre l’avion', 'Pose-toi sur le porte-avions d’arrivée pour encaisser… ou plouf dans la mer !'],
@@ -13845,7 +13859,7 @@ const FILES = {
   chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', '14b7bec1aa'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', 'e3a4bec1eb'],
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
-  pilote: ['pilote', 'games/impl/pilote.js', 'PiloteGame', '9e657f528c'],
+  pilote: ['pilote', 'games/impl/pilote.js', 'PiloteGame', 'f76de5ca14'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '6e1081a69e'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
@@ -20700,7 +20714,7 @@ window.__init3D = () => {
   }
   addEventListener('sb:feature', (e) => {
     const d = e.detail || {};
-    if (off() || inSlot()) return;
+    if (off() || inSlot() || d.quiet) return; // quiet: the game shows its own bonus (Le Pilote, in mid-flight)
     if (d.re) { if (fxLayer()) { burst(0, view().h * 0.1, MOBILE ? 10 : 18, 0.8); fxRun(); } return; }
     bonusFx(d.title, false);
   });

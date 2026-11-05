@@ -69,20 +69,24 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Simulation (3,6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 4 (surtout petits), Duel 1 tour sur 385 (≈ ×130),
   achats 150 / 500 (≈ 88 %).
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
-  avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire : pas
-  d'arrivée prévue, jusqu'à ≈ 30 s). Objets : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes
-  ÷2 / ÷3 / ÷5 / ÷10 (descend de `DOWN`, le gain ne tombe jamais sous ×1). Altitude 0 ou 30 objets (réservoir vide) :
-  il se pose là où il est, tiré dans `SHIPS` : la mer (perdu) ou un porte-avions ×1, ×2, ×5 doré qui multiplie le
-  gain (plafond ×1 000). Pas de petits ±1 (le propriétaire les trouvait inutiles). Tout le vol est tiré au décollage
-  (`flight()`, bloc `===ENGINE`), puis animé (canvas 2D, porte-avions croisés en route, « raté de peu » après une
-  chute en mer). Sensations (voulu par le propriétaire) : entre deux objets, des leurres frôlés (`decoys`, pour le
-  spectacle seulement, le vol est déjà tiré) : bombe « ESQUIVÉ ! », gros multi « RATÉ ! » ; l'avion rebondit quand il
-  touche un objet (ressort `jy` / `ja`). Sur ordinateur le jeu prend toute la largeur et la hauteur libre
-  (`.game-host:has(> .g-pilote)`) ; en plein écran le ciel couvre tout l'écran et les boutons de mise flottent
-  par-dessus (sur téléphone le ciel s'arrête au-dessus des boutons).
-  Quitter en plein vol paie quand même un vol qui allait se poser. Simulation `node tools/sim/pilote.js` (lit le
-  moteur, 20 M vols) : retour ≈ 95,1 %, posé 34 %, ≥ ×10 un vol sur 205, ≥ ×100 un sur 1 370, ×1 000 un sur 10 300,
-  9 objets en médiane (9 vols sur 10 ≤ 22), ×20 à bord au moins une fois dans 17 % des vols.
+  avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
+  ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10
+  (descend de `DOWN`, le gain ne tombe jamais sous ×1), **boost** (grand bond, `BOOST`), **trou d'air** (chute d'un
+  coup, `POCKET`) et le **BONUS** (rare) : tous les porte-avions ×10 jusqu'à l'atterrissage (`BONUS_X`, bandeau doré,
+  ciel doré, porte-avions ×10 / ×20 / ×50, musique emballée par `sb:feature` avec `quiet: true` = sans le médaillon 3D
+  qui cacherait l'avion). Altitude 0 ou 30 objets (réservoir vide) : il se pose là où il est, tiré dans `SHIPS` : la
+  mer (perdu) ou un porte-avions ×1, ×2, ×5 doré (plafond ×1 000). Tout le vol est tiré au décollage (`flight()`,
+  bloc `===ENGINE`), puis animé sur une **trajectoire lisse** (spline monotone par les objets, vitesse qui ralentit
+  après une bombe, au ralenti quand une bombe de plus serait fatale, accélère au boost) avec rebonds (ressort
+  `jy` / `ja`) et secousses (turbulences, fortes dans les trous d'air). Leurres frôlés sans texte (`decoys`, pour le
+  spectacle seulement, voulu par le propriétaire : « faut pas que ça marque que ça esquive »). Tableau de bord en
+  haut à gauche (`.pi-hud`) : gain en vol, altitude en mètres (rouge et alarme quand la prochaine bombe serait
+  fatale), vitesse, distance ; jauge de carburant. Sur ordinateur le jeu prend toute la largeur et la hauteur libre ;
+  en plein écran le ciel couvre tout l'écran et les boutons de mise flottent par-dessus (sur téléphone le ciel
+  s'arrête au-dessus des boutons). Quitter en plein vol paie quand même un vol qui allait se poser. Simulation
+  `node tools/sim/pilote.js` (lit le moteur, 20 M vols) : retour ≈ 95,1 % (dont ≈ 9,7 points par le bonus), posé
+  32 %, bonus 1 vol sur 114, ≥ ×10 un vol sur 94, ≥ ×100 un sur 1 540, ×1 000 un sur 23 000, 7 objets en médiane
+  (9 vols sur 10 ≤ 21).
 - **Fluidité sur ordinateur** (fin de la couche `finition`) : le fond de nuit est sur sa propre couche fixe (`body::after`),
   jamais `background: … fixed` sur `body` (repeint toute la page à chaque défilement : 4 → 60 images/s mesuré) ; pas de
   `backdrop-filter` (flou en direct) sur la barre du haut, les menus, la barre du bas et les messages. Ne pas les remettre.
