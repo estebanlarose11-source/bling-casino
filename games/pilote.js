@@ -76,7 +76,7 @@ class PiloteGame extends BaseGame {
       hello: 'Choisis ta mise et appuie sur DÉCOLLER.',
     });
     this.cv = this.q('.pi-cv'); this.ctx = this.cv.getContext('2d');
-    this.state = 'idle'; this.hist = []; this.parts = []; this.texts = []; this.shakeT = 0; this.ships = [];
+    this.state = 'idle'; this.hist = []; this.parts = []; this.texts = []; this.shakeT = 0; this.ships = []; this.decoys = []; this.jy = 0; this.jv = 0; this.ja = 0;
     this.clouds = Array.from({ length: 16 }, (_, i) => ({ x: i * 240 + Math.random() * 200, y: 0.08 + Math.random() * 0.42, s: 0.6 + Math.random() * 0.9, p: 0.25 + Math.random() * 0.45 }));
     this.onResize = () => this.resize();
     addEventListener('resize', this.onResize);
@@ -107,7 +107,7 @@ class PiloteGame extends BaseGame {
   idle() {
     this.plane = { x: -this.CL * 0.72, y: this.deckY, ang: 0, on: false };
     this.camX = this.plane.x - this.W * 0.3;
-    this.items = []; this.ships = [{ x: -this.CL, m: 0 }];
+    this.items = []; this.decoys = []; this.ships = [{ x: -this.CL, m: 0 }];
     this.draw();
   }
 
@@ -125,6 +125,19 @@ class PiloteGame extends BaseGame {
       add(S * (i + 1), this.yOf(st.A), d, { t: 'item', i });
       slow = isBomb(st.it) ? 1.35 : 1;
     });
+    // Near misses (only for the show, the flight is already drawn): between two items, a bomb the plane skims past
+    // or a multiplier it misses by a hair, just above or below its path.
+    const decoys = [], dz = [['div', 2, 4], ['div', 3, 3], ['div', 5, 2], ['div', 10, 1.6], ['mul', 2, 2], ['mul', 3, 1.6], ['mul', 5, 1.5], ['mul', 10, 1.4], ['add', 100, 1]];
+    const dzW = dz.reduce((a, d) => a + d[2], 0);
+    segs.forEach((sg) => {
+      if (sg.ev.t !== 'item' || sg.ev.i === 0 || Math.random() > 0.6) return;
+      const k = 0.35 + Math.random() * 0.3, x = sg.x0 + (sg.x1 - sg.x0) * k, y0 = sg.y0 + (sg.y1 - sg.y0) * ease(k);
+      let off = (36 + Math.random() * 22) * s * (Math.random() < 0.5 ? -1 : 1), y = y0 + off;
+      if (y < this.topY - 10 * s || y > this.deckY - 50 * s) y = y0 - off;
+      let r = Math.random() * dzW, d = dz[0]; for (const z of dz) { if (r < z[2]) { d = z; break; } r -= z[2]; }
+      decoys.push({ x, y, it: { k: d[0], v: d[1] }, t: Math.random() * 6, passed: false, fade: 1, below: y > y0 });
+    });
+    this.decoys = decoys;
     const n = f.steps.length, xl = S * n + S * 1.2; // touchdown point
     this.xl = xl;
     add(xl, f.ok ? this.deckY : this.seaY + 14 * s, f.fuel ? 2.4 : 1.7, { t: 'touch' }, f.ok ? 'land' : 'fall');
@@ -158,6 +171,7 @@ class PiloteGame extends BaseGame {
     return new Promise((resolve) => {
       this.f = null; this.idle();
       this.f = f; this.state = 'fly'; this.done = resolve; this.stake = this.bet; this.paid = false;
+      this.jy = 0; this.jv = 0; this.ja = 0;
       this.segs = this.plan(f); this.si = 0; this.st = 0; this.T = 1; this.A = A0; this.k = 0;
       this.items = f.steps.map((st, i) => ({ x: this.SP * (i + 1), y: this.yOf(st.A), it: st.it, hit: false, t: Math.random() * 6 }));
       this.slotEl.classList.remove('pi-won', 'pi-lost');
@@ -194,6 +208,7 @@ class PiloteGame extends BaseGame {
     p.ang += (Math.max(-0.6, Math.min(0.9, ang)) - p.ang) * Math.min(1, dt * 8);
     p.x = nx; p.y = ny; p.on = seg.kind !== 'brake';
     if (seg.kind !== 'run' && seg.kind !== 'brake' && Math.random() < dt * 30) this.parts.push({ x: p.x - 30 * this.s, y: p.y + 2, vx: -20, vy: 0, life: 0.6, max: 0.6, c: 'rgba(255,255,255,.55)', r: 3 + Math.random() * 3 });
+    for (const d of this.decoys) if (!d.passed && p.x >= d.x) this.nearMiss(d);
     const want = p.x - this.W * (seg.kind === 'land' || seg.kind === 'fall' || seg.kind === 'brake' ? 0.42 : 0.3);
     this.camX += (want - this.camX) * Math.min(1, dt * 4);
   }
@@ -207,6 +222,7 @@ class PiloteGame extends BaseGame {
       this.T = st.T; this.A = st.after;
       if (isBomb(it)) {
         this.boom(item.x, item.y, big ? 60 : 34); this.shakeT = big ? 0.8 : 0.45;
+        this.jv += (big ? 620 : 460) * s; this.ja += big ? 0.7 : 0.45; // the blast knocks the plane down, it bounces back
         this.text(item.x, item.y - 30 * s, label(it), '#f87171', big ? 44 : 32);
         if (big) this.flash('rgba(239,68,68,.45)');
         sfx.puff();
@@ -215,6 +231,7 @@ class PiloteGame extends BaseGame {
         if (st.after > 0 && st.after <= DOWN) sfx.tease();
       } else {
         const mul = it.k === 'mul';
+        this.jv -= (big ? 520 : 360) * s; this.ja -= 0.3; // the bonus lifts the plane with a jump
         this.burst(item.x, item.y, mul ? ['#f0abfc', '#c084fc', '#fff'] : ['#fde047', '#fbbf24', '#fff'], big ? 70 : 30);
         this.text(item.x, item.y - 30 * s, label(it), mul ? '#f0abfc' : '#fde047', big ? 48 : 34);
         if (big) { this.flash(mul ? 'rgba(217,70,239,.4)' : 'rgba(250,204,21,.45)'); this.shakeT = 0.35; sfx.feature(); } else if (mul) sfx.upgrade(); else sfx.coin();
@@ -296,6 +313,21 @@ class PiloteGame extends BaseGame {
     for (const t of this.texts) { t.life -= dt; t.y -= 38 * dt; }
     this.texts = this.texts.filter((t) => t.life > 0);
     this.shakeT = Math.max(0, this.shakeT - dt);
+    // the plane's bounce after a hit: a damped spring
+    for (let i = 0; i < 2; i++) { const h = dt / 2; this.jv += (-160 * this.jy - 11 * this.jv) * h; this.jy += this.jv * h; this.ja += -this.ja * 7 * h; }
+    for (const d of this.decoys) if (d.passed) d.fade = Math.max(0, d.fade - dt * (isBomb(d.it) ? 0.5 : 1.6));
+  }
+
+  // the plane passes a decoy: a bomb dodged, or a multiplier missed
+  nearMiss(d) {
+    d.passed = true;
+    const s = this.s, bomb = isBomb(d.it), big = isBig(d.it);
+    this.text(d.x, d.y + (d.below ? 34 : -34) * s, bomb ? 'ESQUIVÉ !' : 'RATÉ !', bomb ? '#4ade80' : '#cbd5e1', big ? 28 : 22);
+    this.jv += (d.below ? -1 : 1) * 170 * s; // the plane swerves away
+    if (bomb) { sfx.tick(); if (big) this.say(`😮‍💨 Bombe ${label(d.it)} esquivée de justesse !`); } else {
+      this.burst(d.x, d.y, ['#e2e8f0', '#94a3b8'], 10);
+      if (big) { this.say(`😩 Le ${label(d.it)} lui passe sous le nez…`); sfx.tease(); }
+    }
   }
 
   /* ---------- drawing ---------- */
@@ -329,6 +361,7 @@ class PiloteGame extends BaseGame {
       g.globalAlpha = 0.5 - row * 0.1; g.stroke(); g.globalAlpha = 1;
     }
     for (const sh of this.ships) if (sh.x < R + 40 && sh.x + this.len(sh.m) > L - 40) this.carrier(g, sh, now);
+    for (const d of this.decoys) if (d.fade > 0 && d.x > L - 60 && d.x < R + 60) { g.globalAlpha = d.fade; this.item(g, d, now); g.globalAlpha = 1; }
     for (const it of this.items) if (!it.hit && it.x > L - 60 && it.x < R + 60) this.item(g, it, now);
     for (const p of this.parts) if (p.smoke) { g.globalAlpha = Math.max(0, p.life / p.max) * 0.7; g.fillStyle = p.c; g.beginPath(); g.arc(p.x, p.y, p.r, 0, 6.28); g.fill(); }
     g.globalAlpha = 1;
@@ -401,7 +434,7 @@ class PiloteGame extends BaseGame {
 
   planeDraw(g) {
     const { s } = this, p = this.plane;
-    g.save(); g.translate(p.x, p.y - 9 * s); g.rotate(p.ang); g.scale(s, s);
+    g.save(); g.translate(p.x, p.y - 9 * s + this.jy); g.rotate(p.ang + this.ja); g.scale(s, s);
     if (p.on) {
       g.fillStyle = `rgba(253,186,116,${0.6 + Math.random() * 0.4})`;
       g.beginPath(); g.moveTo(-30, -2); g.lineTo(-44 - Math.random() * 10, 1); g.lineTo(-30, 4); g.fill();

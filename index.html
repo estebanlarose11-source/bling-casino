@@ -3051,8 +3051,23 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 /* big screens: the game takes the whole width and the height that is left (owner's request) */
 .game-host:has(> .g-pilote) { max-width: none; }
 @media (min-width: 900px) { .pi-scene { height: clamp(420px, calc(100vh - 290px), 1100px); } }
-.game-host.is-full > .slot.g-pilote { max-width: none; }
-.game-host.is-full > .slot.g-pilote .pi-scene { height: calc(100dvh - 230px); min-height: 280px; }
+.game-host.is-full:has(> .g-pilote) { padding: 0; overflow: hidden; background: #05060c; }
+/* full screen: the sky fills the whole screen and the bet buttons float over it (owner's request) */
+.game-host.is-full > .slot.g-pilote { display: block !important; position: absolute; inset: 0; width: 100%; height: 100%; max-width: none !important; margin: 0; padding: 0; border: 0; border-radius: 0; box-shadow: none; }
+.game-host.is-full > .slot.g-pilote > .slot-frame, .game-host.is-full > .slot.g-pilote .slot-stage { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; min-height: 0 !important; margin: 0; padding: 0 !important; border: 0; border-radius: 0; background: none; box-shadow: none; max-width: none; }
+.game-host.is-full > .slot.g-pilote .pi-scene { height: 100% !important; border-radius: 0; }
+.game-host.is-full > .slot.g-pilote > .slot-head { position: absolute; top: calc(max(8px, env(safe-area-inset-top, 0px)) + 40px); left: 50%; transform: translateX(-50%); z-index: 6; margin: 0; pointer-events: none; }
+.game-host.is-full > .slot.g-pilote > .slot-head .slot-title { display: none; }
+.game-host.is-full > .slot.g-pilote > .win-bar { position: absolute; left: 50%; transform: translateX(-50%); top: calc(max(8px, env(safe-area-inset-top, 0px)) + 84px); bottom: auto; z-index: 6; margin: 0; pointer-events: none; text-shadow: 0 1px 3px #000; }
+.game-host.is-full > .slot.g-pilote > .controls { position: absolute; left: 50%; bottom: max(10px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); width: min(1000px, calc(100% - 20px)); z-index: 7; margin: 0; background: rgba(8, 15, 35, .78); border: 1px solid rgba(255, 255, 255, .14); border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, .45); }
+.game-host.is-full > .slot.g-pilote .pi-say { bottom: calc(var(--pi-ctl, 104px) + 14px); left: 50%; right: auto; transform: translateX(-50%); width: min(760px, calc(100% - 20px)); }
+.game-host.is-full > .slot.g-pilote .pi-top { top: max(8px, env(safe-area-inset-top, 0px)); }
+@media (max-width: 700px) {
+  .game-host.is-full > .slot.g-pilote > .slot-frame { bottom: 190px !important; height: auto !important; }
+  .game-host.is-full > .slot.g-pilote .pi-say { bottom: 8px; }
+  .game-host.is-full > .slot.g-pilote > .win-bar { top: 150px; }
+  .game-host.is-full > .slot.g-pilote > .controls { background: rgba(8, 15, 35, .92); }
+}
 .pi-top { position: absolute; left: 8px; right: 8px; top: 8px; display: flex; align-items: flex-start; gap: 10px; pointer-events: none; z-index: 2; }
 .pi-total { display: flex; flex-direction: column; align-items: flex-start; min-width: 104px; padding: 5px 12px 6px; border-radius: 4px; background: rgba(8, 15, 35, .72); border: 2px solid rgba(253, 224, 71, .55); color: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, .35); }
 .pi-total small { font: 800 9px Inter, sans-serif; letter-spacing: 1.5px; text-transform: uppercase; color: #cbd5e1; }
@@ -10886,7 +10901,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'pilote', date: '2026-11-05', title: 'Vol sans fin et porte-avions ×5', items: ['L’avion vole sans fin au-dessus de la mer, jusqu’à 30 secondes', 'Gros multiplicateurs : ×2, ×3, ×5, ×10, +5, +20, +100', 'Il se pose là où il tombe : la mer… ou un porte-avions ×1, ×2 ou ×5 doré', 'Tout l’écran sur ordinateur'] },
+  { game: 'pilote', date: '2026-11-05', title: 'Vol sans fin et porte-avions ×5', items: ['L’avion vole sans fin au-dessus de la mer, jusqu’à 30 secondes', 'Gros multiplicateurs : ×2, ×3, ×5, ×10, +5, +20, +100', 'Il se pose là où il tombe : la mer… ou un porte-avions ×1, ×2 ou ×5 doré', 'Bombes esquivées de justesse, multis ratés de peu, l’avion rebondit à chaque choc', 'Plein écran : le ciel prend tout l’écran, les boutons flottent par-dessus'] },
   {
     game: 'pilote', date: '2026-11-05', title: 'Nouveau jeu', isNew: true,
     items: ['Ton avion décolle d’un porte-avions et traverse le ciel', 'Ramasse les pièces (+0,1 à +3) et les étoiles (×2, ×5) : l’avion remonte', 'Les bombes divisent ton gain par 2 et font descendre l’avion', 'Pose-toi sur le porte-avions d’arrivée pour encaisser… ou plouf dans la mer !'],
@@ -13830,7 +13845,7 @@ const FILES = {
   chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', '14b7bec1aa'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', 'e3a4bec1eb'],
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
-  pilote: ['pilote', 'games/impl/pilote.js', 'PiloteGame', '3dae62bae3'],
+  pilote: ['pilote', 'games/impl/pilote.js', 'PiloteGame', '9e657f528c'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '6e1081a69e'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],

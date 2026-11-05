@@ -75,7 +75,11 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   il se pose là où il est, tiré dans `SHIPS` : la mer (perdu) ou un porte-avions ×1, ×2, ×5 doré qui multiplie le
   gain (plafond ×1 000). Pas de petits ±1 (le propriétaire les trouvait inutiles). Tout le vol est tiré au décollage
   (`flight()`, bloc `===ENGINE`), puis animé (canvas 2D, porte-avions croisés en route, « raté de peu » après une
-  chute en mer). Sur ordinateur le jeu prend toute la largeur et la hauteur libre (`.game-host:has(> .g-pilote)`).
+  chute en mer). Sensations (voulu par le propriétaire) : entre deux objets, des leurres frôlés (`decoys`, pour le
+  spectacle seulement, le vol est déjà tiré) : bombe « ESQUIVÉ ! », gros multi « RATÉ ! » ; l'avion rebondit quand il
+  touche un objet (ressort `jy` / `ja`). Sur ordinateur le jeu prend toute la largeur et la hauteur libre
+  (`.game-host:has(> .g-pilote)`) ; en plein écran le ciel couvre tout l'écran et les boutons de mise flottent
+  par-dessus (sur téléphone le ciel s'arrête au-dessus des boutons).
   Quitter en plein vol paie quand même un vol qui allait se poser. Simulation `node tools/sim/pilote.js` (lit le
   moteur, 20 M vols) : retour ≈ 95,1 %, posé 34 %, ≥ ×10 un vol sur 205, ≥ ×100 un sur 1 370, ×1 000 un sur 10 300,
   9 objets en médiane (9 vols sur 10 ≤ 22), ×20 à bord au moins une fois dans 17 % des vols.
