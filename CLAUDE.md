@@ -94,6 +94,19 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   bonus ; environ moitié moins de bombes qu'avant (3,5 par vol, `DOWN` = 5, plus de trous d'air), posé 32 %, bonus
   1 vol sur 126, ≥ ×10 un vol sur 73, ≥ ×100 un sur 1 520, ×1 000 un sur 63 000, 5 objets en médiane (9 vols sur
   10 ≤ 12).
+- **Le Gratte-Ciel** (`games/gratteciel.js`, demande du propriétaire) : **plus de coup de vent**. La tour tient comme une vraie
+  pile : pour chaque cube, le centre de gravité des cubes au-dessus doit rester sur lui (`lean()`) ; un cube trop raté
+  ou une tour qui penche trop, et tout s'écroule. Le cube se balance un peu au bout du câble (`SWAY` = 0,18 cube) et
+  la grue accélère (`SPEED_A` + `SPEED_B` × n cubes/s). Jeu d'adresse : les multiplicateurs `MULT` viennent de
+  `node tools/sim/gratteciel.js` (0,96 ÷ survie d'un très bon joueur, 20 ms d'erreur) : ≈ 96 % pour lui où qu'il
+  encaisse, ≈ 86 % à 10 cubes pour un joueur moyen ; ×22,14 à 30 cubes.
+- **La Tour Bling** : les mots `.bt-word` / `.bt-combo` doivent rester en position absolue (la règle
+  `.g-bling .slot-stage > :not(...)` les en exclut ; avant, ils tombaient sous la grille, coupés). Reflets des cases
+  animés en `transform` et coupés pendant les tours (fluidité sur téléphone).
+- **Paliers de prestige** (`achievements.js`, `PR_TIERS`) : Bronze 1, Argent 5, Or 10, Platine 25, Diamant 50, Légende 100
+  prestiges en tout, en médailles sur le profil (`tiersHTML`) ; le total `pres` est publié dans `leaderboard` et le
+  profil public (`#@pseudo`) montre le palier. **Règles Firestore à recoller** (champ `pres` ajouté) : en attendant, le
+  champ est retiré tout seul (`noPres`).
 - **Fluidité sur ordinateur** (fin de la couche `finition`) : le fond de nuit est sur sa propre couche fixe (`body::after`),
   jamais `background: … fixed` sur `body` (repeint toute la page à chaque défilement : 4 → 60 images/s mesuré) ; pas de
   `backdrop-filter` (flou en direct) sur la barre du haut, les menus, la barre du bas et les messages. Ne pas les remettre.

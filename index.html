@@ -1202,11 +1202,14 @@ body.gated { overflow: hidden; }
 /* ============ Bling Tower ============ */
 .g-bling { --slot-bg: radial-gradient(500px 260px at 50% -5%, rgba(255, 45, 149, .3), transparent 70%), linear-gradient(180deg, #2a0b3d 0%, #12061f 100%); }
 .g-bling .slot-stage { position: relative; overflow: hidden; }
-.g-bling .slot-stage > :not(.bt-bg) { position: relative; z-index: 1; }
+.g-bling .slot-stage > :not(.bt-bg):not(.bt-word):not(.bt-combo) { position: relative; z-index: 1; } /* the big words stay floating over the grid (they used to fall under it, cut off) */
 .g-bling .sg-cell { background: linear-gradient(160deg, rgba(255, 255, 255, .14), rgba(162, 43, 255, .18) 40%, rgba(255, 45, 149, .1)); box-shadow: inset 0 0 0 1px rgba(244, 114, 182, .28), inset 0 10px 18px -12px rgba(255, 255, 255, .5); }
-.g-bling .sg-cell::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, .22) 48%, transparent 60%); background-size: 260% 100%; animation: btSheen 5s ease-in-out infinite; }
+/* sheen: a strip moved with transform (no repaint of the 42 cells), and none while the machine plays (it lagged on phones) */
+.g-bling .sg-cell { overflow: hidden; }
+.g-bling .sg-cell::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 60%; pointer-events: none; background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, .22) 50%, transparent 80%); transform: translateX(-120%); animation: btSheen 5s ease-in-out infinite; }
+.g-bling.busy .sg-cell::after, .g-bling.in-free .sg-cell::after { animation: none; opacity: 0; }
 .g-bling .sg-cell:nth-child(2n)::after { animation-delay: -1.2s; } .g-bling .sg-cell:nth-child(3n)::after { animation-delay: -2.6s; }
-@keyframes btSheen { 0%, 70% { background-position: 130% 0; } 100% { background-position: -130% 0; } }
+@keyframes btSheen { 0%, 70% { transform: translateX(-120%); } 100% { transform: translateX(260%); } }
 .g-bling .sg-sym svg { width: 86%; height: 86%; filter: drop-shadow(0 4px 8px rgba(0, 0, 0, .55)) drop-shadow(0 0 6px rgba(244, 114, 182, .35)); }
 .g-bling .sg-cell.win { box-shadow: inset 0 0 0 2px #fde047, 0 0 24px rgba(253, 224, 71, .65), inset 0 0 22px rgba(244, 114, 182, .55); }
 .g-bling .sg-cell.scatter { background: radial-gradient(circle, rgba(74, 222, 128, .45), rgba(22, 101, 52, .3) 70%); box-shadow: inset 0 0 0 2px #4ade80, 0 0 16px rgba(74, 222, 128, .5); }
@@ -1222,8 +1225,8 @@ body.gated { overflow: hidden; }
     linear-gradient(90deg, #0d0220 0 6%, transparent 6% 8%, #12032a 8% 15%, transparent 15% 17%, #0d0220 17% 22%, transparent 22% 25%, #160433 25% 34%, transparent 34% 36%, #0d0220 36% 44%, transparent 44% 46%, #12032a 46% 54%, transparent 54% 57%, #0d0220 57% 66%, transparent 66% 68%, #160433 68% 77%, transparent 77% 79%, #0d0220 79% 88%, transparent 88% 90%, #12032a 90% 100%);
   -webkit-mask-image: linear-gradient(90deg, #000 0 6%, transparent 6% 8%, #000 8% 15%, transparent 15% 17%, #000 17% 22%, transparent 22% 25%, #000 25% 34%, transparent 34% 36%, #000 36% 44%, transparent 44% 46%, #000 46% 54%, transparent 54% 57%, #000 57% 66%, transparent 66% 68%, #000 68% 77%, transparent 77% 79%, #000 79% 88%, transparent 88% 90%, #000 90%);
   clip-path: polygon(0 40%, 6% 40%, 6% 20%, 15% 20%, 15% 55%, 22% 55%, 22% 10%, 34% 10%, 34% 35%, 44% 35%, 44% 0, 54% 0, 54% 30%, 66% 30%, 66% 15%, 77% 15%, 77% 45%, 88% 45%, 88% 25%, 100% 25%, 100% 100%, 0 100%); }
-.bt-beam { position: absolute; bottom: -10%; width: 90px; height: 140%; transform-origin: 50% 100%; background: linear-gradient(0deg, rgba(253, 224, 71, .35), rgba(253, 224, 71, 0) 80%); filter: blur(6px); animation: btBeam 7s ease-in-out infinite alternate; }
-.bt-beam.b1 { left: 18%; } .bt-beam.b2 { right: 18%; background: linear-gradient(0deg, rgba(244, 114, 182, .35), rgba(244, 114, 182, 0) 80%); animation-delay: -3.5s; }
+.bt-beam { position: absolute; bottom: -10%; width: 90px; height: 140%; transform-origin: 50% 100%; background: radial-gradient(ellipse 50% 100% at 50% 100%, rgba(253, 224, 71, .35), rgba(253, 224, 71, 0) 80%); animation: btBeam 7s ease-in-out infinite alternate; }
+.bt-beam.b1 { left: 18%; } .bt-beam.b2 { right: 18%; background: radial-gradient(ellipse 50% 100% at 50% 100%, rgba(244, 114, 182, .35), rgba(244, 114, 182, 0) 80%); animation-delay: -3.5s; }
 @keyframes btBeam { from { transform: rotate(-28deg); } to { transform: rotate(28deg); } }
 .bt-glitter { position: absolute; inset: -30% 0 0; background-image: radial-gradient(circle, #fde047 1.2px, transparent 2px), radial-gradient(circle, #f9a8d4 1px, transparent 1.8px), radial-gradient(circle, #fff 1px, transparent 1.6px); background-size: 110px 130px, 80px 90px, 150px 170px; background-position: 0 0, 40px 30px, 70px 90px; opacity: .55; animation: btGlitter 9s linear infinite; }
 @keyframes btGlitter { to { transform: translateY(30%); } }
@@ -5172,6 +5175,13 @@ html.light .slot small { color: inherit; }
 /* prestiges & trophies */
 .ac-pr { font-style: normal; font-size: 11px; padding: 1px 7px; margin-left: 4px; border-radius: 999px; background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #1a1205; vertical-align: middle; }
 .ac-prestige { border-top: 1px dashed rgba(251, 191, 36, .35); }
+.pr-tiers { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 6px; }
+.pr-tier { display: flex; flex-direction: column; align-items: center; gap: 1px; min-width: 70px; padding: 8px 6px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .1); background: rgba(255, 255, 255, .03); filter: grayscale(1); opacity: .45; }
+.pr-tier i { font-style: normal; font-size: 26px; line-height: 1.1; }
+.pr-tier b { font-size: 12px; } .pr-tier small { font-size: 10px; color: var(--muted); }
+.pr-tier.on { filter: none; opacity: 1; border-color: var(--c); background: radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%); box-shadow: 0 0 14px color-mix(in srgb, var(--c) 35%, transparent); }
+.pr-tier.on b { color: var(--c); }
+.pr-next { margin: 0 0 10px; }
 .ac-prestige.done { background: rgba(251, 191, 36, .08); }
 .tr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
 .tr-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 8px 10px; border-radius: 14px; text-align: center;
@@ -7259,7 +7269,11 @@ class Profiles extends EventTarget {
     // achievement points (needs the Firestore rules with 'ach'; older rules refuse the field, so retry without it)
     const ach = __mods['achievements.js']?.achievementPoints?.() || 0;
     if (!this.noAch) entry.ach = ach;
+    // total of prestiges (needs the Firestore rules with 'pres'; older rules refuse it: tried once, then left out)
+    const pres = __mods['achievements.js']?.totalPrestige?.() || 0;
+    if (!this.noPres && pres > 0) entry.pres = pres;
     cloud.saveBoard(this.store.current, entry).catch((e) => {
+      if ('pres' in entry) { this.noPres = true; delete entry.pres; return cloud.saveBoard(this.store.current, entry).catch(() => this.publish()); }
       const extra = ['bestGame', 'bestBonusGame', 'look'].filter((k) => k in entry);
       if (extra.length) { this.noExtra = true; extra.forEach((k) => delete entry[k]); }
       else if ('ach' in entry) { this.noAch = true; delete entry.ach; }
@@ -10266,7 +10280,7 @@ const ORIGINALS = [
   {"id": "totemx", "name": "Le Totem Extrême", "cat": "slot", "tag": "Machine à sous", "sub": "Totem jusqu’à ×100 et full screen", "colors": ["#f97316", "#450a0a"], "description": "Le grand frère du Totem, en feu : grille 6×5, les cases gagnantes se scellent et le totem monte à chaque connexion. Au-dessus de ×5, les chiffres brûlent : ×8, ×10, ×15… jusqu’à ×100. Scelle les 30 cases pour le FULL SCREEN, payé 21 fois la mise × le totem.", "features": ["Totem ×1 à ×100", "Full screen", "Cases scellées", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×2 000"},
   {"id": "volcan", "name": "Le Volcan", "wip": true, "cat": "slot", "tag": "Machine à sous", "sub": "Volatilité extrême · jusqu’à ×25 000", "colors": ["#f97316", "#1c0a05"], "description": "Pour les vrais joueurs : une île volcanique qui peut ne rien payer… ou tout faire exploser. 8 symboles identiques n’importe où sur la grille 6×5 paient et explosent en cascade, et chaque explosion fait monter la pression du volcan : ×2, ×4, ×8, ×16. Des pierres de lave de ×2 à ×500 s’additionnent et multiplient le gain. 4 cratères lancent l’ÉRUPTION : 10 tours gratuits où la pression ne redescend jamais.", "features": ["Volatilité extrême", "Grille 6×5 Pay Anywhere", "Cascades", "Pression ×2 à ×16", "Pierres de lave ×2 à ×500", "Éruption : 10 tours gratuits", "2 achats de bonus", "Max ×25 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×25 000"},
   {"id": "barillet", "name": "La Roulette Russe", "cat": "slot", "tag": "Machine à sous", "sub": "576 façons · le revolver met le feu aux gains", "colors": ["#f59e0b", "#1c0f05"], "description": "Un vieux saloon, un revolver chargé à bloc. 5 rouleaux de 3, 4, 4, 4 et 3 cases, 576 façons de gagner et le cow-boy WILD qui couvre tout son rouleau. Une balle d’or et une connexion : le revolver tire 1 à 3 balles sur les cases gagnantes, qui prennent feu avec ×2 à ×10, et les multiplicateurs d’une ligne se multiplient. 3 avis de recherche lancent LE DUEL : des grosses balles à chaque gain, et les cases en feu restent jusqu’à la fin. Puis la roulette russe : 1 à 5 balles pour multiplier ton gain… ou tout perdre.", "features": ["Volatilité extrême", "576 façons de gagner", "WILD qui couvre le rouleau", "Balle d’or : le revolver tire", "Cases en feu ×2 à ×50", "Le Duel : les cases restent en feu", "Roulette russe", "2 achats de bonus", "Max ×20 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×20 000"},
-  {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Chaque cube posé multiplie ta mise, mais gare aux cubes ratés et aux coups de vent.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Bonus PARFAIT", "Encaisse quand tu veux"], "rtp": "96 % (visée parfaite)", "vol": 4, "max": "×125,8"},
+  {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Pas de coup de vent : la tour tient tant qu’elle est bien équilibrée, mais un cube trop raté ou une tour qui penche trop, et tout s’écroule. Chaque cube posé multiplie ta mise.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Une vraie tour qui penche si tu vises mal", "Encaisse quand tu veux"], "rtp": "≈ 96 % (très bon joueur)", "vol": 4, "max": "×22,14"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
   {"id": "billes", "name": "La Descente", "cat": "quick", "tag": "Course", "sub": "Course de billes avec vraie physique", "colors": ["#38bdf8", "#0b1023"], "description": "Cinq billes dévalent un parcours plein de pièges : entonnoirs, plots rebondissants, moulins, bascules, zones turbo et boue. Mise sur une ou plusieurs billes : la première en bas gagne et ta mise est payée selon sa cote !", "features": ["5 billes, cotes qui changent", "Vraie physique, 40 s de suspense", "Mise sur plusieurs billes", "Remise et tours auto"], "rtp": "≈ 95 %", "vol": 3, "max": "×16,8"},
@@ -10915,6 +10929,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'gratteciel', date: '2026-11-06', title: 'Une vraie tour, sans coup de vent', items: ['Plus aucun coup de vent : la tour ne tombe plus au hasard', 'La tour tient tant qu’elle est équilibrée : les cubes décalés la font pencher', 'Un cube trop raté ou une tour qui penche trop, et tout s’écroule', 'Gains recalculés pour ce nouveau jeu d’adresse (jusqu’à ×22)'] },
+  { game: 'bling', date: '2026-11-06', title: 'Plus fluide', items: ['Les mots « CASH ! » et « CASCADE » s’affichent bien au milieu de la grille', 'La machine est plus fluide sur téléphone'] },
   { game: 'pilote', date: '2026-11-05', title: 'Boosts, trous d’air et BONUS ×10', items: ['L’avion vole sans fin au-dessus de la mer et se pose là où il tombe : la mer… ou un porte-avions ×1, ×2, ×5', 'Nouveau BONUS : tous les porte-avions ×10 (×10, ×20, ×50) jusqu’à l’atterrissage', 'Boosts qui font bondir l’avion, trous d’air qui le font chuter d’un coup, vol plus fluide avec secousses', 'Altitude, vitesse et distance en haut à gauche, plein écran avec les boutons par-dessus', 'Nouveau bouton 🚀 Super turbo dans « Bonus & menu » : les vols vont 3 fois plus vite', 'Le boost envoie l’avion tout là-haut : la caméra dézoome, les porte-avions deviennent minuscules et il faut passer entre les bombes', 'Deux fois moins de bombes, et le jeu qui rend le plus du casino (≈ 97 %)', 'Ciel moins chargé, et après un boost l’avion reste plusieurs secondes tout là-haut'] },
   {
     game: 'pilote', date: '2026-11-05', title: 'Nouveau jeu', isNew: true,
@@ -13873,7 +13889,7 @@ const FILES = {
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'b3c63b68ca'],
   chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', '14b7bec1aa'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', 'e3a4bec1eb'],
-  gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', '0b8ac20d26'],
+  gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', 'a7fe064c42'],
   pilote: ['pilote', 'games/impl/pilote.js', 'PiloteGame', '759a2adc83'],
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '6e1081a69e'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
@@ -14673,10 +14689,23 @@ function goPrestige(gid) {
   return p;
 }
 
-// Trophies on the profile: one per machine with at least one prestige, its cover under the trophy.
+// Prestige tiers (owner's request: show who is brave): medals for the total number of prestiges, all machines together.
+const PR_TIERS = [
+  { n: 1, ico: '🥉', name: 'Bronze', c: '#cd7f32' }, { n: 5, ico: '🥈', name: 'Argent', c: '#cbd5e1' }, { n: 10, ico: '🥇', name: 'Or', c: '#facc15' },
+  { n: 25, ico: '💠', name: 'Platine', c: '#67e8f9' }, { n: 50, ico: '💎', name: 'Diamant', c: '#a78bfa' }, { n: 100, ico: '👑', name: 'Légende', c: '#f472b6' },
+];
+const totalPrestige = () => SLOTS.reduce((a, g) => a + prestigeOf(g.id), 0);
+const prestigeTier = (n) => [...PR_TIERS].reverse().find((t) => n >= t.n) || null;
+function tiersHTML(n) {
+  const next = PR_TIERS.find((t) => n < t.n);
+  return `<div class="pr-tiers">${PR_TIERS.map((t) => `<span class="pr-tier${n >= t.n ? ' on' : ''}" style="--c:${t.c}" title="${t.name} : ${t.n} prestige${t.n > 1 ? 's' : ''}"><i>${t.ico}</i><b>${t.name}</b><small>${t.n}</small></span>`).join('')}</div>
+    <p class="muted small pr-next">${n} prestige${n > 1 ? 's' : ''} en tout${next ? ` · prochain palier <b>${next.ico} ${next.name}</b> à ${next.n} (encore ${next.n - n})` : ' · palier maximum atteint 👑'}</p>`;
+}
+// Trophies on the profile: the prestige tiers, then one trophy per machine with at least one prestige, its cover under it.
 function trophiesHTML() {
   const list = SLOTS.map((g) => ({ g, p: prestigeOf(g.id) })).filter((x) => x.p > 0).sort((a, b) => b.p - a.p);
   return `<section class="panel trophies"><div class="sec-head"><h2>🏆 Mes trophées de prestige</h2><a class="more" href="#succes">Succès</a></div>
+    ${tiersHTML(totalPrestige())}
     ${list.length ? `<div class="tr-grid">${list.map(({ g, p }) => `<a class="tr-item p${p}" href="#game-${g.id}" title="${esc(g.name)} · prestige ${p} / ${MAX_PRESTIGE}">
       <span class="tr-cup">🏆<b>${ROMAN[p]}</b></span><span class="tr-stars">${'★'.repeat(p)}${'☆'.repeat(MAX_PRESTIGE - p)}</span>
       <span class="tr-cover">${coverSVG(g, { square: true, badge: false })}</span><small>${esc(g.name)}</small></a>`).join('')}</div>`
@@ -14793,7 +14822,7 @@ async function loadTop(list) {
   } catch (err) { console.error(err); if (list.isConnected) list.innerHTML = '<li class="lb-msg">Classement indisponible pour le moment.</li>'; }
 }
 
-return { renderAchievements, achievementPoints: points, achievementSummary: summary, trophiesHTML };
+return { renderAchievements, achievementPoints: points, achievementSummary: summary, trophiesHTML, totalPrestige, prestigeTier, PR_TIERS };
 })();
 
 // ---- special.js ----
@@ -17820,6 +17849,7 @@ async function renderPlayer(root, name) {
         ${st('💥', 'Plus gros gain', fmt(e.best || 0), bg ? `sur ${esc(bg.name)}` : '')}
         ${st('🎁', 'Plus gros bonus', fmt(e.bestBonus || 0), bb ? `sur ${esc(bb.name)}` : '')}
         ${st('🏅', 'Succès', `${e.ach || 0} pts`)}
+        ${(() => { const A = __mods['achievements.js'], t = e.pres ? A?.prestigeTier?.(e.pres) : null; return t ? st(t.ico, 'Prestige', t.name, `${e.pres} prestige${e.pres > 1 ? 's' : ''}`) : ''; })()}
         ${st('💰', 'Solde', fmt(e.bal || 0))}
       </div>
       <div class="pp-acts">
