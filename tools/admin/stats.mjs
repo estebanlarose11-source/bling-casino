@@ -40,5 +40,19 @@ const md = [
   '',
   '_Les visites sont comptées depuis la mise en ligne du suivi (5 novembre 2026). Sources : le ?src= des liens du kit de lancement, sinon le site d’où vient le visiteur._',
 ].join('\n');
-console.log(md);
-if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, md + '\n');
+// Erreurs JavaScript des joueurs (monitor.js → errors/), regroupées par jeu et par message, sur la même période
+const since = new Date(Date.now() - DAYS * 864e5);
+const errs = await db.collection('errors').where('at', '>=', since).orderBy('at', 'desc').limit(2000).get();
+const groups = {};
+errs.forEach((d) => {
+  const e = d.data(), k = `${e.game || '(site)'} · ${e.msg}`;
+  const g = groups[k] || (groups[k] = { n: 0, users: new Set(), src: e.src, stack: e.stack, ua: e.ua, last: e.at?.toDate?.() });
+  g.n++; g.users.add(e.uid || e.ua);
+});
+const errMd = [
+  '', `## Erreurs des joueurs (${errs.size} sur ${DAYS} jours)`, '',
+  ...Object.entries(groups).sort((a, b) => b[1].n - a[1].n).slice(0, 25).map(([k, g]) =>
+    `- **${g.n}×** (${g.users.size} joueur${g.users.size > 1 ? 's' : ''}) ${k.replace(/\|/g, '/')}\n  - ${g.src || ''} · dernière ${g.last ? g.last.toISOString().slice(0, 16) : '?'}\n  - \`${(g.stack || '').split('\n').slice(0, 3).join(' ⟵ ').slice(0, 400)}\`\n  - ${String(g.ua || '').slice(0, 120)}`),
+].join('\n');
+console.log(md + errMd);
+if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, md + errMd + '\n');
