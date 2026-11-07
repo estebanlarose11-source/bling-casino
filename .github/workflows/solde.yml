@@ -9,8 +9,11 @@ on:
         description: 'Pseudo du joueur (exactement comme dans le jeu)'
         required: true
       solde:
-        description: 'Nouveau solde en KE (ex. 300000)'
-        required: true
+        description: 'Nouveau solde en KE (ex. 300000) ; vide = solde inchangé'
+        required: false
+      record:
+        description: 'Facultatif : baisser ses records (plus gros gain, meilleur bonus) à ce montant en KE'
+        required: false
 
 jobs:
   solde:
@@ -29,3 +32,4 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           PSEUDO: ${{ github.event.inputs.pseudo }}
           SOLDE: ${{ github.event.inputs.solde }}
+          RECORD: ${{ github.event.inputs.record }}
