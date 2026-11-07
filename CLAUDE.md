@@ -392,6 +392,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 
 ## Suivi et administration
 
+- **Changer le solde d'un joueur** (triche…) : GitHub → Actions → « Solde » (`.github/workflows/solde.yml`,
+  `tools/admin/solde.mjs`) avec le pseudo et le nouveau solde en KE : compte (`users/{uid}.bal`, en centimes) et
+  classement, sessions du joueur coupées (un onglet resté ouvert peut réécrire l'ancien solde pendant ≤ 1 h).
+
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu
   (`stats/AAAA-MM-JJ`, envoyés chaque minute).
 - **Plus de page Admin** (supprimée à la demande du propriétaire : il gère tout en passant par Claude). Les données

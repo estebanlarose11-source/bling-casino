@@ -1,0 +1,31 @@
+# Changer le solde d'un joueur (tools/admin/solde.mjs) : Actions → « Solde » → Run workflow → pseudo + nouveau solde en KE.
+# Met à jour son compte et le classement, et coupe ses sessions. Secret nécessaire : FIREBASE_SERVICE_ACCOUNT.
+name: Solde
+
+on:
+  workflow_dispatch:
+    inputs:
+      pseudo:
+        description: 'Pseudo du joueur (exactement comme dans le jeu)'
+        required: true
+      solde:
+        description: 'Nouveau solde en KE (ex. 300000)'
+        required: true
+
+jobs:
+  solde:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+        working-directory: tools/push
+      - name: Nouveau solde
+        run: cp tools/admin/solde.mjs tools/push/solde.mjs && node tools/push/solde.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PSEUDO: ${{ github.event.inputs.pseudo }}
+          SOLDE: ${{ github.event.inputs.solde }}
