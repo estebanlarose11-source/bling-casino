@@ -5520,6 +5520,151 @@ body.fs-on .live-tick { display: none; }
 .jc-sell .jc-pack { flex: none; }
 @media (prefers-reduced-motion: reduce) { .jc-pack::after, .jc-card.holo, .jc-card.holo .jc-in::after, .jc-card.r-L .jc-in::before, .jc-pack.big { animation: none !important; } }
 </style>
+<style id="foot">
+/* ============ Le Derby : match de foot entre amis (games/foot.js, foot-defis.js) ============ */
+.derby { position: relative; color: #e2e8f0; }
+.fo-hero { position: relative; display: flex; gap: 16px; align-items: center; padding: 18px; border-radius: 16px; overflow: hidden; margin-bottom: 14px;
+  background: radial-gradient(120% 140% at 0% 0%, #1f7a35 0%, #0f3d1d 45%, #06140c 100%); border: 1px solid rgba(134,239,172,.25); }
+.fo-hero::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 38px, transparent 38px 76px); pointer-events: none; }
+.fo-hero > div:last-child { position: relative; }
+.fo-hero small { color: #86efac; font: 800 11px/1.2 KeCoin, Archivo, sans-serif; letter-spacing: 1px; }
+.fo-hero h2 { margin: 4px 0 6px; font: 400 clamp(26px, 5vw, 40px)/1 KeCoin, 'Bebas Neue', Impact, sans-serif; letter-spacing: .5px; color: #fff; }
+.fo-hero p { margin: 0; color: #d1fae5; max-width: 560px; }
+.fo-hero-art { position: relative; flex: none; width: 92px; height: 92px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, #fff, #e5e7eb 55%, #94a3b8); box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 6px rgba(255,255,255,.08); animation: foSpin 9s linear infinite; }
+.fo-hero-art span { font-size: 64px; line-height: 1; }
+.fo-hero-art i { display: none; }
+@keyframes foSpin { to { transform: rotate(360deg); } }
+.fo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 14px; }
+.fo-panel { background: linear-gradient(180deg, rgba(30,41,59,.85), rgba(15,23,42,.92)); border: 1px solid rgba(148,163,184,.22); border-radius: 14px; padding: 14px; min-width: 0; }
+.fo-panel h3 { margin: 0 0 10px; font-size: 17px; color: #fff; }
+.fo-lab { display: block; margin: 12px 0 6px; font: 700 12px/1.2 KeCoin, Archivo, sans-serif; color: #94a3b8; text-transform: uppercase; letter-spacing: .5px; }
+.fo-frs { display: flex; flex-wrap: wrap; gap: 6px; }
+.fo-fr { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 999px; background: rgba(15,23,42,.8); border: 1px solid rgba(148,163,184,.3); cursor: pointer; }
+.fo-fr input { position: absolute; opacity: 0; pointer-events: none; }
+.fo-fr .dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; }
+.fo-fr.on .dot { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.fo-fr small { color: #94a3b8; font-size: 11px; }
+.fo-fr:has(input:checked) { background: #14532d; border-color: #4ade80; }
+.fo-addfr:empty { display: none; }
+.fo-addfr { margin-top: 10px; font-size: 13px; }
+.fo-addfr .fr-row { display: none; }
+.fo-addfr .ct-h, .fo-addfr .ct-empty { font-size: 12px; }
+.fo-stake { display: flex; align-items: center; gap: 6px; background: #020617; border: 1px solid rgba(148,163,184,.35); border-radius: 10px; padding: 4px 10px; }
+.fo-stake input { flex: 1; min-width: 0; background: none; border: 0; color: #fde047; font: 800 22px/1.3 KeCoin, Archivo, sans-serif; outline: none; }
+.fo-stake span { color: #fde047; font-size: 20px; }
+.fo-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.fo-chips button, .fo-seg button { padding: 7px 10px; border-radius: 9px; border: 1px solid rgba(148,163,184,.3); background: rgba(15,23,42,.85); color: #e2e8f0; font: 700 12px/1 KeCoin, Archivo, sans-serif; cursor: pointer; }
+.fo-chips button:disabled { opacity: .35; cursor: default; }
+.fo-seg { display: flex; gap: 6px; margin-top: 8px; }
+.fo-seg button { flex: 1; padding: 9px 6px; }
+.fo-seg button.on { background: #16a34a; border-color: #86efac; color: #fff; }
+.fo-kits { display: flex; flex-wrap: wrap; gap: 8px; }
+.fo-kit { width: 34px; height: 34px; border-radius: 9px; border: 2px solid rgba(255,255,255,.25); background: linear-gradient(135deg, var(--a) 0 58%, var(--b) 58% 100%); cursor: pointer; padding: 0; }
+.fo-kit.on { border-color: #fde047; box-shadow: 0 0 0 3px rgba(253,224,71,.35); transform: scale(1.08); }
+.fo-pot { margin: 12px 0 0; }
+.fo-go { width: 100%; margin-top: 12px; }
+.fo-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; border-radius: 11px; background: rgba(2,6,23,.55); border: 1px solid rgba(148,163,184,.18); margin-bottom: 8px; flex-wrap: wrap; }
+.fo-row b { display: block; color: #fff; } .fo-row small { color: #94a3b8; }
+.fo-row.in { border-color: #4ade80; background: rgba(20,83,45,.45); }
+.fo-row.ready { border-color: #fde047; background: rgba(113,63,18,.35); }
+.fo-row-act { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.fo-res.win { color: #4ade80; } .fo-res.lose { color: #f87171; } .fo-res.tie, .fo-res.void { color: #cbd5e1; }
+.fo-help-grid { display: grid; gap: 10px; font-size: 13px; color: #cbd5e1; }
+.fo-help-grid p { margin: 4px 0 0; }
+/* the match, full screen */
+.derby [hidden] { display: none !important; }
+body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.derby-on .nudge { display: none !important; }
+.game-host.is-full:has(> .derby.playing) { padding: 0; overflow: hidden; background: #000; }
+.derby.playing { position: absolute; inset: 0; }
+.fo-match { position: absolute; inset: 0; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; background: #02040b; }
+.fo-cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.fo-top { position: absolute; z-index: 3; top: max(6px, env(safe-area-inset-top, 0px)); left: max(8px, env(safe-area-inset-left, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); display: flex; align-items: center; gap: 8px; pointer-events: none; }
+.fo-score { display: flex; align-items: center; gap: 6px; background: linear-gradient(#111c33, #030712); border: 1px solid rgba(255,255,255,.2); border-radius: 8px; padding: 4px 8px; font: 800 14px/1 KeCoin, Archivo, sans-serif; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.5); }
+.fo-score i { width: 6px; height: 18px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(255,255,255,.35); }
+.fo-score .sc { background: #f8fafc; color: #0f172a; padding: 3px 7px; border-radius: 4px; font-variant-numeric: tabular-nums; }
+.fo-score .clk { color: #fde047; font-style: normal; margin-left: 4px; font-variant-numeric: tabular-nums; min-width: 34px; }
+.fo-net { display: flex; align-items: center; gap: 5px; font: 700 11px/1 KeCoin, Archivo, sans-serif; color: #86efac; background: rgba(2,6,23,.6); border-radius: 6px; padding: 4px 7px; }
+.fo-net i { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+.fo-net.bad { color: #fca5a5; } .fo-net.bad i { background: #ef4444; animation: foBlink .6s infinite alternate; }
+@keyframes foBlink { to { opacity: .2; } }
+.fo-menu { pointer-events: auto; margin-left: auto; width: 42px; height: 42px; border-radius: 11px; background: rgba(2,6,23,.62); color: #fff; border: 1px solid rgba(255,255,255,.22); font-size: 19px; cursor: pointer; }
+.fo-banner { position: absolute; z-index: 2; left: 50%; top: 17%; transform: translate(-50%, -16px) scale(.9); opacity: 0; transition: opacity .25s, transform .25s; text-align: center; pointer-events: none; width: max-content; max-width: 92%; }
+.fo-banner.show { opacity: 1; transform: translate(-50%, 0) scale(1); }
+.fo-banner b { display: block; font: 400 clamp(30px, 6vw, 58px)/1 KeCoin, 'Bebas Neue', Impact, sans-serif; letter-spacing: 1px; color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.45), 0 0 26px rgba(250,204,21,.55); }
+.fo-banner small { display: inline-block; margin-top: 6px; padding: 4px 10px; border-radius: 6px; background: rgba(2,6,23,.7); color: #e2e8f0; font: 700 13px/1.2 KeCoin, Archivo, sans-serif; }
+.fo-banner.mini b { font-size: clamp(22px, 3.8vw, 34px); }
+.fo-banner.goal { top: 22%; }
+.fo-banner.goal b { font-size: clamp(64px, 15vw, 140px); color: #fde047; animation: foGoal .7s cubic-bezier(.2,1.6,.4,1); }
+.fo-banner.big b { color: #fca5a5; }
+@keyframes foGoal { from { transform: scale(.3) rotate(-6deg); opacity: 0; } }
+.fo-pad { position: absolute; z-index: 1; inset: 0; }
+.fo-stick { position: absolute; z-index: 1; width: 124px; height: 124px; margin: -62px 0 0 -62px; border-radius: 50%; left: max(90px, 16%); top: 70%; pointer-events: none; opacity: .4;
+  background: radial-gradient(circle, rgba(255,255,255,.1), rgba(255,255,255,.03) 70%); border: 2px solid rgba(255,255,255,.3); transition: opacity .15s; }
+.fo-stick.on { opacity: 1; transition: none; }
+.fo-stick i { position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #cbd5e1 60%, #64748b); box-shadow: 0 4px 12px rgba(0,0,0,.5); }
+.fo-btns { position: absolute; z-index: 2; right: max(12px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); width: 236px; height: 196px; }
+.fo-b { position: absolute; border-radius: 50%; border: 2px solid rgba(255,255,255,.5); color: #fff; font: 900 11px/1 KeCoin, Archivo, sans-serif; letter-spacing: .4px; display: grid; place-items: center; padding: 0; touch-action: none; -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 6px 16px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.3); opacity: .9; cursor: pointer; text-shadow: 0 1px 2px rgba(0,0,0,.45); }
+.fo-b.on { transform: scale(.9); opacity: 1; filter: brightness(1.3); }
+.fo-b.sh { width: 94px; height: 94px; right: 0; bottom: 0; background: radial-gradient(circle at 35% 30%, #fb7185, #dc2626 70%); font-size: 16px; }
+.fo-b.ps { width: 76px; height: 76px; right: 106px; bottom: 4px; background: radial-gradient(circle at 35% 30%, #4ade80, #15803d 70%); font-size: 12px; }
+.fo-b.tk { width: 68px; height: 68px; right: 96px; bottom: 96px; background: radial-gradient(circle at 35% 30%, #60a5fa, #1d4ed8 70%); }
+.fo-b.sp { width: 64px; height: 64px; right: 12px; bottom: 110px; background: radial-gradient(circle at 35% 30%, #fde047, #ca8a04 70%); color: #1c1917; text-shadow: none; }
+.fo-match[data-ctx="def"] .fo-b.sh { background: radial-gradient(circle at 35% 30%, #fdba74, #ea580c 70%); font-size: 11px; }
+.fo-match[data-ctx="def"] .fo-b.ps { background: radial-gradient(circle at 35% 30%, #c4b5fd, #6d28d9 70%); font-size: 11px; }
+.fo-match.kb .fo-btns, .fo-match.kb .fo-stick { display: none; }
+.fo-hint { position: absolute; z-index: 2; left: 50%; top: 58px; transform: translateX(-50%); max-width: 80%; padding: 7px 12px; border-radius: 10px; background: rgba(2,6,23,.75); border: 1px solid rgba(253,224,71,.45); color: #fde68a; font: 700 13px/1.3 KeCoin, Archivo, sans-serif; text-align: center; pointer-events: none; }
+.fo-keys { position: absolute; z-index: 2; left: 50%; bottom: 96px; transform: translateX(-50%); max-width: 94%; padding: 8px 12px; border-radius: 10px; background: rgba(2,6,23,.78); color: #e2e8f0; font: 600 12px/1.4 KeCoin, Archivo, sans-serif; text-align: center; pointer-events: none; }
+@media (orientation: portrait) { .fo-btns { transform: scale(.92); transform-origin: right bottom; } .fo-stick { top: 78%; } .fo-banner { top: 20%; } }
+@media (max-height: 380px) { .fo-btns { transform: scale(.82); transform-origin: right bottom; } .fo-score { font-size: 12px; } }
+.fo-over { position: absolute; z-index: 4; inset: 0; display: grid; place-items: center; padding: 14px; background: rgba(2,6,23,.6); overflow-y: auto; }
+.fo-over[hidden] { display: none; }
+.fo-over.half { background: rgba(2,6,23,.4); pointer-events: none; }
+.fo-card { width: min(520px, 100%); background: linear-gradient(180deg, #13213f, #0a1120); border: 1px solid rgba(255,255,255,.16); border-radius: 16px; padding: 16px 18px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.6); color: #e2e8f0; }
+.fo-card > small { color: #86efac; font: 800 12px/1 KeCoin, Archivo, sans-serif; letter-spacing: 1.5px; }
+.fo-card h2 { margin: 6px 0; font: 400 clamp(34px, 7vw, 54px)/1 KeCoin, 'Bebas Neue', Impact, sans-serif; color: #fff; letter-spacing: .5px; }
+.fo-final { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 10px 0; font: 800 15px/1.2 KeCoin, Archivo, sans-serif; }
+.fo-final span { display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1; justify-content: flex-end; overflow-wrap: anywhere; }
+.fo-final span:last-child { justify-content: flex-start; }
+.fo-final i { width: 10px; height: 22px; border-radius: 3px; flex: none; box-shadow: 0 0 0 1px rgba(255,255,255,.3); }
+.fo-final b { font: 400 40px/1 KeCoin, 'Bebas Neue', Impact, sans-serif; background: #f8fafc; color: #0f172a; padding: 4px 12px; border-radius: 8px; flex: none; }
+.fo-stats { display: grid; gap: 4px; margin: 10px 0; }
+.fo-st { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; font-size: 13px; padding: 4px 8px; border-radius: 6px; background: rgba(2,6,23,.45); }
+.fo-st b { color: #fff; } .fo-st b:first-child { text-align: right; } .fo-st b:last-child { text-align: left; } .fo-st span { color: #94a3b8; }
+.fo-money { margin: 8px auto; font: 900 26px/1.2 KeCoin, Archivo, sans-serif; color: #e2e8f0; }
+.fo-money.win { color: #4ade80; text-shadow: 0 0 18px rgba(74,222,128,.5); } .fo-money.lose { color: #f87171; }
+.fo-acts { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
+.fo-acts .btn { flex: 1 1 180px; }
+.fo-acts .danger { color: #fca5a5; border-color: rgba(248,113,113,.5); }
+@media (max-height: 520px) {
+  .fo-card { padding: 10px 14px; border-radius: 12px; }
+  .fo-card h2 { font-size: 34px; margin: 2px 0; }
+  .fo-final { margin: 4px 0; } .fo-final b { font-size: 30px; }
+  .fo-stats { grid-template-columns: 1fr 1fr; gap: 3px 8px; margin: 6px 0; }
+  .fo-st { font-size: 12px; padding: 3px 6px; }
+  .fo-acts { margin-top: 8px; } .fo-acts .btn { flex-basis: 150px; padding-top: 8px; padding-bottom: 8px; }
+  .fo-card p { margin: 4px 0; font-size: 12px; }
+  .fo-hero { padding: 12px; } .fo-hero-art { width: 64px; height: 64px; } .fo-hero-art span { font-size: 44px; } .fo-hero h2 { font-size: 26px; }
+}
+.game-host:has(> .derby.playing):not(.is-full) { position: relative; height: min(82vh, 60vw); min-height: 340px; }
+/* waiting room */
+.fo-room { display: grid; place-items: center; min-height: 60vh; padding: 10px 0; }
+.fo-vs { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 14px 0; flex-wrap: wrap; }
+.fo-vs span { display: flex; align-items: center; gap: 8px; font: 800 18px/1.2 KeCoin, Archivo, sans-serif; color: #fff; }
+.fo-vs i { width: 14px; height: 28px; border-radius: 4px; box-shadow: 0 0 0 1px rgba(255,255,255,.35); }
+.fo-vs em { font: 400 34px/1 KeCoin, 'Bebas Neue', Impact, sans-serif; color: #fde047; font-style: normal; }
+.fo-potbig { margin: 8px auto 12px; padding: 12px; border-radius: 12px; background: radial-gradient(circle at 50% 0%, rgba(250,204,21,.18), rgba(2,6,23,.6)); border: 1px solid rgba(250,204,21,.35); }
+.fo-potbig b { display: block; font: 900 30px/1.2 KeCoin, Archivo, sans-serif; color: #fde047; }
+.fo-potbig small { color: #cbd5e1; }
+.fo-status { display: flex; align-items: center; justify-content: center; gap: 8px; color: #cbd5e1; min-height: 40px; }
+.fo-status.bad { color: #fca5a5; }
+.fo-spin { width: 16px; height: 16px; border-radius: 50%; border: 3px solid rgba(255,255,255,.2); border-top-color: #4ade80; animation: foSpin .8s linear infinite; flex: none; }
+/* « X te défie » */
+.fo-pop { text-align: center; }
+.fo-pop-ball { font-size: 54px; animation: foSpin 3s linear infinite; display: inline-block; }
+.fo-pop h3 { margin: 6px 0; font-size: 22px; }
+.fo-pop-acts { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 8px; }
+</style>
 <style id="finition">
 /* ============ Finition : dégradés, reliefs et lumière sur toute l'interface (après toutes les autres couches) ============
    Les écrans des jeux gardent leurs propres couleurs ; le mode clair a ses propres règles plus bas. */
@@ -6180,7 +6325,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
   <main id="view" class="view"></main>
 
   <footer class="foot">
-    <!-- seo-links (fabriqué par tools/seo.py : ne pas modifier à la main) --><section class="seo-foot" aria-label="Tous les jeux de SpinBet Casino"><p><b>SpinBet Casino</b>, casino gratuit en ligne : 47 jeux de casino gratuits sans téléchargement ni dépôt, en argent fictif (KE). Machines à sous avec bonus et jackpots, roulettes, blackjack, poker Texas Hold’em, roues de la fortune, tables multijoueurs et jeux rapides (mines, crash, plinko), sur téléphone comme sur ordinateur. Aucun vrai pari, aucun gain réel.</p><div class="seo-cols"><div><b>Machines à sous gratuites</b><a href="jeux/big-bad-wolf.html">Le Loup</a><a href="jeux/cosmic.html">Le Cosmique</a><a href="jeux/zeus.html">L’Olympe</a><a href="jeux/huff.html">Le Loup 2.0</a><a href="jeux/candy.html">La Sweety</a><a href="jeux/anubis.html">L’Anubis</a><a href="jeux/bling.html">La Tour Bling</a><a href="jeux/pharaon.html">Le Totem</a><a href="jeux/chasse.html">The Hunt</a><a href="jeux/noel.html">La Tournée du Père Noël</a><a href="jeux/totemx.html">Le Totem Extrême</a><a href="jeux/barillet.html">La Roulette Russe</a><a href="jeux/taco.html">La Pizza Yo-Yo</a><a href="jeux/billets.html">Le Coffre-Fort</a><a href="jeux/dragons.html">L’Hydre</a><a href="jeux/labo.html">Le Labo</a><a href="jeux/fortune.html">La Fortune</a></div><div><b>Roulette, blackjack, poker et roues</b><a href="jeux/madwheel.html">La Roue Folle</a><a href="jeux/storm.html">L’Éclair</a><a href="jeux/doublespin.html">La Double Bille</a><a href="jeux/plateau.html">Le Plateau</a><a href="jeux/peche.html">La Pêche</a><a href="jeux/roueor.html">La Roue d’Or</a><a href="jeux/blackjack.html">Le 21</a><a href="jeux/lightningbj.html">Le 21 Électrique</a><a href="jeux/poker.html">Le Texas</a></div><div><b>Tables multijoueurs</b><a href="jeux/storm-online.html">L’Éclair Online</a><a href="jeux/bj-online.html">Le 21 Online</a><a href="jeux/holdem-online.html">Le Texas Online</a><a href="jeux/madwheel-online.html">La Roue Folle Online</a><a href="jeux/robots-online.html">La Course Online</a><a href="jeux/plateau-online.html">Le Plateau Online</a><a href="jeux/peche-online.html">La Pêche Online</a><a href="jeux/roueor-online.html">La Roue d’Or Online</a></div><div><b>Jeux rapides gratuits</b><a href="jeux/mines.html">Le Champ de Mines</a><a href="jeux/avion.html">L’Avion</a><a href="jeux/plinko.html">La Cascade</a><a href="jeux/vortex.html">Le Vortex</a><a href="jeux/casse.html">Le Casse</a><a href="jeux/pileface.html">La Pièce</a><a href="jeux/robots.html">La Course</a><a href="jeux/poulet.html">Le Poulet</a><a href="jeux/gratteciel.html">Le Gratte-Ciel</a><a href="jeux/penalty.html">Le Penalty</a><a href="jeux/ticket.html">Le Ticket</a><a href="jeux/billes.html">La Descente</a><a href="jeux/pilote.html">Le Pilote</a></div><div><b>Guides et astuces</b><a href="articles/meilleures-machines-a-sous-gratuites-2026.html">Les meilleures machines à sous gratuites en 2026</a><a href="articles/jeux-de-casino-gratuits-sans-telechargement.html">Roulette, blackjack et poker gratuits sans téléchargement</a><a href="articles/jeux-crash-mines-plinko-gratuits.html">Jeux crash, mines et plinko gratuits : le guide 2026</a><a href="articles/rtp-volatilite-machines-a-sous.html">RTP et volatilité : comprendre une machine à sous</a><a href="articles/comment-gagner-aux-machines-a-sous.html">Comment gagner aux machines à sous ? Vrais conseils et idées reçues</a><a href="articles/strategie-blackjack.html">Stratégie de base au blackjack : le tableau complet</a><a href="articles/martingale-roulette.html">Martingale à la roulette : est-ce que ça marche vraiment ?</a><a href="articles/casino-gratuit-sur-telephone.html">Casino gratuit sur téléphone, sans téléchargement (Android et iPhone)</a></div></div></section><!-- /seo-links -->
+    <!-- seo-links (fabriqué par tools/seo.py : ne pas modifier à la main) --><section class="seo-foot" aria-label="Tous les jeux de SpinBet Casino"><p><b>SpinBet Casino</b>, casino gratuit en ligne : 48 jeux de casino gratuits sans téléchargement ni dépôt, en argent fictif (KE). Machines à sous avec bonus et jackpots, roulettes, blackjack, poker Texas Hold’em, roues de la fortune, tables multijoueurs et jeux rapides (mines, crash, plinko), sur téléphone comme sur ordinateur. Aucun vrai pari, aucun gain réel.</p><div class="seo-cols"><div><b>Machines à sous gratuites</b><a href="jeux/big-bad-wolf.html">Le Loup</a><a href="jeux/cosmic.html">Le Cosmique</a><a href="jeux/zeus.html">L’Olympe</a><a href="jeux/huff.html">Le Loup 2.0</a><a href="jeux/candy.html">La Sweety</a><a href="jeux/anubis.html">L’Anubis</a><a href="jeux/bling.html">La Tour Bling</a><a href="jeux/pharaon.html">Le Totem</a><a href="jeux/chasse.html">The Hunt</a><a href="jeux/noel.html">La Tournée du Père Noël</a><a href="jeux/totemx.html">Le Totem Extrême</a><a href="jeux/barillet.html">La Roulette Russe</a><a href="jeux/taco.html">La Pizza Yo-Yo</a><a href="jeux/billets.html">Le Coffre-Fort</a><a href="jeux/dragons.html">L’Hydre</a><a href="jeux/labo.html">Le Labo</a><a href="jeux/fortune.html">La Fortune</a></div><div><b>Roulette, blackjack, poker et roues</b><a href="jeux/madwheel.html">La Roue Folle</a><a href="jeux/storm.html">L’Éclair</a><a href="jeux/doublespin.html">La Double Bille</a><a href="jeux/plateau.html">Le Plateau</a><a href="jeux/peche.html">La Pêche</a><a href="jeux/roueor.html">La Roue d’Or</a><a href="jeux/blackjack.html">Le 21</a><a href="jeux/lightningbj.html">Le 21 Électrique</a><a href="jeux/poker.html">Le Texas</a></div><div><b>Tables multijoueurs</b><a href="jeux/storm-online.html">L’Éclair Online</a><a href="jeux/bj-online.html">Le 21 Online</a><a href="jeux/holdem-online.html">Le Texas Online</a><a href="jeux/madwheel-online.html">La Roue Folle Online</a><a href="jeux/robots-online.html">La Course Online</a><a href="jeux/plateau-online.html">Le Plateau Online</a><a href="jeux/peche-online.html">La Pêche Online</a><a href="jeux/roueor-online.html">La Roue d’Or Online</a></div><div><b>Jeux rapides gratuits</b><a href="jeux/mines.html">Le Champ de Mines</a><a href="jeux/avion.html">L’Avion</a><a href="jeux/plinko.html">La Cascade</a><a href="jeux/vortex.html">Le Vortex</a><a href="jeux/casse.html">Le Casse</a><a href="jeux/pileface.html">La Pièce</a><a href="jeux/robots.html">La Course</a><a href="jeux/poulet.html">Le Poulet</a><a href="jeux/gratteciel.html">Le Gratte-Ciel</a><a href="jeux/penalty.html">Le Penalty</a><a href="jeux/ticket.html">Le Ticket</a><a href="jeux/billes.html">La Descente</a><a href="jeux/pilote.html">Le Pilote</a><a href="jeux/foot.html">Le Derby</a></div><div><b>Guides et astuces</b><a href="articles/meilleures-machines-a-sous-gratuites-2026.html">Les meilleures machines à sous gratuites en 2026</a><a href="articles/jeux-de-casino-gratuits-sans-telechargement.html">Roulette, blackjack et poker gratuits sans téléchargement</a><a href="articles/jeux-crash-mines-plinko-gratuits.html">Jeux crash, mines et plinko gratuits : le guide 2026</a><a href="articles/rtp-volatilite-machines-a-sous.html">RTP et volatilité : comprendre une machine à sous</a><a href="articles/comment-gagner-aux-machines-a-sous.html">Comment gagner aux machines à sous ? Vrais conseils et idées reçues</a><a href="articles/strategie-blackjack.html">Stratégie de base au blackjack : le tableau complet</a><a href="articles/martingale-roulette.html">Martingale à la roulette : est-ce que ça marche vraiment ?</a><a href="articles/casino-gratuit-sur-telephone.html">Casino gratuit sur téléphone, sans téléchargement (Android et iPhone)</a></div></div></section><!-- /seo-links -->
     <div><b>SPINBET CASINO</b> · Jeu de divertissement, argent fictif, aucun gain réel. 18+ · <a href="#responsable">Jeu responsable</a> · <a href="jeux/">Tous les jeux</a> · <a href="articles/">Guides et astuces</a> · <a href="confidentialite.html">Confidentialité</a> · <a href="ads/">Nos partenaires</a></div>
   </footer>
 
@@ -7027,6 +7172,24 @@ const cloud = {
     await (await init()).db.collection('duels').doc(id).update(patch);
   },
   async updateDuel(id, patch) { await (await init()).db.collection('duels').doc(id).update(patch); },
+
+  /* ---------- Le Derby, matchs de foot entre amis (foot-defis.js, games/foot.js) : foot/{id} ---------- */
+  async footCreate(data) {
+    const ref = await (await init()).db.collection('foot').add({ ...data, at: firebase.firestore.FieldValue.serverTimestamp() });
+    return ref.id;
+  },
+  async footWatch(uid, cb) {
+    const ms = (x) => x?.toMillis?.() || 0;
+    return (await init()).db.collection('foot').where('p', 'array-contains', uid)
+      .onSnapshot((q) => cb(q.docs.map((d) => { const x = d.data({ serverTimestamps: 'estimate' }); return { id: d.id, ...x, atMs: ms(x.at), accMs: ms(x.acc), jaMs: ms(x.ja), jbMs: ms(x.jb) }; })), (e) => console.error(e));
+  },
+  // 'now' becomes the server time (acc, ja, jb)
+  async footUpdate(id, patch) {
+    const o = JSON.parse(JSON.stringify(patch));
+    for (const k of ['acc', 'ja', 'jb']) if (o[k] === 'now') o[k] = firebase.firestore.FieldValue.serverTimestamp();
+    await (await init()).db.collection('foot').doc(id).update(o);
+  },
+  async footDelete(id) { await (await init()).db.collection('foot').doc(id).delete(); },
 
   /* ---------- KE between players: gifts/{id} = { from, fromName, to, toName, amount (cents), at, claimed } ---------- */
   // The sender's balance drops by the amount in the same write (the rules check it) and sends/{uid} counts
@@ -10285,6 +10448,7 @@ const ORIGINALS = [
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
   {"id": "billes", "name": "La Descente", "cat": "quick", "tag": "Course", "sub": "Course de billes avec vraie physique", "colors": ["#38bdf8", "#0b1023"], "description": "Cinq billes dévalent un parcours plein de pièges : entonnoirs, plots rebondissants, moulins, bascules, zones turbo et boue. Mise sur une ou plusieurs billes : la première en bas gagne et ta mise est payée selon sa cote !", "features": ["5 billes, cotes qui changent", "Vraie physique, 40 s de suspense", "Mise sur plusieurs billes", "Remise et tours auto"], "rtp": "≈ 95 %", "vol": 3, "max": "×16,8"},
   {"id": "pilote", "name": "Le Pilote", "cat": "quick", "tag": "Vol", "sub": "Pose-toi sur le bon porte-avions", "colors": ["#38bdf8", "#0b2a6f"], "description": "Ton avion décolle avec ×1 et vole sans fin au-dessus de la mer : prends les multiplicateurs (×2 à ×10, jusqu’à +100), esquive les bombes (÷2 à ÷10), profite des boosts et tiens bon dans les trous d’air. Quand il n’a plus d’altitude, il se pose là où il est : dans la mer tu perds tout, sur un porte-avions tu gagnes ×1, ×2 ou ×5 ton gain… et avec le BONUS, tous les porte-avions sont ×10 !", "features": ["Vol sans fin, jusqu’à 30 secondes", "Multiplicateurs jusqu’à ×10 et +100", "Boosts et trous d’air", "BONUS : tous les porte-avions ×10", "Altitude, vitesse et distance en direct"], "rtp": "≈ 97 %", "vol": 5, "max": "×1 000"},
+  {"id": "foot", "name": "Le Derby", "cat": "quick", "tag": "Foot entre amis", "sub": "Match de foot 11 contre 11 en direct", "colors": ["#22c55e", "#0b3d1f"], "description": "Un vrai match de foot 11 contre 11 en direct contre un ami : choisis ta mise, ton ami mise la même somme et le gagnant rafle toute la cagnotte (match nul : chacun récupère sa mise). Stick et boutons PASSE, TIR, TACLE et SPRINT sur téléphone, clavier ou manette sur ordinateur. Passes, frappes, têtes, tacles glissés, corners, coups francs et penaltys, avec la caméra de la télé et le ralenti de chaque but. Entraîne-toi d’abord contre l’ordinateur !", "features": ["11 contre 11 en direct entre amis", "Mise libre : le gagnant prend tout", "Match nul = mises rendues", "Stick + PASSE, TIR, TACLE, SPRINT", "Clavier ou manette sur ordinateur", "Caméra TV et ralenti des buts", "Entraînement contre l’ordinateur"], "rtp": "100 % (entre amis)", "vol": 3, "max": "×2 la mise"},
   {"id": "taco", "name": "La Pizza Yo-Yo", "cat": "slot", "tag": "Machine à sous", "sub": "La pizza qui tourne", "colors": ["#f97316", "#7c2d12"], "description": "Une pizza ronde qui tourne ! Elle s’arrête avec un quart ouvert où tombent les symboles : 4 identiques qui se touchent gagnent, les autres glissent vers le centre, et les grosses connexions écartent une part de plus. Les food trucks multiplient le gain. Bonus Le Four : chaque 4ᵉ pepperoni ouvre une part et donne +2 tours, jusqu’à la pizza entière.", "features": ["Pizza ronde qui tourne", "Connexions de 4 symboles", "Parts qui s’écartent", "Food trucks multiplicateurs ×2 à ×50", "Bonus Le Four et Super Four", "Pepperonis à collectionner", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
   {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200\u00a0\uE1E0 tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200\u00a0\uE1E0", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
@@ -10710,6 +10874,31 @@ const SPECS = {
       <circle r="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/></g>
       <g transform="translate(244 236) rotate(18)"><path d="M-9 -10 Q-9 -40 0 -44 Q9 -40 9 -10Z" fill="#b87333"/><rect x="-10" y="-10" width="20" height="34" fill="url(#rrBul${u})"/></g>`,
   },
+  foot: {
+    bg: ['#0b3d1f', '#03110a'], light: '#86efac', title: ['LE DERBY'], font: 'bebas', metal: ['#fff', '#bbf7d0', '#15803d'], tag: 'ENTRE AMIS', photo: 'assets/games/foot/cover.webp',
+    art: (u) => `
+      <radialGradient id="fl${u}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fffbe6"/><stop offset=".3" stop-color="#fef9c3" stop-opacity=".55"/><stop offset="1" stop-color="#fef9c3" stop-opacity="0"/></radialGradient>
+      <linearGradient id="pit${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#15803d"/><stop offset="1" stop-color="#14532d"/></linearGradient>
+      <rect x="0" y="0" width="300" height="96" fill="#0b1224"/>
+      ${Array.from({ length: 60 }, (_, k) => `<circle cx="${(k * 37) % 300}" cy="${30 + ((k * 53) % 60)}" r="2.2" fill="${['#1d4ed8', '#dc2626', '#f8fafc', '#facc15', '#475569'][k % 5]}" opacity=".75"/>`).join('')}
+      <circle cx="40" cy="22" r="40" fill="url(#fl${u})"/><circle cx="262" cy="22" r="40" fill="url(#fl${u})"/>
+      <path d="M0 96 H300 V300 H0Z" fill="url(#pit${u})"/>
+      ${[0, 1, 2, 3, 4, 5].map((k) => `<path d="M${-40 + k * 70} 96 L${-10 + k * 70} 96 L${-90 + k * 92} 300 L${-150 + k * 92} 300Z" fill="#16a34a" opacity=".55"/>`).join('')}
+      <path d="M0 132 H300" stroke="#ecfdf5" stroke-width="2.5" opacity=".8"/><ellipse cx="150" cy="236" rx="120" ry="34" fill="none" stroke="#ecfdf5" stroke-width="2.5" opacity=".7"/>
+      <g transform="translate(206 70)" filter="url(#sh${u})"><path d="M0 0 V58 M80 0 V58 M0 0 H80" stroke="#f8fafc" stroke-width="5" fill="none"/>
+        <g stroke="#fff" stroke-opacity=".3">${Array.from({ length: 9 }, (_, k) => `<path d="M${6 + k * 9} 2 V58"/>`).join('')}${Array.from({ length: 6 }, (_, k) => `<path d="M2 ${8 + k * 9} H78"/>`).join('')}</g></g>
+      <path d="M78 214 Q150 120 238 104" stroke="#fde047" stroke-width="3" stroke-dasharray="7 7" fill="none" opacity=".85"/>
+      <g transform="translate(232 104)" filter="url(#glow${u})"><circle r="15" fill="#fff" stroke="#111" stroke-width="2"/><path d="M0 -7 L6.6 -2.2 L4 5.6 L-4 5.6 L-6.6 -2.2Z" fill="#111"/></g>
+      <g transform="translate(70 150) scale(1.15)" filter="url(#sh${u})">
+        <path d="M14 70 L4 100 M26 70 L40 98" stroke="#f1c7a3" stroke-width="7" stroke-linecap="round"/><path d="M4 100 L-6 100 M40 98 L50 92" stroke="#111" stroke-width="7" stroke-linecap="round"/>
+        <rect x="6" y="56" width="28" height="16" rx="4" fill="#f8fafc"/><rect x="2" y="22" width="36" height="38" rx="9" fill="#1d4ed8"/><text x="20" y="48" font-family="Archivo,sans-serif" font-weight="900" font-size="15" fill="#fff" text-anchor="middle">10</text>
+        <path d="M4 28 L-10 48 M36 28 L52 18" stroke="#1d4ed8" stroke-width="8" stroke-linecap="round"/><circle cx="20" cy="12" r="11" fill="#d9a066"/><path d="M9 9 Q20 -4 31 9Z" fill="#1f1a17"/></g>
+      <g transform="translate(150 132) scale(.92)" filter="url(#sh${u})">
+        <path d="M14 70 L10 100 M26 70 L22 100" stroke="#a8714a" stroke-width="7" stroke-linecap="round"/><path d="M10 100 L0 100 M22 100 L12 100" stroke="#111" stroke-width="7" stroke-linecap="round"/>
+        <rect x="6" y="56" width="28" height="16" rx="4" fill="#111827"/><rect x="2" y="22" width="36" height="38" rx="9" fill="#dc2626"/>
+        <path d="M4 28 L-8 52 M36 28 L46 52" stroke="#dc2626" stroke-width="8" stroke-linecap="round"/><circle cx="20" cy="12" r="11" fill="#7a4b2a"/><path d="M9 8 Q20 -3 31 8Z" fill="#0b0b0b"/></g>
+      <g font-family="KeCoin,Archivo,sans-serif" font-weight="900" text-anchor="middle"><circle cx="40" cy="250" r="24" fill="url(#gold${u})" stroke="#78350f" stroke-width="3"/><text x="40" y="256" font-size="14" fill="#78350f">×2</text></g>`,
+  },
   noel: {
     bg: ['#7f1d1d', '#0b1a3a'], light: '#fde68a', title: ['LA TOURNÉE', 'DU PÈRE NOËL'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'WILD ×8', photo: 'assets/games/noel/cover.webp',
     art: () => '',
@@ -10822,7 +11011,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  chasse: ['#65a30d', '#14532d'], noel: ['#ef4444', '#1e3a8a'], totemx: ['#f97316', '#7f1d1d'], volcan: ['#f97316', '#450a0a'], barillet: ['#d97706', '#451a03'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], pilote: ["#38a6f5", "#0b2a6f"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
+  chasse: ['#65a30d', '#14532d'], noel: ['#ef4444', '#1e3a8a'], totemx: ['#f97316', '#7f1d1d'], volcan: ['#f97316', '#450a0a'], barillet: ['#d97706', '#451a03'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], pilote: ["#38a6f5", "#0b2a6f"], foot: ["#22b45e", "#062a14"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
 };
 // the wheel games' salons wear their game's poster, with the ONLINE ribbon
 ['madwheel', 'plateau', 'peche', 'roueor', 'robots'].forEach((id) => { SPECS[`${id}-online`] = { ...SPECS[id], online: true, tag: 'ONLINE' }; if (CARD[id]) CARD[`${id}-online`] = CARD[id]; });
@@ -10929,6 +11118,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'foot', date: '2026-11-08', isNew: true, title: 'Nouveau : le match de foot entre amis', items: ['Un vrai match 11 contre 11 en direct contre un ami', 'Misez la même somme : le gagnant rafle tout, match nul = mises rendues', 'Stick et boutons PASSE, TIR, TACLE, SPRINT sur téléphone, clavier ou manette sur ordinateur', 'Caméra de la télé, ralenti de chaque but, corners, coups francs et penaltys', 'Entraîne-toi contre l’ordinateur en 3 niveaux'] },
   { game: 'gratteciel', date: '2026-11-06', title: 'Une vraie tour, sans coup de vent', items: ['Plus aucun coup de vent : la tour ne tombe plus au hasard', 'La tour tient tant qu’elle est équilibrée : les cubes décalés la font pencher', 'Un cube trop raté ou une tour qui penche trop, et tout s’écroule', 'Gains recalculés pour ce nouveau jeu d’adresse (jusqu’à ×22)'] },
   { game: 'bling', date: '2026-11-06', title: 'Plus fluide', items: ['Les mots « CASH ! » et « CASCADE » s’affichent bien au milieu de la grille', 'La machine est plus fluide sur téléphone'] },
   { game: 'pilote', date: '2026-11-05', title: 'Boosts, trous d’air et BONUS ×10', items: ['L’avion vole sans fin au-dessus de la mer et se pose là où il tombe : la mer… ou un porte-avions ×1, ×2, ×5', 'Nouveau BONUS : tous les porte-avions ×10 (×10, ×20, ×50) jusqu’à l’atterrissage', 'Boosts qui font bondir l’avion, trous d’air qui le font chuter d’un coup, vol plus fluide avec secousses', 'Altitude, vitesse et distance en haut à gauche, plein écran avec les boutons par-dessus', 'Nouveau bouton 🚀 Super turbo dans « Bonus & menu » : les vols vont 3 fois plus vite', 'Le boost envoie l’avion tout là-haut : la caméra dézoome, les porte-avions deviennent minuscules et il faut passer entre les bombes', 'Deux fois moins de bombes, et le jeu qui rend le plus du casino (≈ 97 %)', 'Ciel moins chargé, et après un boost l’avion reste plusieurs secondes tout là-haut'] },
@@ -12093,6 +12283,7 @@ class Music {
 
 // Themes for the games that had no music of their own.
 const EXTRA_THEMES = {
+  foot: { sd: 0.15, len: 16, root: 196, pad: { wave: 'triangle', vol: 0.018, dur: 1.6, map: { 0: [0, 4, 7], 8: [5, 9, 12] } }, lead: { wave: 'square', vol: 0.03, dur: 0.13, pat: [12, null, 12, 14, 16, null, 16, null, 19, 17, 16, 14, 12, null, 7, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.2, pat: [-12, null, -12, null, -5, null, -5, null, -7, null, -7, null, -12, null, -10, null] }, kick: [0, 4, 8, 10, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.026 },
   volcan: { sd: 0.2, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.016, dur: 2, map: { 0: [0, 3, 7], 8: [-2, 1, 5] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.24, pat: [12, null, 15, null, 17, 15, null, 12, 10, null, 12, null, 15, null, 10, null] }, bass: { wave: 'sine', vol: 0.18, dur: 0.45, pat: [-12, null, -12, null, null, -12, null, null, -14, null, -14, null, null, -9, null, null] }, kick: [0, 3, 6, 8, 11, 14], hat: [4, 12], kv: 0.3, hv: 0.016 },
   barillet: { sd: 0.2, len: 16, root: 146.83, lead: { wave: 'triangle', vol: 0.05, dur: 0.32, pat: [12, null, null, 15, null, 12, null, null, 10, null, 8, null, 7, null, null, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.4, pat: [-12, null, null, -5, null, null, -12, null, -17, null, null, -10, null, null, -5, null] }, kick: [0, 6, 8, 14], hat: [3, 7, 11, 15], kv: 0.16, hv: 0.02 },
   noel: { sd: 0.16, len: 32, root: 261.63, lead: { wave: 'triangle', vol: 0.055, dur: 0.2, pat: [16, null, 16, null, 16, null, null, null, 16, null, 16, null, 16, null, null, null, 16, null, 19, null, 12, null, null, 14, 16, null, null, null, null, null, null, null] }, bass: { wave: 'sine', vol: 0.13, dur: 0.3, pat: [-12, null, null, null, -5, null, null, null, -12, null, null, null, -5, null, null, null, -12, null, null, null, -7, null, null, null, -5, null, null, null, -12, null, null, null] }, comp: { wave: 'square', vol: 0.012, dur: 0.08, map: { 2: [0, 4, 7], 6: [0, 4, 7], 10: [0, 4, 7], 14: [0, 4, 7], 18: [0, 4, 7], 22: [-3, 0, 5], 26: [-1, 2, 7], 30: [0, 4, 7] } }, hat: [2, 6, 10, 14, 18, 22, 26, 30], hv: 0.03, kick: [0, 8, 16, 24], kv: 0.14 },
@@ -13906,6 +14097,7 @@ const FILES = {
   noel: ['noel', 'games/impl/noel.js', 'NoelGame', '30948faeb5'],
   volcan: ['volcan', 'games/impl/volcan.js', 'VolcanGame', 'e6c05773cc'],
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
+  foot: ['foot', 'games/impl/foot.js', 'FootGame', '8290160e24'],
 };
 const loading = {};
 
@@ -17253,6 +17445,237 @@ function renderDuels(root) {
 }
 
 return { renderDuels };
+})();
+
+// ---- foot-defis.js ----
+__mods['foot-defis.js'] = (() => {
+// Le Derby (games/foot.js) : les défis de foot entre amis et leurs mises. Firestore foot/{id} = { p: [a, b], a, an, b,
+// bn, s (mise de chacun, KE entiers), d (minutes), ka, kb (maillots), st, at, acc, ja, jb (arrivée au vestiaire),
+// of / aw (connexion WebRTC), r (résultat : { a, b, f, v, by }, écrit une seule fois), da, db (chacun payé) }.
+// st : 'wait' (défi envoyé, 15 min) → 'go' (accepté) → 'live' (coup d'envoi) → 'end' ; 'no' refusé, 'x' annulé.
+// La mise quitte le solde à l'envoi (a) et à l'acceptation (b). Chaque navigateur se paie lui-même une seule fois
+// (profile.footDone) : le gagnant reçoit les deux mises ; match nul, annulé ou jamais commencé (12 min) = chacun
+// récupère la sienne ; abandon = défaite. Quand les deux joueurs sont payés, le document est effacé.
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { toast, modal } = __mods['ui.js'];
+const { sfx } = __mods['audio.js'];
+
+const WAIT = 15 * 60e3, JOIN = 12 * 60e3, LIVE_MAX = 25 * 60e3, DURS = [4, 6, 8], MAX_STAKE = 100000000;
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const me = () => (profiles.online && profiles.current ? { uid: profiles.store.current, name: String(profiles.current.name || 'Joueur').slice(0, 16) } : null);
+let docs = [], stop = null, startedFor = null, joinId = null, skew = 0, loaded = false;
+const bus = new EventTarget(), shown = new Set(), told = new Set(), closing = new Set();
+const now = () => Date.now() + skew;
+const done = () => profiles.current?.footDone || {};
+const inMatch = () => !!__mods['pages/game.js']?.currentGame?.()?.match;
+const onGame = () => location.hash === '#game-foot';
+
+async function start() {
+  const m = me();
+  if ((m?.uid || null) === startedFor) return;
+  stop?.(); stop = null; docs = []; loaded = false; startedFor = m?.uid || null;
+  bus.dispatchEvent(new Event('change'));
+  if (!m || !cloud.enabled) return;
+  try {
+    stop = await cloud.footWatch(m.uid, (l) => { docs = l; loaded = true; tick(); });
+    cloud.clockPing(m.uid).then((t) => { skew = t - Date.now(); }).catch(() => {});
+  } catch (e) { console.warn('Derby : défis indisponibles (règles Firestore à jour ?)', e); }
+}
+profiles.addEventListener('change', () => setTimeout(start, 1500));
+profiles.ready?.then?.(() => setTimeout(start, 1200));
+setInterval(() => { if (docs.length) tick(); }, 20000);
+
+function tick() {
+  settle();
+  notify();
+  bus.dispatchEvent(new Event('change'));
+}
+
+// my result in a finished match: 'win' | 'lose' | 'tie' | 'void' (stake back) | 'none' (I never paid)
+function outcome(D, uid) {
+  const isA = D.a === uid, t = now();
+  if (D.r) {
+    if (D.r.v) return 'void';
+    if (D.r.f) return D.r.f === uid ? 'lose' : 'win';
+    const mine = isA ? D.r.a : D.r.b, th = isA ? D.r.b : D.r.a;
+    return mine > th ? 'win' : mine < th ? 'lose' : 'tie';
+  }
+  if (D.st === 'no' || D.st === 'x') return isA ? 'void' : 'none';
+  if (D.st === 'wait' && D.atMs && t > D.atMs + WAIT) return isA ? 'void' : 'none';
+  return null;
+}
+function mark(id, v) {
+  profiles.update('footDone', (p) => { p.footDone = { ...(p.footDone || {}), [id]: v }; const k = Object.keys(p.footDone); if (k.length > 100) delete p.footDone[k[0]]; });
+}
+function settle() {
+  const m = me();
+  if (!m || !profiles.current) return;
+  const t = now(), dd = done();
+  for (const D of docs) {
+    const isA = D.a === m.uid;
+    if (dd[D.id]) { closeDoc(D, isA); continue; }
+    // an accepted match that never started, or that nobody finished: close it (first writer wins)
+    if (!D.r && (D.st === 'go' || D.st === 'live') && D.accMs) {
+      const late = D.st === 'go' ? t > D.accMs + JOIN : t > D.accMs + JOIN + (D.d || 8) * 60e3 + LIVE_MAX;
+      if (late && !closing.has(D.id)) {
+        closing.add(D.id);
+        const last = lastScore(D.id);
+        cloud.footUpdate(D.id, { st: 'end', r: last ? { a: last.a, b: last.b, f: '', v: false, by: m.uid } : { a: 0, b: 0, f: '', v: true, by: m.uid } }).catch(() => {});
+      }
+      continue;
+    }
+    const res = outcome(D, m.uid);
+    if (!res) continue;
+    const s = D.s || 0, other = isA ? D.bn : D.an;
+    mark(D.id, res);
+    profiles.update('footEsc', (p) => { if (p.footEsc) { delete p.footEsc[D.id]; } });
+    if (res !== 'none') {
+      const mine = D.r ? (isA ? D.r.a : D.r.b) : 0, th = D.r ? (isA ? D.r.b : D.r.a) : 0;
+      profiles.update('footHist', (p) => { p.footHist = [{ t: Date.now(), vs: other, m: mine, o: th, res, s, ff: D.r?.f ? 1 : 0 }, ...(p.footHist || [])].slice(0, 12); });
+    }
+    if (s && res === 'win') wallet.grant(s * 2);
+    else if (s && (res === 'tie' || res === 'void')) wallet.grant(s);
+    const quiet = onGame() && inMatch();
+    if (!quiet && res !== 'none') {
+      if (res === 'win') { sfx.bigWin?.(); toast(`⚽ Victoire contre ${esc(other)}${D.r?.f ? ' (abandon)' : ` ${D.r.a}-${D.r.b}`}${s ? ` : +${fmt(s * 2)} !` : ' !'}`, 'ok'); }
+      else if (res === 'lose') toast(`⚽ Défaite contre ${esc(other)}${D.r?.f === m.uid ? ' (abandon)' : ` ${D.r.a}-${D.r.b}`}${s ? ` : ${fmt(s)} perdus` : ''}`, 'warn');
+      else if (res === 'tie') toast(`⚽ Match nul contre ${esc(other)} (${D.r.a}-${D.r.b})${s ? ` : ta mise de ${fmt(s)} t’est rendue` : ''}`, 'info');
+      else if (s && (isA || D.st !== 'wait')) toast(`⚽ ${D.st === 'no' ? `${esc(other)} a refusé ton défi` : D.st === 'x' ? 'Défi annulé' : D.st === 'wait' ? `Ton défi à ${esc(other)} a expiré` : 'Match annulé'} : ta mise de ${fmt(s)} t’est rendue`, 'info');
+    }
+    closeDoc(D, isA);
+  }
+  // a stake set aside for a match that disappeared (should not happen): given back after a day
+  if (loaded) {
+    const esc2 = profiles.current?.footEsc || {};
+    for (const [id, e] of Object.entries(esc2)) {
+      if (docs.some((D) => D.id === id) || Date.now() - (e.t || 0) < 864e5) continue;
+      profiles.update('footEsc', (p) => { delete p.footEsc[id]; });
+      if (!dd[id] && e.s) { wallet.grant(e.s); mark(id, 'void'); }
+    }
+  }
+}
+// once I am paid: my flag, or the document is deleted when the other one is paid too
+function closeDoc(D, isA) {
+  const mineF = isA ? 'da' : 'db', theirs = isA ? 'db' : 'da';
+  if (D[mineF] && !D[theirs]) return;
+  if (closing.has(`c${D.id}`)) return;
+  closing.add(`c${D.id}`);
+  (D[theirs] ? cloud.footDelete(D.id) : cloud.footUpdate(D.id, { [mineF]: true })).catch(() => { closing.delete(`c${D.id}`); });
+}
+// the last score seen during a live match (kept by the game), in case nobody could write the result
+function lastScore(id) { try { const x = JSON.parse(localStorage.getItem('spinbet_foot_live') || 'null'); return x && x.id === id ? x : null; } catch { return null; } }
+
+// pop-ups: a friend challenges me, or my challenge was accepted
+function notify() {
+  const m = me(); if (!m) return;
+  const t = now();
+  for (const D of docs) {
+    if (D.b === m.uid && D.st === 'wait' && t < D.atMs + WAIT && !shown.has(D.id) && !done()[D.id]) {
+      shown.add(D.id);
+      if (inMatch()) { toast(`⚽ ${esc(D.an)} te défie au Derby (${D.s ? fmt(D.s) : 'pour l’honneur'}) : réponds après ton match !`, 'info'); continue; }
+      sfx.win?.();
+      modal(`<div class="fo-pop"><div class="fo-pop-ball">⚽</div><h3>${esc(D.an)} te défie au Derby !</h3>
+        <p>Match de foot en direct, ${D.d} min.${D.s ? ` Mise : <b>${fmt(D.s)}</b> chacun, le gagnant prend <b>${fmt(D.s * 2)}</b> (nul : mises rendues).` : ' Pour l’honneur, sans mise.'}</p>
+        <div class="fo-pop-acts"><button class="btn primary lg" data-value="ok">⚽ Accepter et jouer</button><button class="btn ghost" data-value="no">Refuser</button></div>
+        <small class="muted">Ou plus tard : Le Derby › Mes défis (15 min).</small></div>`, { cls: 'fo-pop-m' }).then(async (v) => {
+        if (v === 'no') { decline(D.id).catch(() => {}); return; }
+        if (v !== 'ok') return;
+        try { await accept(D.id, +localStorage.getItem('spinbet_foot_kit') || 0); openMatch(D.id); } catch (e) { toast(e?.message || 'Impossible d’accepter', 'warn'); }
+      });
+    }
+    if (D.a === m.uid && D.st === 'go' && !D.r && D.accMs && t - D.accMs < JOIN && !told.has(D.id) && !done()[D.id]) {
+      told.add(D.id);
+      if (onGame()) continue; // the game takes me to the match itself
+      sfx.win?.();
+      modal(`<div class="fo-pop"><div class="fo-pop-ball">⚽</div><h3>${esc(D.bn)} a accepté ton défi !</h3><p>Il t’attend sur le terrain${D.s ? ` : cagnotte de <b>${fmt(D.s * 2)}</b>` : ''}.</p>
+        <div class="fo-pop-acts"><button class="btn primary lg" data-value="ok">⚽ Jouer maintenant</button></div></div>`, { cls: 'fo-pop-m' }).then((v) => { if (v === 'ok') openMatch(D.id); });
+    }
+  }
+}
+function openMatch(id) {
+  joinId = id;
+  if (onGame()) { const g = __mods['pages/game.js'].currentGame?.(); if (g?.enterRoom && !g.match) { joinId = null; g.enterRoom(id); return; } }
+  location.hash = '#game-foot';
+}
+
+/* ---------- ce que le jeu utilise ---------- */
+async function create({ to, toName, stake, dur, kit }) {
+  const m = me();
+  if (!m) throw new Error('Crée un compte pour défier tes amis');
+  stake = Math.max(0, Math.min(MAX_STAKE, Math.floor(+stake || 0)));
+  if (!DURS.includes(dur)) dur = 6;
+  if (docs.some((D) => D.a === m.uid && D.b === to && D.st === 'wait' && now() < D.atMs + WAIT)) throw new Error(`Tu as déjà un défi en attente avec ${toName}`);
+  if (stake && !wallet.spend(stake)) throw new Error(`Solde insuffisant pour miser ${fmt(stake)}`);
+  try {
+    const id = await cloud.footCreate({ p: [m.uid, to], a: m.uid, an: m.name, b: to, bn: String(toName).slice(0, 16), s: stake, d: dur, ka: Math.max(0, Math.min(15, kit | 0)), st: 'wait' });
+    if (stake) profiles.update('footEsc', (p) => { p.footEsc = { ...(p.footEsc || {}), [id]: { s: stake, t: Date.now() } }; });
+    return id;
+  } catch (e) {
+    console.error(e);
+    if (stake) wallet.grant(stake);
+    throw new Error('Défi impossible pour le moment (réessaie dans un instant)');
+  }
+}
+async function accept(id, kit) {
+  const m = me(), D = docs.find((x) => x.id === id);
+  if (!m || !D || D.b !== m.uid || D.st !== 'wait') throw new Error('Ce défi n’est plus disponible');
+  if (now() > D.atMs + WAIT) throw new Error('Ce défi a expiré');
+  if (D.s && !wallet.spend(D.s)) throw new Error(`Il te faut ${fmt(D.s)} pour accepter ce défi`);
+  try {
+    await cloud.footUpdate(id, { st: 'go', acc: 'now', kb: Math.max(0, Math.min(15, kit | 0)) });
+    if (D.s) profiles.update('footEsc', (p) => { p.footEsc = { ...(p.footEsc || {}), [id]: { s: D.s, t: Date.now() } }; });
+  } catch (e) {
+    console.error(e);
+    if (D.s) wallet.grant(D.s);
+    throw new Error('Impossible d’accepter (le défi a peut-être été annulé)');
+  }
+}
+const decline = (id) => cloud.footUpdate(id, { st: 'no' });
+const cancel = (id) => cloud.footUpdate(id, { st: 'x' });
+const get = (id) => docs.find((D) => D.id === id) || null;
+function watch(id, cb) {
+  const f = () => cb(get(id));
+  bus.addEventListener('change', f);
+  setTimeout(f, 0);
+  return () => bus.removeEventListener('change', f);
+}
+function join(id) { const m = me(), D = get(id); if (!m || !D) return Promise.resolve(); return cloud.footUpdate(id, { [D.a === m.uid ? 'ja' : 'jb']: 'now' }); }
+function result(id, r) {
+  const m = me();
+  const x = { a: Math.max(0, Math.min(99, r.a | 0)), b: Math.max(0, Math.min(99, r.b | 0)), f: String(r.f || ''), v: !!r.v, by: m?.uid || '' };
+  return cloud.footUpdate(id, { st: 'end', r: x });
+}
+// friends to challenge, the ones online first
+function friends() {
+  const list = __mods['friends.js']?.friends?.() || {}, on = new Set((__mods['live.js']?.online?.() || []).map((p) => p.uid));
+  return Object.entries(list).map(([uid, name]) => ({ uid, name, on: on.has(uid) })).sort((a, b) => (b.on - a.on) || a.name.localeCompare(b.name));
+}
+const left = (ms) => { const m = Math.max(0, Math.ceil(ms / 60000)); return m > 1 ? `encore ${m} min` : 'moins d’une minute'; };
+// the challenges as the game shows them
+function list() {
+  const m = me(); if (!m) return [];
+  const t = now(), dd = done();
+  const out = docs.map((D) => {
+    const isA = D.a === m.uid, other = isA ? D.bn : D.an, r = dd[D.id];
+    let view = 'old';
+    if (r) view = 'old';
+    else if (D.st === 'wait' && t < D.atMs + WAIT) view = isA ? 'out' : 'in';
+    else if (D.st === 'go' && !D.r) view = 'ready';
+    else if (D.st === 'live' && !D.r) view = 'live';
+    return { ...D, other, view, left: left(D.atMs + WAIT - t) };
+  }).filter((d) => d.view !== 'old');
+  const hist = (profiles.current?.footHist || []).slice(0, 6).map((h, k) => ({ id: `h${k}`, view: 'done', other: h.vs, s: h.s, d: '', res: h.res,
+    resTxt: `${h.res === 'win' ? '🏆 Gagné' : h.res === 'lose' ? '❌ Perdu' : h.res === 'tie' ? '🤝 Nul' : '↩️ Annulé'}${h.res !== 'void' ? ` ${h.m}-${h.o}` : ''}${h.ff ? ' (abandon)' : ''}${h.s ? ` · ${h.res === 'win' ? `+${fmt(h.s * 2)}` : h.res === 'lose' ? `−${fmt(h.s)}` : 'mise rendue'}` : ''}` }));
+  const order = { in: 0, ready: 1, live: 2, out: 3 };
+  return [...out.sort((a, b) => order[a.view] - order[b.view] || b.atMs - a.atMs), ...hist];
+}
+const on = (fn) => { bus.addEventListener('change', fn); return () => bus.removeEventListener('change', fn); };
+const takeJoin = () => { const j = joinId; joinId = null; return j; };
+const update = (id, patch) => cloud.footUpdate(id, patch);
+
+return { me, on, list, friends, create, accept, decline, cancel, get, watch, join, result, update, takeJoin, openMatch };
 })();
 
 // ---- cashback.js ----

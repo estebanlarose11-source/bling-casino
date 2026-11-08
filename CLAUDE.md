@@ -116,7 +116,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
   en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en
   priorité pour retoucher l'allure générale. Le mode clair a ses propres lignes en bas de cette couche.
-- **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 26 pages et les 47 jeux sur
+- **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 26 pages et les 48 jeux sur
   ordinateur et téléphone, lance une partie dans chaque jeu et relève erreurs, débordements et textes « undefined ».
   `python3 -m http.server 8123` puis `node tools/verif/robot.js`. À relancer après une grosse modification.
 - **Couvertures** (`covers.js`, `poster()`) : un seul gabarit pour tous les jeux (plaque de titre, Bebas Neue, marque).
@@ -124,6 +124,48 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Dessins par code en 3D** (`tools/render3d/`, Three.js) : couvertures des jeux sans image peinte et pièces des
   jeux rapides (`SPRITES`). `cd tools/render3d && npm i three@0.160.0 && node render.js` (couvertures) ou
   `node render.js --pieces` → `assets/games/<id>/…webp` (puis changer `CACHE` dans `sw.js`).
+
+## Le Derby : match de foot entre amis (demande du propriétaire)
+
+- **Le jeu** (`games/foot.js`, id `foot`, catégorie Jeux rapides) : un vrai match de foot **11 contre 11 en direct**
+  entre deux amis, avec une mise. Chacun mise la même somme (mise libre, 0 = « pour l'honneur ») : **le gagnant prend
+  les deux mises**, **match nul = chacun récupère la sienne**, abandon = défaite. Durée 4, 6 ou 8 min (2 mi-temps).
+  Entraînement contre l'ordinateur (Facile / Normal / Difficile, sans mise) pour apprendre.
+- **Commandes** : téléphone = stick flottant à gauche (pouce n'importe où dans la moitié gauche) + boutons PASSE
+  (tenir = passe en l'air / centre), TIR (tenir = puissance, le stick vise un côté du but), TACLE (près du ballon :
+  tacle debout, de loin : glissé ; avec le ballon : DRIBBLE = crochet), SPRINT. En défense PASSE = CHANGER (joueur le
+  plus proche du ballon), TIR = PRESSING (un coéquipier presse aussi). PC : flèches ou ZQSD (`e.code`, marche en
+  AZERTY), K passe, L ou Espace tir, J tacle/dribble, Maj sprint ; manette (Gamepad API : A passe, B tir, X tacle,
+  gâchette sprint). Paysage = caméra TV de bord de terrain, portrait = caméra derrière l'action. Plein écran pendant
+  le match (`setFull`), les messages du site sont cachés (`body.derby-on`).
+- **Moteur** (bloc `===ENGINE` de `games/foot.js`) : 60 images/s, **entièrement déterministe** (tout l'état dans un
+  `Float64Array`, hasard `rnd` dans l'état, seulement + − × ÷ et `Math.sqrt` ; `dexp` maison ; **jamais** `Math.random`,
+  `sin`, `cos`, `exp`, `pow`, `hypot`, `**` dans ce bloc : les deux téléphones doivent calculer exactement le même
+  match). IA d'équipe en 4-4-2 (bloc qui suit le ballon, pressing, couverture, marquage, appels en profondeur),
+  gardiens (placement, plongeons, arrêts / parades / corners), fautes, penaltys, touches, corners, 6 m, coups francs
+  (mur), mi-temps, ralenti des buts (`History`). Niveaux de l'ordinateur : `LVL_*` (vitesse, frappes, gestes
+  techniques, arrêts) ; en ligne les coéquipiers des deux joueurs sont « Normal ».
+  Simulations : `node tools/sim/foot.js` (ordinateur contre ordinateur, `--bots` = « humains » au hasard, vérifie le
+  déterminisme) : ≈ 3,3 buts et 15 tirs par match de 6 min ; `node tools/sim/foot-net.js [ping] [pertes %]` (deux
+  téléphones à travers un faux réseau : états finaux identiques). **Après toute modification du moteur : relancer les
+  deux.**
+- **En ligne** : WebRTC pair à pair (STUN Google + Cloudflare, pas de serveur TURN : si les deux réseaux bloquent la
+  connexion directe, le vestiaire le dit et propose d'annuler, mises rendues), préparé par Firestore `foot/{id}`
+  (`of` / `aw` = offre et réponse). L'hôte = celui qui a lancé le défi (équipe 0). **Rollback** (`Rollback`) : chaque
+  téléphone joue tout de suite ses commandes (prévues `delay` images plus tard), devine celles de l'autre et rejoue
+  quand elles arrivent ; les deux s'attendent (`adv`) ; empreinte des états confirmés chaque seconde, et si elles
+  diffèrent l'invité reprend l'état de l'hôte (`need` / `st`). Les deux versions du jeu doivent être identiques
+  (`NETV` = empreinte du code du moteur, sinon « rechargez la page »). Connexion coupée 25 s = le score du dernier
+  moment confirmé compte. Essais : `?footdur=1500` (mi-temps de 1 500 images), `?footlag=70` (réseau lent et
+  pertes), `?debug` (`window.__foot`).
+- **Défis et mises** (module `foot-defis.js` d'index.html, toujours chargé) : fenêtre « X te défie au Derby ! » sur
+  n'importe quelle page (Accepter et jouer / Refuser), « X a accepté ton défi ! Jouer maintenant ». La mise quitte le
+  solde à l'envoi et à l'acceptation (`wallet.spend`, gardée dans `profile.footEsc`) ; chaque navigateur se paie
+  lui-même une seule fois (`profile.footDone`, historique `profile.footHist`), écrit `da` / `db`, et le document est
+  effacé quand les deux sont payés. Défi sans réponse 15 min = expiré (mise rendue) ; accepté mais pas commencé en
+  12 min = annulé (mises rendues) ; résultat `r` écrit une seule fois (premier qui écrit). Comptes seulement.
+- **Règles Firestore à recoller** (collection `foot` ajoutée dans `firebase/firestore.rules`) : sans elles, les défis
+  en ligne sont refusés (l'entraînement marche quand même).
 
 ## Immersion
 

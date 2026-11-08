@@ -346,6 +346,62 @@ export const SCENES = {
     return s;
   },
 
+  // Le Derby: a blue striker has just shot, the ball flies into the top corner past the diving keeper, gold coins (the pot)
+  foot: async () => {
+    const s = studio({ colors: ['#22b45e', '#062a14'], light: '#bbf7d0', rim: '#86efac', seed: 117, camY: 2.2, dist: 13, lift: 0.12 });
+    const { scene } = s;
+    const grass = canvasTex(1024, 1024, (g) => { for (let i = 0; i < 12; i++) { g.fillStyle = i % 2 ? '#15803d' : '#16a34a'; g.fillRect(i * 86, 0, 86, 1024); } g.strokeStyle = '#ecfdf5'; g.lineWidth = 10; g.beginPath(); g.moveTo(0, 360); g.lineTo(1024, 360); g.stroke(); g.beginPath(); g.arc(512, 360, 170, 0, Math.PI); g.stroke(); });
+    scene.add(mesh(new THREE.PlaneGeometry(26, 26), new THREE.MeshStandardMaterial({ map: grass, roughness: 0.92, envMapIntensity: 0.25 }), { rx: -Math.PI / 2, y: -1.6, z: -4 }));
+    // the goal, a little to the right and behind
+    const post = M.plastic('#f8fafc', 0.25), gx = 1.2, gz = -4.2;
+    scene.add(mesh(new THREE.CylinderGeometry(0.09, 0.09, 3.0, 20), post, { x: gx - 2.6, y: -0.1, z: gz }));
+    scene.add(mesh(new THREE.CylinderGeometry(0.09, 0.09, 3.0, 20), post, { x: gx + 2.6, y: -0.1, z: gz }));
+    scene.add(mesh(new THREE.CylinderGeometry(0.09, 0.09, 5.3, 20), post, { x: gx, y: 1.4, z: gz, rz: Math.PI / 2 }));
+    const netT = canvasTex(512, 512, (g) => { g.clearRect(0, 0, 512, 512); g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 3; for (let i = 0; i <= 512; i += 28) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 512); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(512, i); g.stroke(); } }, { repeat: true });
+    netT.repeat.set(3, 1.8);
+    scene.add(mesh(new THREE.PlaneGeometry(5.2, 3.0), new THREE.MeshStandardMaterial({ map: netT, transparent: true, side: THREE.DoubleSide, roughness: 0.9 }), { x: gx, y: -0.1, z: gz - 1.2, shadow: false }));
+    // a footballer made of rounded pieces, posed with the joints
+    const player = ({ shirt, shorts, socks, skin, hair, num, gloves }) => {
+      const g = new THREE.Group(), mat = (c) => M.matte(c, 0.55);
+      const joint = (x, y, z) => { const j = new THREE.Group(); j.position.set(x, y, z); g.add(j); return j; };
+      const seg = (parent, r, len, m, y0 = 0) => { const c = mesh(new THREE.CapsuleGeometry(r, len, 8, 16), m, { y: y0 - len / 2 - r * 0.6 }); parent.add(c); return c; };
+      g.add(mesh(new THREE.CapsuleGeometry(0.34, 0.55, 8, 20), mat(shirt), { y: 1.2, s: [1, 1, 0.78] }));
+      g.add(mesh(new THREE.CylinderGeometry(0.33, 0.36, 0.34, 20), mat(shorts), { y: 0.68, s: [1, 1, 0.8] }));
+      if (num) { const t = label(num, { w: 256, h: 256, font: '900 170px Arial', color: '#ffffff' }); g.add(mesh(new THREE.PlaneGeometry(0.42, 0.42), new THREE.MeshStandardMaterial({ map: t, transparent: true, roughness: 0.6 }), { y: 1.25, z: -0.29, ry: Math.PI, shadow: false })); }
+      g.add(mesh(new THREE.SphereGeometry(0.23, 32, 24), mat(skin), { y: 1.92 }));
+      g.add(mesh(new THREE.SphereGeometry(0.245, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.5), mat(hair), { y: 1.95, rx: -0.25 }));
+      const legs = [-1, 1].map((k) => { const hip = joint(k * 0.17, 0.62, 0); seg(hip, 0.12, 0.42, mat(skin)); const knee = new THREE.Group(); knee.position.y = -0.7; hip.add(knee); seg(knee, 0.105, 0.42, mat(socks)); knee.add(mesh(new THREE.BoxGeometry(0.2, 0.12, 0.36), M.matte('#111111', 0.5), { y: -0.72, z: 0.08 })); return { hip, knee }; });
+      const arms = [-1, 1].map((k) => { const sh = joint(k * 0.44, 1.52, 0); seg(sh, 0.09, 0.32, mat(shirt)); const el = new THREE.Group(); el.position.y = -0.5; sh.add(el); seg(el, 0.08, 0.3, mat(gloves ? shirt : skin)); if (gloves) el.add(mesh(new THREE.SphereGeometry(0.11, 16, 12), mat(gloves), { y: -0.5 })); return { sh, el }; });
+      return { g, legs, arms };
+    };
+    // the striker: right leg through the ball, arms open
+    const st = player({ shirt: '#1d4ed8', shorts: '#f8fafc', socks: '#1d4ed8', skin: '#d9a066', hair: '#1f1a17', num: '10' });
+    st.legs[1].hip.rotation.x = -1.15; st.legs[1].knee.rotation.x = 0.25; st.legs[0].hip.rotation.x = 0.35; st.legs[0].knee.rotation.x = 0.6;
+    st.arms[0].sh.rotation.z = -1.1; st.arms[1].sh.rotation.z = 1.0; st.arms[1].sh.rotation.x = 0.5;
+    st.g.position.set(-2.6, -1.55, 0.6); st.g.rotation.set(0, Math.PI + 0.65, -0.08); st.g.scale.setScalar(1.05);
+    scene.add(st.g);
+    // the keeper: flying to his left, arms stretched to the ball
+    const gk = player({ shirt: '#f59e0b', shorts: '#1c1917', socks: '#f59e0b', skin: '#a8714a', hair: '#0b0b0b', gloves: '#f8fafc' });
+    gk.arms[0].sh.rotation.z = 2.8; gk.arms[1].sh.rotation.z = 2.5; gk.legs[0].hip.rotation.z = 0.25; gk.legs[1].hip.rotation.z = -0.1; gk.legs[1].knee.rotation.x = 0.5;
+    gk.g.position.set(1.75, 0.25, gz + 0.5); gk.g.rotation.set(0.1, -0.2, -1.25); gk.g.scale.setScalar(0.95);
+    scene.add(gk.g);
+    // the ball, just out of his reach, and its trail
+    const ballT = canvasTex(1024, 512, (g) => {
+      g.fillStyle = '#fafafa'; g.fillRect(0, 0, 1024, 512); g.fillStyle = '#111827';
+      const pent = (x, y, r) => { g.beginPath(); for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + (i * 2 * Math.PI) / 5; g.lineTo(x + Math.cos(a) * r, y + Math.sin(a) * r); } g.fill(); };
+      for (let i = 0; i < 5; i++) { pent(i * 205 + 100, 150, 52); pent(i * 205 + 200, 360, 52); }
+      pent(512, 18, 70); pent(512, 500, 70);
+    });
+    scene.add(mesh(new THREE.SphereGeometry(0.42, 64, 48), new THREE.MeshPhysicalMaterial({ map: ballT, roughness: 0.35, clearcoat: 0.6, envMapIntensity: 0.6 }), { x: 3.3, y: 1.0, z: gz + 0.3, rx: 0.4, ry: 0.9 }));
+    const trail = new THREE.CatmullRomCurve3([new THREE.Vector3(-1.6, -1.2, 1.0), new THREE.Vector3(0.8, 0.6, -0.8), new THREE.Vector3(3.0, 0.98, gz + 0.4)]);
+    scene.add(mesh(new THREE.TubeGeometry(trail, 60, 0.06, 12), new THREE.MeshBasicMaterial({ color: '#fef08a', transparent: true, opacity: 0.65, blending: THREE.AdditiveBlending, depthWrite: false }), { shadow: false }));
+    // the pot
+    [[-0.6, -1.35, 2.6, 0.9, 0.4], [0.3, -1.4, 3.1, 1.3, -0.5], [-1.4, -1.2, 3.3, 0.5, 0.9]].forEach(([x, y, z, rx, rz]) => { const c = coin(0.42, 0.1, M.gold('#ffc53d', 0.2), coinFace('k')); c.position.set(x, y, z); c.rotation.set(rx, 0, rz); scene.add(c); });
+    scene.add(shadowFloor(-1.59, 0.4));
+    scene.add(sparkles(30, 119, { spread: [10, 5, 4], center: [0.5, 2.2, -2], colors: ['#ffffff', '#fef9c3', '#bbf7d0'] }));
+    return s;
+  },
+
   // Le Ticket: a scratch card half scratched, a gold coin on it
   ticket: async () => {
     const s = studio({ colors: ['#f6c21f', '#a3176b'], light: '#fde68a', rim: '#f9a8d4', seed: 91, camY: 3.0, dist: 11.5, lift: 0.12 });

@@ -15,6 +15,7 @@ let ids = ['big-bad-wolf', ...block.split('\n').filter((l) => l.trim().startsWit
 ids = ids.filter((id) => !id.endsWith('-online'));
 if (process.argv.length > 2) ids = process.argv.slice(2);
 
+const PLAY = { foot: '[data-train]' };
 async function shoot(browser, opts, id, file, phone) {
   const ctx = await browser.newContext(opts);
   await ctx.addInitScript(() => { try { localStorage.setItem('spinbet_tuto_v1', '1'); } catch {} });
@@ -23,6 +24,14 @@ async function shoot(browser, opts, id, file, phone) {
   await p.waitForSelector('.game-host > *:not(.game-loading)', { timeout: 20000 }).catch(() => {});
   await p.waitForTimeout(4500);
   await p.addStyleTag({ content: '.ct-fab,.toasts,.ad-offer,.live-tick,.tuto,.bw-offer{display:none!important}' });
+  // games that open on a menu: a match is started first (Le Derby: the training against the computer)
+  if (PLAY[id]) {
+    await p.click(PLAY[id]).catch(() => {});
+    await p.waitForTimeout(7000);
+    await p.screenshot({ path: file });
+    await ctx.close();
+    return;
+  }
   const host = p.locator('.game-host');
   await host.scrollIntoViewIfNeeded();
   await p.waitForTimeout(400);

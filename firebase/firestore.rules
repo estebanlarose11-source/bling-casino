@@ -496,6 +496,58 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ---------- Le Derby : matchs de foot entre amis (foot-defis.js, games/foot.js) ----------
+    // foot/{id} = { p: [a, b], a, an, b, bn, s (mise de chacun, KE entiers), d (minutes), ka, kb (maillots), st, at,
+    //   acc, ja, jb (arrivée au vestiaire), of (connexion proposée par a), aw (réponse de b), r (résultat), da, db }.
+    // st : 'wait' (défi envoyé) → 'go' (accepté dans les 15 min) → 'live' (coup d'envoi) → 'end' (résultat r, écrit une
+    // seule fois) ; ou 'no' (refusé) / 'x' (annulé par a). Lu et écrit seulement par les deux joueurs ; chacun note
+    // qu'il a été payé (da / db) et le document est effacé quand l'autre l'est aussi (ou au bout de 7 jours).
+    function footOnly(f) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(f); }
+    function isSdp(x) { return x is map && x.keys().hasOnly(['g', 'sdp']) && x.g is int && x.g >= 0 && x.sdp is string && x.sdp.size() <= 30000; }
+    function isFootRes(r) {
+      return r is map && r.keys().hasOnly(['a', 'b', 'f', 'v', 'by']) && r.by == request.auth.uid
+        && r.a is int && r.a >= 0 && r.a <= 99 && r.b is int && r.b >= 0 && r.b <= 99
+        && r.f is string && r.f.size() <= 128 && r.v is bool;
+    }
+    match /foot/{id} {
+      allow read: if signedIn() && request.auth.uid in resource.data.p;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['p', 'a', 'an', 'b', 'bn', 's', 'd', 'ka', 'st', 'at'])
+        && request.resource.data.a == request.auth.uid
+        && request.resource.data.b is string && request.resource.data.b.size() > 5 && request.resource.data.b.size() < 128
+        && request.resource.data.b != request.auth.uid
+        && request.resource.data.p == [request.auth.uid, request.resource.data.b]
+        && isPseudo(request.resource.data.an) && isPseudo(request.resource.data.bn)
+        && request.resource.data.s is int && request.resource.data.s >= 0 && request.resource.data.s <= 100000000
+        && request.resource.data.d in [4, 6, 8]
+        && request.resource.data.ka is int && request.resource.data.ka >= 0 && request.resource.data.ka < 16
+        && request.resource.data.st == 'wait' && request.resource.data.at == request.time;
+      allow update: if signedIn() && request.auth.uid in resource.data.p && (
+        // b accepte (dans les 15 min) ou refuse ; a annule tant que personne n'a répondu
+        (resource.data.st == 'wait' && request.auth.uid == resource.data.b && request.time < resource.data.at + duration.value(15, 'm')
+          && footOnly(['st', 'acc', 'kb']) && request.resource.data.st == 'go' && request.resource.data.acc == request.time
+          && request.resource.data.kb is int && request.resource.data.kb >= 0 && request.resource.data.kb < 16)
+        || (resource.data.st == 'wait' && request.auth.uid == resource.data.b && footOnly(['st']) && request.resource.data.st == 'no')
+        || (resource.data.st == 'wait' && request.auth.uid == resource.data.a && footOnly(['st']) && request.resource.data.st == 'x')
+        // vestiaire et connexion directe entre les deux téléphones
+        || (resource.data.st in ['go', 'live'] && request.auth.uid == resource.data.a && footOnly(['ja']) && request.resource.data.ja == request.time)
+        || (resource.data.st in ['go', 'live'] && request.auth.uid == resource.data.b && footOnly(['jb']) && request.resource.data.jb == request.time)
+        || (resource.data.st in ['go', 'live'] && request.auth.uid == resource.data.a && footOnly(['of']) && isSdp(request.resource.data.of))
+        || (resource.data.st in ['go', 'live'] && request.auth.uid == resource.data.b && footOnly(['aw']) && isSdp(request.resource.data.aw))
+        || (resource.data.st == 'go' && request.auth.uid == resource.data.a && footOnly(['st']) && request.resource.data.st == 'live')
+        // le résultat, une seule fois
+        || (resource.data.st in ['go', 'live'] && !('r' in resource.data) && footOnly(['st', 'r'])
+          && request.resource.data.st == 'end' && isFootRes(request.resource.data.r))
+        // chacun note qu'il a été payé
+        || (request.auth.uid == resource.data.a && footOnly(['da']) && request.resource.data.da == true)
+        || (request.auth.uid == resource.data.b && footOnly(['db']) && request.resource.data.db == true)
+      );
+      allow delete: if signedIn() && request.auth.uid in resource.data.p && (
+        (request.auth.uid == resource.data.a && resource.data.get('db', false) == true)
+        || (request.auth.uid == resource.data.b && resource.data.get('da', false) == true)
+        || request.time > resource.data.at + duration.value(7, 'd'));
+    }
+
     // ---------- Cartes à collectionner : le Marché (jcc.js) ----------
     // market/{id} = { s (vendeur), sn, c (carte), h (brillante), p (prix, KE entiers), st, at, b, bn, sa }.
     // Les comptes connectés lisent tout. Le vendeur crée l'offre à son nom (st 'open'). Ensuite seulement :

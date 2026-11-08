@@ -27,6 +27,8 @@ Ce que ça change :
 - les tournois du soir et du week-end (`tournois`) : un score ne s’écrit que pendant le tournoi et ne peut que monter ;
 - le jackpot commun (`jackpot`, `jackpotwins`) : la cagnotte ne fait que monter, sauf pour celui qui touche le max win ;
 - les duels entre amis (`duels`) : lus par les deux joueurs seulement, chacun n’écrit que ses propres tours ;
+- Le Derby, le match de foot entre amis (`foot`) : lu et écrit par les deux joueurs seulement (défi, acceptation,
+  connexion directe entre les deux téléphones, résultat écrit une seule fois), effacé quand les deux sont payés ;
 - tout le reste de la base est fermé.
 
 ## 1 bis. Chat général et envoi de KE entre joueurs

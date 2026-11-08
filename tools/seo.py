@@ -77,6 +77,7 @@ KW = {
     'vortex': 'jeu du vortex gratuit', 'casse': 'jeu du coffre-fort gratuit', 'pileface': 'pile ou face en ligne gratuit',
     'robots': 'course de robots gratuite', 'poulet': 'jeu du poulet gratuit', 'gratteciel': 'jeu de cubes à empiler gratuit',
     'penalty': 'jeu de penalty gratuit', 'ticket': 'ticket à gratter gratuit en ligne', 'billes': 'course de billes gratuite', 'pilote': 'jeu d’avion gratuit avec multiplicateurs',
+    'foot': 'jeu de foot en ligne gratuit entre amis',
 }
 KW_CAT = {'slot': 'machine à sous gratuite', 'table': 'jeu de casino gratuit', 'quick': 'jeu rapide gratuit'}
 kw_of = lambda g: KW.get(g['id']) or KW_CAT.get(g['cat'], 'jeu de casino gratuit')
@@ -98,6 +99,15 @@ def tips(g):
     """Tips for the player, written from the game's catalogue entry (category, volatility, features, max win)."""
     name, vol, feats, f = g['name'], int(g.get('vol', 3)), [plain(x) for x in g.get('features', [])], ' '.join(g.get('features', [])).lower()
     out = []
+    if g['id'] == 'foot':  # Le Derby: a football match between friends, not a game against the house
+        return [
+            "Commence par l’entraînement contre l’ordinateur (Facile, Normal, Difficile) pour apprendre les commandes avant de miser contre un ami.",
+            "Tiens le bouton TIR pour frapper plus fort et pousse le stick vers un côté du but pour viser le poteau : une frappe trop chargée passe au-dessus.",
+            "Ne tacle pas par derrière : c’est faute, et dans ta surface c’est penalty. Préfère le tacle debout quand l’attaquant est face à toi.",
+            "En défense, PASSE change de joueur et TIR appelle un coéquipier au pressing : à deux, le ballon se récupère beaucoup plus vite.",
+            "Avec le ballon, TACLE devient DRIBBLE : un crochet rapide qui évite le tacle de l’adversaire.",
+            "La mise est libre : chacun mise la même somme, le gagnant prend toute la cagnotte et un match nul rend sa mise à chacun. Tout est en KE, une monnaie fictive.",
+        ]
     if g['cat'] == 'slot':
         if vol >= 4:
             out.append(f"Volatilité {'extrême' if vol >= 5 else 'élevée'} : {name} peut rester calme plusieurs dizaines de tours puis tout donner d’un coup dans le bonus. Joue petit (1 % de ton solde par tour environ) pour tenir jusqu’au bonus.")
@@ -133,6 +143,12 @@ def tips(g):
 
 def faq(g):
     name = g['name']
+    if g['id'] == 'foot':
+        return [(f"{name} est-il gratuit ?", f"Oui. {name} se joue gratuitement sur SpinBet Casino, dans le navigateur, sur téléphone comme sur ordinateur, avec des KE (monnaie fictive) : aucun dépôt, rien à télécharger."),
+                ("Comment défier un ami ?", "Crée ton compte, ajoute ton ami avec son pseudo (chat › Amis), puis dans Le Derby choisis-le, ta mise et la durée du match. Dès qu’il accepte, le match commence en direct sur vos deux appareils."),
+                ("Que se passe-t-il en cas de match nul ?", "Chacun récupère sa mise. Sinon le gagnant prend toute la cagnotte (les deux mises). Abandonner en cours de match fait perdre."),
+                (f"Peut-on jouer à {name} sur ordinateur ?", "Oui : les flèches ou ZQSD pour courir, K pour la passe, L ou Espace pour le tir, J pour le tacle et Maj pour sprinter. Une manette marche aussi."),
+                (f"Peut-on gagner de l’argent réel à {name} ?", "Non. SpinBet Casino est un jeu de divertissement : les KE n’ont aucune valeur réelle et ne s’échangent pas contre de l’argent.")]
     q = [(f"{name} est-il gratuit ?", f"Oui. {name} se joue gratuitement sur SpinBet Casino, dans le navigateur, sur téléphone comme sur ordinateur, avec des KE (monnaie fictive) : aucun dépôt."),
          (f"Peut-on gagner de l’argent réel à {name} ?", "Non. SpinBet Casino est un jeu de divertissement : les KE n’ont aucune valeur réelle et ne s’échangent pas contre de l’argent."),
          (f"Quel est le RTP de {name} ?", f"Le retour au joueur de {name} est {g.get('rtp', '≈ 92 %')}" + (f", avec un gain maximum de {plain(g['max'])} la mise." if g.get('max') else '.'))]
