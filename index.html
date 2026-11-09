@@ -6120,6 +6120,9 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 @keyframes bjvClapL { 50% { transform: rotate(-7deg) translate(10px, -6px); } } @keyframes bjvClapR { 50% { transform: rotate(7deg) translate(-10px, -6px); } }
 .bjv-persp { position: absolute; left: 0; top: 0; width: 1280px; height: 830px; perspective: 1100px; perspective-origin: 50% 500px; transform-style: preserve-3d; z-index: 2; }
 .bjv-table { position: absolute; inset: 0; transform-origin: 50% 100%; transform: rotateX(var(--tilt)); transform-style: preserve-3d; }
+/* the 3D boxes must not catch taps (they sit in front of the tilted table): only the chips and the circle do */
+.bjv-world, .bjv-persp, .bjv-table, .bjv-room, .bjv-dealer, .bjv-dcards, .bjv-up { pointer-events: none; }
+.bjv-table .bjv-spot, .bjv-table .bjv-pick { pointer-events: auto; }
 .bjv-felt { position: absolute; left: -60px; top: -30px; overflow: visible; pointer-events: none; }
 .bjv-defs { position: absolute; }
 .bjv-mark { position: absolute; width: 2px; height: 2px; pointer-events: none; }
