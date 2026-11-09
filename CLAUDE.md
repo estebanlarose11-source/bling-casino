@@ -515,6 +515,16 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   total d'un tour bonus compris (`sb:roundend` dans `achievements.js`) : avant, seul le plus gros paiement comptait,
   et un bonus payé tour gratuit par tour gratuit (La Tour Bling…) n'atteignait jamais ×200.
 
+- **Budget d'écritures Firebase** (forfait gratuit Spark : 20 000 écritures par jour, remis à zéro vers 9 h, heure de
+  Paris) : le 9 novembre 2026 il a été épuisé vers 21 h 30 (profil enregistré toutes les 4 s + classement à chaque
+  fois ≈ 30 écritures par minute et par joueur) : plus aucune sauvegarde, les soldes revenaient en arrière, amis et
+  défis en ligne en panne. Depuis : profil toutes les 25 s au plus (`SAVE_DELAY`, et tout de suite quand la page est
+  cachée ou quittée), classement toutes les 3 min (`BOARD_EVERY`), statistiques et jackpot toutes les 5 min.
+  **Copie sur l'appareil** (`spinbet_cloud_bak`, `profile.savedAt`) : si l'écriture échoue, la visite suivante sur cet
+  appareil repart de la copie (message « Sauvegarde en ligne impossible… » au 2e échec, nouvel essai de plus en plus
+  espacé). Les outils admin (`solde.mjs`, `succes.mjs`) écrivent `admAt` : leur changement passe toujours avant la
+  copie. **Ne jamais ajouter d'écriture fréquente** (à chaque tour, chaque seconde) ; si le site grandit encore, passer
+  au forfait Blaze (payé à l'usage, quelques centimes au-delà de 20 000 écritures).
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu
   (`stats/AAAA-MM-JJ`, envoyés chaque minute).
 - **Plus de page Admin** (supprimée à la demande du propriétaire : il gère tout en passant par Claude). Les données

@@ -7458,7 +7458,14 @@ const { wallet, START } = __mods['wallet.js'];
 const { cloud } = __mods['cloud.js'];
 
 const KEY = 'bling.profiles.v1';
-const SAVE_DELAY = 4000; // cloud writes are grouped: one write per 4 s of play at most
+// Cloud writes are grouped: one write per 25 s of play at most (it was 4 s, plus the leaderboard each time: about
+// 30 writes a minute per player, and the free Firebase plan (20 000 writes a day) ran out in the evening, 9 nov. 2026:
+// nothing was saved any more, balances came back to the last save). The page being hidden or left still saves at once.
+const SAVE_DELAY = 25000, BOARD_EVERY = 3 * 60000;
+// Every save is also kept on this device (BAK): if the cloud write fails (quota, network), the next visit on this
+// device starts from it instead of the older cloud copy. An admin change (tools/admin/solde.mjs, admAt) always wins.
+const BAK = 'spinbet_cloud_bak';
+function readBak(uid) { try { const b = JSON.parse(localStorage.getItem(BAK) || 'null'); return b && b.uid === uid && b.data ? b : null; } catch { return null; } }
 const NAME_MIN = 3, NAME_MAX = 16;
 const NAME_RE = /^[\p{L}\p{N}_.-]+(?: [\p{L}\p{N}_.-]+)*$/u;
 
@@ -7534,6 +7541,9 @@ class Profiles extends EventTarget {
   async openAccount(user, pseudo) {
     let data = await cloud.load(user.uid);
     const isNew = !data;
+    // a newer copy kept on this device (a save that never reached the cloud) wins over the cloud copy
+    const bak = data && readBak(user.uid);
+    if (bak && bak.t > (data.savedAt || 0) + 1000 && bak.t > (data.admAt || 0)) { data = { ...data, ...bak.data, admAt: data.admAt }; this.fromBak = true; }
     if (isNew) {
       data = blank(pseudo || user.email.split('@')[0], false);
       // An account created while playing as a guest keeps what the guest won: balance, stats, level, missions…
@@ -7550,7 +7560,8 @@ class Profiles extends EventTarget {
     this.mode = 'cloud';
     this.store = { current: user.uid, users: { [user.uid]: data } };
     this.bind();
-    this.publish();
+    this.publish(true);
+    if (this.fromBak) { this.fromBak = false; this.save(); }
     this.dispatchEvent(new CustomEvent('change', { detail: { isNew } }));
     return { profile: data, isNew };
   }
@@ -7590,15 +7601,27 @@ class Profiles extends EventTarget {
     clearTimeout(this.saveT);
     this.saveT = null;
     if (this.mode === 'cloud' && this.current) {
-      cloud.save(this.store.current, this.current).catch((e) => console.error(e));
-      this.publish();
+      const me = this.current, uid = this.store.current;
+      me.savedAt = Date.now();
+      try { localStorage.setItem(BAK, JSON.stringify({ uid, t: me.savedAt, data: me })); } catch { /* storage full or unavailable */ }
+      cloud.save(uid, me).then(() => { this.saveFail = 0; }).catch((e) => {
+        console.error(e);
+        // the cloud refuses (Firebase quota, network): try again later, the copy on this device keeps the game
+        this.saveFail = (this.saveFail || 0) + 1;
+        if (this.mode === 'cloud' && !this.saveT) this.saveT = setTimeout(() => this.flush(), Math.min(5 * 60000, SAVE_DELAY * 2 ** this.saveFail));
+        if (this.saveFail === 2 && !this.warned) { this.warned = true; try { __mods['ui.js'].toast('⚠️ Sauvegarde en ligne impossible pour le moment : ta partie reste gardée sur cet appareil et sera envoyée dès que possible', 'warn'); } catch { /* ignore */ } }
+      });
+      this.publish(document.hidden);
     }
   }
 
   // The account's public leaderboard entry: level, balance and best wins (in KE).
-  publish() {
+  publish(force) {
     const me = this.current;
     if (this.mode !== 'cloud' || !me) return;
+    // the leaderboard line: every 3 minutes at most (and when the page is hidden or the account opens)
+    if (!force && Date.now() - (this.pubAt || 0) < BOARD_EVERY) return;
+    this.pubAt = Date.now();
     const { xpToNext } = __mods['progress.js'];
     const level = me.prog?.level || 1, xp = me.prog?.xp || 0, need = xpToNext(level);
     const entry = {
@@ -7624,7 +7647,7 @@ class Profiles extends EventTarget {
     const pres = __mods['achievements.js']?.totalPrestige?.() || 0;
     if (!this.noPres && pres > 0) entry.pres = pres;
     cloud.saveBoard(this.store.current, entry).catch((e) => {
-      if ('pres' in entry) { this.noPres = true; delete entry.pres; return cloud.saveBoard(this.store.current, entry).catch(() => this.publish()); }
+      if ('pres' in entry) { this.noPres = true; delete entry.pres; return cloud.saveBoard(this.store.current, entry).catch(() => this.publish(true)); }
       const extra = ['bestGame', 'bestBonusGame', 'look'].filter((k) => k in entry);
       if (extra.length) { this.noExtra = true; extra.forEach((k) => delete entry[k]); }
       else if ('ach' in entry) { this.noAch = true; delete entry.ach; }
@@ -15480,7 +15503,8 @@ function flush() {
   const o = opens, s = spins; opens = {}; spins = {};
   cloud.bumpStats(day(), o, s).catch(() => { for (const k in o) opens[k] = (opens[k] || 0) + o[k]; for (const k in s) spins[k] = (spins[k] || 0) + s[k]; });
 }
-setInterval(flush, 60000);
+setInterval(flush, 5 * 60000); // every 5 min (fewer Firebase writes) and when the page is left
+document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
 addEventListener('pagehide', flush);
 document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
 
@@ -17402,7 +17426,8 @@ async function flush() {
   pend = Math.max(0, pend - ke);
   try { await cloud.feedJackpot(ke); } catch (e) { pend += ke; console.warn('Jackpot : cagnotte non envoyée (règles Firestore à jour ?)', e); }
 }
-setInterval(flush, 60000);
+setInterval(flush, 5 * 60000); // every 5 min (fewer Firebase writes) and when the page is left
+document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
 addEventListener('pagehide', flush);
 
 async function start() {

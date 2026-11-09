@@ -37,7 +37,7 @@ async function main() {
   const p = (ach.p || {})[game] || 0;
   if (x <= before) { console.log(`ℹ️ « ${name} » a déjà ×${before} sur ${game} (prestige ${p}) : rien à changer.`); return; }
   await admin.auth().revokeRefreshTokens(uid).catch(() => {});
-  await ref.update({ [`ach.s.${game}`]: { n: 0, w: 0, b: 0, a: 0, ...st, x } });
+  await ref.update({ [`ach.s.${game}`]: { n: 0, w: 0, b: 0, a: 0, ...st, x }, admAt: Date.now() }); // admAt: the copy kept on the device must not undo it
   console.log(`✅ « ${name} » · ${game} (prestige ${p}) : meilleur gain ×${before} → ×${x}. Il récupère sa récompense dans Succès.`);
   console.log('   Ses sessions sont coupées : il doit se reconnecter (ou recharger la page).');
 }

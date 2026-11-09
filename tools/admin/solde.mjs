@@ -47,7 +47,8 @@ async function main() {
     if (st.gameHist) up['stats.gameHist'] = Object.fromEntries(Object.entries(st.gameHist).map(([g, l]) => [g, (l || []).filter((h) => !(h.amount > rec))]));
     bup.best = Math.min(b.data()?.best || 0, rec); bup.bestBonus = Math.min(b.data()?.bestBonus || 0, rec);
   }
-  if (Object.keys(up).length) await userRef.update(up);
+  // admAt: the copy of the profile kept on the player's device (profile.js, spinbet_cloud_bak) must not undo this change
+  if (Object.keys(up).length) await userRef.update({ ...up, admAt: Date.now() });
   if (b.exists && Object.keys(bup).length) await boardRef.update({ ...bup, updated: Date.now() });
   console.log(keep ? `✅ Solde de « ${name} » inchangé : ${fmt(before)}.` : `✅ Solde de « ${name} » : ${fmt(before)} → ${fmt(ke)} (compte${b.exists ? ' et classement' : ''}).`);
   if (b.exists) console.log(`   Records avant : un tour ${fmt(b.data().best || 0)}, bonus ${fmt(b.data().bestBonus || 0)}${rec != null ? ` → maintenant ${fmt(bup.best)} / ${fmt(bup.bestBonus)}` : ' (inchangés)'}.`);
