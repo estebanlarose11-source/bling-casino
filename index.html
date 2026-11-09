@@ -14846,6 +14846,14 @@ addEventListener('sb:feature', (e) => {
   if (d.re) return;
   bump(d.game, (st) => { st.a++; if (!d.bought) st.b++; });
 });
+// « gain d'au moins ×… » also counts the whole round, bonus included: a bonus pays each free spin on its own (a
+// ×220 bonus of La Tour Bling = many small payouts), sb:roundend gives the total of the round in × the stake.
+addEventListener('sb:roundend', (e) => {
+  const d = e.detail || {};
+  if (!(d.x > 0) || !d.game) return;
+  const x = Math.round(d.x * 10) / 10;
+  if (x > statsOf(d.game).x) bump(d.game, (st) => { st.x = Math.max(st.x, x); });
+});
 
 // --- rewards ---
 function claim(gid, id) {

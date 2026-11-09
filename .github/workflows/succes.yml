@@ -1,0 +1,35 @@
+# Compter un gain qui n'a pas débloqué un succès « gain d'au moins ×… » (tools/admin/succes.mjs) :
+# Actions → « Succès » → Run workflow → pseudo, id du jeu, gain en ×. Secret nécessaire : FIREBASE_SERVICE_ACCOUNT.
+name: Succès
+
+on:
+  workflow_dispatch:
+    inputs:
+      pseudo:
+        description: 'Pseudo du joueur (exactement comme dans le jeu)'
+        required: true
+      jeu:
+        description: 'Id du jeu (ex. bling = La Tour Bling)'
+        required: true
+      gain_x:
+        description: 'Gain obtenu en × la mise (ex. 220)'
+        required: true
+
+jobs:
+  succes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+        working-directory: tools/push
+      - name: Corriger le succès
+        run: cp tools/admin/succes.mjs tools/push/succes.mjs && node tools/push/succes.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PSEUDO: ${{ github.event.inputs.pseudo }}
+          JEU: ${{ github.event.inputs.jeu }}
+          GAIN_X: ${{ github.event.inputs.gain_x }}

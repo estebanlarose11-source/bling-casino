@@ -439,6 +439,12 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   bonus, retire les gains plus gros de ses listes) : compte (`users/{uid}.bal`, en centimes) et
   classement, sessions du joueur coupées (un onglet resté ouvert peut réécrire l'ancien solde pendant ≤ 1 h).
 
+- **Succès « gain d'au moins ×… » oubliés** : GitHub → Actions → « Succès » (`.github/workflows/succes.yml`,
+  `tools/admin/succes.mjs`) avec le pseudo, l'id du jeu et le × prouvé : monte `users/{uid}.ach.s.<jeu>.x` (jamais
+  plus bas), le joueur récupère la récompense dans Succès. Depuis le 9 novembre 2026, ces succès comptent aussi le
+  total d'un tour bonus compris (`sb:roundend` dans `achievements.js`) : avant, seul le plus gros paiement comptait,
+  et un bonus payé tour gratuit par tour gratuit (La Tour Bling…) n'atteignait jamais ×200.
+
 - `monitor.js` : erreurs JavaScript des joueurs (`errors/`) et compteurs d'ouvertures / de tours par jeu
   (`stats/AAAA-MM-JJ`, envoyés chaque minute).
 - **Plus de page Admin** (supprimée à la demande du propriétaire : il gère tout en passant par Claude). Les données
