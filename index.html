@@ -11356,6 +11356,8 @@ const UPDATES = [
   { game: 'bj-online', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['La même table que Le 21, avec la croupière qui distribue', 'Les autres joueurs sont assis autour de toi : leur nom, leur mise et leurs cartes', 'Choisis ta mise avec les jetons sur le tapis, puis PRÊT'] },
   { game: 'blackjack', date: '2026-11-09', title: 'Les jetons répondent au doigt', items: ['Tu peux enfin choisir ta mise : touche les jetons sur le tapis ou le cercle de mise', 'La même table pour les 3 blackjacks du casino'] },
   { game: 'blackjack', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['Une vraie table vue depuis ta place, avec la croupière qui distribue les cartes', 'Choisis tes jetons directement sur le tapis et pose-les sur le cercle de mise', 'Grands boutons en bas : Doubler, Vider, Répéter, Distribuer, puis Séparer, Rester, Tirer', 'La caméra s’approche pendant que tu mises et recule pour la partie', 'Table plus claire et plus spacieuse, avec l’ambiance de la salle de casino au fond'] },
+  { game: 'boxe', date: '2026-11-09', title: 'Défis entre amis réparés', items: ['La liste de tes amis s’affiche bien dans le vestiaire, même quand elle arrive après l’ouverture du jeu', 'Tes amis qui se connectent apparaissent « en ligne » tout seuls'] },
+  { game: 'foot', date: '2026-11-09', title: 'Défis entre amis réparés', items: ['La liste de tes amis s’affiche bien dans le vestiaire, même quand elle arrive après l’ouverture du jeu', 'Tes amis qui se connectent apparaissent « en ligne » tout seuls'] },
   { game: 'boxe', date: '2026-11-09', isNew: true, title: 'Nouveau : la boxe entre amis', items: ['Un vrai combat de boxe en direct contre un ami', 'Misez la même somme : le vainqueur rafle la bourse, match nul = mises rendues', 'DROITE, CROCHET, UPPERCUT, coups au corps, ESQUIVE et GARDE', 'Choisis ta caméra : 1re personne (tes gants devant toi), 3e personne ou vue TV', 'Knockdowns avec le compte de l’arbitre, K.-O. et décision des 3 juges', 'Entraîne-toi contre l’ordinateur en 3 niveaux'] },
   { game: 'foot', date: '2026-11-08', isNew: true, title: 'Nouveau : le match de foot entre amis', items: ['Un vrai match 11 contre 11 en direct contre un ami', 'Misez la même somme : le gagnant rafle tout, match nul = mises rendues', 'Stick et boutons PASSE, TIR, TACLE, SPRINT sur téléphone, clavier ou manette sur ordinateur', 'Caméra de la télé, ralenti de chaque but, corners, coups francs et penaltys', 'Entraîne-toi contre l’ordinateur en 3 niveaux'] },
   { game: 'gratteciel', date: '2026-11-06', title: 'Une vraie tour, sans coup de vent', items: ['Plus aucun coup de vent : la tour ne tombe plus au hasard', 'La tour tient tant qu’elle est équilibrée : les cubes décalés la font pencher', 'Un cube trop raté ou une tour qui penche trop, et tout s’écroule', 'Gains recalculés pour ce nouveau jeu d’adresse (jusqu’à ×22)'] },
@@ -14340,8 +14342,8 @@ const FILES = {
   volcan: ['volcan', 'games/impl/volcan.js', 'VolcanGame', 'e6c05773cc'],
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
   filon: ['filon', 'games/impl/filon.js', 'FilonGame', '45904335f9'],
-  foot: ['foot', 'games/impl/foot.js', 'FootGame', '8290160e24'],
-  boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '82efe1a3d5'],
+  foot: ['foot', 'games/impl/foot.js', 'FootGame', '1025072609'],
+  boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '48602d9af5'],
 };
 // files a game needs first (the shared blackjack table of the 3 blackjacks)
 const DEPS = { blackjack: ['bjtable'], lightningbj: ['bjtable'], 'bj-online': ['bjtable'] };

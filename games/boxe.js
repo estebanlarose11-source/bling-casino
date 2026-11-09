@@ -1457,12 +1457,19 @@ class BoxeGame {
     if (j) setTimeout(() => this.enterRoom(j), 50);
     this.onUnload = (e) => { if (this.match && this.online && !this.match.over) { e.preventDefault(); e.returnValue = ''; } };
     addEventListener('beforeunload', this.onUnload);
+    // the friends list arrives a few seconds after the page (Firestore), and friends come online or leave:
+    // the lobby follows (before, it stayed on « Ajoute d'abord tes amis »)
+    const idle = () => { if (!this.dead && !this.match && !this.room) this.refresh(); };
+    const FB = __mods['friends.js']?.bus;
+    FB?.addEventListener('change', idle);
+    this.offFr = () => FB?.removeEventListener('change', idle);
+    this.frT = setInterval(idle, 10000);
   }
   destroy() {
     this.dead = true;
     if (this.match && this.online && !this.match.over) this.forfeit(true);
     this.leaveRoom(); this.endMatch();
-    this.off?.(); this.music.stop();
+    this.off?.(); this.offFr?.(); clearInterval(this.frT); this.music.stop();
     removeEventListener('beforeunload', this.onUnload);
   }
   me() { return this.FD?.me?.() || null; }
