@@ -103,20 +103,31 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **La Tour Bling** : les mots `.bt-word` / `.bt-combo` doivent rester en position absolue (la règle
   `.g-bling .slot-stage > :not(...)` les en exclut ; avant, ils tombaient sous la grille, coupés). Reflets des cases
   animés en `transform` et coupés pendant les tours (fluidité sur téléphone).
-- **Le 21** (`games/blackjack.js`, demande du propriétaire, d'après des captures d'un autre jeu : même principe, pas
-  ses couleurs) : vue « table de casino » `.bjv`. La table est un plan en 3D CSS (`.bjv-table`, `rotateX(74deg)`,
-  perspective 1100 px, coordonnées du plan `W` × `H`) vu depuis la place du joueur ; tapis vert, rail noir à liseré
-  doré, rail de jetons, sabot et bac à cartes. Croupière en SVG (`DEALER_BODY` derrière la table, `DEALER_ARMS`
-  devant : avant-bras et mains qui distribuent, classes `dealP` / `dealD` / `flip` / `happy`), tête hors du cadre.
-  Cartes posées sur le tapis et un peu redressées (`.bjv-lean`), bulles de score et plaques de résultat face au
-  joueur (`.bjv-up`). 5 jetons choisis selon le solde (`picks()`) posés sur le tapis devant le cercle de mise
-  (toucher = poser). Barre du bas : 4 grands boutons (Doubler / Vider / Répéter / Distribuer, puis Séparer / Rester /
-  Tirer / Doubler, et Miser / Rejouer à la fin) avec l'avatar et le solde au milieu. Caméra (`camera()`, mesurée une
-  fois par `measure()`) : proche du cercle pendant les mises, reculée pour la partie, jamais au-dessus du cou de la
-  croupière ; hors plein écran la hauteur de la table s'adapte (2:1 sur ordinateur). Les règles et gains ne
-  changent pas. Demande du propriétaire : croupière reculée (petite, coupée à la taille par le bord de la table,
-  `.bjv-dealer` 256 px de large), tapis clair avec projecteur (`bjvSpot`), lumières et tables floues au fond
-  (`.bjv-glow`), messages qui s'effacent après 4,5 s. Le CSS est à la fin de la couche `finition`.
+- **Les 3 blackjacks ont la même table** (demande du propriétaire, d'après des captures d'un autre jeu : même principe,
+  pas ses couleurs) : `games/bjtable.js` (`BjTableGame`, chargé avant eux grâce à `DEPS` du chargeur
+  `games/impl/index.js` ; entrée `bjtable` dans `FILES`, `hasImpl` l'ignore). Le 21 (`blackjack.js`), Le 21 Électrique
+  (`lightningbj.js`) et Le 21 Online (`bj-online.js`) n'ont plus que leurs règles et étendent `BjTableGame`.
+  Vue `.bjv` (classe `bjv-game` sur le jeu ; CSS à la fin de la couche `finition`) : plan en 3D CSS (`.bjv-table`,
+  `rotateX(74deg)`, perspective 1100 px, coordonnées du plan `W` × `H`) vu depuis la place du joueur ; tapis vert, rail
+  noir à liseré doré, rail de jetons, sabot et bac à cartes. Croupière en SVG (`DEALER_BODY` derrière la table,
+  `DEALER_ARMS` devant : avant-bras et mains qui distribuent, classes `dealP` / `dealD` / `flip` / `happy`), reculée
+  (petite, coupée à la taille par le bord de la table), tête hors du cadre. Cartes posées sur le tapis et un peu
+  redressées (`.bjv-lean`), bulles de score et plaques de résultat face au joueur (`.bjv-up`). Mises : `this.bets`
+  (`main` + une entrée par mise annexe), 5 jetons choisis selon le solde (`picks()`) posés sur le tapis ; toucher un
+  jeton = le poser sur le cercle principal, toucher un cercle = y poser le jeton choisi ; `costOf()` = ce que coûtent
+  les mises (Le 21 Électrique y ajoute ses frais éclair). Barre du bas : 4 grands boutons (`buttons()` / `can()` /
+  `onButton()` de chaque jeu) avec l'avatar et le solde au milieu. Caméra (`camera()`, mesurée une fois par
+  `measure()`) : proche du cercle pendant les mises, reculée pour la partie, jamais au-dessus du cou de la croupière ;
+  hors plein écran la hauteur de la table s'adapte (2:1 sur ordinateur). Tapis clair avec projecteur (`bjvSpot`),
+  lumières et tables floues au fond (`.bjv-glow`), messages qui s'effacent après 4,5 s.
+  **Pièges** : les boîtes 3D (`.bjv-persp`, `.bjv-table`…) sont en `pointer-events: none` (sinon elles prennent tous
+  les touchers et les jetons ne répondent plus, bug de novembre 2026) ; ne jamais donner à un élément de la table une
+  classe déjà utilisée par le site (`side` = le menu latéral, décalé hors de l'écran sur téléphone).
+  Le 21 Électrique : mises annexes en cercles (`SIDES` : Paires et 21+3 de part et d'autre du cercle, Bust It près de
+  la croupière), résultats sur leurs cercles (`sideResult`), panneau des multiplicateurs en haut (`.lbv-board`).
+  Le 21 Online : les autres joueurs assis aux places `SEATS` (4 au plus : nom, mise, cartes, résultat ; tout le salon
+  et le chat restent sous la table hors plein écran), chronomètre du salon en haut (`.bjo-timer`).
+  Les règles et les gains des 3 jeux n'ont pas changé.
 - **Paliers de prestige** (`achievements.js`, `PR_TIERS`) : Bronze 1, Argent 5, Or 10, Platine 25, Diamant 50, Légende 100
   prestiges en tout, en médailles sur le profil (`tiersHTML`) ; le total `pres` est publié dans `leaderboard` et le
   profil public (`#@pseudo`) montre le palier. **Règles Firestore à recoller** (champ `pres` ajouté) : en attendant, le

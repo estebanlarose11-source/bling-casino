@@ -6081,15 +6081,15 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .ev-card.ev-invite { --ac: #f59e0b; } .ev-card.ev-invite small { color: #fcd34d; } .ev-card.ev-invite b { font-family: KeCoin, 'Bebas Neue', Impact, sans-serif; }
 
 /* ---------- Le 21 : table de casino en perspective (games/blackjack.js, .bjv) ---------- */
-.game-host .slot.g-blackjack { display: block !important; padding: 0 !important; max-width: none !important; }
-.game-host:has(> .g-blackjack) { max-width: 1240px; }
-.game-host.is-full:has(> .g-blackjack) { padding: 0 !important; max-width: none; }
-.slot.g-blackjack > .slot-head, .slot.g-blackjack > .win-bar, .slot.g-blackjack > .controls { display: none !important; }
-.slot.g-blackjack > .slot-frame { padding: 0 !important; margin: 0 !important; background: none !important; box-shadow: none !important; border: 0 !important; position: static !important; }
-.slot.g-blackjack .slot-stage { padding: 0 !important; background: none !important; box-shadow: none !important; border: 0 !important; }
+.game-host .slot.bjv-game { display: block !important; padding: 0 !important; max-width: none !important; }
+.game-host:has(> .bjv-game) { max-width: 1240px; }
+.game-host.is-full:has(> .bjv-game) { padding: 0 !important; max-width: none; }
+.slot.bjv-game > .slot-head, .slot.bjv-game > .win-bar, .slot.bjv-game > .controls { display: none !important; }
+.slot.bjv-game > .slot-frame { padding: 0 !important; margin: 0 !important; background: none !important; box-shadow: none !important; border: 0 !important; position: static !important; }
+.slot.bjv-game .slot-stage { padding: 0 !important; background: none !important; box-shadow: none !important; border: 0 !important; }
 .bjv { position: relative; height: clamp(460px, min(78vh, 62vw), 820px); overflow: hidden; border-radius: 14px; background: #1c0810; user-select: none; -webkit-user-select: none; touch-action: manipulation; isolation: isolate; }
 @media (max-width: 700px), (orientation: portrait) { .bjv { height: clamp(420px, calc(100dvh - 170px), 820px); border-radius: 10px; } }
-.game-host.is-full .slot.g-blackjack .bjv { height: 100dvh; border-radius: 0; }
+.game-host.is-full .slot.bjv-game .bjv { height: 100dvh; border-radius: 0; }
 .bjv-world { position: absolute; left: 0; top: 0; width: 1280px; height: 1200px; transform-origin: 0 0; transition: transform .9s cubic-bezier(.45, .05, .25, 1); }
 .bjv-room { position: absolute; left: -2600px; right: -2600px; top: -2600px; bottom: -800px; background-size: 120px 120px; }
 .bjv-glow { position: absolute; left: -500px; right: -500px; top: 0; height: 700px; pointer-events: none; background:
@@ -6121,7 +6121,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .bjv-persp { position: absolute; left: 0; top: 0; width: 1280px; height: 830px; perspective: 1100px; perspective-origin: 50% 500px; transform-style: preserve-3d; z-index: 2; }
 .bjv-table { position: absolute; inset: 0; transform-origin: 50% 100%; transform: rotateX(var(--tilt)); transform-style: preserve-3d; }
 /* the 3D boxes must not catch taps (they sit in front of the tilted table): only the chips and the circle do */
-.bjv-world, .bjv-persp, .bjv-table, .bjv-room, .bjv-dealer, .bjv-dcards, .bjv-up { pointer-events: none; }
+.bjv-world, .bjv-persp, .bjv-table, .bjv-room, .bjv-dealer, .bjv-dcards, .bjv-seat, .bjv-up { pointer-events: none; }
 .bjv-table .bjv-spot, .bjv-table .bjv-pick { pointer-events: auto; }
 .bjv-felt { position: absolute; left: -60px; top: -30px; overflow: visible; pointer-events: none; }
 .bjv-defs { position: absolute; }
@@ -6129,7 +6129,39 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .bjv-up { position: absolute; transform-origin: 50% 100%; transform: translate(-50%, -100%) rotateX(calc(-1 * var(--tilt))); }
 .bjv-shoe { width: 150px; height: 120px; } .bjv-discard { width: 90px; height: 100px; }
 .bjv-shoe svg, .bjv-discard svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .5)); }
-.bjv-dcards, .bjv-hand { position: absolute; width: 0; height: 0; transform-style: preserve-3d; }
+.bjv-dcards, .bjv-hand, .bjv-seat { position: absolute; width: 0; height: 0; transform-style: preserve-3d; }
+.bjv-spot.bjv-sb .bjv-stack i { left: -36px; top: -36px; width: 72px; height: 72px; }
+.bjv-spot.bjv-sb .bjv-amt { font-size: 19px; padding: 3px 10px; }
+.bjv-sres { left: 50%; top: 50%; z-index: 40; padding: 6px 12px; border-radius: 10px; white-space: nowrap; font: 900 18px/1.1 KeCoin, Archivo, sans-serif; color: #fff; background: linear-gradient(180deg, #3b4252, #1a1e27); border: 2px solid rgba(255, 255, 255, .3); box-shadow: 0 8px 18px rgba(0, 0, 0, .5); transform: translate(-50%, -100%) translateZ(60px) rotateX(calc(-1 * var(--tilt))); animation: bjvPop .45s cubic-bezier(.3, 1.6, .5, 1); text-align: center; }
+.bjv-sres small { display: block; font: 700 13px/1.2 Inter, sans-serif; opacity: .9; }
+.bjv-sres.win { background: linear-gradient(180deg, #22c55e, #11733a); border-color: #bbf7d0; } .bjv-sres.lose { background: linear-gradient(180deg, #7f1d1d, #3f0b0b); }
+.bjv-sres[hidden] { display: none; }
+.bjv-seat .bjv-card { width: 62px; height: 88px; }
+.bjv-seat .bjv-f .tl, .bjv-seat .bjv-f .br { font-size: 22px; } .bjv-seat .bjv-f .tl i, .bjv-seat .bjv-f .br i { font-size: 17px; }
+.bjv-seat .bjv-f .mid { font-size: 44px; } .bjv-seat .bjv-f .ace { font-size: 58px; } .bjv-seat .bjv-f .fc { left: 14px; right: 14px; top: 18px; bottom: 18px; } .bjv-seat .bjv-f .fc b { font-size: 34px; } .bjv-seat .bjv-f .fc i { font-size: 18px; }
+.bjv-seat .bjv-k::after { width: 30px; height: 30px; margin: -15px; font-size: 16px; }
+.bjv-seat .bjv-bub { top: 96px; min-width: 44px; height: 44px; font-size: 20px; }
+.bjv-seat .bjv-res { top: 80px; font-size: 24px; padding: 6px 16px; }
+.bjv-tag { left: 0; top: 150px; display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border-radius: 999px; background: rgba(8, 10, 14, .82); border: 2px solid rgba(231, 199, 102, .55); color: #fff; font: 800 18px/1.1 KeCoin, Archivo, sans-serif; white-space: nowrap; }
+.bjv-tag .lk-av, .bjv-tag .bjv-ini2 { width: 34px; height: 34px; font-size: 20px; } .bjv-tag .bjv-ini2 { display: grid; place-items: center; border-radius: 50%; background: #2b303b; color: #fde68a; }
+.bjv-tag em { font-style: normal; color: #fde68a; } .bjv-tag.ok { border-color: #4ade80; }
+.bjv-tag[hidden] { display: none; }
+/* Le 21 Online on the shared table: the room timer over the scene; players list and chat stay under the table */
+.bjo-timer.on-timer { position: absolute; left: 50%; top: 56px; z-index: 6; transform: translateX(-50%); width: min(92%, 420px); margin: 0; padding: 6px 12px; border-radius: 12px; background: rgba(8, 10, 14, .78); border: 1px solid rgba(231, 199, 102, .35); pointer-events: none; text-align: center; }
+.bjo-timer b { font: 800 13px Archivo, sans-serif; color: #fff; } .bjo-timer i { display: block; height: 4px; margin-top: 4px; border-radius: 4px; background: rgba(255, 255, 255, .12); overflow: hidden; } .bjo-timer i span { display: block; height: 100%; background: #e7c766; transition: width .5s; }
+.bjo .bjv-msg { top: 112px; }
+.game-host.is-full .slot.bjv-game > .on-side, .game-host.is-full .slot.bjv-game .on-side { display: none !important; }
+.slot.bjv-game > .on-side { margin-top: 12px; }
+@media (max-width: 700px) { .bjo-timer.on-timer { top: 50px; } .bjo .bjv-msg { top: 104px; } }
+/* Le 21 Électrique on the shared table: the lightning board over the scene, under the top bar */
+.lbv-board { position: absolute; left: 50%; top: 56px; z-index: 6; transform: translateX(-50%); width: min(92%, 440px); padding: 5px 8px 6px; border-radius: 12px; background: rgba(4, 8, 30, .82); border: 1px solid rgba(159, 212, 255, .45); box-shadow: 0 8px 22px rgba(0, 0, 0, .5); pointer-events: none; }
+.lbv-board.charge { box-shadow: 0 0 0 2px #9fd4ff, 0 0 30px rgba(159, 212, 255, .7); }
+.lbv-board .lb-tiles { gap: 5px; } .lbv-board .lb-tile { padding: 2px 2px 4px; border-radius: 8px; }
+.lbv-board .lb-tile b { font-size: 18px; } .lbv-board .lb-tile small { font-size: 10px; }
+.lbj .bjv-msg { top: 118px; }
+.bjv-bub .lb-x { margin-left: 6px; font-size: 15px; padding: 2px 6px; }
+.bjv-res.zap { background: linear-gradient(180deg, #38bdf8, #1e3a8a); border-color: #e0f2fe; box-shadow: 0 0 30px rgba(56, 189, 248, .8), 0 10px 26px rgba(0, 0, 0, .55); }
+@media (max-width: 700px) { .lbv-board { top: 50px; width: 94%; } .lbv-board .lb-tile b { font-size: 15px; } .lbj .bjv-msg { top: 104px; } }
 .bjv-hands { position: absolute; inset: 0; transform-style: preserve-3d; pointer-events: none; }
 .bjv-card { position: absolute; width: 108px; height: 152px; transform-style: preserve-3d; }
 .bjv-lean { position: absolute; inset: 0; transform-origin: 50% 100%; transform: rotateX(-18deg); transform-style: preserve-3d; }
@@ -6160,7 +6192,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .bjv-res.bj { background: linear-gradient(180deg, #fde68a, #c8961e); color: #2a1a00; border-color: #fff8db; }
 .bjv-res.lose { background: linear-gradient(180deg, #7f1d1d, #3f0b0b); border-color: rgba(254, 202, 202, .5); }
 @keyframes bjvPop { from { opacity: 0; scale: .5; } }
-.bjv-spot { position: absolute; width: 150px; height: 150px; margin: -75px 0 0 -75px; padding: 0; border: 0; border-radius: 50%; background: none; transform-style: preserve-3d; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.bjv-spot { position: absolute; width: var(--d, 150px); height: var(--d, 150px); margin: calc(var(--d, 150px) / -2) 0 0 calc(var(--d, 150px) / -2); padding: 0; border: 0; border-radius: 50%; background: none; transform-style: preserve-3d; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .bjv-spot::before { content: ''; position: absolute; inset: 4px; border-radius: 50%; }
 .bjv[data-phase="bet"] .bjv-spot::before, .bjv[data-phase="end"] .bjv-spot::before { box-shadow: 0 0 0 4px rgba(253, 230, 138, .9), 0 0 34px rgba(253, 230, 138, .55); animation: bjvRing 1.6s ease-in-out infinite; }
 @keyframes bjvRing { 50% { opacity: .35; } }
@@ -6171,7 +6203,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .bjv-amt { left: 50%; top: 50%; padding: 4px 14px; border-radius: 999px; background: rgba(8, 10, 14, .82); border: 2px solid #e7c766; color: #fde68a; font: 900 24px/1.1 KeCoin, Archivo, sans-serif; white-space: nowrap; transform: translate(-50%, -100%) translateZ(var(--z, 40px)) rotateX(calc(-1 * var(--tilt))); }
 .bjv-pick { position: absolute; width: 82px; height: 82px; margin: -41px 0 0 -41px; padding: 0; border: 0; border-radius: 50%; background: none; transform-style: preserve-3d; cursor: pointer; transition: transform .22s cubic-bezier(.3, 1.5, .5, 1), opacity .3s; -webkit-tap-highlight-color: transparent; }
 .bjv-pick svg { filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .5)) drop-shadow(0 12px 10px rgba(0, 0, 0, .35)); }
-.bjv-pick.on { transform: translateZ(18px) scale(1.14); }
+.bjv-pick.on { transform: translateZ(10px) scale(1.08); }
 .bjv-pick.on::before { content: ''; position: absolute; inset: -7px; border-radius: 50%; border: 5px solid #fde047; }
 .bjv-pick.on svg { filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .5)) brightness(1.12); }
 .bjv-pick:disabled { opacity: .3; cursor: default; }
@@ -11118,6 +11150,9 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'lightningbj', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['La même table que Le 21 : croupière, jetons sur le tapis, grands boutons en bas', 'Les mises annexes sont des cercles sur le tapis : Paires et 21+3 à côté de ta mise, Bust It près de la croupière', 'Pose tes jetons où tu veux, comme dans un vrai casino', 'Les multiplicateurs éclair s’allument en haut de l’écran'] },
+  { game: 'bj-online', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['La même table que Le 21, avec la croupière qui distribue', 'Les autres joueurs sont assis autour de toi : leur nom, leur mise et leurs cartes', 'Choisis ta mise avec les jetons sur le tapis, puis PRÊT'] },
+  { game: 'blackjack', date: '2026-11-09', title: 'Les jetons répondent au doigt', items: ['Tu peux enfin choisir ta mise : touche les jetons sur le tapis ou le cercle de mise', 'La même table pour les 3 blackjacks du casino'] },
   { game: 'blackjack', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['Une vraie table vue depuis ta place, avec la croupière qui distribue les cartes', 'Choisis tes jetons directement sur le tapis et pose-les sur le cercle de mise', 'Grands boutons en bas : Doubler, Vider, Répéter, Distribuer, puis Séparer, Rester, Tirer', 'La caméra s’approche pendant que tu mises et recule pour la partie', 'Table plus claire et plus spacieuse, avec l’ambiance de la salle de casino au fond'] },
   { game: 'foot', date: '2026-11-08', isNew: true, title: 'Nouveau : le match de foot entre amis', items: ['Un vrai match 11 contre 11 en direct contre un ami', 'Misez la même somme : le gagnant rafle tout, match nul = mises rendues', 'Stick et boutons PASSE, TIR, TACLE, SPRINT sur téléphone, clavier ou manette sur ordinateur', 'Caméra de la télé, ralenti de chaque but, corners, coups francs et penaltys', 'Entraîne-toi contre l’ordinateur en 3 niveaux'] },
   { game: 'gratteciel', date: '2026-11-06', title: 'Une vraie tour, sans coup de vent', items: ['Plus aucun coup de vent : la tour ne tombe plus au hasard', 'La tour tient tant qu’elle est équilibrée : les cubes décalés la font pencher', 'Un cube trop raté ou une tour qui penche trop, et tout s’écroule', 'Gains recalculés pour ce nouveau jeu d’adresse (jusqu’à ×22)'] },
@@ -14052,7 +14087,7 @@ __mods['games/impl/index.js'] = (() => {
 
 const FILES = {
   'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', 'b631fcbf76'],
-  'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '3357f3e2c8'],
+  'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '88301951af'],
   'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '3f67cd2454'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', '779625004b'],
@@ -14064,8 +14099,9 @@ const FILES = {
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '9e528dfdf5'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
-  blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '2fa493e6c7'],
-  lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'bdcfd7b479'],
+  bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '8172f58ae6'],
+  blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '473a8559d8'],
+  lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', '419585a560'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '4f6ae0eba7'],
   avion: ['avion', 'games/impl/avion.js', 'AvionGame', 'c403583020'],
@@ -14100,6 +14136,8 @@ const FILES = {
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '8290160e24'],
 };
+// files a game needs first (the shared blackjack table of the 3 blackjacks)
+const DEPS = { blackjack: ['bjtable'], lightningbj: ['bjtable'], 'bj-online': ['bjtable'] };
 const loading = {};
 
 function loadScript(src) {
@@ -14112,8 +14150,12 @@ function loadScript(src) {
   });
 }
 
-const hasImpl = (id) => !!FILES[id];
+const hasImpl = (id) => !!FILES[id] && id !== 'bjtable';
 function loadImpl(id) {
+  if (DEPS[id]) return Promise.all(DEPS[id].map((d) => loadImpl(d))).then(() => loadOne(id));
+  return loadOne(id);
+}
+function loadOne(id) {
   const [file, mod, cls, v] = FILES[id];
   if (!loading[file]) {
     loading[file] = loadScript(`games/${file}.js?v=${v}`);

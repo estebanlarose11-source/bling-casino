@@ -1,14 +1,17 @@
-// SpinBet Casino · BjOnlineGame — loaded on demand by games/impl/index.js (index.html).
+// SpinBet Casino · BjOnlineGame — loaded on demand by games/impl/index.js (index.html), after games/bjtable.js.
 // ---- games/impl/bj-online.js ----
 __mods['games/impl/bj-online.js'] = (() => {
-// Le 21 Online: multiplayer blackjack (online.js, OnlineRoom). Everyone in the room bets and presses PRÊT; the
-// cards are dealt as soon as every seated player is ready (at once when alone, or 20 s after the first PRÊT).
-// Each player then hits, stands or doubles; the dealer plays when everyone is done (or after 25 s), the same for all. Infinite shoe, blackjack pays 6 to 5, the dealer hits soft 17, no split, double on
-// the first two cards; with no peek, a dealer blackjack beats everything but a player blackjack.
-// Simulated with the basic strategy: ≈ 97,5 %.
+// Le 21 Online: multiplayer blackjack (online.js, OnlineRoom) on the same table as Le 21 (games/bjtable.js,
+// BjTableGame): the other players sit at the places around the player (avatar, name, bet, cards). Everyone in the
+// room bets with the chips and presses PRÊT; the cards are dealt as soon as every seated player is ready (at once
+// when alone, or 20 s after the first PRÊT). Each player then hits, stands or doubles; the croupière plays when
+// everyone is done (or after 25 s), the same for all. Infinite shoe, blackjack pays 6 to 5, the croupière hits soft
+// 17, no split, double on the first two cards; with no peek, a dealer blackjack beats everything but a player
+// blackjack. Simulated with the basic strategy: ≈ 97,5 %.
 
-const { BaseGame, fmtC } = __mods['core/base.js'];
-const { OnlineRoom, rng, cardHTML, chatHTML, mountChat, esc, now } = __mods['online.js'];
+const { BjTableGame, fromIndex } = __mods['games/impl/bjtable.js'];
+const { fmtC } = __mods['core/base.js'];
+const { OnlineRoom, rng, chatHTML, mountChat, esc, now } = __mods['online.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
@@ -43,36 +46,61 @@ function settle(bet, acts, pc, dc) {
 }
 /* ===END ENGINE */
 
-class BjOnlineGame extends BaseGame {
+const tot = (cards) => { const v = total(cards); return isBJ(cards) ? '21' : `${v.soft && v.t < 21 ? `${v.t - 10}/` : ''}${v.t}`; };
+
+class BjOnlineGame extends BjTableGame {
   constructor(root, game) {
-    super(root, game, {
-      music: EXTRA_THEMES.blackjack, autoplay: false, turbo: false, mainLabel: 'PRÊT', betLabel: 'Ma mise',
-      cls: 'table-game online-game bjo',
-      stage: `<div class="on-timer"><b>Connexion au salon…</b><i><span></span></i><small class="on-wait"></small></div>
-        <div class="bjo-table"><div class="bj-zone dealer"><div class="bj-label">Croupière <b class="dt"></b></div><div class="bj-cards dc"></div></div>
-        <div class="bj-arc">LE BLACKJACK PAIE 6 POUR 5 · LA CROUPIÈRE TIRE À 17 SOUPLE</div>
-        <div class="bj-zone me"><div class="bj-label">Ma main <b class="pt"></b></div><div class="bj-cards pc"></div></div></div>`,
-      below: `<div class="bj-actions"><button class="bj-btn" data-bj="h">Tirer <small>+1 carte</small></button><button class="bj-btn" data-bj="s">Rester</button><button class="bj-btn" data-bj="d">Doubler <small>×2, 1 carte</small></button></div>
-        <div class="on-side"><div class="on-players"><div class="on-chat-h">👥 Joueurs dans le salon</div><div class="on-plist bjo-others"><p class="muted small">Personne dans le salon.</p></div></div>${chatHTML()}</div>`,
-      hello: 'Choisis ta mise puis PRÊT : les cartes partent quand tout le salon est prêt.',
+    super(root, game, { music: EXTRA_THEMES.blackjack, turbo: false, mainLabel: 'PRÊT', betLabel: 'Ma mise', cls: 'bjo',
+      below: `<div class="on-side"><div class="on-players"><div class="on-chat-h">👥 Joueurs dans le salon</div><div class="on-plist bjo-others"><p class="muted small">Personne dans le salon.</p></div></div>${chatHTML()}</div>`,
+      hello: 'Choisis ta mise puis PRÊT : les cartes partent quand tout le salon est prêt.' }, {
+      t2: 'LA CROUPIÈRE TIRE À 17 SOUPLE', seats: true,
+      overlay: '<div class="on-timer bjo-timer"><b>Connexion au salon…</b><i><span></span></i><small class="on-wait"></small></div>',
     });
-    this.qa('[data-bj]').forEach((b) => { b.onclick = () => this.act(b.dataset.bj); });
-    this.cur = 0;
+    this.cur = 0; this.phase = 'bet'; this.myBet = 0; this.acts = '';
     this.room = new OnlineRoom(game.id, { two: true, decideMs: DECIDE_MS, resultMs: RESULT_MS, waitMs: WAIT_MS, onState: (st) => this.onState(st), onSeed: (k, s, d, n) => this.onSeed(k, s, d, n) });
     if (!this.room.me) this.msg('Crée un compte (ou connecte-toi) pour jouer : en invité, tu peux regarder la table.');
     this.room.start();
     mountChat(this.root, game.id).then((f) => { this.stopChat = f; });
+    this.renderActions();
   }
 
   destroy() { this.room.stop(); this.stopChat?.(); super.destroy(); }
-  stakeLabel() { return this.myBet ? this.myBet * (this.acts?.includes('d') ? 2 : 1) : this.bet; }
-  onMeters() { if (this.mainBtn) this.mainBtn.disabled = !!this.myBet || this.phase !== 'bet' || !this.room?.me; }
+  betting() { return this.phase === 'bet' && !this.myBet; }
+  stakeLabel() { return this.myBet ? this.myBet * (this.acts?.includes('d') ? 2 : 1) : this.bets?.main || 0; }
+  inPlayStake() { return this.stakeLabel(); }
+  myHand() { return this.A && this.inHand ? handOf(this.A, this.room.me, this.acts) : []; }
+
+  buttons() {
+    if (this.phase === 'play' && this.inHand) return [['', 'SÉPARER', 'none'], ['', 'RESTER', 's'], ['', 'TIRER', 'h'], ['', 'DOUBLER', 'd']];
+    return [['×2', 'DOUBLER', 'x2'], ['', 'VIDER', 'clear'], ['', 'RÉPÉTER', 'repeat'], ['', this.myBet && this.phase === 'bet' ? 'PRÊT ✔' : 'PRÊT', 'ready']];
+  }
+  can(k) {
+    if (k === 'ready') return this.betting() && !!this.room?.me && this.bets.main > 0 && this.balC() >= this.bets.main;
+    if (['h', 's', 'd'].includes(k)) {
+      const ok = this.phase === 'play' && this.A && this.inHand && !this.done;
+      return ok && (k !== 'd' || (this.myHand().length === 2 && wallet.cents >= this.myBet));
+    }
+    if (k === 'none') return false;
+    return this.canBetKey(k);
+  }
+  onButton(k) { if (k === 'ready') this.onMain(); else if (['h', 's', 'd'].includes(k)) this.act(k); }
+  renderActions() {
+    if (!this.view || !this.room) return;
+    this.paintHud();
+    if (this.mainBtn) this.mainBtn.disabled = !this.can('ready');
+    const p = this.phase;
+    this.setState(p === 'bet' ? 'g' : p === 'play' ? 'r' : 'o', p === 'bet' ? (this.myBet ? 'PRÊT ✔' : 'FAITES VOS JEUX') : p === 'play' ? (this.inHand && !this.done ? 'À VOUS DE JOUER' : 'LES JOUEURS JOUENT') : 'RÉSULTAT');
+  }
+  onMeters() { this.renderActions(); }
+  paintActs() { this.renderActions(); }
 
   onState(st) {
     if (st.phase === 'bet' && st.n !== this.cur) this.newRound(st.n);
     if (st.phase !== this.phase) {
-      this.phase = st.phase; this.busy = st.phase !== 'bet' || !!this.myBet; this.updateMeters(); this.paintActs();
+      this.phase = st.phase; this.busy = st.phase !== 'bet' || !!this.myBet; this.updateMeters();
       if (st.phase === 'result' && this.myBet && !this.done) this.done = true;
+      this.setCam(st.phase === 'bet' && !this.myBet ? 'bet' : 'play');
+      this.renderActions();
     }
     const bar = this.q('.on-timer'), b = bar.querySelector('b'), w = bar.querySelector('.on-wait'), sp = bar.querySelector('span');
     if (st.phase === 'bet') {
@@ -80,46 +108,43 @@ class BjOnlineGame extends BaseGame {
       b.textContent = !total ? 'Faites vos mises · appuie sur PRÊT' : `Faites vos mises · ${nr} / ${total} prêt${nr > 1 ? 's' : ''}`;
       w.textContent = nr && st.waiting.length ? `En attente de ${st.waiting.map((s) => s.name).slice(0, 4).join(', ')}${st.waiting.length > 4 ? '…' : ''} · distribution auto dans ${Math.ceil(left / 1000)} s` : '';
       sp.style.width = `${total ? (nr / total) * 100 : 0}%`; bar.classList.remove('closed');
-      this.paint(st.present.map((s) => ({ uid: s.uid, name: s.name, look: s.look, bet: s.n === st.n && s.ready ? s.d?.bet : 0, ready: s.n === st.n && s.ready })));
+      const list = st.present.map((s) => ({ uid: s.uid, name: s.name, look: s.look, bet: s.n === st.n && s.ready ? s.d?.bet : 0, ready: s.n === st.n && s.ready }));
+      this.paint(list); this.paintSeats(list);
     } else if (st.phase === 'play') {
       const left = Math.max(0, st.deadline - now());
       b.textContent = this.myBet && !this.done ? `À toi de jouer · ${Math.ceil(left / 1000)} s` : `Les joueurs jouent · ${Math.ceil(left / 1000)} s`;
       w.textContent = ''; sp.style.width = `${(left / DECIDE_MS) * 100}%`; bar.classList.add('closed');
-      if (left <= 0 && this.myBet && !this.done) { this.done = true; this.paintActs(); }
+      if (left <= 0 && this.myBet && !this.done) { this.done = true; this.renderActions(); }
       this.paintPlay(st);
     } else { b.textContent = 'Résultat'; w.textContent = ''; sp.style.width = '100%'; bar.classList.add('closed'); }
   }
 
   newRound(n) {
     this.cur = n; this.myBet = 0; this.acts = ''; this.A = null; this.B = null; this.inHand = false; this.done = false; this.paid = false; this.dealt = null;
-    this.q('.dc').innerHTML = ''; this.q('.pc').innerHTML = ''; this.q('.dt').textContent = ''; this.q('.pt').textContent = '';
-    this.busy = false; this.updateMeters(); this.paintActs();
+    this.clearTable(); this.q('.bjv-hands').innerHTML = ''; this.lastPay = this.lastPay || 0;
+    this.busy = false; this.updateMeters(); this.setCam('bet'); this.renderActions();
   }
 
   async onMain() {
-    if (this.myBet || this.phase !== 'bet') return;
+    if (!this.betting()) return;
     if (!this.room.me) return this.msg('Crée un compte pour jouer au salon.');
-    const b = this.bet;
+    const b = this.bets.main;
+    if (!b) { this.msg('Pose au moins un jeton sur le cercle de mise'); this.shake(this.q('.bjv-spot.main')); return; }
     if (!this.pay(b)) return;
-    this.myBet = b; this.lastStake = b; this.busy = true; this.updateMeters();
+    this.myBet = b; this.lastStake = b; this.lastBets = { ...this.bets }; this.busy = true; this.updateMeters();
     this.msg(`Prêt avec ${fmtC(b)} · les cartes partent quand tout le salon est prêt`);
+    this.setCam('play'); this.renderActions();
     await this.room.seat({ n: this.cur, ready: true, d: { bet: b }, rt: now(), acts: '', done: false });
-  }
-
-  paintActs() {
-    const can = this.phase === 'play' && this.A && this.inHand && !this.done;
-    const pc = can ? handOf(this.A, this.room.me, this.acts) : [];
-    this.qa('[data-bj]').forEach((b) => { b.disabled = !can || (b.dataset.bj === 'd' && (pc.length !== 2 || wallet.cents < this.myBet)); });
   }
 
   async act(a) {
     if (this.phase !== 'play' || !this.A || !this.inHand || this.done) return;
     if (a === 'd' && !this.pay(this.myBet)) return;
     this.acts += a;
-    const pc = handOf(this.A, this.room.me, this.acts), v = total(pc).t;
+    const pc = this.myHand(), v = total(pc).t;
     if (a !== 'h' || v >= 21) this.done = true;
     sfx.click?.();
-    this.paintMe(); this.paintActs();
+    this.paintTable(true); this.renderActions();
     if (v > 21) this.msg('Tu dépasses 21…');
     await this.room.seat({ n: this.cur, acts: this.acts, done: this.done });
   }
@@ -134,44 +159,90 @@ class BjOnlineGame extends BaseGame {
         const pc = handOf(seed, this.room.me);
         if (isBJ(pc)) { this.done = true; this.msg('BLACKJACK !'); this.room.seat({ n: this.cur, acts: '', done: true }); } else this.msg('À toi : tirer, rester ou doubler');
       }
-      this.phase = 'play'; this.busy = true; this.updateMeters();
-      this.focusStage?.(); sfx.click?.(); this.paintMe(); this.paintActs();
+      this.phase = 'play'; this.busy = true; this.updateMeters(); this.setCam('play');
+      this.focusStage?.(); this.paintTable(true); this.renderActions();
     }
-    if (k === 'b') { this.B = seed; this.finalActs = doc.acts || {}; this.done = true; this.paintActs(); this.finish(); }
+    if (k === 'b') { this.B = seed; this.finalActs = doc.acts || {}; this.done = true; this.renderActions(); this.finish(); }
   }
 
-  paintMe() {
+  /* ---------- the cards on the table ---------- */
+  // brings a row up to date: new cards fly from the shoe (anim), the rest is drawn at once
+  async syncRow(row, list, anim, to = 'p') {
+    if (!row) return;
+    const key = list.map((c) => (c == null ? 'x' : c)).join(',');
+    const have = (row.dataset.cards || '').split(',').filter(Boolean);
+    const want = key.split(',').filter(Boolean);
+    row.dataset.cards = key;
+    const same = have.length <= want.length && have.every((c, i) => c === want[i] || (c === 'x' && want[i] !== 'x' && i === have.length - 1));
+    if (!anim || !same) { this.putCards(row, want.map((c, i) => (c === 'x' ? { r: 'A', s: '♠', down: true, id: `x${i}` } : fromIndex(+c, `${c}-${i}`)))); return; }
+    // a face-down card that now has a value: it turns over
+    const nodes = [...row.querySelectorAll(':scope > .bjv-card')];
+    have.forEach((c, i) => { if (c === 'x' && want[i] !== 'x' && nodes[i]) { const n = this.cardEl(fromIndex(+want[i])); n.classList.add('down'); row.replaceChild(n, nodes[i]); this.layout(row); setTimeout(() => n.classList.remove('down'), 60); } });
+    for (let i = have.length; i < want.length; i++) await this.deal(row, want[i] === 'x' ? { r: 'A', s: '♠' } : fromIndex(+want[i]), want[i] === 'x', to);
+  }
+  myRow() {
+    let el = this.handEl(0);
+    if (!el) { el = this.buildHand(); this.placeHands(1); }
+    return el;
+  }
+  paintTable(anim) {
     if (!this.A) return;
-    const dc = dealerOf(this.A, this.B);
-    this.q('.dc').innerHTML = dc.map((c) => cardHTML(c)).join('') + (this.B ? '' : cardHTML(null, true));
-    this.q('.dt').textContent = total(dc).t;
+    const dc = dealerOf(this.A, this.B), dl = this.B ? dc : [...dc, null];
+    this.syncRow(this.dealerRow(), dl, anim, 'd');
+    this.bubble(this.q('.bjv-bub.d'), tot(dc), total(dc).t > 21 ? 'bust' : '');
     if (this.inHand) {
-      const pc = handOf(this.A, this.room.me, this.acts), v = total(pc);
-      this.q('.pc').innerHTML = pc.map((c) => cardHTML(c)).join('');
-      this.q('.pt').textContent = isBJ(pc) ? 'BLACKJACK' : `${v.t}${v.soft && v.t < 21 ? ' (souple)' : ''}`;
-    } else this.q('.pc').innerHTML = '<p class="muted small">Pas dans cette main : regarde la table et rejoins la suivante.</p>';
+      const pc = this.myHand(), el = this.myRow();
+      this.syncRow(el, pc, anim);
+      this.bubble(el.querySelector('.bjv-bub'), tot(pc), total(pc).t > 21 ? 'bust' : isBJ(pc) ? 'bj' : '');
+    }
+  }
+  // the other players at the places around the table (4 at most; everybody is in the list under the table)
+  others(list) { const me = this.room?.me; return list.filter((x) => x.uid !== me).slice(0, 4); }
+  paintSeats(list, play) {
+    const S = __mods['shop.js'], others = this.others(list);
+    for (let i = 0; i < 4; i++) {
+      const seat = this.seatEl(i), x = others[i], tag = seat.querySelector('.bjv-tag');
+      if (!x) { tag.hidden = true; this.putCards(seat, []); seat.dataset.cards = ''; this.bubble(seat.querySelector('.bjv-bub'), ''); this.result(seat.querySelector('.bjv-res')); continue; }
+      const html = `${S?.lookHTML?.(x.look, 'sm') || `<span class="bjv-ini2">${esc(String(x.name || '?').charAt(0).toUpperCase())}</span>`}<b>${esc(x.name)}</b>${x.bet ? `<em>${fmtC(x.bet * ((x.acts || '').includes('d') ? 2 : 1))}</em>` : ''}`;
+      if (tag.dataset.h !== html) { tag.dataset.h = html; tag.innerHTML = html; }
+      tag.hidden = false; tag.classList.toggle('ok', !!x.ready || !!x.done);
+      if (play && this.A) {
+        const pc = handOf(this.A, x.uid, x.acts || '');
+        this.syncRow(seat, pc, true);
+        this.bubble(seat.querySelector('.bjv-bub'), tot(pc), total(pc).t > 21 ? 'bust' : isBJ(pc) ? 'bj' : '');
+        this.result(seat.querySelector('.bjv-res'), x.res > 0 ? 'win' : 'lose', x.res != null ? (x.res > 0 ? `+${fmtC(x.res)}` : 'PERDU') : '');
+      }
+    }
   }
 
   paintPlay(st) {
     // the other players' hands, live from their seats
-    this.paint((this.dealt || []).map((p) => {
+    const list = (this.dealt || []).map((p) => {
       const s = this.room.seats[p.u], acts = s && s.n === this.cur ? String(s.acts || '') : '';
       return { uid: p.u, name: p.nm, look: s?.look, bet: p.d?.bet || 0, acts, done: s && s.n === this.cur && s.done };
-    }));
+    });
+    this.paint(list); this.paintSeats(list, true);
   }
 
   finish() {
-    this.paintMe();
+    this.paintTable(true);
     const dc = dealerOf(this.A, this.B);
-    this.paint((this.dealt || []).map((p) => {
+    const list = (this.dealt || []).map((p) => {
       const acts = p.u === this.room.me ? this.acts : this.finalActs[p.u] || '';
       return { uid: p.u, name: p.nm, look: this.room.seats[p.u]?.look, bet: p.d?.bet || 0, acts, res: settle(p.d?.bet || 0, acts, handOf(this.A, p.u, acts), dc) };
-    }));
+    });
+    this.paint(list); this.paintSeats(list, true);
+    this.dealerDo('flip', 600);
     if (!this.inHand || !this.myBet || this.paid) return;
     this.paid = true;
-    const pc = handOf(this.A, this.room.me, this.acts), ret = settle(this.myBet, this.acts, pc, dc), stake = this.stakeLabel(), net = ret - stake;
+    const pc = this.myHand(), ret = settle(this.myBet, this.acts, pc, dc), stake = this.stakeLabel(), net = ret - stake;
+    this.lastPay = ret;
+    const el = this.myRow();
+    this.result(el.querySelector('.bjv-res'), net > 0 ? (isBJ(pc) ? 'win bj' : 'win') : net < 0 ? 'lose' : 'push', net > 0 ? `${isBJ(pc) ? 'BLACKJACK !' : 'GAGNÉ'}<small>+${fmtC(net)}</small>` : net < 0 ? `PERDU${isBJ(dc) ? '<small>blackjack de la croupière</small>' : total(pc).t > 21 ? '<small>plus de 21</small>' : ''}` : 'ÉGALITÉ');
+    this.view.classList.add('done');
     this.msg(`Croupière ${total(dc).t > 21 ? 'saute' : total(dc).t} · ${net > 0 ? `Tu gagnes ${fmtC(net)}` : net < 0 ? `Tu perds ${fmtC(-net)}` : 'Égalité, mise rendue'}`);
-    if (ret > 0) { this.win(ret); this.setLast(ret); if (net > 0) { const pt = center(this.q('.pc')); fx.burst(pt.x, pt.y, 24, ['#fde047', '#fff', '#86efac'], 7); sfx.win(); } }
+    if (ret > 0) { this.win(ret); this.setLast(ret); if (net > 0) { const pt = center(el.querySelector('.bjv-res') || el); fx.burst(pt.x, pt.y, 24, ['#fde047', '#fff', '#86efac'], 7); sfx.win(); this.dealerDo('happy', 1600); } }
+    this.renderActions();
   }
 
   paint(list) {
