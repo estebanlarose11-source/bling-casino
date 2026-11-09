@@ -4785,6 +4785,90 @@ html.light .slot small { color: inherit; }
 @keyframes vcPulse { to { filter: brightness(1.4) saturate(1.3); } }
 @media (prefers-reduced-motion: reduce) { .vc-embers, .vc-lava-flow { display: none; } .g-volcan .vc-sky { animation: none !important; } }
 
+/* ============ Le Filon (mine d'or 7×7, multiplicateurs des cases ; dessins provisoires en attendant les images du propriétaire) ============ */
+.g-filon { --slot-bg: radial-gradient(700px 320px at 50% 100%, rgba(245, 158, 11, .32), transparent 70%), radial-gradient(520px 260px at 12% -10%, rgba(120, 53, 15, .45), transparent 70%), linear-gradient(180deg, #2a1a0b 0%, #160d05 55%, #070402 100%); }
+.g-filon .slot-title h2 { font-family: KeCoin, 'Bebas Neue', Archivo, sans-serif; letter-spacing: 2px; background: linear-gradient(180deg, #fffbe0, #facc15 50%, #a16207); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.fl-frame { padding: 7px; border-radius: 8px; background: linear-gradient(145deg, #fde68a, #a16207 22%, #4a2c12 45%, #2b1708 60%, #ca8a04 82%, #fef3c7); box-shadow: 0 0 30px rgba(245, 158, 11, .35), 0 20px 50px rgba(0, 0, 0, .65); transition: box-shadow .5s; }
+.fl-frame > .slot-stage { border-radius: 5px; background: #120b05; overflow: hidden; }
+.fl-stage { position: relative; padding: 6px; }
+.fl-bg { position: absolute; inset: 0; pointer-events: none; overflow: hidden; background: radial-gradient(60% 45% at 50% 105%, rgba(245, 158, 11, .35), transparent 70%), radial-gradient(40% 30% at 20% 30%, rgba(120, 72, 30, .4), transparent 70%), linear-gradient(180deg, #2b1a0c, #120b05 70%); }
+.g-filon[style*="--fl-bg:"] .fl-bg { background: linear-gradient(180deg, rgba(10, 6, 2, .25), rgba(10, 6, 2, .45)), var(--fl-bg) center / cover no-repeat; }
+.g-filon.in-free[style*="--fl-bg2"] .fl-bg { background: linear-gradient(180deg, rgba(10, 6, 2, .2), rgba(10, 6, 2, .4)), var(--fl-bg2) center / cover no-repeat; }
+.g-filon[style*="--fl-bg:"] .fl-beam, .g-filon[style*="--fl-bg:"] .fl-lamp { display: none; }
+.fl-beam { position: absolute; background: linear-gradient(90deg, #3b2410, #7c4a1e 45%, #4a2c12); box-shadow: 0 0 12px rgba(0, 0, 0, .6); opacity: .6; }
+.fl-beam.l { left: 0; top: 0; bottom: 0; width: 12px; }
+.fl-beam.r { right: 0; top: 0; bottom: 0; width: 12px; }
+.fl-beam.t { left: 0; right: 0; top: 0; height: 10px; background: linear-gradient(180deg, #7c4a1e, #3b2410); }
+.fl-lamp { position: absolute; top: 2%; width: 110px; height: 110px; border-radius: 50%; background: radial-gradient(circle, rgba(253, 224, 71, .45), rgba(245, 158, 11, .14) 45%, transparent 70%); animation: flFlicker 3s ease-in-out infinite alternate; }
+.fl-lamp.a { left: 0; } .fl-lamp.b { right: 0; animation-delay: -1.4s; }
+@keyframes flFlicker { 0% { opacity: .7; } 30% { opacity: .95; } 55% { opacity: .75; } 100% { opacity: 1; transform: scale(1.06); } }
+.fl-dust i { position: absolute; bottom: -6px; left: var(--x); width: var(--s); height: var(--s); border-radius: 50%; background: #fde68a; opacity: .55; animation: flDust var(--d) linear infinite; animation-delay: var(--l); }
+@keyframes flDust { to { transform: translate(-18px, -480px); opacity: 0; } }
+.fl-top { position: relative; z-index: 2; display: flex; gap: 6px; align-items: center; margin-bottom: 6px; min-height: 34px; flex-wrap: wrap; }
+.fl-ante { display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 7px; border-radius: 10px; border: 0; cursor: pointer; text-align: left; color: #fde68a; background: rgba(20, 12, 4, .8); box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .35); transition: box-shadow .25s, background .25s; }
+.fl-ante b { display: block; font: 900 12px/1.15 KeCoin, Archivo, sans-serif; letter-spacing: 1px; }
+.fl-ante small { display: block; font: 600 10px/1.2 Archivo, sans-serif; color: rgba(255, 255, 255, .68); }
+.fl-sw { position: relative; flex: none; width: 34px; height: 18px; border-radius: 9px; background: rgba(255, 255, 255, .15); transition: background .25s; }
+.fl-sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #d6d3d1; transition: transform .25s, background .25s; }
+.fl-ante.on { background: linear-gradient(180deg, rgba(234, 88, 12, .6), rgba(124, 45, 18, .75)); box-shadow: inset 0 0 0 1px #fb923c, 0 0 16px rgba(249, 115, 22, .6); }
+.fl-ante.on .fl-sw { background: #f97316; }
+.fl-ante.on .fl-sw::after { transform: translateX(16px); background: #fff7c2; }
+.fl-ante:disabled { opacity: .55; cursor: default; }
+.g-filon.in-free .fl-ante { display: none; }
+.fl-mods { display: flex; gap: 5px; flex-wrap: wrap; }
+.fl-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font: 800 11px/1.3 Archivo, sans-serif; color: #fff; background: color-mix(in srgb, var(--c) 55%, #120b05); box-shadow: inset 0 0 0 1px var(--c), 0 0 10px color-mix(in srgb, var(--c) 50%, transparent); white-space: nowrap; }
+.g-filon .grid-host { position: relative; z-index: 1; }
+.g-filon .sg { gap: 3px; padding: 5px; background: rgba(10, 6, 2, .5); border-radius: 8px; box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .28); }
+.g-filon .sg-cell { border-radius: 4px; background: radial-gradient(circle at 50% 40%, rgba(255, 240, 200, .07), rgba(0, 0, 0, .28)); box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .08); }
+.g-filon .sg-sym svg { width: 90%; height: 90%; }
+.fl-img { width: 94%; height: 94%; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .6)); pointer-events: none; user-select: none; }
+.g-filon .sg-cell.win .fl-img { animation: winBounce .7s ease-in-out infinite; }
+.g-filon .sg-cell:has(> .sg-badge.on.f1) { background: radial-gradient(circle, rgba(217, 119, 6, .3), rgba(0, 0, 0, .25) 75%); }
+.g-filon .sg-cell:has(> .sg-badge.on.f2) { background: radial-gradient(circle, rgba(250, 204, 21, .34), rgba(0, 0, 0, .22) 75%); box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .5); }
+.g-filon .sg-cell:has(> .sg-badge.on.f3) { background: radial-gradient(circle, rgba(253, 224, 71, .52), rgba(161, 98, 7, .3) 75%); box-shadow: inset 0 0 0 1.5px #facc15, inset 0 0 14px rgba(253, 224, 71, .45); }
+.g-filon .sg-cell:has(> .sg-badge.on.f4) { background: radial-gradient(circle, rgba(255, 237, 160, .65), rgba(234, 88, 12, .42) 75%); box-shadow: inset 0 0 0 2px #fb923c, inset 0 0 18px rgba(251, 146, 60, .6); }
+.g-filon .sg-badge { top: auto; bottom: 3%; right: 3%; font: 900 19cqh/1 KeCoin, Archivo, sans-serif; padding: 3cqh 5cqh; border-radius: 3cqh; color: #2a1606; background: linear-gradient(180deg, #fcd9a8, #b45309); box-shadow: 0 0 6px rgba(180, 83, 9, .8); }
+.g-filon .sg-badge.f2 { background: linear-gradient(180deg, #fffbe0, #eab308); box-shadow: 0 0 8px rgba(234, 179, 8, .9); }
+.g-filon .sg-badge.f3 { color: #fff; background: linear-gradient(180deg, #facc15, #b45309); box-shadow: 0 0 10px #facc15, 0 0 0 1px #fff7c2; }
+.g-filon .sg-badge.f4 { color: #fff; background: linear-gradient(180deg, #fb923c, #b91c1c); box-shadow: 0 0 14px #f97316, 0 0 0 1px #fde68a; }
+.g-filon .sg-badge.bump { animation: flBadge .5s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes flBadge { 0% { transform: scale(.4); } 55% { transform: scale(1.5); } }
+.g-filon .sg-cell.win { box-shadow: inset 0 0 0 2px #fde047, 0 0 18px rgba(250, 204, 21, .85), inset 0 0 16px rgba(253, 224, 71, .45); }
+.g-filon .sg-cell.wild { background: radial-gradient(circle, rgba(250, 204, 21, .42), rgba(0, 0, 0, .2) 70%); }
+.g-filon .sg-cell.scatter { background: radial-gradient(circle, rgba(245, 158, 11, .5), rgba(0, 0, 0, .2) 70%); box-shadow: inset 0 0 0 1.5px #f59e0b, 0 0 12px rgba(245, 158, 11, .5); }
+.g-filon .sg-cell.scatter svg, .g-filon .sg-cell.scatter .fl-img { animation: flFloat 1.6s ease-in-out infinite; }
+@keyframes flFloat { 50% { transform: translateY(-4%) scale(1.05); } }
+.g-filon .sg-cell.boom { background: radial-gradient(circle, rgba(239, 68, 68, .38), rgba(0, 0, 0, .2) 70%); }
+.g-filon .sg-cell.mys { background: radial-gradient(circle, rgba(250, 204, 21, .32), rgba(0, 0, 0, .25) 70%); }
+.g-filon .sg-cell.mys.conta { background: radial-gradient(circle, rgba(34, 197, 94, .42), rgba(0, 0, 0, .25) 70%); }
+.g-filon .sg-cell.lamp { background: radial-gradient(circle, rgba(253, 224, 71, .48), rgba(0, 0, 0, .2) 70%); }
+.g-filon .sg-cell.fl-open .sg-sym { animation: flOpen .32s ease-in forwards; }
+@keyframes flOpen { 50% { transform: scale(1.25) rotate(8deg); filter: brightness(2.2); } 100% { transform: scale(.2) rotate(-20deg); filter: brightness(3); opacity: .2; } }
+.g-filon .sg-cell.blast { z-index: 1; box-shadow: inset 0 0 0 2px #fb923c, inset 0 0 22px rgba(249, 115, 22, .85); background: radial-gradient(circle, rgba(254, 240, 138, .6), rgba(234, 88, 12, .38) 70%); }
+.fl-lab { position: absolute; left: 50%; bottom: 3%; transform: translateX(-50%); padding: 0 4cqh; border-radius: 3cqh; font: 900 18cqh/1.25 KeCoin, Archivo, sans-serif; color: #fff; background: rgba(0, 0, 0, .72); white-space: nowrap; }
+.fl-area::before { content: '3×3'; }
+.g-filon.mod-big .fl-area::before { content: '5×5'; }
+.g-filon.mod-big .fl-area { background: #b91c1c; }
+.fl-plus { color: #1c1006; background: linear-gradient(180deg, #fffbe0, #facc15); }
+.fl-plus::before { content: '+1'; }
+.g-filon.mod-lamp .fl-plus::before { content: '+2'; }
+.fl-tag { position: absolute; bottom: 3%; left: 50%; transform: translateX(-50%); padding: 0 4cqh; border-radius: 3cqh; background: #b91c1c; color: #fff; font: 900 14cqh/1.3 Archivo, sans-serif; font-style: normal; letter-spacing: .5px; box-shadow: 0 0 6px rgba(0, 0, 0, .6); }
+.fl-word { position: absolute; left: 50%; top: 52%; z-index: 20; pointer-events: none; transform: translate(-50%, -50%); white-space: nowrap; font: 900 clamp(30px, 7.5vw, 72px)/1 KeCoin, 'Bebas Neue', Impact, sans-serif; letter-spacing: 2px;
+  background: linear-gradient(180deg, #fff, #fef08a 35%, #f59e0b 65%, #92400e); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 4px 0 #3b2410) drop-shadow(0 0 14px rgba(245, 158, 11, .9)); animation: vcWord 1.4s ease forwards; }
+.g-filon.in-free .fl-bg { background: radial-gradient(70% 55% at 50% 105%, rgba(250, 204, 21, .6), transparent 70%), radial-gradient(40% 30% at 80% 20%, rgba(245, 158, 11, .35), transparent 70%), linear-gradient(180deg, #3a2408, #160d05 70%); }
+.g-filon.in-free .fl-frame { box-shadow: 0 0 44px rgba(250, 204, 21, .6), 0 20px 50px rgba(0, 0, 0, .65); }
+.fl-wov h3 { margin: 0; }
+.fl-wov .fl-wsub { margin: 0 0 4px; }
+.fl-wheel { position: relative; width: min(74vw, 330px); aspect-ratio: 1; filter: drop-shadow(0 0 22px rgba(250, 204, 21, .5)); }
+.fl-wheel svg { width: 100%; height: 100%; display: block; }
+.fl-wrot { transform-box: view-box; transform-origin: 50% 50%; }
+.fl-pin { position: absolute; left: 50%; top: -8px; width: 0; height: 0; transform: translateX(-50%); border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 28px solid #fef3c7; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .7)); }
+.fl-picked { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; min-height: 30px; }
+.fl-picked .fl-chip { font-size: 14px; padding: 5px 12px; animation: symPop .45s cubic-bezier(.3, 1.8, .5, 1); }
+.intro-glyph .fl-img { width: 130px; height: 130px; }
+.fl-pay svg, .fl-pay .fl-img { width: 100%; height: 100%; }
+@media (prefers-reduced-motion: reduce) { .fl-dust, .fl-lamp { display: none; } .g-filon .sg-cell.scatter svg, .g-filon .sg-cell.scatter .fl-img { animation: none; } }
+
 /* ============ La Roulette Russe (576 façons 3-4-4-4-3, volatilité extrême, images du propriétaire) ============ */
 .g-barillet { --slot-bg: #1a0d05; }
 .g-barillet > .slot-bg { background: linear-gradient(180deg, rgba(20, 8, 2, .35), rgba(20, 8, 2, .15) 40%, rgba(12, 5, 1, .7)), var(--rr-bg) 72% center / cover no-repeat !important; filter: none; }
@@ -10536,6 +10620,7 @@ const ORIGINALS = [
   {"id": "totemx", "name": "Le Totem Extrême", "cat": "slot", "tag": "Machine à sous", "sub": "Totem jusqu’à ×100 et full screen", "colors": ["#f97316", "#450a0a"], "description": "Le grand frère du Totem, en feu : grille 6×5, les cases gagnantes se scellent et le totem monte à chaque connexion. Au-dessus de ×5, les chiffres brûlent : ×8, ×10, ×15… jusqu’à ×100. Scelle les 30 cases pour le FULL SCREEN, payé 21 fois la mise × le totem.", "features": ["Totem ×1 à ×100", "Full screen", "Cases scellées", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×2 000"},
   {"id": "volcan", "name": "Le Volcan", "wip": true, "cat": "slot", "tag": "Machine à sous", "sub": "Volatilité extrême · jusqu’à ×25 000", "colors": ["#f97316", "#1c0a05"], "description": "Pour les vrais joueurs : une île volcanique qui peut ne rien payer… ou tout faire exploser. 8 symboles identiques n’importe où sur la grille 6×5 paient et explosent en cascade, et chaque explosion fait monter la pression du volcan : ×2, ×4, ×8, ×16. Des pierres de lave de ×2 à ×500 s’additionnent et multiplient le gain. 4 cratères lancent l’ÉRUPTION : 10 tours gratuits où la pression ne redescend jamais.", "features": ["Volatilité extrême", "Grille 6×5 Pay Anywhere", "Cascades", "Pression ×2 à ×16", "Pierres de lave ×2 à ×500", "Éruption : 10 tours gratuits", "2 achats de bonus", "Max ×25 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×25 000"},
   {"id": "barillet", "name": "La Roulette Russe", "cat": "slot", "tag": "Machine à sous", "sub": "576 façons · le revolver met le feu aux gains", "colors": ["#f59e0b", "#1c0f05"], "description": "Un vieux saloon, un revolver chargé à bloc. 5 rouleaux de 3, 4, 4, 4 et 3 cases, 576 façons de gagner et le cow-boy WILD qui couvre tout son rouleau. Une balle d’or et une connexion : le revolver tire 1 à 3 balles sur les cases gagnantes, qui prennent feu avec ×2 à ×10, et les multiplicateurs d’une ligne se multiplient. 3 avis de recherche lancent LE DUEL : des grosses balles à chaque gain, et les cases en feu restent jusqu’à la fin. Puis la roulette russe : 1 à 5 balles pour multiplier ton gain… ou tout perdre.", "features": ["Volatilité extrême", "576 façons de gagner", "WILD qui couvre le rouleau", "Balle d’or : le revolver tire", "Cases en feu ×2 à ×50", "Le Duel : les cases restent en feu", "Roulette russe", "2 achats de bonus", "Max ×20 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×20 000"},
+  {"id": "filon", "name": "Le Filon", "wip": true, "cat": "slot", "tag": "Machine à sous", "sub": "Mine d’or · cases jusqu’à ×8 192", "colors": ["#f59e0b", "#1c1006"], "description": "Une vieille mine d’or où chaque case de la grille 7×7 cache un multiplicateur. 10 symboles identiques n’importe où paient et tombent en cascade, et chaque gain pose un ×2 sur sa case, puis le double : ×4, ×8… jusqu’à ×8 192. Minerais mystère, dynamite et joker doré font grimper les cases. 3, 4 ou 5 BONUS lancent La Veine d’or, La Grande Galerie ou La Ruée vers l’or : la roue des bonus, et des multiplicateurs qui ne repartent jamais à zéro.", "features": ["Volatilité extrême", "Grille 7×7 Pay Anywhere", "Cascades", "Multiplicateurs des cases ×2 à ×8 192", "Minerais mystère et dynamite", "3 bonus et la roue des bonus", "Mise boostée et tour doré", "5 achats de bonus", "Max ×30 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×30 000"},
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Pas de coup de vent : la tour tient tant qu’elle est bien équilibrée, mais un cube trop raté ou une tour qui penche trop, et tout s’écroule. Chaque cube posé multiplie ta mise.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Une vraie tour qui penche si tu vises mal", "Encaisse quand tu veux"], "rtp": "≈ 96 % (très bon joueur)", "vol": 4, "max": "×22,14"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
@@ -10968,6 +11053,33 @@ const SPECS = {
       <circle r="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/></g>
       <g transform="translate(244 236) rotate(18)"><path d="M-9 -10 Q-9 -40 0 -44 Q9 -40 9 -10Z" fill="#b87333"/><rect x="-10" y="-10" width="20" height="34" fill="url(#rrBul${u})"/></g>`,
   },
+  filon: {
+    bg: ['#78350f', '#0c0603'], light: '#fde68a', title: ['LE FILON'], font: 'bebas', metal: ['#fffbe0', '#facc15', '#92400e'], tag: 'MAX ×30 000',
+    art: (u) => `
+      <radialGradient id="flcG${u}" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fef08a"/><stop offset=".4" stop-color="#f59e0b" stop-opacity=".7"/><stop offset="1" stop-color="#78350f" stop-opacity="0"/></radialGradient>
+      <linearGradient id="flcR${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f3a36"/><stop offset="1" stop-color="#1c1917"/></linearGradient>
+      <radialGradient id="flcN${u}" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#fffbe0"/><stop offset=".5" stop-color="#facc15"/><stop offset="1" stop-color="#a16207"/></radialGradient>
+      <linearGradient id="flcC${u}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#78716c"/><stop offset="1" stop-color="#292524"/></linearGradient>
+      <path d="M-10 -10 H310 V420 H-10Z M58 420 V150 Q150 40 242 150 V420Z" fill="url(#flcR${u})" fill-rule="evenodd"/>
+      <path d="M58 420 V150 Q150 40 242 150 V420Z" fill="#120a04"/>
+      <ellipse cx="150" cy="200" rx="95" ry="125" fill="url(#flcG${u})"/>
+      <path d="M0 60 Q30 80 22 120 T40 190 M300 40 Q270 90 284 130 T262 220 M8 262 Q36 240 50 280 M262 270 Q284 250 300 262" fill="none" stroke="#facc15" stroke-width="3" opacity=".75" filter="url(#glow${u})"/>
+      ${[[24, 96, 5], [276, 150, 6], [36, 214, 4], [286, 88, 3.5], [14, 170, 3]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#flcN${u})" filter="url(#glow${u})"/>`).join('')}
+      <path d="M100 400 L139 214 M200 400 L161 214" stroke="#a8a29e" stroke-width="5"/>
+      ${[[372, 64], [334, 52], [300, 42], [272, 34], [248, 27], [228, 21]].map(([y, w]) => `<path d="M${150 - w} ${y} H${150 + w}" stroke="#6b4423" stroke-width="5"/>`).join('')}
+      <path d="M70 420 V136 M230 420 V136" stroke="url(#wood${u})" stroke-width="22"/>
+      <path d="M44 130 H256" stroke="url(#wood${u})" stroke-width="22" stroke-linecap="round"/>
+      <path d="M70 420 V136 M230 420 V136 M44 130 H256" stroke="#2a1606" stroke-width="1.5" fill="none" opacity=".5"/>
+      <path d="M100 141 V160" stroke="#a8a29e" stroke-width="2"/>
+      <g transform="translate(100 178)"><circle r="26" fill="url(#flcG${u})" opacity=".9"/><path d="M-9 -16 H9 L7 -10 H-7Z" fill="#57534e"/><rect x="-7" y="-10" width="14" height="20" fill="#fde68a" fill-opacity=".5" stroke="#1c1917" stroke-width="2"/><path d="M0 6 C-4 2 -2 -4 0 -8 C2 -4 4 2 0 6Z" fill="#fb923c"/><path d="M-9 10 H9 L7 15 H-7Z" fill="#57534e"/></g>
+      <g transform="translate(160 238)" filter="url(#sh${u})">
+        ${[[-40, -8, 13], [-18, -18, 15], [6, -20, 15], [30, -12, 14], [-28, 2, 12], [-4, -4, 14], [20, 2, 13], [44, 2, 11]].map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="url(#flcN${u})" stroke="#713f12" stroke-width="2"/>`).join('')}
+        <path d="M-64 4 H64 L52 44 H-52Z" fill="url(#flcC${u})" stroke="#0c0a09" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M-58 18 H58 M-54 31 H54" stroke="#a8a29e" stroke-width="2.5" opacity=".7"/>
+        <circle cx="-32" cy="48" r="10" fill="#1c1917" stroke="#a8a29e" stroke-width="3"/><circle cx="32" cy="48" r="10" fill="#1c1917" stroke="#a8a29e" stroke-width="3"/>
+        <circle cx="-14" cy="-26" r="3.5" fill="#fff"/></g>
+      <path d="M232 196 l4 -11 l4 11 l11 4 l-11 4 l-4 11 l-4 -11 l-11 -4Z M64 236 l3 -8 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3Z M150 96 l3 -8 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3Z" fill="#fff" filter="url(#glow${u})"/>`,
+  },
   boxe: {
     bg: ['#450a0a', '#05060d'], light: '#fca5a5', title: ['LE RING'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'ENTRE AMIS',
     art: (u) => `
@@ -11121,7 +11233,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  chasse: ['#65a30d', '#14532d'], noel: ['#ef4444', '#1e3a8a'], totemx: ['#f97316', '#7f1d1d'], volcan: ['#f97316', '#450a0a'], barillet: ['#d97706', '#451a03'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], pilote: ["#38a6f5", "#0b2a6f"], foot: ["#22b45e", "#062a14"], boxe: ["#ef4444", "#3b0707"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
+  chasse: ['#65a30d', '#14532d'], noel: ['#ef4444', '#1e3a8a'], totemx: ['#f97316', '#7f1d1d'], volcan: ['#f97316', '#450a0a'], barillet: ['#d97706', '#451a03'], filon: ['#f59e0b', '#422006'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], pilote: ["#38a6f5", "#0b2a6f"], foot: ["#22b45e", "#062a14"], boxe: ["#ef4444", "#3b0707"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
 };
 // the wheel games' salons wear their game's poster, with the ONLINE ribbon
 ['madwheel', 'plateau', 'peche', 'roueor', 'robots'].forEach((id) => { SPECS[`${id}-online`] = { ...SPECS[id], online: true, tag: 'ONLINE' }; if (CARD[id]) CARD[`${id}-online`] = CARD[id]; });
@@ -12433,6 +12545,7 @@ const EXTRA_THEMES = {
   peche: { sd: 0.2, len: 16, root: 174.61, pad: { wave: 'sawtooth', vol: 0.014, dur: 1.8, map: { 0: [0, 4, 7], 8: [-3, 0, 5] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.22, pat: [12, null, 14, 16, null, 19, null, 16, 14, null, 12, 9, null, 12, null, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.3, pat: [-12, null, null, -5, null, null, -10, null, -12, null, null, -7, null, null, -5, null] }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.018 },
   roueor: { sd: 0.22, len: 16, root: 146.83, pad: { wave: 'sawtooth', vol: 0.016, dur: 2, map: { 0: [0, 3, 7], 8: [-2, 2, 7] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.24, pat: [12, null, 15, null, 19, null, 17, 15, 12, null, 10, null, 12, null, null, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.4, pat: [-12, null, null, -12, null, null, -9, null, -12, null, null, -12, null, null, -7, null] }, kick: [0, 6, 8, 14], hat: [4, 12], kv: 0.2, hv: 0.02 },
   billes: { sd: 0.15, len: 16, root: 220, lead: { wave: 'square', vol: 0.024, dur: 0.1, pat: [12, 16, 19, 24, 19, 16, 12, null, 14, 17, 21, 26, 21, 17, 14, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.16, pat: [-12, null, -12, -5, null, -5, -12, null, -10, null, -10, -3, null, -3, -10, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.18, hv: 0.02 },
+  filon: { sd: 0.17, len: 16, root: 146.83, pad: { wave: 'triangle', vol: 0.014, dur: 1.8, map: { 0: [0, 4, 7], 8: [-2, 2, 5] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.16, pat: [12, null, 14, 16, null, 19, 16, null, 14, 12, null, 9, 12, null, 7, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.22, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -7, null, -5, null] }, kick: [0, 8, 11], hat: [4, 12], kv: 0.18, hv: 0.02 },
 };
 
 return { musicOn, Music, EXTRA_THEMES };
@@ -14214,6 +14327,7 @@ const FILES = {
   noel: ['noel', 'games/impl/noel.js', 'NoelGame', '30948faeb5'],
   volcan: ['volcan', 'games/impl/volcan.js', 'VolcanGame', 'e6c05773cc'],
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
+  filon: ['filon', 'games/impl/filon.js', 'FilonGame', '37ab59df39'],
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '8290160e24'],
   boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '82efe1a3d5'],
 };
@@ -14386,7 +14500,7 @@ ${liveHTML(game)}
 function renderGame(root, { id }) {
   const game = getGame(id);
   if (!game) { location.hash = '#accueil'; return; }
-  if (game.wip) {
+  if (game.wip && !/[?&]essai\b/.test(location.search)) { // ?essai : the owner tries a game en travaux before it opens
     root.innerHTML = `<section class="panel locked-game wip-page"><div class="wip-big">🔒</div><h2>${game.name}</h2><p><b>En travaux</b> : cette machine arrive bientôt.</p><a class="btn primary" href="#lobby-slot">Voir les autres machines</a></section>`;
     return;
   }
@@ -15186,6 +15300,7 @@ const LIST = [
   ['totemx', [['n', 'Bonus de feu', T(/^BONUS DE FEU/)], ['r', 'Feu Royal', T(/^FEU ROYAL/)]]],
   ['volcan', [['fs', 'Éruption', T(/^ÉRUPTION/)]]],
   ['barillet', [['fs', 'Le Duel', T(/^LE DUEL/)]]],
+  ['filon', [['b1', 'La Veine d’or', T(/^LA VEINE D’OR/)], ['b2', 'La Grande Galerie', T(/^LA GRANDE GALERIE/)], ['b3', 'La Ruée vers l’or', T(/^LA RUÉE VERS L’OR/)]]],
   ['madwheel', [['cf', 'Pile ou Face'], ['ch', 'Tir aux Cibles'], ['pa', 'Pachinko'], ['ct', 'Méga Folie']]],
   ['plateau', [['b2', 'Bonus 2 lancers'], ['b4', 'Bonus 4 lancers']]],
   ['peche', [['fb', 'Poisson bleu'], ['fo', 'Poisson orange'], ['fr', 'Poisson rouge']]],

@@ -54,7 +54,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   +2 000). Simulation 600 000 bonus : valeur moyenne ≈ ×127 (comme avant), ≈ 12 relances au lieu de 27, médiane ×8.
 - **Jeu « en travaux »** : `"wip": true` dans sa ligne du catalogue `ORIGINALS` → vignette grisée avec cadenas
   « EN TRAVAUX », page du jeu fermée, absent de `SLOTS`, du Défi spécial (`LIST`), des duels, du jackpot et des pages
-  SEO. Pour l'ouvrir : retirer `"wip": true` puis `python3 tools/build.py`. **Le Volcan est en travaux** (demande du
+  SEO. Pour l'ouvrir : retirer `"wip": true` puis `python3 tools/build.py`. Le propriétaire essaie un jeu en travaux
+  avec `?essai` dans l'adresse (`renderGame` dans `pages/game.js`). **Le Volcan est en travaux** (demande du
   propriétaire) jusqu'à ce qu'il demande de le finir.
 - **La Roulette Russe** (`games/barillet.js`, id `barillet`, volatilité extrême, images du propriétaire dans
   `assets/games/barillet/` : symboles découpés de sa planche, `wildtall.webp` pour le WILD étendu, fond `bg.webp`,
@@ -68,6 +69,25 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`pendingC`, payés si le joueur quitte), après la roulette russe (`GAMBLE` ×1,15 … ×5,76, retour 96 %, hors RTP).
   Simulation (3,6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 4 (surtout petits), Duel 1 tour sur 385 (≈ ×130),
   achats 150 / 500 (≈ 88 %).
+- **Le Filon** (`games/filon.js`, id `filon`, **en travaux** jusqu'à ce que le propriétaire envoie ses images ; il
+  l'essaie avec `?essai` : www.spinbetcaz.com/?essai#game-filon). Machine à sous faite d'après son cahier des charges
+  (mécanique d'un jeu existant, mais thème, noms et dessins originaux : une mine d'or). Grille 7×7 Pay Anywhere
+  (10 symboles ou plus, jokers compris), cascades, un multiplicateur par case (×2 au 1er gain sur la case, puis doublé ;
+  gain = table × moyenne des multiplicateurs de ses cases ; jeu de base : remis à zéro à chaque tour, plafond ×128),
+  minerai mystère (devient un symbole, ×2 / ×4 / ×8 sur sa case), minerai contagieux (sur toutes les cases de ce
+  symbole), dynamite (quand il n'y a plus de gain : 3×3, enlève les symboles qui paient, double les multiplicateurs),
+  joker doré. 3 / 4 / 5 BONUS → LA VEINE D'OR (7 tours, 1 bonus de la roue), LA GRANDE GALERIE (8 tours, 2 bonus),
+  LA RUÉE VERS L'OR (10 tours, les 3) ; roue des bonus (`wheel()`) : minerai contagieux, grosse dynamite 5×5, lampes
+  doubles (+2) ; lampes +1 tour ; multiplicateurs gardés pendant tout le bonus (un gain les monte jusqu'à ×128,
+  minerais et dynamite jusqu'à ×8 192), table ÷ 8 pendant le bonus (`payFree`). Mise boostée ×2 (`ante` : BONUS
+  ×1,61 ; bouton au-dessus de la grille et « Bonus & menu » ; max win sur la mise de base : `capC`, `maxCheck`),
+  achats ×95 / ×225 / ×765, Tirage chance ×200 (60 / 30 / 10 %), Tour doré ×5 (10 cases de ×8 à ×1 024, `GOLD`).
+  Simulation `node tools/sim/filon.js` (6 M tours) : RTP ≈ 92 %, mise boostée ≈ 92 %, un bonus 1 tour sur 275,
+  achats ≈ 88 %, max ×30 000 atteint (≈ 1 Ruée vers l'or sur 15 000 à 60 000). **Images du propriétaire** :
+  `assets/games/filon/<nom>.webp`, puis ajouter le nom dans `PICS` (quartz cuivre emeraude saphir rubis lanterne
+  pioche wagonnet lingots joker bonus dynamite mystere contagieux lampe fond fond-bonus) et changer `CACHE` dans
+  `sw.js`. **À l'ouverture** : retirer `"wip": true`, entrée `UPDATES`, `ORDER` + `KW` dans `seo.py`, captures
+  (`tools/seo/shots.js`) et image de partage, `python3 tools/build.py`.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10
