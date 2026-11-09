@@ -69,8 +69,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`pendingC`, payés si le joueur quitte), après la roulette russe (`GAMBLE` ×1,15 … ×5,76, retour 96 %, hors RTP).
   Simulation (3,6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 4 (surtout petits), Duel 1 tour sur 385 (≈ ×130),
   achats 150 / 500 (≈ 88 %).
-- **Le Filon** (`games/filon.js`, id `filon`, **en travaux** jusqu'à ce que le propriétaire envoie ses images ; il
-  l'essaie avec `?essai` : www.spinbetcaz.com/?essai#game-filon). Machine à sous faite d'après son cahier des charges
+- **Le Filon** (`games/filon.js`, id `filon`, ouvert le 9 novembre 2026 avec les images du propriétaire : symboles
+  découpés de sa planche (cases en bois gardées, numéros effacés), son fond de galerie `fond.webp`, `fond-bonus.webp` =
+  le même, plus doré ; couverture = centre du fond). Machine à sous faite d'après son cahier des charges
   (mécanique d'un jeu existant, mais thème, noms et dessins originaux : une mine d'or). Grille 7×7 Pay Anywhere
   (10 symboles ou plus, jokers compris), cascades, un multiplicateur par case (×2 au 1er gain sur la case, puis doublé ;
   gain = table × moyenne des multiplicateurs de ses cases ; jeu de base : remis à zéro à chaque tour, plafond ×128),
@@ -84,10 +85,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   achats ×95 / ×225 / ×765, Tirage chance ×200 (60 / 30 / 10 %), Tour doré ×5 (10 cases de ×8 à ×1 024, `GOLD`).
   Simulation `node tools/sim/filon.js` (6 M tours) : RTP ≈ 92 %, mise boostée ≈ 92 %, un bonus 1 tour sur 275,
   achats ≈ 88 %, max ×30 000 atteint (≈ 1 Ruée vers l'or sur 15 000 à 60 000). **Images du propriétaire** :
-  `assets/games/filon/<nom>.webp`, puis ajouter le nom dans `PICS` (quartz cuivre emeraude saphir rubis lanterne
-  pioche wagonnet lingots joker bonus dynamite mystere contagieux lampe fond fond-bonus) et changer `CACHE` dans
-  `sw.js`. **À l'ouverture** : retirer `"wip": true`, entrée `UPDATES`, `ORDER` + `KW` dans `seo.py`, captures
-  (`tools/seo/shots.js`) et image de partage, `python3 tools/build.py`.
+  `assets/games/filon/<nom>.webp`, toutes listées dans `PICS` (quartz cuivre emeraude saphir rubis lanterne
+  pioche wagonnet lingots joker bonus dynamite mystere contagieux lampe fond fond-bonus) (changer `CACHE` dans
+  `sw.js` si elles changent).
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

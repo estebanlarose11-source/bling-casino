@@ -186,7 +186,7 @@ const GIFT_BET = 100; // free rounds of the site are played at 1 KE (FREE_BET of
 // The owner's pictures (assets/games/filon/<name>.webp) replace the drawings below as soon as their name is in PICS.
 // Names: quartz cuivre emeraude saphir rubis lanterne pioche wagonnet lingots joker bonus dynamite mystere contagieux
 // lampe, fond (background of the base game), fond-bonus (background of the bonus).
-const PICS = new Set([]);
+const PICS = new Set(['quartz', 'cuivre', 'emeraude', 'saphir', 'rubis', 'lanterne', 'pioche', 'wagonnet', 'lingots', 'joker', 'bonus', 'dynamite', 'mystere', 'contagieux', 'lampe', 'fond', 'fond-bonus']); // owner's pictures (November 2026)
 const PIC_V = 1;
 const picSrc = (n) => { const f = `assets/games/filon/${n}.webp`; return window.__assets?.[f] || `${f}?v=${PIC_V}`; };
 const pic = (n) => `<img class="fl-img" src="${picSrc(n)}" alt="" draggable="false" decoding="async">`;
