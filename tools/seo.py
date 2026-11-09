@@ -78,6 +78,7 @@ KW = {
     'robots': 'course de robots gratuite', 'poulet': 'jeu du poulet gratuit', 'gratteciel': 'jeu de cubes à empiler gratuit',
     'penalty': 'jeu de penalty gratuit', 'ticket': 'ticket à gratter gratuit en ligne', 'billes': 'course de billes gratuite', 'pilote': 'jeu d’avion gratuit avec multiplicateurs',
     'foot': 'jeu de foot en ligne gratuit entre amis',
+    'boxe': 'jeu de boxe en ligne gratuit entre amis',
 }
 KW_CAT = {'slot': 'machine à sous gratuite', 'table': 'jeu de casino gratuit', 'quick': 'jeu rapide gratuit'}
 kw_of = lambda g: KW.get(g['id']) or KW_CAT.get(g['cat'], 'jeu de casino gratuit')
@@ -107,6 +108,16 @@ def tips(g):
             "En défense, PASSE change de joueur et TIR appelle un coéquipier au pressing : à deux, le ballon se récupère beaucoup plus vite.",
             "Avec le ballon, TACLE devient DRIBBLE : un crochet rapide qui évite le tacle de l’adversaire.",
             "La mise est libre : chacun mise la même somme, le gagnant prend toute la cagnotte et un match nul rend sa mise à chacun. Tout est en KE, une monnaie fictive.",
+        ]
+    if g['id'] == 'boxe':  # Le Ring: a boxing match between friends, not a game against the house
+        return [
+            "Commence par l’entraînement contre l’ordinateur (Facile, Normal, Difficile) pour apprendre les coups avant de miser contre un ami.",
+            "La DROITE est rapide et porte loin : parfaite pour garder l’adversaire à distance. Le CROCHET et l’UPPERCUT font plus mal mais laissent plus de temps pour être esquivés.",
+            "Esquive puis frappe : après une esquive réussie, ton coup suivant est un CONTRE, plus rapide et 1,5 fois plus fort.",
+            "Attention à l’esquive basse : elle évite la droite et le crochet, mais un uppercut dedans fait très mal.",
+            "Vise le corps (stick vers le bas + coup) : l’adversaire s’épuise, ses coups deviennent lents et mous.",
+            "Au tapis, tape très vite sur les boutons pour te relever avant 10. Trois knockdowns dans le même round, et l’arbitre arrête le combat.",
+            "La mise est libre : chacun mise la même somme, le vainqueur prend toute la bourse et un match nul rend sa mise à chacun. Tout est en KE, une monnaie fictive.",
         ]
     if g['cat'] == 'slot':
         if vol >= 4:
@@ -148,6 +159,12 @@ def faq(g):
                 ("Comment défier un ami ?", "Crée ton compte, ajoute ton ami avec son pseudo (chat › Amis), puis dans Le Derby choisis-le, ta mise et la durée du match. Dès qu’il accepte, le match commence en direct sur vos deux appareils."),
                 ("Que se passe-t-il en cas de match nul ?", "Chacun récupère sa mise. Sinon le gagnant prend toute la cagnotte (les deux mises). Abandonner en cours de match fait perdre."),
                 (f"Peut-on jouer à {name} sur ordinateur ?", "Oui : les flèches ou ZQSD pour courir, K pour la passe, L ou Espace pour le tir, J pour le tacle et Maj pour sprinter. Une manette marche aussi."),
+                (f"Peut-on gagner de l’argent réel à {name} ?", "Non. SpinBet Casino est un jeu de divertissement : les KE n’ont aucune valeur réelle et ne s’échangent pas contre de l’argent.")]
+    if g['id'] == 'boxe':
+        return [(f"{name} est-il gratuit ?", f"Oui. {name} se joue gratuitement sur SpinBet Casino, dans le navigateur, sur téléphone comme sur ordinateur, avec des KE (monnaie fictive) : aucun dépôt, rien à télécharger."),
+                ("Comment défier un ami à la boxe ?", "Crée ton compte, ajoute ton ami avec son pseudo (chat › Amis), puis dans Le Ring choisis-le, ta mise et le nombre de rounds. Dès qu’il accepte, le combat commence en direct sur vos deux appareils."),
+                ("Peut-on jouer en vue à la première personne ?", "Oui : choisis la 1re personne (tes gants devant toi, l’adversaire en face), la 3e personne (derrière ton boxeur) ou la vue TV, avant le combat ou pendant, avec le bouton caméra."),
+                ("Comment se termine un combat ?", "Par K.-O. (pas relevé avant 10), par arrêt de l’arbitre (3 knockdowns dans le même round) ou à la décision de 3 juges qui notent chaque round. En cas d’égalité, match nul : chacun récupère sa mise."),
                 (f"Peut-on gagner de l’argent réel à {name} ?", "Non. SpinBet Casino est un jeu de divertissement : les KE n’ont aucune valeur réelle et ne s’échangent pas contre de l’argent.")]
     q = [(f"{name} est-il gratuit ?", f"Oui. {name} se joue gratuitement sur SpinBet Casino, dans le navigateur, sur téléphone comme sur ordinateur, avec des KE (monnaie fictive) : aucun dépôt."),
          (f"Peut-on gagner de l’argent réel à {name} ?", "Non. SpinBet Casino est un jeu de divertissement : les KE n’ont aucune valeur réelle et ne s’échangent pas contre de l’argent."),

@@ -15,7 +15,7 @@ let ids = ['big-bad-wolf', ...block.split('\n').filter((l) => l.trim().startsWit
 ids = ids.filter((id) => !id.endsWith('-online'));
 if (process.argv.length > 2) ids = process.argv.slice(2);
 
-const PLAY = { foot: '[data-train]' };
+const PLAY = { foot: '[data-train]', boxe: '[data-train]' };
 async function shoot(browser, opts, id, file, phone) {
   const ctx = await browser.newContext(opts);
   await ctx.addInitScript(() => { try { localStorage.setItem('spinbet_tuto_v1', '1'); } catch {} });

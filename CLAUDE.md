@@ -192,6 +192,31 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Règles Firestore à recoller** (collection `foot` ajoutée dans `firebase/firestore.rules`) : sans elles, les défis
   en ligne sont refusés (l'entraînement marche quand même).
 
+## Le Ring : combat de boxe entre amis (demande du propriétaire)
+
+- **Le jeu** (`games/boxe.js`, id `boxe`, catégorie Jeux rapides) : même principe que Le Derby (mise identique pour les
+  deux, le vainqueur prend les deux mises, nul = mises rendues, abandon = défaite), 3, 5 ou 7 rounds d'1 min
+  (`d` = 4, 6, 8 → `ROUNDS`), entraînement contre l'ordinateur (Facile / Normal / Difficile). **3 caméras au choix**
+  (voulu par le propriétaire) : 1re personne (ses gants devant soi, l'adversaire en face), 3e personne (derrière son
+  boxeur), vue TV ; choix dans le vestiaire, bouton 🎥 pendant le combat ou touche V (`spinbet_boxe_cam`).
+- **Commandes** : stick = bouger (tourner autour, avancer, reculer) ; DROITE, CROCHET, UPPERCUT ; stick en bas + coup =
+  au corps ; ESQUIVE (stick ← / → = rotation, évite droite et uppercut ; stick ↓ = esquive basse, évite droite et
+  crochet mais l'uppercut fait ×1,5) ; GARDE (tenir ; avec stick ↓ = garde basse pour le corps). Esquive réussie =
+  CONTRE (plus rapide, ×1,5). PC : flèches / ZQSD, K droite, J crochet, I uppercut, Espace esquive, Maj garde.
+- **Règles** (bloc `===ENGINE`, données `PU`) : endurance, knockdown à 0 de vie (compte de l'arbitre, taper vite pour
+  se relever, compte de 8 obligatoire), 3 knockdowns dans un round = arrêt de l'arbitre, sinon 3 juges (10-9, −1 par
+  knockdown) et décision à la majorité. Moteur **déterministe** comme celui du foot (mêmes interdits : pas de
+  `Math.random`, `sin`, `cos`… dans le bloc). Simulations : `node tools/sim/boxe.js` (combats + déterminisme) et
+  `node tools/sim/boxe-net.js [ping] [pertes %]` (deux téléphones, mêmes empreintes). **Après toute modification du
+  moteur : relancer les deux.**
+- **Rendu** : petite 3D maison en canvas 2D (`View`, `capsule`, `ball`, poses `poseOf` + IK des coudes et genoux),
+  ring, cordes, public, arbitre qui compte. Essais : `?debug` (`window.__boxe`), `?boxdur=600` (rounds courts),
+  `?boxlag=70`.
+- **En ligne** : copie de `Link` / `Rollback` du Derby, et les défis passent par `foot-defis.js` dans les mêmes
+  documents Firestore `foot/{id}` : **`ka` / `kb` ≥ 10 = un combat de boxe** (couleur = `ka − 10`), résultat
+  `r = { a: 1, b: 0 }` pour le vainqueur, 0-0 = nul. Aucune règle Firestore à recoller. `list('boxe')` donne les
+  combats, `footHist` marque les combats `g: 'b'`.
+
 ## Immersion
 
 - **Écran d'ouverture des jeux** (`showIntro` dans `pages/game.js`) : affiche du jeu en fond flou, titre, 3 points forts
