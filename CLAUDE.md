@@ -114,7 +114,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Tirer / Doubler, et Miser / Rejouer à la fin) avec l'avatar et le solde au milieu. Caméra (`camera()`, mesurée une
   fois par `measure()`) : proche du cercle pendant les mises, reculée pour la partie, jamais au-dessus du cou de la
   croupière ; hors plein écran la hauteur de la table s'adapte (2:1 sur ordinateur). Les règles et gains ne
-  changent pas. Le CSS est à la fin de la couche `finition`.
+  changent pas. Demande du propriétaire : croupière reculée (petite, coupée à la taille par le bord de la table,
+  `.bjv-dealer` 256 px de large), tapis clair avec projecteur (`bjvSpot`), lumières et tables floues au fond
+  (`.bjv-glow`), messages qui s'effacent après 4,5 s. Le CSS est à la fin de la couche `finition`.
 - **Paliers de prestige** (`achievements.js`, `PR_TIERS`) : Bronze 1, Argent 5, Or 10, Platine 25, Diamant 50, Légende 100
   prestiges en tout, en médailles sur le profil (`tiersHTML`) ; le total `pres` est publié dans `leaderboard` et le
   profil public (`#@pseudo`) montre le palier. **Règles Firestore à recoller** (champ `pres` ajouté) : en attendant, le

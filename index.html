@@ -6092,18 +6092,26 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .game-host.is-full .slot.g-blackjack .bjv { height: 100dvh; border-radius: 0; }
 .bjv-world { position: absolute; left: 0; top: 0; width: 1280px; height: 1200px; transform-origin: 0 0; transition: transform .9s cubic-bezier(.45, .05, .25, 1); }
 .bjv-room { position: absolute; left: -2600px; right: -2600px; top: -2600px; bottom: -800px; background-size: 120px 120px; }
-.bjv-dealer { position: absolute; left: 430px; top: 328px; width: 420px; z-index: 1; pointer-events: none; }
+.bjv-glow { position: absolute; left: -500px; right: -500px; top: 0; height: 700px; pointer-events: none; background:
+  radial-gradient(300px 220px at 50% 470px, rgba(255, 214, 150, .3), transparent 70%),
+  radial-gradient(150px 34px at 26% 548px, rgba(40, 170, 110, .55), transparent 70%), radial-gradient(150px 34px at 74% 548px, rgba(40, 170, 110, .55), transparent 70%),
+  radial-gradient(44px 44px at 27% 420px, rgba(255, 200, 110, .6), transparent 70%), radial-gradient(44px 44px at 73% 420px, rgba(255, 200, 110, .6), transparent 70%),
+  radial-gradient(30px 30px at 32% 470px, rgba(255, 110, 110, .5), transparent 70%), radial-gradient(30px 30px at 68% 470px, rgba(120, 190, 255, .45), transparent 70%),
+  radial-gradient(26px 26px at 23% 470px, rgba(255, 235, 170, .45), transparent 70%), radial-gradient(26px 26px at 77% 470px, rgba(255, 235, 170, .45), transparent 70%),
+  radial-gradient(34px 34px at 35% 400px, rgba(255, 200, 110, .35), transparent 70%), radial-gradient(34px 34px at 65% 400px, rgba(255, 200, 110, .35), transparent 70%),
+  radial-gradient(700px 200px at 50% 560px, rgba(255, 200, 140, .14), transparent 70%); filter: blur(3px); }
+.bjv-dealer { position: absolute; left: 512px; top: 366px; width: 256px; z-index: 1; pointer-events: none; }
 .bjv-dealer.front { z-index: 3; }
 .bjv-dealer svg { display: block; width: 100%; height: auto; overflow: visible; }
 .bjv-dealer:not(.front) { filter: drop-shadow(0 18px 24px rgba(0, 0, 0, .55)); }
 .bjv-breath { transform-box: view-box; transform-origin: 300px 640px; animation: bjvBreath 4.6s ease-in-out infinite; }
 @keyframes bjvBreath { 50% { transform: scale(1.008, 1.014); } }
 .bjv-arm { transform-box: view-box; }
-.bjv-arm.l { transform-origin: 134px 300px; } .bjv-arm.r { transform-origin: 466px 300px; }
+.bjv-arm.l { transform-origin: 136px 374px; } .bjv-arm.r { transform-origin: 464px 374px; }
 .bjv.dealP .bjv-arm.r { animation: bjvReachP .52s ease-in-out; }
-@keyframes bjvReachP { 40% { transform: rotate(12deg) translate(-36px, 90px) scale(1.12); } }
+@keyframes bjvReachP { 40% { transform: rotate(24deg) translate(-20px, 64px) scale(1.12); } }
 .bjv.dealD .bjv-arm.r { animation: bjvReachD .46s ease-in-out; }
-@keyframes bjvReachD { 40% { transform: rotate(10deg) translate(-18px, 24px); } }
+@keyframes bjvReachD { 40% { transform: rotate(14deg) translate(-10px, 16px); } }
 .bjv.flip .bjv-arm.l { animation: bjvFlip .6s ease-in-out; }
 @keyframes bjvFlip { 45% { transform: rotate(-12deg) translate(18px, -14px); } }
 .bjv.idle .bjv-arm.l { animation: bjvIdle 1.4s ease-in-out; }
@@ -6121,8 +6129,8 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .bjv-dcards, .bjv-hand { position: absolute; width: 0; height: 0; transform-style: preserve-3d; }
 .bjv-hands { position: absolute; inset: 0; transform-style: preserve-3d; pointer-events: none; }
 .bjv-card { position: absolute; width: 108px; height: 152px; transform-style: preserve-3d; }
-.bjv-lean { position: absolute; inset: 0; transform-origin: 50% 100%; transform: rotateX(-22deg); transform-style: preserve-3d; }
-.bjv-dcards .bjv-lean { transform: rotateX(-14deg); }
+.bjv-lean { position: absolute; inset: 0; transform-origin: 50% 100%; transform: rotateX(-18deg); transform-style: preserve-3d; }
+.bjv-dcards .bjv-lean { transform: rotateX(-12deg); }
 .bjv-in { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .4s cubic-bezier(.3, .7, .3, 1); }
 .bjv-card.down .bjv-in { transform: rotateY(180deg); }
 .bjv-f, .bjv-k { position: absolute; inset: 0; border-radius: 9px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
@@ -6144,7 +6152,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .bjv-bub.bj { background: radial-gradient(circle at 40% 30%, #fde68a, #c8961e); color: #2a1a00; border-color: #fff8db; }
 .bjv-bub[hidden], .bjv-res[hidden], .bjv-amt[hidden] { display: none; }
 .bjv-res { left: 0; top: 112px; z-index: 50; transform: translate(-50%, -100%) translateZ(34px) rotateX(calc(-1 * var(--tilt))); padding: 10px 26px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; white-space: nowrap; font: 900 34px/1 'Bebas Neue', Archivo, sans-serif; letter-spacing: 2px; color: #fff; background: linear-gradient(180deg, #3b4252, #1a1e27); border: 2px solid rgba(255, 255, 255, .35); box-shadow: 0 10px 26px rgba(0, 0, 0, .55); animation: bjvPop .45s cubic-bezier(.3, 1.6, .5, 1); }
-.bjv-res small { font: 800 20px/1.2 KeCoin, Archivo, sans-serif; letter-spacing: 0; }
+.bjv-res small { font: 800 20px/1.2 KeCoin, Archivo, sans-serif; letter-spacing: 0; text-transform: none; opacity: .92; }
 .bjv-res.win { background: linear-gradient(180deg, #22c55e, #11733a); border-color: #bbf7d0; }
 .bjv-res.bj { background: linear-gradient(180deg, #fde68a, #c8961e); color: #2a1a00; border-color: #fff8db; }
 .bjv-res.lose { background: linear-gradient(180deg, #7f1d1d, #3f0b0b); border-color: rgba(254, 202, 202, .5); }
@@ -6166,7 +6174,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .bjv-pick:disabled { opacity: .3; cursor: default; }
 .bjv:not([data-phase="bet"]) .bjv-pick { opacity: 0; pointer-events: none; transform: translateY(40px); }
 .bjv-flychip { position: absolute; width: 96px; height: 96px; pointer-events: none; filter: drop-shadow(0 6px 0 rgba(0, 0, 0, .5)); }
-.bjv-shade { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: linear-gradient(180deg, rgba(10, 2, 6, .95) 0, rgba(10, 2, 6, .55) 60px, transparent 150px), radial-gradient(ellipse 80% 70% at 50% 62%, transparent 55%, rgba(0, 0, 0, .5)); }
+.bjv-shade { position: absolute; inset: 0; z-index: 4; pointer-events: none; background: linear-gradient(180deg, rgba(14, 4, 9, .8) 0, rgba(14, 4, 9, .3) 56px, transparent 120px), radial-gradient(ellipse 85% 75% at 50% 62%, transparent 60%, rgba(0, 0, 0, .35)); }
 .bjv-top { position: absolute; left: 10px; right: 10px; top: 8px; z-index: 6; display: flex; align-items: center; gap: 8px; pointer-events: none; }
 .bjv-top > button { pointer-events: auto; }
 .bjv-top .bjv-sq { width: 44px; height: 44px; border-radius: 10px; font-size: 20px; }
@@ -6182,6 +6190,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
 .bjv-state[data-s="g"] i { background: #4ade80; box-shadow: 0 0 10px #4ade80; } .bjv-state[data-s="o"] i { background: #fbbf24; box-shadow: 0 0 10px #fbbf24; } .bjv-state[data-s="r"] i { background: #f87171; box-shadow: 0 0 10px #f87171; }
 .bjv-msg { position: absolute; left: 50%; top: 60px; z-index: 6; transform: translateX(-50%); width: max-content; max-width: min(92%, 560px); padding: 6px 14px; border-radius: 999px; background: rgba(8, 8, 12, .62); color: #f8fafc; font: 600 13px/1.3 KeCoin, Inter, sans-serif; text-align: center; pointer-events: none; }
 .bjv-msg:empty { display: none; }
+.bjv-msg { opacity: 0; transition: opacity .5s; } .bjv-msg.show { opacity: 1; }
 .bjv-hud { position: absolute; left: 0; right: 0; bottom: 0; z-index: 6; display: grid; grid-template-columns: 1fr 1fr minmax(120px, 170px) 1fr 1fr; align-items: end; gap: 8px; padding: 0 10px 10px; pointer-events: none; }
 .bjv-hud > * { pointer-events: auto; }
 .bjv-b, .bjv-sq { height: 56px; border-radius: 12px; border: 1px solid rgba(231, 199, 102, .45); background: linear-gradient(180deg, #2c303b, #13151b); color: #f5e6b8; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 6px 16px rgba(0, 0, 0, .5); cursor: pointer; -webkit-tap-highlight-color: transparent; }
@@ -11106,7 +11115,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'blackjack', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['Une vraie table vue depuis ta place, avec la croupière qui distribue les cartes', 'Choisis tes jetons directement sur le tapis et pose-les sur le cercle de mise', 'Grands boutons en bas : Doubler, Vider, Répéter, Distribuer, puis Séparer, Rester, Tirer', 'La caméra s’approche pendant que tu mises et recule pour la partie'] },
+  { game: 'blackjack', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['Une vraie table vue depuis ta place, avec la croupière qui distribue les cartes', 'Choisis tes jetons directement sur le tapis et pose-les sur le cercle de mise', 'Grands boutons en bas : Doubler, Vider, Répéter, Distribuer, puis Séparer, Rester, Tirer', 'La caméra s’approche pendant que tu mises et recule pour la partie', 'Table plus claire et plus spacieuse, avec l’ambiance de la salle de casino au fond'] },
   { game: 'foot', date: '2026-11-08', isNew: true, title: 'Nouveau : le match de foot entre amis', items: ['Un vrai match 11 contre 11 en direct contre un ami', 'Misez la même somme : le gagnant rafle tout, match nul = mises rendues', 'Stick et boutons PASSE, TIR, TACLE, SPRINT sur téléphone, clavier ou manette sur ordinateur', 'Caméra de la télé, ralenti de chaque but, corners, coups francs et penaltys', 'Entraîne-toi contre l’ordinateur en 3 niveaux'] },
   { game: 'gratteciel', date: '2026-11-06', title: 'Une vraie tour, sans coup de vent', items: ['Plus aucun coup de vent : la tour ne tombe plus au hasard', 'La tour tient tant qu’elle est équilibrée : les cubes décalés la font pencher', 'Un cube trop raté ou une tour qui penche trop, et tout s’écroule', 'Gains recalculés pour ce nouveau jeu d’adresse (jusqu’à ×22)'] },
   { game: 'bling', date: '2026-11-06', title: 'Plus fluide', items: ['Les mots « CASH ! » et « CASCADE » s’affichent bien au milieu de la grille', 'La machine est plus fluide sur téléphone'] },
@@ -14052,7 +14061,7 @@ const FILES = {
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '9e528dfdf5'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
-  blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', 'a65483c26c'],
+  blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '2fa493e6c7'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'bdcfd7b479'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '4f6ae0eba7'],

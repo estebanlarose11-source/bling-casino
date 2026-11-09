@@ -32,7 +32,7 @@ const CHIPS = [
 const MAXSTAKE = 1000000;
 // Plane of the table (felt + rail) and the places on it.
 const W = 1280, H = 830, CX = 640, TILT = 74;
-const SHOE = { x: 1018, y: 150 }, DEALER = { x: CX, y: 200 }, HAND = { y: 414 }, SPOT = { x: CX, y: 590, r: 70 };
+const SHOE = { x: 1018, y: 150 }, DEALER = { x: CX, y: 126 }, HAND = { y: 446 }, SPOT = { x: CX, y: 590, r: 70 };
 const PICK = [-184, -92, 0, 92, 184].map((dx) => ({ x: CX + dx, y: 716 - (dx * dx) / 640 }));
 const CW = 88, CH = 124; // card size on the felt
 
@@ -79,28 +79,27 @@ const DEALER_BODY = `<svg class="bjv-body" viewBox="0 0 600 640" aria-hidden="tr
   </g>
 </svg>`;
 const ARM = `
-    <path d="M80 270 C 80 304 92 330 112 348 L 194 342 C 184 322 178 298 178 270 Z" fill="url(#bjvSleeve)"/>
-    <path d="M100 300 C 106 322 114 334 128 344" stroke="#aeb6c1" stroke-width="3" fill="none"/>
-    <path d="M108 344 L 196 338 L 198 356 L 112 362 Z" fill="#f4f6f9" stroke="#aeb6c1" stroke-width="2"/>
-    <rect x="168" y="344" width="11" height="8" rx="2" fill="url(#bjvGold)"/>
-    <g transform="translate(-30 4)">
-      <path d="M128 358 C 134 378 164 390 200 388 C 228 386 244 378 238 368 C 252 366 254 356 244 350 C 236 342 220 340 208 348 C 192 340 160 342 136 350 Z" fill="url(#bjvSkinH)"/>
-      <path d="M204 386 C 218 384 230 378 238 370 M 218 380 C 232 376 242 368 246 358 M 190 388 C 202 386 212 382 218 376" stroke="#b77c5c" stroke-width="2" fill="none" opacity=".75"/>
-      <path d="M160 362 C 174 356 190 354 204 358" stroke="#c48b6a" stroke-width="2" fill="none" opacity=".55"/>
-    </g>`;
+    <path d="M94 270 C 86 312 78 344 70 368 L 142 374 C 152 342 166 306 178 270 Z" fill="url(#bjvSleeve)"/>
+    <path d="M112 300 C 104 330 96 350 90 366" stroke="#9aa3ae" stroke-width="3" fill="none"/>
+    <path d="M68 364 L 144 372 L 142 390 L 64 382 Z" fill="#f4f6f9" stroke="#aeb6c1" stroke-width="2"/>
+    <rect x="118" y="374" width="11" height="8" rx="2" fill="url(#bjvGold)"/>
+    <path d="M70 386 C 72 404 100 418 130 416 C 154 414 168 406 162 394 C 174 392 176 382 166 378 C 158 370 142 370 134 378 C 118 372 92 374 74 382 Z" fill="url(#bjvSkinH)"/>
+    <path d="M134 414 C 146 412 156 406 162 398 M 146 408 C 158 404 166 396 170 386 M 120 416 C 130 414 138 410 144 404" stroke="#b77c5c" stroke-width="2" fill="none" opacity=".75"/>
+    <path d="M96 392 C 110 386 126 384 140 388" stroke="#c48b6a" stroke-width="2" fill="none" opacity=".5"/>`;
 const DEALER_ARMS = `<svg class="bjv-arms" viewBox="0 0 600 640" aria-hidden="true">${DEALER_DEFS}
-  <g class="bjv-arm l"><g transform="translate(-24 0)">${ARM}</g></g>
-  <g class="bjv-arm r"><g transform="translate(624 0) scale(-1 1)">${ARM}</g></g>
+  <g class="bjv-arm l"><g transform="translate(0 94)">${ARM}</g></g>
+  <g class="bjv-arm r"><g transform="translate(600 94) scale(-1 1)">${ARM}</g></g>
 </svg>`;
 
 // Felt, rail and everything printed on the table (plane coordinates).
 const FELT = `<svg class="bjv-felt" viewBox="-60 -30 1400 ${H + 60}" width="1400" height="${H + 60}" aria-hidden="true">
   <defs>
-    <radialGradient id="bjvFelt" cx="50%" cy="10%" r="95%"><stop offset="0" stop-color="#147a5b"/><stop offset=".45" stop-color="#0d5c45"/><stop offset=".8" stop-color="#083d2f"/><stop offset="1" stop-color="#052a20"/></radialGradient>
+    <radialGradient id="bjvFelt" cx="50%" cy="10%" r="95%"><stop offset="0" stop-color="#22a77a"/><stop offset=".4" stop-color="#178a64"/><stop offset=".75" stop-color="#0f6a4d"/><stop offset="1" stop-color="#0a4f3a"/></radialGradient>
     <linearGradient id="bjvRail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2a2e"/><stop offset=".5" stop-color="#121215"/><stop offset="1" stop-color="#050506"/></linearGradient>
     <linearGradient id="bjvMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dfe4e9"/><stop offset=".5" stop-color="#8d97a1"/><stop offset="1" stop-color="#4b535b"/></linearGradient>
+    <radialGradient id="bjvSpot" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="#fff8dc" stop-opacity=".16"/><stop offset=".6" stop-color="#fff8dc" stop-opacity=".05"/><stop offset="1" stop-color="#fff8dc" stop-opacity="0"/></radialGradient>
     <pattern id="bjvWeave" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 6 L6 0" stroke="rgba(255,255,255,.035)" stroke-width="1"/></pattern>
-    <path id="bjvT1" d="M300 268 Q640 470 980 268"/><path id="bjvT2" d="M368 318 Q640 492 912 318"/>
+    <path id="bjvT1" d="M290 262 Q640 432 990 262"/><path id="bjvT2" d="M356 306 Q640 452 924 306"/>
   </defs>
   <path d="M-40 -14 L1320 -14 L1320 0 A680 830 0 0 1 -40 0 Z" fill="url(#bjvRail)"/>
   <path d="M-40 0 A680 830 0 0 0 1320 0" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
@@ -108,12 +107,13 @@ const FELT = `<svg class="bjv-felt" viewBox="-60 -30 1400 ${H + 60}" width="1400
   <path d="M36 0 A604 744 0 0 0 1244 0 Z" fill="url(#bjvGold)"/>
   <path d="M40 0 A600 740 0 0 0 1240 0 Z" fill="url(#bjvFelt)"/>
   <path d="M40 0 A600 740 0 0 0 1240 0 Z" fill="url(#bjvWeave)"/>
+  <path d="M40 0 A600 740 0 0 0 1240 0 Z" fill="url(#bjvSpot)"/>
   <rect x="20" y="-22" width="1240" height="22" rx="4" fill="#111114"/><rect x="20" y="-4" width="1240" height="4" fill="url(#bjvGold)"/>
   <g fill="none" stroke="#e7c766" stroke-opacity=".55">
     <path d="M118 0 A522 650 0 0 0 1162 0" stroke-width="3"/>
     <path d="M128 0 A512 640 0 0 0 1152 0" stroke-width="1.2"/>
   </g>
-  <g font-family="Cinzel, Georgia, serif" fill="#f0d27a" fill-opacity=".85">
+  <g font-family="Cinzel, Georgia, serif" fill="#f6dc8a" fill-opacity=".95">
     <text font-size="40" font-weight="900" letter-spacing="4"><textPath href="#bjvT1" startOffset="50%" text-anchor="middle">LE BLACKJACK PAIE 6 POUR 5</textPath></text>
     <text font-size="21" font-weight="700" letter-spacing="2" fill-opacity=".7"><textPath href="#bjvT2" startOffset="50%" text-anchor="middle">LA CROUPIÈRE TIRE À 16 ET RESTE À 17</textPath></text>
   </g>
@@ -126,11 +126,11 @@ const FELT = `<svg class="bjv-felt" viewBox="-60 -30 1400 ${H + 60}" width="1400
   <circle cx="${SPOT.x}" cy="${SPOT.y}" r="${SPOT.r + 10}" fill="none" stroke="#e7c766" stroke-opacity=".35" stroke-width="2"/>
   <circle cx="${SPOT.x}" cy="${SPOT.y}" r="${SPOT.r}" fill="rgba(0,0,0,.14)" stroke="#f0d27a" stroke-opacity=".9" stroke-width="4"/>
   <text x="${SPOT.x}" y="${SPOT.y - SPOT.r - 18}" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-weight="900" font-size="20" letter-spacing="3" fill="#f0d27a" fill-opacity=".7">MISE</text>
-  <g transform="translate(${CX - 250} 8)">
-    <rect width="500" height="92" rx="10" fill="url(#bjvMetal)"/><rect x="8" y="8" width="484" height="76" rx="6" fill="#1b1f24"/>
-    ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => {
-      const c = [CHIPS[1], CHIPS[2], CHIPS[3], CHIPS[4], CHIPS[5], CHIPS[6], CHIPS[0], CHIPS[1], CHIPS[2], CHIPS[3], CHIPS[4]][i], x = 14 + i * 43.2;
-      return `<g transform="translate(${x} 12)"><rect width="38" height="68" rx="16" fill="${c[2]}"/><rect width="38" height="68" rx="16" fill="url(#bjvRackShade)"/>${Array.from({ length: 9 }, (_, k) => `<rect x="${k % 2 ? 4 : 26}" y="${4 + k * 7.2}" width="8" height="2.4" fill="${c[3]}" opacity=".9"/>`).join('')}</g>`;
+  <g transform="translate(${CX - 190} 10)">
+    <rect width="380" height="88" rx="10" fill="url(#bjvMetal)"/><rect x="8" y="8" width="364" height="72" rx="6" fill="#1b1f24"/>
+    ${[0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
+      const c = [CHIPS[1], CHIPS[2], CHIPS[3], CHIPS[4], CHIPS[5], CHIPS[6], CHIPS[0], CHIPS[1]][i], x = 14 + i * 44.5;
+      return `<g transform="translate(${x} 12)"><rect width="38" height="64" rx="16" fill="${c[2]}"/><rect width="38" height="64" rx="16" fill="url(#bjvRackShade)"/>${Array.from({ length: 8 }, (_, k) => `<rect x="${k % 2 ? 4 : 26}" y="${4 + k * 7.6}" width="8" height="2.4" fill="${c[3]}" opacity=".9"/>`).join('')}</g>`;
     }).join('')}
     <linearGradient id="bjvRackShade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".45"/><stop offset=".45" stop-color="#fff" stop-opacity=".18"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></linearGradient>
   </g>
@@ -145,7 +145,7 @@ const SHOE_SVG = `<svg viewBox="0 0 150 120" aria-hidden="true">
 const DISCARD_SVG = `<svg viewBox="0 0 90 100" aria-hidden="true"><path d="M6 94 L84 94 L84 20 L6 20 Z" fill="rgba(200,220,240,.16)" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
   <g fill="#7a1428" stroke="#e7c766" stroke-width="1">${Array.from({ length: 5 }, (_, i) => `<rect x="14" y="${84 - i * 5}" width="62" height="8" rx="1.5"/>`).join('')}</g></svg>`;
 
-const ROOM_BG = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><rect width="120" height="120" fill="#2a0b14"/><path d="M60 0 L120 60 L60 120 L0 60 Z" fill="none" stroke="#4a1a22" stroke-width="2"/><path d="M60 22 L98 60 L60 98 L22 60 Z" fill="#33101a" stroke="#5a2a26" stroke-width="1.5"/><circle cx="60" cy="60" r="10" fill="none" stroke="#7a4a2a" stroke-width="2"/><circle cx="60" cy="60" r="3" fill="#7a4a2a"/><circle cx="0" cy="0" r="6" fill="#4a1a22"/><circle cx="120" cy="0" r="6" fill="#4a1a22"/><circle cx="0" cy="120" r="6" fill="#4a1a22"/><circle cx="120" cy="120" r="6" fill="#4a1a22"/></svg>')}")`;
+const ROOM_BG = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><rect width="120" height="120" fill="#3d1020"/><path d="M60 0 L120 60 L60 120 L0 60 Z" fill="none" stroke="#5e2231" stroke-width="2"/><path d="M60 22 L98 60 L60 98 L22 60 Z" fill="#46142a" stroke="#74352f" stroke-width="1.5"/><circle cx="60" cy="60" r="10" fill="none" stroke="#a06a3a" stroke-width="2"/><circle cx="60" cy="60" r="3" fill="#a06a3a"/><circle cx="0" cy="0" r="6" fill="#5e2231"/><circle cx="120" cy="0" r="6" fill="#5e2231"/><circle cx="0" cy="120" r="6" fill="#5e2231"/><circle cx="120" cy="120" r="6" fill="#5e2231"/></svg>')}")`;
 
 class BlackjackGame extends BaseGame {
   constructor(root, game) {
@@ -155,6 +155,7 @@ class BlackjackGame extends BaseGame {
       stage: `<div class="bjv" data-cam="bet" style="--tilt:${TILT}deg">
         <div class="bjv-world">
           <div class="bjv-room" style="background-image:${ROOM_BG}"></div>
+          <div class="bjv-glow"></div>
           <div class="bjv-dealer">${DEALER_BODY}</div>
           <div class="bjv-persp"><div class="bjv-table">
             ${FELT}
@@ -231,13 +232,13 @@ class BlackjackGame extends BaseGame {
     // focus: what must be seen. Bottom = the chips on the felt, just above the buttons.
     const cx = M.spot.x + M.spot.w / 2;
     const y2 = bet ? M.pick.y : M.spot.b + 10;
-    const y1 = bet ? M.edge.y + 30 : M.dealer.y + M.dealer.h * 0.2;
-    const fw = bet ? (wide ? 760 : 470) : (wide ? 900 : 560);
+    const y1 = bet ? M.edge.y + 30 : M.dealer.y + M.dealer.h * 0.12;
+    const fw = bet ? (wide ? 760 : 470) : (wide ? 860 : 540);
     // not in full screen, the scene is as tall as needed: no empty room above the croupière (her head is out of frame)
     const full = !!this.root.closest('.is-full');
     if (!full) {
       const want = wide ? Math.round(Math.max(420, Math.min(cw / 1.95, innerHeight * 0.82)))
-        : Math.round(top + hud + (M.spot.b + 10 - (M.dealer.y + M.dealer.h * 0.2)) * (cw / 560));
+        : Math.round(top + hud + (M.spot.b + 10 - (M.dealer.y + M.dealer.h * 0.12)) * (cw / 540));
       if (Math.abs(v.clientHeight - want) > 2) { v.style.height = `${want}px`; ch = want; }
     } else if (v.style.height) { v.style.height = ''; ch = v.clientHeight; }
     const neck = M.dealer.y + M.dealer.h * 0.09;
@@ -249,6 +250,12 @@ class BlackjackGame extends BaseGame {
     if (!animate) { void this.world.offsetWidth; this.world.style.transition = ''; }
   }
   setCam(k) { if (this.view.dataset.cam === k) return; this.view.dataset.cam = k; this.camera(true); }
+
+  msg(t) {
+    if (this.dead || !this.msgEl) return;
+    this.msgEl.innerHTML = t; this.msgEl.classList.add('show');
+    clearTimeout(this.msgT); this.msgT = setTimeout(() => this.msgEl?.classList.remove('show'), 4500);
+  }
 
   /* ---------- dealer ---------- */
   dealerDo(cls, ms) {
@@ -578,10 +585,10 @@ class BlackjackGame extends BaseGame {
     let net = 0, payAll = 0, big = false;
     this.results = this.hands.map((h) => {
       const ps = score(h.cards).t; let pay = 0, res;
-      if (ps > 21) res = { k: 'lose', t: 'PERDU' };
+      if (ps > 21) res = { k: 'lose', t: 'PERDU<small>plus de 21</small>' };
       else if (isBJ(h) && !dbj) { pay = Math.floor(h.bet * 2.2); res = { k: 'win bj', t: `BLACKJACK !<small>+${fmtC(pay - h.bet)}</small>` }; big = true; }
       else if (isBJ(h) && dbj) { pay = h.bet; res = { k: 'push', t: 'ÉGALITÉ' }; }
-      else if (dbj) res = { k: 'lose', t: 'BLACKJACK DE LA CROUPIÈRE' };
+      else if (dbj) res = { k: 'lose', t: 'PERDU<small>blackjack de la croupière</small>' };
       else if (ds > 21 || ps > ds) { pay = h.bet * 2; res = { k: 'win', t: `GAGNÉ<small>+${fmtC(h.bet)}</small>` }; }
       else if (ps === ds) { pay = h.bet; res = { k: 'push', t: 'ÉGALITÉ' }; }
       else res = { k: 'lose', t: 'PERDU' };
