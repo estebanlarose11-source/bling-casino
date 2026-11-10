@@ -4878,6 +4878,30 @@ html.light .slot small { color: inherit; }
 .g-filon .sg-cell.blast::after { box-shadow: inset 0 0 0 2.5px #fb923c, inset 0 0 22px rgba(249, 115, 22, .9); }
 .g-filon .sg-badge, .g-filon .fl-lab, .g-filon .fl-tag { z-index: 2; }
 .intro-glyph .fl-img { border-radius: 14px; }
+/* Le Filon, comme les autres machines peintes (demande du propriétaire, 10 novembre 2026) : le fond de la mine derrière toute la machine,
+   sans cadre ni titre, grandes cases, plein écran sans bandes noires */
+.slot.g-filon > .slot-bg { background: var(--fl-bg, #160d05) center / cover no-repeat !important; filter: none !important; transition: background-image .6s; }
+.slot.g-filon.in-free > .slot-bg { background-image: var(--fl-bg2, var(--fl-bg)) !important; }
+.g-filon > .slot-bg::after { display: none; }
+.g-filon > .slot-head { display: none !important; }
+.g-filon > .slot-frame, .g-filon.in-free > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.g-filon > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; overflow: visible; }
+.g-filon .fl-stage { padding: 0; }
+.g-filon .fl-bg, .g-filon.in-free .fl-bg, .g-filon[style*="--fl-bg:"] .fl-bg, .g-filon.in-free[style*="--fl-bg2"] .fl-bg { background: none !important; }
+.g-filon .fl-top { justify-content: center; min-height: 0; margin-bottom: 4px; }
+.g-filon .fl-ante { padding: 4px 10px 4px 6px; background: rgba(14, 8, 3, .72); }
+.g-filon .sg { width: min(100%, calc(100vh - var(--chrome) + var(--fl-x, 0px))); gap: 2px; padding: 3px; border-radius: 6px; background: rgba(10, 6, 2, .38); box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .3), 0 10px 30px rgba(0, 0, 0, .45); }
+.g-filon .sg-sym .fl-img { width: 98%; height: 98%; border-radius: 4px; }
+.g-filon .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
+.g-filon .controls { background: rgba(14, 8, 3, .55); border-color: rgba(250, 204, 21, .18); }
+@media (min-width: 900px) and (min-height: 700px) { .g-filon { --fl-x: 90px; } }
+.game-host:not(.is-full):has(> .g-filon) { max-width: max(420px, min(980px, calc(100vh - var(--chrome) + 90px + 260px))); }
+.game-host.is-full:has(> .slot.g-filon) { padding: 0; background: #0a0603; overflow: hidden; --chrome: 200px; }
+.game-host.is-full > .slot.g-filon { width: 100%; max-width: none !important; min-height: 100%; margin: 0; border-radius: 0; border: 0; display: flex; flex-direction: column; justify-content: center; padding: max(8px, env(safe-area-inset-top, 0px)) max(6px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(6px, env(safe-area-inset-left, 0px)); box-sizing: border-box; }
+.game-host.is-full > .slot.g-filon > .slot-bg { grid-column: auto !important; grid-row: auto !important; position: absolute; inset: 0; }
+.game-host.is-full > .slot.g-filon .sg { width: min(100%, calc(100dvh - var(--chrome))); }
+.game-host.is-full > .slot.g-filon .controls { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
+@media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .slot.g-filon) { --chrome: 48px; } .game-host.is-full > .slot.g-filon { display: grid; padding: 4px 8px; } .g-filon .fl-top { margin-bottom: 2px; } .g-filon .fl-ante small { display: none; } }
 @media (prefers-reduced-motion: reduce) { .fl-dust, .fl-lamp { display: none; } .g-filon .sg-cell.scatter svg, .g-filon .sg-cell.scatter .fl-img { animation: none; } }
 
 /* ============ La Roulette Russe (576 façons 3-4-4-4-3, volatilité extrême, images du propriétaire) ============ */
@@ -11374,6 +11398,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'filon', date: '2026-11-10', title: 'Toute la mine en grand', isNew: true, items: ['Le décor de la mine remplit tout l’écran, derrière toute la machine', 'Des cases bien plus grosses', 'En plein écran : la mine sur tout le téléphone, sans bandes noires', 'Pendant le bonus, toute la mine passe à l’or'] },
   { game: 'filon', date: '2026-11-09', title: 'Nouvelle machine : la mine d’or', isNew: true, items: ['Chaque case de la grille cache un multiplicateur qui double à chaque gain, jusqu’à ×8 192', 'Minerais mystère, dynamite et joker doré font grimper les cases', '3 bonus avec la roue des bonus, et des multiplicateurs qui restent jusqu’à la fin', 'Mise boostée, tour doré et tirage chance', 'Jusqu’à ×30 000 la mise'] },
   { game: 'lightningbj', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['La même table que Le 21 : croupière, jetons sur le tapis, grands boutons en bas', 'Les mises annexes sont des cercles sur le tapis : Paires et 21+3 à côté de ta mise, Bust It près de la croupière', 'Pose tes jetons où tu veux, comme dans un vrai casino', 'Les multiplicateurs éclair s’allument en haut de l’écran'] },
   { game: 'bj-online', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['La même table que Le 21, avec la croupière qui distribue', 'Les autres joueurs sont assis autour de toi : leur nom, leur mise et leurs cartes', 'Choisis ta mise avec les jetons sur le tapis, puis PRÊT'] },

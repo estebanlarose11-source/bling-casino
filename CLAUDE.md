@@ -84,7 +84,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   ×1,61 ; bouton au-dessus de la grille et « Bonus & menu » ; max win sur la mise de base : `capC`, `maxCheck`),
   achats ×95 / ×225 / ×765, Tirage chance ×200 (60 / 30 / 10 %), Tour doré ×5 (10 cases de ×8 à ×1 024, `GOLD`).
   Simulation `node tools/sim/filon.js` (6 M tours) : RTP ≈ 92 %, mise boostée ≈ 92 %, un bonus 1 tour sur 275,
-  achats ≈ 88 %, max ×30 000 atteint (≈ 1 Ruée vers l'or sur 15 000 à 60 000). **Images du propriétaire** :
+  achats ≈ 88 %, max ×30 000 atteint (≈ 1 Ruée vers l'or sur 15 000 à 60 000). **Mise en page** (demande du propriétaire, comme L'Anubis / L'Olympe) : `fond.webp` derrière toute la machine
+  (`.slot-bg`, `fond-bonus.webp` pendant le bonus), sans titre ni cadre, grandes cases (grille = largeur libre ou hauteur
+  `100vh - --chrome`, +90 px sur ordinateur `--fl-x`), plein écran sans bandes noires (bloc à la fin du CSS du Filon). **Images du propriétaire** :
   `assets/games/filon/<nom>.webp`, toutes listées dans `PICS` (quartz cuivre emeraude saphir rubis lanterne
   pioche wagonnet lingots joker bonus dynamite mystere contagieux lampe fond fond-bonus) (changer `CACHE` dans
   `sw.js` si elles changent).
