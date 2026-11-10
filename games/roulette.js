@@ -65,9 +65,9 @@ function wheelSVG() {
   const segs = [], nums = [], frets = [];
   const P = (a, r) => { const t = ((a - 90) * Math.PI) / 180; return `${(r * Math.cos(t)).toFixed(2)} ${(r * Math.sin(t)).toFixed(2)}`; };
   for (let i = 0; i < NP; i++) {
-    const n = ORDER[i], a0 = i * A - A / 2, a1 = a0 + A, f = n === 0 ? '#14883f' : REDS.has(n) ? '#b3172a' : '#16181d';
+    const n = ORDER[i], a0 = i * A - A / 2, a1 = a0 + A, f = n === 0 ? '#14883f' : REDS.has(n) ? '#b3172a' : '#16181d', f2 = n === 0 ? '#0e622d' : REDS.has(n) ? '#81101e' : '#0f1014';
     segs.push(`<path d="M${P(a0, 164)} L${P(a0, 202)} A202 202 0 0 1 ${P(a1, 202)} L${P(a1, 164)} A164 164 0 0 0 ${P(a0, 164)}Z" fill="${f}"/>`);
-    segs.push(`<path d="M${P(a0, 128)} L${P(a0, 164)} A164 164 0 0 1 ${P(a1, 164)} L${P(a1, 128)} A128 128 0 0 0 ${P(a0, 128)}Z" fill="${f}" filter="url(#rlPocketSh)"/>`);
+    segs.push(`<path d="M${P(a0, 128)} L${P(a0, 164)} A164 164 0 0 1 ${P(a1, 164)} L${P(a1, 128)} A128 128 0 0 0 ${P(a0, 128)}Z" fill="${f2}"/>`);
     nums.push(`<text transform="rotate(${(i * A).toFixed(2)}) translate(0 -177)" text-anchor="middle" dominant-baseline="middle" font-size="${n > 9 ? 19 : 21}">${n}</text>`);
     frets.push(`<path d="M${P(a0, 128)} L${P(a0, 202)}" />`);
   }
@@ -82,8 +82,7 @@ function wheelSVG() {
     <radialGradient id="rlDome" cx=".38" cy=".32" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".35" stop-color="#cfd6dd"/><stop offset=".75" stop-color="#7c8691"/><stop offset="1" stop-color="#3b424b"/></radialGradient>
     <radialGradient id="rlBall" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#e9ecf2"/><stop offset="1" stop-color="#8c93a3"/></radialGradient>
     <linearGradient id="rlGoldR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fbe7a1"/><stop offset=".5" stop-color="#c9952f"/><stop offset="1" stop-color="#7a5510"/></linearGradient>
-    <filter id="rlPocketSh" x="-10%" y="-10%" width="120%" height="120%"><feComponentTransfer><feFuncR type="linear" slope=".72"/><feFuncG type="linear" slope=".72"/><feFuncB type="linear" slope=".72"/></feComponentTransfer></filter>
-    <filter id="rlSoft"><feGaussianBlur stdDeviation="6"/></filter>
+    <radialGradient id="rlPit" r=".5"><stop offset=".9" stop-color="#120803" stop-opacity=".85"/><stop offset="1" stop-color="#120803" stop-opacity="0"/></radialGradient>
     <pattern id="rlGrain" width="40" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(18)"><path d="M0 6 Q10 2 20 6 T40 6" stroke="#3a1806" stroke-opacity=".22" fill="none" stroke-width="1.4"/></pattern>
   </defs>
   <circle r="300" fill="url(#rlRim)"/>
@@ -92,8 +91,9 @@ function wheelSVG() {
   <circle r="265" fill="url(#rlTrack)"/>
   <circle r="262" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
   ${dia}
-  <circle r="208" fill="#120803" filter="url(#rlSoft)" opacity=".8"/>
-  <g class="rl-rotor">
+  <circle r="226" fill="url(#rlPit)"/>
+</svg>
+<div class="rl-rotor"><svg viewBox="-210 -210 420 420" width="420" height="420" aria-hidden="true"><g>
     <circle r="206" fill="url(#rlGoldR)"/>
     ${segs.join('')}
     <g fill="#fff" font-family="Archivo, Inter, sans-serif" font-weight="900">${nums.join('')}</g>
@@ -108,9 +108,8 @@ function wheelSVG() {
       <circle r="18" fill="url(#rlChrome)" stroke="#59616b"/>
       <circle cx="-6" cy="-8" r="6" fill="#fff" opacity=".8"/>
     </g>
-  </g>
-  <circle class="rl-ball" r="8.5" cx="0" cy="${-R_TRACK}" fill="url(#rlBall)" stroke="#6b7280" stroke-width=".8"/>
-</svg>`;
+  </g></svg></div>
+<div class="rl-bw"><i class="rl-ballv" style="transform:translateY(-${R_TRACK}px)"></i></div>`;
 }
 
 const ROOM = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140"><rect width="140" height="140" fill="#16314f"/><g fill="none" stroke="#b08a3e" stroke-opacity=".55"><circle cx="70" cy="70" r="20" stroke-width="2"/><circle cx="70" cy="70" r="12" stroke-width="1.5"/><path d="M70 44 L74 56 L70 52 L66 56Z M70 96 L74 84 L70 88 L66 84Z M44 70 L56 74 L52 70 L56 66Z M96 70 L84 74 L88 70 L84 66Z" fill="#b08a3e" fill-opacity=".5"/></g><g fill="#24456a"><circle cx="0" cy="0" r="5"/><circle cx="140" cy="0" r="5"/><circle cx="0" cy="140" r="5"/><circle cx="140" cy="140" r="5"/></g></svg>')}")`;
@@ -187,13 +186,12 @@ function feltSVG() {
       <linearGradient id="rlGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fbe7a1"/><stop offset=".5" stop-color="#d4a637"/><stop offset="1" stop-color="#8a6512"/></linearGradient>
       <linearGradient id="rlMetal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#58616b"/><stop offset=".5" stop-color="#c9d1d9"/><stop offset="1" stop-color="#4a525b"/></linearGradient>
       <radialGradient id="bjvChipShade" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient>
-      <filter id="rlChipSh" x="-40%" y="-40%" width="180%" height="200%"><feDropShadow dx="0" dy="4" stdDeviation="2.5" flood-color="#000" flood-opacity=".6"/></filter>
     </defs>
     ${o.join('')}
     <g class="rl-hots">${L.HOTS.map((h) => { const [x, y] = hotXY(h); return `<circle class="rl-hot" data-k="${h.key}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="19"/>`; }).join('')}</g>
-    <g class="rl-hl"></g>
-    <g class="rl-chips"></g>
-  </svg>`;
+  </svg>
+  <svg class="rl-layer rl-hlsvg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><g class="rl-hl"></g></svg>
+  <svg class="rl-layer rl-chipsvg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" aria-hidden="true"><g class="rl-chips"></g></svg>`;
 }
 // the hot spots of buildDefs (splits, corners, streets, six lines…) moved to this mirrored grid
 function hotXY(h) {
@@ -256,62 +254,57 @@ class RouletteGame extends BaseGame {
     this.bets = {}; this.stack = []; this.lastBets = null; this.pickI = 2; this.phase = 'bet';
     this.wcur = 0; // rotor angle
     try { this.hist = JSON.parse(localStorage.getItem('spinbet_roulette_hist') || '[]').filter((x) => x >= 0 && x <= 36).slice(0, 500); } catch { this.hist = []; }
-    this.cam = { ...CAMS.bet, box: [...CAMS.bet.box] };
     this.root.addEventListener('click', (e) => this.onTap(e));
-    this.ro = new ResizeObserver(() => this.applyCam(this.cam));
+    this.ro = new ResizeObserver(() => this.applyCam());
     this.ro.observe(this.view);
-    this.applyCam(this.cam);
+    this.applyCam('bet');
     this.paintLed();
     this.paintAll();
     this.tip('Choisis un jeton en bas, puis touche le tapis pour miser.');
   }
-  destroy() { this.ro?.disconnect(); cancelAnimationFrame(this.camRaf); super.destroy(); }
+  destroy() { this.ro?.disconnect(); super.destroy(); }
 
   /* ---------- camera ---------- */
   // Fits a box of the plane (tilted by `tilt` degrees, seen through the perspective) into the free part of the view.
-  applyCam(c) {
-    const v = this.view; if (!v || this.dead) return;
-    const cw = v.clientWidth; let ch = v.clientHeight; if (!cw || !ch) return;
+  // The perspective and the tilt turn around a fixed point (the middle of the plane), so a camera move is only two
+  // transforms (tilt of .rl-table, translate + scale of .rl-world) that the browser animates by itself (CSS transition,
+  // no repaint): the table stays smooth on phones.
+  frame(c) {
+    const v = this.view; if (!v || this.dead) return null;
+    const cw = v.clientWidth; let ch = v.clientHeight; if (!cw || !ch) return null;
     const full = !!this.root.closest('.is-full');
     const top = (this.q('.rl-top')?.offsetHeight || 46) + 10, hud = (this.q('.rl-hud')?.offsetHeight || 70) + 8;
-    const t = (c.tilt * Math.PI) / 180, [x0, y0, x1, y1] = c.box, ox = (x0 + x1) / 2, oy = (y0 + y1) / 2;
+    const t = (c.tilt * Math.PI) / 180, [x0, y0, x1, y1] = c.box, ox = W / 2, oy = H / 2;
     const pr = (x, y) => { const dy = y - oy, s = PERSP / (PERSP - dy * Math.sin(t)); return [ox + (x - ox) * s, oy + dy * Math.cos(t) * s]; };
     const P = [pr(x0, y0), pr(x1, y0), pr(x0, y1), pr(x1, y1)];
     const bx0 = Math.min(...P.map((p) => p[0])), bx1 = Math.max(...P.map((p) => p[0])), by0 = Math.min(...P.map((p) => p[1])), by1 = Math.max(...P.map((p) => p[1]));
     // outside full screen the scene is as tall as the betting view needs (phones), within limits
-    if (!full && c === this.cam && this.view.dataset.cam === 'bet' && !this.camAnim) {
+    if (!full && c === CAMS.bet) {
       const want = Math.round(top + hud + ((by1 - by0) * (cw - 16)) / (bx1 - bx0));
       const lim = matchMedia('(orientation: portrait)').matches ? Math.max(340, Math.min(want + 16, innerHeight - 110)) : Math.max(420, Math.min(innerHeight * 0.86, cw * 0.62, 860));
       if (Math.abs(v.clientHeight - lim) > 2) { v.style.height = `${lim}px`; ch = lim; }
     } else if (full && v.style.height) { v.style.height = ''; ch = v.clientHeight; }
     const aw = cw - 16, ah = ch - top - hud;
     const k = Math.min(aw / (bx1 - bx0), ah / (by1 - by0));
-    const tx = cw / 2 - ((bx0 + bx1) / 2) * k, ty = top + ah / 2 - ((by0 + by1) / 2) * k;
-    this.persp.style.perspectiveOrigin = `${ox}px ${oy}px`;
-    this.tableEl.style.transformOrigin = `${ox}px ${oy}px`;
+    return { k, tx: cw / 2 - ((bx0 + bx1) / 2) * k, ty: top + ah / 2 - ((by0 + by1) / 2) * k };
+  }
+  applyCam(name = this.view?.dataset.cam || 'bet', animate = false) {
+    const c = CAMS[name], f = this.frame(c); if (!f) return;
+    const ms = animate ? (this.turbo ? 650 : 1000) : 0;
+    this.view.style.setProperty('--cam', `${ms}ms`);
+    if (!animate) { this.view.classList.add('rl-still'); }
     this.tableEl.style.transform = `rotateX(${c.tilt}deg)`;
     this.view.style.setProperty('--tilt', `${c.tilt}deg`);
-    this.world.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${k.toFixed(4)})`;
-    this.q('.rl-room').style.backgroundSize = `${Math.max(40, 140 * k * 1.6)}px`;
+    this.world.style.transform = `translate(${f.tx.toFixed(1)}px, ${f.ty.toFixed(1)}px) scale(${f.k.toFixed(4)})`;
+    if (!animate) { void this.world.offsetWidth; this.view.classList.remove('rl-still'); }
+    return ms;
   }
-  setCam(name, ms = 1000) {
-    const to = CAMS[name]; this.view.dataset.cam = name;
-    const from = { tilt: this.cam.tilt, box: [...this.cam.box] };
-    cancelAnimationFrame(this.camRaf);
-    if (this.turbo) ms *= 0.6;
-    return new Promise((res) => {
-      const t0 = performance.now();
-      this.camAnim = true;
-      const step = (now) => {
-        if (this.dead) return res();
-        const u = Math.min(1, (now - t0) / ms), e = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
-        this.cam = { tilt: from.tilt + (to.tilt - from.tilt) * e, box: from.box.map((v, i) => v + (to.box[i] - v) * e) };
-        this.applyCam(this.cam);
-        if (u < 1) this.camRaf = requestAnimationFrame(step); else { this.camAnim = false; this.cam = { tilt: to.tilt, box: [...to.box] }; this.applyCam(this.cam); res(); }
-      };
-      this.camRaf = requestAnimationFrame(step);
-    });
+  setCam(name) {
+    this.view.dataset.cam = name;
+    const ms = this.applyCam(name, true);
+    return this.wait0(ms + 40);
   }
+  wait0(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
   /* ---------- taps ---------- */
   onTap(e) {
@@ -392,7 +385,7 @@ class RouletteGame extends BaseGame {
       const a = this.bets[k], p = ANCH[k]; if (!p || !a) continue;
       const c = chipOf(a), n = Math.min(4, Math.max(1, Math.ceil(a / c[0])));
       const discs = Array.from({ length: n - 1 }, (_, i) => `<ellipse cx="0" cy="${-i * 5 + 3}" rx="23" ry="23" fill="${c[2]}" stroke="${c[3]}" stroke-width="3" stroke-dasharray="6 5"/>`).join('');
-      out.push(`<g class="rl-ch${fresh.includes(k) ? ' fresh' : ''}" data-c="${k}" transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})" filter="url(#rlChipSh)">${discs}<g transform="translate(0 ${-(n - 1) * 5})"><svg x="-24" y="-24" width="48" height="48" viewBox="0 0 100 100" overflow="visible">${chipSVG([c[0], fmtK(a), c[2], c[3], c[4]], 100)}</svg></g></g>`);
+      out.push(`<g class="rl-ch${fresh.includes(k) ? ' fresh' : ''}" data-c="${k}" transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})"><ellipse cx="2" cy="${6 - (n - 1) * 2}" rx="25" ry="${23 + (n - 1) * 3}" fill="#000" opacity=".4"/>${discs}<g transform="translate(0 ${-(n - 1) * 5})"><svg x="-24" y="-24" width="48" height="48" viewBox="0 0 100 100" overflow="visible">${chipSVG([c[0], fmtK(a), c[2], c[3], c[4]], 100)}</svg></g></g>`);
     }
     this.chipsG.innerHTML = out.join('');
   }
@@ -473,17 +466,16 @@ class RouletteGame extends BaseGame {
       this.q('.rl-hl').innerHTML = '';
       this.tip('Rien ne va plus…');
       const r = Math.floor(Math.random() * NP);
-      const cam = this.setCam('spin', 1100);
-      await this.wait(250);
+      await this.setCam('spin');
+      if (this.dead) return;
       await this.spinTo(ORDER.indexOf(r));
-      await cam;
       if (this.dead) return;
       this.hist.unshift(r); this.hist = this.hist.slice(0, 500);
       try { localStorage.setItem('spinbet_roulette_hist', JSON.stringify(this.hist)); } catch { /* ignore */ }
       this.showWinner(r);
       sfx.reelStop?.(0);
       await this.wait(1500);
-      await this.setCam('bet', 1000);
+      await this.setCam('bet');
       if (this.dead) return;
       this.paintLed();
       await this.resolve(placed, r, tt);
@@ -491,21 +483,22 @@ class RouletteGame extends BaseGame {
   }
 
   spinTo(idx) {
-    const svg = this.q('.rl-wheel'), rotor = svg.querySelector('.rl-rotor'), ball = svg.querySelector('.rl-ball');
+    const box = this.q('.rl-wheelbox'), rotor = box.querySelector('.rl-rotor'), bw = box.querySelector('.rl-bw'), ball = box.querySelector('.rl-ballv');
     const T = this.turbo ? 4.2 : 7.4, T2 = T + 0.01;
     const w0 = this.wcur, wEnd = w0 + 300 + Math.random() * 120;
     const rel = idx * A + (Math.random() - 0.5) * A * 0.35;
     const E0 = 360 * (this.turbo ? 6 : 9) + Math.random() * 120;
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    box.classList.add('spin');
     let last = null;
-    const pos = (ang, rad) => { const t = ((ang - 90) * Math.PI) / 180; ball.setAttribute('cx', (rad * Math.cos(t)).toFixed(2)); ball.setAttribute('cy', (rad * Math.sin(t)).toFixed(2)); };
+    const pos = (ang, rad) => { bw.style.transform = `rotate(${ang.toFixed(2)}deg)`; ball.style.transform = `translateY(${(-rad).toFixed(1)}px)`; };
     return new Promise((res) => {
       const t0 = performance.now();
       const frame = (now) => {
         if (this.dead) return res();
         const t = Math.min(T2, ((now - t0) / 1000) * (reduced ? 6 : 1)), u = Math.min(1, t / T);
         const wa = w0 + (wEnd - w0) * (1 - Math.pow(1 - u, 1.8));
-        rotor.setAttribute('transform', `rotate(${wa.toFixed(2)})`);
+        rotor.style.transform = `rotate(${wa.toFixed(2)}deg)`;
         const Tb = T - 1.4;
         const bounce = t > Tb && t < T ? 10 * Math.exp(-3.6 * (t - Tb)) * Math.sin(16 * (t - Tb)) : 0;
         const E = t >= T ? 0 : E0 * Math.pow(1 - u, 2.4);
@@ -513,7 +506,11 @@ class RouletteGame extends BaseGame {
         const rad = u < 0.55 ? R_TRACK : u < 0.84 ? R_TRACK - (R_TRACK - R_POCKET) * ((x) => x * x * (3 - 2 * x))((u - 0.55) / 0.29) : R_POCKET + (t > Tb && t < T ? Math.abs(bounce) * 0.6 : 0);
         pos(ba, rad);
         if (u > 0.5 && t < T) { const nn = Math.floor((ba - wa) / A); if (last !== null && nn !== last) ballTick(Math.max(0.04, 0.15 * (1 - u) + 0.04)); last = nn; }
-        if (t >= T2) { this.wcur = wEnd % 360; rotor.setAttribute('transform', `rotate(${this.wcur.toFixed(2)})`); pos(this.wcur + rel, R_POCKET); return res(); }
+        if (t >= T2) {
+          this.wcur = wEnd % 360; rotor.style.transform = `rotate(${this.wcur.toFixed(2)}deg)`; pos(this.wcur + rel, R_POCKET);
+          box.classList.remove('spin');
+          return res();
+        }
         requestAnimationFrame(frame);
       };
       requestAnimationFrame(frame);

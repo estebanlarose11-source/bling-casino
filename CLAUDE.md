@@ -159,6 +159,11 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   « NUMÉRO GAGNANT », marqueur. Barre du bas : Vider, Répéter, Annuler, 5 jetons (ceux du 21 : `DEPS` roulette → `bjtable`),
   ×2, Lancer (table vide = rejoue les mises d'avant). Limites 5 000 KE par case, 10 000 KE en tout. Paiements classiques
   (plein 35 pour 1), retour 97,3 %.
+  **Fluidité** (bug « ça rame » du 10 novembre 2026, 22 → 47 images/s sur téléphone ralenti ×4) : la caméra ne bouge que par
+  2 transformations animées par le navigateur (`transition` sur `.rl-table` et `.rl-world`, origine fixe au centre du plan,
+  `frame()` calcule le cadrage) ; le plateau de la roue (`.rl-rotor`) et la bille (`.rl-bw` / `.rl-ballv`) sont des calques
+  à part tournés par `transform` ; jetons et cases gagnantes dans leurs propres SVG (`.rl-chipsvg`, `.rl-hlsvg`) ; aucun
+  filtre SVG ni `filter` CSS sur le tapis ou la roue. Ne pas les remettre.
 - **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
   avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série

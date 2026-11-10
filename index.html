@@ -5715,9 +5715,17 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
 .rl-room::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 55%, transparent 40%, rgba(2, 8, 18, .55)); }
 .rl-world { position: absolute; left: 0; top: 0; width: 2000px; height: 860px; transform-origin: 0 0; }
 .rl-world, .rl-persp, .rl-table, .rl-felt, .rl-up, .rl-wheelbox, .rl-room, .rl-shade { pointer-events: none; }
-.rl-persp { position: absolute; inset: 0; perspective: 1900px; transform-style: preserve-3d; }
-.rl-table { position: absolute; inset: 0; transform-style: preserve-3d; }
-.rl-felt { position: absolute; left: 0; top: 0; overflow: visible; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, .55)); }
+.rl-persp { position: absolute; inset: 0; perspective: 1900px; perspective-origin: 1000px 430px; transform-style: preserve-3d; }
+.rl-table { position: absolute; inset: 0; transform-style: preserve-3d; transform-origin: 1000px 430px; }
+/* camera moves = two transforms animated by the browser itself (no repaint) */
+@property --tilt { syntax: '<angle>'; inherits: true; initial-value: 12deg; }
+.rl { transition: --tilt var(--cam, 1s) cubic-bezier(.65, 0, .35, 1); }
+.rl-table, .rl-world { transition: transform var(--cam, 1s) cubic-bezier(.65, 0, .35, 1); }
+.rl.rl-still, .rl.rl-still .rl-table, .rl.rl-still .rl-world { transition: none; }
+.rl-layer { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+.rl-hlsvg { transform: translateZ(1px); animation: rlHl .9s ease-in-out infinite alternate; }
+.rl-chipsvg { transform: translateZ(2px); }
+.rl-felt { position: absolute; left: 0; top: 0; overflow: visible; }
 .rl-felt text { font: 900 26px Archivo, Inter, sans-serif; fill: #fff; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
 .rl-felt .rl-num { font-size: 30px; }
 .rl-felt .rl-out { font: 400 30px 'Bebas Neue', Archivo, sans-serif; letter-spacing: 2px; fill: #eaf2f8; }
@@ -5733,7 +5741,6 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
 .rl-no > :first-child, path.rl-no, .rl-hot.rl-no { animation: rlNo .45s; }
 @keyframes rlNo { 30% { fill: rgba(239, 68, 68, .55); } }
 .rl-hl, .rl-chips, .rl-led, .rl-ch { pointer-events: none; }
-.rl-hl > * { animation: rlHl .9s ease-in-out infinite alternate; }
 @keyframes rlHl { from { opacity: .45; } }
 .rl-ch.fresh { animation: rlIn .25s ease-out; }
 @keyframes rlIn { from { opacity: 0; } }
@@ -5741,14 +5748,19 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
 .rl-ledn { font: 700 24px 'Courier New', monospace !important; text-anchor: middle; }
 .rl-ledn.r { fill: #ff3b3b; } .rl-ledn.b { fill: #f4f4f4; } .rl-ledn.g { fill: #2bff6a; }
 .rl-ledn.last { font-size: 30px !important; filter: drop-shadow(0 0 5px currentColor); }
-.rl-wheelbox { position: absolute; width: 600px; height: 600px; transform-style: preserve-3d; }
-.rl-wheel { display: block; width: 600px; height: 600px; filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .6)); }
+.rl-wheelbox { position: absolute; width: 600px; height: 600px; transform: translateZ(1px); }
+.rl-wheel { position: absolute; left: 0; top: 0; display: block; width: 600px; height: 600px; }
+.rl-rotor { position: absolute; left: 90px; top: 90px; width: 420px; height: 420px; transform-origin: 50% 50%; }
+.rl-rotor svg { display: block; }
+.rl-bw { position: absolute; left: 300px; top: 300px; width: 0; height: 0; }
+.rl-ballv { position: absolute; left: -8.5px; top: -8.5px; width: 17px; height: 17px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #e9ecf2 60%, #8c93a3); box-shadow: 0 2px 2px rgba(0, 0, 0, .55); }
+.rl-wheelbox.spin .rl-rotor, .rl-wheelbox.spin .rl-bw, .rl-wheelbox.spin .rl-ballv { will-change: transform; }
 .rl-up { position: absolute; transform-origin: 50% 100%; transform: translate(-50%, -100%) rotateX(calc(-1 * var(--tilt))); }
 .rl-sign { transform: translate(-50%, -100%) rotateX(calc(-1 * var(--tilt) + 18deg)) rotateZ(-14deg); filter: drop-shadow(0 10px 8px rgba(0, 0, 0, .5)); }
 .rl-sign svg, .rl-dolly svg { display: block; }
 .rl-dolly { width: 44px; height: 80px; transform: translate(-50%, -96%) rotateX(calc(-1 * var(--tilt))); animation: rlDrop .45s cubic-bezier(.3, 1.4, .5, 1); }
 .rl-dolly[hidden] { display: none; }
-@keyframes rlDrop { from { margin-top: -60px; opacity: 0; } }
+@keyframes rlDrop { from { translate: 0 -60px; opacity: 0; } }
 .rl-shade { position: absolute; inset: 0; z-index: 3; background: linear-gradient(180deg, rgba(4, 12, 24, .7) 0, transparent 90px), linear-gradient(0deg, rgba(4, 12, 24, .7) 0, transparent 100px); }
 /* top bar */
 .rl-top { position: absolute; left: 8px; right: 8px; top: 6px; z-index: 6; display: flex; align-items: center; gap: 8px; height: 50px; padding: 0 6px; border-radius: 12px; background: linear-gradient(180deg, #2d6fb3, #174a83); border: 1px solid rgba(160, 205, 255, .55); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 6px 16px rgba(0, 0, 0, .45); }
@@ -11548,6 +11560,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'roulette', date: '2026-11-10', title: 'Roulette plus fluide', items: ['La caméra et la roue bougent deux fois plus en douceur, même sur téléphone', 'La bille roule sans à-coups jusqu’au numéro gagnant'] },
   { game: 'roulette', date: '2026-11-10', isNew: true, title: 'Nouveau : La Roulette en 3D', items: ['Une vraie table de roulette : tapis bleu, roue en bois et bille qui roule', 'Mise sur le cylindre : Tiers, Orphelins, Voisins du zéro, Jeu zéro, ou un numéro et ses voisins', 'La caméra file vers la roue pendant le lancer, puis revient sur ton numéro', 'Répéter, annuler, doubler, et le tableau lumineux des derniers numéros'] },
   { game: 'bataille', date: '2026-11-10', isNew: true, title: 'Nouveau : La Bataille', items: ['Une carte pour toi, une pour la croupière : la plus haute gagne', 'Gagne 5 mains d’affilée : la 5e paie ×5 ta mise !', 'Mise Égalité payée 12 pour 1', 'La même table et la même croupière que Le 21'] },
   { game: 'filon', date: '2026-11-10', title: 'Toute la mine en grand', isNew: true, items: ['Le décor de la mine remplit tout l’écran, derrière toute la machine', 'Des cases bien plus grosses', 'En plein écran : la mine sur tout le téléphone, sans bandes noires', 'Pendant le bonus, toute la mine passe à l’or'] },
@@ -14511,7 +14524,7 @@ const FILES = {
   bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '8172f58ae6'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '473a8559d8'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', '419585a560'],
-  roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', '9576441afd'],
+  roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', 'e273868aed'],
   bataille: ['bataille', 'games/impl/bataille.js', 'BatailleGame', '39b70b1d30'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '4f6ae0eba7'],
