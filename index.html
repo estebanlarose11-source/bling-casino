@@ -5825,6 +5825,31 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
 .rl-sbs small { margin: 0 6px 0 -2px; color: #94a3b8; font-weight: 700; }
 .rl-sb { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font: 900 14px Archivo, sans-serif; color: #fff; background: #1f2937; border: 2px solid rgba(255, 255, 255, .3); }
 .rl-sb.r { background: #c21d30; } .rl-sb.g { background: #14883f; }
+/* the other roulettes on the same table (L’Éclair, La Double Bille, L’Éclair Online) */
+.rl-wnb { display: flex; justify-content: center; gap: 8px; }
+.rl-wnb b.y { background: radial-gradient(circle at 40% 30%, #ffe680, #c8961e) !important; color: #2a1a00; }
+.rl-wnb b.y[hidden] { display: none; }
+.rl-wnb b:has(+ b.y:not([hidden])), .rl-wnb b.y { width: 72px !important; height: 72px !important; font-size: 34px !important; }
+.rl-ballv.y { background: radial-gradient(circle at 35% 30%, #fff7cc, #ffd23f 60%, #a87b00); }
+.rl-lksvg { transform: translateZ(1.5px); }
+.rl-lkring { fill: none; stroke: #ffe14a; stroke-width: 6; }
+.rl-lkn { animation: rlLk 1s ease-in-out infinite alternate; }
+.rl-lkn.yel .rl-lkring { stroke: #ffd23f; stroke-width: 8; stroke-dasharray: 10 6; }
+@keyframes rlLk { from { opacity: .55; } }
+.rl-lkbg { fill: #0b1a4d; stroke: #9fd4ff; stroke-width: 3; }
+.rl-felt .rl-lkt, .rl-lkt { font: 900 22px Archivo, sans-serif; fill: #ffe14a; text-anchor: middle; dominant-baseline: middle; }
+.rl-feat { position: absolute; right: 12px; top: 66px; z-index: 6; width: 210px; padding: 7px 10px 9px; border-radius: 12px; text-align: center; background: linear-gradient(180deg, #13306e, #071640); border: 2px solid rgba(159, 212, 255, .6); box-shadow: 0 10px 24px rgba(0, 0, 0, .45); pointer-events: none; }
+.rl-feat small { display: block; font: 900 12px Cinzel, Georgia, serif; letter-spacing: 1.5px; color: #ffe14a; }
+.rl-fv { margin-top: 4px; font: 700 12px/1.3 KeCoin, Inter, sans-serif; color: #dbeafe; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 8px; }
+.rl-fv span { font: 800 13px Archivo, sans-serif; color: #ffe14a; } .rl-fv span b { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding: 0 4px; margin-right: 3px; border-radius: 12px; background: #fff; color: #0b1a4d; }
+.rl-feat.ds { background: linear-gradient(180deg, #5a3d05, #241600); border-color: rgba(255, 210, 63, .7); }
+.rl-fm { display: block; font: 900 34px/1.1 Archivo, sans-serif; color: #ffd23f; text-shadow: 0 0 14px rgba(255, 210, 63, .6); }
+.rl-feat.rolling .rl-fm { animation: rlRoll .14s linear infinite; } @keyframes rlRoll { 50% { opacity: .5; } }
+.rl-feat.big { box-shadow: 0 0 28px rgba(255, 210, 63, .8), 0 10px 24px rgba(0, 0, 0, .45); }
+.rl-online .bjo-timer.on-timer { top: 64px; }
+.rl-online .rl-tip { top: 122px; }
+@media (max-width: 760px) { .rl-feat { top: 56px; width: 150px; padding: 5px 8px 6px; } .rl-fv { font-size: 10px; } .rl-fm { font-size: 24px; } .rl-online .bjo-timer.on-timer { top: 54px; width: min(60%, 300px); } .rl-online .rl-tip { top: 106px; } }
+@media (max-width: 460px) { .rl-feat .rl-fv { display: none; } .rl-feat.storm .rl-fv { display: flex; } }
 /* La Bataille (games/bataille.js) : la série de 5 victoires, au-dessus de la table du 21 */
 .btl-serie { position: absolute; left: 50%; top: 58px; z-index: 6; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 14px; background: rgba(8, 10, 14, .8); border: 1px solid rgba(231, 199, 102, .45); box-shadow: 0 8px 20px rgba(0, 0, 0, .45); pointer-events: none; white-space: nowrap; }
 .btl-serie small { font: 900 12px Cinzel, Georgia, serif; letter-spacing: 2px; color: #f0d27a; }
@@ -11560,6 +11585,9 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'storm', date: '2026-11-10', title: 'Nouvelle table en 3D', items: ['La même table que La Roulette : tapis bleu, roue en bois et caméra qui suit la bille', 'Les éclairs frappent directement les numéros du tapis', 'Mise sur le cylindre : Tiers, Orphelins, Voisins, Jeu zéro', 'Tableau lumineux des derniers numéros et statistiques'] },
+  { game: 'storm-online', date: '2026-11-10', title: 'Nouvelle table en 3D', items: ['La même table que La Roulette, pour tout le salon', 'Les éclairs frappent directement les numéros du tapis', 'Les joueurs et le chat restent sous la table'] },
+  { game: 'doublespin', date: '2026-11-10', title: 'Nouvelle table en 3D', items: ['La même table que La Roulette : tapis bleu et roue en bois', 'Les deux billes roulent ensemble, la jaune finit un peu après', 'Le numéro de la bille jaune s’allume en or sur le tapis'] },
   { game: 'roulette', date: '2026-11-10', title: 'Roulette plus fluide', items: ['La caméra et la roue bougent deux fois plus en douceur, même sur téléphone', 'La bille roule sans à-coups jusqu’au numéro gagnant'] },
   { game: 'roulette', date: '2026-11-10', isNew: true, title: 'Nouveau : La Roulette en 3D', items: ['Une vraie table de roulette : tapis bleu, roue en bois et bille qui roule', 'Mise sur le cylindre : Tiers, Orphelins, Voisins du zéro, Jeu zéro, ou un numéro et ses voisins', 'La caméra file vers la roue pendant le lancer, puis revient sur ton numéro', 'Répéter, annuler, doubler, et le tableau lumineux des derniers numéros'] },
   { game: 'bataille', date: '2026-11-10', isNew: true, title: 'Nouveau : La Bataille', items: ['Une carte pour toi, une pour la croupière : la plus haute gagne', 'Gagne 5 mains d’affilée : la 5e paie ×5 ta mise !', 'Mise Égalité payée 12 pour 1', 'La même table et la même croupière que Le 21'] },
@@ -14508,7 +14536,7 @@ __mods['games/impl/index.js'] = (() => {
 // tools/build.py: run `python3 tools/build.py` after changing a file in games/.
 
 const FILES = {
-  'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', 'b631fcbf76'],
+  'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', '0a69ae2268'],
   'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '88301951af'],
   'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '3f67cd2454'],
@@ -14519,12 +14547,13 @@ const FILES = {
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'fcbe76e4e1'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'c757c58318'],
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '9e528dfdf5'],
-  storm: ['storm', 'games/impl/storm.js', 'StormGame', '926159b79d'],
-  doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', '6a7224b090'],
+  storm: ['storm', 'games/impl/storm.js', 'StormGame', '209ac1dbd4'],
+  doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', 'a2079e2117'],
   bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '8172f58ae6'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '473a8559d8'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', '419585a560'],
-  roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', 'e273868aed'],
+  rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', 'bf9bc2722c'],
+  roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', '7854b34117'],
   bataille: ['bataille', 'games/impl/bataille.js', 'BatailleGame', '39b70b1d30'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '4f6ae0eba7'],
@@ -14562,8 +14591,9 @@ const FILES = {
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '1025072609'],
   boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '48602d9af5'],
 };
-// files a game needs first (the shared blackjack table of the 3 blackjacks and La Bataille; its chips for La Roulette)
-const DEPS = { blackjack: ['bjtable'], lightningbj: ['bjtable'], 'bj-online': ['bjtable'], bataille: ['bjtable'], roulette: ['bjtable'] };
+// files a game needs first (the shared blackjack table of the 3 blackjacks and La Bataille; the shared roulette table
+// of the 4 roulettes, which uses the chips of the blackjack table)
+const DEPS = { blackjack: ['bjtable'], lightningbj: ['bjtable'], 'bj-online': ['bjtable'], bataille: ['bjtable'], rltable: ['bjtable'], roulette: ['rltable'], storm: ['rltable'], doublespin: ['rltable'], 'storm-online': ['rltable'] };
 const loading = {};
 
 function loadScript(src) {
@@ -14576,7 +14606,7 @@ function loadScript(src) {
   });
 }
 
-const hasImpl = (id) => !!FILES[id] && id !== 'bjtable';
+const hasImpl = (id) => !!FILES[id] && id !== 'bjtable' && id !== 'rltable';
 function loadImpl(id) {
   if (DEPS[id]) return Promise.all(DEPS[id].map((d) => loadImpl(d))).then(() => loadOne(id));
   return loadOne(id);

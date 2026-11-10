@@ -150,20 +150,24 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Le 21 Online : les autres joueurs assis aux places `SEATS` (4 au plus : nom, mise, cartes, résultat ; tout le salon
   et le chat restent sous la table hors plein écran), chronomètre du salon en haut (`.bjo-timer`).
   Les règles et les gains des 3 jeux n'ont pas changé.
-- **La Roulette** (`games/roulette.js`, id `roulette`, demande du propriétaire d'après les captures d'un autre jeu : même
-  principe, dessins à nous) : roulette européenne sur une table en 3D (plan `W` × `H` incliné, caméra `applyCam` / `setCam`
-  animée en JS : `bet` presque vu de dessus pour miser, `spin` penchée sur la roue en bois pendant le lancer). Tapis bleu :
-  cylindre (Tiers, Orphelins, Voisins, Jeu zéro = `ANNOUNCED` ; un numéro du cylindre = lui + 2 voisins), grille avec le 0
-  à droite et les « 2 pour 1 » à gauche (miroir des cases de `buildDefs` de `core/roulette.js` : `hotXY`), douzaines,
-  chances simples ; tableau lumineux des derniers numéros (statistiques au toucher, `spinbet_roulette_hist`), panneau
-  « NUMÉRO GAGNANT », marqueur. Barre du bas : Vider, Répéter, Annuler, 5 jetons (ceux du 21 : `DEPS` roulette → `bjtable`),
-  ×2, Lancer (table vide = rejoue les mises d'avant). Limites 5 000 KE par case, 10 000 KE en tout. Paiements classiques
-  (plein 35 pour 1), retour 97,3 %.
+- **Les 4 roulettes ont la même table en 3D** (demande du propriétaire, d'après des captures d'un autre jeu : même
+  principe, dessins à nous) : `games/rltable.js` (`RlTableGame`, chargé avant elles par `DEPS` ; il utilise les jetons de
+  `bjtable`, entrée `rltable` dans `FILES`, `hasImpl` l'ignore). La Roulette (`roulette.js`, plein 35, retour 97,3 %),
+  L'Éclair (`storm.js`, éclairs sur 1 à 5 numéros du tapis, `markLucky`), La Double Bille (`doublespin.js`, 2 billes,
+  `balls: 2`, multiplicateur de la jaune dans le panneau `.rl-feat`) et L'Éclair Online (`storm-online.js`, salon :
+  PRÊT, chronomètre `.bjo-timer`, joueurs et chat sous la table) n'ont plus que leurs règles (cotes d'origine
+  inchangées) et passent par les crochets `beforeSpin()`, `draw()`, `payOf()`, `winnerText()`, `resultText()`.
+  Plan `W` × `H` incliné, caméra `bet` (presque vu de dessus pour miser) et `spin` (penchée sur la roue en bois).
+  Tapis bleu : cylindre (Tiers, Orphelins, Voisins, Jeu zéro = `ANNOUNCED` ; un numéro du cylindre = lui + 2 voisins),
+  grille avec le 0 à droite et les « 2 pour 1 » à gauche (miroir des cases de `buildDefs` de `core/roulette.js` :
+  `hotXY`), douzaines, chances simples ; tableau lumineux des derniers numéros (statistiques au toucher,
+  `spinbet_<id>_hist`), panneau « NUMÉRO GAGNANT », marqueur. Barre du bas : Vider, Répéter, Annuler, 5 jetons, ×2,
+  Lancer (table vide = rejoue les mises d'avant). Limites 5 000 KE par case, 10 000 KE en tout.
   **Fluidité** (bug « ça rame » du 10 novembre 2026, 22 → 47 images/s sur téléphone ralenti ×4) : la caméra ne bouge que par
   2 transformations animées par le navigateur (`transition` sur `.rl-table` et `.rl-world`, origine fixe au centre du plan,
-  `frame()` calcule le cadrage) ; le plateau de la roue (`.rl-rotor`) et la bille (`.rl-bw` / `.rl-ballv`) sont des calques
-  à part tournés par `transform` ; jetons et cases gagnantes dans leurs propres SVG (`.rl-chipsvg`, `.rl-hlsvg`) ; aucun
-  filtre SVG ni `filter` CSS sur le tapis ou la roue. Ne pas les remettre.
+  `frame()` calcule le cadrage) ; le plateau de la roue (`.rl-rotor`) et les billes (`.rl-bw` / `.rl-ballv`) sont des calques
+  à part tournés par `transform` ; jetons, éclairs et cases gagnantes dans leurs propres SVG (`.rl-chipsvg`, `.rl-lksvg`,
+  `.rl-hlsvg`) ; aucun filtre SVG ni `filter` CSS sur le tapis ou la roue. Ne pas les remettre.
 - **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
   avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série
