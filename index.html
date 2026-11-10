@@ -5699,6 +5699,138 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
 .fo-over.break { pointer-events: auto; background: rgba(2,6,23,.55); }
 .fo-over.menu .fo-help-grid { margin-top: 12px; text-align: left; }
 </style>
+<style id="roulette">
+/* ============ La Roulette : table de roulette en 3D (games/roulette.js, .rl) ============ */
+.game-host .slot.rl-game { display: block !important; padding: 0 !important; max-width: none !important; }
+.game-host:has(> .rl-game) { max-width: 1320px; }
+.game-host.is-full:has(> .rl-game) { padding: 0 !important; max-width: none; }
+.slot.rl-game > .slot-head, .slot.rl-game > .win-bar, .slot.rl-game > .controls, .slot.rl-game > .slot-bg { display: none !important; }
+.slot.rl-game > .slot-frame { padding: 0 !important; margin: 0 !important; background: none !important; box-shadow: none !important; border: 0 !important; position: static !important; }
+.slot.rl-game .slot-stage { padding: 0 !important; background: none !important; box-shadow: none !important; border: 0 !important; }
+.game-host.is-full .slot.rl-game > .on-side, .game-host.is-full .slot.rl-game .on-side { display: none !important; }
+.slot.rl-game > .on-side { margin-top: 12px; }
+.rl { position: relative; height: 560px; overflow: hidden; border-radius: 14px; background: #10243a; user-select: none; -webkit-user-select: none; touch-action: manipulation; isolation: isolate; }
+.game-host.is-full .slot.rl-game .rl { height: 100dvh !important; border-radius: 0; }
+.rl-room { position: absolute; inset: 0; background-color: #16314f; background-size: 140px; }
+.rl-room::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 60% at 50% 55%, transparent 40%, rgba(2, 8, 18, .55)); }
+.rl-world { position: absolute; left: 0; top: 0; width: 2000px; height: 860px; transform-origin: 0 0; }
+.rl-world, .rl-persp, .rl-table, .rl-felt, .rl-up, .rl-wheelbox, .rl-room, .rl-shade { pointer-events: none; }
+.rl-persp { position: absolute; inset: 0; perspective: 1900px; transform-style: preserve-3d; }
+.rl-table { position: absolute; inset: 0; transform-style: preserve-3d; }
+.rl-felt { position: absolute; left: 0; top: 0; overflow: visible; filter: drop-shadow(0 30px 40px rgba(0, 0, 0, .55)); }
+.rl-felt text { font: 900 26px Archivo, Inter, sans-serif; fill: #fff; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
+.rl-felt .rl-num { font-size: 30px; }
+.rl-felt .rl-out { font: 400 30px 'Bebas Neue', Archivo, sans-serif; letter-spacing: 2px; fill: #eaf2f8; }
+.rl-felt .rl-out.sm { font-size: 17px; letter-spacing: 1.5px; }
+.rl-felt .rl-rt text { font-size: 22px; }
+.rl-felt .rl-an-t { font: 400 25px 'Bebas Neue', Archivo, sans-serif; letter-spacing: 2px; fill: #eaf2f8; }
+.rl-cell, .rl-rt, .rl-an, .rl-hot, [data-led] { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.rl-hot { fill: transparent; }
+.rl[data-phase="bet"] .rl-cell:hover > :first-child, .rl[data-phase="bet"] .rl-an:hover > path { fill: rgba(255, 255, 255, .14); }
+.rl[data-phase="bet"] .rl-rt:hover > path { filter: brightness(1.35); }
+.rl[data-phase="bet"] .rl-hot:hover { fill: rgba(255, 255, 255, .35); }
+.rl:not([data-phase="bet"]) .rl-cell, .rl:not([data-phase="bet"]) .rl-rt, .rl:not([data-phase="bet"]) .rl-an, .rl:not([data-phase="bet"]) .rl-hot { cursor: default; }
+.rl-no > :first-child, path.rl-no, .rl-hot.rl-no { animation: rlNo .45s; }
+@keyframes rlNo { 30% { fill: rgba(239, 68, 68, .55); } }
+.rl-hl, .rl-chips, .rl-led, .rl-ch { pointer-events: none; }
+.rl-hl > * { animation: rlHl .9s ease-in-out infinite alternate; }
+@keyframes rlHl { from { opacity: .45; } }
+.rl-ch.fresh { animation: rlIn .25s ease-out; }
+@keyframes rlIn { from { opacity: 0; } }
+.rl-ch.win { filter: drop-shadow(0 0 7px #fde047) drop-shadow(0 0 2px #fff); }
+.rl-ledn { font: 700 24px 'Courier New', monospace !important; text-anchor: middle; }
+.rl-ledn.r { fill: #ff3b3b; } .rl-ledn.b { fill: #f4f4f4; } .rl-ledn.g { fill: #2bff6a; }
+.rl-ledn.last { font-size: 30px !important; filter: drop-shadow(0 0 5px currentColor); }
+.rl-wheelbox { position: absolute; width: 600px; height: 600px; transform-style: preserve-3d; }
+.rl-wheel { display: block; width: 600px; height: 600px; filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .6)); }
+.rl-up { position: absolute; transform-origin: 50% 100%; transform: translate(-50%, -100%) rotateX(calc(-1 * var(--tilt))); }
+.rl-sign { transform: translate(-50%, -100%) rotateX(calc(-1 * var(--tilt) + 18deg)) rotateZ(-14deg); filter: drop-shadow(0 10px 8px rgba(0, 0, 0, .5)); }
+.rl-sign svg, .rl-dolly svg { display: block; }
+.rl-dolly { width: 44px; height: 80px; transform: translate(-50%, -96%) rotateX(calc(-1 * var(--tilt))); animation: rlDrop .45s cubic-bezier(.3, 1.4, .5, 1); }
+.rl-dolly[hidden] { display: none; }
+@keyframes rlDrop { from { margin-top: -60px; opacity: 0; } }
+.rl-shade { position: absolute; inset: 0; z-index: 3; background: linear-gradient(180deg, rgba(4, 12, 24, .7) 0, transparent 90px), linear-gradient(0deg, rgba(4, 12, 24, .7) 0, transparent 100px); }
+/* top bar */
+.rl-top { position: absolute; left: 8px; right: 8px; top: 6px; z-index: 6; display: flex; align-items: center; gap: 8px; height: 50px; padding: 0 6px; border-radius: 12px; background: linear-gradient(180deg, #2d6fb3, #174a83); border: 1px solid rgba(160, 205, 255, .55); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 6px 16px rgba(0, 0, 0, .45); }
+.rl-sq { flex: none; width: 40px; height: 38px; border-radius: 9px; border: 1px solid rgba(255, 255, 255, .3); background: rgba(6, 26, 56, .45); color: #fff; display: grid; place-items: center; font: 700 20px/1 Inter, sans-serif; cursor: pointer; }
+.rl-sq svg { width: 20px; height: 20px; }
+.rl-full span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.rl-me { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.rl-av { flex: none; width: 36px; height: 36px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: #0b2a50; border: 2px solid rgba(255, 255, 255, .5); }
+.rl-av .lk-av { width: 36px; height: 36px; }
+.rl-ini { font: 900 18px Archivo, sans-serif; color: #fde68a; }
+.rl-me b { display: block; font: 700 13px/1.1 Inter, sans-serif; color: #e6f1ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+.rl-me em { display: block; font: 800 15px/1.2 KeCoin, Archivo, sans-serif; font-style: normal; color: #fff; white-space: nowrap; }
+.rl-total { position: relative; margin-left: auto; min-width: 0; flex: 0 1 300px; height: 36px; border-radius: 8px; background: #0a2747; border: 1px solid rgba(255, 255, 255, .25); overflow: hidden; display: flex; align-items: center; justify-content: flex-end; padding: 0 10px; }
+.rl-total i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(180deg, #3ddc5f, #189a37); transition: width .25s; }
+.rl-total span { position: relative; font: 800 15px KeCoin, Archivo, sans-serif; color: #fff; white-space: nowrap; text-shadow: 0 1px 2px rgba(0, 0, 0, .6); }
+.rl-gain { flex: none; padding: 2px 10px; border-radius: 8px; background: rgba(6, 26, 56, .45); text-align: right; }
+.rl-gain small { display: block; font: 700 9px Inter, sans-serif; letter-spacing: 1px; text-transform: uppercase; color: #bfe0ff; }
+.rl-gain b { font: 800 14px KeCoin, Archivo, sans-serif; color: #fde68a; white-space: nowrap; }
+/* messages */
+.rl-tip { position: absolute; left: 50%; top: 66px; z-index: 6; transform: translateX(-50%); width: max-content; max-width: min(92%, 620px); padding: 9px 16px; border-radius: 10px; background: rgba(28, 34, 44, .92); border: 1px solid rgba(255, 255, 255, .2); color: #fff; font: 700 14px/1.35 KeCoin, Inter, sans-serif; text-align: center; pointer-events: none; opacity: 0; transition: opacity .35s; box-shadow: 0 8px 22px rgba(0, 0, 0, .45); }
+.rl-tip.show { opacity: 1; }
+.rl-tip.warn { background: rgba(40, 20, 24, .95); border-color: rgba(252, 165, 165, .5); }
+.rl-wn { position: absolute; left: 12px; top: 66px; z-index: 6; width: 190px; padding: 8px 10px 10px; border-radius: 12px; text-align: center; background: linear-gradient(180deg, #1a5f96, #0b2d52); border: 2px solid rgba(220, 236, 255, .7); box-shadow: 0 10px 26px rgba(0, 0, 0, .5); animation: rlWn .5s cubic-bezier(.3, 1.5, .5, 1); pointer-events: none; }
+.rl-wn[hidden] { display: none; }
+@keyframes rlWn { from { transform: scale(.4); opacity: 0; } }
+.rl-wn small { display: block; font: 900 12px Cinzel, Georgia, serif; letter-spacing: 1px; color: #fff; }
+.rl-wn b { display: grid; place-items: center; width: 92px; height: 92px; margin: 6px auto; border-radius: 50%; font: 900 46px/1 Archivo, sans-serif; color: #fff; border: 4px solid #d7dde4; box-shadow: inset 0 -6px 12px rgba(0, 0, 0, .4), 0 0 0 3px #39424c; background: radial-gradient(circle at 40% 30%, #3a4250, #111419); }
+.rl-wn.r b { background: radial-gradient(circle at 40% 30%, #e0384b, #7a0d18); } .rl-wn.g b { background: radial-gradient(circle at 40% 30%, #2bbf63, #0b5a2a); }
+.rl-wn em { font: 800 11px Inter, sans-serif; font-style: normal; color: #cfe6ff; letter-spacing: .5px; }
+.rl-turn { display: none; }
+@keyframes rlTurn { 85% { opacity: 1; } to { opacity: 0; visibility: hidden; } }
+@media (orientation: portrait) { .rl-turn { display: block; position: absolute; left: 50%; top: 52px; animation: rlTurn 6s forwards; z-index: 5; transform: translateX(-50%); width: max-content; max-width: 90%; padding: 5px 12px; border-radius: 10px; background: rgba(8, 16, 30, .7); color: #cfe6ff; font: 700 11px Inter, sans-serif; pointer-events: none; } .rl[data-cam="spin"] .rl-turn { display: none; } }
+/* bottom bar */
+.rl-hud { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 6; display: flex; align-items: center; gap: 6px; height: 68px; padding: 0 6px; border-radius: 12px; background: linear-gradient(180deg, #2d6fb3, #174a83); border: 1px solid rgba(160, 205, 255, .55); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), 0 -4px 16px rgba(0, 0, 0, .35); }
+.rl-b { flex: none; width: 64px; height: 56px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .25); background: rgba(6, 26, 56, .35); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; cursor: pointer; padding: 0; -webkit-tap-highlight-color: transparent; transition: transform .12s, opacity .2s; }
+.rl-b svg { width: 30px; height: 30px; }
+.rl-b b { font: 900 22px/30px Archivo, sans-serif; }
+.rl-b span { font: 800 10px Inter, sans-serif; letter-spacing: .4px; text-transform: uppercase; color: #dbeafe; }
+.rl-b:disabled { opacity: .35; cursor: default; }
+.rl-b:not(:disabled):active { transform: scale(.95); }
+.rl-go { width: 96px; margin-left: auto; background: linear-gradient(180deg, #f8dc7e, #c8961e); color: #2a1800; border-color: #fff4c7; box-shadow: 0 0 18px rgba(248, 220, 126, .5); }
+.rl-go span { color: #2a1800; font-size: 12px; }
+.rl-go.stop { background: linear-gradient(180deg, #ef4444, #991b1b); color: #fff; } .rl-go.stop span { color: #fff; }
+.rl-chipbar { flex: 1 1 auto; display: flex; justify-content: center; align-items: center; gap: 6px; min-width: 0; padding: 4px 10px; border-radius: 34px; background: rgba(4, 18, 40, .55); box-shadow: inset 0 2px 6px rgba(0, 0, 0, .5); }
+.rl-pick { flex: none; width: 50px; height: 50px; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; transition: transform .18s cubic-bezier(.3, 1.5, .5, 1); -webkit-tap-highlight-color: transparent; }
+.rl-pick svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .45)); }
+.rl-pick.on { transform: scale(1.22) translateY(-4px); }
+.rl-pick.on svg { filter: drop-shadow(0 0 0 3px #fff) drop-shadow(0 0 10px rgba(255, 255, 255, .8)); }
+.rl-pick.off { opacity: .35; }
+@media (max-width: 760px) {
+  .rl-top { height: 44px; gap: 6px; } .rl-sq { width: 34px; height: 32px; } .rl-av { width: 30px; height: 30px; } .rl-me b { font-size: 11px; max-width: 80px; } .rl-me em { font-size: 13px; }
+  .rl-total { height: 30px; padding: 0 6px; } .rl-total span { font-size: 12px; } .rl-gain { display: none; }
+  .rl-tip { top: 56px; font-size: 12.5px; } .rl-wn { top: 56px; width: 140px; } .rl-wn b { width: 66px; height: 66px; font-size: 34px; }
+  .rl-hud { height: 58px; gap: 4px; padding: 0 4px; } .rl-b { width: 44px; height: 48px; } .rl-b svg { width: 24px; height: 24px; } .rl-b span { font-size: 8px; } .rl-b b { font-size: 18px; line-height: 24px; }
+  .rl-go { width: 64px; } .rl-go span { font-size: 9px; } .rl-chipbar { gap: 2px; padding: 3px 4px; } .rl-pick { width: 36px; height: 36px; }
+}
+@media (max-width: 460px) { .rl-me div { display: none; } .rl-b[data-rl="x2"] { display: none; } .rl-b { width: 38px; } .rl-b span { font-size: 7px; letter-spacing: 0; } .rl-go { width: 54px; } .rl-pick { flex: 0 1 34px; width: auto; height: auto; aspect-ratio: 1; min-width: 0; } .rl-chipbar { gap: 1px; } }
+.rl-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin: 10px 0; }
+.rl-stats div { padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, .06); }
+.rl-stats b { display: block; font-size: 12px; color: #94a3b8; } .rl-stats span { font: 800 16px Archivo, sans-serif; }
+.rl-sbs { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 6px 0 10px; }
+.rl-sbs small { margin: 0 6px 0 -2px; color: #94a3b8; font-weight: 700; }
+.rl-sb { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font: 900 14px Archivo, sans-serif; color: #fff; background: #1f2937; border: 2px solid rgba(255, 255, 255, .3); }
+.rl-sb.r { background: #c21d30; } .rl-sb.g { background: #14883f; }
+/* La Bataille (games/bataille.js) : la série de 5 victoires, au-dessus de la table du 21 */
+.btl-serie { position: absolute; left: 50%; top: 58px; z-index: 6; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; padding: 6px 12px; border-radius: 14px; background: rgba(8, 10, 14, .8); border: 1px solid rgba(231, 199, 102, .45); box-shadow: 0 8px 20px rgba(0, 0, 0, .45); pointer-events: none; white-space: nowrap; }
+.btl-serie small { font: 900 12px Cinzel, Georgia, serif; letter-spacing: 2px; color: #f0d27a; }
+.btl-pips { display: flex; gap: 5px; }
+.btl-pips i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 900 12px/1 Archivo, sans-serif; font-style: normal; color: rgba(255, 255, 255, .45); background: #20242c; border: 2px solid rgba(231, 199, 102, .35); transition: background .3s, color .3s; }
+.btl-pips i:last-child { width: 38px; border-radius: 15px; color: #f0d27a; }
+.btl-pips i.on { background: radial-gradient(circle at 40% 30%, #4ade80, #15803d); color: #fff; border-color: #bbf7d0; }
+.btl-pips i:last-child.on { background: radial-gradient(circle at 40% 30%, #fde68a, #c8961e); color: #2a1a00; border-color: #fff8db; box-shadow: 0 0 18px rgba(253, 224, 71, .8); }
+.btl-pips i.pop { animation: btlPop .5s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes btlPop { from { transform: scale(.3); } }
+.btl-serie em { font: 700 12px KeCoin, Inter, sans-serif; font-style: normal; color: #e2e8f0; }
+.btl-serie.hot { border-color: #fde047; animation: btlHot 1s ease-in-out infinite alternate; }
+.btl-serie.hot em { color: #fde047; }
+@keyframes btlHot { to { box-shadow: 0 0 24px rgba(253, 224, 71, .55), 0 8px 20px rgba(0, 0, 0, .45); } }
+.btl .bjv-msg { top: 112px; }
+.btl .bjv-hand .bjv-res { left: -250px; top: 70px; }
+@media (max-width: 700px) { .btl-serie { top: 52px; gap: 6px; padding: 5px 8px; } .btl-pips i { width: 24px; height: 24px; font-size: 10px; } .btl-pips i:last-child { width: 32px; } .btl-serie em { display: none; } .btl .bjv-msg { top: 96px; } }
+</style>
 <style id="finition">
 /* ============ Finition : dégradés, reliefs et lumière sur toute l'interface (après toutes les autres couches) ============
    Les écrans des jeux gardent leurs propres couleurs ; le mode clair a ses propres règles plus bas. */
@@ -6537,7 +6669,7 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
   <main id="view" class="view"></main>
 
   <footer class="foot">
-    <!-- seo-links (fabriqué par tools/seo.py : ne pas modifier à la main) --><section class="seo-foot" aria-label="Tous les jeux de SpinBet Casino"><p><b>SpinBet Casino</b>, casino gratuit en ligne : 50 jeux de casino gratuits sans téléchargement ni dépôt, en argent fictif (KE). Machines à sous avec bonus et jackpots, roulettes, blackjack, poker Texas Hold’em, roues de la fortune, tables multijoueurs et jeux rapides (mines, crash, plinko), sur téléphone comme sur ordinateur. Aucun vrai pari, aucun gain réel.</p><div class="seo-cols"><div><b>Machines à sous gratuites</b><a href="jeux/big-bad-wolf.html">Le Loup</a><a href="jeux/cosmic.html">Le Cosmique</a><a href="jeux/zeus.html">L’Olympe</a><a href="jeux/huff.html">Le Loup 2.0</a><a href="jeux/candy.html">La Sweety</a><a href="jeux/anubis.html">L’Anubis</a><a href="jeux/bling.html">La Tour Bling</a><a href="jeux/pharaon.html">Le Totem</a><a href="jeux/chasse.html">The Hunt</a><a href="jeux/noel.html">La Tournée du Père Noël</a><a href="jeux/totemx.html">Le Totem Extrême</a><a href="jeux/barillet.html">La Roulette Russe</a><a href="jeux/filon.html">Le Filon</a><a href="jeux/taco.html">La Pizza Yo-Yo</a><a href="jeux/billets.html">Le Coffre-Fort</a><a href="jeux/dragons.html">L’Hydre</a><a href="jeux/labo.html">Le Labo</a><a href="jeux/fortune.html">La Fortune</a></div><div><b>Roulette, blackjack, poker et roues</b><a href="jeux/madwheel.html">La Roue Folle</a><a href="jeux/storm.html">L’Éclair</a><a href="jeux/doublespin.html">La Double Bille</a><a href="jeux/plateau.html">Le Plateau</a><a href="jeux/peche.html">La Pêche</a><a href="jeux/roueor.html">La Roue d’Or</a><a href="jeux/blackjack.html">Le 21</a><a href="jeux/lightningbj.html">Le 21 Électrique</a><a href="jeux/poker.html">Le Texas</a></div><div><b>Tables multijoueurs</b><a href="jeux/storm-online.html">L’Éclair Online</a><a href="jeux/bj-online.html">Le 21 Online</a><a href="jeux/holdem-online.html">Le Texas Online</a><a href="jeux/madwheel-online.html">La Roue Folle Online</a><a href="jeux/robots-online.html">La Course Online</a><a href="jeux/plateau-online.html">Le Plateau Online</a><a href="jeux/peche-online.html">La Pêche Online</a><a href="jeux/roueor-online.html">La Roue d’Or Online</a></div><div><b>Jeux rapides gratuits</b><a href="jeux/mines.html">Le Champ de Mines</a><a href="jeux/avion.html">L’Avion</a><a href="jeux/plinko.html">La Cascade</a><a href="jeux/vortex.html">Le Vortex</a><a href="jeux/casse.html">Le Casse</a><a href="jeux/pileface.html">La Pièce</a><a href="jeux/robots.html">La Course</a><a href="jeux/poulet.html">Le Poulet</a><a href="jeux/gratteciel.html">Le Gratte-Ciel</a><a href="jeux/penalty.html">Le Penalty</a><a href="jeux/ticket.html">Le Ticket</a><a href="jeux/billes.html">La Descente</a><a href="jeux/pilote.html">Le Pilote</a><a href="jeux/foot.html">Le Derby</a><a href="jeux/boxe.html">Le Ring</a></div><div><b>Guides et astuces</b><a href="articles/meilleures-machines-a-sous-gratuites-2026.html">Les meilleures machines à sous gratuites en 2026</a><a href="articles/jeux-de-casino-gratuits-sans-telechargement.html">Roulette, blackjack et poker gratuits sans téléchargement</a><a href="articles/jeux-crash-mines-plinko-gratuits.html">Jeux crash, mines et plinko gratuits : le guide 2026</a><a href="articles/rtp-volatilite-machines-a-sous.html">RTP et volatilité : comprendre une machine à sous</a><a href="articles/comment-gagner-aux-machines-a-sous.html">Comment gagner aux machines à sous ? Vrais conseils et idées reçues</a><a href="articles/strategie-blackjack.html">Stratégie de base au blackjack : le tableau complet</a><a href="articles/martingale-roulette.html">Martingale à la roulette : est-ce que ça marche vraiment ?</a><a href="articles/casino-gratuit-sur-telephone.html">Casino gratuit sur téléphone, sans téléchargement (Android et iPhone)</a></div></div></section><!-- /seo-links -->
+    <!-- seo-links (fabriqué par tools/seo.py : ne pas modifier à la main) --><section class="seo-foot" aria-label="Tous les jeux de SpinBet Casino"><p><b>SpinBet Casino</b>, casino gratuit en ligne : 52 jeux de casino gratuits sans téléchargement ni dépôt, en argent fictif (KE). Machines à sous avec bonus et jackpots, roulettes, blackjack, poker Texas Hold’em, roues de la fortune, tables multijoueurs et jeux rapides (mines, crash, plinko), sur téléphone comme sur ordinateur. Aucun vrai pari, aucun gain réel.</p><div class="seo-cols"><div><b>Machines à sous gratuites</b><a href="jeux/big-bad-wolf.html">Le Loup</a><a href="jeux/cosmic.html">Le Cosmique</a><a href="jeux/zeus.html">L’Olympe</a><a href="jeux/huff.html">Le Loup 2.0</a><a href="jeux/candy.html">La Sweety</a><a href="jeux/anubis.html">L’Anubis</a><a href="jeux/bling.html">La Tour Bling</a><a href="jeux/pharaon.html">Le Totem</a><a href="jeux/chasse.html">The Hunt</a><a href="jeux/noel.html">La Tournée du Père Noël</a><a href="jeux/totemx.html">Le Totem Extrême</a><a href="jeux/barillet.html">La Roulette Russe</a><a href="jeux/filon.html">Le Filon</a><a href="jeux/taco.html">La Pizza Yo-Yo</a><a href="jeux/billets.html">Le Coffre-Fort</a><a href="jeux/dragons.html">L’Hydre</a><a href="jeux/labo.html">Le Labo</a><a href="jeux/fortune.html">La Fortune</a></div><div><b>Roulette, blackjack, poker et roues</b><a href="jeux/madwheel.html">La Roue Folle</a><a href="jeux/roulette.html">La Roulette</a><a href="jeux/storm.html">L’Éclair</a><a href="jeux/doublespin.html">La Double Bille</a><a href="jeux/plateau.html">Le Plateau</a><a href="jeux/peche.html">La Pêche</a><a href="jeux/roueor.html">La Roue d’Or</a><a href="jeux/blackjack.html">Le 21</a><a href="jeux/lightningbj.html">Le 21 Électrique</a><a href="jeux/bataille.html">La Bataille</a><a href="jeux/poker.html">Le Texas</a></div><div><b>Tables multijoueurs</b><a href="jeux/storm-online.html">L’Éclair Online</a><a href="jeux/bj-online.html">Le 21 Online</a><a href="jeux/holdem-online.html">Le Texas Online</a><a href="jeux/madwheel-online.html">La Roue Folle Online</a><a href="jeux/robots-online.html">La Course Online</a><a href="jeux/plateau-online.html">Le Plateau Online</a><a href="jeux/peche-online.html">La Pêche Online</a><a href="jeux/roueor-online.html">La Roue d’Or Online</a></div><div><b>Jeux rapides gratuits</b><a href="jeux/mines.html">Le Champ de Mines</a><a href="jeux/avion.html">L’Avion</a><a href="jeux/plinko.html">La Cascade</a><a href="jeux/vortex.html">Le Vortex</a><a href="jeux/casse.html">Le Casse</a><a href="jeux/pileface.html">La Pièce</a><a href="jeux/robots.html">La Course</a><a href="jeux/poulet.html">Le Poulet</a><a href="jeux/gratteciel.html">Le Gratte-Ciel</a><a href="jeux/penalty.html">Le Penalty</a><a href="jeux/ticket.html">Le Ticket</a><a href="jeux/billes.html">La Descente</a><a href="jeux/pilote.html">Le Pilote</a><a href="jeux/foot.html">Le Derby</a><a href="jeux/boxe.html">Le Ring</a></div><div><b>Guides et astuces</b><a href="articles/meilleures-machines-a-sous-gratuites-2026.html">Les meilleures machines à sous gratuites en 2026</a><a href="articles/jeux-de-casino-gratuits-sans-telechargement.html">Roulette, blackjack et poker gratuits sans téléchargement</a><a href="articles/jeux-crash-mines-plinko-gratuits.html">Jeux crash, mines et plinko gratuits : le guide 2026</a><a href="articles/rtp-volatilite-machines-a-sous.html">RTP et volatilité : comprendre une machine à sous</a><a href="articles/comment-gagner-aux-machines-a-sous.html">Comment gagner aux machines à sous ? Vrais conseils et idées reçues</a><a href="articles/strategie-blackjack.html">Stratégie de base au blackjack : le tableau complet</a><a href="articles/martingale-roulette.html">Martingale à la roulette : est-ce que ça marche vraiment ?</a><a href="articles/casino-gratuit-sur-telephone.html">Casino gratuit sur téléphone, sans téléchargement (Android et iPhone)</a></div></div></section><!-- /seo-links -->
     <div><b>SPINBET CASINO</b> · Jeu de divertissement, argent fictif, aucun gain réel. 18+ · <a href="#responsable">Jeu responsable</a> · <a href="jeux/">Tous les jeux</a> · <a href="articles/">Guides et astuces</a> · <a href="confidentialite.html">Confidentialité</a> · <a href="ads/">Nos partenaires</a></div>
   </footer>
 
@@ -10649,6 +10781,7 @@ const ORIGINALS = [
   {"id": "bling", "name": "La Tour Bling", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "pharaon", "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×500"},
   {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Boost, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Boost et quatre jeux bonus animés : Pile ou Face, Tir aux Cibles, Pachinko et Méga Folie.", "features": ["Boost ×2 à ×50", "Pile ou Face", "Tir aux Cibles", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
+  {"id": "roulette", "name": "La Roulette", "cat": "table", "tag": "Roulette", "sub": "Roulette européenne en 3D : cylindre, voisins, tiers", "colors": ["#2a76a8", "#0b2d52"], "description": "Une vraie table de roulette européenne en 3D : pose tes jetons sur le tapis bleu (pleins, chevaux, carrés, douzaines, rouge ou noir) ou sur le cylindre (Tiers, Orphelins, Voisins du zéro, Jeu zéro, un numéro et ses voisins), puis la caméra file vers la roue en bois et suit la bille jusqu’au numéro gagnant. Tableau lumineux des derniers numéros et statistiques.", "features": ["Table et roue en 3D", "Plein payé 35 pour 1", "Cylindre : Tiers, Orphelins, Voisins, Jeu zéro", "Numéro + ses voisins", "Répéter, annuler, doubler", "Statistiques : numéros chauds et froids"], "rtp": "≈ 97,3 %", "vol": 3, "max": "×36"},
   {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
   {"id": "storm-online", "name": "L’Éclair Online", "cat": "table", "tag": "En ligne", "sub": "Roulette éclair multijoueur : la roue part quand tout le salon est prêt", "colors": ["#1f56ff", "#071440"], "description": "La roulette éclair en multijoueur : chacun pose ses jetons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La foudre et la bille sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Éclairs ×50 à ×50 000", "Chat du salon"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
   {"id": "bj-online", "name": "Le 21 Online", "cat": "table", "tag": "En ligne", "sub": "Blackjack multijoueur : les cartes partent quand tout le salon est prêt", "colors": ["#11a05f", "#06301f"], "description": "Le blackjack en multijoueur : chacun mise et appuie sur PRÊT, les cartes partent dès que tout le salon est prêt (tout de suite si tu es seul). La même croupière pour tous, les mains des autres joueurs à côté de la tienne, et un chat pour le salon.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Blackjack 6 pour 5", "Chat du salon"], "rtp": "≈ 97,5 %", "vol": 1, "max": "×2,2"},
@@ -10664,6 +10797,7 @@ const ORIGINALS = [
   {"id": "roueor", "name": "La Roue d’Or", "cat": "table", "tag": "Jeu de roue", "sub": "Simple, Moyen ou Compliqué : 24 cubes à ouvrir", "colors": ["#fbbf24", "#14110a"], "description": "Une roue noire et métal avec une part en or. Choisis ton niveau : Simple (beaucoup d’or, petits cubes), Moyen ou Compliqué (peu d’or, cubes jusqu’à ×5 000). Sur l’or, place au bonus des 24 cubes : regarde les multiplicateurs, ils se cachent et se mélangent, choisis le tien et décide à chaque étape si tu encaisses ou continues !", "features": ["3 niveaux : Simple, Moyen, Compliqué", "24 cubes montrés puis mélangés", "Encaisse l’offre ou continue", "Jusqu’à ×5 000", "Tours automatiques"], "rtp": "≈ 95 %", "vol": 5, "max": "×5 000"},
   {"id": "blackjack", "name": "Le 21", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 6 pour 5", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 6 pour 5.", "features": ["Doubler", "Séparer une paire", "Blackjack 6 pour 5", "Animations de cartes"], "rtp": "≈ 98 %", "vol": 1, "max": "×2,2"},
   {"id": "lightningbj", "name": "Le 21 Électrique", "cat": "table", "tag": "Cartes", "sub": "Multiplicateurs éclair jusqu’à ×1000", "colors": ["#3b82f6", "#0b0f3a"], "description": "Le blackjack frappé par la foudre : avant chaque distribution, les scores 17, 18, 19, 20 et 21 reçoivent un multiplicateur de ×1 à ×1000. Gagne ta main sur ce score et ton gain est multiplié tout de suite. Side bets Paires Parfaites, 21+3 et Bust It.", "features": ["Multiplicateurs ×1 à ×1000", "Gain multiplié dans la manche", "Paires Parfaites", "21+3", "Bust It", "Doubler et séparer"], "rtp": "≈ 97,5 %", "vol": 4, "max": "×1 500"},
+  {"id": "bataille", "name": "La Bataille", "cat": "table", "tag": "Cartes", "sub": "La carte la plus haute gagne · série ×5", "colors": ["#c8961e", "#3b0d18"], "description": "La bataille sur la table du casino : une carte pour toi, une pour la croupière, la plus haute gagne (l’As est le plus fort) et paie 1 pour 1. Gagne 5 mains d’affilée avec la même mise et la 5e main paie ×5 ta mise ! Mise annexe Égalité payée 12 pour 1.", "features": ["La carte la plus haute gagne", "Série : 5 victoires = ×5", "Mise Égalité 12 pour 1", "Croupière qui distribue", "Parties rapides"], "rtp": "≈ 96 %", "vol": 2, "max": "×13"},
   {"id": "poker", "name": "Le Texas", "cat": "table", "tag": "Poker", "sub": "No Limit contre 1 à 5 bots", "colors": ["#10b981", "#06301f"], "description": "Une vraie table de Texas Hold’em No Limit : choisis tes adversaires (1 à 5 bots aux caractères différents), les blindes et ton tapis, puis joue pré-flop, flop, turn et river jusqu’au showdown.", "features": ["1 à 5 bots", "Blindes au choix", "Pots secondaires", "Bots qui bluffent", "Raccourcis de mise", "Showdown animé"], "rtp": "Selon ton jeu", "vol": 3, "max": "Toute la table"},
   {"id": "mines", "name": "Le Champ de Mines", "cat": "quick", "tag": "Instantané", "sub": "Évite les bombes", "colors": ["#ffa51f", "#8a2a0c"], "description": "Retourne des cases sans toucher une bombe. Choisis de 1 à 24 bombes : plus il y en a, plus le multiplicateur grimpe vite. Encaisse quand tu veux.", "features": ["1 à 24 bombes", "Encaisse quand tu veux", "Multiplicateur croissant"], "rtp": "≈ 96 %", "vol": 3, "max": "Selon les bombes"},
   {"id": "avion", "name": "L’Avion", "cat": "quick", "tag": "Crash", "sub": "Encaisse avant l’explosion", "colors": ["#f0284f", "#4a0a1f"], "description": "L’avion décolle et le multiplicateur grimpe : encaisse avant qu’il explose. Tu peux régler un encaissement automatique.", "features": ["Courbe en direct", "Encaissement auto", "Historique des explosions"], "rtp": "≈ 95 %", "vol": 4, "max": "×1 000"},
@@ -10929,6 +11063,22 @@ const SPECS = {
       ${rouletteWheel(150, 196, 130, u)}
       <circle cx="104" cy="168" r="11" fill="url(#pearl${u})" filter="url(#sh${u})"/><circle cx="198" cy="210" r="11" fill="url(#gold${u})" stroke="#fff3c4" filter="url(#glow${u})"/>
       <text x="150" y="98" text-anchor="middle" font-family="KeCoin,${FONTS.orb}" font-weight="900" font-size="34" fill="url(#tit${u})" stroke="#3b2a00" stroke-width="1.5" paint-order="stroke" filter="url(#glow${u})">×100 000</text>`,
+  },
+  roulette: {
+    bg: ['#0f3d66', '#02070f'], light: '#9fd4ff', title: ['LA ROULETTE'], font: 'cinzel', metal: ['#fff', '#fde68a', '#a16207'], tag: '35 POUR 1',
+    art: (u) => `
+      <ellipse cx="150" cy="300" rx="210" ry="120" fill="#1d5b85" stroke="#7a3d12" stroke-width="12"/>
+      ${rouletteWheel(150, 186, 132, u, 0.5)}
+      <circle cx="96" cy="176" r="8" fill="url(#pearl${u})" filter="url(#sh${u})"/>
+      ${[0, 1, 2, 3].map((k) => `<ellipse cx="52" cy="${272 - k * 7}" rx="24" ry="8" fill="${k % 2 ? '#fff' : '#c8102e'}" stroke="#3b0a0a" stroke-width="1"/>`).join('')}
+      ${[0, 1, 2, 3, 4].map((k) => `<ellipse cx="248" cy="${276 - k * 7}" rx="24" ry="8" fill="${k % 2 ? '#fff' : '#138a52'}" stroke="#05301c" stroke-width="1"/>`).join('')}`,
+  },
+  bataille: {
+    bg: ['#5a1020', '#0a0204'], light: '#fde68a', title: ['LA BATAILLE'], font: 'cinzel', metal: ['#fff', '#fde68a', '#a16207'], tag: 'SÉRIE ×5',
+    art: (u) => `
+      <ellipse cx="150" cy="300" rx="190" ry="110" fill="#0e6b43" stroke="#fde68a" stroke-opacity=".35" stroke-width="3"/>
+      ${card(100, 176, -12, 'A', '♠', false, u, 1.35)}${card(202, 168, 10, 'K', '♥', true, u, 1.35)}
+      <text x="150" y="104" text-anchor="middle" font-family="KeCoin,Georgia,serif" font-weight="900" font-size="44" fill="url(#tit${u})" stroke="#3b2a00" stroke-width="1.5" paint-order="stroke" filter="url(#glow${u})">×5</text>`,
   },
   blackjack: {
     photo: 'assets/games/blackjack/cover.webp', baked: true,
@@ -11290,7 +11440,7 @@ const CARD = {
   'storm-online': ['#1f56ff', '#071440'], 'bj-online': ['#11a05f', '#06301f'], 'holdem-online': ['#10b981', '#06301f'],
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
-  madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
+  madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], roulette: ['#2a86c8', '#0b2d52'], bataille: ['#d6a630', '#5a1020'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
   chasse: ['#65a30d', '#14532d'], noel: ['#ef4444', '#1e3a8a'], totemx: ['#f97316', '#7f1d1d'], volcan: ['#f97316', '#450a0a'], barillet: ['#d97706', '#451a03'], filon: ['#f59e0b', '#422006'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], pilote: ["#38a6f5", "#0b2a6f"], foot: ["#22b45e", "#062a14"], boxe: ["#ef4444", "#3b0707"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
 };
 // the wheel games' salons wear their game's poster, with the ONLINE ribbon
@@ -11398,6 +11548,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'roulette', date: '2026-11-10', isNew: true, title: 'Nouveau : La Roulette en 3D', items: ['Une vraie table de roulette : tapis bleu, roue en bois et bille qui roule', 'Mise sur le cylindre : Tiers, Orphelins, Voisins du zéro, Jeu zéro, ou un numéro et ses voisins', 'La caméra file vers la roue pendant le lancer, puis revient sur ton numéro', 'Répéter, annuler, doubler, et le tableau lumineux des derniers numéros'] },
+  { game: 'bataille', date: '2026-11-10', isNew: true, title: 'Nouveau : La Bataille', items: ['Une carte pour toi, une pour la croupière : la plus haute gagne', 'Gagne 5 mains d’affilée : la 5e paie ×5 ta mise !', 'Mise Égalité payée 12 pour 1', 'La même table et la même croupière que Le 21'] },
   { game: 'filon', date: '2026-11-10', title: 'Toute la mine en grand', isNew: true, items: ['Le décor de la mine remplit tout l’écran, derrière toute la machine', 'Des cases bien plus grosses', 'En plein écran : la mine sur tout le téléphone, sans bandes noires', 'Pendant le bonus, toute la mine passe à l’or'] },
   { game: 'filon', date: '2026-11-09', title: 'Nouvelle machine : la mine d’or', isNew: true, items: ['Chaque case de la grille cache un multiplicateur qui double à chaque gain, jusqu’à ×8 192', 'Minerais mystère, dynamite et joker doré font grimper les cases', '3 bonus avec la roue des bonus, et des multiplicateurs qui restent jusqu’à la fin', 'Mise boostée, tour doré et tirage chance', 'Jusqu’à ×30 000 la mise'] },
   { game: 'lightningbj', date: '2026-11-09', title: 'Nouvelle table de casino', items: ['La même table que Le 21 : croupière, jetons sur le tapis, grands boutons en bas', 'Les mises annexes sont des cercles sur le tapis : Paires et 21+3 à côté de ta mise, Bust It près de la croupière', 'Pose tes jetons où tu veux, comme dans un vrai casino', 'Les multiplicateurs éclair s’allument en haut de l’écran'] },
@@ -12584,6 +12736,8 @@ const EXTRA_THEMES = {
   storm: { sd: 0.19, len: 16, root: 110, lead: { wave: 'sawtooth', vol: 0.025, dur: 0.16, pat: [12, null, 15, null, 17, null, 15, 12, null, 10, null, 12, 15, null, 19, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.22, pat: [0, null, 0, null, -2, null, -2, null, -4, null, -4, null, -5, null, -5, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.2, hv: 0.025 },
   doublespin: { sd: 0.25, len: 16, root: 174.61, lead: { wave: 'triangle', vol: 0.05, dur: 0.3, pat: [12, null, 16, null, 19, null, 21, 19, null, 16, null, 14, 12, null, null, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.4, pat: [-12, null, null, -5, null, null, -7, null, -12, null, null, -5, null, null, -10, null] }, comp: { wave: 'square', vol: 0.014, dur: 0.12, map: { 2: [0, 4, 7], 6: [0, 4, 9], 10: [-3, 0, 4], 14: [-5, -1, 2] } }, kick: [0, 8], hat: [4, 12], kv: 0.16, hv: 0.02 },
   madwheel: { sd: 0.17, len: 16, root: 220, lead: { wave: 'square', vol: 0.03, dur: 0.14, pat: [12, 16, 19, 16, 12, 16, 19, 24, 21, 17, 14, 17, 19, null, 16, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.2, pat: [-12, null, 0, null, -12, null, 0, null, -7, null, 5, null, -5, null, 7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.025 },
+  roulette: { sd: 0.27, len: 16, root: 164.81, lead: { wave: 'triangle', vol: 0.042, dur: 0.34, pat: [12, null, 15, null, 19, null, 17, 15, null, 12, null, 10, 12, null, null, null] }, bass: { wave: 'sine', vol: 0.14, dur: 0.38, pat: [-12, null, null, -5, null, null, -9, null, -14, null, null, -7, null, null, -10, null] }, comp: { wave: 'triangle', vol: 0.016, dur: 0.22, map: { 2: [0, 3, 7, 10], 10: [-4, 0, 3, 7] } }, hat: [2, 6, 10, 14], hv: 0.014 },
+  bataille: { sd: 0.22, len: 16, root: 130.81, lead: { wave: 'square', vol: 0.022, dur: 0.18, pat: [12, null, 12, 15, null, 17, null, 15, 19, null, 17, 15, 12, null, 10, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.24, pat: [-12, null, -12, null, -5, null, -7, null, -12, null, -12, null, -3, null, -5, null] }, comp: { wave: 'triangle', vol: 0.016, dur: 0.18, map: { 0: [0, 3, 7], 8: [-2, 2, 5] } }, kick: [0, 8], hat: [4, 12], kv: 0.14, hv: 0.018 },
   blackjack: { sd: 0.28, len: 16, root: 146.83, lead: { wave: 'triangle', vol: 0.045, dur: 0.35, pat: [7, null, 10, null, 12, null, 14, null, 15, null, 14, 12, 10, null, null, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.3, pat: [-12, null, -5, null, -10, null, -3, null, -8, null, -1, null, -7, null, 0, null] }, comp: { wave: 'triangle', vol: 0.018, dur: 0.2, map: { 2: [0, 3, 7, 10], 10: [-2, 2, 5, 9] } }, hat: [2, 6, 10, 14], hv: 0.015 },
   mines: { sd: 0.21, len: 16, root: 130.81, lead: { wave: 'sine', vol: 0.05, dur: 0.25, pat: [12, null, null, 13, null, null, 12, null, 15, null, null, 13, null, null, 12, null] }, bass: { wave: 'sawtooth', vol: 0.04, dur: 0.5, pat: [-12, null, null, null, null, null, null, null, -11, null, null, null, null, null, null, null] }, kick: [0, 6, 8], hat: [4, 12], kv: 0.2, hv: 0.02 },
   avion: { sd: 0.16, len: 16, root: 196, lead: { wave: 'sawtooth', vol: 0.022, dur: 0.12, pat: [12, 12, 19, 12, 17, 12, 15, 12, 12, 12, 19, 12, 22, 19, 17, 15] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.18, pat: [-12, null, -12, null, -12, null, -12, null, -9, null, -9, null, -7, null, -7, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.22, hv: 0.025 },
@@ -14357,6 +14511,8 @@ const FILES = {
   bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '8172f58ae6'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '473a8559d8'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', '419585a560'],
+  roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', '9576441afd'],
+  bataille: ['bataille', 'games/impl/bataille.js', 'BatailleGame', '39b70b1d30'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '4f6ae0eba7'],
   avion: ['avion', 'games/impl/avion.js', 'AvionGame', 'c403583020'],
@@ -14393,8 +14549,8 @@ const FILES = {
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '1025072609'],
   boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '48602d9af5'],
 };
-// files a game needs first (the shared blackjack table of the 3 blackjacks)
-const DEPS = { blackjack: ['bjtable'], lightningbj: ['bjtable'], 'bj-online': ['bjtable'] };
+// files a game needs first (the shared blackjack table of the 3 blackjacks and La Bataille; its chips for La Roulette)
+const DEPS = { blackjack: ['bjtable'], lightningbj: ['bjtable'], 'bj-online': ['bjtable'], bataille: ['bjtable'], roulette: ['bjtable'] };
 const loading = {};
 
 function loadScript(src) {

@@ -16,8 +16,8 @@
 "d": "2026-11-09"
 },
 "articles/jeux-de-casino-gratuits-sans-telechargement.html": {
-"h": "406f32e6138548a1",
-"d": "2026-11-05"
+"h": "641f8fd9db6bdf85",
+"d": "2026-11-10"
 },
 "articles/martingale-roulette.html": {
 "h": "93293fbdaa50e1eb",
@@ -36,8 +36,8 @@
 "d": "2026-11-05"
 },
 "index.html": {
-"h": "86f9a2841d4b339a",
-"d": "2026-11-09"
+"h": "9915030c7663d233",
+"d": "2026-11-10"
 },
 "jeux/anubis.html": {
 "h": "96171443388b4029",
@@ -50,6 +50,10 @@
 "jeux/barillet.html": {
 "h": "4d25a5c1a49af9ac",
 "d": "2026-11-05"
+},
+"jeux/bataille.html": {
+"h": "c4d4e9cdfb0c9627",
+"d": "2026-11-10"
 },
 "jeux/big-bad-wolf.html": {
 "h": "17bf2467660d4962",
@@ -64,12 +68,12 @@
 "d": "2026-11-05"
 },
 "jeux/bj-online.html": {
-"h": "7079155adec87ea8",
-"d": "2026-11-05"
+"h": "262d2b5bd0de499a",
+"d": "2026-11-10"
 },
 "jeux/blackjack.html": {
-"h": "08df6d53e698c988",
-"d": "2026-11-05"
+"h": "c7e9deb858822e4e",
+"d": "2026-11-10"
 },
 "jeux/bling.html": {
 "h": "3c601854d00e8ecd",
@@ -96,8 +100,8 @@
 "d": "2026-11-05"
 },
 "jeux/doublespin.html": {
-"h": "e850549ef7068768",
-"d": "2026-11-05"
+"h": "7460111d62e6f9ee",
+"d": "2026-11-10"
 },
 "jeux/dragons.html": {
 "h": "be6d7d9a015dfb87",
@@ -120,32 +124,32 @@
 "d": "2026-11-06"
 },
 "jeux/holdem-online.html": {
-"h": "9004a5e546ddc32a",
-"d": "2026-11-05"
+"h": "50df056182747417",
+"d": "2026-11-10"
 },
 "jeux/huff.html": {
 "h": "c5e3b6f899e96ce7",
 "d": "2026-11-05"
 },
 "jeux/index.html": {
-"h": "e3f9fde9a3452a78",
-"d": "2026-11-09"
+"h": "312871da2a813bac",
+"d": "2026-11-10"
 },
 "jeux/labo.html": {
 "h": "182504071fb25d93",
 "d": "2026-11-05"
 },
 "jeux/lightningbj.html": {
-"h": "3082972bff77e4cd",
-"d": "2026-11-05"
+"h": "e8262f474a2c20bb",
+"d": "2026-11-10"
 },
 "jeux/madwheel-online.html": {
-"h": "4b4c44227bc0d24b",
-"d": "2026-11-05"
+"h": "d744b321450a5bec",
+"d": "2026-11-10"
 },
 "jeux/madwheel.html": {
-"h": "96bf96e8da0835d5",
-"d": "2026-11-05"
+"h": "3813761b5506c11e",
+"d": "2026-11-10"
 },
 "jeux/mines.html": {
 "h": "9f068a9ab9f357eb",
@@ -156,12 +160,12 @@
 "d": "2026-11-05"
 },
 "jeux/peche-online.html": {
-"h": "1a5a80bb30eaf493",
-"d": "2026-11-05"
+"h": "7f974ada527597d0",
+"d": "2026-11-10"
 },
 "jeux/peche.html": {
-"h": "3b7ffd8f0f851c4a",
-"d": "2026-11-05"
+"h": "55c7e71cffe80c9d",
+"d": "2026-11-10"
 },
 "jeux/penalty.html": {
 "h": "4496c10ce21253b1",
@@ -180,48 +184,52 @@
 "d": "2026-11-05"
 },
 "jeux/plateau-online.html": {
-"h": "ddc682045e617ee3",
-"d": "2026-11-05"
+"h": "08578ba3b7fee9aa",
+"d": "2026-11-10"
 },
 "jeux/plateau.html": {
-"h": "d0b50e346892f276",
-"d": "2026-11-05"
+"h": "d53a4045d5253c35",
+"d": "2026-11-10"
 },
 "jeux/plinko.html": {
 "h": "4333e1b1d94e658f",
 "d": "2026-11-05"
 },
 "jeux/poker.html": {
-"h": "7b7011a53881212d",
-"d": "2026-11-05"
+"h": "ae1ad893c7801e44",
+"d": "2026-11-10"
 },
 "jeux/poulet.html": {
 "h": "0d0fb4c5bc7929d0",
 "d": "2026-11-05"
 },
 "jeux/robots-online.html": {
-"h": "f229d0c6d3327e26",
-"d": "2026-11-05"
+"h": "6d0589a53ced8009",
+"d": "2026-11-10"
 },
 "jeux/robots.html": {
 "h": "c623bed04eb58c17",
 "d": "2026-11-05"
 },
 "jeux/roueor-online.html": {
-"h": "eb3058a5282b68c7",
-"d": "2026-11-05"
+"h": "b3bd22f5dbd9d23e",
+"d": "2026-11-10"
 },
 "jeux/roueor.html": {
-"h": "16fca8c9ac8b9259",
-"d": "2026-11-05"
+"h": "6118a150cf5b5b3a",
+"d": "2026-11-10"
+},
+"jeux/roulette.html": {
+"h": "bc700aaf077b3b71",
+"d": "2026-11-10"
 },
 "jeux/storm-online.html": {
-"h": "e281db75696c789e",
-"d": "2026-11-05"
+"h": "08acdc0af6864d3e",
+"d": "2026-11-10"
 },
 "jeux/storm.html": {
-"h": "7d18f333c7f5b8c4",
-"d": "2026-11-05"
+"h": "2d73a8f3d43044fb",
+"d": "2026-11-10"
 },
 "jeux/taco.html": {
 "h": "a2ca1a4e3af62312",

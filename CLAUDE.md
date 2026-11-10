@@ -150,6 +150,20 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Le 21 Online : les autres joueurs assis aux places `SEATS` (4 au plus : nom, mise, cartes, résultat ; tout le salon
   et le chat restent sous la table hors plein écran), chronomètre du salon en haut (`.bjo-timer`).
   Les règles et les gains des 3 jeux n'ont pas changé.
+- **La Roulette** (`games/roulette.js`, id `roulette`, demande du propriétaire d'après les captures d'un autre jeu : même
+  principe, dessins à nous) : roulette européenne sur une table en 3D (plan `W` × `H` incliné, caméra `applyCam` / `setCam`
+  animée en JS : `bet` presque vu de dessus pour miser, `spin` penchée sur la roue en bois pendant le lancer). Tapis bleu :
+  cylindre (Tiers, Orphelins, Voisins, Jeu zéro = `ANNOUNCED` ; un numéro du cylindre = lui + 2 voisins), grille avec le 0
+  à droite et les « 2 pour 1 » à gauche (miroir des cases de `buildDefs` de `core/roulette.js` : `hotXY`), douzaines,
+  chances simples ; tableau lumineux des derniers numéros (statistiques au toucher, `spinbet_roulette_hist`), panneau
+  « NUMÉRO GAGNANT », marqueur. Barre du bas : Vider, Répéter, Annuler, 5 jetons (ceux du 21 : `DEPS` roulette → `bjtable`),
+  ×2, Lancer (table vide = rejoue les mises d'avant). Limites 5 000 KE par case, 10 000 KE en tout. Paiements classiques
+  (plein 35 pour 1), retour 97,3 %.
+- **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
+  avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
+  gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série
+  à zéro, gardée dans `spinbet_bataille_serie`) ; mise annexe ÉGALITÉ 12 pour 1. Simulation `node tools/sim/bataille.js` :
+  mise principale ≈ 96 % (dont 3,5 points de série, bonus 1 main sur 86), Égalité ≈ 96 %.
 - **Paliers de prestige** (`achievements.js`, `PR_TIERS`) : Bronze 1, Argent 5, Or 10, Platine 25, Diamant 50, Légende 100
   prestiges en tout, en médailles sur le profil (`tiersHTML`) ; le total `pres` est publié dans `leaderboard` et le
   profil public (`#@pseudo`) montre le palier. **Règles Firestore à recoller** (champ `pres` ajouté) : en attendant, le

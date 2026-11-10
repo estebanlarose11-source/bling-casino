@@ -67,6 +67,7 @@ KW = {
     'madwheel': 'jeu de roue gratuit à 4 bonus', 'storm': 'roulette gratuite à multiplicateurs',
     'doublespin': 'roulette gratuite à deux billes', 'plateau': 'jeu de roue et de dés gratuit',
     'peche': 'jeu de roue gratuit, pêche aux multiplicateurs', 'roueor': 'roue de la fortune gratuite',
+    'roulette': 'roulette européenne gratuite en 3D', 'bataille': 'jeu de bataille gratuit en ligne',
     'blackjack': 'blackjack gratuit en ligne', 'lightningbj': 'blackjack gratuit à multiplicateurs',
     'poker': 'poker Texas Hold’em gratuit contre des bots',
     'storm-online': 'roulette multijoueur gratuite', 'bj-online': 'blackjack multijoueur gratuit',
