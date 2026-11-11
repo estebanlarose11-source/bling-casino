@@ -1,0 +1,145 @@
+DIAMANTS REDK — cahier des charges et images à envoyer à Claude
+==================================================================
+Statut : EN PRÉPARATION. Le jeu sera construit puis mis « EN TRAVAUX » (vignette grisée avec cadenas,
+invisible pour les joueurs ; toi tu l'essaies avec ?essai dans l'adresse). Il ne sera ouvert à tout le
+monde que quand tu diras qu'il est fini à 100 %.
+
+------------------------------------------------------------------
+PARTIE 1 — LE JEU EN GROS
+------------------------------------------------------------------
+
+1. IDENTITÉ
+   - Nom : DIAMANTS REDK (logo en haut de la machine). Id technique : redk.
+   - Catégorie : Machines à sous. Volatilité : haute.
+   - Thème : temple ancien somptueux, pierre sculptée, ors ciselés, torches, rubis rouges.
+   - Écriture : lettres « bloc » massives en 3D, biseautées, reflets or et métal, pour le logo et
+     tous les textes de la machine (« POUR DÉVERROUILLER », « RE-SPINS », les valeurs des rubis…).
+     Le logo et le titre du bonus seront TES images (peintes, donc exactement le style voulu).
+     Pour les textes écrits par le jeu (valeurs, compteurs), je ne peux pas recopier la police
+     d'une autre machine existante : je prends une police libre du même genre (bloc massif) et je lui
+     ajoute le biseau, le dégradé or et les reflets en CSS. Si tu as acheté/possèdes une police
+     précise avec sa licence, envoie-moi le fichier et je l'utilise.
+
+2. JEU DE BASE
+   - Grille 5 rouleaux × 3 rangées, 20 lignes fixes.
+   - Symboles : 10, J, Q, K, A sculptés dans l'or (paient peu) ; 4 trésors du temple (paient
+     beaucoup) ; WILD (rouleaux 2 à 5, remplace tout sauf rubis et boosters).
+   - LE RUBIS ROUGE : symbole du bonus. Chaque rubis porte une valeur écrite dessus par le jeu,
+     en fois la mise (ex. 1.00, 2.00, 5.00, 10.00, 25.00, jusqu'à 50.00 × la mise), ou une plaque
+     MINI / MINOR / MAJOR.
+   - 6 rubis ou plus sur l'écran = le bonus RUBY LINK.
+
+3. MISE EN SCÈNE DU SUSPENSE (quand il manque un seul rubis)
+   - Dès qu'il en manque 1 pour le bonus (ou, dans le bonus, pour déverrouiller une rangée) :
+     • le dernier rouleau ralentit nettement (rotation 2 à 3 fois plus longue) ;
+     • zoom dramatique sur la case encore vide (la caméra s'approche, le reste s'assombrit) ;
+     • l'écran tremble / vibre de plus en plus fort jusqu'à l'arrêt (et le téléphone vibre sur Android) ;
+     • les sons habituels se coupent : battements de cœur amplifiés + nappe grave qui monte ;
+     • à l'arrêt : explosion de lumière rouge si le rubis tombe, soupir sonore s'il ne tombe pas.
+   - Rappel des règles du site : pas de pluie de pièces ni de médaillon en 3D dans les machines à sous
+     (le zoom et le tremblement sont en 2D, donc permis), le grand « GROS GAIN ! » reste.
+
+4. LE BONUS « RUBY LINK »
+   - Les rubis qui l'ont déclenché restent collés. Grille de départ 5×3, 3 RE-SPINS.
+   - Chaque nouveau rubis se colle et remet le compteur à 3. Plus de re-spins = fin du bonus.
+   - Au-dessus de la grille : 3 RANGÉES VERROUILLÉES (plaques de pierre « POUR DÉVERROUILLER »)
+     → la grille peut grandir jusqu'à 5×6 (30 cases).
+   - LES 4 BOOSTERS (rubis spéciaux qui tombent pendant le bonus, rangés dans la barre en haut) :
+     • SPIN+       : +1 re-spin en plus (compteur à 4 pendant ce tour-là).
+     • REELS+      : déverrouille la rangée suivante (5×4, puis 5×5, puis 5×6).
+     • MULTIPLIER+ : multiplicateur du bonus +1 (×1 → ×2 → … ×10), appliqué au total à la fin.
+     • VALUE+      : ajoute sa valeur à TOUS les rubis déjà posés.
+   - Rangée débloquée : un petit compteur « encore X rubis POUR DÉVERROUILLER » peut aussi la
+     déverrouiller quand assez de rubis sont collés (en plus de REELS+). À régler par simulation.
+   - Fin du bonus : on compte chaque rubis un par un (montée du compteur), puis × le multiplicateur.
+   - JACKPOTS : MINI ×10, MINOR ×25, MAJOR ×100 la mise (plaques sur des rubis),
+     GRAND ×1 000 = toutes les cases ouvertes remplies.
+   - Gain maximum : ×5 000 la mise (atteignable, vérifié par simulation).
+
+5. ACHATS ET OPTIONS (comme les autres machines)
+   - Acheter RUBY LINK : ≈ 100 × la mise.
+   - Acheter RUBY LINK SUPER : ≈ 250 × la mise (commence avec une rangée déjà ouverte et ×2).
+   - Super turbo, tours auto, Défi spécial (ligne ajoutée), tournois, jackpot du site : comme partout.
+
+6. CHIFFRES VISÉS (réglés par simulation avant de pousser)
+   - Retour ≈ 92 % ; achats ≈ 88 %.
+   - Un gain environ 1 tour sur 3 ou 4 ; bonus ≈ 1 tour sur 180.
+   - Le suspense (il manque 1 rubis) ≈ 1 tour sur 30 à 40 : assez souvent pour faire monter la
+     tension, pas trop pour que ça reste spécial.
+
+7. SONS ET MUSIQUE (faits par moi, sauf si tu veux en envoyer)
+   - Musique du temple (percussions, cordes graves, cuivres), qui s'emballe pendant le bonus.
+   - Son de chaque rubis qui se colle (cristal), de rangée qui se déverrouille (pierre qui glisse),
+     des 4 boosters, des jackpots, battements de cœur + nappe grave du suspense.
+
+------------------------------------------------------------------
+PARTIE 2 — LES IMAGES À M'ENVOYER
+------------------------------------------------------------------
+Format : PNG ou WEBP, le plus grand possible (je redécoupe et j'allège).
+Symboles et logos : FOND TRANSPARENT. Une planche avec plusieurs symboles, c'est très bien aussi :
+je les découpe (comme pour Le Filon et La Roulette Russe).
+Ne mets AUCUN chiffre sur les rubis : les valeurs sont écrites par le jeu.
+
+A. LES LOGOS
+   1. logo        « DIAMANTS REDK » en lettres bloc 3D or biseauté, fond transparent, large
+                  (environ 1600 × 500).
+   2. logo-bonus  « RUBY LINK » dans le même style (rouge rubis + or), fond transparent.
+   3. (option)    plaque-gagne : « GROS GAIN » / « ÉNORME GAIN » dans le même style
+                  (sinon je garde le titre du site).
+
+B. LE DÉCOR
+   4. fond        Le temple (jeu de base), format portrait ≈ 1080 × 1920 pour le téléphone.
+   5. fond-large  (option) Le même en paysage ≈ 1920 × 1080 pour l'ordinateur
+                  (sinon j'étire / je recadre le portrait).
+   6. fond-bonus  Le temple pendant RUBY LINK (illuminé de rouge, rubis qui brillent).
+   7. cadre       Le cadre de la grille en or sculpté (5 × 3, avec la place des 3 rangées au-dessus),
+                  centre transparent.
+
+C. LES SYMBOLES (carrés, ≥ 512 × 512, fond transparent)
+   8.  dix, valet, dame, roi, as     10 J Q K A sculptés dans l'or (5 images).
+   9.  h1  Scarabée d'or             (ou ce que tu veux : 4 trésors du temple)
+   10. h2  Calice / coupe sacrée
+   11. h3  Masque / idole d'or
+   12. h4  La gardienne du temple (statue) — le meilleur symbole
+   13. wild       WILD (œil du temple, ou le mot WILD gravé dans l'or)
+   14. rubis      Le rubis rouge brillant, SANS chiffre (le jeu écrit 1.00, 5.00, 25.00…)
+   15. rubis-or   (option) un rubis plus gros / plus brillant pour les grosses valeurs et les jackpots
+
+D. LE BONUS
+   16. case-vide       Une alcôve de pierre vide (case du bonus sans rubis).
+   17. case-verrou     La plaque de pierre verrouillée (cadenas sculpté), SANS texte
+                       (le jeu écrit « POUR DÉVERROUILLER » dans la bonne police).
+   18. spin-plus       Booster SPIN+   } 4 images, fond transparent, chacune une couleur
+   19. reels-plus      Booster REELS+  } (ex. vert, bleu, violet, or) avec le mot dessus
+   20. mult-plus       Booster MULTIPLIER+ (ou « MULTI+ »)
+   21. value-plus      Booster VALUE+
+   22. (option) jackpots  4 plaques MINI / MINOR / MAJOR / GRAND (sinon je les dessine)
+   23. (option) compteur  plaque des RE-SPINS (le chiffre est écrit par le jeu)
+
+E. LA COUVERTURE (vignette dans le casino)
+   24. cover  Image du temple et des rubis, SANS texte (le titre est ajouté par le site) — ou avec
+              le logo peint dedans, dis-le-moi et je recadre.
+
+Le strict minimum pour que je commence : 1, 2, 4, 6, 8 à 14, 16 à 21, 24.
+Le reste est en option : je le dessine par le code si tu ne l'envoies pas.
+
+------------------------------------------------------------------
+PARTIE 3 — TES CHOIX (réponds simplement)
+------------------------------------------------------------------
+   - Le nom du bonus reste « RUBY LINK » (en anglais) ou « LE LIEN DES RUBIS » ?
+   - Les valeurs sur les rubis : en fois la mise (1.00 = 1 × la mise, conseillé)
+     ou directement en KE (ex. 500, 2 500) ?
+   - Les 4 trésors du temple (h1 à h4) : d'accord avec scarabée, calice, masque, gardienne ?
+   - Couleurs des 4 boosters ?
+
+------------------------------------------------------------------
+PARTIE 4 — CE QUE JE FAIS QUAND J'AI LES IMAGES
+------------------------------------------------------------------
+   1. Je découpe et j'allège les images (assets/games/redk/).
+   2. Je construis le jeu (games/redk.js), la simulation (tools/sim/redk.js) et je règle les gains
+      (≈ 92 %, achats ≈ 88 %, max ×5 000 atteignable).
+   3. Je le mets EN TRAVAUX ("wip": true) : toi seul l'essaies avec ?essai.
+   4. Tu me dis ce qu'il faut changer, je corrige.
+   5. Quand tu dis « c'est fini à 100 % » : j'enlève EN TRAVAUX, j'ajoute sa ligne au Défi spécial
+      (100 000 KE aux joueurs qui ont fini), la page Google, les captures, l'image de partage,
+      l'affiche « NOUVEAU », et je le mets en ligne.

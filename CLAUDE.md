@@ -90,6 +90,11 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `assets/games/filon/<nom>.webp`, toutes listées dans `PICS` (quartz cuivre emeraude saphir rubis lanterne
   pioche wagonnet lingots joker bonus dynamite mystere contagieux lampe fond fond-bonus) (changer `CACHE` dans
   `sw.js` si elles changent).
+- **Diamants REDK** (id prévu `redk`, demande du propriétaire du 11 novembre 2026) : machine à sous temple + rubis
+  (5×3, bonus « Ruby Link » à re-spins, rangées verrouillées, boosters Spin+ / Reels+ / Multiplier+ / Value+, suspense
+  quand il manque 1 rubis). **Pas encore construite** : cahier des charges et liste des images dans
+  `notes/diamants-redk-cahier-des-charges.txt`. Quand les images arrivent : construire le jeu **en travaux**
+  (`"wip": true`) et ne l'ouvrir que quand le propriétaire dit qu'il est fini à 100 %.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10
