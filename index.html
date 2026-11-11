@@ -5820,6 +5820,25 @@ body.fs-on .live-tick { display: none; }
 .jc-shop-dot { width: 14px; height: 18px; border-radius: 3px; background: linear-gradient(160deg, var(--p1), var(--p2)); box-shadow: 0 0 8px var(--p1); }
 .jc-sell .jc-pack { flex: none; }
 @media (prefers-reduced-motion: reduce) { .jc-pack::after, .jc-card.holo, .jc-card.holo .jc-in::after, .jc-card.r-L .jc-in::before, .jc-pack.big { animation: none !important; } }
+
+/* JCC : « Ouvrir tous mes paquets d'un coup » */
+.jc-open-all { display: flex; width: 100%; margin-top: 12px; }
+.jc-all .jc-scene-in { width: min(1100px, 96vw); height: calc(100dvh - 24px); max-height: calc(100dvh - 24px); box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; align-items: center; }
+.jc-all .jc-scene-acts { flex: none; }
+@media (max-width: 520px) { .jc-all .jc-scene-t { font-size: 13px; } .jc-all-sum span { font-size: 11.5px; padding: 3px 8px; } }
+.jc-all-sum { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 4px 0; }
+.jc-all-sum span { padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; background: rgba(255, 255, 255, .08); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15); }
+.jc-all-p.p-o, .jc-all-r.r-L { color: #fde68a; box-shadow: inset 0 0 0 1px #f59e0b !important; }
+.jc-all-p.p-v, .jc-all-r.r-E { color: #e9d5ff; box-shadow: inset 0 0 0 1px #a855f7 !important; }
+.jc-all-r.r-R { color: #bae6fd; box-shadow: inset 0 0 0 1px #38bdf8 !important; }
+.jc-all-r.new { color: #bbf7d0; box-shadow: inset 0 0 0 1px #22c55e !important; }
+.jc-all-grid { flex: 1 1 0; width: 100%; align-self: stretch; box-sizing: border-box; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; padding: 10px 4px; margin: 6px 0; overscroll-behavior: contain; }
+.jc-all-c { position: relative; animation: jcAllIn .45s cubic-bezier(.3, 1.5, .5, 1) backwards; animation-delay: calc(var(--i) * 35ms); }
+.jc-all-c .jc-card { width: 100%; }
+.jc-all-c.wow .jc-card { box-shadow: 0 0 22px rgba(250, 204, 21, .75); }
+@keyframes jcAllIn { from { opacity: 0; transform: translateY(14px) scale(.85) rotateY(70deg); } }
+@media (prefers-reduced-motion: reduce) { .jc-all-c { animation: none; } }
+@media (max-width: 520px) { .jc-all-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } }
 </style>
 <style id="foot">
 /* ============ Le Derby : match de foot entre amis (games/foot.js, foot-defis.js) ============ */
@@ -20354,6 +20373,55 @@ function openPack(t, fromForge) {
   showOpening(t, hand, S);
   paintBadge();
 }
+// « Ouvrir tous mes paquets » (owner's request): every pack opened at once, one save, then a summary of the cards
+// (each card once with ×count, the best first, NOUVELLE on the new ones).
+function openAll() {
+  if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour jouer aux cartes', 'warn');
+  const s0 = st(), counts = { o: s0.packs.o || 0, v: s0.packs.v || 0, b: s0.packs.b || 0 }, total = counts.o + counts.v + counts.b;
+  if (!total) return;
+  const S = serie(pickSerie), hand = [];
+  for (const t of ['o', 'v', 'b']) for (let k = 0; k < counts[t]; k++) hand.push(...draw(t, S));
+  save((s) => {
+    for (const t of ['o', 'v', 'b']) s.packs[t] = Math.max(0, (s.packs[t] || 0) - counts[t]);
+    hand.forEach((x) => {
+      const cur = s.cards[x.id] ? [...s.cards[x.id]] : [0, 0];
+      x.isNew = (cur[0] + cur[1]) === 0;
+      cur[x.h] = (cur[x.h] || 0) + 1;
+      s.cards[x.id] = cur;
+    });
+    s.log = [{ t: 'all', at: Date.now(), c: hand.slice(0, 40).map((x) => x.id + (x.h ? '*' : '')) }, ...(s.log || [])].slice(0, 20);
+  });
+  showAll(counts, hand, S);
+  paintBadge();
+}
+function showAll(counts, hand, S) {
+  scene?.remove();
+  // one tile per card (normal / shiny apart), with how many came
+  const by = new Map();
+  hand.forEach((x) => { const k = x.id + (x.h ? '*' : ''); const o = by.get(k) || { ...x, n: 0, isNew: false }; o.n++; o.isNew = o.isNew || x.isNew; by.set(k, o); });
+  const list = [...by.values()].sort((a, b) => RANK.indexOf(CARD[b.id].r) - RANK.indexOf(CARD[a.id].r) || b.h - a.h || (b.isNew - a.isNew));
+  const nNew = list.filter((x) => x.isNew).length, packs = counts.o + counts.v + counts.b;
+  const tally = RANK.split('').reverse().map((k) => [k, hand.filter((x) => CARD[x.id].r === k).length]).filter(([, n]) => n);
+  const box = document.createElement('div');
+  box.className = 'jc-scene jc-all';
+  box.innerHTML = `<div class="jc-scene-in">
+      <p class="jc-scene-t">${packs} paquets ouverts · ${hand.length} cartes · ${esc(S.name)}</p>
+      <div class="jc-all-sum">${['o', 'v', 'b'].filter((t) => counts[t]).map((t) => `<span class="jc-all-p p-${t}">${counts[t]} × ${PACKS[t].name.toLowerCase()}</span>`).join('')}</div>
+      <div class="jc-all-sum">${tally.map(([k, n]) => `<span class="jc-all-r r-${k}">${n} ${RAR[k].name.toLowerCase()}${n > 1 ? 's' : ''}</span>`).join('')}${nNew ? `<span class="jc-all-r new">✨ ${nNew} nouvelle${nNew > 1 ? 's' : ''}</span>` : ''}</div>
+      <div class="jc-all-grid">${list.map((x, i) => `<div class="jc-all-c${CARD[x.id].r === 'L' || x.h ? ' wow' : ''}" style="--i:${Math.min(i, 40)}">${cardHTML(CARD[x.id], { holo: x.h, count: x.n, badge: x.isNew ? '<span class="jc-tag new">NOUVELLE</span>' : '' })}</div>`).join('')}</div>
+      <div class="jc-scene-acts"><button class="btn primary" data-jc-close>Tout est rangé dans mon album</button></div>
+    </div>`;
+  document.body.appendChild(box);
+  scene = box;
+  requestAnimationFrame(() => box.classList.add('show'));
+  const top = list[0] && CARD[list[0].id].r;
+  if (top === 'L' || list.some((x) => x.h)) { sfx.bigWin?.(); fx.coins?.(60); } else if (top === 'E') sfx.win?.(); else sfx.coin?.();
+  const close = () => { box.classList.remove('show'); setTimeout(() => box.remove(), 200); if (scene === box) scene = null; paintPage(); };
+  box.addEventListener('click', (e) => { if (e.target.closest('[data-jc-close]')) close(); });
+  paintPage();
+  setTimeout(checkAlbum, 800);
+}
+
 // the album is finished: paid once per series
 function checkAlbum() {
   const s = st();
@@ -20443,7 +20511,7 @@ function showOpening(t, hand, S) {
       <p class="jc-scene-t">${PACKS[t].name} · ${esc(S.name)}</p>
       <div class="jc-scene-pack">${packHTML(t, { cls: 'big', attr: 'data-jc-tear' })}<p class="muted">Touche le paquet pour l’ouvrir</p></div>
       <div class="jc-hand" hidden>${hand.map((x, i) => `<div class="jc-flip" data-jc-flip="${i}" style="--i:${i}"><div class="jc-back"><span>🃏</span></div><div class="jc-front">${cardHTML(CARD[x.id], { holo: x.h, badge: x.isNew ? '<span class="jc-tag new">NOUVELLE</span>' : '<span class="jc-tag dup">DOUBLE</span>' })}</div></div>`).join('')}</div>
-      <div class="jc-scene-acts" hidden><button class="btn ghost" data-jc-all>Tout retourner</button><button class="btn primary" data-jc-close hidden>Continuer</button><button class="btn primary" data-jc-next hidden></button></div>
+      <div class="jc-scene-acts" hidden><button class="btn ghost" data-jc-all>Tout retourner</button><button class="btn primary" data-jc-close hidden>Continuer</button><button class="btn primary" data-jc-next hidden></button><button class="btn primary" data-jc-rest hidden></button></div>
     </div>`;
   document.body.appendChild(box);
   scene = box;
@@ -20462,6 +20530,8 @@ function showOpening(t, hand, S) {
     const s = st(), nt = ['o', 'v', 'b'].find((k) => s.packs[k] > 0);
     const nb = box.querySelector('[data-jc-next]');
     if (nt) { nb.hidden = false; nb.dataset.t = nt; nb.textContent = `Ouvrir le suivant (${PACKS[nt].sub.toLowerCase()})`; }
+    const left = packCount(s), rb = box.querySelector('[data-jc-rest]');
+    if (left >= 2) { rb.hidden = false; rb.textContent = `Ouvrir les ${left} autres d’un coup`; }
     paintPage();
     setTimeout(checkAlbum, 600);
   };
@@ -20476,6 +20546,7 @@ function showOpening(t, hand, S) {
     const f = e.target.closest('[data-jc-flip]');
     if (f) return flip(f);
     if (e.target.closest('[data-jc-all]')) { box.querySelectorAll('[data-jc-flip]:not(.on)').forEach((el, i) => setTimeout(() => flip(el), i * 180)); return; }
+    if (e.target.closest('[data-jc-rest]')) { close(); setTimeout(openAll, 220); return; }
     const n = e.target.closest('[data-jc-next]');
     if (n) { close(); setTimeout(() => openPack(n.dataset.t), 220); return; }
     if (e.target.closest('[data-jc-close]')) close();
@@ -20639,6 +20710,7 @@ function paintPage() {
     <section class="panel jc-packs"><div class="sec-head"><h2>Mes paquets</h2><small>${np ? `${np} à ouvrir` : 'joue pour en gagner'}</small></div>
       <div class="jc-pack-row">${['b', 'v', 'o'].map((t) => `<div class="jc-pack-slot">${packHTML(t, { cls: s.packs[t] ? '' : 'none' })}<b>${PACKS[t].name}</b><span>${s.packs[t] || 0} paquet${(s.packs[t] || 0) > 1 ? 's' : ''}</span>
         <button class="btn ${s.packs[t] ? 'primary' : 'ghost'} sm" data-jc-open="${t}" ${s.packs[t] ? '' : 'disabled'}>Ouvrir</button></div>`).join('')}</div>
+      ${np >= 2 ? `<button class="btn primary lg jc-open-all" data-jc-open-all>🃏 Ouvrir tous mes paquets d’un coup (${np})</button>` : ''}
       ${shopHTML(s)}
       ${SERIES.length > 1 ? `<p class="jc-pick">Ouvrir les paquets dans la série : ${SERIES.map((x) => `<button class="chip${pickSerie === x.id ? ' on' : ''}" data-jc-serie="${x.id}">${esc(x.name)}</button>`).join('')}</p>` : ''}
     </section>
@@ -20723,6 +20795,7 @@ document.addEventListener('click', (e) => {
   if (!here()) return;
   const q = (sel) => e.target.closest(sel);
   let b;
+  if (q('[data-jc-open-all]')) return openAll();
   if ((b = q('[data-jc-open]'))) return openPack(b.dataset.jcOpen);
   if ((b = q('[data-jc-buy-pack]'))) return buyPack(b.dataset.jcBuyPack);
   if (q('[data-jc-ad-pack]')) return adPackClick();
