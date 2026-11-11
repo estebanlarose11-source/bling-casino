@@ -1,0 +1,150 @@
+DIAMANTS REDK — LISTE DÉTAILLÉE DES SYMBOLES
+=============================================
+(complète notes/diamants-redk-cahier-des-charges.txt)
+
+------------------------------------------------------------------
+RÈGLES COMMUNES À TOUS LES SYMBOLES
+------------------------------------------------------------------
+- Format : PNG ou WEBP, FOND TRANSPARENT, carré, idéalement 1024 × 1024 (512 × 512 minimum).
+- Le dessin remplit environ 85 % du carré (petite marge tout autour, rien de coupé).
+- Même lumière pour tous : lumière chaude de torche venant d'en haut à gauche, ombres en bas à droite.
+- Même style pour tous : or sculpté et poli, pierres précieuses taillées, bords biseautés,
+  un léger contour sombre pour bien se détacher du fond du temple.
+- Le ROUGE est réservé aux rubis : aucun autre symbole ne doit être rouge, sinon le joueur
+  croit voir un rubis (et le suspense ne marche plus).
+- Pas besoin de version « gagnante » ou animée : le jeu ajoute lui-même l'éclat, le
+  rebond, les étincelles et le cadre lumineux sur les symboles gagnants.
+- Tu peux tout envoyer sur une ou plusieurs PLANCHES (plusieurs symboles sur une image) :
+  je les découpe. Laisse juste un peu d'espace entre eux.
+
+Les gains indiqués sont PROVISOIRES (en fois la mise d'une ligne, pour 3 / 4 / 5 symboles
+alignés de gauche à droite) : je les règle par simulation pour arriver à ≈ 92 %.
+
+------------------------------------------------------------------
+1. LES 5 PETITS SYMBOLES (les plus fréquents, paient peu)
+------------------------------------------------------------------
+Lettres et chiffre en bloc 3D massif, or sculpté biseauté, chacun incrusté d'une pierre de
+couleur différente pour qu'on les reconnaisse d'un coup d'œil (même sur un petit téléphone).
+
+ Fichier   Symbole  Incrustation / couleur dominante        Gains 3 / 4 / 5 (provisoire)
+ --------  -------  --------------------------------------  ----------------------------
+ dix       10       jade VERT, petites gravures de feuilles  ×5 / ×10 / ×25
+ valet     J        lapis BLEU foncé, liseré argent          ×5 / ×10 / ×25
+ dame      Q        améthyste VIOLETTE                       ×5 / ×15 / ×40
+ roi       K        ambre ORANGE / topaze                    ×10 / ×20 / ×50
+ as        A        turquoise CYAN, petit soleil gravé       ×10 / ×25 / ×60
+
+Détails : lettres bien épaisses, faces avant plates et brillantes, tranches biseautées
+plus sombres, éraflures et patine légère (or ancien, pas neuf). La pierre est sertie dans la
+lettre (au centre de la barre du A, dans la boucle du Q, etc.).
+
+------------------------------------------------------------------
+2. LES 4 TRÉSORS DU TEMPLE (plus rares, paient beaucoup)
+------------------------------------------------------------------
+Du moins cher au plus cher. Chaque trésor a sa couleur d'accent pour le reconnaître.
+
+ h1 — LE SCARABÉE D'OR                                   ×20 / ×50 / ×150
+   Scarabée vu de dessus, ailes légèrement ouvertes, carapace en or poli bombé avec un
+   reflet blanc. Ailes en émail TURQUOISE et or, pattes fines dorées, petit soleil
+   (disque d'or) tenu au-dessus de la tête. Accent : turquoise.
+
+ h2 — LE CALICE SACRÉ                                     ×25 / ×75 / ×200
+   Coupe en or sur un pied haut, ciselée de motifs anciens, sertie de pierres VERTES
+   (émeraudes) tout autour. Une fine fumée d'encens blanche qui s'en échappe.
+   Vu de trois-quarts, légèrement en contre-plongée. Accent : vert émeraude.
+
+ h3 — LE MASQUE DE L'IDOLE                                ×40 / ×100 / ×300
+   Masque d'or de face, traits sévères et majestueux, coiffe sculptée, yeux en onyx
+   NOIR avec un éclat blanc, front orné d'une pierre BLEU saphir. Fissures fines,
+   or patiné. Accent : bleu saphir.
+
+ h4 — LA GARDIENNE DU TEMPLE (le meilleur symbole)        ×50 / ×150 / ×500
+   Buste d'une statue de prêtresse / gardienne en or et pierre claire, de face ou
+   trois-quarts, coiffe haute et collier large, regard intense avec les yeux qui
+   brillent d'une lumière dorée. Fond de halo doré derrière la tête (dans le dessin,
+   le reste reste transparent). Accent : or blanc et lumière.
+
+------------------------------------------------------------------
+3. LE WILD
+------------------------------------------------------------------
+ wild — L'ŒIL DU TEMPLE                                    Remplace tous les symboles
+   Médaillon rond en or massif, au centre un grand œil sculpté dont la pupille est   sauf rubis et boosters.
+   une pierre ÉMERAUDE brillante (pas rouge). Rayons gravés tout autour.             Seulement sur les
+   En bas du médaillon, sur un bandeau : le mot « WILD » en lettres bloc 3D or       rouleaux 2, 3, 4 et 5.
+   biseauté (c'est le seul symbole avec un mot peint dessus).                        5 WILD = ×1 000 la ligne.
+
+------------------------------------------------------------------
+4. LES RUBIS (le cœur du jeu)
+------------------------------------------------------------------
+ rubis — LE RUBIS ROUGE
+   - Gros rubis taillé (taille coussin ou ovale, beaucoup de facettes), ROUGE profond,
+     éclats blancs sur les facettes du haut, cœur rouge lumineux.
+   - Serti dans une fine monture en or à 4 griffes.
+   - TRÈS IMPORTANT : AUCUN chiffre dessus. Le jeu écrit la valeur (1.00, 5.00, 25.00…)
+     en lettres or biseautées sur le bas du rubis : garde la moitié basse plus
+     simple et plus sombre (moins de reflets blancs) pour que le chiffre soit bien lisible.
+   - Même taille que les autres symboles.
+   - Valeurs écrites par le jeu (en fois la mise totale) : 1, 2, 3, 5, 10, 15, 25, 50,
+     ou une plaque MINI (×10), MINOR (×25), MAJOR (×100).
+
+ rubis-or — LE RUBIS ROYAL (option, conseillé)
+   - Le même rubis, plus gros, serti dans une couronne d'or plus riche, avec un halo
+     de lumière rouge et or et quelques éclats autour.
+   - Utilisé pour les grosses valeurs (×25 et plus) et pour les jackpots MINI / MINOR /
+     MAJOR : le joueur voit tout de suite qu'un gros rubis vient de tomber.
+
+ rubis-vide — (option) Le rubis éteint
+   - Le même rubis, mais gris/sombre et sans éclat. Sert dans le suspense : la case vide
+     « devine » un rubis éteint qui s'allume (ou pas) à l'arrêt du rouleau.
+
+------------------------------------------------------------------
+5. LES 4 BOOSTERS (seulement pendant le bonus RUBY LINK)
+------------------------------------------------------------------
+Pierres précieuses taillées en forme de plaque/écusson, serties d'or, chacune de sa couleur,
+avec son mot peint dessus en lettres bloc 3D or biseauté (mêmes lettres que le logo).
+Ils tombent dans la grille comme des rubis puis s'envolent vers la barre en haut.
+
+ spin-plus — SPIN+          Émeraude VERTE, flèche circulaire gravée (deux flèches qui tournent).
+                            Effet : +1 re-spin.
+ reels-plus — REELS+        Saphir BLEU, trois barres horizontales + flèche vers le haut gravées.
+                            Effet : déverrouille la rangée suivante (jusqu'à 5×6).
+ mult-plus — MULTIPLIER+    Améthyste VIOLETTE, grand « × » gravé. (Si le mot est trop long, écris
+                            « MULTI+ ».) Effet : multiplicateur du bonus +1 (jusqu'à ×10).
+ value-plus — VALUE+        Topaze OR/AMBRE, pièce gravée avec un « + ».
+                            Effet : ajoute sa valeur à tous les rubis déjà posés.
+
+------------------------------------------------------------------
+6. LES CASES ET PLAQUES DU BONUS
+------------------------------------------------------------------
+ case-vide — L'ALCÔVE
+   Case carrée creusée dans la pierre du temple, intérieur sombre (presque noir avec un
+   peu de bleu nuit), fin liseré d'or sur le bord. Sans motif au centre (c'est là que
+   tombent les rubis). Pas transparente : c'est un fond de case.
+
+ case-verrou — LA RANGÉE VERROUILLÉE
+   UNE LONGUE PLAQUE de pierre sculptée, de la largeur des 5 rouleaux (format 5 pour 1,
+   par ex. 2500 × 500), fermée par des chaînes ou des barres d'or, un CADENAS sculpté
+   au centre ou à gauche. SANS texte : laisse une zone lisse à droite du cadenas, le jeu
+   y écrit « POUR DÉVERROUILLER » et ce qu'il manque. Il y en a 3 l'une au-dessus de
+   l'autre ; la même image servira pour les 3.
+
+ jackpots (option) — 4 PLAQUES
+   Plaques horizontales (format 3 pour 1), mot peint dessus en lettres bloc 3D :
+   MINI (bronze), MINOR (argent), MAJOR (or), GRAND (or + rubis sertis). Le montant est
+   écrit par le jeu en dessous. Si tu ne les envoies pas, je les dessine.
+
+ compteur (option) — LA PLAQUE DES RE-SPINS
+   Petite plaque d'or avec 3 ou 4 alvéoles (ronds) vides : le jeu les allume une par une
+   pour montrer les re-spins restants.
+
+------------------------------------------------------------------
+RÉCAPITULATIF (24 images de symboles et plaques)
+------------------------------------------------------------------
+ Obligatoires (16) : dix, valet, dame, roi, as, h1, h2, h3, h4, wild, rubis,
+                     spin-plus, reels-plus, mult-plus, value-plus, case-vide,
+                     + case-verrou (17)
+ Conseillé (1)     : rubis-or
+ Options (5)       : rubis-vide, jackpots MINI / MINOR / MAJOR / GRAND, compteur
+
+Avec ça + les logos, les 2 fonds et la couverture (voir le cahier des charges), je peux
+construire tout le jeu.
