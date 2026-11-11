@@ -234,6 +234,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   téléphone en hauteur sur 2 rangées, en largeur plein écran : 3 rangées dans la colonne de droite des machines, 2 rangées
   pour les jeux rapides (`.table-game`). Le Valhalla garde sa pierre grise (`.vk-ctl`) ; les tables (21 `.bjv-game`,
   roulettes `.rl-game`) et les salons en ligne (`.online-game`) gardent leur barre.
+- **Passe « améliore tout » du 12 novembre 2026** (demande du propriétaire), 3 blocs à la fin de la couche `finition` :
+  **pages du site** (bloc « panneaux et cases néon » : variables `--panel` / `--panel-2` / `--panel-3` / `--line` / `--muted`
+  en violet, cases des pages arrondies 12 px en dégradé, onglets `.lb-tabs` en pilule, barres de progression rose → or,
+  champs arrondis) ; **écran des gros gains** (bloc « Écran des gros gains » : titre Bebas en métal, rayons sur 2 couches,
+  anneau, montant dans une plaque à cadre lumineux, « × la mise » en pastille, une couleur par palier `--bw1…3` ;
+  paliers en français dans `TIERS` / `WIN_TIERS` : GROS GAIN, MÉGA GAIN, GAIN ÉPIQUE, GAIN LÉGENDAIRE) ; écran
+  d'annonce des bonus (`.slot-overlay.intro`) dans la même famille. Les tables (21, roulettes) n'ont pas été touchées.
 - **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 26 pages et les 48 jeux sur
   ordinateur et téléphone, lance une partie dans chaque jeu et relève erreurs, débordements et textes « undefined ».
   `python3 -m http.server 8123` puis `node tools/verif/robot.js`. À relancer après une grosse modification.

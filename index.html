@@ -7207,6 +7207,76 @@ html.light .nx-cats small { color: #6b5a86; }
   .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-group b { padding: 4px 5px; font-size: 13px; }
   .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl.no-step .ctl-bet { grid-column: 1 / 3 !important; }
 }
+
+/* ============ Pages du site : panneaux et cases « néon » (12 novembre 2026, demande du propriétaire : « améliore tout »).
+   Les anciennes cases carrées et grises des pages (Profil, Succès, Classement, Tournois, Missions…) prennent le relief de
+   l'accueil : fond violet en dégradé, bord lumineux, coins arrondis ; onglets en pilule ; titres de page en lumière. ============ */
+html:not(.light) { --bg: #0b0614; --bg-2: #120a1f; --panel: #170f26; --panel-2: #1e1432; --panel-3: #2c1e48; --line: #3b2a5c; --muted: #a99cc4; }
+html:not(.light) .view :is(.ac-stats > div, .stat-grid > div, .ref-stats > div, .side-stats > div, .sd, .ms-row, .ms-chest, .ev-prog li, .ac-game, .ac-tier, .rank-card, .ref-card, .ref-need, .defi-prize, .defi-live, .refill-bal, .store-card, .ph-row, .ph-sheet, .tier, .br-list li, .feat-chips > span, .wh-legend > span, .sp-list li, .ul > li) {
+  border-radius: 12px !important;
+}
+html:not(.light) .view :is(.ac-stats > div, .stat-grid > div, .ref-stats > div, .side-stats > div, .sd, .ms-row, .ev-prog li, .ac-game, .tier, .refill-bal, .store-card, .ph-row) {
+  background: linear-gradient(180deg, rgba(44, 30, 72, .72), rgba(24, 15, 40, .82)) !important; border: 1px solid rgba(190, 140, 255, .18) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05), 0 6px 16px rgba(0, 0, 0, .22);
+}
+html:not(.light) .view :is(.ac-stats, .stat-grid, .ref-stats) > div b { text-shadow: 0 0 14px rgba(255, 95, 200, .25); }
+html:not(.light) .view .ac-tier { background: rgba(14, 8, 24, .7) !important; border-color: rgba(190, 140, 255, .14) !important; }
+html:not(.light) .view .sd.now, html:not(.light) .view .ev-prog li.on { border-color: rgba(255, 95, 200, .7) !important; box-shadow: 0 0 16px rgba(255, 63, 164, .25); }
+html:not(.light) .view :is(.ac-bar, .ms-bar, .jc-bar) { border-radius: 999px !important; background: rgba(8, 4, 16, .7) !important; }
+html:not(.light) .view :is(.ac-bar, .ms-bar) i { border-radius: 999px !important; background: linear-gradient(90deg, #ff5fc8, #a855f7 60%, #fbbf24) !important; box-shadow: 0 0 10px rgba(255, 95, 200, .5); }
+/* tabs: a dark groove with pills, the chosen one in pink light */
+html:not(.light) .lb-tabs { border-radius: 999px !important; padding: 5px !important; gap: 4px !important; background: rgba(8, 4, 16, .75) !important; border: 1px solid rgba(190, 140, 255, .2) !important; box-shadow: inset 0 2px 6px rgba(0, 0, 0, .5); }
+html:not(.light) .lb-tabs button { border-radius: 999px !important; transition: background .2s, color .2s, box-shadow .2s; }
+html:not(.light) .lb-tabs button.on { background: linear-gradient(180deg, rgba(255, 63, 164, .42), rgba(139, 61, 255, .3)) !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(255, 140, 220, .7), 0 0 16px rgba(255, 63, 164, .28); }
+@media (max-width: 520px) { html:not(.light) .lb-tabs { border-radius: 18px !important; } html:not(.light) .lb-tabs button { border-radius: 14px !important; } }
+/* page titles and eyebrows */
+html:not(.light) .view > :first-child h1, html:not(.light) .view > .panel > h1 { text-shadow: 0 0 26px rgba(255, 95, 200, .28); }
+html:not(.light) .view .eyebrow { border-radius: 999px !important; }
+/* fields */
+html:not(.light) .view :is(input[type="text"], input[type="number"], input[type="search"], input[type="email"], input[type="password"], select, textarea) { border-radius: 10px !important; background-color: rgba(8, 4, 16, .7) !important; border: 1px solid rgba(190, 140, 255, .25) !important; color: var(--text); }
+html:not(.light) .view :is(input, select, textarea):focus { outline: none; border-color: #ff5fc8 !important; box-shadow: 0 0 0 3px rgba(255, 63, 164, .2); }
+/* tables of the pages */
+html:not(.light) .view table.feed tbody tr { transition: background .15s; }
+html:not(.light) .view table.feed tbody tr:hover { background: rgba(255, 95, 200, .06); }
+html:not(.light) .view table.feed th { color: #c9b6ff; letter-spacing: .08em; }
+/* the play disc on the posters: round, pink */
+.game-card .play { background: radial-gradient(circle at 50% 50%, rgba(255, 63, 164, .28), rgba(11, 6, 20, .62) 70%) !important; }
+.game-card .play svg { background: linear-gradient(180deg, #ff7cc4, #d81b74) !important; color: #fff !important; box-shadow: 0 0 26px rgba(255, 63, 164, .7), inset 0 1px 0 rgba(255, 255, 255, .5) !important; border-radius: 50% !important; }
+/* footer */
+html:not(.light) .foot { border-top: 1px solid rgba(190, 140, 255, .14); background: linear-gradient(180deg, transparent, rgba(139, 61, 255, .06)); }
+
+/* ============ Écran des gros gains (12 novembre 2026) : titre en métal avec reflet qui passe, halo et rayons sur
+   deux couches, montant dans une plaque de verre à cadre doré, « × la mise » en pastille. Une couleur par palier. ============ */
+.slot-overlay.bigwin { --bw1: #fff7c2; --bw2: #fbbf24; --bw3: #b45309; --bwg: rgba(251, 191, 36, .75); gap: clamp(8px, 1.6vh, 18px); overflow: hidden; background: radial-gradient(60% 50% at 50% 46%, color-mix(in srgb, var(--bw2) 26%, transparent), transparent 70%), radial-gradient(circle, rgba(16, 8, 30, .78), rgba(4, 2, 10, .95)) !important; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.slot-overlay.bigwin.mega { --bw1: #ffe1f3; --bw2: #ff4fa8; --bw3: #9d174d; --bwg: rgba(255, 79, 168, .75); }
+.slot-overlay.bigwin.epic { --bw1: #f3e8ff; --bw2: #a855f7; --bw3: #581c87; --bwg: rgba(168, 85, 247, .75); }
+.slot-overlay.bigwin.legend { --bw1: #ecfeff; --bw2: #22d3ee; --bw3: #7c3aed; --bwg: rgba(34, 211, 238, .75); }
+.slot-overlay.bigwin.sum { --bw1: #fff; --bw2: var(--accent, #fbbf24); --bw3: color-mix(in srgb, var(--accent, #fbbf24) 45%, #000); --bwg: color-mix(in srgb, var(--accent, #fbbf24) 70%, transparent); }
+.bigwin .rays { inset: -60% !important; background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--bw2) 22%, transparent) 0 7deg, transparent 7deg 18deg) !important; opacity: .7; animation: rays 16s linear infinite !important; }
+.bigwin .rays::after { content: ''; position: absolute; inset: 0; background: repeating-conic-gradient(from 9deg, color-mix(in srgb, var(--bw1) 16%, transparent) 0 3deg, transparent 3deg 24deg); animation: rays 9s linear infinite reverse; }
+.slot-overlay.bigwin::before { content: ''; position: absolute; left: 50%; top: 46%; width: min(120vw, 900px); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; z-index: -1; pointer-events: none; border: 3px solid color-mix(in srgb, var(--bw2) 70%, transparent); opacity: 0; animation: bwRing 1.8s ease-out infinite; }
+@keyframes bwRing { 0% { scale: .15; opacity: .9; } 100% { scale: 1; opacity: 0; } }
+.slot-overlay.bigwin h3 { position: relative; margin: 0; padding: 0 .1em; font: 400 clamp(46px, 11vw, 124px)/.95 'Bebas Neue', Archivo, Impact, sans-serif !important; letter-spacing: .04em; text-transform: uppercase;
+  background: linear-gradient(180deg, #fff 0%, var(--bw1) 22%, var(--bw2) 50%, var(--bw3) 54%, var(--bw2) 78%, var(--bw1) 100%) !important; -webkit-background-clip: text !important; background-clip: text !important; color: transparent !important;
+  -webkit-text-stroke: 1.5px color-mix(in srgb, var(--bw3) 80%, #000);
+  filter: drop-shadow(0 2px 0 var(--bw3)) drop-shadow(0 4px 0 color-mix(in srgb, var(--bw3) 70%, #000)) drop-shadow(0 6px 0 color-mix(in srgb, var(--bw3) 45%, #000)) drop-shadow(0 12px 14px rgba(0, 0, 0, .65)) drop-shadow(0 0 34px var(--bwg)) !important;
+  animation: bwTitle .7s cubic-bezier(.3, 1.7, .5, 1) both, bwBeat 1.4s ease-in-out .7s infinite !important; }
+@keyframes bwTitle { 0% { transform: scale(3) rotate(-6deg); opacity: 0; } 60% { opacity: 1; } 100% { transform: none; } }
+@keyframes bwBeat { 50% { transform: scale(1.045); } }
+.bigwin.legend h3 { background: linear-gradient(90deg, #22d3ee, #a855f7 35%, #f43f9e 65%, #fbbf24) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-stroke: 1.5px #1e1b4b; }
+.bigwin .tier-tag { color: #14081f !important; font-weight: 400; padding: 5px 18px; border-radius: 999px !important; font: 400 clamp(15px, 2.4vw, 22px)/1.1 'Bebas Neue', Archivo, sans-serif; letter-spacing: .14em; color: #1a1200; background: linear-gradient(180deg, var(--bw1), var(--bw2)) !important; box-shadow: 0 0 0 2px #05080b, 0 0 20px var(--bwg); }
+.bigwin .bw-amt { position: relative; padding: clamp(8px, 1.6vh, 16px) clamp(20px, 5vw, 46px); border-radius: 18px; font: 900 clamp(34px, 8vw, 78px)/1.05 KeCoin, Archivo, sans-serif !important; color: #fff !important; white-space: nowrap;
+  background: linear-gradient(180deg, rgba(30, 18, 50, .92), rgba(8, 4, 16, .94)); box-shadow: inset 0 0 0 2px #05080b, inset 0 0 0 5px var(--bw2), inset 0 0 0 7px #05080b, inset 0 2px 30px color-mix(in srgb, var(--bw2) 35%, transparent), 0 0 44px var(--bwg), 0 16px 34px rgba(0, 0, 0, .6);
+  text-shadow: 0 0 12px var(--bw2), 0 3px 0 var(--bw3) !important; animation: bwPlate .6s cubic-bezier(.3, 1.6, .5, 1) .25s both !important; overflow: hidden; }
+.bigwin .bw-amt::after { content: ''; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; transform: skewX(-20deg); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .35), transparent); animation: bwShine 2.4s ease-in-out 1s infinite; pointer-events: none; }
+@keyframes bwPlate { from { transform: translateY(40px) scale(.6); opacity: 0; } }
+@keyframes bwShine { 0% { left: -60%; } 55%, 100% { left: 130%; } }
+.slot-overlay.bigwin > p { padding: 5px 16px; border-radius: 999px; font: 800 clamp(13px, 2vw, 18px)/1.2 Archivo, Inter, sans-serif; letter-spacing: .06em; color: var(--bw1); background: rgba(8, 4, 16, .7); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--bw2) 60%, transparent); animation: bwPlate .5s ease-out .5s both; }
+@media (prefers-reduced-motion: reduce) { .bigwin .rays, .bigwin .rays::after, .slot-overlay.bigwin::before, .slot-overlay.bigwin h3, .bigwin .bw-amt::after { animation: none !important; } }
+/* the bonus intro screen: the same family */
+.slot-overlay.intro h3 { font: 400 clamp(38px, 8vw, 86px)/.98 'Bebas Neue', Archivo, Impact, sans-serif; letter-spacing: .05em; -webkit-text-stroke: 1px rgba(0, 0, 0, .55); filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .55)) drop-shadow(0 0 26px var(--accent)); }
+.slot-overlay.intro p { max-width: 640px; padding: 8px 18px; border-radius: 14px; background: rgba(8, 4, 16, .6); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); line-height: 1.4; }
+.slot-overlay.intro small { padding: 4px 12px; border-radius: 999px; background: rgba(255, 255, 255, .08); animation: bwBeat 1.4s ease-in-out infinite; }
 </style>
 </head>
 <body>
@@ -13525,10 +13595,10 @@ const { stageFor, warm, prepare } = __mods['core/pixi.js'];
 const BETS = [1, 2, 3, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000]; // whole KE, capped by the balance
 const LINE_COLORS = ['#22d3ee', '#f43f9e', '#00e701', '#fbbf24', '#a855f7', '#fb7185', '#38bdf8', '#facc15', '#34d399', '#e879f9'];
 const WIN_TIERS = [
-  { x: 100, label: 'LEGENDARY WIN', cls: 'legend' },
-  { x: 50, label: 'EPIC WIN', cls: 'epic' },
-  { x: 25, label: 'MEGA WIN', cls: 'mega' },
-  { x: 10, label: 'BIG WIN', cls: 'big' },
+  { x: 100, label: 'GAIN LÉGENDAIRE', cls: 'legend' },
+  { x: 50, label: 'GAIN ÉPIQUE', cls: 'epic' },
+  { x: 25, label: 'MÉGA GAIN', cls: 'mega' },
+  { x: 10, label: 'GROS GAIN', cls: 'big' },
 ];
 
 class SlotMachine {
@@ -14258,10 +14328,10 @@ const FREE_BET = 100; // free spins (referral reward) are played at 1\u00a0\uE1E
 
 const TIERS = [
   { x: 150, label: 'Grand Souffle WIN', cls: 'legend' },
-  { x: 100, label: 'LEGENDARY WIN', cls: 'legend' },
-  { x: 50, label: 'EPIC WIN', cls: 'epic' },
-  { x: 25, label: 'MEGA WIN', cls: 'mega' },
-  { x: 10, label: 'BIG WIN', cls: 'big' },
+  { x: 100, label: 'GAIN LÉGENDAIRE', cls: 'legend' },
+  { x: 50, label: 'GAIN ÉPIQUE', cls: 'epic' },
+  { x: 25, label: 'MÉGA GAIN', cls: 'mega' },
+  { x: 10, label: 'GROS GAIN', cls: 'big' },
 ];
 
 class BaseGame {
