@@ -205,6 +205,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   panneaux en dégradé avec bord lumineux et coins arrondis (12 px), boutons en dégradé bleu, menus et barre du bas
   en verre, cartes de jeu qui se soulèvent au survol. Elle passe après toutes les autres couches : la modifier en
   priorité pour retoucher l'allure générale. Le mode clair a ses propres lignes en bas de cette couche.
+- **Style néon violet et rose + vitrine de l'accueil** (demande du propriétaire du 11 novembre 2026, d'après une bannière
+  de casino : nuit violette, lumières roses, boutons en pilule rose) : bloc « Néon violet et rose » à la fin de la couche
+  `finition` (il passe après tout ; `--green` = rose `#f472d0`, `--fin-blue` = dégradé rose des boutons). **Accueil** :
+  vitrine `vitrineHTML()` dans `pages/lobby.js` (dessin SVG maison `NX_ART` : podium lumineux, machine 777, roulette,
+  4 as, jetons ; titre SPINBET CASINO, cadeau du jour, JOUER MAINTENANT / CRÉER UN COMPTE), rangée des catégories
+  `.nx-cats`, puis cadeau du jour, Nouveautés, Populaires, Machines à sous, événements, encarts. Sur téléphone : dessin
+  en haut, texte centré dessous. **Ordinateur (≥ 1180 px)** : menu horizontal dans la barre du haut (`.nx-nav`,
+  menus déroulants Événements / Récompenses), le menu de gauche devient un tiroir ouvert par ☰ (`--side: 0`).
 - **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 26 pages et les 48 jeux sur
   ordinateur et téléphone, lance une partie dans chaque jeu et relève erreurs, débordements et textes « undefined ».
   `python3 -m http.server 8123` puis `node tools/verif/robot.js`. À relancer après une grosse modification.

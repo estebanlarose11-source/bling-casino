@@ -6802,6 +6802,153 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
   .bjv-top { top: 6px; left: 6px; right: 6px; gap: 6px; } .bjv-meter { padding: 3px 8px; } .bjv-meter b { font-size: 13px; }
   .bjv-state { padding: 5px 9px; font-size: 10px; } .bjv-msg { top: 50px; font-size: 12px; }
 }
+
+/* ============ Néon violet et rose (demande du propriétaire du 11 novembre 2026, d'après une bannière de casino :
+   nuit violette, lumières roses, boutons en pilule rose, menu en haut sur ordinateur, vitrine sur l'accueil).
+   Après tout le reste de la finition : c'est ici qu'on retouche l'allure générale. ============ */
+:root {
+  --green: #f472d0; --green-d: #b4239a; --cyan: #f5c2ff; --purple: #c9a3ff; --pink: #ffb3e6;
+  --nx-pink: #ff3fa4; --nx-violet: #8b3dff;
+  --fin-blue: linear-gradient(180deg, #ff7cc4 0%, #ff3f9e 48%, #d81b74 100%);
+  --fin-edge: linear-gradient(135deg, rgba(255, 95, 200, .42), rgba(255, 255, 255, .05) 38%, rgba(255, 255, 255, .03) 62%, rgba(139, 61, 255, .4));
+  --fin-panel: linear-gradient(180deg, rgba(30, 18, 46, .96), rgba(16, 9, 26, .96));
+}
+html:not(.light) body { background: #0b0614; }
+html:not(.light) body::after {
+  background:
+    radial-gradient(900px 560px at 18% -8%, rgba(176, 38, 255, .26), transparent 62%),
+    radial-gradient(820px 560px at 100% 10%, rgba(255, 46, 160, .16), transparent 60%),
+    radial-gradient(900px 600px at 60% 115%, rgba(120, 40, 220, .16), transparent 60%),
+    linear-gradient(180deg, #120a1f 0%, #0a0612 100%) !important;
+}
+html:not(.light) .top { background: linear-gradient(180deg, rgba(20, 10, 32, .97), rgba(14, 8, 24, .95)) !important; border-bottom: 1px solid rgba(255, 95, 200, .16); }
+html:not(.light) .side { background: linear-gradient(180deg, #170c26 0%, #0e0818 60%, #120a1f 100%); border-right: 1px solid rgba(255, 95, 200, .12); }
+.side-nav a:hover { background: linear-gradient(90deg, rgba(255, 95, 200, .12), rgba(255, 95, 200, 0)); }
+.side-nav a.on { background: linear-gradient(90deg, rgba(255, 63, 164, .3), rgba(139, 61, 255, .08) 70%, transparent) !important; box-shadow: inset 3px 0 0 #ff5fc8, 0 0 18px rgba(255, 63, 164, .14) !important; }
+.side-label { background: linear-gradient(90deg, #ff7cc4, #c9a3ff 60%, #fbbf24); -webkit-background-clip: text; background-clip: text; }
+.logo > span:not(.logo-mark) em { background: linear-gradient(90deg, #ff6fc0, #b06bff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.logo-mark { background: linear-gradient(135deg, #ff3fa4, #7b2cff) !important; box-shadow: 0 0 18px rgba(255, 63, 164, .55) !important; color: #fff !important; }
+.sec-head h2::before { background: linear-gradient(180deg, #ff6fc0, #8b3dff 60%, #fbbf24) !important; box-shadow: 0 0 12px rgba(255, 95, 200, .55) !important; }
+.btn.primary, body:not(.ml-off) .btn.primary { color: #fff !important; text-shadow: 0 1px 1px rgba(90, 0, 40, .35); box-shadow: 0 8px 22px rgba(255, 46, 150, .35), inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -2px 0 rgba(0, 0, 0, .18) !important; }
+.btn.primary:hover:not(:disabled) { box-shadow: 0 10px 28px rgba(255, 46, 150, .5), inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -2px 0 rgba(0, 0, 0, .18) !important; }
+html:not(.light) .btn.ghost { box-shadow: inset 0 0 0 1px rgba(255, 140, 220, .25), inset 0 1px 0 rgba(255, 255, 255, .06) !important; }
+html:not(.light) .btn.ghost:hover:not(:disabled) { background: linear-gradient(180deg, rgba(255, 95, 200, .14), rgba(255, 95, 200, .04)) !important; box-shadow: inset 0 0 0 1px rgba(255, 95, 200, .5) !important; }
+@media (hover: hover) { .game-card:hover .thumb { box-shadow: 0 18px 36px rgba(0, 0, 0, .55), 0 0 0 1px rgba(255, 95, 200, .6), 0 0 26px rgba(255, 63, 164, .3) !important; } }
+html:not(.light) .chip.on { background: linear-gradient(180deg, rgba(255, 63, 164, .36), rgba(139, 61, 255, .2)) !important; box-shadow: inset 0 0 0 1px rgba(255, 120, 210, .7), 0 0 18px rgba(255, 63, 164, .22) !important; }
+html:not(.light) .bottom-nav { background: linear-gradient(180deg, #1a0e2a, #0b0614) !important; border-top: 1px solid rgba(255, 95, 200, .18) !important; }
+html:not(.light) .bottom-nav a.on { background: linear-gradient(180deg, rgba(255, 63, 164, .26), rgba(139, 61, 255, .06)) !important; box-shadow: inset 0 1px 0 rgba(255, 120, 210, .45); }
+html:not(.light) .modal, html:not(.light) .ad-offer { background: linear-gradient(180deg, #1d1230, #100a1a) padding-box, var(--fin-edge) border-box !important; }
+html:not(.light) .gate-card { background: linear-gradient(180deg, #1c1130, #0e0818) padding-box, var(--fin-edge) border-box !important; }
+::selection { background: rgba(255, 95, 200, .35); }
+.ct-fab { background: linear-gradient(180deg, #ff7cc4, #c4237f) !important; box-shadow: 0 8px 24px rgba(255, 46, 150, .4) !important; color: #fff !important; }
+html:not(.light) ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #4a2668, #2a1640); border-color: #0b0614; }
+html:not(.light) ::-webkit-scrollbar-track { background: #0b0614; }
+.dh-card:not(.ready) { background: linear-gradient(135deg, rgba(255, 63, 164, .10), rgba(139, 61, 255, .05)); border-color: rgba(255, 95, 200, .26); }
+html.light .btn.primary { background: linear-gradient(180deg, #ff6fbf, #ec2f8e 60%, #c0186c) !important; }
+html.light .side-nav a.on { background: linear-gradient(90deg, rgba(236, 47, 142, .14), transparent) !important; box-shadow: inset 3px 0 0 #ec2f8e !important; }
+
+/* ---------- la vitrine de l'accueil ---------- */
+.nx-hero {
+  position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: center; gap: 8px;
+  margin: 0 0 18px; padding: 18px 40px 18px 12px; min-height: 420px; border-radius: 20px; overflow: hidden; isolation: isolate;
+  background:
+    radial-gradient(60% 80% at 28% 55%, rgba(255, 46, 170, .28), transparent 70%),
+    radial-gradient(50% 70% at 85% 20%, rgba(139, 61, 255, .22), transparent 70%),
+    linear-gradient(135deg, #1d0b33 0%, #12081f 55%, #1a0a2c 100%);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .45), inset 0 0 0 1px rgba(255, 140, 220, .16);
+}
+.nx-hero::after { content: ''; position: absolute; inset: auto 0 0 0; height: 40%; z-index: -1; background: radial-gradient(60% 100% at 30% 100%, rgba(160, 60, 255, .22), transparent 70%); pointer-events: none; }
+.nx-stage { position: relative; min-width: 0; }
+.nx-art { display: block; width: 100%; height: auto; max-height: 440px; overflow: visible; }
+.nx-chip { animation: nxFloat 5.5s ease-in-out infinite; transform-box: fill-box; }
+.nx-chip.b { animation-duration: 6.8s; animation-delay: -2s; } .nx-chip.c { animation-duration: 4.6s; animation-delay: -1s; }
+@keyframes nxFloat { 50% { translate: 0 -10px; } }
+.nx-rotor { animation: nxSpin 14s linear infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes nxSpin { to { rotate: 360deg; } }
+.nx-7 { animation: nxGlow 2.6s ease-in-out infinite; }
+@keyframes nxGlow { 50% { opacity: .78; } }
+@media (prefers-reduced-motion: reduce) { .nx-chip, .nx-rotor, .nx-7 { animation: none; } }
+.nx-copy { position: relative; min-width: 0; color: #fff; }
+.nx-new { display: inline-flex; align-items: center; gap: 8px; margin-bottom: 14px; padding: 4px 12px 4px 4px; border-radius: 999px; font-size: 13px; font-weight: 700; color: #ffd6f1; background: rgba(255, 63, 164, .12); box-shadow: inset 0 0 0 1px rgba(255, 120, 210, .35); }
+.nx-new b { padding: 3px 9px; border-radius: 999px; font: 800 11px/1.2 Inter, sans-serif; letter-spacing: 1px; color: #fff; background: linear-gradient(180deg, #ff6fbf, #e3248a); }
+.nx-hero h1, html.light .nx-hero h1 { color: #fff !important; }
+.nx-hero h1 { margin: 0; font: 400 clamp(46px, 6.2vw, 92px)/.92 'Bebas Neue', Archivo, Impact, sans-serif; letter-spacing: .02em; color: #fff; text-shadow: 0 0 28px rgba(255, 95, 200, .35); }
+.nx-copy .nx-short { display: none; }
+.nx-copy p { margin: 12px 0 18px; max-width: 470px; font: 600 clamp(13px, 1.1vw, 15.5px)/1.45 Inter, sans-serif; letter-spacing: .02em; text-transform: uppercase; color: #e6dcf5; }
+.nx-bonus { font: 400 clamp(30px, 3.6vw, 52px)/1 'Bebas Neue', Archivo, Impact, sans-serif; color: #fff; letter-spacing: .02em; }
+.nx-bonus span { font-family: KeCoin, 'Bebas Neue', Archivo, sans-serif; color: #ff4fa8; text-shadow: 0 0 22px rgba(255, 63, 164, .55); }
+.nx-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.nx-btn { display: inline-flex; align-items: center; justify-content: center; height: 48px; padding: 0 30px; border-radius: 999px; font: 800 14px Inter, sans-serif; letter-spacing: 1.2px; color: #fff; background: linear-gradient(180deg, #ff6fbf, #ff2f93 55%, #d3186f); box-shadow: 0 10px 30px rgba(255, 46, 150, .45), inset 0 1px 0 rgba(255, 255, 255, .45); transition: transform .15s, box-shadow .2s, filter .2s; }
+.nx-btn:hover { filter: brightness(1.08); box-shadow: 0 12px 38px rgba(255, 46, 150, .6), inset 0 1px 0 rgba(255, 255, 255, .5); }
+.nx-btn:active { transform: translateY(1px) scale(.98); }
+.nx-btn.ghost { background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1.5px rgba(255, 140, 220, .55); }
+
+/* the categories under the vitrine: one tidy row */
+.nx-cats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; }
+.nx-cats a { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; background: linear-gradient(180deg, rgba(40, 20, 62, .9), rgba(20, 10, 34, .9)) padding-box, var(--fin-edge) border-box; border: 1px solid transparent; transition: transform .2s, box-shadow .2s; min-width: 0; }
+.nx-cats a:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(255, 46, 150, .22); }
+.nx-cats i { grid-row: 1 / 3; font-style: normal; font-size: 26px; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: radial-gradient(circle at 35% 30%, rgba(255, 95, 200, .35), rgba(139, 61, 255, .18)); }
+.nx-cats b { font-size: clamp(12.5px, 1vw, 14px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nx-cats small { color: #b9a8d4; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html.light .nx-cats a { background: linear-gradient(180deg, #fff, #f7f0ff) padding-box, var(--fin-edge) border-box; }
+html.light .nx-cats small { color: #6b5a86; }
+
+@media (max-width: 1100px) { .nx-cats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* phone: the picture on top, the text under it, centred */
+@media (max-width: 760px) {
+  .nx-hero { grid-template-columns: 1fr; min-height: 0; padding: 6px 18px 22px; gap: 0; text-align: center; border-radius: 18px; }
+  .nx-stage { margin: 0 -8px -6px; }
+  .nx-art { height: min(56vw, 250px); }
+  .nx-copy p { display: none; }
+  .nx-copy p.nx-short { display: block; margin: 6px auto 12px; font-size: 12.5px; text-transform: none; letter-spacing: .01em; font-weight: 600; color: #d9cdee; }
+  .nx-hero h1 { font-size: clamp(46px, 14vw, 62px); }
+  .nx-bonus { font-size: clamp(24px, 7.4vw, 32px); }
+  .nx-bonus span { display: block; font-size: 1.25em; }
+  .nx-cta { justify-content: center; margin-top: 16px; gap: 10px; }
+  .nx-btn { flex: 1 1 0; min-width: 0; height: 46px; padding: 0 10px; font-size: 12px; letter-spacing: .4px; white-space: nowrap; }
+  .nx-new { margin-bottom: 10px; font-size: 12px; }
+  .nx-cats { gap: 8px; margin-bottom: 16px; }
+  .nx-cats a { grid-template-columns: 1fr; grid-template-rows: auto auto auto; justify-items: center; text-align: center; padding: 10px 6px; row-gap: 2px; }
+  .nx-cats i { grid-row: auto; width: 38px; height: 38px; font-size: 22px; margin-bottom: 2px; }
+  .nx-cats b { font-size: 12.5px; max-width: 100%; } .nx-l { display: none; } .nx-cats small { font-size: 11px; max-width: 100%; }
+}
+
+/* ---------- menu du haut sur ordinateur (le menu de gauche s'ouvre par le bouton ☰) ---------- */
+.nx-logo, .nx-nav { display: none; }
+@media (min-width: 1180px) {
+  :root { --side: 0px; }
+  .side { width: 280px; transform: translateX(-105%); box-shadow: 0 0 60px rgba(0, 0, 0, .6); z-index: 60; }
+  body.side-open .side { transform: none; }
+  body.side-open .side-scrim { display: block; position: fixed; inset: 0; z-index: 55; background: rgba(5, 2, 10, .55); }
+  .top { padding: 0 20px; gap: 14px; }
+  .burger { display: grid; place-items: center; padding: 0; }
+  .nx-logo { display: flex; padding: 0; font-size: 17px; white-space: nowrap; }
+  .nx-logo .logo-mark { width: 32px; height: 32px; font-size: 16px; }
+  .nx-nav { display: flex; align-items: center; gap: 2px; min-width: 0; }
+  .nx-nav > a, .nx-dd > button { display: inline-flex; align-items: center; gap: 4px; height: 38px; padding: 0 12px; border-radius: 999px; font: 700 12.5px Inter, sans-serif; letter-spacing: .8px; text-transform: uppercase; color: #e4d4f7; white-space: nowrap; transition: color .15s, background .15s; }
+  .nx-nav > a:hover, .nx-dd > button:hover, .nx-dd:focus-within > button { color: #fff; background: rgba(255, 95, 200, .1); }
+  .nx-nav > a.on { color: #ff6fc0; }
+  .nx-dd { position: relative; }
+  .nx-dd > button i { font-style: normal; font-size: 10px; opacity: .7; }
+  .nx-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 230px; padding: 6px; border-radius: 14px; display: grid; gap: 2px; background: linear-gradient(180deg, #1f1233, #120a1f) padding-box, var(--fin-edge) border-box; border: 1px solid transparent; box-shadow: 0 20px 50px rgba(0, 0, 0, .55); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .15s, transform .15s, visibility 0s .15s; z-index: 50; }
+  .nx-menu::before { content: ''; position: absolute; inset: -10px 0 auto; height: 10px; }
+  .nx-dd:hover .nx-menu, .nx-dd:focus-within .nx-menu { opacity: 1; visibility: visible; transform: none; transition: opacity .15s, transform .15s; }
+  .nx-menu a { padding: 9px 12px; border-radius: 9px; font-weight: 600; font-size: 14px; color: #e9def8; white-space: nowrap; }
+  .nx-menu a:hover, .nx-menu a.on { background: linear-gradient(90deg, rgba(255, 63, 164, .22), rgba(139, 61, 255, .06)); color: #fff; }
+  .top-wallet { margin: 0 0 0 auto; }
+  .top-right { position: static; }
+  .demo-tag { display: none; }
+  .view, .foot { margin-left: auto; margin-right: auto; }
+  .view { max-width: 1340px; }
+  html.light .nx-nav > a, html.light .nx-dd > button { color: #3b2a55; }
+  html.light .nx-menu { background: #fff padding-box, var(--fin-edge) border-box; }
+  html.light .nx-menu a { color: #2a1d40; }
+}
+@media (min-width: 1180px) and (max-width: 1560px) { .top-right .jp-chip { display: none; } }
+@media (min-width: 1180px) and (max-width: 1360px) {
+  .nx-nav > a, .nx-dd > button { padding: 0 9px; font-size: 11.5px; letter-spacing: .4px; }
+  .me-chip .me-name { display: none; }
+}
 </style>
 </head>
 <body>
@@ -6892,6 +7039,31 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
   <header class="top">
     <button class="icon-btn burger" data-toggle-side aria-label="Menu"><svg class="ico"><use href="#ui-menu"/></svg></button>
     <a class="logo mobile" href="#accueil"><span class="logo-mark">S</span></a>
+    <a class="logo nx-logo" href="#accueil"><span class="logo-mark">S</span><span>SPINBET<em>CASINO</em></span></a>
+    <nav class="nx-nav" aria-label="Menu principal">
+      <a href="#lobby-slot" data-nav="slots">Machines à sous</a>
+      <a href="#lobby-table" data-nav="tables">Roues &amp; tables</a>
+      <a href="#lobby-quick" data-nav="quick">Jeux rapides</a>
+      <div class="nx-dd"><button type="button" aria-haspopup="true">Événements <i>▾</i></button><div class="nx-menu">
+        <a href="#special" data-nav="special">🏆 Défi spécial</a>
+        <a href="#tournois" data-nav="tournois">🏁 Tournois</a>
+        <a href="#jackpot" data-nav="jackpot">💎 Jackpot commun</a>
+        <a href="#battle" data-nav="battle">⚔️ Battle Royale</a>
+        <a href="#duels" data-nav="duels">🤺 Duels entre amis</a>
+        <a href="#loto" data-nav="loto">🎱 Loto</a>
+        <a href="#paris" data-nav="paris">⚽ Sport</a>
+        <a href="#cashback" data-nav="cashback">💸 Cashback</a>
+      </div></div>
+      <div class="nx-dd"><button type="button" aria-haspopup="true">Récompenses <i>▾</i></button><div class="nx-menu">
+        <a href="#roue" data-nav="wheel">🎡 Roue du jour</a>
+        <a href="#missions" data-nav="missions">🎯 Missions du jour</a>
+        <a href="#defi" data-nav="defi">🏁 Défi de la semaine</a>
+        <a href="#succes" data-nav="ach">🏅 Succès</a>
+        <a href="#jcc" data-nav="jcc">🃏 Cartes à collectionner</a>
+        <a href="#recompenses" data-nav="rewards">📺 Récompenses vidéo</a>
+        <a href="#boutique" data-nav="shop">🛍️ Boutique</a>
+      </div></div>
+    </nav>
     <div class="top-wallet">
       <div class="balance"><b data-balance>0&nbsp;&#xE1E0;</b></div>
       <a class="btn primary top-refill" href="#recharger" aria-label="Recharger"><span>Recharger</span><b>+</b></a>
@@ -12149,7 +12321,83 @@ function mountDailyHome(root) {
 }
 const { challengeGame } = __mods['social.js'];
 
-const VOL = ['', 'Très basse', 'Basse', 'Moyenne', 'Haute', 'Très haute'];
+/* Vitrine of the home page (owner's request, 11 November 2026, after a neon casino banner: a lit podium with a
+   777 machine, a roulette wheel and fanned aces in purple and pink light, the big title and the welcome gift on the
+   right). Drawn here in SVG (our own drawing), a single picture: no filter per frame, only the chips float. */
+const NX_ART = (() => {
+  const chip = (x, y, r, c, rot, cls = '') => `<g class="nx-chip ${cls}" transform="translate(${x} ${y}) rotate(${rot})"><ellipse rx="${r}" ry="${r * .42}" cy="${r * .16}" fill="#1a0820"/><ellipse rx="${r}" ry="${r * .42}" fill="${c}"/><ellipse rx="${r}" ry="${r * .42}" fill="none" stroke="#fff" stroke-width="${r * .2}" stroke-dasharray="${r * .32} ${r * .38}" opacity=".9"/><ellipse rx="${r * .6}" ry="${r * .25}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1"/></g>`;
+  const card = (x, rot, glow, suit, red) => `<g transform="rotate(${rot} 320 420) translate(${320 + x} 0)"><rect x="-46" y="70" width="92" height="132" rx="9" fill="url(#nxCard)" stroke="${glow}" stroke-width="2.4"/><rect x="-46" y="70" width="92" height="132" rx="9" fill="none" stroke="${glow}" stroke-width="8" opacity=".22"/><text x="-34" y="96" font-family="Archivo,Arial,sans-serif" font-weight="900" font-size="20" fill="${red ? '#ff6fae' : '#e9e2ff'}">A</text><text x="0" y="152" text-anchor="middle" font-size="40" fill="${glow}" opacity=".95">${suit}</text></g>`;
+  // the wheel: 37 pockets as one dashed ring (red / black), a green zero, a gold rim
+  const pockets = 2 * Math.PI * 70 / 37;
+  const seven = (x) => `<g transform="translate(${x} 0)"><rect x="-34" y="262" width="68" height="96" rx="10" fill="url(#nxReel)"/><rect x="-34" y="262" width="68" height="96" rx="10" fill="none" stroke="#ff9fe0" stroke-opacity=".7" stroke-width="2"/><text x="0" y="336" text-anchor="middle" font-family="'Bebas Neue',Archivo,Impact,sans-serif" font-size="78" fill="url(#nxSeven)" stroke="#ffd7f4" stroke-width="1.4" class="nx-7">7</text></g>`;
+  return `<svg class="nx-art" viewBox="0 0 640 520" role="img" aria-label="Machine à sous 777, roulette et cartes sur un podium lumineux">
+  <defs>
+    <radialGradient id="nxHalo" cx="50%" cy="55%" r="50%"><stop offset="0" stop-color="#ff3fb4" stop-opacity=".75"/><stop offset=".45" stop-color="#8b2cf5" stop-opacity=".35"/><stop offset="1" stop-color="#3b0a6b" stop-opacity="0"/></radialGradient>
+    <linearGradient id="nxCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1640"/><stop offset="1" stop-color="#0c0614"/></linearGradient>
+    <linearGradient id="nxReel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a0f57"/><stop offset=".5" stop-color="#c13ad8"/><stop offset="1" stop-color="#3a0f57"/></linearGradient>
+    <linearGradient id="nxSeven" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#ff7ad9"/><stop offset="1" stop-color="#9b2cff"/></linearGradient>
+    <linearGradient id="nxBody" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5b1a86"/><stop offset=".5" stop-color="#e15fe6"/><stop offset="1" stop-color="#5b1a86"/></linearGradient>
+    <linearGradient id="nxTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9ad8"/><stop offset="1" stop-color="#9d4dff"/></linearGradient>
+    <linearGradient id="nxSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b264ff"/><stop offset="1" stop-color="#3a1466"/></linearGradient>
+    <linearGradient id="nxRim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#d79a2b"/><stop offset="1" stop-color="#7a4a10"/></linearGradient>
+    <filter id="nxBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <ellipse cx="320" cy="270" rx="300" ry="250" fill="url(#nxHalo)"/>
+  ${card(-96, -22, '#4fc3ff', '♣')}${card(-34, -8, '#ff5fa8', '♥', 1)}${card(34, 8, '#c86bff', '♠')}${card(96, 22, '#ff6fd0', '♦', 1)}
+  <g transform="translate(320 228)">
+    <circle r="96" fill="#14061f" stroke="url(#nxRim)" stroke-width="9"/>
+    <circle r="96" fill="none" stroke="#ff5fd2" stroke-width="16" opacity=".25" filter="url(#nxBlur)"/>
+    <circle r="70" fill="none" stroke="#c0122f" stroke-width="22" stroke-dasharray="${pockets.toFixed(2)} ${pockets.toFixed(2)}"/>
+    <circle r="70" fill="none" stroke="#14070f" stroke-width="22" stroke-dasharray="${pockets.toFixed(2)} ${pockets.toFixed(2)}" stroke-dashoffset="${pockets.toFixed(2)}"/>
+    <circle r="70" fill="none" stroke="#11a35a" stroke-width="22" stroke-dasharray="${pockets.toFixed(2)} 999" transform="rotate(-92)"/>
+    <circle r="56" fill="#3a1a12" stroke="#d79a2b" stroke-width="2"/>
+    <g class="nx-rotor"><path d="M0-50 V50 M-50 0 H50" stroke="url(#nxRim)" stroke-width="5" stroke-linecap="round"/><circle r="12" fill="url(#nxRim)"/></g>
+    <circle cx="44" cy="-58" r="6" fill="#fff"/>
+  </g>
+  <rect x="190" y="246" width="260" height="128" rx="22" fill="#1a0629" stroke="url(#nxBody)" stroke-width="5"/>
+  <rect x="190" y="246" width="260" height="128" rx="22" fill="none" stroke="#ff5fd2" stroke-width="16" opacity=".35" filter="url(#nxBlur)"/>
+  ${seven(246)}${seven(320)}${seven(394)}
+  <rect x="200" y="300" width="240" height="6" rx="3" fill="#fff" opacity=".18"/>
+  <g class="nx-podium">
+    <ellipse cx="320" cy="468" rx="250" ry="34" fill="#ff4fb8" opacity=".35" filter="url(#nxBlur)"/>
+    <path d="M86 448 a234 30 0 0 0 468 0 v-16 a234 30 0 0 0 -468 0 z" fill="url(#nxSide)"/>
+    <ellipse cx="320" cy="432" rx="234" ry="30" fill="#2a0f45" stroke="#ff8fe0" stroke-width="2.5"/>
+    <path d="M136 420 a184 24 0 0 0 368 0 v-30 a184 24 0 0 0 -368 0 z" fill="url(#nxSide)"/>
+    <ellipse cx="320" cy="390" rx="184" ry="24" fill="url(#nxTop)"/>
+    <ellipse cx="320" cy="390" rx="184" ry="24" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2"/>
+    <ellipse cx="320" cy="392" rx="140" ry="14" fill="#fff" opacity=".35" filter="url(#nxBlur)"/>
+  </g>
+  ${chip(70, 110, 22, '#d6157a', -20, 'a')}${chip(560, 92, 18, '#7a2cff', 25, 'b')}${chip(600, 300, 24, '#e01e6e', -35, 'c')}${chip(40, 330, 19, '#8d2fff', 30, 'b')}${chip(150, 40, 14, '#ff4fb8', 10, 'c')}${chip(480, 30, 13, '#b52cff', -10, 'a')}${chip(585, 205, 12, '#ff3f8f', 40, 'c')}${chip(48, 240, 12, '#ba3bff', -40, 'a')}
+</svg>`;
+})();
+
+function vitrineHTML() {
+  const playable = ALL_GAMES.filter((g) => !g.wip).length;
+  const guest = __mods['profile.js'].profiles.guest;
+  const fresh = UPDATES.find((u) => u.isNew && getGame(u.game) && (Date.now() - Date.parse(`${u.date}T12:00:00`)) / 864e5 <= 14);
+  const fg = fresh && getGame(fresh.game);
+  return `<section class="nx-hero">
+    <div class="nx-stage">${NX_ART}</div>
+    <div class="nx-copy">
+      ${fg ? `<a class="nx-new" href="#game-${fg.id}"><b>NOUVEAU</b>${fg.name} ›</a>` : '<span class="nx-new"><b>GRATUIT</b>Casino en ligne · argent fictif</span>'}
+      <h1>SPINBET CASINO</h1>
+      <p>Machines à sous, roulettes, blackjack et jeux rapides : ${playable} jeux à jouer gratuitement, en KE, la monnaie du site. Aucun dépôt, aucun vrai pari.</p>
+      <p class="nx-short">${playable} jeux gratuits · aucun dépôt · aucun vrai pari</p>
+      <div class="nx-bonus">CADEAU DU JOUR <span>JUSQU’À ${fmt(10000)}</span></div>
+      <div class="nx-cta"><a class="nx-btn" href="#lobby-slot">JOUER MAINTENANT</a>${guest ? '<a class="nx-btn ghost" href="#" data-signup>CRÉER UN COMPTE</a>' : '<a class="nx-btn ghost" href="#recharger">RECHARGER</a>'}</div>
+    </div>
+  </section>
+  <nav class="nx-cats" aria-label="Catégories">
+    <a href="#lobby-slot"><i>🎰</i><b>Machines<span class="nx-l"> à sous</span></b><small>${ALL_GAMES.filter((g) => !g.wip && FILTERS[1].test(g)).length} jeux</small></a>
+    <a href="#lobby-table"><i>🎡</i><b>Roues &amp; tables</b><small>Roulette, 21, poker</small></a>
+    <a href="#lobby-quick"><i>⚡</i><b>Jeux rapides</b><small>Mines, Pilote…</small></a>
+    <a href="#tournois"><i>🏁</i><b>Tournois</b><small>Chaque soir</small></a>
+    <a href="#jackpot"><i>💎</i><b>Jackpot</b><small data-jackpot="short">…</small></a>
+    <a href="#lobby-fav"><i>❤️</i><b>Mes favoris</b><small>Tes jeux</small></a>
+  </nav>`;
+}
+
+const VOL =['', 'Très basse', 'Basse', 'Moyenne', 'Haute', 'Très haute'];
 const volLabel = (g) => (g.original ? VOL[g.vol] : g.volatility);
 
 const thumbArt = (g, opts) => coverSVG(g, opts);
@@ -12226,12 +12474,13 @@ function renderLobby(root, params = {}) {
   };
 
   const body = filter === 'all'
-    ? '<div data-ev-home></div>' + `<a class="sp-banner" href="#special"><span>🏆</span><div><b>DÉFI SPÉCIAL · ${fmt(__mods['special.js'].specialStatus().prize)}</b><small>Débloque tous les bonus du casino en jouant : ${__mods['special.js'].specialStatus().have} / ${__mods['special.js'].specialStatus().total}</small></div><em>Voir le défi ›</em></a>`
+    ? row('✨ Nouveautés', [...new Set(UPDATES.map((u) => u.game))].map(getGame).filter((g) => g && !g.wip).slice(0, 12))
+      + row('Populaires', ['fortune', 'cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
+      + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
+      + '<div data-ev-home></div>' + `<a class="sp-banner" href="#special"><span>🏆</span><div><b>DÉFI SPÉCIAL · ${fmt(__mods['special.js'].specialStatus().prize)}</b><small>Débloque tous les bonus du casino en jouant : ${__mods['special.js'].specialStatus().have} / ${__mods['special.js'].specialStatus().total}</small></div><em>Voir le défi ›</em></a>`
       + '<a class="snap-box" href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><svg class="snap-ghost" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c2.9 0 5.2 2.2 5.2 5.3v2.3c.5.2 1.1.1 1.5-.1.6-.2 1.2.3 1 .9-.2.5-1 .8-1.7 1-.4.1-.6.5-.4.9.9 1.8 2.4 3.1 4 3.5.4.1.5.6.2.8-.6.4-1.5.6-2.4.8-.2.3-.2.9-.5 1.1-.5.2-1.3-.1-2.2 0-1.3.2-2 1.6-4.7 1.6s-3.4-1.4-4.7-1.6c-.9-.1-1.7.2-2.2 0-.3-.2-.3-.8-.5-1.1-.9-.2-1.8-.4-2.4-.8-.3-.2-.2-.7.2-.8 1.6-.4 3.1-1.7 4-3.5.2-.4 0-.8-.4-.9-.7-.2-1.5-.5-1.7-1-.2-.6.4-1.1 1-.9.4.2 1 .3 1.5.1V7.5c0-3.1 2.3-5.3 5.2-5.3z" fill="#fff" stroke="#000" stroke-width="1.2"/></svg><div><b>Code cadeau du jour en story Snap</b><small>Ajoute <strong>spinbetcazino</strong> : chaque jour un code qui rapporte des KE (à entrer dans Recharger)</small></div><em>Ajouter ›</em></a>'
       + '<section class="panel live-now" data-live-now></section>'
       + row('🟢 En ligne · joue avec les autres', ['storm-online', 'bj-online', 'holdem-online', 'madwheel-online', 'plateau-online', 'peche-online', 'roueor-online', 'robots-online'].map(getGame))
-      + row('Populaires', ['fortune', 'cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
-      + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
       + '<div class="hta-slot" data-hta=""></div>'
       + row('Roues & tables', ORIGINALS.filter(FILTERS[3].test), 'table')
       + row('Jeux rapides', ORIGINALS.filter(FILTERS[4].test), 'quick')
@@ -12271,8 +12520,8 @@ function renderLobby(root, params = {}) {
       </div>
     </section>` : '';
 
-  root.innerHTML = `${filter === 'all' ? dailyHomeHTML() : ''}
-    ${hero || `<section class="hero">
+  root.innerHTML = `${filter === 'all' ? vitrineHTML() + dailyHomeHTML() : ''}
+    ${filter === 'all' ? '' : hero || `<section class="hero">
       <div class="hero-main theme-wolf has-bg">${bgArt(wolf, 'upd-bg')}
         <div class="hero-copy">
           <span class="eyebrow">Nouveau · ${BRAND.provider}</span>
@@ -12289,16 +12538,17 @@ function renderLobby(root, params = {}) {
       </div>
     </section>`}
 
+
+    ${filter === 'all' ? '' : `<div class="chips">${FILTERS.map((x) => `<a class="chip${x.id === filter ? ' on' : ''}" href="#${x.id === 'all' ? 'accueil' : `lobby-${x.id}`}">${x.icon} ${x.label}</a>`).join('')}</div>`}
+
+    ${body}
+
     <div class="promos">
     ${filter === 'all' && profilesReady() ? (() => { const m = missionStatus(), n = m.rows.filter((r) => r.claimed).length; return m.chest ? '' : `<a class="app-promo ms-promo" href="#missions">${bgArt(getGame((m.rows.find((r) => !r.claimed && r.game) || UPDATES[0] || {}).game))}<span class="wp-ico">🎯</span><span><b>Missions du jour · ${n} / 3</b><small>${m.toClaim ? `${m.toClaim} récompense${m.toClaim > 1 ? 's' : ''} à récupérer !` : m.rows.map((r) => r.text).join(' · ')}</small></span><em>${m.toClaim ? 'Récupérer' : 'Voir'}</em></a>`; })() : ''}
     ${filter === 'all' ? `<a class="app-promo defi-promo" href="#defi">${bgArt(getGame(challengeGame()))}<span class="wp-ico">🏁</span><span><b>3 Défis de la semaine · machines à sous : ${getGame(challengeGame()).name}</b><small data-leader>100 000\u00a0\uE1E0 au n°1</small></span><em>Participer</em></a>` : ''}
     ${filter === 'all' && wheelReady() ? `<a class="app-promo wheel-promo" href="#roue">${bgArt(getGame('roueor'))}<span class="wp-ico">🎡</span><span><b>Ta Roue du jour est prête !</b><small>Un tour gratuit : KE, XP ou bonus offert</small></span><em>Tourner</em></a>` : ''}
     ${filter === 'all' && !__mods['pages/app.js'].installed() ? `<a class="app-promo" href="#appli" data-get-app><img src="assets/icon-192.png" alt="" width="44" height="44"><span><b>Télécharge l’appli SpinBet</b><small>Gratuit, plein écran · iPhone et Android</small></span><em>Télécharger</em></a>` : ''}
     </div>
-
-    <div class="chips">${FILTERS.map((x) => `<a class="chip${x.id === filter ? ' on' : ''}" href="#${x.id === 'all' ? 'accueil' : `lobby-${x.id}`}">${x.icon} ${x.label}</a>`).join('')}</div>
-
-    ${body}
 
     <section class="two-col">
       <div class="panel">
@@ -21150,6 +21400,8 @@ function mountPro() {
 ['gesturestart', 'gesturechange'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }));
 document.querySelector('[data-toggle-side]').onclick = () => document.body.classList.toggle('side-open');
 document.querySelector('.side-scrim').onclick = () => document.body.classList.remove('side-open');
+// top menu (computer): a dropdown closes once a page is chosen (it stays open while it holds the focus)
+document.querySelector('.nx-nav')?.addEventListener('click', (e) => { if (e.target.closest('a')) setTimeout(() => document.activeElement?.blur?.(), 0); });
 
 wallet.addEventListener('change', updateWallet);
 addEventListener('hashchange', route);
