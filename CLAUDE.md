@@ -312,7 +312,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   menu » de toutes les machines à sous (les deux moteurs, `core/base.js` et `slot/machine.js`, localStorage
   `<id>_super`). Il allume aussi le Turbo et met `globalThis.__sbSuper` : `sleep` des moteurs (`core/base.js`,
   `core/grid.js`, `slot/machine.js`, `slot/holdspin.js`) ×0,3, rouleaux ×0,45, cascades ×0,5, comptage des gains et
-  tours auto plus courts. Remis à zéro en quittant le jeu. Ne change pas les gains. Mesuré : Le Loup 1,8 s → 0,57 s
+  tours auto plus courts. Remis à zéro en quittant le jeu. Ne change pas les gains. **Dès qu'un bonus démarre** (`sb:feature`, sauf relance `re`), Turbo et Super turbo se coupent tout seuls
+  et restent coupés (`onFeatCalm` dans les deux moteurs, message « Turbo coupé pour profiter du bonus ») : voulu par le
+  propriétaire, le joueur les remet lui-même. Mesuré : Le Loup 1,8 s → 0,57 s
   par tour, L'Olympe 2,0 → 1,15 s.
 - **Max win** : chaque machine à sous a un gain maximum par tour, bonus compris (`max` du catalogue → `maxX`),
   appliqué par `core/base.js` (`win()`) et `slot/machine.js` (`payOut()`). Fin de chaque tour payé : événement

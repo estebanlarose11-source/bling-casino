@@ -13044,6 +13044,15 @@ class SlotMachine {
     try { this.superT = localStorage.getItem(`${game.id}_super`) === '1'; } catch { this.superT = false; } // super turbo (owner's request)
     if (this.superT) this.turbo = true;
     globalThis.__sbSuper = this.superT;
+    // a bonus starts: Turbo and Super turbo go off so it can be watched (owner's request); the player turns them on again
+    this.onFeatCalm = (e) => {
+      const d = e.detail || {};
+      if (d.game !== this.game.id || d.re || d.quiet || (!this.turbo && !this.superT)) return;
+      this.turbo = false; this.superT = false; globalThis.__sbSuper = false;
+      try { localStorage.setItem(`${this.game.id}_super`, '0'); } catch { /* private mode */ }
+      toast('⚡ Turbo coupé pour profiter du bonus · tu peux le remettre dans « Bonus & menu »', 'info');
+    };
+    addEventListener('sb:feature', this.onFeatCalm);
     this.auto = 0;
     this.busy = false;
     this.free = null;
@@ -13159,6 +13168,7 @@ class SlotMachine {
     this.music.stop();
     this.root.removeEventListener('click', this.onClick);
     removeEventListener('keydown', this.onKey);
+    removeEventListener('sb:feature', this.onFeatCalm);
     wallet.removeEventListener('change', this.onWallet);
   }
 
@@ -13768,6 +13778,15 @@ class BaseGame {
     this.render();
     this.bind();
     this.unfit = autoFit(this.root);
+    // a bonus starts: Turbo and Super turbo go off so it can be watched (owner's request); the player turns them on again
+    this.onFeatCalm = (e) => {
+      const d = e.detail || {};
+      if (game.cat !== 'slot' || d.game !== game.id || d.re || d.quiet || (!this.turbo && !this.superT)) return;
+      this.turbo = false; this.superT = false; globalThis.__sbSuper = false;
+      this.saveKey(`${game.id}_turbo`, 0); this.saveKey(`${game.id}_super`, 0);
+      toast('⚡ Turbo coupé pour profiter du bonus · tu peux le remettre dans « Bonus & menu »', 'info');
+    };
+    addEventListener('sb:feature', this.onFeatCalm);
     const fr = gifts.rounds(game.id);
     if (fr && this.cfg.bets.includes(FREE_BET)) {
       this.bi = this.cfg.bets.indexOf(FREE_BET); this.updateMeters();
@@ -13907,6 +13926,7 @@ class BaseGame {
     this.artHost?.remove();
     this.root.removeEventListener('click', this.onClick);
     removeEventListener('keydown', this.onKey);
+    removeEventListener('sb:feature', this.onFeatCalm);
     wallet.removeEventListener('change', this.onWallet);
     document.querySelectorAll('.g-overlay').forEach((n) => n.remove());
   }
