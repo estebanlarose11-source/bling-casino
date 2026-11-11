@@ -90,8 +90,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `assets/games/filon/<nom>.webp`, toutes listées dans `PICS` (quartz cuivre emeraude saphir rubis lanterne
   pioche wagonnet lingots joker bonus dynamite mystere contagieux lampe fond fond-bonus) (changer `CACHE` dans
   `sw.js` si elles changent).
-- **Diamants REDK** (`games/redk.js`, id `redk`, demande du propriétaire du 11 novembre 2026, **en travaux** `"wip": true`
-  jusqu'à ce qu'il dise qu'elle est finie à 100 % ; cahier des charges `notes/diamants-redk-cahier-des-charges.txt`).
+- **Diamants REDK** (`games/redk.js`, id `redk`, demande du propriétaire du 11 novembre 2026, **ouverte à tous le
+  11 novembre 2026** (« c'est parfait ») ; cahier des charges `notes/diamants-redk-cahier-des-charges.txt`).
   Images du propriétaire dans `assets/games/redk/` : symboles découpés de ses 2 planches (`s0`…`s4` = 10 J Q K A de la
   planche 2, K passé en orange pour ne pas ressembler au rubis ; `s5` scarabée, `s6` œil, `s7` Anubis, `s8` pharaon,
   `wild` couronne, `scat` pyramide, `ruby` diamant rouge, boosters `b-spin` / `b-reels` / `b-mult` / `b-value`), sa vidéo
@@ -104,9 +104,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`.rk-board`), tremblement (`.rk-shake.q1-3`), musique coupée et battements de cœur + nappe grave (`Heart`), vibration ;
   aussi dans le Ruby Link (1 rubis pour ouvrir une rangée, 1 case pour le GRAND). Simulation `node tools/sim/redk.js`
   (6 M tours) : RTP ≈ 92,5 %, un gain 1 tour sur 4, Ruby Link 1 sur 246 (≈ ×61), pyramide 1 sur 266, suspense 1 sur 29,
-  achats ×66 / ×175 ≈ 88 %, max ×5 000 atteint (surtout par les achats). Le Défi spécial a déjà sa ligne (comptée à
-  l'ouverture). **À l'ouverture** : retirer `"wip": true`, `python3 tools/build.py`, captures `node tools/seo/shots.js redk`,
-  image de partage, affiche `UPDATES` (isNew), changer `CACHE`.
+  achats ×66 / ×175 ≈ 88 %, max ×5 000 atteint (surtout par les achats). Ligne dans le Défi spécial (Ruby Link,
+  Tours de la pyramide), page Google `jeux/redk.html`, captures `assets/shots/redk*.webp`, image de partage
+  `assets/share/redk.jpg`, affiche `UPDATES` « NOUVEAU ».
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

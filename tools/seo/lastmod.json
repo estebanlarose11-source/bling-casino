@@ -24,19 +24,19 @@
 "d": "2026-11-05"
 },
 "articles/meilleures-machines-a-sous-gratuites-2026.html": {
-"h": "61d565489f8ca549",
-"d": "2026-11-09"
+"h": "a8f081a4bfb98123",
+"d": "2026-11-11"
 },
 "articles/rtp-volatilite-machines-a-sous.html": {
-"h": "a289262cf600bb94",
-"d": "2026-11-09"
+"h": "4461fc850573a415",
+"d": "2026-11-11"
 },
 "articles/strategie-blackjack.html": {
 "h": "73da9d35812ef85f",
 "d": "2026-11-05"
 },
 "index.html": {
-"h": "479332327a6f9546",
+"h": "bf507d36b52bb35b",
 "d": "2026-11-11"
 },
 "jeux/anubis.html": {
@@ -132,8 +132,8 @@
 "d": "2026-11-05"
 },
 "jeux/index.html": {
-"h": "312871da2a813bac",
-"d": "2026-11-10"
+"h": "7e55da259e5168bc",
+"d": "2026-11-11"
 },
 "jeux/labo.html": {
 "h": "182504071fb25d93",
@@ -202,6 +202,10 @@
 "jeux/poulet.html": {
 "h": "0d0fb4c5bc7929d0",
 "d": "2026-11-05"
+},
+"jeux/redk.html": {
+"h": "a7efbcb6c5e8911a",
+"d": "2026-11-11"
 },
 "jeux/robots-online.html": {
 "h": "6d0589a53ced8009",
