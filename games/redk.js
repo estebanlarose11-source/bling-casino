@@ -19,35 +19,42 @@ const { fx, center } = __mods['fx.js'];
 // Symbols 0-4: cards 10 J Q K A; 5 scarab, 6 eye, 7 Anubis, 8 pharaoh; 9 WILD crown (reels 2-5, replaces 0-8);
 // 10 pyramid SCATTER (one per reel at most); 11 RUBY (carries a value in × the total bet).
 // Ruby Link grid: 5 columns × 6 rows, cell = c * 6 + r (r = 0 at the top); rows 3-5 are the base grid, rows 0-2 locked.
-const COLS = 5, ROWS = 3, N = 15, BR = 6, BN = 30, NS = 9, WILD = 9, SCAT = 10, RUBY = 11, CAPX = 5000;
+// Owner's wishes (11 November 2026): the RUBY LINK comes often (≈ 1 spin in 50 to 100) even if it pays little, and it
+// is the only bonus that can be bought; 4 pyramids open LA PYRAMIDE D'OR, a rare special bonus that cannot be bought:
+// only golden rubies fall, with big multipliers (shown ×N), on the whole 5×6 grid at once.
+const COLS = 5, ROWS = 3, N = 15, BR = 6, BN = 30, NS = 9, WILD = 9, SCAT = 10, RUBY = 11, CAPX = 10000;
 const LINES = [
   [1, 1, 1, 1, 1], [0, 0, 0, 0, 0], [2, 2, 2, 2, 2], [0, 1, 2, 1, 0], [2, 1, 0, 1, 2],
   [0, 0, 1, 2, 2], [2, 2, 1, 0, 0], [1, 0, 0, 0, 1], [1, 2, 2, 2, 1], [0, 1, 1, 1, 0],
   [2, 1, 1, 1, 2], [1, 0, 1, 2, 1], [1, 2, 1, 0, 1], [0, 1, 0, 1, 0], [2, 1, 2, 1, 2],
   [1, 1, 0, 1, 1], [1, 1, 2, 1, 1], [0, 2, 0, 2, 0], [2, 0, 2, 0, 2], [0, 2, 2, 2, 0],
 ];
-const FS_COUNT = { 3: 10, 4: 12, 5: 15 }, FS_RETRIG = 5;
+const GOLD_AT = 4; // pyramids for LA PYRAMIDE D'OR
 const JPX = { mini: 10, minor: 25, major: 100, grand: 1000 };
-const BUY = { link: 66, super: 175 };
+const BUY = { link: 28 };
 const P = {
   // reel weights of symbols 0-8, WILD weight (reels 2-5), chance of a pyramid on a reel, of a ruby on a cell, stacks
-  w: [32, 31, 30, 29, 28, 13, 11, 9, 7], wild: 18, scat: 0.075, ruby: 0.115, stack: 0.3,
-  // pays per line in × the line bet (bet / 20) for 3, 4 and 5 symbols, scaled by K (× fsK in the free spins)
+  w: [32, 31, 30, 29, 28, 13, 11, 9, 7], wild: 18, scat: 0.092, ruby: 0.147, stack: 0.3,
+  // pays per line in × the line bet (bet / 20) for 3, 4 and 5 symbols, scaled by K
   pays: [[5, 15, 50], [5, 15, 50], [5, 20, 75], [10, 25, 100], [10, 30, 125], [15, 50, 200], [20, 75, 300], [30, 100, 400], [50, 150, 750]],
-  K: 1.45, fsMul: 3, fsWild: 22, fsRuby: 0.11,
+  K: 1.15,
   // ruby values (× the bet) on the reels and in Ruby Link; jackpot rubies on the reels
-  val: [[1, 30], [2, 25], [3, 16], [5, 12], [8, 7], [10, 5], [15, 2.6], [25, 1.3], [50, 0.45]], jpBase: [['mini', 1.6], ['minor', 0.35]],
+  val: [[1, 40], [2, 28], [3, 14], [5, 9], [8, 4], [10, 3], [15, 1.4], [25, 0.6], [50, 0.2]], jpBase: [['mini', 1.6], ['minor', 0.35]],
   // Ruby Link: chance per open empty cell on each re-spin, and what lands there
-  hp: 0.068,
+  hp: 0.034,
   land: [['v', 86], ['mini', 3.4], ['minor', 1.1], ['major', 0.22], ['spin', 2.6], ['reels', 2.6], ['mult', 2.1], ['value', 2.4]],
   boost: [[1, 40], [2, 30], [3, 18], [5, 12]], // VALUE+ adds this (× the bet) to every ruby
   unlock: [11, 16, 21], // rubies needed to unlock the 1st, 2nd and 3rd locked row (REELS+ also unlocks one)
   multUp: [[1, 60], [2, 28], [3, 12]], maxMult: 10, maxLeft: 5,
-  superRows: 1, superMult: 2, // RUBY LINK SUPER: starts with one row open and ×2
+  // LA PYRAMIDE D'OR: golden rubies only, big values, golden multipliers; the 30 cells open from the start
+  gStart: 6, ghp: 0.045,
+  gval: [[2, 30], [3, 24], [5, 20], [10, 12], [15, 6], [25, 4], [50, 2], [100, 0.8], [250, 0.25]],
+  gland: [['v', 85], ['mult', 10], ['spin', 3], ['major', 2]],
+  gmultUp: [[1, 55], [2, 28], [3, 12], [5, 5]], gmaxMult: 20,
 };
 function wp(R, l) { let t = 0; for (const x of l) t += x[1]; let q = R() * t; for (const x of l) { if (q < x[1]) return x[0]; q -= x[1]; } return l[l.length - 1][0]; }
-function symbol(c, R, free) {
-  const ws = c >= 1 ? (free ? P.fsWild : P.wild) : 0;
+function symbol(c, R) {
+  const ws = c >= 1 ? P.wild : 0;
   let t = ws; for (const x of P.w) t += x;
   let q = R() * t;
   if (q < ws) return WILD; q -= ws;
@@ -57,22 +64,22 @@ function symbol(c, R, free) {
 const rubyVal = (R) => (R() < 0.04 ? wp(R, P.jpBase) : wp(R, P.val));
 const vx = (v) => (typeof v === 'number' ? v : JPX[v]);
 // A screen of 15 cells (cell = c * 3 + r): at most one pyramid per reel, rubies carry a value, symbols in stacks.
-function screen(R, free) {
+function screen(R) {
   const g = [], vals = {};
   for (let c = 0; c < COLS; c++) {
-    const sr = R() < P.scat * (free ? 0.75 : 1) ? Math.floor(R() * ROWS) : -1;
+    const sr = R() < P.scat ? Math.floor(R() * ROWS) : -1;
     for (let r = 0; r < ROWS; r++) {
       const i = c * ROWS + r;
       if (r === sr) g[i] = SCAT;
-      else if (R() < (free ? P.fsRuby : P.ruby)) { g[i] = RUBY; vals[i] = rubyVal(R); }
+      else if (R() < P.ruby) { g[i] = RUBY; vals[i] = rubyVal(R); }
       else if (r && g[i - 1] < NS + 1 && R() < P.stack) g[i] = g[i - 1];
-      else g[i] = symbol(c, R, free);
+      else g[i] = symbol(c, R);
     }
   }
   return { g, vals };
 }
 // 20 lines, left to right, 3+ symbols; the WILD replaces 0-8 (5 WILDs pay like 5 pharaohs).
-function lines(g, k = 1) {
+function lines(g) {
   const wins = [];
   LINES.forEach((L, li) => {
     let s = -1, n = 0;
@@ -84,26 +91,28 @@ function lines(g, k = 1) {
     }
     if (s < 0 && n === COLS) s = NS - 1;
     if (s < 0 || n < 3) return;
-    wins.push({ line: li, s, n, x: P.pays[s][n - 3] / 20 * P.K * k, cells: L.slice(0, n).map((r, c) => c * ROWS + r) });
+    wins.push({ line: li, s, n, x: P.pays[s][n - 3] / 20 * P.K, cells: L.slice(0, n).map((r, c) => c * ROWS + r) });
   });
   return wins;
 }
 const count = (g, v) => g.filter((x) => x === v).length;
-// One paid spin (or one free spin): the screen, the line wins (× the bet), the pyramids and the rubies.
-function spin(R = Math.random, free = false) {
-  const { g, vals } = screen(R, free), wins = lines(g, free ? P.fsMul : 1);
+// One paid spin: the screen, the line wins (× the bet), the pyramids and the rubies.
+function spin(R = Math.random) {
+  const { g, vals } = screen(R), wins = lines(g);
   const sc = count(g, SCAT), rubies = Object.keys(vals).map(Number);
-  return { g, vals, wins, x: wins.reduce((a, w) => a + w.x, 0), scat: sc, fs: sc >= 3 ? FS_COUNT[Math.min(5, sc)] : 0, rubies, link: rubies.length >= 6 };
+  return { g, vals, wins, x: wins.reduce((a, w) => a + w.x, 0), scat: sc, gold: sc >= GOLD_AT, rubies, link: rubies.length >= 6 };
 }
-// base cell (c, r) → Ruby Link cell (c, r + 3)
+// base cell (c, r) → Ruby Link cell (c, r + 3), and back
 const toBig = (i) => Math.floor(i / ROWS) * BR + (i % ROWS) + 3;
-// The whole Ruby Link from the starting rubies { bigCell: value }. Every re-spin: { add: [{ i, t, v, b? }], left, rows,
-// mult, snap }. rows = open rows (3 to 6, from the bottom), mult = the bonus multiplier (×1 to ×10).
+const toBase = (b) => Math.floor(b / BR) * ROWS + (b % BR) - 3;
+// The whole Ruby Link (or, with opts.gold, LA PYRAMIDE D'OR) from the starting rubies { bigCell: value }.
+// Every re-spin: { add: [{ i, t, v, b?, up?, mult?, row? }], left, rows, mult, auto, snap }.
 function linkRun(start, R = Math.random, opts = {}) {
-  const cur = { ...start }, steps = [];
-  let left = 3, rows = 3 + (opts.rows || 0), mult = opts.mult || 1, guard = 0;
+  const gold = !!opts.gold, cur = { ...start }, steps = [];
+  let left = 3, rows = gold ? BR : 3 + (opts.rows || 0), mult = opts.mult || 1, guard = 0;
+  const hp = gold ? P.ghp : P.hp, land = gold ? P.gland : P.land, vals = gold ? P.gval : P.val;
+  const up = gold ? P.gmultUp : P.multUp, maxM = gold ? P.gmaxMult : P.maxMult;
   const open = (i) => (i % BR) >= BR - rows;
-  const nOpen = () => COLS * rows;
   const unlockAuto = () => { let u = 0; while (rows < BR && Object.keys(cur).length >= P.unlock[rows - 3]) { rows++; u++; } return u; };
   unlockAuto();
   while (left > 0 && guard++ < 400) {
@@ -112,15 +121,15 @@ function linkRun(start, R = Math.random, opts = {}) {
     let spinPlus = 0;
     for (let c = 0; c < COLS; c++) for (let r = 0; r < BR; r++) {
       const i = c * BR + r;
-      if (!open(i) || i in cur || R() >= P.hp) continue;
-      const t = wp(R, P.land);
-      if (t === 'v') { cur[i] = wp(R, P.val); add.push({ i, t, v: cur[i] }); continue; }
+      if (!open(i) || i in cur || R() >= hp) continue;
+      const t = wp(R, land);
+      if (t === 'v') { cur[i] = wp(R, vals); add.push({ i, t, v: cur[i] }); continue; }
       if (t === 'mini' || t === 'minor' || t === 'major') { cur[i] = t; add.push({ i, t, v: t }); continue; }
       // boosters: they act, then stay as a ruby with a value
       const a = { i, t, v: 0 };
-      if (t === 'spin') { spinPlus++; cur[i] = a.v = wp(R, P.val); }
-      else if (t === 'reels') { if (rows < BR) { rows++; a.row = rows; } cur[i] = a.v = wp(R, P.val); }
-      else if (t === 'mult') { a.up = wp(R, P.multUp); mult = Math.min(P.maxMult, mult + a.up); a.mult = mult; cur[i] = a.v = wp(R, P.val); }
+      if (t === 'spin') { spinPlus++; cur[i] = a.v = wp(R, vals); }
+      else if (t === 'reels') { if (rows < BR) { rows++; a.row = rows; } cur[i] = a.v = wp(R, vals); }
+      else if (t === 'mult') { a.up = wp(R, up); mult = Math.min(maxM, mult + a.up); a.mult = mult; cur[i] = a.v = wp(R, vals); }
       else { const b = wp(R, P.boost); for (const j in cur) if (typeof cur[j] === 'number') cur[j] += b; cur[i] = a.v = b; a.b = b; }
       add.push(a);
     }
@@ -131,40 +140,26 @@ function linkRun(start, R = Math.random, opts = {}) {
   const full = Object.keys(cur).length >= BN;
   let sum = 0; for (const j in cur) sum += vx(cur[j]);
   const total = (sum + (full ? JPX.grand : 0)) * mult; // the GRAND is multiplied too
-  return { start: { ...start }, steps, cur, rows, mult, sum, total, full };
+  return { start: { ...start }, steps, cur, rows, mult, sum, total, full, gold };
 }
-// n random starting rubies (bought Ruby Link) on the 15 cells of the base grid
-function startRubies(n = 6, R = Math.random) {
+// n random starting rubies (bought Ruby Link, or LA PYRAMIDE D'OR) on the 15 cells of the base grid
+function startRubies(n = 6, R = Math.random, gold = false) {
   const cells = [...Array(N).keys()];
   for (let i = cells.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [cells[i], cells[j]] = [cells[j], cells[i]]; }
-  const o = {}; cells.slice(0, n).forEach((i) => { o[toBig(i)] = wp(R, P.val); });
+  const o = {}; cells.slice(0, n).forEach((i) => { o[toBig(i)] = wp(R, gold ? P.gval : P.val); });
   return o;
 }
 const startOf = (res) => Object.fromEntries(res.rubies.map((i) => [toBig(i), res.vals[i]]));
-// The free spins: list of spins (with their Ruby Link when 6 rubies land) and total (× the bet).
-function freeRun(cnt, R = Math.random) {
-  const spins = [];
-  let left = cnt, total = 0, guard = 0;
-  while (left > 0 && guard++ < 300) {
-    left--;
-    const s = spin(R, true);
-    if (s.scat >= 3) { left += FS_RETRIG; s.re = FS_RETRIG; }
-    if (s.link) s.run = linkRun(startOf(s), R);
-    s.left = left; total += s.x + (s.run ? s.run.total : 0); s.total = total;
-    spins.push(s);
-  }
-  return { spins, total };
-}
 // A whole paid round (for the simulator): × the bet, capped.
 function round(R = Math.random) {
-  const s = spin(R, false);
-  let t = s.x, link = 0, fs = 0;
-  if (s.fs) { fs = freeRun(s.fs, R).total; t += fs; }
+  const s = spin(R);
+  let t = s.x, link = 0, gold = 0, gr = null;
   if (s.link) { link = linkRun(startOf(s), R).total; t += link; }
-  return { total: Math.min(CAPX, t), line: s.x, link, fs, hasLink: s.link, hasFs: !!s.fs };
+  if (s.gold) { gr = linkRun(startRubies(P.gStart, R, true), R, { gold: true }); gold = gr.total; t += gold; }
+  return { total: Math.min(CAPX, t), line: s.x, link, gold, hasLink: s.link, hasGold: s.gold, goldFull: !!gr?.full };
 }
-const buyRun = (kind, R = Math.random) => Math.min(CAPX, linkRun(startRubies(6, R), R, kind === 'super' ? { rows: P.superRows, mult: P.superMult } : {}).total);
-const ENGINE = { COLS, ROWS, N, BR, BN, NS, WILD, SCAT, RUBY, CAPX, LINES, FS_COUNT, FS_RETRIG, JPX, BUY, P, wp, screen, lines, spin, toBig, linkRun, startRubies, startOf, freeRun, round, buyRun, vx };
+const buyRun = (R = Math.random) => Math.min(CAPX, linkRun(startRubies(6, R), R).total);
+const ENGINE = { COLS, ROWS, N, BR, BN, NS, WILD, SCAT, RUBY, CAPX, LINES, GOLD_AT, JPX, BUY, P, wp, symbol, screen, lines, spin, toBig, toBase, linkRun, startRubies, startOf, round, buyRun, vx };
 /* ===END ENGINE */
 
 const E = ENGINE;
@@ -258,9 +253,8 @@ class RedkGame extends BaseGame {
       </div>`,
       buys: [
         { id: 'link', icon: '💎', label: 'RUBY LINK · 6 rubis', desc: '6 rubis qui restent, 3 re-spins, 3 rangées à déverrouiller et les boosters', cost: (b) => b * E.BUY.link },
-        { id: 'super', icon: '👑', label: 'RUBY LINK SUPER', desc: `6 rubis, une rangée déjà ouverte et le multiplicateur déjà à ×${PP.superMult}`, cost: (b) => b * E.BUY.super },
       ],
-      hello: '6 rubis = RUBY LINK · 3 pyramides = tours gratuits',
+      hello: `6 rubis = RUBY LINK · ${E.GOLD_AT} pyramides = LA PYRAMIDE D’OR`,
     });
     // the owner's moving diamond mine behind the whole machine (the same in the bonus)
     const bg = this.q('.slot-bg');
@@ -281,8 +275,7 @@ class RedkGame extends BaseGame {
     });
     this.reels.el.classList.add('rk-rs');
     this.reels.setAll(this.idle());
-    ['ruby', 'wild', 'scat', 'b-spin', 'b-reels', 'b-mult', 'b-value', 's7', 's8'].forEach((n) => { new Image().src = src(n); });
-    new Image().src = src('ruby');
+    ['ruby', 'ruby-gold', 'wild', 'scat', 'b-spin', 'b-reels', 'b-mult', 'b-value', 's7', 's8'].forEach((n) => { new Image().src = src(n); });
     this.paintJps();
   }
 
@@ -292,16 +285,19 @@ class RedkGame extends BaseGame {
   paintJps() { if (this.dead) return; this.qa('[data-jp]').forEach((n) => { n.innerHTML = `${kfmt(E.JPX[n.dataset.jp] * this.bet)}${KE}`; }); }
 
   // a calm screen without bonus symbols in excess (shown at the opening and after a bonus)
-  idle() { const { g, vals } = E.screen(Math.random, false); this.vals = vals; return g; }
+  idle() { const { g, vals } = E.screen(Math.random); this.vals = vals; return g; }
   filler(c) {
     const r = Math.random();
-    if (r < 0.1) return E.RUBY;
-    if (r < 0.125) return E.SCAT;
-    return E.screen(Math.random, this.inFree).g[c * E.ROWS];
+    if (r < 0.12) return E.RUBY;
+    if (r < 0.14) return E.SCAT;
+    return E.symbol(c, Math.random);
   }
+  // a ruby with its value in KE; in LA PYRAMIDE D'OR a golden ruby with its big multiplier (×N the bet)
   rubyHTML(v) {
-    if (typeof v === 'string') return `${img('ruby', 'rk-img rk-rb jp')}<b class="rk-v jp ${v}"><small>${JP_NAME[v]}</small>${kfmt(E.JPX[v] * this.bet)}</b>`;
-    return `${img('ruby', `rk-img rk-rb${v >= 15 ? ' big' : ''}`)}<b class="rk-v${v >= 15 ? ' big' : ''}">${kfmt(v * this.bet)}${KE}</b>`;
+    const gold = this.goldMode, pic = gold ? 'ruby-gold' : 'ruby';
+    if (typeof v === 'string') return `${img(pic, 'rk-img rk-rb jp')}<b class="rk-v jp ${v}"><small>${JP_NAME[v]}</small>${kfmt(E.JPX[v] * this.bet)}</b>`;
+    const big = v >= (gold ? 50 : 15);
+    return `${img(pic, `rk-img rk-rb${big ? ' big' : ''}`)}<b class="rk-v${big ? ' big' : ''}${gold ? ' gx' : ''}">${gold ? `×${v.toLocaleString('fr-FR')}` : `${kfmt(v * this.bet)}${KE}`}</b>`;
   }
   cellArt(v, i) {
     if (v === E.RUBY) return this.rubyHTML(i >= 0 && this.vals[i] !== undefined ? this.vals[i] : E.wp(Math.random, PP.val));
@@ -319,16 +315,16 @@ class RedkGame extends BaseGame {
   }
 
   /* ---------- the suspense (one ruby or one pyramid missing) ---------- */
-  // node = the reel (or cell) that can still bring it: slow reel, zoom on it, the screen shakes, heartbeat
+  // node = the reel (or cell) that can still bring it: slow reel that glows, the screen shakes, heartbeat (no zoom:
+  // the owner did not want it)
   tense(node, level = 1) {
-    const board = this.q('.rk-board'), shake = this.q('.rk-shake');
+    const shake = this.q('.rk-shake');
     if (!node) {
       if (!this.tensing) return;
       this.tensing = false;
       this.heart.stop();
       this.slotEl.classList.remove('rk-tense');
       shake.classList.remove('q1', 'q2', 'q3');
-      board.style.transform = '';
       this.qa('.rk-focus').forEach((n) => n.classList.remove('rk-focus'));
       if (this.musicWas) { this.musicWas = false; this.music.start(); }
       return;
@@ -341,18 +337,13 @@ class RedkGame extends BaseGame {
     }
     this.qa('.rk-focus').forEach((n) => n.classList.remove('rk-focus'));
     node.classList.add('rk-focus');
-    // the zoom: the board grows around the reel / cell that may still bring it
-    const a = board.getBoundingClientRect(), b = node.getBoundingClientRect(), k = a.width / (board.offsetWidth || 1) || 1;
-    const x = (b.left + b.width / 2 - a.left) / k, y = (b.top + b.height / 2 - a.top) / k;
-    board.style.transformOrigin = `${x}px ${y}px`;
-    board.style.transform = `scale(${level >= 2 ? 1.32 : 1.2})`;
     shake.classList.remove('q1', 'q2', 'q3'); void shake.offsetWidth; shake.classList.add(`q${Math.min(3, level)}`);
   }
   // the end of the suspense: an explosion of red light if it came, a sigh if not
   tenseEnd(ok) {
     if (!this.tensing) return;
     this.tense(null);
-    if (ok) { this.flash('rgba(239,68,68,.6)'); this.shake(); sfx.jackpot(); vibe([90, 50, 160]); }
+    if (ok) { this.flash(this.goldTease ? 'rgba(250,204,21,.6)' : 'rgba(239,68,68,.6)'); this.shake(); sfx.jackpot(); vibe([90, 50, 160]); }
     else this.heart.sigh();
   }
 
@@ -363,7 +354,7 @@ class RedkGame extends BaseGame {
       tease: (c, vals) => {
         let r = 0, s = 0;
         for (let j = 0; j < c * E.ROWS; j++) { if (vals[j] === E.RUBY) r++; if (vals[j] === E.SCAT) s++; }
-        const t = (r === 5 || s === 2) && !this.superT;
+        const t = (r === 5 || s === E.GOLD_AT - 1) && !this.superT;
         if (t) tease.add(c);
         return t;
       },
@@ -378,8 +369,8 @@ class RedkGame extends BaseGame {
           }
         }
         if (this.dead) return;
-        if (tease.has(c + 1)) { this.tense(this.reels.reelEls[c + 1], [...tease].indexOf(c + 1) + 1); this.msg(res.rubies.filter((i) => i < (c + 1) * E.ROWS).length === 5 ? '💎 Plus qu’un rubis…' : '🔺 Plus qu’une pyramide…'); }
-        else if (tease.has(c)) this.tenseEnd(res.link || res.fs > 0);
+        if (tease.has(c + 1)) { const rb = res.rubies.filter((i) => i < (c + 1) * E.ROWS).length === 5; this.goldTease = !rb; this.tense(this.reels.reelEls[c + 1], [...tease].indexOf(c + 1) + 1); this.msg(rb ? '💎 Plus qu’un rubis…' : '🔺 Plus qu’une pyramide pour LA PYRAMIDE D’OR…'); }
+        else if (tease.has(c)) this.tenseEnd(res.link || res.gold);
       },
     });
     this.tense(null);
@@ -394,9 +385,14 @@ class RedkGame extends BaseGame {
     this.lastStake = b;
     this.setLast(0); this.winAmt.textContent = ''; this.setBanner('');
     let total = 0;
-    if (buy) total = await this.rubyLink(E.startRubies(6), b, cap, buy === 'super' ? { rows: PP.superRows, mult: PP.superMult, title: 'RUBY LINK SUPER' } : {});
-    else {
-      const res = E.spin(Math.random, false);
+    if (buy) {
+      // a bought Ruby Link looks like one won on the reels: the 6 rubies land, then the BONUS video
+      const start = E.startRubies(6);
+      await this.buyReveal(start);
+      if (this.dead) return;
+      total = await this.rubyLink(start, b, cap);
+    } else {
+      const res = E.spin(Math.random);
       this.vals = res.vals;
       await this.spinReels(res);
       if (this.dead) return;
@@ -405,22 +401,23 @@ class RedkGame extends BaseGame {
         this.reels.mark([...new Set(res.wins.flatMap((w) => w.cells))]);
         this.msg(this.winMsg(res.wins, b));
         this.win(total); this.setLast(total); this.winAmt.textContent = fmtC(total);
-      } else this.msg(res.rubies.length === 5 ? '5 rubis… il en fallait 6 !' : res.scat === 2 ? 'Deux pyramides… il en fallait une de plus !' : res.rubies.length ? `${res.rubies.length} rubis · il en faut 6 pour le RUBY LINK` : 'Pas de gain');
-      if (res.link || res.fs) {
+      } else this.msg(res.rubies.length === 5 ? '5 rubis… il en fallait 6 !' : res.scat === E.GOLD_AT - 1 ? `${res.scat} pyramides… il en fallait ${E.GOLD_AT} !` : res.rubies.length ? `${res.rubies.length} rubis · il en faut 6 pour le RUBY LINK` : 'Pas de gain');
+      if (res.link || res.gold) {
         this.stopAuto();
         if (total > 0) { sfx.win(); await this.wait(900); }
         this.reels.unmark();
-        if (res.link) {
+        if (res.gold) {
+          this.reels.mark(res.g.map((v, i) => (v === E.SCAT ? i : -1)).filter((i) => i >= 0), 'win');
+          this.word(`${res.scat} PYRAMIDES !`, 'goldw'); sfx.jackpot(); fx.confetti(80); await this.wait(1500);
+          this.reels.unmark();
+          total += await this.rubyLink(E.startRubies(PP.gStart, Math.random, true), b, cap - total, { gold: true });
+        }
+        if (res.link && total < cap) {
+          this.reels.setAll(res.g); this.vals = res.vals;
           this.reels.mark(res.rubies, 'win');
           this.word('6 RUBIS !', 'ruby'); await this.wait(1200);
           this.reels.unmark();
           total += await this.rubyLink(E.startOf(res), b, cap - total);
-        }
-        if (res.fs && total < cap) {
-          this.reels.mark(res.g.map((v, i) => (v === E.SCAT ? i : -1)).filter((i) => i >= 0), 'win');
-          this.word(`${res.scat} PYRAMIDES !`, 'fs'); sfx.feature(); await this.wait(1200);
-          this.reels.unmark();
-          total += await this.freeSpins(res.fs, b, cap - total);
         }
       } else if (total > 0) await this.celebrate(total);
       this.reels.unmark();
@@ -431,6 +428,21 @@ class RedkGame extends BaseGame {
     this.bonusDone = false;
   }
 
+  // The reels turn and land the starting rubies of a bought Ruby Link, as if it had been won.
+  async buyReveal(start) {
+    const { g } = E.screen(Math.random), vals = {};
+    for (let i = 0; i < E.N; i++) if (g[i] === E.RUBY || g[i] === E.SCAT) g[i] = E.symbol(Math.floor(i / E.ROWS), Math.random);
+    for (const k in start) { const i = E.toBase(+k); g[i] = E.RUBY; vals[i] = start[k]; }
+    this.vals = vals;
+    this.msg('Les rouleaux tournent…');
+    await this.spinReels({ g, rubies: Object.keys(vals).map(Number), link: true, gold: false });
+    if (this.dead) return;
+    this.reels.mark(Object.keys(vals).map(Number), 'win');
+    this.word('6 RUBIS !', 'ruby'); sfx.feature();
+    await this.wait(1300);
+    this.reels.unmark();
+  }
+
   winMsg(wins, b) {
     const top = wins.slice().sort((p, q) => q.x - p.x);
     const t = top.slice(0, 2).map((w) => `${w.n} × ${NAMES[w.s]} : +${fmtC(Math.round(w.x * b))}`).join(' · ');
@@ -438,87 +450,45 @@ class RedkGame extends BaseGame {
   }
 
   /* ---------- the owner's BONUS video opens every bonus (won or bought) ---------- */
-  bonusIntro(title, sub) {
+  // A short fade to black, the video, another fade to black: the bonus grid is set up in the dark, and the caller
+  // lifts the black (blackout(false)) once the bonus is on screen.
+  blackout(on) {
+    if (on) {
+      if (!this.fadeEl) { this.fadeEl = document.createElement('div'); this.fadeEl.className = 'rk-fade g-overlay'; document.body.appendChild(this.fadeEl); }
+      return this.fadeEl.animate([{ opacity: 0 }, { opacity: 1 }], { duration: this.superT ? 120 : 380, easing: 'ease-in', fill: 'forwards' }).finished.catch(() => {});
+    }
+    const f = this.fadeEl; this.fadeEl = null;
+    if (!f) return Promise.resolve();
+    return f.animate([{ opacity: 1 }, { opacity: 0 }], { duration: this.superT ? 150 : 450, easing: 'ease-out', fill: 'forwards' }).finished.catch(() => {}).then(() => f.remove());
+  }
+  async bonusIntro(title, sub, gold = false) {
     // achievements.js, special.js and the music listen: a bonus started (bought or not)
     dispatchEvent(new CustomEvent('sb:feature', { detail: { game: this.game.id, title, bought: !!this.buyRound, re: false } }));
+    await this.blackout(true);
+    if (this.dead) return this.blackout(false);
     duck(0.12, this.turbo ? 3 : 6.5);
     vibe([60, 50, 60, 50, 150]);
     const vsrc = asset('assets/games/redk/intro.mp4'), upright = matchMedia('(max-aspect-ratio: 1 / 1)').matches;
     const ov = this.overlay(`${upright ? `<video class="rk-ivbg" src="${vsrc}" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>` : ''}<video class="rk-ivid" src="${vsrc}" playsinline preload="auto" disablepictureinpicture></video>
-      <div class="rk-ititle"><b>${title}</b><p>${sub}</p></div><small>Touchez pour passer</small>`, 'rk-intro');
+      <div class="rk-ititle"><b>${title}</b><p>${sub}</p></div><small>Touchez pour continuer</small>`, `rk-intro${gold ? ' gold' : ''}`);
     const v = ov.querySelector('.rk-ivid'), vb = ov.querySelector('.rk-ivbg');
     if (vb) { vb.muted = true; if (this.turbo) vb.playbackRate = this.superT ? 2 : 1.5; vb.play().catch(() => {}); }
     v.muted = isMuted();
     v.volume = 0.85;
     if (this.turbo) v.playbackRate = this.superT ? 2 : 1.5;
-    return new Promise((resolve) => {
+    v.play().catch(() => { v.muted = true; v.play().catch(() => { ov.classList.add('novid'); fx.confetti(60); sfx.feature(); }); });
+    await this.blackout(false);
+    await new Promise((resolve) => {
       let over = false;
-      const done = () => { if (over) return; over = true; clearTimeout(t); ov.classList.add('out'); v.pause(); vb?.pause(); setTimeout(() => { ov.remove(); resolve(); }, 320); };
+      const done = () => { if (over) return; over = true; clearTimeout(t); clearInterval(watch); resolve(); };
       const t = setTimeout(done, this.superT ? 2400 : this.turbo ? 4600 : 7000);
       v.addEventListener('ended', done);
-      v.play().catch(() => { v.muted = true; v.play().catch(() => { ov.classList.add('novid'); fx.confetti(60); sfx.feature(); }); });
       ov.addEventListener('click', done);
-      const watch = setInterval(() => { if (this.dead) { clearInterval(watch); done(); } if (over) clearInterval(watch); }, 400);
+      const watch = setInterval(() => { if (this.dead) done(); }, 400);
     });
-  }
-
-  /* ---------- LES TOURS DE LA PYRAMIDE (free spins, wins ×3) ---------- */
-  async freeSpins(count, b, capLeft) {
-    await this.bonusIntro('LES TOURS DE LA PYRAMIDE', `${count} tours gratuits · tous les gains ×${PP.fsMul} · plus de couronnes WILD · 6 rubis lancent encore le RUBY LINK`);
-    if (this.dead) return 0;
-    this.inFree = true;
-    this.slotEl.classList.add('rk-free');
-    try { this.video.playbackRate = 1.3; } catch { /* ignore */ }
-    let sum = 0, done = 0, max = count, left = count, capped = false;
-    const banner = () => this.setBanner(`<b>TOURS DE LA PYRAMIDE</b><span class="pill">Tour ${done} / ${max}</span><span class="pill">Gains ×${PP.fsMul}</span><span class="pill gold">${fmtC(Math.round(Math.min(sum, capLeft)))}</span>`);
-    banner();
-    while (left > 0 && !this.dead) {
-      left--; done++; banner();
-      const s = E.spin(Math.random, true);
-      this.vals = s.vals;
-      await this.spinReels(s);
-      if (this.dead) return 0;
-      const won = Math.round(s.x * b);
-      if (s.wins.length) {
-        this.reels.mark([...new Set(s.wins.flatMap((w) => w.cells))]);
-        this.msg(`${this.winMsg(s.wins, b)} <b class="rk-x">×${PP.fsMul}</b>`);
-        sum += won; banner();
-        this.winAmt.textContent = fmtC(Math.round(Math.min(sum, capLeft)));
-        sfx.win();
-        await this.wait(s.x >= 10 ? 1300 : 800);
-      } else { this.msg('Pas de gain sur ce tour'); await this.wait(350); }
-      if (s.scat >= 3) {
-        this.reels.mark(s.g.map((v, i) => (v === E.SCAT ? i : -1)).filter((i) => i >= 0), 'win');
-        left += E.FS_RETRIG; max += E.FS_RETRIG; banner();
-        this.word(`+${E.FS_RETRIG} TOURS !`, 'fs'); sfx.feature(); fx.confetti(50);
-        await this.wait(1300);
-      }
-      this.reels.unmark();
-      if (s.link && sum < capLeft) {
-        this.reels.mark(s.rubies, 'win');
-        this.word('6 RUBIS !', 'ruby'); await this.wait(1100);
-        this.reels.unmark();
-        const w = await this.rubyLink(E.startOf(s), b, capLeft - sum, { inFree: true });
-        sum += w; banner();
-        if (this.dead) return 0;
-      }
-      if (sum >= capLeft) { capped = true; break; }
-    }
-    this.inFree = false;
-    this.slotEl.classList.remove('rk-free');
-    try { this.video.playbackRate = 1; } catch { /* ignore */ }
-    this.setBanner('');
-    const won = Math.min(sum, capLeft);
-    // the free-spin line wins are paid here (the Ruby Links inside were paid already)
-    const lineWon = won - (this.linkInFree || 0);
-    this.linkInFree = 0;
-    if (lineWon > 0) this.win(lineWon, 'Tours de la pyramide');
-    this.setLast(won);
-    await this.celebrate(won, { summary: 'TOURS DE LA PYRAMIDE', stake: b });
-    this.msg(capped ? `GAIN MAXIMUM ! ${fmtC(won)}` : won > 0 ? `Tours de la pyramide : ${max} tours, ${fmtC(won)}` : 'Les tours de la pyramide sont finis : pas de gain cette fois');
-    this.bonusDone = true;
-    this.reels.setAll(this.idle());
-    return won;
+    await this.blackout(true);
+    v.pause(); vb?.pause(); ov.remove();
+    if (this.dead) await this.blackout(false);
   }
 
   /* ---------- RUBY LINK ---------- */
@@ -558,22 +528,27 @@ class RedkGame extends BaseGame {
   pop(i) { this.linkCell(i)?.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.2)', filter: 'brightness(1.6)' }, { transform: 'scale(1)' }], { duration: 380, easing: 'ease-out' }); }
 
   async rubyLink(start, b, capLeft, opts = {}) {
-    const title = opts.title || 'RUBY LINK';
-    await this.bonusIntro(title, `${Object.keys(start).length} rubis restent en place · 3 re-spins, remis à 3 à chaque nouveau rubis · déverrouille les 3 rangées du haut · SPIN+, REELS+, MULTI+, VALUE+ · grille pleine : GRAND`);
+    const gold = !!opts.gold, title = gold ? 'LA PYRAMIDE D’OR' : 'RUBY LINK';
+    await this.bonusIntro(title, gold
+      ? `Le bonus spécial : que des rubis dorés, avec de gros multiplicateurs (jusqu’à ×${Math.max(...PP.gval.map((x) => x[0]))}) · les 30 cases ouvertes · MULTI+ jusqu’à ×${PP.gmaxMult} · grille pleine : GRAND`
+      : `${Object.keys(start).length} rubis restent en place · 3 re-spins, remis à 3 à chaque nouveau rubis · déverrouille les 3 rangées du haut · SPIN+, REELS+, MULTI+, VALUE+ · grille pleine : GRAND`, gold);
     if (this.dead) return 0;
     const run = E.linkRun(start, Math.random, opts);
+    this.goldMode = gold;
     this.slotEl.classList.add('rk-linking');
+    this.slotEl.classList.toggle('rk-gold', gold);
     this.lv = { ...run.start };
     this.mult = opts.mult || 1;
-    this.buildLink(3 + (opts.rows || 0));
+    this.buildLink(gold ? E.BR : 3);
     this.q('.rk-link').hidden = false;
     for (const i in this.lv) this.setLinkCell(+i, this.lv[i]);
     this.paintBoost();
+    this.focusStage?.();
+    await this.blackout(false);
     const sumNow = () => { let t = 0; for (const j in this.lv) t += E.vx(this.lv[j]); return t; };
     const banner = (left) => this.setBanner(`<b>${title}</b><span class="pill rk-left">Re-spins <i class="rk-dots">${[0, 1, 2, 3, 4].slice(0, Math.max(3, left)).map((k) => `<i class="${k < left ? 'on' : ''}"></i>`).join('')}</i></span><span class="pill">×${this.mult}</span><span class="pill gold">${fmtC(Math.round(Math.min(sumNow() * this.mult * b, capLeft)))}</span>`);
     banner(3);
-    this.msg('Les rubis restent : 3 re-spins');
-    this.focusStage?.();
+    this.msg(gold ? 'Les rubis dorés restent : 3 re-spins' : 'Les rubis restent : 3 re-spins');
     await this.wait(700);
     // rows already opened by the starting rubies
     let r0 = this.rows; while (r0 < E.BR && Object.keys(this.lv).length >= PP.unlock[r0 - 3]) r0++;
@@ -594,7 +569,7 @@ class RedkGame extends BaseGame {
       if (st.rows !== this.rows) await this.unlockRows(st.rows);
       banner(st.left);
       if (st.add.length) { const pl = this.banner?.querySelector('.rk-left'); pl?.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.35)', boxShadow: '0 0 18px #ef4444' }, { transform: 'scale(1)' }], { duration: 600, easing: 'ease-out' }); }
-      const nb = `${Object.keys(this.lv).length} / ${E.COLS * this.rows} rubis`;
+      const nb = `${Object.keys(this.lv).length} / ${E.COLS * this.rows} rubis${gold ? ' dorés' : ''}`;
       this.msg(st.add.length ? `${nb} · ${st.add.length} nouveau${st.add.length > 1 ? 'x' : ''} : les re-spins repartent à ${st.left} !` : st.left ? `${nb} · encore ${st.left} re-spin${st.left > 1 ? 's' : ''}` : `${nb} · dernier re-spin terminé`);
       await this.wait(this.turbo ? 200 : 420);
     }
@@ -623,17 +598,16 @@ class RedkGame extends BaseGame {
       await this.wait(900);
     }
     const won = Math.min(Math.round(tot), capLeft);
-    if (won > 0) { this.win(won, title === 'RUBY LINK SUPER' ? 'Ruby Link Super' : 'Ruby Link'); this.setLast(won); }
-    if (opts.inFree) this.linkInFree = (this.linkInFree || 0) + won;
+    if (won > 0) { this.win(won, gold ? 'La Pyramide d’or' : 'Ruby Link'); this.setLast(won); }
     await this.celebrate(won, { summary: title, stake: b });
     this.setBanner('');
-    this.slotEl.classList.remove('rk-linking');
+    this.slotEl.classList.remove('rk-linking', 'rk-gold');
     this.q('.rk-link').hidden = true;
     this.msg(`${title} : ${fmtC(won)}${run.full ? ' · GRILLE PLEINE !' : ''}`);
     this.bonusDone = true;
+    this.goldMode = false;
     this.lv = {};
-    if (!opts.inFree) this.reels.setAll(this.idle());
-    if (opts.inFree) this.setBanner('');
+    this.reels.setAll(this.idle());
     return won;
   }
 
@@ -676,7 +650,7 @@ class RedkGame extends BaseGame {
     if (slow) this.tenseEnd(st.add.length > 0);
     for (const a of st.add) {
       if (this.dead) return;
-      const n0 = this.linkCell(a.i), p = center(n0);
+      const n0 = this.linkCell(a.i), p = center(n0), C = this.goldMode ? GOLD : RUBY_C;
       if (BOOST[a.t]) {
         const B = BOOST[a.t];
         // the booster lands, flies to its place above the grid and acts
@@ -692,7 +666,7 @@ class RedkGame extends BaseGame {
         if (a.t === 'value') {
           for (const j in this.lv) if (typeof this.lv[j] === 'number') { this.lv[j] += a.b; this.setLinkCell(+j, this.lv[j]); this.pop(+j); }
           this.word(`VALUE+ · +${kfmt(a.b * b)}${KE}<br><small>sur tous les rubis</small>`, 'value');
-        } else if (a.t === 'mult') this.word(`MULTI+ · ×${a.mult}`, 'mult');
+        } else if (a.t === 'mult') this.word(`MULTI+ · +${a.up}<br><small>×${a.mult}</small>`, 'mult');
         else if (a.t === 'spin') this.word('SPIN+ · +1 RE-SPIN', 'spin');
         else this.word(a.row ? 'REELS+ · UNE RANGÉE EN PLUS' : 'REELS+', 'reels');
         this.flash(`${B.c}55`); sfx.upgrade();
@@ -705,8 +679,9 @@ class RedkGame extends BaseGame {
         this.setLinkCell(a.i, a.v);
         this.dropIn(a.i);
         if (typeof a.v === 'string') { this.word(`${JP_NAME[a.v]}<br><small>${kfmt(E.JPX[a.v] * b)}${KE}</small>`, `jp ${a.v}`); sfx.jackpot(); vibe([80, 50, 120]); await this.wait(900); }
+        else if (this.goldMode && a.v >= 50) { this.word(`×${a.v}`, 'goldw'); sfx.bigWin(); this.flash('rgba(250,204,21,.45)'); vibe([60, 40, 90]); await this.wait(700); }
         else sfx.coin();
-        fx.burst(p.x, p.y, a.v >= 15 ? 22 : 12, RUBY_C, a.v >= 15 ? 7 : 5);
+        fx.burst(p.x, p.y, a.v >= 15 ? 22 : 12, C, a.v >= 15 ? 7 : 5);
         await this.wait(this.turbo ? 70 : 140);
       }
     }
@@ -719,13 +694,13 @@ class RedkGame extends BaseGame {
     const jp = (k) => `<b>${JP_NAME[k]} ×${E.JPX[k].toLocaleString('fr-FR')}</b>`;
     return this.rules(`<h4>Symboles (× la mise, par ligne)</h4><div class="paytable">${rows}
       <div class="pay-item"><div class="pay-sym rk-pay">${img('wild')}</div><div class="pay-vals"><b>Couronne WILD</b><br><span>Rouleaux 2 à 5, remplace tous les symboles sauf le rubis et la pyramide</span></div></div>
-      <div class="pay-item"><div class="pay-sym rk-pay">${img('scat')}</div><div class="pay-vals"><b>Pyramide</b><br><span>3 : ${E.FS_COUNT[3]} tours gratuits · 4 : ${E.FS_COUNT[4]} · 5 : ${E.FS_COUNT[5]}</span></div></div>
+      <div class="pay-item"><div class="pay-sym rk-pay">${img('scat')}</div><div class="pay-vals"><b>Pyramide</b><br><span>${E.GOLD_AT} pyramides ou plus : LA PYRAMIDE D’OR</span></div></div>
       <div class="pay-item"><div class="pay-sym rk-pay">${img('ruby')}</div><div class="pay-vals"><b>Rubis rouge</b><br><span>Porte sa valeur en KE (1 à 50 fois la mise, ou MINI / MINOR) · 6 ou plus : RUBY LINK</span></div></div></div>
       <h4>20 lignes</h4><p>5 rouleaux de 3 cases et 20 lignes fixes. Une ligne paie dès que 3 symboles identiques ou plus se suivent depuis la gauche.</p>
       <h4>RUBY LINK</h4><p>6 rubis ou plus : ils <b>restent en place</b> et tu as <b>3 re-spins</b>. Chaque nouveau rubis reste et remet les re-spins à 3. Au-dessus de la grille, <b>3 rangées verrouillées</b> : chacune s’ouvre quand assez de rubis sont posés (${PP.unlock.join(', ')}) ou avec <b>REELS+</b>, jusqu’à 5 × 6 cases. Les boosters : <b>SPIN+</b> (+1 re-spin), <b>REELS+</b> (une rangée en plus), <b>MULTI+</b> (le multiplicateur du bonus monte, jusqu’à ×${PP.maxMult}), <b>VALUE+</b> (ajoute sa valeur à tous les rubis posés). Rubis spéciaux : ${jp('mini')}, ${jp('minor')}, ${jp('major')} la mise. Les 30 cases remplies : ${jp('grand')}. À la fin, tous les rubis sont additionnés, puis multipliés.</p>
-      <h4>Les tours de la pyramide</h4><p>3 pyramides ou plus : <b>${E.FS_COUNT[3]}, ${E.FS_COUNT[4]} ou ${E.FS_COUNT[5]} tours gratuits</b>, tous les gains ×${PP.fsMul}, plus de couronnes WILD. 3 pyramides : +${E.FS_RETRIG} tours. 6 rubis lancent le RUBY LINK pendant les tours gratuits.</p>
+      <h4>LA PYRAMIDE D’OR</h4><p>Le bonus spécial, qu’on ne peut pas acheter : ${E.GOLD_AT} pyramides ou plus. Les <b>30 cases sont ouvertes</b> et il ne tombe que des <b>rubis dorés</b> avec de gros multiplicateurs (×${PP.gval.map((x) => x[0]).join(', ×')} la mise), des <b>MULTI+</b> qui montent le multiplicateur jusqu’à ×${PP.gmaxMult}, des SPIN+ et des MAJOR. Grille pleine : ${jp('grand')}, multiplié lui aussi.</p>
       <h4>Le suspense</h4><p>Quand il ne manque qu’un rubis (ou qu’une pyramide), les derniers rouleaux ralentissent… à toi de retenir ton souffle.</p>
-      <h4>Achats</h4><p>RUBY LINK ×${E.BUY.link} la mise (6 rubis) · RUBY LINK SUPER ×${E.BUY.super} (une rangée déjà ouverte, multiplicateur ×${PP.superMult}). Gain maximum ×${E.CAPX.toLocaleString('fr-FR')}.</p>`);
+      <h4>Achat</h4><p>RUBY LINK ×${E.BUY.link} la mise (6 rubis). La Pyramide d’or ne s’achète pas. Gain maximum ×${E.CAPX.toLocaleString('fr-FR')}.</p>`);
   }
 }
 

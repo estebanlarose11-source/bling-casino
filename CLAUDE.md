@@ -90,23 +90,24 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `assets/games/filon/<nom>.webp`, toutes listées dans `PICS` (quartz cuivre emeraude saphir rubis lanterne
   pioche wagonnet lingots joker bonus dynamite mystere contagieux lampe fond fond-bonus) (changer `CACHE` dans
   `sw.js` si elles changent).
-- **Diamants REDK** (`games/redk.js`, id `redk`, demande du propriétaire du 11 novembre 2026, **ouverte à tous le
-  11 novembre 2026** (« c'est parfait ») ; cahier des charges `notes/diamants-redk-cahier-des-charges.txt`).
-  Images du propriétaire dans `assets/games/redk/` : symboles découpés de ses 2 planches (`s0`…`s4` = 10 J Q K A de la
-  planche 2, K passé en orange pour ne pas ressembler au rubis ; `s5` scarabée, `s6` œil, `s7` Anubis, `s8` pharaon,
-  `wild` couronne, `scat` pyramide, `ruby` diamant rouge, boosters `b-spin` / `b-reels` / `b-mult` / `b-value`), sa vidéo
-  de mine de diamants `bg.mp4` (fond animé, en aller-retour pour une boucle sans coupure, le même pendant les bonus,
-  derrière toute la machine) et sa vidéo BONUS `intro.mp4` (6,5 s avec son, jouée à chaque bonus gagné ou acheté :
-  `bonusIntro`). 5×3, 20 lignes ; rubis avec leur valeur **en KE** (n × la mise, `kfmt` : 500, 2 500, 25K) ; 6 rubis =
-  RUBY LINK (grille 5×6, 3 rangées verrouillées ouvertes à 11 / 16 / 21 rubis ou par REELS+, boosters SPIN+ / REELS+ /
-  MULTI+ / VALUE+, MINI ×10 / MINOR ×25 / MAJOR ×100, GRAND ×1 000 multiplié aussi) ; 3 pyramides = tours de la
-  pyramide (gains ×3). **Suspense** quand il manque 1 rubis ou 1 pyramide (`tense()`) : rouleau ralenti, zoom sur lui
-  (`.rk-board`), tremblement (`.rk-shake.q1-3`), musique coupée et battements de cœur + nappe grave (`Heart`), vibration ;
-  aussi dans le Ruby Link (1 rubis pour ouvrir une rangée, 1 case pour le GRAND). Simulation `node tools/sim/redk.js`
-  (6 M tours) : RTP ≈ 92,5 %, un gain 1 tour sur 4, Ruby Link 1 sur 246 (≈ ×61), pyramide 1 sur 266, suspense 1 sur 29,
-  achats ×66 / ×175 ≈ 88 %, max ×5 000 atteint (surtout par les achats). Ligne dans le Défi spécial (Ruby Link,
-  Tours de la pyramide), page Google `jeux/redk.html`, captures `assets/shots/redk*.webp`, image de partage
-  `assets/share/redk.jpg`, affiche `UPDATES` « NOUVEAU ».
+- **Diamants REDK** (`games/redk.js`, id `redk`, demande du propriétaire du 11 novembre 2026, ouverte à tous le même jour ;
+  cahier des charges `notes/diamants-redk-cahier-des-charges.txt`). Images du propriétaire dans `assets/games/redk/` :
+  symboles découpés de ses 2 planches (`s0`…`s4` = 10 J Q K A de la planche 2, K passé en orange ; `s5` scarabée, `s6`
+  œil, `s7` Anubis, `s8` pharaon, `wild` couronne, `scat` pyramide, `ruby` diamant rouge, `ruby-gold` = le même passé en
+  or, boosters `b-spin` / `b-reels` / `b-mult` / `b-value`), sa vidéo de mine `bg.mp4` (fond animé en boucle derrière toute
+  la machine) et sa vidéo BONUS `intro.mp4` (`bonusIntro` : fondu au noir → vidéo plein écran, sur téléphone en largeur
+  ×1,65 sur la même vidéo floutée pour que le mot BONUS soit entier → fondu au noir → le bonus ; `blackout()`).
+  5×3, 20 lignes ; rubis avec leur valeur **en KE** (`kfmt`). **Voulu par le propriétaire** : le **RUBY LINK** (6 rubis ;
+  grille 5×6, 3 rangées verrouillées ouvertes à 11 / 16 / 21 rubis ou par REELS+, boosters SPIN+ / REELS+ / MULTI+ /
+  VALUE+, MINI / MINOR / MAJOR, GRAND ×1 000) tombe **souvent** (≈ 1 tour sur 76, ≈ ×28 en moyenne) et c'est **le seul
+  achat** (×28, `buyReveal` : les rouleaux tournent et posent les 6 rubis comme un vrai bonus) ; **4 pyramides** = **LA
+  PYRAMIDE D'OR**, bonus spécial **qu'on ne peut pas acheter**, rare (≈ 1 tour sur 3 000, ≈ ×475) : 30 cases ouvertes,
+  que des rubis dorés affichés en ×N (`gval` ×2 à ×250), MULTI+ jusqu'à ×20 (`gmultUp`), SPIN+, MAJOR. Plus de tours
+  gratuits. **Suspense** (1 rubis ou 1 pyramide manquant, `tense()`) : rouleau ralenti qui brille, tremblement
+  (`.rk-shake`), battements de cœur (`Heart`), vibration — **sans zoom** (le propriétaire n'en veut pas). Simulation
+  `node tools/sim/redk.js` (6 M tours) : RTP ≈ 92,5 % (lignes 40, Ruby Link 36,5, Pyramide d'or ≈ 16), un gain 1 tour
+  sur 4, achat ≈ 88,5 %, max ×10 000 (atteint dans la Pyramide d'or, ≈ 1 sur 100 000). Défi spécial : Ruby Link et
+  La Pyramide d'or.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10
