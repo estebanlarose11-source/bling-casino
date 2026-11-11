@@ -5059,17 +5059,25 @@ html.light .slot small { color: inherit; }
 .rk-word.value { filter: drop-shadow(0 3px 0 #451a03) drop-shadow(0 0 20px rgba(245, 158, 11, .95)); font-size: clamp(24px, 6.5vw, 52px); }
 
 /* the BONUS video that opens every bonus */
-/* the whole video is shown (never cut), a bit smaller than the screen, over a blurred copy of itself */
-.slot-overlay.rk-intro { background: radial-gradient(circle at 50% 45%, rgba(30, 58, 138, .35), rgba(2, 4, 12, .9) 75%), #02040c url(assets/games/redk/intro-bg.webp?v=1) center / cover no-repeat; padding: 16px; overflow: hidden; gap: 14px; }
-.rk-ivid { position: relative; display: block; width: min(92vw, 1000px, calc((100dvh - 230px) * 16 / 9)); aspect-ratio: 16 / 9; height: auto; object-fit: contain; border-radius: 16px; background: #000; box-shadow: 0 0 0 2px rgba(250, 204, 21, .75), 0 0 40px rgba(96, 165, 250, .45), 0 20px 50px rgba(0, 0, 0, .7); animation: rkVid .5s cubic-bezier(.3, 1.5, .5, 1) both; }
-@keyframes rkVid { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
-.rk-ititle { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 16px; text-align: center; animation: rkTitle .7s cubic-bezier(.3, 1.6, .5, 1) 1.2s both; }
-.rk-ititle b { font-size: clamp(30px, 7vw, 60px); line-height: .95; color: transparent; background: linear-gradient(180deg, #fff 0%, #fecaca 30%, #ef4444 52%, #7f1d1d 56%, #f87171 80%, #450a0a 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 1.5px #2a0303; filter: drop-shadow(0 3px 0 #450a0a) drop-shadow(0 0 24px rgba(239, 68, 68, .9)); }
+/* the BONUS video on the whole screen (owner's wish); on a phone held upright the picture is shown wider than the
+   screen (the word BONUS a bit smaller, never cut) over the same video, blurred, that fills the rest of the screen */
+.slot-overlay.rk-intro { background: #000; padding: 0; overflow: hidden; justify-content: flex-end; }
+.rk-ivid, .rk-ivbg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.rk-ivbg { display: none; }
+.slot-overlay.rk-intro .rk-ititle { position: absolute; left: 0; right: 0; bottom: 10%; }
+@media (max-aspect-ratio: 1 / 1) {
+  .rk-ivbg { display: block; transform: scale(1.15); filter: blur(16px) brightness(.75) saturate(1.2); }
+  .rk-ivid { inset: auto; left: 50%; top: 43%; width: 165vw; height: auto; aspect-ratio: 16 / 9; transform: translate(-50%, -50%);
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 84%, transparent 100%); mask-image: linear-gradient(180deg, transparent 0, #000 16%, #000 84%, transparent 100%); }
+  .slot-overlay.rk-intro .rk-ititle { bottom: 13%; }
+}
+.rk-ititle { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 0 16px; text-align: center; animation: rkTitle .7s cubic-bezier(.3, 1.6, .5, 1) 1.6s both; }
+.rk-ititle b { font-size: clamp(32px, 8vw, 68px); line-height: .95; color: transparent; background: linear-gradient(180deg, #fff 0%, #fecaca 30%, #ef4444 52%, #7f1d1d 56%, #f87171 80%, #450a0a 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 1.5px #2a0303; filter: drop-shadow(0 3px 0 #450a0a) drop-shadow(0 0 24px rgba(239, 68, 68, .9)); }
 .rk-ititle p { max-width: 640px; margin: 0; padding: 6px 12px; border-radius: 10px; font: 700 clamp(12px, 2.6vw, 16px)/1.35 Archivo, sans-serif; color: #fff7d6; background: rgba(0, 0, 0, .55); }
 @keyframes rkTitle { from { opacity: 0; transform: scale(.4) translateY(30px); } to { opacity: 1; transform: none; } }
 .slot-overlay.rk-intro > small { position: absolute; right: 14px; bottom: max(12px, env(safe-area-inset-bottom, 0px)); color: #e2e8f0; text-shadow: 0 1px 3px #000; }
 .slot-overlay.rk-intro.novid { background: radial-gradient(circle at 50% 45%, #7f1d1d, #050a1c 70%); }
-.slot-overlay.rk-intro.novid .rk-ititle { animation-delay: 0s; } .slot-overlay.rk-intro.novid .rk-ivid { display: none; }
+.slot-overlay.rk-intro.novid .rk-ititle { bottom: 40%; animation-delay: 0s; } .slot-overlay.rk-intro.novid .rk-ivid, .slot-overlay.rk-intro.novid .rk-ivbg { display: none; }
 .rk-pay .rk-img { width: 100%; height: 100%; }
 @media (prefers-reduced-motion: reduce) { .rk-shake.q1, .rk-shake.q2, .rk-shake.q3, .rk-sparks i, .rk-logo b, .rk-logo::after { animation: none; } }
 @media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .slot.g-filon) { --chrome: 48px; } .game-host.is-full > .slot.g-filon { display: grid; padding: 4px 8px; } .g-filon .fl-top { margin-bottom: 2px; } .g-filon .fl-ante small { display: none; } }
@@ -11765,7 +11773,7 @@ const UPDATES = [
   { game: 'roulette', date: '2026-11-10', title: 'Roulette plus fluide', items: ['La caméra et la roue bougent deux fois plus en douceur, même sur téléphone', 'La bille roule sans à-coups jusqu’au numéro gagnant'] },
   { game: 'roulette', date: '2026-11-10', isNew: true, title: 'Nouveau : La Roulette en 3D', items: ['Une vraie table de roulette : tapis bleu, roue en bois et bille qui roule', 'Mise sur le cylindre : Tiers, Orphelins, Voisins du zéro, Jeu zéro, ou un numéro et ses voisins', 'La caméra file vers la roue pendant le lancer, puis revient sur ton numéro', 'Répéter, annuler, doubler, et le tableau lumineux des derniers numéros'] },
   { game: 'bataille', date: '2026-11-10', isNew: true, title: 'Nouveau : La Bataille', items: ['Une carte pour toi, une pour la croupière : la plus haute gagne', 'Gagne 5 mains d’affilée : la 5e paie ×5 ta mise !', 'Mise Égalité payée 12 pour 1', 'La même table et la même croupière que Le 21'] },
-  { game: 'redk', date: '2026-11-11', title: 'Animation BONUS en entier', isNew: true, items: ['L’animation BONUS s’affiche en entier, sans être coupée, sur téléphone comme sur ordinateur', 'Le nom du bonus apparaît juste en dessous', 'Une mine de diamants qui bouge derrière toute la machine', '6 rubis lancent le RUBY LINK, 3 pyramides les tours gratuits'] },
+  { game: 'redk', date: '2026-11-11', title: 'Animation BONUS en plein écran', isNew: true, items: ['L’animation BONUS remplit tout l’écran, avec le mot BONUS en entier sur téléphone', 'Le nom du bonus apparaît juste en dessous', 'Une mine de diamants qui bouge derrière toute la machine', '6 rubis lancent le RUBY LINK, 3 pyramides les tours gratuits'] },
   { game: 'redk', date: '2026-11-11', title: 'Nouvelle machine : les rubis rouges', isNew: true, items: ['Une mine de diamants qui bouge derrière toute la machine', 'Les rubis montrent leur valeur en KE : 6 rubis lancent le RUBY LINK', 'Déverrouille les 3 rangées du haut et attrape les boosters SPIN+, REELS+, MULTI+ et VALUE+', 'Quand il ne manque qu’un rubis : ralenti, zoom, l’écran tremble et le cœur bat…', '3 pyramides : tours gratuits avec gains ×3, jusqu’à ×5 000 la mise'] },
   { game: 'filon', date: '2026-11-10', title: 'Toute la mine en grand', isNew: true, items: ['Le décor de la mine remplit tout l’écran, derrière toute la machine', 'Des cases bien plus grosses', 'En plein écran : la mine sur tout le téléphone, sans bandes noires', 'Pendant le bonus, toute la mine passe à l’or'] },
   { game: 'filon', date: '2026-11-09', title: 'Nouvelle machine : la mine d’or', isNew: true, items: ['Chaque case de la grille cache un multiplicateur qui double à chaque gain, jusqu’à ×8 192', 'Minerais mystère, dynamite et joker doré font grimper les cases', '3 bonus avec la roue des bonus, et des multiplicateurs qui restent jusqu’à la fin', 'Mise boostée, tour doré et tirage chance', 'Jusqu’à ×30 000 la mise'] },
@@ -14765,7 +14773,7 @@ const FILES = {
   volcan: ['volcan', 'games/impl/volcan.js', 'VolcanGame', 'e6c05773cc'],
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
   filon: ['filon', 'games/impl/filon.js', 'FilonGame', '45904335f9'],
-  redk: ['redk', 'games/impl/redk.js', 'RedkGame', '23c0637cb7'],
+  redk: ['redk', 'games/impl/redk.js', 'RedkGame', '51b16d7eae'],
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '1025072609'],
   boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '48602d9af5'],
 };

@@ -443,15 +443,17 @@ class RedkGame extends BaseGame {
     dispatchEvent(new CustomEvent('sb:feature', { detail: { game: this.game.id, title, bought: !!this.buyRound, re: false } }));
     duck(0.12, this.turbo ? 3 : 6.5);
     vibe([60, 50, 60, 50, 150]);
-    const ov = this.overlay(`<video class="rk-ivid" src="${asset('assets/games/redk/intro.mp4')}" playsinline preload="auto" disablepictureinpicture></video>
+    const vsrc = asset('assets/games/redk/intro.mp4'), upright = matchMedia('(max-aspect-ratio: 1 / 1)').matches;
+    const ov = this.overlay(`${upright ? `<video class="rk-ivbg" src="${vsrc}" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>` : ''}<video class="rk-ivid" src="${vsrc}" playsinline preload="auto" disablepictureinpicture></video>
       <div class="rk-ititle"><b>${title}</b><p>${sub}</p></div><small>Touchez pour passer</small>`, 'rk-intro');
-    const v = ov.querySelector('video');
+    const v = ov.querySelector('.rk-ivid'), vb = ov.querySelector('.rk-ivbg');
+    if (vb) { vb.muted = true; if (this.turbo) vb.playbackRate = this.superT ? 2 : 1.5; vb.play().catch(() => {}); }
     v.muted = isMuted();
     v.volume = 0.85;
     if (this.turbo) v.playbackRate = this.superT ? 2 : 1.5;
     return new Promise((resolve) => {
       let over = false;
-      const done = () => { if (over) return; over = true; clearTimeout(t); ov.classList.add('out'); v.pause(); setTimeout(() => { ov.remove(); resolve(); }, 320); };
+      const done = () => { if (over) return; over = true; clearTimeout(t); ov.classList.add('out'); v.pause(); vb?.pause(); setTimeout(() => { ov.remove(); resolve(); }, 320); };
       const t = setTimeout(done, this.superT ? 2400 : this.turbo ? 4600 : 7000);
       v.addEventListener('ended', done);
       v.play().catch(() => { v.muted = true; v.play().catch(() => { ov.classList.add('novid'); fx.confetti(60); sfx.feature(); }); });
