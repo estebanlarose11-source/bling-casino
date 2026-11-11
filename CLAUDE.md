@@ -90,11 +90,23 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `assets/games/filon/<nom>.webp`, toutes listées dans `PICS` (quartz cuivre emeraude saphir rubis lanterne
   pioche wagonnet lingots joker bonus dynamite mystere contagieux lampe fond fond-bonus) (changer `CACHE` dans
   `sw.js` si elles changent).
-- **Diamants REDK** (id prévu `redk`, demande du propriétaire du 11 novembre 2026) : machine à sous temple + rubis
-  (5×3, bonus « Ruby Link » à re-spins, rangées verrouillées, boosters Spin+ / Reels+ / Multiplier+ / Value+, suspense
-  quand il manque 1 rubis ; valeurs des rubis affichées en KE, = n × la mise, choix du propriétaire). **Pas encore construite** : cahier des charges et liste des images dans
-  `notes/diamants-redk-cahier-des-charges.txt` (symboles en détail : `notes/diamants-redk-symboles.txt`). Quand les images arrivent : construire le jeu **en travaux**
-  (`"wip": true`) et ne l'ouvrir que quand le propriétaire dit qu'il est fini à 100 %.
+- **Diamants REDK** (`games/redk.js`, id `redk`, demande du propriétaire du 11 novembre 2026, **en travaux** `"wip": true`
+  jusqu'à ce qu'il dise qu'elle est finie à 100 % ; cahier des charges `notes/diamants-redk-cahier-des-charges.txt`).
+  Images du propriétaire dans `assets/games/redk/` : symboles découpés de ses 2 planches (`s0`…`s4` = 10 J Q K A de la
+  planche 2, K passé en orange pour ne pas ressembler au rubis ; `s5` scarabée, `s6` œil, `s7` Anubis, `s8` pharaon,
+  `wild` couronne, `scat` pyramide, `ruby` diamant rouge, boosters `b-spin` / `b-reels` / `b-mult` / `b-value`), sa vidéo
+  de mine de diamants `bg.mp4` (fond animé, en aller-retour pour une boucle sans coupure, le même pendant les bonus,
+  derrière toute la machine) et sa vidéo BONUS `intro.mp4` (6,5 s avec son, jouée à chaque bonus gagné ou acheté :
+  `bonusIntro`). 5×3, 20 lignes ; rubis avec leur valeur **en KE** (n × la mise, `kfmt` : 500, 2 500, 25K) ; 6 rubis =
+  RUBY LINK (grille 5×6, 3 rangées verrouillées ouvertes à 11 / 16 / 21 rubis ou par REELS+, boosters SPIN+ / REELS+ /
+  MULTI+ / VALUE+, MINI ×10 / MINOR ×25 / MAJOR ×100, GRAND ×1 000 multiplié aussi) ; 3 pyramides = tours de la
+  pyramide (gains ×3). **Suspense** quand il manque 1 rubis ou 1 pyramide (`tense()`) : rouleau ralenti, zoom sur lui
+  (`.rk-board`), tremblement (`.rk-shake.q1-3`), musique coupée et battements de cœur + nappe grave (`Heart`), vibration ;
+  aussi dans le Ruby Link (1 rubis pour ouvrir une rangée, 1 case pour le GRAND). Simulation `node tools/sim/redk.js`
+  (6 M tours) : RTP ≈ 92,5 %, un gain 1 tour sur 4, Ruby Link 1 sur 246 (≈ ×61), pyramide 1 sur 266, suspense 1 sur 29,
+  achats ×66 / ×175 ≈ 88 %, max ×5 000 atteint (surtout par les achats). Le Défi spécial a déjà sa ligne (comptée à
+  l'ouverture). **À l'ouverture** : retirer `"wip": true`, `python3 tools/build.py`, captures `node tools/seo/shots.js redk`,
+  image de partage, affiche `UPDATES` (isNew), changer `CACHE`.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10
