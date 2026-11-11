@@ -44,10 +44,21 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Le Totem Extrême** (`games/totemx.js`) : grille 6×5, totem ×1 ×2 ×3 ×4 ×5 puis en feu ×8 … ×100, FULL SCREEN
   (30 cases scellées) = 21 × la mise × le totem. Réglages vérifiés par simulation : RTP ≈ 92,3 %, achats 43 et 99 fois
   la mise (≈ 87,4 / 88,2 %), full screen ≈ 1 tour sur 1 700, max win ×2 000 ≈ 1 tour sur 55 000.
-- **Le Volcan** (`games/volcan.js`, volatilité extrême) : grille 6×5 Pay Anywhere, cascades, pression ×1 → ×16 (chaque
-  explosion = 1 point, seuils `TUNE.press` en jeu normal, `TUNE.pressFree` dans l'ÉRUPTION où elle ne redescend jamais),
-  pierres de lave ×2 à ×500. Réglages vérifiés par simulation (6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 5, Éruption
-  1 tour sur 325 (≈ ×130), achats 150 et 500 fois la mise (≈ 88 / 87 %), max ×25 000 atteignable.
+- **Le Valhalla** (`games/viking.js`, id `viking`, demande du propriétaire du 11 novembre 2026, **à la place du Volcan**, supprimé) :
+  d'après sa capture d'une machine viking (disposition reprise, **cadre, crête, pilier et boutons dessinés par nous** :
+  `CREST`, `PILLAR`, `SKY`) avec **ses symboles** (planche `tools/art/viking-planche.jpg`, découpée et détourée par
+  `tools/art/viking.py`, `pip install "rembg[cpu]"` → `assets/games/viking/` : `s0`…`s3` J Q K A, `s4` corne, `s5` marteau,
+  `s6` casque, `s7` chope, `s8` guerrière, `s9` corbeaux, `s10` berserker, `wild` / `scat` = cadres entiers, `wild-c` /
+  `scat-c` = portraits des cases et des jauges, `cover`). **La valkyrie = WILD** (rouleaux 2 à 5), **le vieux viking (« le
+  Jarl ») = SCATTER**. 5×4, 25 lignes. 4 Jarls = BONUS VALHALLA : 15 tours gratuits, 5 WILD posés qui restent collés et
+  chaque nouveau WILD reste aussi (calque `.vk-sticky` au-dessus des rouleaux) ; 5 Jarls = SUPER BONUS (10 WILD au départ).
+  **Jauges des héros à gauche** (voulu par le propriétaire, gardées par mise : localStorage `spinbet_viking_m`) : 1 point par
+  Jarl (1 à 3) et par WILD qui tombent, le portrait s'anime ; Jarl à 250 = le bonus sans les 4 Jarls, valkyrie à 500 = le
+  SUPER BONUS (la fin de son message manquait : choix fait, à confirmer). Barre du bas en pierre comme sa capture (`vk-ctl` :
+  lignes, mise, MISE MAX, tourner, auto, gain, solde), téléphone en hauteur (héros au-dessus, barre sur 2 rangées) et en largeur.
+  Achats ×77 / ×350. Simulation `node tools/sim/viking.js` (6 M tours, jauges comprises) : RTP ≈ 92,5 % (lignes 53, bonus 39,5),
+  un gain 1 tour sur 3,8, un bonus 1 tour sur 248 (4 Jarls 1/925, jauge Jarl 1/403, Super 1/2 090), achats ≈ 88 %,
+  max ×1 000 (atteint dans le Super bonus, ≈ 1 sur 15 000).
 - **Anubis, bonus Jugement** (`games/anubis.js`, voulu par le propriétaire) : une colonne pleine ne fusionne plus toute
   seule (seul un cube de lave la fait redescendre ; une colonne pleine ne reçoit que lave ou crâne doré), moins d'objets
   qui tombent (`JPC` 0,12) mais beaucoup plus de crânes (`JW` cube 40 / crâne 20 / doré 3 / lave 4, crânes ×`SKX` = +8 à
@@ -55,8 +66,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Jeu « en travaux »** : `"wip": true` dans sa ligne du catalogue `ORIGINALS` → vignette grisée avec cadenas
   « EN TRAVAUX », page du jeu fermée, absent de `SLOTS`, du Défi spécial (`LIST`), des duels, du jackpot et des pages
   SEO. Pour l'ouvrir : retirer `"wip": true` puis `python3 tools/build.py`. Le propriétaire essaie un jeu en travaux
-  avec `?essai` dans l'adresse (`renderGame` dans `pages/game.js`). **Le Volcan est en travaux** (demande du
-  propriétaire) jusqu'à ce qu'il demande de le finir.
+  avec `?essai` dans l'adresse (`renderGame` dans `pages/game.js`).
 - **La Roulette Russe** (`games/barillet.js`, id `barillet`, volatilité extrême, images du propriétaire dans
   `assets/games/barillet/` : symboles découpés de sa planche, `wildtall.webp` pour le WILD étendu, fond `bg.webp`,
   couverture). Mise en page voulue par le propriétaire (d'après sa référence, couleurs changées) : rouleaux de
