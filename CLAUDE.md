@@ -99,13 +99,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   ×1,65 sur la même vidéo floutée pour que le mot BONUS soit entier → fondu au noir → le bonus ; `blackout()`).
   5×3, 20 lignes ; rubis avec leur valeur **en KE** (`kfmt`). **Voulu par le propriétaire** : le **RUBY LINK** (6 rubis ;
   grille 5×6, 3 rangées verrouillées ouvertes à 11 / 16 / 21 rubis ou par REELS+, boosters SPIN+ / REELS+ / MULTI+ /
-  VALUE+, MINI / MINOR / MAJOR, GRAND ×1 000) tombe **souvent** (≈ 1 tour sur 76, ≈ ×28 en moyenne) et c'est **le seul
+  VALUE+, MINI / MINOR / MAJOR, GRAND ×1 000 ; **SPIN+ = un re-spin de plus à chaque remise à zéro jusqu'à la fin
+  du bonus** : 3 → 4 → 5 → 6, `base`, voulu par le propriétaire) tombe **souvent** (≈ 1 tour sur 76, ≈ ×28 en moyenne) et c'est **le seul
   achat** (×28, `buyReveal` : les rouleaux tournent et posent les 6 rubis comme un vrai bonus) ; **4 pyramides** = **LA
   PYRAMIDE D'OR**, bonus spécial **qu'on ne peut pas acheter**, rare (≈ 1 tour sur 3 000, ≈ ×475) : 30 cases ouvertes,
   que des rubis dorés affichés en ×N (`gval` ×2 à ×250), MULTI+ jusqu'à ×20 (`gmultUp`), SPIN+, MAJOR. Plus de tours
   gratuits. **Suspense** (1 rubis ou 1 pyramide manquant, `tense()`) : rouleau ralenti qui brille, tremblement
   (`.rk-shake`), battements de cœur (`Heart`), vibration — **sans zoom** (le propriétaire n'en veut pas). Simulation
-  `node tools/sim/redk.js` (6 M tours) : RTP ≈ 92,5 % (lignes 40, Ruby Link 36,5, Pyramide d'or ≈ 16), un gain 1 tour
+  `node tools/sim/redk.js` (6 M tours) : RTP ≈ 92,5 % (lignes 40, Ruby Link 36,5, Pyramide d'or ≈ 15,5), un gain 1 tour
   sur 4, achat ≈ 88,5 %, max ×10 000 (atteint dans la Pyramide d'or, ≈ 1 sur 100 000). Défi spécial : Ruby Link et
   La Pyramide d'or.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions

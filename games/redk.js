@@ -45,9 +45,9 @@ const P = {
   land: [['v', 86], ['mini', 3.4], ['minor', 1.1], ['major', 0.22], ['spin', 2.6], ['reels', 2.6], ['mult', 2.1], ['value', 2.4]],
   boost: [[1, 40], [2, 30], [3, 18], [5, 12]], // VALUE+ adds this (× the bet) to every ruby
   unlock: [11, 16, 21], // rubies needed to unlock the 1st, 2nd and 3rd locked row (REELS+ also unlocks one)
-  multUp: [[1, 60], [2, 28], [3, 12]], maxMult: 10, maxLeft: 5,
+  multUp: [[1, 60], [2, 28], [3, 12]], maxMult: 10, maxLeft: 6, // SPIN+ adds one re-spin to every reset for the rest of the bonus (owner's wish), up to 6
   // LA PYRAMIDE D'OR: golden rubies only, big values, golden multipliers; the 30 cells open from the start
-  gStart: 6, ghp: 0.045,
+  gStart: 6, ghp: 0.042,
   gval: [[2, 30], [3, 24], [5, 20], [10, 12], [15, 6], [25, 4], [50, 2], [100, 0.8], [250, 0.25]],
   gland: [['v', 85], ['mult', 10], ['spin', 3], ['major', 2]],
   gmultUp: [[1, 55], [2, 28], [3, 12], [5, 5]], gmaxMult: 20,
@@ -109,7 +109,7 @@ const toBase = (b) => Math.floor(b / BR) * ROWS + (b % BR) - 3;
 // Every re-spin: { add: [{ i, t, v, b?, up?, mult?, row? }], left, rows, mult, auto, snap }.
 function linkRun(start, R = Math.random, opts = {}) {
   const gold = !!opts.gold, cur = { ...start }, steps = [];
-  let left = 3, rows = gold ? BR : 3 + (opts.rows || 0), mult = opts.mult || 1, guard = 0;
+  let base = 3, left = 3, rows = gold ? BR : 3 + (opts.rows || 0), mult = opts.mult || 1, guard = 0;
   const hp = gold ? P.ghp : P.hp, land = gold ? P.gland : P.land, vals = gold ? P.gval : P.val;
   const up = gold ? P.gmultUp : P.multUp, maxM = gold ? P.gmaxMult : P.maxMult;
   const open = (i) => (i % BR) >= BR - rows;
@@ -118,7 +118,6 @@ function linkRun(start, R = Math.random, opts = {}) {
   while (left > 0 && guard++ < 400) {
     if (Object.keys(cur).length >= BN) break;
     const add = [];
-    let spinPlus = 0;
     for (let c = 0; c < COLS; c++) for (let r = 0; r < BR; r++) {
       const i = c * BR + r;
       if (!open(i) || i in cur || R() >= hp) continue;
@@ -127,15 +126,15 @@ function linkRun(start, R = Math.random, opts = {}) {
       if (t === 'mini' || t === 'minor' || t === 'major') { cur[i] = t; add.push({ i, t, v: t }); continue; }
       // boosters: they act, then stay as a ruby with a value
       const a = { i, t, v: 0 };
-      if (t === 'spin') { spinPlus++; cur[i] = a.v = wp(R, vals); }
+      if (t === 'spin') { base = Math.min(P.maxLeft, base + 1); a.base = base; cur[i] = a.v = wp(R, vals); }
       else if (t === 'reels') { if (rows < BR) { rows++; a.row = rows; } cur[i] = a.v = wp(R, vals); }
       else if (t === 'mult') { a.up = wp(R, up); mult = Math.min(maxM, mult + a.up); a.mult = mult; cur[i] = a.v = wp(R, vals); }
       else { const b = wp(R, P.boost); for (const j in cur) if (typeof cur[j] === 'number') cur[j] += b; cur[i] = a.v = b; a.b = b; }
       add.push(a);
     }
     const auto = unlockAuto();
-    left = add.length ? Math.min(P.maxLeft, 3 + spinPlus) : left - 1;
-    steps.push({ add, left, rows, mult, auto, snap: { ...cur } });
+    left = add.length ? base : left - 1;
+    steps.push({ add, left, base, rows, mult, auto, snap: { ...cur } });
   }
   const full = Object.keys(cur).length >= BN;
   let sum = 0; for (const j in cur) sum += vx(cur[j]);
@@ -546,7 +545,8 @@ class RedkGame extends BaseGame {
     this.focusStage?.();
     await this.blackout(false);
     const sumNow = () => { let t = 0; for (const j in this.lv) t += E.vx(this.lv[j]); return t; };
-    const banner = (left) => this.setBanner(`<b>${title}</b><span class="pill rk-left">Re-spins <i class="rk-dots">${[0, 1, 2, 3, 4].slice(0, Math.max(3, left)).map((k) => `<i class="${k < left ? 'on' : ''}"></i>`).join('')}</i></span><span class="pill">×${this.mult}</span><span class="pill gold">${fmtC(Math.round(Math.min(sumNow() * this.mult * b, capLeft)))}</span>`);
+    const banner = (left) => this.setBanner(`<b>${title}</b><span class="pill rk-left">Re-spins <i class="rk-dots">${[0, 1, 2, 3, 4, 5].slice(0, Math.max(this.spinBase, left)).map((k) => `<i class="${k < left ? 'on' : ''}"></i>`).join('')}</i></span><span class="pill">×${this.mult}</span><span class="pill gold">${fmtC(Math.round(Math.min(sumNow() * this.mult * b, capLeft)))}</span>`);
+    this.spinBase = 3;
     banner(3);
     this.msg(gold ? 'Les rubis dorés restent : 3 re-spins' : 'Les rubis restent : 3 re-spins');
     await this.wait(700);
@@ -667,7 +667,7 @@ class RedkGame extends BaseGame {
           for (const j in this.lv) if (typeof this.lv[j] === 'number') { this.lv[j] += a.b; this.setLinkCell(+j, this.lv[j]); this.pop(+j); }
           this.word(`VALUE+ · +${kfmt(a.b * b)}${KE}<br><small>sur tous les rubis</small>`, 'value');
         } else if (a.t === 'mult') this.word(`MULTI+ · +${a.up}<br><small>×${a.mult}</small>`, 'mult');
-        else if (a.t === 'spin') this.word('SPIN+ · +1 RE-SPIN', 'spin');
+        else if (a.t === 'spin') { this.spinBase = a.base; this.word(`SPIN+<br><small>${a.base} RE-SPINS À CHAQUE FOIS</small>`, 'spin'); }
         else this.word(a.row ? 'REELS+ · UNE RANGÉE EN PLUS' : 'REELS+', 'reels');
         this.flash(`${B.c}55`); sfx.upgrade();
         await this.wait(this.turbo ? 350 : 800);
@@ -697,7 +697,7 @@ class RedkGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym rk-pay">${img('scat')}</div><div class="pay-vals"><b>Pyramide</b><br><span>${E.GOLD_AT} pyramides ou plus : LA PYRAMIDE D’OR</span></div></div>
       <div class="pay-item"><div class="pay-sym rk-pay">${img('ruby')}</div><div class="pay-vals"><b>Rubis rouge</b><br><span>Porte sa valeur en KE (1 à 50 fois la mise, ou MINI / MINOR) · 6 ou plus : RUBY LINK</span></div></div></div>
       <h4>20 lignes</h4><p>5 rouleaux de 3 cases et 20 lignes fixes. Une ligne paie dès que 3 symboles identiques ou plus se suivent depuis la gauche.</p>
-      <h4>RUBY LINK</h4><p>6 rubis ou plus : ils <b>restent en place</b> et tu as <b>3 re-spins</b>. Chaque nouveau rubis reste et remet les re-spins à 3. Au-dessus de la grille, <b>3 rangées verrouillées</b> : chacune s’ouvre quand assez de rubis sont posés (${PP.unlock.join(', ')}) ou avec <b>REELS+</b>, jusqu’à 5 × 6 cases. Les boosters : <b>SPIN+</b> (+1 re-spin), <b>REELS+</b> (une rangée en plus), <b>MULTI+</b> (le multiplicateur du bonus monte, jusqu’à ×${PP.maxMult}), <b>VALUE+</b> (ajoute sa valeur à tous les rubis posés). Rubis spéciaux : ${jp('mini')}, ${jp('minor')}, ${jp('major')} la mise. Les 30 cases remplies : ${jp('grand')}. À la fin, tous les rubis sont additionnés, puis multipliés.</p>
+      <h4>RUBY LINK</h4><p>6 rubis ou plus : ils <b>restent en place</b> et tu as <b>3 re-spins</b>. Chaque nouveau rubis reste et remet les re-spins à 3. Au-dessus de la grille, <b>3 rangées verrouillées</b> : chacune s’ouvre quand assez de rubis sont posés (${PP.unlock.join(', ')}) ou avec <b>REELS+</b>, jusqu’à 5 × 6 cases. Les boosters : <b>SPIN+</b> (un re-spin de plus à chaque fois jusqu’à la fin du bonus : 4, puis 5, jusqu’à ${PP.maxLeft}), <b>REELS+</b> (une rangée en plus), <b>MULTI+</b> (le multiplicateur du bonus monte, jusqu’à ×${PP.maxMult}), <b>VALUE+</b> (ajoute sa valeur à tous les rubis posés). Rubis spéciaux : ${jp('mini')}, ${jp('minor')}, ${jp('major')} la mise. Les 30 cases remplies : ${jp('grand')}. À la fin, tous les rubis sont additionnés, puis multipliés.</p>
       <h4>LA PYRAMIDE D’OR</h4><p>Le bonus spécial, qu’on ne peut pas acheter : ${E.GOLD_AT} pyramides ou plus. Les <b>30 cases sont ouvertes</b> et il ne tombe que des <b>rubis dorés</b> avec de gros multiplicateurs (×${PP.gval.map((x) => x[0]).join(', ×')} la mise), des <b>MULTI+</b> qui montent le multiplicateur jusqu’à ×${PP.gmaxMult}, des SPIN+ et des MAJOR. Grille pleine : ${jp('grand')}, multiplié lui aussi.</p>
       <h4>Le suspense</h4><p>Quand il ne manque qu’un rubis (ou qu’une pyramide), les derniers rouleaux ralentissent… à toi de retenir ton souffle.</p>
       <h4>Achat</h4><p>RUBY LINK ×${E.BUY.link} la mise (6 rubis). La Pyramide d’or ne s’achète pas. Gain maximum ×${E.CAPX.toLocaleString('fr-FR')}.</p>`);
