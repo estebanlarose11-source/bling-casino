@@ -226,6 +226,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `.nx-cats`, puis cadeau du jour, Nouveautés, Populaires, Machines à sous, événements, encarts. Sur téléphone : dessin
   en haut, texte centré dessous. **Ordinateur (≥ 1180 px)** : menu horizontal dans la barre du haut (`.nx-nav`,
   menus déroulants Événements / Récompenses), le menu de gauche devient un tiroir ouvert par ☰ (`--side: 0`).
+- **Barre de mise « pierre gravée » partout** (demande du propriétaire du 11 novembre 2026 : la barre du Valhalla dans toutes
+  les machines et tous les jeux, dans leurs couleurs) : classe `pro-ctl` sur `.controls` des deux moteurs (`core/base.js`
+  et `slot/machine.js`, qui reçoit aussi `--accent` / `--accent2`), boutons `pb-max` (MISE MAX, `maxBet()`, si la mise
+  se règle) et `pb-auto` (tours auto → « Bonus & menu »). Bloc « Barre de mise » à la fin de la couche `finition` :
+  couleurs tirées de `--accent` / `--accent2`, disposition « mise · MISE MAX · tourner · auto · gain · solde · menu »,
+  téléphone en hauteur sur 2 rangées, en largeur plein écran : 3 rangées dans la colonne de droite des machines, 2 rangées
+  pour les jeux rapides (`.table-game`). Le Valhalla garde sa pierre grise (`.vk-ctl`) ; les tables (21 `.bjv-game`,
+  roulettes `.rl-game`) et les salons en ligne (`.online-game`) gardent leur barre.
 - **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 26 pages et les 48 jeux sur
   ordinateur et téléphone, lance une partie dans chaque jeu et relève erreurs, débordements et textes « undefined ».
   `python3 -m http.server 8123` puis `node tools/verif/robot.js`. À relancer après une grosse modification.

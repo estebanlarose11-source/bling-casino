@@ -246,10 +246,7 @@ class VikingGame extends BaseGame {
     const ctl = this.q('.controls');
     ctl.classList.add('vk-ctl');
     ctl.insertAdjacentHTML('afterbegin', '<div class="vk-c vk-lines"><label>LIGNES</label><b>25</b></div>');
-    this.q('.ctl-bet').insertAdjacentHTML('afterend', '<button class="vk-max" type="button" data-vk="max" aria-label="Mise maximum">MISE<br>MAX</button>');
-    this.mainBtn.insertAdjacentHTML('afterend', '<button class="vk-auto" type="button" data-act="menu" aria-label="Tours auto et bonus"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 8l6 4-6 4z" fill="currentColor"/></svg></button>');
-    this.onVk = (e) => { if (e.target.closest('[data-vk="max"]')) this.maxBet(); };
-    this.root.addEventListener('click', this.onVk);
+    this.q('.pb-max')?.classList.add('vk-max'); this.q('.pb-auto')?.classList.add('vk-auto');
     this.reels = new Reels(this.q('.vk-rwrap'), {
       cols: E.COLS, rows: E.ROWS, game: this, random: (c) => this.filler(c), art: (v) => this.cellArt(v),
       cls: (v) => (v === E.SCAT ? 'scat' : v === E.WILD ? 'wild' : v >= 8 ? 'hi' : v >= 4 ? 'mid' : 'lo'),
@@ -263,7 +260,6 @@ class VikingGame extends BaseGame {
     ['wild-c', 'scat-c', 's8', 's9', 's10'].forEach((n) => { new Image().src = src(n); });
   }
 
-  destroy() { this.root.removeEventListener('click', this.onVk); super.destroy(); }
 
   /* ---------- the meters (kept per stake) ---------- */
   loadMeters() { try { this.mAll = JSON.parse(localStorage.getItem(KEY)) || {}; } catch { this.mAll = {}; } }
@@ -306,12 +302,7 @@ class VikingGame extends BaseGame {
     if (v === E.SCAT) return `<div class="vk-hero scat">${img('scat-c', 'vk-pimg')}<b>BONUS</b></div>`;
     return img(`s${v}`);
   }
-  maxBet() {
-    if (this.busy) return;
-    let k = 0;
-    while (this.canRaise() && k++ < 40) this.changeBet(1);
-    if (!k) this.msg('Mise max avec ton solde');
-  }
+
 
   word(t, cls = '') {
     const w = this.q('.vk-word');

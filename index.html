@@ -4873,7 +4873,7 @@ html.light .slot small { color: inherit; }
 .g-viking.busy .vk-ctl .spin-btn svg { animation: spinIcon .8s linear infinite; }
 .vk-ctl .ctl-opts .opt { padding: 7px 9px !important; border-radius: 6px !important; background: linear-gradient(180deg, #4f5a66, #262e37) !important; box-shadow: var(--vk-edge) !important; }
 .vk-ctl .ctl-opts .opt span { display: none; }
-@media (max-width: 1100px) { .vk-ctl .vk-lines { display: none; } .slot.g-viking .controls.vk-ctl { grid-template-columns: auto auto auto auto minmax(0, 1fr) minmax(0, 1fr) auto !important; grid-template-areas: "bet max spin auto win bal opts"; } }
+@media (max-width: 1100px) { .vk-ctl .vk-lines { display: none; } .slot.g-viking .controls.vk-ctl { grid-template-columns: auto auto auto auto minmax(96px, 1fr) minmax(96px, 1fr) auto !important; grid-template-areas: "bet max spin auto win bal opts"; } }
 
 /* phone held upright: the two heroes side by side above the machine, no pillar, the bar on 3 rows */
 @media (max-aspect-ratio: 1 / 1) {
@@ -7080,6 +7080,113 @@ html.light .nx-cats small { color: #6b5a86; }
 @media (min-width: 1180px) and (max-width: 1360px) {
   .nx-nav > a, .nx-dd > button { padding: 0 9px; font-size: 11.5px; letter-spacing: .4px; }
   .me-chip .me-name { display: none; }
+}
+
+/* ============ Barre de mise « pierre gravée » dans toutes les machines et tous les jeux (demande du propriétaire du
+   11 novembre 2026 : la barre du Valhalla partout, dans les couleurs de chaque jeu). Couleurs tirées de --accent /
+   --accent2 du jeu ; Le Valhalla garde sa pierre grise (.vk-ctl). Les tables (21, roulettes) ont leur propre barre. ============ */
+.slot:not(.g-viking) .controls.pro-ctl {
+  --pa: var(--accent, #7cc8ff); --pd: var(--accent2, #1b2129);
+  --pb-hi: color-mix(in srgb, var(--pd) 45%, #8a96a3); --pb-mid: color-mix(in srgb, var(--pd) 60%, #3a434f); --pb-lo: color-mix(in srgb, var(--pd) 70%, #0b0f14);
+  --pb-ring: color-mix(in srgb, var(--pa) 55%, #4a5562); --pb-glow: color-mix(in srgb, var(--pa) 55%, transparent);
+  --pb-txt: color-mix(in srgb, var(--pa) 30%, #f1f5f9);
+  --pb-edge: inset 0 2px 0 color-mix(in srgb, var(--pa) 30%, rgba(255, 255, 255, .45)), inset 0 -3px 0 rgba(0, 0, 0, .55), 0 0 0 2px #05080b;
+  border: 0 !important; border-radius: 12px !important;
+  background: repeating-linear-gradient(115deg, rgba(255, 255, 255, .025) 0 2px, transparent 2px 9px), linear-gradient(180deg, var(--pb-hi) 0%, var(--pb-mid) 40%, var(--pb-lo) 100%) !important;
+  box-shadow: var(--pb-edge), 0 0 22px color-mix(in srgb, var(--pa) 18%, transparent), 0 10px 26px rgba(0, 0, 0, .55) !important;
+}
+.slot:not(.g-viking) .pro-ctl label { color: var(--pb-txt) !important; text-shadow: 0 1px 2px #000; font: 800 clamp(9px, .9vw, 11px)/1 Archivo, sans-serif !important; letter-spacing: .12em !important; text-transform: uppercase; margin-bottom: 3px; text-align: center; }
+.slot:not(.g-viking) .pro-ctl .ctl-group b { display: block; min-width: 0; padding: 6px 10px; border-radius: 5px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font: 800 clamp(13px, 1.4vw, 17px)/1.1 Archivo, KeCoin, sans-serif; color: #fff; background: #07090c; box-shadow: inset 0 0 0 2px #05080b, inset 0 0 0 3px var(--pb-ring), inset 0 2px 6px #000; }
+.slot:not(.g-viking) .pro-ctl .round-btn { width: 28px; height: 32px; padding: 0; border-radius: 5px !important; font-size: 19px; font-weight: 900; color: var(--pa); background: linear-gradient(180deg, var(--pb-hi), var(--pb-lo)) !important; box-shadow: var(--pb-edge) !important; }
+.slot:not(.g-viking) .pro-ctl .round-btn:disabled { opacity: .45; }
+.pb-max, .pb-auto { cursor: pointer; }
+.slot:not(.g-viking) .pro-ctl .pb-max, .slot:not(.g-viking) .pro-ctl .pb-auto { height: 52px; min-width: 58px; border-radius: 8px; font: 400 17px/.95 'Bebas Neue', Archivo, sans-serif; letter-spacing: .08em; color: #f1f5f9; background: linear-gradient(180deg, var(--pb-hi), var(--pb-lo)); box-shadow: var(--pb-edge), 0 4px 10px rgba(0, 0, 0, .5); }
+.slot:not(.g-viking) .pro-ctl .pb-auto { display: grid; place-items: center; color: var(--pa); }
+.pro-ctl .pb-auto svg { width: 28px; height: 28px; filter: drop-shadow(0 0 5px var(--pb-glow, #38bdf8)); }
+.pro-ctl .pb-max:active, .pro-ctl .pb-auto:active { transform: translateY(1px); }
+.slot.busy .pro-ctl .pb-max { opacity: .45; pointer-events: none; }
+/* the spin button: a square of dark glass in a lit frame of the game's colour */
+.slot:not(.g-viking) .pro-ctl .spin-btn:not(.wide) { width: clamp(64px, 7vw, 86px) !important; height: clamp(64px, 7vw, 86px) !important; border-radius: 14px !important; color: color-mix(in srgb, var(--pa) 60%, #fff) !important; background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--pd) 60%, #1e2a36), #07090c 72%) !important; box-shadow: inset 0 0 0 3px #05080b, inset 0 0 0 7px var(--pb-ring), inset 0 0 0 9px #05080b, 0 0 0 2px #05080b, 0 0 24px var(--pb-glow), 0 8px 18px rgba(0, 0, 0, .55) !important; }
+.slot:not(.g-viking) .pro-ctl .spin-btn:not(.wide) svg { width: 58%; height: 58%; filter: drop-shadow(0 0 6px var(--pa)) drop-shadow(0 0 14px var(--pb-glow)); }
+.slot:not(.g-viking) .pro-ctl .spin-btn.wide { min-width: clamp(120px, 14vw, 190px); height: clamp(56px, 6vw, 68px) !important; border-radius: 12px !important; padding: 0 18px !important; color: #fff !important; background: linear-gradient(180deg, color-mix(in srgb, var(--pa) 70%, #fff), var(--pa) 45%, color-mix(in srgb, var(--pa) 55%, #000)) !important; box-shadow: inset 0 0 0 2px #05080b, inset 0 0 0 5px color-mix(in srgb, var(--pa) 50%, #fff), inset 0 2px 0 7px rgba(255, 255, 255, .15), 0 0 0 2px #05080b, 0 0 24px var(--pb-glow), 0 8px 18px rgba(0, 0, 0, .55) !important; }
+.slot:not(.g-viking) .pro-ctl .spin-btn.wide .main-label { font: 400 clamp(17px, 1.9vw, 24px)/1 'Bebas Neue', Archivo, sans-serif !important; letter-spacing: .08em; text-shadow: 0 2px 0 rgba(0, 0, 0, .45), 0 0 10px rgba(0, 0, 0, .35); }
+.slot:not(.g-viking) .pro-ctl .spin-btn::before, .slot:not(.g-viking) .pro-ctl .spin-btn::after { display: none !important; }
+.slot:not(.g-viking) .pro-ctl .spin-btn.cash { color: #2a1600 !important; background: linear-gradient(180deg, #fff3b0, #fbbf24 50%, #b45309) !important; box-shadow: inset 0 0 0 2px #05080b, inset 0 0 0 5px #fde68a, 0 0 0 2px #05080b, 0 0 30px rgba(251, 191, 36, .7) !important; }
+.slot:not(.g-viking) .pro-ctl .spin-btn.cash .main-label { text-shadow: none; }
+.slot:not(.g-viking) .pro-ctl .spin-btn:disabled, .slot:not(.g-viking) .pro-ctl .spin-btn[disabled] { filter: grayscale(.5) brightness(.75); }
+.slot:not(.g-viking) .pro-ctl .ctl-opts .opt { padding: 8px 10px !important; border-radius: 8px !important; color: #f1f5f9; background: linear-gradient(180deg, var(--pb-hi), var(--pb-lo)) !important; box-shadow: var(--pb-edge) !important; }
+.slot:not(.g-viking) .pro-ctl .ctl-opts .opt span { color: var(--pb-txt) !important; }
+.slot:not(.g-viking) .pro-ctl .ctl-opts .opt.fs-btn span { display: none; }
+.slot:not(.g-viking) .pro-ctl .ctl-info > .ctl-group { width: 100%; justify-self: stretch; }
+.slot:not(.g-viking) .pro-ctl .ctl-info > .ctl-group b { width: 100%; box-sizing: border-box; }
+.slot:not(.g-viking) .pro-ctl .ctl-opts .opt span { display: none !important; }
+.slot:not(.g-viking) .pro-ctl .ctl-group { display: block !important; text-align: center; }
+.slot:not(.g-viking) .pro-ctl .ctl-group label { display: block !important; }
+
+/* layout (machines and quick games; the tables and the online rooms keep their own layout) */
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .controls.pro-ctl { display: grid !important; grid-template-columns: auto auto auto auto minmax(96px, 1fr) minmax(96px, 1fr) auto !important; grid-template-areas: "bet max spin auto win bal opts"; align-items: end; gap: clamp(6px, 1vw, 14px) !important; padding: 8px clamp(8px, 1.4vw, 18px) 10px !important; max-width: 1100px; width: 100%; box-sizing: border-box; margin-left: auto; margin-right: auto; }
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-info { display: contents !important; }
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-info > .ctl-group:nth-child(1) { grid-area: bal !important; min-width: 0; }
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-info > .ctl-group:nth-child(2) { grid-area: win !important; min-width: 0; }
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-bet { grid-area: bet !important; gap: 4px !important; align-items: end !important; justify-self: center !important; width: auto !important; margin: 0 !important; }
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-group.center { min-width: 76px; }
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .pb-max { grid-area: max !important; }
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .spin-btn { grid-area: spin !important; justify-self: center !important; align-self: center !important; }
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .pb-auto { grid-area: auto !important; }
+.slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-opts { grid-area: opts !important; align-self: center !important; justify-self: center !important; flex-wrap: nowrap !important; gap: 6px !important; }
+/* phone held upright: two rows around the big button */
+@media (max-aspect-ratio: 1 / 1) {
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .controls.pro-ctl { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) auto !important; grid-template-areas: "win win spin bal bal" "bet bet spin max opts"; align-items: center; row-gap: 6px !important; column-gap: 6px !important; padding: 6px 8px !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .pb-auto { display: none !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-group.center { min-width: 54px; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .round-btn { width: 26px; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-group b { padding: 5px 6px; font-size: 14px; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-bet { gap: 3px !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .controls.pro-ctl { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) auto !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .pb-max { height: 38px; min-width: 0; justify-self: stretch; font-size: 14px; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-opts .opt { padding: 6px 7px !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-opts .opt span { display: none; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .spin-btn:not(.wide) { width: 76px !important; height: 76px !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .spin-btn.wide { min-width: 0; max-width: 132px; height: 76px !important; padding: 0 10px !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .spin-btn.wide .main-label { font-size: 18px !important; white-space: normal; line-height: 1 !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl.no-step .ctl-bet { grid-column: 1 / 3 !important; }
+}
+/* phone held sideways: one compact row */
+@media (orientation: landscape) and (max-height: 520px) {
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .controls.pro-ctl { padding: 5px 8px !important; gap: 6px !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .spin-btn:not(.wide) { width: 54px !important; height: 54px !important; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .spin-btn.wide { height: 50px !important; min-width: 110px; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .pb-max, .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .pb-auto { height: 40px; min-width: 46px; font-size: 14px; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-group b { padding: 4px 6px; font-size: 13px; }
+  .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-opts .opt span { display: none; }
+}
+@media (max-width: 760px) and (min-aspect-ratio: 1 / 1) { .slot:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-opts .opt span { display: none; } }
+
+/* phone sideways in full screen: the machines put the bar in a narrow column on the right → 3 rows */
+@media (orientation: landscape) and (max-height: 560px) {
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .controls.pro-ctl { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto !important; grid-template-areas: "win bal spin" "bet bet spin" "max opts opts"; align-items: center; row-gap: 5px !important; column-gap: 6px !important; padding: 6px 8px !important; max-width: none; }
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .pro-ctl .pb-auto { display: none !important; }
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .pro-ctl .pb-max { height: 34px; min-width: 0; justify-self: stretch; font-size: 13px; line-height: .9; }
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .pro-ctl .ctl-opts { justify-self: end !important; }
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .pro-ctl .ctl-opts .opt { padding: 5px 7px !important; }
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .pro-ctl .spin-btn:not(.wide) { width: 58px !important; height: 58px !important; }
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .pro-ctl .ctl-group.center { min-width: 54px; }
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .pro-ctl .round-btn { width: 26px; height: 28px; }
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .pro-ctl .ctl-group b { padding: 4px 5px; font-size: 13px; }
+  .game-host.is-full > .slot:not(.g-viking):not(.table-game):not(.online-game) .pro-ctl label { font-size: 8.5px !important; margin-bottom: 2px; }
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .controls.pro-ctl { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) auto !important; grid-template-areas: "win win spin bal bal" "bet bet spin max opts"; align-items: center; row-gap: 5px !important; column-gap: 6px !important; padding: 6px 8px !important; }
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .pb-auto { display: none !important; }
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .pb-max { height: 34px; min-width: 0; justify-self: stretch; font-size: 13px; line-height: .9; }
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .spin-btn.wide { min-width: 96px !important; max-width: 130px; height: 62px !important; padding: 0 8px !important; }
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .spin-btn.wide .main-label { font-size: 16px !important; white-space: normal; line-height: 1 !important; }
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .spin-btn:not(.wide) { width: 58px !important; height: 58px !important; }
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-group.center { min-width: 54px; }
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .round-btn { width: 26px; height: 28px; }
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl .ctl-group b { padding: 4px 5px; font-size: 13px; }
+  .game-host.is-full > .slot.table-game:not(.g-viking):not(.bjv-game):not(.rl-game):not(.online-game) .pro-ctl.no-step .ctl-bet { grid-column: 1 / 3 !important; }
 }
 </style>
 </head>
@@ -13455,7 +13562,7 @@ class SlotMachine {
     const g = this.game;
     const jp = g.holdSpin?.jackpots;
     this.root.innerHTML = `
-      <div class="slot theme-${g.theme}"${g.id === 'big-bad-wolf' ? ` style="--wolf-bg:url('${window.__assets?.['assets/games/wolf/bg.webp'] || 'assets/games/wolf/bg.webp?v=1'}')"` : ''}>
+      <div class="slot theme-${g.theme}" style="--accent:${g.colors[0]};--accent2:${g.colors[1]}${g.id === 'big-bad-wolf' ? `;--wolf-bg:url('${window.__assets?.['assets/games/wolf/bg.webp'] || 'assets/games/wolf/bg.webp?v=1'}')` : ''}">
         <div class="slot-bg"></div>
         <div class="slot-head">
           <div class="slot-title"><span class="art gart">${coverSVG(g, { square: true })}</span><div><h2>${g.name}</h2><small>${g.subtitle}</small><em class="prov">${BRAND.provider}</em></div></div>
@@ -13470,7 +13577,7 @@ class SlotMachine {
           </div>
         </div>
         <div class="win-bar"><span class="msg">Bonne chance !</span><b class="win-amt"></b></div>
-        <div class="controls">
+        <div class="controls pro-ctl">
           <div class="ctl-info">
             <div class="ctl-group"><label>Solde</label><b class="bal"></b></div>
             <div class="ctl-group"><label>Gain</label><b class="last-win">0,00\u00a0\uE1E0</b></div>
@@ -13480,10 +13587,12 @@ class SlotMachine {
             <div class="ctl-group center"><label>Mise</label><b class="bet-val"></b></div>
             <button class="round-btn" data-act="bet+" aria-label="Augmenter la mise">+</button>
           </div>
+          <button class="pb-max" type="button" data-act="max" aria-label="Mise maximum">MISE<br>MAX</button>
           <button class="spin-btn" data-act="spin" aria-label="Lancer">
             <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.3 0 6 2.7 6 6a6 6 0 0 1-10.2 4.2l-1.4 1.4A8 8 0 0 0 20 12c0-4.4-3.6-8-8-8z" fill="currentColor"/></svg>
             <span class="auto-count"></span>
           </button>
+          <button class="pb-auto" type="button" data-act="menu" aria-label="Tours auto et bonus"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 8l6 4-6 4z" fill="currentColor"/></svg></button>
           <div class="ctl-opts">${MENU_BTN}${FULL_BTN}</div>
         </div>
       </div>`;
@@ -13511,6 +13620,7 @@ class SlotMachine {
       const act = b.dataset.act;
       if (act === 'spin') { if (this.auto) this.stopAuto(); else this.play(); }
       if (act === 'bet-' || act === 'bet+') this.changeBet(act === 'bet+' ? 1 : -1);
+      if (act === 'max') this.maxBet();
       if (act === 'menu') this.openMenu();
       if (act === 'full') toggleFull(this.root);
     };
@@ -13550,6 +13660,14 @@ class SlotMachine {
     const ac = this.root.querySelector('.auto-count');
     ac.textContent = this.auto ? this.auto : '';
     this.slotEl.classList.toggle('auto-on', !!this.auto);
+  }
+
+  // MISE MAX (the stone bar): the highest stake the balance allows
+  maxBet() {
+    if (this.busy || this.free) return;
+    let k = 0;
+    while (BETS[this.betIdx + 1] !== undefined && wallet.canAfford(BETS[this.betIdx + 1]) && k++ < 40) this.changeBet(1);
+    if (!k) toast(`Mise max avec ton solde : ${fmt(this.bet)}`, 'info');
   }
 
   changeBet(d) {
@@ -14230,7 +14348,7 @@ class BaseGame {
         </div>
         ${c.below || ''}
         <div class="win-bar"><span class="msg">${c.hello || 'Choisis ta mise et lance.'}</span><b class="win-amt"></b></div>
-        <div class="controls">
+        <div class="controls pro-ctl${c.stepper ? '' : ' no-step'}${c.mainLabel ? ' has-label' : ''}">
           <div class="ctl-info">
             <div class="ctl-group"><label>Solde</label><b class="bal"></b></div>
             <div class="ctl-group"><label>Gain</label><b class="last-win">0,00\u00a0\uE1E0</b></div>
@@ -14240,7 +14358,9 @@ class BaseGame {
             <div class="ctl-group center"><label>${c.betLabel || 'Mise'}</label><b class="bet-val"></b></div>
             <button class="round-btn" data-act="bet+" aria-label="Augmenter la mise">+</button>
           </div>` : `<div class="ctl-bet"><div class="ctl-group center"><label>${c.betLabel || 'Mise totale'}</label><b class="bet-val"></b></div></div>`}
+          ${c.stepper ? '<button class="pb-max" type="button" data-act="max" aria-label="Mise maximum">MISE<br>MAX</button>' : ''}
           <button class="spin-btn${c.mainLabel ? ' wide' : ''}" data-act="main" aria-label="${c.mainAria || 'Lancer'}">${main}<span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          ${c.autoplay ? '<button class="pb-auto" type="button" data-act="menu" aria-label="Tours auto et bonus"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 8l6 4-6 4z" fill="currentColor"/></svg></button>' : ''}
           <div class="ctl-opts">${MENU_BTN}${FULL_BTN}</div>
         </div>
       </div>`;
@@ -14269,6 +14389,7 @@ class BaseGame {
       const act = b.dataset.act;
       if (act === 'main') { if (this.auto) this.stopAuto(); else this.onMain(); }
       if (act === 'bet-' || act === 'bet+') this.changeBet(act === 'bet+' ? 1 : -1);
+      if (act === 'max') this.maxBet();
       if (act === 'menu') this.openMenu();
       if (act === 'full') toggleFull(this.root);
     };
@@ -14317,6 +14438,14 @@ class BaseGame {
 
   // Can the stake go up one step? Not past the balance (the first stake is always allowed).
   canRaise() { const nx = this.cfg.bets[this.bi + 1]; return nx !== undefined && nx <= this.balC(); }
+
+  // MISE MAX (the stone bar): the highest stake the balance allows
+  maxBet() {
+    if (this.busy || this.playing) return;
+    let k = 0;
+    while (this.canRaise() && k++ < 40) this.changeBet(1);
+    if (!k) toast(`Mise max avec ton solde : ${fmtC(this.bet)}`, 'info');
+  }
 
   changeBet(d) {
     if (this.busy) return;
@@ -15178,7 +15307,7 @@ const FILES = {
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '234dd4780f'],
   totemx: ['totemx', 'games/impl/totemx.js', 'TotemXGame', '9ed53a6ac8'],
   noel: ['noel', 'games/impl/noel.js', 'NoelGame', '30948faeb5'],
-  viking: ['viking', 'games/impl/viking.js', 'VikingGame', 'defd84bbd9'],
+  viking: ['viking', 'games/impl/viking.js', 'VikingGame', '061a87ba47'],
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
   filon: ['filon', 'games/impl/filon.js', 'FilonGame', '45904335f9'],
   redk: ['redk', 'games/impl/redk.js', 'RedkGame', 'bd8206438f'],
