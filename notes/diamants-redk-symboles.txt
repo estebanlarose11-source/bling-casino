@@ -80,12 +80,16 @@ Du moins cher au plus cher. Chaque trésor a sa couleur d'accent pour le reconna
    - Gros rubis taillé (taille coussin ou ovale, beaucoup de facettes), ROUGE profond,
      éclats blancs sur les facettes du haut, cœur rouge lumineux.
    - Serti dans une fine monture en or à 4 griffes.
-   - TRÈS IMPORTANT : AUCUN chiffre dessus. Le jeu écrit la valeur (1.00, 5.00, 25.00…)
+   - TRÈS IMPORTANT : AUCUN chiffre dessus. Le jeu écrit la valeur EN KE (500, 2 500, 25K…)
      en lettres or biseautées sur le bas du rubis : garde la moitié basse plus
      simple et plus sombre (moins de reflets blancs) pour que le chiffre soit bien lisible.
    - Même taille que les autres symboles.
-   - Valeurs écrites par le jeu (en fois la mise totale) : 1, 2, 3, 5, 10, 15, 25, 50,
-     ou une plaque MINI (×10), MINOR (×25), MAJOR (×100).
+   - Valeurs écrites par le jeu EN KE, avec le logo de la pièce KE (choix du propriétaire).
+     Elles suivent la mise : 1, 2, 3, 5, 10, 15, 25 ou 50 fois la mise totale.
+     Ex. à 100 KE de mise : 100, 200, 300, 500, 1 000, 1 500, 2 500, 5 000 KE.
+     À 10 000 KE de mise : 10K … 500K. Les grands nombres sont raccourcis (25K, 1,5M)
+     pour tenir sur le rubis : prévois de la place pour 4 à 5 caractères.
+     Ou une plaque MINI (×10), MINOR (×25), MAJOR (×100) avec son montant en KE.
 
  rubis-or — LE RUBIS ROYAL (option, conseillé)
    - Le même rubis, plus gros, serti dans une couronne d'or plus riche, avec un halo

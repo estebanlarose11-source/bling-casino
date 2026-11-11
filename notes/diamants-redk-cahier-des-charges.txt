@@ -25,8 +25,9 @@ PARTIE 1 — LE JEU EN GROS
    - Symboles : 10, J, Q, K, A sculptés dans l'or (paient peu) ; 4 trésors du temple (paient
      beaucoup) ; WILD (rouleaux 2 à 5, remplace tout sauf rubis et boosters).
    - LE RUBIS ROUGE : symbole du bonus. Chaque rubis porte une valeur écrite dessus par le jeu,
-     en fois la mise (ex. 1.00, 2.00, 5.00, 10.00, 25.00, jusqu'à 50.00 × la mise), ou une plaque
-     MINI / MINOR / MAJOR.
+     DIRECTEMENT EN KE (choix du propriétaire), avec le logo de la pièce KE : la valeur suit la mise
+     (1 à 50 fois la mise : à 100 KE de mise → 100, 200, 500, 1 000, 2 500, 5 000 KE), ou une plaque
+     MINI / MINOR / MAJOR (avec son montant en KE). Grands nombres raccourcis : 25 000 → 25K, 1 500 000 → 1,5M.
    - 6 rubis ou plus sur l'écran = le bonus RUBY LINK.
 
 3. MISE EN SCÈNE DU SUSPENSE (quand il manque un seul rubis)
@@ -102,7 +103,7 @@ C. LES SYMBOLES (carrés, ≥ 512 × 512, fond transparent)
    11. h3  Masque / idole d'or
    12. h4  La gardienne du temple (statue) — le meilleur symbole
    13. wild       WILD (œil du temple, ou le mot WILD gravé dans l'or)
-   14. rubis      Le rubis rouge brillant, SANS chiffre (le jeu écrit 1.00, 5.00, 25.00…)
+   14. rubis      Le rubis rouge brillant, SANS chiffre (le jeu écrit la valeur en KE : 500, 2 500, 25K…)
    15. rubis-or   (option) un rubis plus gros / plus brillant pour les grosses valeurs et les jackpots
 
 D. LE BONUS
@@ -127,8 +128,7 @@ Le reste est en option : je le dessine par le code si tu ne l'envoies pas.
 PARTIE 3 — TES CHOIX (réponds simplement)
 ------------------------------------------------------------------
    - Le nom du bonus reste « RUBY LINK » (en anglais) ou « LE LIEN DES RUBIS » ?
-   - Les valeurs sur les rubis : en fois la mise (1.00 = 1 × la mise, conseillé)
-     ou directement en KE (ex. 500, 2 500) ?
+   - Les valeurs sur les rubis : EN KE (choisi par le propriétaire le 11 novembre 2026).
    - Les 4 trésors du temple (h1 à h4) : d'accord avec scarabée, calice, masque, gardienne ?
    - Couleurs des 4 boosters ?
 
