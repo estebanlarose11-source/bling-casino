@@ -16,7 +16,7 @@ function work({ mode, n }) {
     for (let k = 0; k < n; k++) {
       const r = E.round(st);
       o.line += r.line; o.bonus += Math.min(r.bonus, E.CAPX);
-      if (r.kind) { if (r.natural) o.nNat++; else if (r.kind === 'super') o.nMw++; else o.nMs++; }
+      if (r.kind) { if (r.natural) o.nNat++; else if (r.kind === 'giant') o.nMw++; else o.nMs++; }
       if (r.total >= E.CAPX) o.cap++;
       if (r.total >= 100) o.big++;
       o.paid += r.total; o.sq += r.total * r.total; if (r.total > 0) o.hits++;
@@ -46,9 +46,9 @@ const pct = (x) => `${(x * 100).toFixed(2)} %`;
   console.log(`RTP total : ${pct(b.paid / b.n)}  (lignes ${pct(b.line / b.n)}, bonus ${pct(b.bonus / b.n)})`);
   console.log(`Un gain : 1 tour sur ${(b.n / b.hits).toFixed(2)} · ≥ ×100 : 1 sur ${Math.round(b.n / b.big)} · max ×${E.CAPX} : ${b.cap}`);
   const nb = b.nNat + b.nMs + b.nMw;
-  console.log(`Bonus : 1 tour sur ${Math.round(b.n / nb)} (4 scatters 1 sur ${Math.round(b.n / b.nNat)}, jauge scatter 1 sur ${Math.round(b.n / b.nMs)}, jauge wild (super) 1 sur ${Math.round(b.n / b.nMw)})`);
+  console.log(`Bonus : 1 tour sur ${Math.round(b.n / nb)} (4 scatters 1 sur ${Math.round(b.n / b.nNat)}, jauge scatter 1 sur ${Math.round(b.n / b.nMs)}, jauge valkyrie (géante) 1 sur ${Math.round(b.n / b.nMw)})`);
   console.log(`Écart type d'un tour : ×${Math.sqrt(b.sq / b.n - (b.paid / b.n) ** 2).toFixed(1)}`);
-  for (const kind of ['bonus', 'super']) {
+  for (const kind of ['bonus', 'giant']) {
     const r = await run(kind, B), v = r.vals.sort((p, q) => p - q);
     console.log(`Achat ${kind} (×${E.BUY[kind]}) : moyenne ×${(r.paid / r.n).toFixed(1)} → ${pct(r.paid / r.n / E.BUY[kind])} · médiane ×${v[v.length >> 1].toFixed(1)} · max atteint ${r.cap} fois`);
   }

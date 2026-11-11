@@ -51,14 +51,17 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `s6` casque, `s7` chope, `s8` guerrière, `s9` corbeaux, `s10` berserker, `wild` / `scat` = cadres entiers, `wild-c` /
   `scat-c` = portraits des cases et des jauges, `cover`). **La valkyrie = WILD** (rouleaux 2 à 5), **le vieux viking (« le
   Jarl ») = SCATTER**. 5×4, 25 lignes. 4 Jarls = BONUS VALHALLA : 15 tours gratuits, 5 WILD posés qui restent collés et
-  chaque nouveau WILD reste aussi (calque `.vk-sticky` au-dessus des rouleaux) ; 5 Jarls = SUPER BONUS (10 WILD au départ).
+  chaque nouveau WILD reste aussi (calque `.vk-sticky` au-dessus des rouleaux).
   **Jauges des héros à gauche** (voulu par le propriétaire, gardées par mise : localStorage `spinbet_viking_m`) : 1 point par
-  Jarl (1 à 3) et par WILD qui tombent, le portrait s'anime ; Jarl à 250 = le bonus sans les 4 Jarls, valkyrie à 500 = le
-  SUPER BONUS (la fin de son message manquait : choix fait, à confirmer). Barre du bas en pierre comme sa capture (`vk-ctl` :
-  lignes, mise, MISE MAX, tourner, auto, gain, solde), téléphone en hauteur (héros au-dessus, barre sur 2 rangées) et en largeur.
-  Achats ×77 / ×350. Simulation `node tools/sim/viking.js` (6 M tours, jauges comprises) : RTP ≈ 92,5 % (lignes 53, bonus 39,5),
-  un gain 1 tour sur 3,8, un bonus 1 tour sur 248 (4 Jarls 1/925, jauge Jarl 1/403, Super 1/2 090), achats ≈ 88 %,
-  max ×1 000 (atteint dans le Super bonus, ≈ 1 sur 15 000).
+  Jarl (1 à 3) et par WILD qui tombent, le portrait s'anime ; Jarl à 250 = le bonus sans les 4 Jarls ; valkyrie à 500 (ou
+  5 Jarls) = **LA VALKYRIE GÉANTE** (voulu par le propriétaire : « un cube qui se déplace partout à chaque spin et plus il
+  connecte plus il devient gros ») : 10 tours gratuits, WILD géant 2×2 placé ailleurs à chaque tour (`giantRun`,
+  `.vk-giant`), chaque ligne gagnante qui passe par lui = 1 connexion, `GIANT.need` 18 / 45 / 100 connexions → 3×3, 4×4,
+  puis toute la grille ; gains de ce bonus ×`KG` 0,5. Barre du bas en pierre comme sa capture (`vk-ctl` : lignes, mise,
+  MISE MAX, tourner, auto, gain, solde), téléphone en hauteur (héros au-dessus, barre sur 2 rangées) et en largeur.
+  Achats ×77 / ×315. Simulation `node tools/sim/viking.js` (6 M tours, jauges comprises) : RTP ≈ 92 % (lignes 54, bonus 38),
+  un gain 1 tour sur 3,8, un bonus 1 tour sur 246 (4 Jarls 1/905, jauge Jarl 1/403, Valkyrie géante 1/2 090), achats ≈ 88 %,
+  max ×1 000 (≈ 1 Valkyrie géante sur 120 ; grille entière dans ≈ 27 % d'entre elles).
 - **Anubis, bonus Jugement** (`games/anubis.js`, voulu par le propriétaire) : une colonne pleine ne fusionne plus toute
   seule (seul un cube de lave la fait redescendre ; une colonne pleine ne reçoit que lave ou crâne doré), moins d'objets
   qui tombent (`JPC` 0,12) mais beaucoup plus de crânes (`JW` cube 40 / crâne 20 / doré 3 / lave 4, crânes ×`SKX` = +8 à

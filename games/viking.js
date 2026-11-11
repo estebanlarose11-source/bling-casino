@@ -5,9 +5,9 @@ __mods['games/impl/viking.js'] = (() => {
 // symbols (assets/games/viking, cut from his sheet by tools/art/viking.py) in a carved stone machine: crest on top,
 // the two heroes' meters on the left, a rune pillar on the right, a stone control bar at the bottom (layout of his
 // reference picture, drawings of our own). The old viking is the SCATTER, the valkyrie the WILD.
-// 4 scatters = BONUS VALHALLA: 5 WILDs land and stay, 15 free spins, every new WILD stays too (5 scatters = SUPER).
-// 1 to 3 scatters fill the old viking's meter (250 = the bonus), every WILD the valkyrie's (500 = SUPER BONUS:
-// 10 sticky WILDs from the start). The meters are kept per stake (localStorage spinbet_viking_m).
+// 4 scatters = BONUS VALHALLA: 5 WILDs land and stay, 15 free spins, every new WILD stays too (5 scatters = LA VALKYRIE GÉANTE).
+// 1 to 3 scatters fill the old viking's meter (250 = the bonus), every WILD the valkyrie's (500 = LA VALKYRIE GÉANTE:
+// a giant WILD that moves at every spin and grows when it connects). The meters are kept per stake (localStorage spinbet_viking_m).
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { Reels } = __mods['core/reels.js'];
@@ -21,7 +21,7 @@ const { fx, center } = __mods['fx.js'];
 // 12 SCATTER old viking (any reel, one per reel at most).
 // Owner's wishes (11 November 2026): 4 scatters = bonus: 5 WILDs land and stay, 15 free spins, every new WILD stays too.
 // Side meters (one per stake): each scatter that lands fills the old viking's meter (250 = the bonus without 4 scatters),
-// each WILD fills the valkyrie's (500 = the SUPER BONUS: the free spins start with 10 sticky WILDs).
+// each WILD fills the valkyrie's (500 = LA VALKYRIE GÉANTE, giantRun).
 const COLS = 5, ROWS = 4, N = 20, NS = 11, WILD = 11, SCAT = 12, CAPX = 1000;
 const LINES = [
   [1, 1, 1, 1, 1], [2, 2, 2, 2, 2], [0, 0, 0, 0, 0], [3, 3, 3, 3, 3], [0, 1, 2, 1, 0],
@@ -30,15 +30,15 @@ const LINES = [
   [2, 2, 3, 2, 2], [1, 1, 2, 1, 1], [2, 2, 1, 2, 2], [0, 1, 0, 1, 0], [3, 2, 3, 2, 3],
   [1, 0, 1, 0, 1], [2, 3, 2, 3, 2], [0, 2, 0, 2, 0], [3, 1, 3, 1, 3], [1, 2, 1, 2, 1],
 ];
-const BONUS_AT = 4, FS = 15, START = { bonus: 5, super: 10 };
+const BONUS_AT = 4, FS = 15, START = { bonus: 5 };
 const METER = { scat: 250, wild: 500 };
-const BUY = { bonus: 77, super: 350 };
+const BUY = { bonus: 77, giant: 315 };
 const P = {
   w: [30, 30, 28, 28, 17, 17, 15, 15, 9, 8, 7], wild: 3.2, scat: 0.125,
   // free spins: weights of the symbols and of a new WILD (reels 2-5)
   wf: [30, 30, 28, 28, 17, 17, 15, 15, 9, 8, 7], wildF: 3.2,
   pays: [[5, 15, 40], [5, 15, 40], [5, 20, 50], [5, 20, 50], [10, 30, 100], [10, 30, 100], [15, 40, 125], [15, 40, 125], [20, 75, 250], [25, 100, 300], [40, 150, 500], [50, 200, 1000]],
-  K: 3.8, KF: 0.8,
+  K: 3.85, KF: 0.8, KG: 0.5,
   pts: { scat: [0, 1, 2, 3], wild: 1 }, // meter points: one per scatter (1 to 3), one per WILD
 };
 function symbol(c, R, free) {
@@ -104,20 +104,47 @@ function freeRun(n, R = Math.random) {
   }
   return { start, spins, total };
 }
+// LA VALKYRIE GÉANTE (owner's wish, valkyrie meter at 500, or 5 Jarls): a giant WILD block, 2×2 at first, lands
+// somewhere new at every free spin; each time it is part of a winning line it grows: 3×3, 4×4, then the whole grid.
+// { spins: [{ g, at: [c, r], size, wins, x, grew }], total }
+const GIANT = { spins: 10, sizes: [2, 3, 4, 5], need: [18, 45, 100] }; // 5 = the whole 5×4 grid; need = connections to grow
+function blockCells(c, r, s) {
+  if (s >= 5) return [...Array(N).keys()];
+  const o = []; for (let i = 0; i < s; i++) for (let j = 0; j < s; j++) o.push((c + i) * ROWS + r + j);
+  return o;
+}
+function giantRun(R = Math.random) {
+  const spins = [];
+  let k = 0, total = 0, link = 0;
+  for (let n = 0; n < GIANT.spins; n++) {
+    const s = GIANT.sizes[k];
+    const c = s >= 5 ? 0 : Math.floor(R() * (COLS - s + 1)), r = s >= 5 ? 0 : Math.floor(R() * (ROWS - s + 1));
+    const block = blockCells(c, r, s), g = screen(R, true, block);
+    const wins = lines(g, P.KG), x = wins.reduce((a, w) => a + w.x, 0);
+    // each winning line that goes through the valkyrie is one connection; enough of them and she grows
+    const inBlock = new Set(block), con = wins.filter((w) => w.cells.some((i) => inBlock.has(i))).length;
+    let grew = false;
+    if (k < GIANT.sizes.length - 1) { link += con; if (link >= GIANT.need[k]) { link = 0; k++; grew = true; } }
+    total += x;
+    spins.push({ g, at: [c, r], size: s, block, wins, x, con, grew, next: GIANT.sizes[k], link, need: GIANT.need[k] || 0 });
+  }
+  return { spins, total };
+}
+const runOf = (kind, R) => (kind === 'giant' ? giantRun(R) : freeRun(START.bonus, R));
 // A player's long run (simulator): meters kept from spin to spin, like in the game (one stake).
 function round(st, R = Math.random) {
   const s = spin(R);
   let t = s.x, bonus = 0, kind = '';
   st.s = Math.min(METER.scat, st.s + s.ps); st.w = Math.min(METER.wild, st.w + s.pw);
-  if (s.bonus) kind = s.superB ? 'super' : 'bonus';
-  else if (st.w >= METER.wild) { kind = 'super'; st.w = 0; }
+  if (s.bonus) kind = s.superB ? 'giant' : 'bonus';
+  else if (st.w >= METER.wild) { kind = 'giant'; st.w = 0; }
   else if (st.s >= METER.scat) { kind = 'bonus'; st.s = 0; }
-  if (kind) bonus = freeRun(START[kind], R).total;
+  if (kind) bonus = runOf(kind, R).total;
   t += bonus;
   return { total: Math.min(CAPX, t), line: s.x, bonus, kind, natural: s.bonus };
 }
-const buyRun = (kind, R = Math.random) => Math.min(CAPX, freeRun(START[kind], R).total);
-const ENGINE = { COLS, ROWS, N, NS, WILD, SCAT, CAPX, LINES, BONUS_AT, FS, START, METER, BUY, P, symbol, screen, lines, spin, startWilds, freeRun, round, buyRun, count };
+const buyRun = (kind, R = Math.random) => Math.min(CAPX, runOf(kind, R).total);
+const ENGINE = { COLS, ROWS, N, NS, WILD, SCAT, CAPX, LINES, BONUS_AT, FS, START, METER, BUY, P, GIANT, symbol, screen, lines, spin, startWilds, freeRun, blockCells, giantRun, runOf, round, buyRun, count };
 /* ===END ENGINE */
 
 const E = ENGINE;
@@ -197,7 +224,7 @@ class VikingGame extends BaseGame {
           <div class="vk-meter scat" data-m="s"><div class="vk-por">${img('scat-c', 'vk-pimg')}<i class="vk-aura"></i></div>
             <div class="vk-mtxt"><b class="vk-mname">LE JARL</b><div class="vk-bar"><i></i><b>0/${E.METER.scat}</b></div><small>BONUS</small></div></div>
           <div class="vk-meter wild" data-m="w"><div class="vk-por">${img('wild-c', 'vk-pimg')}<i class="vk-aura"></i></div>
-            <div class="vk-mtxt"><b class="vk-mname">LA VALKYRIE</b><div class="vk-bar"><i></i><b>0/${E.METER.wild}</b></div><small>SUPER BONUS</small></div></div>
+            <div class="vk-mtxt"><b class="vk-mname">LA VALKYRIE</b><div class="vk-bar"><i></i><b>0/${E.METER.wild}</b></div><small>VALKYRIE GÉANTE</small></div></div>
         </div>
         <div class="vk-machine">
           ${CREST}
@@ -210,7 +237,7 @@ class VikingGame extends BaseGame {
       </div>`,
       buys: [
         { id: 'bonus', icon: '⚔️', label: 'BONUS VALHALLA · 15 tours', desc: '5 WILD collés dès le départ, chaque nouveau WILD reste jusqu’à la fin', cost: (b) => b * E.BUY.bonus },
-        { id: 'super', icon: '👑', label: 'SUPER BONUS · 15 tours', desc: '10 WILD collés dès le départ, chaque nouveau WILD reste jusqu’à la fin', cost: (b) => b * E.BUY.super },
+        { id: 'giant', icon: '👑', label: `LA VALKYRIE GÉANTE · ${E.GIANT.spins} tours`, desc: 'Un WILD géant qui change de place à chaque tour et grandit quand il fait gagner : 2×2, 3×3, 4×4, puis toute la grille', cost: (b) => b * E.BUY.giant },
       ],
       hello: `${E.BONUS_AT} Jarls = BONUS · les jauges de gauche lancent le bonus toutes seules`,
     });
@@ -313,7 +340,7 @@ class VikingGame extends BaseGame {
         if (this.inFree || c < 3) return false;
         let s = 0; for (let j = 0; j < c * E.ROWS; j++) if (vals[j] === E.SCAT) s++;
         const t = s === E.BONUS_AT - 1 || (c === 4 && s === E.BONUS_AT);
-        if (t && !tease) { tease = true; this.msg(s === E.BONUS_AT ? '⚔️ Un 5e Jarl pour le SUPER BONUS…' : '⚔️ Plus qu’un Jarl pour le BONUS…'); }
+        if (t && !tease) { tease = true; this.msg(s === E.BONUS_AT ? '⚔️ Un 5e Jarl pour LA VALKYRIE GÉANTE…' : '⚔️ Plus qu’un Jarl pour le BONUS…'); }
         if (t) this.reels.reelEls[c].classList.add('vk-focus');
         return t;
       },
@@ -342,7 +369,7 @@ class VikingGame extends BaseGame {
     this.setLast(0); this.winAmt.textContent = ''; this.setBanner('');
     let total = 0;
     if (buy) {
-      total = await this.freeSpins(buy, b, cap);
+      total = buy === 'giant' ? await this.giantSpins(b, cap) : await this.freeSpins(buy, b, cap);
     } else {
       const res = E.spin(Math.random);
       await this.spinReels(res.g);
@@ -358,8 +385,8 @@ class VikingGame extends BaseGame {
       if (res.ps) await this.addPoints('s', res.ps, cells(E.SCAT));
       if (res.pw) await this.addPoints('w', res.pw, cells(E.WILD));
       let kind = '';
-      if (res.bonus) kind = res.superB ? 'super' : 'bonus';
-      else if (this.m.w >= E.METER.wild) { kind = 'super'; await this.meterFull('w'); }
+      if (res.bonus) kind = res.superB ? 'giant' : 'bonus';
+      else if (this.m.w >= E.METER.wild) { kind = 'giant'; await this.meterFull('w'); }
       else if (this.m.s >= E.METER.scat) { kind = 'bonus'; await this.meterFull('s'); }
       if (kind) {
         this.stopAuto();
@@ -371,7 +398,7 @@ class VikingGame extends BaseGame {
           await this.wait(1500);
           this.reels.unmark();
         }
-        total += await this.freeSpins(kind, b, cap - total);
+        total += kind === 'giant' ? await this.giantSpins(b, cap - total) : await this.freeSpins(kind, b, cap - total);
       } else if (total > 0) await this.celebrate(total);
       this.reels.unmark();
     }
@@ -400,9 +427,9 @@ class VikingGame extends BaseGame {
     return top.length > 2 ? `${t} · +${top.length - 2} ligne${top.length > 3 ? 's' : ''}` : t;
   }
 
-  /* ---------- BONUS VALHALLA / SUPER BONUS: 15 free spins, the WILDs stay ---------- */
+  /* ---------- BONUS VALHALLA: 15 free spins, the WILDs stay ---------- */
   async freeSpins(kind, b, capLeft) {
-    const sup = kind === 'super', title = sup ? 'SUPER BONUS VALHALLA' : 'BONUS VALHALLA', n0 = E.START[kind];
+    const sup = false, title = 'BONUS VALHALLA', n0 = E.START.bonus;
     await this.featureIntro(title, `${E.FS} tours gratuits · ${n0} WILD collés dès le départ · chaque nouveau WILD reste jusqu’à la fin`, img('wild', 'vk-iimg'), 2600);
     if (this.dead) return 0;
     const run = E.freeRun(n0);
@@ -466,16 +493,94 @@ class VikingGame extends BaseGame {
     return tot;
   }
 
+  /* ---------- LA VALKYRIE GÉANTE: a giant WILD that moves at every spin and grows when it connects ---------- */
+  placeGiant(at, size, anim) {
+    let n = this.stickyEl.querySelector('.vk-giant');
+    const first = n?.getBoundingClientRect();
+    if (!n) { n = document.createElement('div'); n.className = 'vk-giant'; n.innerHTML = `${img('wild', 'vk-gimg')}<b>WILD</b><i class="vk-gs"></i>`; this.stickyEl.appendChild(n); }
+    const full = size >= 5, w = full ? E.COLS : size, h = full ? E.ROWS : size;
+    n.style.gridColumn = `${at[0] + 1} / span ${w}`; n.style.gridRow = `${at[1] + 1} / span ${h}`;
+    n.dataset.size = full ? 'full' : size;
+    n.querySelector('.vk-gs').textContent = full ? 'TOUTE LA GRILLE' : `${size}×${size}`;
+    const last = n.getBoundingClientRect();
+    if (anim === 'drop') n.animate([{ transform: 'translateY(-120%) scale(1.2)', opacity: 0 }, { opacity: 1, offset: 0.6 }, { transform: 'none' }], { duration: this.superT ? 200 : 600, easing: 'cubic-bezier(.3,1.4,.5,1)' });
+    else if (first && anim === 'move') {
+      // she flies from her old place to the new one
+      n.animate([{ transform: `translate(${first.left - last.left}px, ${first.top - last.top}px) scale(${first.width / last.width}, ${first.height / last.height})`, transformOrigin: '0 0' }, { transform: 'none', transformOrigin: '0 0' }], { duration: this.superT ? 160 : this.turbo ? 260 : 480, easing: 'cubic-bezier(.4,0,.2,1)' });
+    }
+    return n;
+  }
+  async giantSpins(b, capLeft) {
+    const title = 'LA VALKYRIE GÉANTE';
+    await this.featureIntro(title, `${E.GIANT.spins} tours gratuits · la valkyrie devient un WILD géant qui change de place à chaque tour · plus elle connecte de lignes, plus elle grandit : 2×2, 3×3, 4×4, puis toute la grille`, img('wild', 'vk-iimg'), 2800);
+    if (this.dead) return 0;
+    const run = E.giantRun();
+    this.inFree = true; this.stuck = new Set();
+    this.slotEl.classList.add('in-free', 'vk-free', 'vk-super');
+    this.focusStage?.();
+    let tot = 0, size = E.GIANT.sizes[0], link = 0, need = E.GIANT.need[0];
+    const banner = (k) => this.setBanner(`<b>${title}</b><span class="pill">Tour ${Math.min(k, E.GIANT.spins)} / ${E.GIANT.spins}</span><span class="pill vk-wp">${size >= 5 ? 'GRILLE ENTIÈRE' : `${size}×${size}`}</span>${need ? `<span class="pill">Lignes ${link} / ${need}</span>` : ''}<span class="pill gold">${fmtC(tot)}</span>`);
+    banner(0);
+    for (let k = 0; k < run.spins.length; k++) {
+      if (this.dead) return 0;
+      const sp = run.spins[k];
+      banner(k + 1);
+      this.reels.unmark(); this.stickyEl.querySelector('.vk-giant')?.classList.remove('win');
+      // the giant moves first, then the reels turn under her
+      this.placeGiant(sp.at, sp.size, k ? 'move' : 'drop');
+      sp.block.forEach((i) => this.stuck.add(i));
+      sfx.land?.(); vibe(30);
+      await this.wait(k ? 380 : 700);
+      await this.spinReels(sp.g);
+      this.stuck = new Set();
+      if (this.dead) return 0;
+      if (sp.x > 0) {
+        const amt = Math.max(0, Math.min(Math.round(sp.x * b), capLeft - tot));
+        this.reels.mark([...new Set(sp.wins.flatMap((w) => w.cells))]);
+        if (sp.con) this.stickyEl.querySelector('.vk-giant')?.classList.add('win');
+        this.msg(`${sp.con ? `La valkyrie connecte ${sp.con} ligne${sp.con > 1 ? 's' : ''} · ` : ''}${this.winMsg(sp.wins, b)}`);
+        if (amt > 0) { this.win(amt, title); tot += amt; }
+        this.winAmt.textContent = fmtC(tot);
+        sfx.win();
+      }
+      link = sp.grew ? 0 : sp.link; size = sp.next; need = E.GIANT.need[E.GIANT.sizes.indexOf(size)] || 0;
+      banner(k + 1);
+      await this.wait(sp.x >= 20 ? 1400 : sp.x > 0 ? 900 : 350);
+      if (sp.grew) {
+        // she grows: a flash, then she takes her new size at the same place (or the whole grid)
+        const g = this.stickyEl.querySelector('.vk-giant'), p = center(g);
+        this.word(size >= 5 ? 'TOUTE LA GRILLE !' : `ELLE GRANDIT ! ${size}×${size}`, 'gold');
+        this.flash('rgba(250,204,21,.5)'); this.shake(); sfx.upgrade?.(); sfx.feature?.(); vibe([60, 40, 120]);
+        fx.burst(p.x, p.y, 60, GOLD, 10);
+        const c = Math.min(sp.at[0], E.COLS - Math.min(size, E.COLS)), r = Math.min(sp.at[1], E.ROWS - Math.min(size, E.ROWS));
+        this.placeGiant(size >= 5 ? [0, 0] : [c, Math.max(0, r)], size, 'move');
+        await this.wait(1300);
+      }
+      if (tot >= capLeft) break;
+    }
+    this.reels.unmark();
+    await this.celebrate(tot, { summary: title, stake: b });
+    this.setBanner('');
+    this.slotEl.classList.remove('in-free', 'vk-free', 'vk-super');
+    this.inFree = false; this.stuck = null;
+    this.unstickAll();
+    this.reels.setAll(this.idle());
+    this.msg(`${title} : ${fmtC(tot)}`);
+    this.bonusDone = true;
+    return tot;
+  }
+
   info() {
     const f = (x) => (Math.round(x / 25 * PP.K * 100) / 100).toLocaleString('fr-FR');
     const rows = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((s) => `<div class="pay-item"><div class="pay-sym vk-pay">${img(`s${s}`)}</div><div class="pay-vals"><b>${NAMES[s]}</b><br><span>3 : ×${f(PP.pays[s][0])} · 4 : ×${f(PP.pays[s][1])} · 5 : ×${f(PP.pays[s][2])}</span></div></div>`).join('');
     return this.rules(`<h4>Symboles (× la mise, par ligne)</h4><div class="paytable">${rows}
       <div class="pay-item"><div class="pay-sym vk-pay">${img('wild-c')}</div><div class="pay-vals"><b>La valkyrie WILD</b><br><span>Rouleaux 2 à 5, remplace tous les symboles sauf le Jarl · 3 : ×${f(PP.pays[E.WILD][0])} · 4 : ×${f(PP.pays[E.WILD][1])} · 5 : ×${f(PP.pays[E.WILD][2])}</span></div></div>
-      <div class="pay-item"><div class="pay-sym vk-pay">${img('scat-c')}</div><div class="pay-vals"><b>Le Jarl (BONUS)</b><br><span>${E.BONUS_AT} Jarls : BONUS VALHALLA · 5 Jarls : SUPER BONUS</span></div></div></div>
+      <div class="pay-item"><div class="pay-sym vk-pay">${img('scat-c')}</div><div class="pay-vals"><b>Le Jarl (BONUS)</b><br><span>${E.BONUS_AT} Jarls : BONUS VALHALLA · 5 Jarls : LA VALKYRIE GÉANTE</span></div></div></div>
       <h4>25 lignes</h4><p>5 rouleaux de 4 cases et 25 lignes fixes. Une ligne paie dès que 3 symboles identiques ou plus se suivent depuis la gauche.</p>
-      <h4>BONUS VALHALLA</h4><p>${E.BONUS_AT} Jarls n’importe où : <b>${E.FS} tours gratuits</b>. La valkyrie pose <b>${E.START.bonus} WILD</b> qui restent collés pendant tout le bonus, et <b>chaque nouveau WILD reste aussi</b> jusqu’à la fin : ils s’accumulent tour après tour. 5 Jarls : le SUPER BONUS.</p>
-      <h4>Les jauges des héros</h4><p>À gauche, deux jauges (une par mise, gardées d’une partie à l’autre). Chaque Jarl qui tombe (1 à 3) donne 1 point au Jarl : à <b>${E.METER.scat}</b>, le BONUS VALHALLA démarre tout seul, sans les ${E.BONUS_AT} Jarls. Chaque WILD qui tombe donne 1 point à la valkyrie : à <b>${E.METER.wild}</b>, c’est le <b>SUPER BONUS</b> : ${E.FS} tours gratuits avec <b>${E.START.super} WILD collés</b> dès le départ.</p>
-      <h4>Achats</h4><p>BONUS VALHALLA ×${E.BUY.bonus} la mise · SUPER BONUS ×${E.BUY.super} la mise. Gain maximum ×${E.CAPX.toLocaleString('fr-FR')}.</p>`);
+      <h4>BONUS VALHALLA</h4><p>${E.BONUS_AT} Jarls n’importe où : <b>${E.FS} tours gratuits</b>. La valkyrie pose <b>${E.START.bonus} WILD</b> qui restent collés pendant tout le bonus, et <b>chaque nouveau WILD reste aussi</b> jusqu’à la fin : ils s’accumulent tour après tour.</p>
+      <h4>LA VALKYRIE GÉANTE</h4><p>${E.GIANT.spins} tours gratuits : la valkyrie devient un <b>WILD géant</b> de 2×2 qui <b>change de place à chaque tour</b>. Chaque ligne gagnante qui passe par elle est une connexion : après ${E.GIANT.need[0]} connexions elle passe en <b>3×3</b>, après ${E.GIANT.need[1]} de plus en <b>4×4</b>, après ${E.GIANT.need[2]} de plus elle couvre <b>toute la grille</b>. 5 Jarls d’un coup la lancent aussi.</p>
+      <h4>Les jauges des héros</h4><p>À gauche, deux jauges (une par mise, gardées d’une partie à l’autre). Chaque Jarl qui tombe (1 à 3) donne 1 point au Jarl : à <b>${E.METER.scat}</b>, le BONUS VALHALLA démarre tout seul, sans les ${E.BONUS_AT} Jarls. Chaque WILD qui tombe donne 1 point à la valkyrie : à <b>${E.METER.wild}</b>, c’est <b>LA VALKYRIE GÉANTE</b>.</p>
+      <h4>Achats</h4><p>BONUS VALHALLA ×${E.BUY.bonus} la mise · LA VALKYRIE GÉANTE ×${E.BUY.giant} la mise. Gain maximum ×${E.CAPX.toLocaleString('fr-FR')}.</p>`);
   }
 }
 
