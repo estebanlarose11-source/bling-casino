@@ -6509,6 +6509,20 @@ html.light .btn.primary { color: #fff !important; background: linear-gradient(18
 /* ---------- paris pour rire (#paris) ---------- */
 .pr-hero h1 { margin: 6px 0; font: 900 clamp(24px, 4vw, 34px)/1.1 KeCoin, Archivo, sans-serif; }
 .pr-chips { margin: 4px 0 14px; }
+.pr-mode { display: flex; gap: 6px; margin: 4px 0 6px; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, .05); width: fit-content; }
+.pr-mode button { padding: 8px 16px; border-radius: 999px; font: 800 14px Archivo, sans-serif; color: var(--muted); background: none; }
+.pr-mode button.on { color: #fff; background: var(--fin-blue, linear-gradient(180deg, #ec4899, #be185d)); box-shadow: 0 4px 14px rgba(236, 72, 153, .35); }
+.pr-modehelp { margin: 0 0 8px; }
+.pr-odd.sel { background: linear-gradient(180deg, rgba(251, 191, 36, .45), rgba(251, 191, 36, .18)); box-shadow: inset 0 0 0 2px #fbbf24, 0 0 14px rgba(251, 191, 36, .45); } .pr-odd.sel b { color: #fff7d6; }
+.pr-slipbar { position: sticky; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 30; display: flex; align-items: center; gap: 10px; margin: 12px 0; padding: 10px 12px; border-radius: 14px; background: linear-gradient(180deg, #2a1048, #1a0a30); box-shadow: inset 0 0 0 1px rgba(251, 191, 36, .6), 0 10px 30px rgba(0, 0, 0, .6); }
+.pr-slipbar > div { display: flex; flex-direction: column; flex: 1; min-width: 0; } .pr-slipbar b { font-size: 15px; } .pr-slipbar span { font: 900 14px KeCoin, Archivo, sans-serif; color: #fbbf24; }
+@media (max-width: 760px) { .pr-slipbar { bottom: calc(70px + env(safe-area-inset-bottom, 0px)); } }
+.pr-legs { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 6px; }
+.pr-legs li { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; padding: 7px 10px; border-radius: 10px; background: rgba(255, 255, 255, .05); font-size: 13px; }
+.pr-legs li span { display: flex; flex-direction: column; min-width: 0; } .pr-legs li small { color: var(--muted); font-size: 11px; } .pr-legs li em { font: 900 13px KeCoin, Archivo, sans-serif; font-style: normal; color: #bfe6ff; }
+.pr-leg { display: block; font-style: normal; font-size: 11.5px; color: var(--muted); } .pr-leg.won { color: #86efac; } .pr-leg.lost { color: #fca5a5; }
+.pr-cb small { display: grid; gap: 2px; }
+
 .pr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-bottom: 18px; }
 .pr-match { padding: 14px; border-radius: 14px; background: var(--fin-panel) padding-box, var(--fin-edge) border-box; border: 1px solid transparent; box-shadow: 0 10px 26px rgba(0, 0, 0, .3); }
 .pr-match.live { background: linear-gradient(180deg, rgba(239, 68, 68, .14), rgba(13, 17, 24, .96)) padding-box, linear-gradient(135deg, #ef4444, rgba(255, 255, 255, .05)) border-box; }
@@ -19940,6 +19954,9 @@ __mods['paris.js'] = (() => {
 // Liga, Serie A, NBA). The matches, live scores and odds come from paris/matchs.json on the « data » branch, written
 // every 30 min by GitHub (tools/matchs/fetch.mjs). Bets are saved in the profile (profile.paris) and paid at the next
 // visit after the final whistle. Odds fixed before the match (≈ 95 % return). Play money only.
+// COMBINÉS (owner's wish): in « Combiné » mode, a tap on an odd puts it in the slip (one pick per match, 2 to COMBO_MAX
+// matches); the odds multiply (up to COMBO_ODDS) and every pick must win. A postponed match counts as odds 1; one lost
+// pick = the whole combiné lost (settled as soon as it is known).
 
 const { wallet, fmt } = __mods['wallet.js'];
 const { profiles } = __mods['profile.js'];
@@ -19948,7 +19965,7 @@ const { sfx } = __mods['audio.js'];
 const { fx } = __mods['fx.js'];
 
 const URL_ = 'https://raw.githubusercontent.com/estebanlarose11-source/bling-casino/data/paris/matchs.json';
-const MAX_BET = 10000, CLOSE_MS = 60000, FIN_MAX = 10;
+const MAX_BET = 10000, CLOSE_MS = 60000, FIN_MAX = 10, COMBO_MAX = 8, COMBO_ODDS = 1000;
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const ox = (o) => o.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const hm = (t) => new Date(t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
@@ -19989,6 +20006,21 @@ function settle() {
   const pay = [];
   save((list) => list.map((b) => {
     if (b.st !== 'open') return b;
+    if (b.combo) {
+      // each pick: 'w' won, 'l' lost, 'v' void (postponed), null not played yet
+      const st = b.combo.map((c) => {
+        const m = byId(c.m);
+        if (m && m.state === 'post' && m.done && m.score) return result(m, c.k) ? 'w' : 'l';
+        if ((m && m.state === 'post' && !m.done && Date.now() > m.start + 6 * 3600e3) || (!m && Date.now() > c.start + 4 * 864e5)) return 'v';
+        return null;
+      });
+      if (st.includes('l')) { lost++; return { ...b, st: 'lost', legs: st }; }
+      if (st.includes(null)) return b;
+      const odds = Math.min(COMBO_ODDS, b.combo.reduce((x, c, i) => x * (st[i] === 'w' ? c.odds : 1), 1));
+      if (st.every((x) => x === 'v')) { back += b.stake; return { ...b, st: 'void', legs: st }; }
+      const g = Math.round(b.stake * odds * 100) / 100; won += g; pay.push([g, { ...b, odds }]);
+      return { ...b, st: 'won', paid: g, legs: st };
+    }
     const m = byId(b.m);
     if (m && m.state === 'post' && m.done && m.score) {
       if (result(m, b.k)) { const g = Math.round(b.stake * b.odds * 100) / 100; won += g; pay.push([g, b]); return { ...b, st: 'won', paid: g, res: m.score }; }
@@ -20038,14 +20070,65 @@ async function placeBet(m, k) {
   paintPage();
 }
 
+/* ---------- combinés ---------- */
+let mode = 'simple', slip = []; // slip = [{ m, k }]
+const oddOf = (m, k) => (k.startsWith('S:') ? m.odds.scores?.[k.slice(2)] : m.odds[k]);
+const slipLegs = () => slip.map((x) => { const m = byId(x.m); const o = m && oddOf(m, x.k); return m && o && open(m) ? { ...x, mt: m, odds: o } : null; }).filter(Boolean);
+const slipOdds = (legs = slipLegs()) => Math.min(COMBO_ODDS, legs.reduce((x, l) => x * l.odds, 1));
+function toggleSlip(m, k) {
+  if (!open(m)) return toast('Les paris sont fermés pour ce match', 'warn');
+  const i = slip.findIndex((x) => x.m === m.id);
+  if (i >= 0 && slip[i].k === k) slip.splice(i, 1); // same pick again: removed
+  else if (i >= 0) slip[i] = { m: m.id, k }; // another pick of the same match: replaced (one pick per match)
+  else if (slip.length >= COMBO_MAX) return toast(`${COMBO_MAX} matchs au maximum dans un combiné`, 'warn');
+  else slip.push({ m: m.id, k });
+  sfx.click?.();
+  paintPage();
+}
+async function placeCombo() {
+  if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour parier', 'warn');
+  const legs = slipLegs();
+  if (legs.length < 2) return toast('Choisis au moins 2 matchs pour un combiné', 'warn');
+  const odds = slipOdds(legs), max = Math.min(MAX_BET, Math.floor(wallet.balance));
+  const quick = [10, 50, 100, 500, 1000, 5000].filter((v) => v <= max);
+  const p = modal(`<div class="pr-slip"><small class="muted">Combiné · ${legs.length} matchs · tout doit être gagné</small>
+      <h3>🎟️ Mon combiné</h3>
+      <ul class="pr-legs">${legs.map((l) => `<li><span>${esc(l.mt.home.name)} – ${esc(l.mt.away.name)}<small>${dayLabel(l.mt.start)} ${hm(l.mt.start)}</small></span><b>${esc(pickName(l.mt, l.k))}</b><em>${ox(l.odds)}</em></li>`).join('')}</ul>
+      <div class="pr-pick"><span>Cote totale</span><b>${ox(odds)}</b><em>${odds >= COMBO_ODDS ? `plafond ×${COMBO_ODDS}` : `${legs.map((l) => ox(l.odds)).join(' × ')}`}</em></div>
+      <label class="pr-lab">Mise (KE)<input type="number" inputmode="numeric" min="1" max="${max}" step="1" value="${Math.min(100, max) || 1}" data-stake></label>
+      <div class="pr-quick">${quick.map((v) => `<button type="button" class="chip" data-q="${v}">${v.toLocaleString('fr-FR')}</button>`).join('')}<button type="button" class="chip" data-q="${max}">Max</button></div>
+      <p class="pr-gain">Gain possible : <b data-gain></b></p>
+      <button class="btn primary lg ga-wide" data-value="ok">Valider le combiné</button>
+      <p class="muted small">Un seul match perdu et le combiné est perdu. Un match reporté compte pour une cote de 1. Payé tout seul après le dernier match.</p></div>`, { cls: 'pr-modal' });
+  const box = [...document.querySelectorAll('.pr-modal')].pop(), inp = box.querySelector('[data-stake]');
+  const upd = () => { const v = Math.max(0, Math.floor(+inp.value || 0)); box.querySelector('[data-gain]').textContent = fmt(Math.round(v * odds * 100) / 100); };
+  box.querySelectorAll('[data-q]').forEach((b) => { b.onclick = () => { inp.value = b.dataset.q; upd(); }; });
+  inp.addEventListener('input', upd); upd();
+  let stake = 0;
+  box.querySelector('[data-value="ok"]').addEventListener('click', () => { stake = Math.floor(+inp.value || 0); }, { capture: true });
+  if ((await p) !== 'ok') return;
+  const now = slipLegs();
+  if (now.length !== legs.length) return toast('Un des matchs a commencé : vérifie ton combiné', 'warn');
+  if (!(stake >= 1) || stake > max) return toast(`Mise entre 1 et ${fmt(max)}`, 'warn');
+  if (!wallet.debit(stake)) return toast('Solde insuffisant', 'warn');
+  const combo = legs.map((l) => ({ m: l.m, k: l.k, odds: l.odds, start: l.mt.start, label: `${l.mt.home.name} – ${l.mt.away.name} : ${pickName(l.mt, l.k)}` }));
+  save((list) => [{ id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, combo, odds, stake, at: Date.now(), start: Math.max(...combo.map((c) => c.start)), st: 'open', label: `Combiné ${legs.length} matchs` }, ...list]);
+  slip = [];
+  sfx.coin(); fx.coins?.(18);
+  toast(`🎟️ Combiné validé : ${fmt(stake)} à la cote ${ox(odds)}`, 'ok');
+  paintPage();
+}
+const legLine = (c, st) => `<i class="pr-leg ${st === 'w' ? 'won' : st === 'l' ? 'lost' : st === 'v' ? 'void' : ''}">${st === 'w' ? '✅' : st === 'l' ? '❌' : st === 'v' ? '↩️' : '⏳'} ${esc(c.label)} · ${ox(c.odds)}</i>`;
+
 /* ---------- the page ---------- */
 let root = null, league = 'all', showScores = new Set();
 const here = () => root?.isConnected && location.hash.replace(/^#\/?/, '') === 'paris'; // the view is shared by every page
 const logo = (t) => (t.logo ? `<img src="${esc(t.logo)}" alt="" loading="lazy" onerror="this.remove()">` : '<i class="pr-nologo"></i>');
 function matchHTML(m) {
   const live = m.state === 'in', fin = m.state === 'post', can = open(m);
-  const mine = bets().filter((b) => b.m === m.id);
-  const btn = (k, lab) => `<button class="pr-odd" data-bet="${m.id}" data-k="${k}" ${can ? '' : 'disabled'}><small>${lab}</small><b>${ox(m.odds[k])}</b></button>`;
+  const mine = bets().filter((b) => b.m === m.id), inCombo = bets().filter((b) => b.st === 'open' && b.combo?.some((c) => c.m === m.id)).length;
+  const sel = (k) => (mode === 'combo' && slip.some((x) => x.m === m.id && x.k === k) ? ' sel' : '');
+  const btn = (k, lab) => `<button class="pr-odd${sel(k)}" data-bet="${m.id}" data-k="${k}" ${can ? '' : 'disabled'}><small>${lab}</small><b>${ox(m.odds[k])}</b></button>`;
   return `<div class="pr-match${live ? ' live' : ''}${fin ? ' fin' : ''}">
     <div class="pr-top"><span>${esc(m.league)}</span>${live ? `<b class="pr-live"><i></i>EN DIRECT ${esc(m.clock)}</b>` : fin ? '<b>Terminé</b>' : `<b>${dayLabel(m.start)} · ${hm(m.start)}</b>`}</div>
     <div class="pr-teams"><div>${logo(m.home)}<span>${esc(m.home.name)}</span></div>
@@ -20053,7 +20136,8 @@ function matchHTML(m) {
       <div>${logo(m.away)}<span>${esc(m.away.name)}</span></div></div>
     ${fin ? '' : `<div class="pr-odds">${btn('1', m.sport === 'soccer' ? '1' : esc(m.home.name))}${m.odds.N ? btn('N', 'Nul') : ''}${btn('2', m.sport === 'soccer' ? '2' : esc(m.away.name))}</div>`}
     ${!fin && can && m.odds.scores ? `<button class="pr-more" data-scores="${m.id}">${showScores.has(m.id) ? '▴ Cacher les scores exacts' : '▾ Score exact (grosses cotes)'}</button>
-      ${showScores.has(m.id) ? `<div class="pr-scores">${Object.entries(m.odds.scores).map(([s, o]) => `<button class="pr-odd sm" data-bet="${m.id}" data-k="S:${s}"><small>${s.replace('-', ' - ')}</small><b>${ox(o)}</b></button>`).join('')}</div>` : ''}` : ''}
+      ${showScores.has(m.id) ? `<div class="pr-scores">${Object.entries(m.odds.scores).map(([s, o]) => `<button class="pr-odd sm${sel(`S:${s}`)}" data-bet="${m.id}" data-k="S:${s}"><small>${s.replace('-', ' - ')}</small><b>${ox(o)}</b></button>`).join('')}</div>` : ''}` : ''}
+    ${inCombo ? `<div class="pr-mine"><span>🎟️ Dans ${inCombo} combiné${inCombo > 1 ? 's' : ''} en cours</span></div>` : ''}
     ${mine.length ? `<div class="pr-mine">${mine.map((b) => `<span class="${b.st}">🎟️ ${fmt(b.stake)} sur ${esc(pickName(m, b.k))} · cote ${ox(b.odds)}${b.st === 'won' ? ` · <b>+${fmt(b.paid)}</b>` : b.st === 'lost' ? ' · perdu' : b.st === 'void' ? ' · remboursé' : ''}</span>`).join('')}</div>` : ''}
   </div>`;
 }
@@ -20070,14 +20154,17 @@ function paintPage() {
   const my = bets(), openB = my.filter((b) => b.st === 'open'), doneB = my.filter((b) => b.st !== 'open').slice(0, 12);
   root.innerHTML = `
     <section class="panel pr-hero"><span class="eyebrow">⚽🏀 Paris pour rire</span><h1>Parie tes KE sur les vrais matchs</h1>
-      <p class="muted">Ligue 1, Ligue des champions, Ligue Europa, Premier League, Liga, Serie A et NBA. Choisis le vainqueur, le nul ou le score exact : tu es payé tout seul après le match. Argent fictif, juste pour le fun.</p></section>
+      <p class="muted">Ligue 1, Ligue des champions, Ligue Europa, Premier League, Liga, Serie A et NBA. Choisis le vainqueur, le nul ou le score exact, seul ou en <b>combiné</b> (les cotes se multiplient) : tu es payé tout seul après le match. Argent fictif, juste pour le fun.</p></section>
     ${openB.length || doneB.length ? `<section class="panel pr-bets"><h2>🎟️ Mes paris</h2>
-      ${openB.length ? `<ul>${openB.map((b) => { const m = byId(b.m); return `<li><span>${esc(b.label)}</span><em>${fmt(b.stake)} × ${ox(b.odds)} = <b>${fmt(Math.round(b.stake * b.odds * 100) / 100)}</b></em><small>${m?.state === 'in' ? `🔴 ${m.score?.join(' - ')} · ${esc(m.clock)}` : `${dayLabel(b.start)} ${hm(b.start)}`}</small></li>`; }).join('')}</ul>` : ''}
-      ${doneB.length ? `<details><summary>Paris terminés (${doneB.length})</summary><ul>${doneB.map((b) => `<li class="${b.st}"><span>${esc(b.label)}</span><em>${b.st === 'won' ? `✅ +${fmt(b.paid)}` : b.st === 'lost' ? `❌ −${fmt(b.stake)}` : '↩️ remboursé'}</em>${b.res ? `<small>score ${b.res.join(' - ')}</small>` : ''}</li>`).join('')}</ul></details>` : ''}
+      ${openB.length ? `<ul>${openB.map((b) => { if (b.combo) return `<li class="pr-cb"><span>🎟️ ${esc(b.label)}</span><em>${fmt(b.stake)} × ${ox(b.odds)} = <b>${fmt(Math.round(b.stake * b.odds * 100) / 100)}</b></em><small>${b.combo.map((c) => { const mm = byId(c.m); const st = mm && mm.state === 'post' && mm.done && mm.score ? (result(mm, c.k) ? 'w' : 'l') : null; return legLine(c, st); }).join('')}</small></li>`; const m = byId(b.m); return `<li><span>${esc(b.label)}</span><em>${fmt(b.stake)} × ${ox(b.odds)} = <b>${fmt(Math.round(b.stake * b.odds * 100) / 100)}</b></em><small>${m?.state === 'in' ? `🔴 ${m.score?.join(' - ')} · ${esc(m.clock)}` : `${dayLabel(b.start)} ${hm(b.start)}`}</small></li>`; }).join('')}</ul>` : ''}
+      ${doneB.length ? `<details><summary>Paris terminés (${doneB.length})</summary><ul>${doneB.map((b) => `<li class="${b.st}${b.combo ? ' pr-cb' : ''}"><span>${b.combo ? '🎟️ ' : ''}${esc(b.label)}</span><em>${b.st === 'won' ? `✅ +${fmt(b.paid)}` : b.st === 'lost' ? `❌ −${fmt(b.stake)}` : '↩️ remboursé'}</em>${b.res ? `<small>score ${b.res.join(' - ')}</small>` : ''}${b.combo ? `<small>${b.combo.map((c, i) => legLine(c, b.legs?.[i])).join('')}</small>` : ''}</li>`).join('')}</ul></details>` : ''}
     </section>` : ''}
+    <div class="pr-mode"><button class="${mode === 'simple' ? 'on' : ''}" data-mode="simple">Pari simple</button><button class="${mode === 'combo' ? 'on' : ''}" data-mode="combo">🎟️ Combiné</button></div>
+    ${mode === 'combo' ? `<p class="muted small pr-modehelp">Touche une cote dans plusieurs matchs (${COMBO_MAX} au plus, un choix par match) : les cotes se multiplient. Il faut tout gagner.</p>` : ''}
     <div class="chips pr-chips"><a class="chip${league === 'all' ? ' on' : ''}" href="#" data-league="all">Tous</a>${leagues.map((l) => `<a class="chip${league === l ? ' on' : ''}" href="#" data-league="${esc(l)}">${esc(l)}</a>`).join('')}</div>
     ${!data ? '<p class="panel muted">Chargement des matchs…</p>' : !shown.length ? '<p class="panel muted">Pas de match dans les prochains jours pour ce championnat.</p>'
       : order.map((k) => `<section><div class="sec-head"><h2>${k}</h2><small>${groups[k].length} match${groups[k].length > 1 ? 's' : ''}</small></div><div class="pr-grid">${groups[k].map(matchHTML).join('')}</div></section>`).join('')}
+    ${mode === 'combo' && slip.length ? (() => { const legs = slipLegs(); return `<div class="pr-slipbar"><div><b>🎟️ ${legs.length} match${legs.length > 1 ? 's' : ''}</b><span>cote ${ox(slipOdds(legs))}</span></div><button class="btn ghost sm" data-slip-clear>Vider</button><button class="btn primary" data-slip-go ${legs.length >= 2 ? '' : 'disabled'}>${legs.length >= 2 ? 'Valider le combiné' : 'Encore 1 match'}</button></div>`; })() : ''}
     <p class="muted small pr-note">Cotes calculées par SpinBet avant chaque match (retour ≈ 95 %). Les paris ferment au coup d’envoi. Scores mis à jour toutes les 30 minutes. Jeu en argent fictif : aucun gain réel.</p>`;
 }
 function renderParis(r) {
@@ -20089,7 +20176,11 @@ function renderParis(r) {
 document.addEventListener('click', (e) => {
   if (!here()) return;
   const b = e.target.closest('[data-bet]');
-  if (b) { const m = byId(b.dataset.bet); if (m) placeBet(m, b.dataset.k); return; }
+  if (b) { const m = byId(b.dataset.bet); if (m) (mode === 'combo' ? toggleSlip : placeBet)(m, b.dataset.k); return; }
+  const md = e.target.closest('[data-mode]');
+  if (md) { mode = md.dataset.mode; paintPage(); return; }
+  if (e.target.closest('[data-slip-go]')) return placeCombo();
+  if (e.target.closest('[data-slip-clear]')) { slip = []; paintPage(); return; }
   const s = e.target.closest('[data-scores]');
   if (s) { const id = s.dataset.scores; showScores.has(id) ? showScores.delete(id) : showScores.add(id); paintPage(); return; }
   const l = e.target.closest('[data-league]');

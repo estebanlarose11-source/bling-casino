@@ -410,6 +410,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   scores public d'ESPN, calcule les cotes une fois avant le match (Poisson, retour ≈ 95 %) et range
   `paris/matchs.json` sur la branche **`data`** (pas déployée par Vercel : `git.deploymentEnabled`), lue par le site
   sur raw.githubusercontent.com. Paris dans `profile.paris`, payés à la visite suivante ; match reporté = remboursé.
+  **Combinés** (voulu par le propriétaire) : bouton « 🎟️ Combiné » en haut de la page, chaque cote touchée va dans le panier
+  (`slip`, un choix par match, 2 à `COMBO_MAX` = 8 matchs, barre collée en bas avec la cote totale) ; cotes multipliées
+  (plafond `COMBO_ODDS` ×1 000), un match perdu = combiné perdu (réglé dès qu'on le sait), match reporté = cote 1. Pari
+  rangé avec `combo: [{ m, k, odds, start, label }]` et `legs` (état de chaque match) une fois réglé.
 
 - **Battle Royale** (`battle.js`, page `#battle`) : toutes les heures de 12 h à 23 h (Paris), une machine (tirée de
   l'heure). Entrée 500 KE (inscriptions 1 h avant et pendant la manche 1), 3 manches de 15 min, 10 tours comptés par
