@@ -5840,6 +5840,7 @@ body.fs-on .live-tick { display: none; }
 .jc-all-r.r-S { color: #fff7d6; background: linear-gradient(90deg, #b45309, #f59e0b) !important; }
 .jc-ends { font-style: normal; font-size: 13px; font-weight: 800; color: #f9a8d4; } .jc-ends b { font-size: inherit; color: #fff; text-shadow: none; }
 .jc-ends.over { color: var(--muted); }
+.jc-asks li { flex-wrap: wrap; gap: 6px 10px; } .jc-ask-st { font-size: 12px; font-weight: 700; color: var(--muted); } .jc-ask-st.ok { color: #86efac; } .jc-ask-st.no { color: #fca5a5; }
 @media (prefers-reduced-motion: reduce) { .jc-card.r-S, .jc-card.s-p.r-R .jc-in::before, .jc-card.r-S .jc-in::before { animation: none !important; } }
 .jc-all-p.p-v, .jc-all-r.r-E { color: #e9d5ff; box-shadow: inset 0 0 0 1px #a855f7 !important; }
 .jc-all-r.r-R { color: #bae6fd; box-shadow: inset 0 0 0 1px #38bdf8 !important; }
@@ -8365,6 +8366,34 @@ const cloud = {
   jccBuy(id, uid, name) { return this.jccMove(id, 'open', { st: 'sold', b: uid, bn: name, sa: firebase.firestore.FieldValue.serverTimestamp() }); },
   jccCancel(id) { return this.jccMove(id, 'open', { st: 'off' }); },
   jccPaid(id) { return this.jccMove(id, 'sold', { st: 'paid' }); },
+  /* asks/{id} = { r, rn, c, p, ok, st, at, s, sn, sa }: a player asks for a card he misses (Marché, « Demandes »).
+     st: 'open' → 'sold' (a player with a double sold it, only when ok = enough balance) → 'paid' (the asker's browser paid)
+     → deleted by the seller's browser once it has paid itself; or 'sold' → 'back' (asker short of KE) → 'open' (the seller
+     took his card back). The asker deletes his request when he wants. */
+  async jccAsk(o) { const ref = await (await init()).db.collection('asks').add({ ...o, st: 'open', at: firebase.firestore.FieldValue.serverTimestamp() }); return ref.id; },
+  async jccAsks() {
+    const q = await (await init()).db.collection('asks').where('st', '==', 'open').limit(400).get();
+    return q.docs.map((d) => ({ id: d.id, ...d.data(), at: d.data().at?.toMillis?.() || 0 }));
+  },
+  async jccAsksOf(field, uid, cb) {
+    return (await init()).db.collection('asks').where(field, '==', uid).limit(60)
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) }))), (e) => console.error(e));
+  },
+  async jccAskMove(id, from, patch, extra) {
+    const { db } = await init(), ref = db.collection('asks').doc(id);
+    return db.runTransaction(async (tx) => {
+      const d = await tx.get(ref);
+      if (!d.exists || d.data().st !== from || (extra && !extra(d.data()))) return false;
+      if (patch === null) tx.delete(ref); else tx.update(ref, patch);
+      return true;
+    });
+  },
+  jccAskOk(id, ok) { return this.jccAskMove(id, 'open', { ok }); },
+  jccAskFill(id, uid, name) { return this.jccAskMove(id, 'open', { st: 'sold', s: uid, sn: name, sa: firebase.firestore.FieldValue.serverTimestamp() }, (x) => x.ok === true && x.r !== uid); },
+  jccAskPaid(id) { return this.jccAskMove(id, 'sold', { st: 'paid' }); },
+  jccAskBack(id) { return this.jccAskMove(id, 'sold', { st: 'back', ok: false }); },
+  jccAskReopen(id) { const D = firebase.firestore.FieldValue.delete(); return this.jccAskMove(id, 'back', { st: 'open', s: D, sn: D, sa: D }); },
+  jccAskDrop(id, from) { return this.jccAskMove(id, from, null); },
   async giftHistory(uid) {
     const db = (await init()).db;
     const [a, b] = await Promise.all([db.collection('gifts').where('from', '==', uid).limit(20).get(), db.collection('gifts').where('to', '==', uid).limit(20).get()]);
@@ -20862,15 +20891,20 @@ let offers = null, offersT = 0, offersBusy = false, offersErr = false, mine = []
 function loadOffers(force) {
   if (offersBusy || !me() || (!force && offers && Date.now() - offersT < 30000)) return Promise.resolve(offers);
   offersBusy = true;
-  return cloud.jccOffers().then((l) => { offers = l; offersErr = false; offersT = Date.now(); return l; })
+  return Promise.all([cloud.jccOffers(), cloud.jccAsks().catch((e) => { console.warn(e); return asks || []; })])
+    .then(([l, k]) => { offers = l; asks = k; offersErr = false; offersT = Date.now(); return l; })
     .catch((e) => { console.warn(e); offersErr = true; return offers; }).finally(() => { offersBusy = false; paintPage(); });
 }
 async function watchMine() {
   const m = me();
   if ((m?.uid || null) === mineFor) return;
   stopMine?.(); stopMine = null; mine = []; mineFor = m?.uid || null; offers = null;
+  stopAsks.forEach((f) => f?.()); stopAsks = []; myAsks = []; fills = []; asks = null;
   if (!m) return;
   stopMine = await cloud.jccMine(m.uid, (l) => { mine = l; collect(); paintPage(); }).catch((e) => { console.warn(e); return null; });
+  const w = (f, cb) => cloud.jccAsksOf(f, m.uid, cb).then((u) => stopAsks.push(u)).catch((e) => console.warn(e));
+  w('r', (l) => { myAsks = l; handleAsks(); paintPage(); });
+  w('s', (l) => { fills = l; handleAsks(); paintPage(); });
 }
 // my cards sold while I was away: each sale is marked « paid » once (transaction), then paid here
 const paying = new Set();
@@ -20954,6 +20988,142 @@ async function buy(oid) {
   offers = (offers || []).filter((x) => x.id !== oid);
   paintPage();
 }
+/* ---------- card requests (asks/{id}, owner's idea): a player asks for a card he misses (any series, old ones too);
+   whoever has it in double sells it in one touch, the asker's browser pays itself. Without enough KE the request stays
+   up, marked « pas assez de solde » (ok = false, kept up to date by the asker's browser), and can't be filled. ---------- */
+const MAXASK = 10;
+let asks = null, myAsks = [], fills = [], stopAsks = [], okT = 0;
+const askBusy = new Set();
+const canSell = (s, id) => owned(s, id) >= 2 && (s.cards[id]?.[0] || 0) > 0;
+const myOpen = () => myAsks.filter((k) => k.st === 'open' || k.st === 'sold' || k.st === 'back');
+async function handleAsks() {
+  const s = st();
+  for (const k of myAsks) {
+    if (askBusy.has(k.id)) continue;
+    // a player sold me the card: I pay (or give it back if my balance is too low now)
+    if (k.st === 'sold') {
+      askBusy.add(k.id);
+      try {
+        if (wallet.spend(k.p)) {
+          const ok = await cloud.jccAskPaid(k.id).catch((e) => { console.warn(e); return false; });
+          if (!ok) wallet.grant(k.p);
+          else {
+            save((x) => { const c = [...(x.cards[k.c] || [0, 0])]; c[0]++; x.cards[k.c] = c; });
+            sfx.win?.(); toast(`🃏 ${esc(k.sn || 'Un joueur')} t’a vendu ${esc(CARD[k.c]?.name || 'ta carte')} : −${fmt(k.p)}, elle est dans ton album !`, 'ok');
+            setTimeout(checkAlbum, 500);
+          }
+        } else {
+          await cloud.jccAskBack(k.id);
+          toast(`⚠️ ${esc(k.sn || 'Un joueur')} voulait te vendre ${esc(CARD[k.c]?.name || 'une carte')}, mais ton solde est trop bas (${fmt(k.p)})`, 'warn');
+        }
+      } catch (e) { console.warn(e); }
+      askBusy.delete(k.id);
+    } else if (k.st === 'open' && owned(s, k.c) > 0) {
+      // found elsewhere (pack, Marché): the request is not needed any more
+      askBusy.add(k.id);
+      await cloud.jccAskDrop(k.id, 'open').catch((e) => console.warn(e));
+      askBusy.delete(k.id);
+    }
+  }
+  for (const k of fills) {
+    if (askBusy.has(k.id)) continue;
+    if (k.st === 'paid') {
+      askBusy.add(k.id);
+      const ok = await cloud.jccAskDrop(k.id, 'paid').catch((e) => { console.warn(e); return false; });
+      if (ok) { wallet.grant(k.p); sfx.coin?.(); toast(`💰 ${esc(k.rn || 'Un joueur')} a payé ${esc(CARD[k.c]?.name || 'ta carte')} : +${fmt(k.p)}`, 'ok'); }
+      askBusy.delete(k.id);
+    } else if (k.st === 'back') {
+      askBusy.add(k.id);
+      const ok = await cloud.jccAskReopen(k.id).catch((e) => { console.warn(e); return false; });
+      if (ok) {
+        save((x) => { const c = [...(x.cards[k.c] || [0, 0])]; c[0]++; x.cards[k.c] = c; });
+        toast(`↩️ ${esc(k.rn || 'Le joueur')} n’avait plus assez de solde : ${esc(CARD[k.c]?.name || 'ta carte')} est revenue dans ton album`, 'info');
+      }
+      askBusy.delete(k.id);
+    }
+  }
+  syncOk();
+}
+// « assez de solde ? » on my open requests: written only when it changes (Firebase write budget)
+function syncOk() {
+  if (okT) return;
+  okT = setTimeout(() => {
+    okT = 0;
+    for (const k of myAsks) {
+      if (k.st !== 'open' || askBusy.has(k.id)) continue;
+      const want = wallet.canAfford(k.p);
+      if (k.ok !== want) { k.ok = want; cloud.jccAskOk(k.id, want).catch((e) => console.warn(e)); }
+    }
+  }, 4000);
+}
+wallet.addEventListener('change', () => { if (myAsks.some((k) => k.st === 'open')) syncOk(); });
+async function askCard(id) {
+  const m = me(), c = CARD[id];
+  if (!m) return askAccount();
+  if (owned(st(), id)) return toast('Tu as déjà cette carte', 'info');
+  if (myOpen().some((k) => k.c === id)) return toast('Tu as déjà demandé cette carte', 'info');
+  if (myOpen().length >= MAXASK) return toast(`${MAXASK} demandes au maximum en même temps`, 'warn');
+  const p = cote(c), rich = wallet.canAfford(p);
+  const v = await modal(`<h3>📣 Demander ${esc(c.name)}</h3><div class="jc-sell">${cardHTML(c, { cls: 'sm' })}<div>
+      <p>Ta demande apparaît dans le Marché. Un joueur qui l’a en double peut te la vendre d’un seul geste : <b>${fmt(p)}</b> sont pris sur ton solde et la carte arrive dans ton album.</p>
+      ${rich ? '' : `<p class="jc-miss">⚠️ Ton solde est trop bas pour le moment : ta demande sera marquée « pas assez de solde » jusqu’à ce que tu aies ${fmt(p)}.</p>`}
+      <p class="muted small">Tu peux retirer ta demande quand tu veux. ${MAXASK} demandes au maximum.</p></div></div>
+    <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Demander</button></div>`, { cls: 'jc-modal' });
+  if (v !== 'ok') return;
+  try {
+    await cloud.jccAsk({ r: m.uid, rn: m.name, c: id, p, ok: wallet.canAfford(p) });
+    toast(`📣 Demande envoyée : ${esc(c.name)} à ${fmt(p)}`, 'ok');
+    loadOffers(true);
+  } catch (e) { console.warn(e); toast('La demande n’a pas marché, réessaie', 'warn'); }
+}
+async function cancelAsk(aid) {
+  const ok = await cloud.jccAskDrop(aid, 'open').catch((e) => { console.warn(e); return false; });
+  toast(ok ? 'Demande retirée' : 'Impossible pour le moment : un joueur est peut-être en train de te la vendre', ok ? 'ok' : 'info');
+  asks = (asks || []).filter((x) => x.id !== aid);
+  paintPage();
+}
+let filling = false;
+async function fillAsk(aid) {
+  const m = me();
+  if (!m) return askAccount();
+  const k = (asks || []).find((x) => x.id === aid), c = k && CARD[k.c];
+  if (!k || !c || filling || k.r === m.uid) return;
+  if (!canSell(st(), k.c)) return toast('Tu dois avoir cette carte en double (pas brillante) pour la vendre', 'warn');
+  if (!k.ok) return toast(`${esc(k.rn)} n’a pas assez de solde pour le moment`, 'info');
+  const v = await modal(`<h3>Vendre ${esc(c.name)} à ${esc(k.rn)} ?</h3><div class="jc-sell">${cardHTML(c, { cls: 'sm' })}<div>
+      <p><b>${esc(k.rn)}</b> demande cette carte.</p><p class="jc-price">+${fmt(k.p)}</p>
+      <p class="muted small">Ton double part tout de suite. Tu reçois ${fmt(k.p)} dès que son jeu a payé (tout de suite s’il est en ligne, sinon à sa prochaine visite). S’il n’a plus assez de solde, la carte te revient.</p></div></div>
+    <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Vendre</button></div>`, { cls: 'jc-modal' });
+  if (v !== 'ok' || !canSell(st(), k.c)) return;
+  filling = true;
+  save((x) => { const z = [...x.cards[k.c]]; z[0]--; x.cards[k.c] = z; });
+  try {
+    const ok = await cloud.jccAskFill(aid, m.uid, m.name);
+    if (!ok) throw Object.assign(new Error('late'), { late: 1 });
+    sfx.coin?.(); toast(`🤝 ${esc(c.name)} vendue à ${esc(k.rn)} : +${fmt(k.p)} dès qu’il a payé`, 'ok');
+  } catch (e) {
+    if (!e.late) console.warn(e);
+    save((x) => { const z = [...(x.cards[k.c] || [0, 0])]; z[0]++; x.cards[k.c] = z; });
+    toast(e.late ? 'Trop tard : quelqu’un d’autre lui a vendu la carte, ou la demande a changé' : 'La vente n’a pas marché, ta carte est restée dans ton album', 'info');
+  }
+  filling = false;
+  asks = (asks || []).filter((x) => x.id !== aid);
+  paintPage();
+}
+function asksHTML(s, m) {
+  const L = (asks || []).filter((k) => CARD[k.c] && k.r !== m.uid && k.p === cote(CARD[k.c]));
+  const mineL = myOpen().filter((k) => CARD[k.c]);
+  const sellable = L.filter((k) => canSell(s, k.c)).sort((a, b) => b.ok - a.ok || b.p - a.p);
+  const stat = (k) => k.st === 'open' ? (k.ok ? '<span class="jc-ask-st ok">En attente d’un vendeur</span>' : `<span class="jc-ask-st no">⚠️ Pas assez de solde (il te faut ${fmt(k.p)})</span>`) : '<span class="jc-ask-st">Vente en cours…</span>';
+  return `<section class="panel"><div class="sec-head"><h2>📣 Demandes des joueurs</h2><small>${L.length} demande${L.length > 1 ? 's' : ''}</small></div>
+    <p class="muted small">Ils cherchent ces cartes. Tu en as une en double ? Vends-la d’un seul geste : l’argent est pris sur leur solde.</p>
+    ${sellable.length ? `<div class="jc-grid">${sellable.map((k) => `<div class="jc-offer">${cardHTML(CARD[k.c], { badge: '<span class="jc-tag new">TU L’AS EN DOUBLE</span>' })}
+      <div class="jc-offer-b"><span class="pname">${esc(k.rn)}</span><b>+${fmt(k.p)}</b>${k.ok ? `<button class="btn primary sm" data-jc-fill="${k.id}">Vendre</button>` : '<button class="btn ghost sm" disabled title="Ce joueur n’a pas assez de solde pour le moment">Pas assez de solde</button>'}</div></div>`).join('')}</div>`
+      : `<p class="muted">${L.length ? 'Personne ne demande une carte que tu as en double pour le moment.' : 'Aucune demande pour le moment.'}</p>`}
+    <h3 class="jc-h3">Mes demandes <small class="muted">${mineL.length} / ${MAXASK}</small></h3>
+    ${mineL.length ? `<ul class="jc-hist jc-asks">${mineL.map((k) => `<li><span>${esc(CARD[k.c].name)} <small class="muted">${esc(serie(CARD[k.c].sid).name)}</small></span>${stat(k)}<b>${fmt(k.p)}</b>${k.st === 'open' ? `<button class="btn ghost sm" data-jc-unask="${k.id}">Retirer</button>` : ''}</li>`).join('')}</ul>`
+      : '<p class="muted small">Il te manque une carte, même d’une ancienne série ? Touche-la dans ton album → « 📣 Demander cette carte ».</p>'}</section>`;
+}
 const askAccount = () => toast('Le Marché est réservé aux comptes : crée ton compte gratuit (tes cartes sont gardées) <button class="btn sm" data-signup>Créer</button>', 'warn');
 
 /* ---------- the page ---------- */
@@ -21001,11 +21171,12 @@ function albumHTML(s, S) {
 function marketHTML(s, m) {
   if (!m) return `<section class="panel jc-empty"><h2>🏪 Le Marché</h2><p>Achète les cartes qui te manquent à d’autres joueurs, et vends tes doubles.</p><p>Le Marché est réservé aux comptes (gratuit). Ton album et tes paquets sont gardés.</p><button class="btn primary" data-signup>Créer mon compte</button></section>`;
   if (!offers) return `<section class="panel"><h2>🏪 Le Marché</h2><p class="muted">${offersErr ? 'Le Marché est indisponible pour le moment.' : 'Chargement des offres…'}</p></section>`;
+  const top = asksHTML(s, m);
   let L = offers.filter((o) => CARD[o.c] && o.p === cote(CARD[o.c], o.h)); // only offers at the card's value
   const miss = (o) => !owned(s, o.c);
   if (missOnly) L = L.filter(miss);
   L.sort((a, b) => miss(b) - miss(a) || RANK.indexOf(CARD[b.c].r) - RANK.indexOf(CARD[a.c].r) || a.p - b.p);
-  return `<section class="panel"><div class="sec-head"><h2>🏪 Le Marché</h2><small>${offers.length} carte${offers.length > 1 ? 's' : ''} en vente</small></div>
+  return `${top}<section class="panel"><div class="sec-head"><h2>🏪 Le Marché</h2><small>${offers.length} carte${offers.length > 1 ? 's' : ''} en vente</small></div>
     <p class="jc-pick"><button class="chip${missOnly ? ' on' : ''}" data-jc-miss="1">⭐ Celles qui me manquent</button><button class="chip${missOnly ? '' : ' on'}" data-jc-miss="0">Toutes</button><button class="chip" data-jc-reload>↻ Actualiser</button></p>
     ${L.length ? `<div class="jc-grid">${L.map((o) => `<div class="jc-offer">${cardHTML(CARD[o.c], { holo: o.h, badge: miss(o) ? '<span class="jc-tag new">IL TE MANQUE</span>' : '' })}
       <div class="jc-offer-b"><span class="pname">${esc(o.sn)}</span><b>${fmt(o.p)}</b>${o.s === m.uid ? `<button class="btn ghost sm" data-jc-cancel="${o.id}">Retirer</button>` : `<button class="btn primary sm" data-jc-buy="${o.id}">Acheter</button>`}</div></div>`).join('')}</div>`
@@ -21039,6 +21210,7 @@ function rulesHTML() {
       <li>✨ <b>Cartes brillantes</b> : ${pc(HOLO)} des cartes sortent en version brillante, qui vaut 3 fois sa cote.</li>
       <li>🏪 <b>Doubles</b> : vends-les aux autres joueurs dans le Marché, à la valeur de la carte, ou recycle-les dans la Forge.</li>
       <li>🛒 <b>Acheter un paquet</b> : ${SHOP_DAY} paquets par jour au maximum, au choix (bleu ${fmt(SHOP.b)}, violet ${fmt(SHOP.v)}, doré ${fmt(SHOP.o)}). Pour le reste, il faut jouer !</li>
+      <li>📣 <b>Demandes</b> : il te manque une carte, même d’une ancienne série ? Touche-la dans l’album → « Demander ». Un joueur qui l’a en double te la vend d’un geste et le prix est pris sur ton solde. Sans assez de solde, ta demande reste marquée « pas assez de solde » jusqu’à ce que tu l’aies.</li>
       <li>🔒 <b>Pas de boutique de cartes</b> : une carte s’obtient seulement dans les paquets, ou en l’achetant à un autre joueur (à sa valeur).</li>
       <li>🏆 <b>Album complet</b> : les ${NOW.list.length} cartes de la série <b>${esc(NOW.name)}</b> = <b>${fmt(albumOf(NOW))}</b>${NOW.ends ? `, à finir avant le ${new Date(endsAt(NOW)).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' })} (encore ${leftText(NOW)})` : ''}. Puis une nouvelle série sort et les paquets s’ouvrent dedans.</li>
       <li>🤫 <b>Cartes secrètes</b> : les plus dures à trouver (${fmt(rarOf('S', NOW).cote)} chacune). Les paquets dorés en donnent un peu plus souvent… mais il faudra de la chance, ou le Marché.</li>
@@ -21054,16 +21226,20 @@ function rulesHTML() {
 function showCard(id) {
   const c = CARD[id], s = st(), x = s.cards[id] || [0, 0], n = x[0] + x[1], m = me();
   const forSale = (offers || []).filter((o) => o.c === id && o.s !== m?.uid && o.p === cote(c, o.h)).sort((a, b) => a.p - b.p);
+  const asked = myOpen().some((k) => k.c === id), wanted = (asks || []).filter((k) => k.c === id && k.r !== m?.uid && k.p === cote(c)).length;
   modal(`<div class="jc-detail">${cardHTML(c, { locked: !n, holo: x[1] > 0, cls: 'lg' })}<div>
       <h3>${n ? esc(c.name) : 'Carte à trouver'}</h3>
       <p class="muted">${rarC(c).name} · ${esc(serie(c.sid).name)} · n° ${c.num}/${c.total} · cote ${fmt(cote(c))}</p>
       <p>${n ? `Tu en as <b>${n}</b>${x[1] ? ` (dont ${x[1]} brillante${x[1] > 1 ? 's' : ''})` : ''}.` : 'Tu ne l’as pas encore.'}</p>
       ${n >= 2 ? `<div class="jc-acts">${x[0] ? '<button class="btn primary sm" data-value="sell0">🏷️ Vendre un double</button>' : ''}${x[1] ? '<button class="btn primary sm" data-value="sell1">🏷️ Vendre une brillante</button>' : ''}</div>` : n ? '<p class="muted small">Un seul exemplaire : il reste dans ton album.</p>' : ''}
+      ${!n ? (asked ? '<p class="jc-miss">📣 Tu as demandé cette carte : elle arrive dès qu’un joueur te la vend.</p>' : `<div class="jc-acts"><button class="btn primary sm" data-value="ask">📣 Demander cette carte (${fmt(cote(c))})</button></div>`) : ''}
+      ${n >= 2 && wanted ? `<p class="jc-miss">📣 ${wanted} joueur${wanted > 1 ? 's la demandent' : ' la demande'} !</p><div class="jc-acts"><button class="btn ghost sm" data-value="buy">Voir les demandes</button></div>` : ''}
       ${forSale.length ? `<p class="jc-miss">🏪 ${forSale.length} en vente au Marché, dès ${fmt(forSale[0].p)}</p><div class="jc-acts"><button class="btn ghost sm" data-value="buy">Voir au Marché</button></div>` : ''}
     </div></div>`, { cls: 'jc-modal wide' }).then((v) => {
     if (v === 'sell0') sell(id, 0);
     else if (v === 'sell1') sell(id, 1);
-    else if (v === 'buy') { tab = 'market'; missOnly = false; paintPage(); }
+    else if (v === 'ask') askCard(id);
+    else if (v === 'buy') { tab = 'market'; missOnly = false; loadOffers(); paintPage(); }
   });
 }
 document.addEventListener('click', (e) => {
@@ -21081,6 +21257,8 @@ document.addEventListener('click', (e) => {
   if (q('[data-jc-reload]')) return loadOffers(true);
   if ((b = q('[data-jc-card]'))) return showCard(b.dataset.jcCard);
   if ((b = q('[data-jc-buy]'))) return buy(b.dataset.jcBuy);
+  if ((b = q('[data-jc-fill]'))) return fillAsk(b.dataset.jcFill);
+  if ((b = q('[data-jc-unask]'))) return cancelAsk(b.dataset.jcUnask);
   if ((b = q('[data-jc-cancel]'))) return cancel(b.dataset.jcCancel);
   if (q('[data-jc-recycle]')) return recycle();
   if (q('[data-jc-forge]')) return forgePack();

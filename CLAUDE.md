@@ -434,6 +434,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Simulation (seul, avec la Forge, sans Marché) : album ≈ 790 paquets en médiane (320 à 1 650). Liste :
   `notes/jcc-trois-petits-cochons-cartes.txt`. **Prochaine série vers le 12 décembre** : l'ajouter à la fin de `SERIES`
   avec son `ends` (un mois plus tard).
+  **Demandes de cartes** (demande du propriétaire du 12 novembre 2026, `askCard` / `fillAsk` / `handleAsks`, Firestore
+  `asks/{id}`, **règles à recoller**) : dans l'album, une carte manquante (toutes séries, anciennes comprises) →
+  « 📣 Demander cette carte » (à sa cote, 10 au plus). Au Marché, « Demandes des joueurs » montre celles qu'on a en double
+  (exemplaire normal) : « Vendre » d'un geste (open → sold, seulement si `ok`). Le navigateur du demandeur paie
+  (sold → paid, carte ajoutée) ou, sans assez de solde, la rend (sold → back → open, carte rendue au vendeur) ; le vendeur
+  se paie en effaçant la demande payée. `ok` = « assez de solde », écrit par le demandeur seulement quand il change
+  (« Pas assez de solde » chez les autres, la demande reste). Une demande s'efface toute seule si on a trouvé la carte
+  ailleurs. Prix max du Marché passé à 600 000 (secrète brillante).
   Liste des cartes pour le propriétaire : `notes/jcc-les-origines-cartes.txt` (dossier `notes/` = ses notes) ; en faire
   une pareille pour chaque nouvelle série.
 

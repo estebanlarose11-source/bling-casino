@@ -561,7 +561,7 @@ service cloud.firestore {
         && isPseudo(request.resource.data.sn)
         && request.resource.data.c is string && request.resource.data.c.size() >= 2 && request.resource.data.c.size() <= 24
         && request.resource.data.h is bool
-        && request.resource.data.p is int && request.resource.data.p >= 1 && request.resource.data.p <= 500000
+        && request.resource.data.p is int && request.resource.data.p >= 1 && request.resource.data.p <= 600000
         && request.resource.data.st == 'open'
         && request.resource.data.at == request.time;
       allow update: if signedIn() && (
@@ -575,6 +575,41 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st']))
       );
       allow delete: if signedIn() && resource.data.s == request.auth.uid && resource.data.st in ['off', 'paid'];
+    }
+
+    // asks/{id} = demande d'une carte au Marché { r (demandeur), rn, c (carte), p (prix), ok (assez de solde), st, at, s, sn, sa }.
+    // Le demandeur crée la demande (st 'open') et tient « ok » à jour. Un autre compte vend sa carte en double si ok
+    // (open → sold, à son nom) ; le navigateur du demandeur paie (sold → paid) ou, sans assez de solde, la rend
+    // (sold → back) ; le vendeur reprend alors sa carte (back → open) ou, payé, efface la demande (paid).
+    match /asks/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['r', 'rn', 'c', 'p', 'ok', 'st', 'at'])
+        && request.resource.data.r == request.auth.uid
+        && isPseudo(request.resource.data.rn)
+        && request.resource.data.c is string && request.resource.data.c.size() >= 2 && request.resource.data.c.size() <= 24
+        && request.resource.data.p is int && request.resource.data.p >= 1 && request.resource.data.p <= 600000
+        && request.resource.data.ok is bool
+        && request.resource.data.st == 'open'
+        && request.resource.data.at == request.time;
+      allow update: if signedIn() && (
+        (resource.data.r == request.auth.uid && resource.data.st == 'open' && request.resource.data.st == 'open'
+          && request.resource.data.ok is bool && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ok']))
+        || (resource.data.r == request.auth.uid && resource.data.st == 'open' && request.resource.data.st == 'off'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st']))
+        || (resource.data.st == 'open' && resource.data.ok == true && request.resource.data.st == 'sold'
+          && resource.data.r != request.auth.uid && request.resource.data.s == request.auth.uid
+          && isPseudo(request.resource.data.sn) && request.resource.data.sa == request.time
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st', 's', 'sn', 'sa']))
+        || (resource.data.r == request.auth.uid && resource.data.st == 'sold' && request.resource.data.st == 'paid'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st']))
+        || (resource.data.r == request.auth.uid && resource.data.st == 'sold' && request.resource.data.st == 'back'
+          && request.resource.data.ok == false && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st', 'ok']))
+        || (resource.data.s == request.auth.uid && resource.data.st == 'back' && request.resource.data.st == 'open'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['st', 's', 'sn', 'sa']))
+      );
+      allow delete: if signedIn() && ((resource.data.r == request.auth.uid && resource.data.st in ['open', 'off'])
+        || (resource.data.s == request.auth.uid && resource.data.st == 'paid'));
     }
 
     // Tout le reste est fermé.
