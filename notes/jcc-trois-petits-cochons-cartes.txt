@@ -1,5 +1,5 @@
 SPINBET CASINO · CARTES À COLLECTIONNER (JCC)
-Série 2 « Les Trois Petits Cochons » · 88 cartes (80 normales, 5 rares, 3 secrètes)
+Série 2 « Les Trois Petits Cochons » · 88 cartes (30 communes, 30 peu communes, 20 précieuses, 5 rares, 3 secrètes)
 Sortie le 12 novembre 2026, fin le 12 décembre 2026 à minuit (heure de Paris).
 Album complet = 500 000 KE (seulement avant la fin).
 
@@ -8,136 +8,136 @@ Case de ta planche entre crochets (A1…J8 = ligne, colonne ; R1…R5 rares ; S1
 
 ========== 🐷 COCHONS ==========
 
-01 · Le Petit Peintre · Normale (500 KE)  [A2]
+01 · Le Petit Peintre · Commune (500 KE)  [A2]
       Il montre son pinceau à son frère, tout fier.
 
-02 · Tope là ! · Normale (500 KE)  [A3]
+02 · Tope là ! · Commune (500 KE)  [A3]
       Deux frères, une idée : construire la maison.
 
-03 · Les Bavards · Normale (500 KE)  [A4]
+03 · Les Bavards · Commune (500 KE)  [A4]
       Ils parlent de briques depuis ce matin.
 
-04 · La Pomme de la Discorde · Normale (500 KE)  [A7]
+04 · La Pomme de la Discorde · Peu commune (2 000 KE)  [A7]
       Une pomme pour deux ? Il y a un problème.
 
-05 · Retour du Potager · Normale (500 KE)  [A8]
+05 · Retour du Potager · Commune (500 KE)  [A8]
       Des carottes plein les bras pour la soupe.
 
-06 · Le Cadeau · Normale (500 KE)  [B1]
+06 · Le Cadeau · Commune (500 KE)  [B1]
       Un bouquet cueilli juste pour toi.
 
-07 · La Petite Cuisinière · Normale (500 KE)  [B2]
+07 · La Petite Cuisinière · Commune (500 KE)  [B2]
       Son tablier est toujours impeccable.
 
-08 · Le Maçon · Normale (500 KE)  [B8]
+08 · Le Maçon · Peu commune (2 000 KE)  [B8]
       Une brique, du mortier, une autre brique.
 
-09 · Frère et Sœur · Normale (500 KE)  [C2]
+09 · Frère et Sœur · Commune (500 KE)  [C2]
       Toujours ensemble, même face au loup.
 
-10 · Le Barbouilleur · Normale (500 KE)  [D8]
+10 · Le Barbouilleur · Commune (500 KE)  [D8]
       Il repeint la maison… et ses sabots.
 
-11 · L’Artiste · Normale (500 KE)  [E1]
+11 · L’Artiste · Peu commune (2 000 KE)  [E1]
       Il peint la maison de ses rêves.
 
-12 · La Danse des Planches · Normale (500 KE)  [E2]
+12 · La Danse des Planches · Peu commune (2 000 KE)  [E2]
       Elle danse sur le chantier, il soupire.
 
-13 · Le Siffleur · Normale (500 KE)  [E5]
+13 · Le Siffleur · Commune (500 KE)  [E5]
       Il siffle en travaillant, comme toujours.
 
-14 · Le Frileux · Normale (500 KE)  [E6]
+14 · Le Frileux · Commune (500 KE)  [E6]
       Une écharpe, un seau, et en route !
 
-15 · L’Écharpe Rouge · Normale (500 KE)  [E7]
+15 · L’Écharpe Rouge · Commune (500 KE)  [E7]
       Il ne la quitte jamais, même en été.
 
-16 · La Joie du Matin · Normale (500 KE)  [E8]
+16 · La Joie du Matin · Commune (500 KE)  [E8]
       Le loup n’est pas là : on danse !
 
-17 · Le Paysagiste · Normale (500 KE)  [F1]
+17 · Le Paysagiste · Commune (500 KE)  [F1]
       Il peint la prairie depuis son tabouret.
 
-18 · Le Guitariste · Normale (500 KE)  [F2]
+18 · Le Guitariste · Peu commune (2 000 KE)  [F2]
       Trois accords et toute la ferme chante.
 
-19 · Le Bricoleur · Normale (500 KE)  [F3]
+19 · Le Bricoleur · Commune (500 KE)  [F3]
       Une pince à la main, il répare tout.
 
-20 · La Cueilleuse · Normale (500 KE)  [F4]
+20 · La Cueilleuse · Peu commune (2 000 KE)  [F4]
       La plus belle pomme du verger est à elle.
 
-21 · La Pomme d’Or · Normale (500 KE)  [F5]
+21 · La Pomme d’Or · Précieuse (8 000 KE)  [F5]
       Il l’a trouvée sous le vieux pommier.
 
-22 · La Danseuse · Normale (500 KE)  [F6]
+22 · La Danseuse · Peu commune (2 000 KE)  [F6]
       Elle tourne, tourne et tourne encore.
 
-23 · Le Violoneux · Normale (500 KE)  [F7]
+23 · Le Violoneux · Peu commune (2 000 KE)  [F7]
       Sa musique fait fuir le loup (presque).
 
-24 · Le Scieur · Normale (500 KE)  [F8]
+24 · Le Scieur · Commune (500 KE)  [F8]
       Du bois pour le feu de ce soir.
 
-25 · Le Portraitiste · Normale (500 KE)  [G1]
+25 · Le Portraitiste · Commune (500 KE)  [G1]
       Il a peint ses deux frères. Ils râlent.
 
-26 · Le Premier Violon · Normale (500 KE)  [G2]
+26 · Le Premier Violon · Peu commune (2 000 KE)  [G2]
       Il joue la mélodie des trois maisons.
 
-27 · Le Musicien · Normale (500 KE)  [G3]
+27 · Le Musicien · Commune (500 KE)  [G3]
       Il accorde son violon depuis une heure.
 
-28 · La Sérénade · Normale (500 KE)  [G4]
+28 · La Sérénade · Peu commune (2 000 KE)  [G4]
       Une chanson pour la voisine d’à côté.
 
-29 · Le Charpentier · Normale (500 KE)  [G5]
+29 · Le Charpentier · Commune (500 KE)  [G5]
       Son rabot ne s’arrête jamais.
 
-30 · L’Heure du Thé · Normale (500 KE)  [G7]
+30 · L’Heure du Thé · Peu commune (2 000 KE)  [G7]
       Une pause bien méritée entre deux murs.
 
-31 · Les Bâtisseurs · Normale (500 KE)  [G8]
+31 · Les Bâtisseurs · Précieuse (8 000 KE)  [G8]
       À deux, le mur monte deux fois plus vite.
 
-32 · Le Grand Frère · Normale (500 KE)  [H2]
+32 · Le Grand Frère · Commune (500 KE)  [H2]
       C’est lui qui a eu l’idée des briques.
 
-33 · Bretelles Jaunes · Normale (500 KE)  [H4]
+33 · Bretelles Jaunes · Commune (500 KE)  [H4]
       Il attend le loup de pied ferme.
 
-34 · La Couturière · Normale (500 KE)  [H5]
+34 · La Couturière · Peu commune (2 000 KE)  [H5]
       Elle recoud les salopettes de toute la famille.
 
-35 · La Veillée · Normale (500 KE)  [H8]
+35 · La Veillée · Précieuse (8 000 KE)  [H8]
       Trois frères, une forêt, et des bruits bizarres.
 
-36 · La Cuisinière · Normale (500 KE)  [I1]
+36 · La Cuisinière · Commune (500 KE)  [I1]
       Elle prépare la tarte aux pommes.
 
-37 · Le Flûtiste · Normale (500 KE)  [I2]
+37 · Le Flûtiste · Commune (500 KE)  [I2]
       Il joue en marchant, sans jamais trébucher.
 
-38 · Le Troubadour · Normale (500 KE)  [I3]
+38 · Le Troubadour · Peu commune (2 000 KE)  [I3]
       Il chante l’histoire des trois maisons.
 
-39 · Le Ramoneur · Normale (500 KE)  [I5]
+39 · Le Ramoneur · Peu commune (2 000 KE)  [I5]
       Une cheminée propre, un loup bien reçu.
 
-40 · Le Gardien du Feu · Normale (500 KE)  [I7]
+40 · Le Gardien du Feu · Précieuse (8 000 KE)  [I7]
       Le feu doit brûler toute la nuit.
 
-41 · Les Retrouvailles · Normale (500 KE)  [J1]
+41 · Les Retrouvailles · Précieuse (8 000 KE)  [J1]
       Tout le monde est sain et sauf !
 
-42 · Coup de Foudre · Normale (500 KE)  [J2]
+42 · Coup de Foudre · Précieuse (8 000 KE)  [J2]
       Il a tapé sur son sabot… et il est amoureux.
 
-43 · Le Petit Lumineux · Normale (500 KE)  [J4]
+43 · Le Petit Lumineux · Précieuse (8 000 KE)  [J4]
       Une lueur magique au creux des sabots.
 
-44 · La Fête des Cochons · Normale (500 KE)  [J7]
+44 · La Fête des Cochons · Précieuse (8 000 KE)  [J7]
       Le loup est parti : ce soir, on fait la fête !
 
 81 · La Pomme Enchantée · Rare (50 000 KE)  [R3]
@@ -152,37 +152,37 @@ Case de ta planche entre crochets (A1…J8 = ligne, colonne ; R1…R5 rares ; S1
 
 ========== 🐺 LOUP ==========
 
-45 · Le Démolisseur · Normale (500 KE)  [B3]
+45 · Le Démolisseur · Précieuse (8 000 KE)  [B3]
       Il souffle, il souffle… et ça s’écroule.
 
-46 · Le Faux Ami · Normale (500 KE)  [C1]
+46 · Le Faux Ami · Peu commune (2 000 KE)  [C1]
       Un grand sourire, des dents encore plus grandes.
 
-47 · Le Loup Furieux · Normale (500 KE)  [C3]
+47 · Le Loup Furieux · Peu commune (2 000 KE)  [C3]
       La maison de briques ne veut pas tomber.
 
-48 · Toc Toc Toc · Normale (500 KE)  [D1]
+48 · Toc Toc Toc · Peu commune (2 000 KE)  [D1]
       « Petit cochon, laisse-moi entrer ! »
 
-49 · La Poursuite · Normale (500 KE)  [D2]
+49 · La Poursuite · Peu commune (2 000 KE)  [D2]
       Cours, petit cochon, cours !
 
-50 · Le Rôdeur · Normale (500 KE)  [H1]
+50 · Le Rôdeur · Précieuse (8 000 KE)  [H1]
       Il essaie toutes les portes de la ferme.
 
-51 · Les Yeux dans le Noir · Normale (500 KE)  [H7]
+51 · Les Yeux dans le Noir · Précieuse (8 000 KE)  [H7]
       Derrière l’arbre, deux yeux jaunes.
 
-52 · Le Loup Musicien · Normale (500 KE)  [I4]
+52 · Le Loup Musicien · Peu commune (2 000 KE)  [I4]
       Il voulait jouer avec eux. Personne n’y croit.
 
-53 · Le Ricaneur · Normale (500 KE)  [I6]
+53 · Le Ricaneur · Peu commune (2 000 KE)  [I6]
       Il rit déjà du festin de ce soir.
 
-54 · Le Loup Gourmand · Normale (500 KE)  [J5]
+54 · Le Loup Gourmand · Précieuse (8 000 KE)  [J5]
       Il a volé la pomme d’or au coucher du soleil.
 
-55 · La Nuit du Loup · Normale (500 KE)  [J6]
+55 · La Nuit du Loup · Précieuse (8 000 KE)  [J6]
       La pleine lune, et des pas dans la forêt.
 
 83 · Le Grand Méchant Loup · Rare (50 000 KE)  [R1]
@@ -197,79 +197,79 @@ Case de ta planche entre crochets (A1…J8 = ligne, colonne ; R1…R5 rares ; S1
 
 ========== 🧱 MAISONS ==========
 
-56 · La Maison de Briques · Normale (500 KE)  [A1]
+56 · La Maison de Briques · Peu commune (2 000 KE)  [A1]
       La seule qui a tenu bon.
 
-57 · La Maison de Paille · Normale (500 KE)  [A5]
+57 · La Maison de Paille · Peu commune (2 000 KE)  [A5]
       Construite en une heure, envolée en une seconde.
 
-58 · Le Tas de Bâtons · Normale (500 KE)  [A6]
+58 · Le Tas de Bâtons · Peu commune (2 000 KE)  [A6]
       C’était une maison, avant le loup.
 
-59 · La Maison Branlante · Normale (500 KE)  [B4]
+59 · La Maison Branlante · Peu commune (2 000 KE)  [B4]
       Un souffle de plus et tout tombe.
 
-60 · La Cabane de Bois · Normale (500 KE)  [B5]
+60 · La Cabane de Bois · Peu commune (2 000 KE)  [B5]
       Montée vite, trop vite.
 
-61 · Le Chalet · Normale (500 KE)  [B6]
+61 · Le Chalet · Peu commune (2 000 KE)  [B6]
       Joli, mais le loup souffle fort.
 
-62 · Le Mur de Briques · Normale (500 KE)  [B7]
+62 · Le Mur de Briques · Peu commune (2 000 KE)  [B7]
       Brique après brique, la patience paie.
 
-63 · La Maison en Ruine · Normale (500 KE)  [C4]
+63 · La Maison en Ruine · Précieuse (8 000 KE)  [C4]
       Le loup est passé par là.
 
-64 · Le Toit Troué · Normale (500 KE)  [C5]
+64 · Le Toit Troué · Peu commune (2 000 KE)  [C5]
       Il pleut dans le salon.
 
-65 · Le Marteau · Normale (500 KE)  [C6]
+65 · Le Marteau · Commune (500 KE)  [C6]
       L’outil préféré du grand frère.
 
-66 · La Scie et les Briques · Normale (500 KE)  [C7]
+66 · La Scie et les Briques · Commune (500 KE)  [C7]
       Tout ce qu’il faut pour bien bâtir.
 
-67 · La Baratte · Normale (500 KE)  [C8]
+67 · La Baratte · Commune (500 KE)  [C8]
       Pour faire le beurre de la tartine.
 
-68 · L’Effondrement · Normale (500 KE)  [D3]
+68 · L’Effondrement · Précieuse (8 000 KE)  [D3]
       Un nuage de poussière et plus de maison.
 
-69 · La Reconstruction · Normale (500 KE)  [D4]
+69 · La Reconstruction · Peu commune (2 000 KE)  [D4]
       On recommence, en plus solide.
 
-70 · La Cheminée · Normale (500 KE)  [D5]
+70 · La Cheminée · Peu commune (2 000 KE)  [D5]
       Le loup y passera. Le chaudron l’attend.
 
-71 · La Pomme Rouge · Normale (500 KE)  [D6]
+71 · La Pomme Rouge · Commune (500 KE)  [D6]
       Croquante, sucrée, convoitée.
 
-72 · La Motte de Beurre · Normale (500 KE)  [D7]
+72 · La Motte de Beurre · Commune (500 KE)  [D7]
       Toute fraîche, sortie de la baratte.
 
-73 · La Maison en Feu · Normale (500 KE)  [E3]
+73 · La Maison en Feu · Précieuse (8 000 KE)  [E3]
       Le loup a eu une très mauvaise idée.
 
-74 · Le Siège · Normale (500 KE)  [E4]
+74 · Le Siège · Précieuse (8 000 KE)  [E4]
       Les cochons défendent la maison de pierre.
 
-75 · La Vieille Baratte · Normale (500 KE)  [G6]
+75 · La Vieille Baratte · Commune (500 KE)  [G6]
       Elle était déjà là du temps de grand-mère.
 
-76 · Le Goûter · Normale (500 KE)  [H3]
+76 · Le Goûter · Commune (500 KE)  [H3]
       Une pomme et du beurre : le festin.
 
-77 · La Grande Scie · Normale (500 KE)  [H6]
+77 · La Grande Scie · Commune (500 KE)  [H6]
       Elle coupe les bâtons comme du beurre.
 
-78 · Le Foyer · Normale (500 KE)  [I8]
+78 · Le Foyer · Précieuse (8 000 KE)  [I8]
       Bien au chaud derrière les briques.
 
-79 · Le Chantier · Normale (500 KE)  [J3]
+79 · Le Chantier · Précieuse (8 000 KE)  [J3]
       Ça fume, ça cogne, ça construit.
 
-80 · La Nuit au Coin du Feu · Normale (500 KE)  [J8]
+80 · La Nuit au Coin du Feu · Précieuse (8 000 KE)  [J8]
       Dehors le loup, dedans la chaleur.
 
 85 · La Forteresse de Briques · Rare (50 000 KE)  [R2]
@@ -279,5 +279,6 @@ Case de ta planche entre crochets (A1…J8 = ligne, colonne ; R1…R5 rares ; S1
       La première brique de la maison qui a tenu.
 
 
-Chances par carte : paquet bleu 99,25 % normale / 0,7 % rare / 0,05 % secrète ; violet 97,3 / 2,5 / 0,2 ; doré 89,2 / 10 / 0,8.
-Seul, sans le Marché : ≈ 790 paquets en médiane pour finir l’album (320 pour les plus chanceux, 1 650 pour les moins chanceux).
+Chances par carte : paquet bleu 89,3 % commune / 9 % peu commune / 1,2 % précieuse / 0,45 % rare / 0,05 % secrète ;
+violet 72 / 20 / 6 / 1,8 / 0,2 ; doré 45 / 35 / 12 / 7,2 / 0,8.
+Après 18 paquets : environ 40 cartes différentes. Seul, sans le Marché : ≈ 825 paquets en médiane pour finir l’album.

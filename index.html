@@ -5845,7 +5845,8 @@ body.fs-on .live-tick { display: none; }
   background: linear-gradient(160deg, color-mix(in srgb, var(--c1) 85%, #fff), var(--c1) 30%, var(--c2) 75%, #050308); box-shadow: 0 8px 20px rgba(0, 0, 0, .5), 0 0 0 1px rgba(0, 0, 0, .6), inset 0 0 0 2px color-mix(in srgb, var(--rc) 70%, transparent);
   cursor: pointer; transition: transform .2s, box-shadow .2s; user-select: none; }
 .jc-card:hover { transform: translateY(-3px); }
-.jc-card.r-R { --rc: #60a5fa; } .jc-card.r-E { --rc: #c084fc; } .jc-card.r-L { --rc: #fbbf24; }
+.jc-card.r-R { --rc: #60a5fa; } .jc-card.r-E { --rc: #c084fc; } .jc-card.r-L { --rc: #fbbf24; } .jc-card.r-U { --rc: #4ade80; } .jc-card.r-T { --rc: #2dd4bf; }
+.jc-card.r-T:not(.locked) { box-shadow: 0 8px 22px rgba(0, 0, 0, .5), 0 0 16px rgba(45, 212, 191, .5), inset 0 0 0 2px rgba(45, 212, 191, .85); }
 .jc-card.r-E { box-shadow: 0 8px 22px rgba(0, 0, 0, .5), 0 0 16px rgba(192, 132, 252, .45), inset 0 0 0 2px rgba(192, 132, 252, .8); }
 .jc-card.r-L { box-shadow: 0 8px 22px rgba(0, 0, 0, .5), 0 0 22px rgba(251, 191, 36, .6), inset 0 0 0 2px rgba(251, 191, 36, .9); }
 .jc-in { position: absolute; inset: 3.2cqw; display: flex; flex-direction: column; gap: 1.6cqw; border-radius: 4cqw; padding: 2.2cqw; overflow: hidden;
@@ -5896,7 +5897,7 @@ body.fs-on .live-tick { display: none; }
 .jc-empty { text-align: center; } .jc-empty .btn { margin-top: 6px; }
 .jc-forge-pts { list-style: none; padding: 0; margin: 12px 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
 .jc-forge-pts li { --rc: #cbd5e1; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, .04); border: 1px solid var(--line); font-size: 13px; container-type: inline-size; }
-.jc-forge-pts li.r-R { --rc: #60a5fa; } .jc-forge-pts li.r-E { --rc: #c084fc; } .jc-forge-pts li.r-L { --rc: #fbbf24; }
+.jc-forge-pts li.r-R { --rc: #60a5fa; } .jc-forge-pts li.r-U { --rc: #4ade80; } .jc-forge-pts li.r-T { --rc: #2dd4bf; } .jc-forge-pts li.r-E { --rc: #c084fc; } .jc-forge-pts li.r-L { --rc: #fbbf24; }
 .jc-forge-pts li .jc-gem { width: 12px; height: 12px; margin: 0; border-radius: 3px; box-shadow: 0 0 8px var(--rc); }
 .jc-forge-pts li b { margin-left: auto; color: var(--text); }
 .jc-hist { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
@@ -5907,7 +5908,7 @@ body.fs-on .live-tick { display: none; }
 .jc-odds { width: 100%; border-collapse: collapse; font-size: 13px; }
 .jc-odds th, .jc-odds td { padding: 8px 6px; text-align: center; border-bottom: 1px solid var(--line); }
 .jc-odds td:first-child { text-align: left; font-weight: 700; }
-.jc-odds th.r-R { color: #60a5fa; } .jc-odds th.r-E { color: #c084fc; } .jc-odds th.r-L { color: #fbbf24; }
+.jc-odds th.r-R { color: #60a5fa; } .jc-odds th.r-U { color: #4ade80; } .jc-odds th.r-T { color: #2dd4bf; } .jc-odds th.r-E { color: #c084fc; } .jc-odds th.r-L { color: #fbbf24; }
 
 /* modals */
 .jc-modal.wide { max-width: 640px; }
@@ -15683,7 +15684,7 @@ const FILES = {
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
   filon: ['filon', 'games/impl/filon.js', 'FilonGame', '45904335f9'],
   redk: ['redk', 'games/impl/redk.js', 'RedkGame', 'bd8206438f'],
-  pirates: ['pirates', 'games/impl/pirates.js', 'PiratesGame', '5776559361'],
+  pirates: ['pirates', 'games/impl/pirates.js', 'PiratesGame', '01751bea92'],
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '1025072609'],
   boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '48602d9af5'],
 };
@@ -20541,8 +20542,11 @@ const RAR = {
   E: { name: 'Épique', cote: 8000, forge: 10, pow: 700 },
   L: { name: 'Légendaire', cote: 25000, forge: 40, pow: 1000 },
   S: { name: 'Secrète', cote: 200000, forge: 60, pow: 1500 },
+  // between Commune and Rare, used by the 2nd series (owner's wish: « un niveau de rareté », more doubles)
+  U: { name: 'Peu commune', cote: 2000, forge: 2, pow: 240 },
+  T: { name: 'Précieuse', cote: 8000, forge: 6, pow: 520 },
 };
-const RANK = 'CRELS';
+const RANK = 'CUTRELS'; // from the most common to the rarest (the old series use C R E L; the 2nd one C U T R S)
 const PACKS = {
   b: { name: 'Paquet bleu', sub: 'Classique', odds: { C: 0.753, R: 0.215, E: 0.03, L: 0.002 } },
   v: { name: 'Paquet violet', sub: 'Rare', odds: { C: 0.448, R: 0.42, E: 0.12, L: 0.012 }, floor: 'R' },
@@ -20647,91 +20651,93 @@ const SERIES = [
     id: 'p', name: 'Les Trois Petits Cochons', season: 'Saison 2 · novembre – décembre 2026',
     ends: '2026-12-12T23:59:59+01:00', album: 500000,
     els: { c: { name: 'Cochons', icon: '🐷', c1: '#f9a8d4', c2: '#6b1d45' }, l: { name: 'Loup', icon: '🐺', c1: '#94a3b8', c2: '#1e2533' }, m: { name: 'Maisons', icon: '🧱', c1: '#f59e0b', c2: '#5a2a0c' } },
-    rar: { C: { name: 'Normale', cote: 500, forge: 1, pow: 120 }, R: { name: 'Rare', cote: 50000, forge: 20, pow: 800 }, S: { name: 'Secrète', cote: 200000, forge: 60, pow: 1500 } },
-    // per card; no floor (one rare is worth more than a gold pack). Average value of the 5 cards (brillantes
-    // comprised) ≈ 5 000 / 11 300 / 37 300 KE: still under the shop prices.
-    odds: { b: { C: 0.9925, R: 0.007, S: 0.0005 }, v: { C: 0.973, R: 0.025, S: 0.002 }, o: { C: 0.892, R: 0.1, S: 0.008 } },
+    rar: { C: { name: 'Commune', cote: 500, forge: 1, pow: 120 }, R: { name: 'Rare', cote: 50000, forge: 20, pow: 800 }, S: { name: 'Secrète', cote: 200000, forge: 60, pow: 1500 } },
+    // per card; no floor (one rare is worth more than a gold pack). The 80 normal cards in 3 levels (owner's wish, after
+    // 18 packs he had 60 different cards): 30 Communes, 30 Peu communes (2 000 KE), 20 Précieuses (8 000 KE). After 18
+    // packs ≈ 40 different cards; album ≈ 825 packs alone (median). Average value of the 5 cards (brillantes comprised)
+    // ≈ 5 550 / 13 500 / 37 550 KE: still under the shop prices.
+    odds: { b: { C: 0.893, U: 0.09, T: 0.012, R: 0.0045, S: 0.0005 }, v: { C: 0.72, U: 0.2, T: 0.06, R: 0.018, S: 0.002 }, o: { C: 0.45, U: 0.35, T: 0.12, R: 0.072, S: 0.008 } },
     cards: [
       ['a2', 'c', 'C', 'Le Petit Peintre', { img: 'p/a2' }, 'Il montre son pinceau à son frère, tout fier.'],
       ['a3', 'c', 'C', 'Tope là !', { img: 'p/a3' }, 'Deux frères, une idée : construire la maison.'],
       ['a4', 'c', 'C', 'Les Bavards', { img: 'p/a4' }, 'Ils parlent de briques depuis ce matin.'],
-      ['a7', 'c', 'C', 'La Pomme de la Discorde', { img: 'p/a7' }, 'Une pomme pour deux ? Il y a un problème.'],
+      ['a7', 'c', 'U', 'La Pomme de la Discorde', { img: 'p/a7' }, 'Une pomme pour deux ? Il y a un problème.'],
       ['a8', 'c', 'C', 'Retour du Potager', { img: 'p/a8' }, 'Des carottes plein les bras pour la soupe.'],
       ['b1', 'c', 'C', 'Le Cadeau', { img: 'p/b1' }, 'Un bouquet cueilli juste pour toi.'],
       ['b2', 'c', 'C', 'La Petite Cuisinière', { img: 'p/b2' }, 'Son tablier est toujours impeccable.'],
-      ['b8', 'c', 'C', 'Le Maçon', { img: 'p/b8' }, 'Une brique, du mortier, une autre brique.'],
+      ['b8', 'c', 'U', 'Le Maçon', { img: 'p/b8' }, 'Une brique, du mortier, une autre brique.'],
       ['c2', 'c', 'C', 'Frère et Sœur', { img: 'p/c2' }, 'Toujours ensemble, même face au loup.'],
       ['d8', 'c', 'C', 'Le Barbouilleur', { img: 'p/d8' }, 'Il repeint la maison… et ses sabots.'],
-      ['e1', 'c', 'C', 'L’Artiste', { img: 'p/e1' }, 'Il peint la maison de ses rêves.'],
-      ['e2', 'c', 'C', 'La Danse des Planches', { img: 'p/e2' }, 'Elle danse sur le chantier, il soupire.'],
+      ['e1', 'c', 'U', 'L’Artiste', { img: 'p/e1' }, 'Il peint la maison de ses rêves.'],
+      ['e2', 'c', 'U', 'La Danse des Planches', { img: 'p/e2' }, 'Elle danse sur le chantier, il soupire.'],
       ['e5', 'c', 'C', 'Le Siffleur', { img: 'p/e5' }, 'Il siffle en travaillant, comme toujours.'],
       ['e6', 'c', 'C', 'Le Frileux', { img: 'p/e6' }, 'Une écharpe, un seau, et en route !'],
       ['e7', 'c', 'C', 'L’Écharpe Rouge', { img: 'p/e7' }, 'Il ne la quitte jamais, même en été.'],
       ['e8', 'c', 'C', 'La Joie du Matin', { img: 'p/e8' }, 'Le loup n’est pas là : on danse !'],
       ['f1', 'c', 'C', 'Le Paysagiste', { img: 'p/f1' }, 'Il peint la prairie depuis son tabouret.'],
-      ['f2', 'c', 'C', 'Le Guitariste', { img: 'p/f2' }, 'Trois accords et toute la ferme chante.'],
+      ['f2', 'c', 'U', 'Le Guitariste', { img: 'p/f2' }, 'Trois accords et toute la ferme chante.'],
       ['f3', 'c', 'C', 'Le Bricoleur', { img: 'p/f3' }, 'Une pince à la main, il répare tout.'],
-      ['f4', 'c', 'C', 'La Cueilleuse', { img: 'p/f4' }, 'La plus belle pomme du verger est à elle.'],
-      ['f5', 'c', 'C', 'La Pomme d’Or', { img: 'p/f5' }, 'Il l’a trouvée sous le vieux pommier.'],
-      ['f6', 'c', 'C', 'La Danseuse', { img: 'p/f6' }, 'Elle tourne, tourne et tourne encore.'],
-      ['f7', 'c', 'C', 'Le Violoneux', { img: 'p/f7' }, 'Sa musique fait fuir le loup (presque).'],
+      ['f4', 'c', 'U', 'La Cueilleuse', { img: 'p/f4' }, 'La plus belle pomme du verger est à elle.'],
+      ['f5', 'c', 'T', 'La Pomme d’Or', { img: 'p/f5' }, 'Il l’a trouvée sous le vieux pommier.'],
+      ['f6', 'c', 'U', 'La Danseuse', { img: 'p/f6' }, 'Elle tourne, tourne et tourne encore.'],
+      ['f7', 'c', 'U', 'Le Violoneux', { img: 'p/f7' }, 'Sa musique fait fuir le loup (presque).'],
       ['f8', 'c', 'C', 'Le Scieur', { img: 'p/f8' }, 'Du bois pour le feu de ce soir.'],
       ['g1', 'c', 'C', 'Le Portraitiste', { img: 'p/g1' }, 'Il a peint ses deux frères. Ils râlent.'],
-      ['g2', 'c', 'C', 'Le Premier Violon', { img: 'p/g2' }, 'Il joue la mélodie des trois maisons.'],
+      ['g2', 'c', 'U', 'Le Premier Violon', { img: 'p/g2' }, 'Il joue la mélodie des trois maisons.'],
       ['g3', 'c', 'C', 'Le Musicien', { img: 'p/g3' }, 'Il accorde son violon depuis une heure.'],
-      ['g4', 'c', 'C', 'La Sérénade', { img: 'p/g4' }, 'Une chanson pour la voisine d’à côté.'],
+      ['g4', 'c', 'U', 'La Sérénade', { img: 'p/g4' }, 'Une chanson pour la voisine d’à côté.'],
       ['g5', 'c', 'C', 'Le Charpentier', { img: 'p/g5' }, 'Son rabot ne s’arrête jamais.'],
-      ['g7', 'c', 'C', 'L’Heure du Thé', { img: 'p/g7' }, 'Une pause bien méritée entre deux murs.'],
-      ['g8', 'c', 'C', 'Les Bâtisseurs', { img: 'p/g8' }, 'À deux, le mur monte deux fois plus vite.'],
+      ['g7', 'c', 'U', 'L’Heure du Thé', { img: 'p/g7' }, 'Une pause bien méritée entre deux murs.'],
+      ['g8', 'c', 'T', 'Les Bâtisseurs', { img: 'p/g8' }, 'À deux, le mur monte deux fois plus vite.'],
       ['h2', 'c', 'C', 'Le Grand Frère', { img: 'p/h2' }, 'C’est lui qui a eu l’idée des briques.'],
       ['h4', 'c', 'C', 'Bretelles Jaunes', { img: 'p/h4' }, 'Il attend le loup de pied ferme.'],
-      ['h5', 'c', 'C', 'La Couturière', { img: 'p/h5' }, 'Elle recoud les salopettes de toute la famille.'],
-      ['h8', 'c', 'C', 'La Veillée', { img: 'p/h8' }, 'Trois frères, une forêt, et des bruits bizarres.'],
+      ['h5', 'c', 'U', 'La Couturière', { img: 'p/h5' }, 'Elle recoud les salopettes de toute la famille.'],
+      ['h8', 'c', 'T', 'La Veillée', { img: 'p/h8' }, 'Trois frères, une forêt, et des bruits bizarres.'],
       ['i1', 'c', 'C', 'La Cuisinière', { img: 'p/i1' }, 'Elle prépare la tarte aux pommes.'],
       ['i2', 'c', 'C', 'Le Flûtiste', { img: 'p/i2' }, 'Il joue en marchant, sans jamais trébucher.'],
-      ['i3', 'c', 'C', 'Le Troubadour', { img: 'p/i3' }, 'Il chante l’histoire des trois maisons.'],
-      ['i5', 'c', 'C', 'Le Ramoneur', { img: 'p/i5' }, 'Une cheminée propre, un loup bien reçu.'],
-      ['i7', 'c', 'C', 'Le Gardien du Feu', { img: 'p/i7' }, 'Le feu doit brûler toute la nuit.'],
-      ['j1', 'c', 'C', 'Les Retrouvailles', { img: 'p/j1' }, 'Tout le monde est sain et sauf !'],
-      ['j2', 'c', 'C', 'Coup de Foudre', { img: 'p/j2' }, 'Il a tapé sur son sabot… et il est amoureux.'],
-      ['j4', 'c', 'C', 'Le Petit Lumineux', { img: 'p/j4' }, 'Une lueur magique au creux des sabots.'],
-      ['j7', 'c', 'C', 'La Fête des Cochons', { img: 'p/j7' }, 'Le loup est parti : ce soir, on fait la fête !'],
-      ['b3', 'l', 'C', 'Le Démolisseur', { img: 'p/b3' }, 'Il souffle, il souffle… et ça s’écroule.'],
-      ['c1', 'l', 'C', 'Le Faux Ami', { img: 'p/c1' }, 'Un grand sourire, des dents encore plus grandes.'],
-      ['c3', 'l', 'C', 'Le Loup Furieux', { img: 'p/c3' }, 'La maison de briques ne veut pas tomber.'],
-      ['d1', 'l', 'C', 'Toc Toc Toc', { img: 'p/d1' }, '« Petit cochon, laisse-moi entrer ! »'],
-      ['d2', 'l', 'C', 'La Poursuite', { img: 'p/d2' }, 'Cours, petit cochon, cours !'],
-      ['h1', 'l', 'C', 'Le Rôdeur', { img: 'p/h1' }, 'Il essaie toutes les portes de la ferme.'],
-      ['h7', 'l', 'C', 'Les Yeux dans le Noir', { img: 'p/h7' }, 'Derrière l’arbre, deux yeux jaunes.'],
-      ['i4', 'l', 'C', 'Le Loup Musicien', { img: 'p/i4' }, 'Il voulait jouer avec eux. Personne n’y croit.'],
-      ['i6', 'l', 'C', 'Le Ricaneur', { img: 'p/i6' }, 'Il rit déjà du festin de ce soir.'],
-      ['j5', 'l', 'C', 'Le Loup Gourmand', { img: 'p/j5' }, 'Il a volé la pomme d’or au coucher du soleil.'],
-      ['j6', 'l', 'C', 'La Nuit du Loup', { img: 'p/j6' }, 'La pleine lune, et des pas dans la forêt.'],
-      ['a1', 'm', 'C', 'La Maison de Briques', { img: 'p/a1' }, 'La seule qui a tenu bon.'],
-      ['a5', 'm', 'C', 'La Maison de Paille', { img: 'p/a5' }, 'Construite en une heure, envolée en une seconde.'],
-      ['a6', 'm', 'C', 'Le Tas de Bâtons', { img: 'p/a6' }, 'C’était une maison, avant le loup.'],
-      ['b4', 'm', 'C', 'La Maison Branlante', { img: 'p/b4' }, 'Un souffle de plus et tout tombe.'],
-      ['b5', 'm', 'C', 'La Cabane de Bois', { img: 'p/b5' }, 'Montée vite, trop vite.'],
-      ['b6', 'm', 'C', 'Le Chalet', { img: 'p/b6' }, 'Joli, mais le loup souffle fort.'],
-      ['b7', 'm', 'C', 'Le Mur de Briques', { img: 'p/b7' }, 'Brique après brique, la patience paie.'],
-      ['c4', 'm', 'C', 'La Maison en Ruine', { img: 'p/c4' }, 'Le loup est passé par là.'],
-      ['c5', 'm', 'C', 'Le Toit Troué', { img: 'p/c5' }, 'Il pleut dans le salon.'],
+      ['i3', 'c', 'U', 'Le Troubadour', { img: 'p/i3' }, 'Il chante l’histoire des trois maisons.'],
+      ['i5', 'c', 'U', 'Le Ramoneur', { img: 'p/i5' }, 'Une cheminée propre, un loup bien reçu.'],
+      ['i7', 'c', 'T', 'Le Gardien du Feu', { img: 'p/i7' }, 'Le feu doit brûler toute la nuit.'],
+      ['j1', 'c', 'T', 'Les Retrouvailles', { img: 'p/j1' }, 'Tout le monde est sain et sauf !'],
+      ['j2', 'c', 'T', 'Coup de Foudre', { img: 'p/j2' }, 'Il a tapé sur son sabot… et il est amoureux.'],
+      ['j4', 'c', 'T', 'Le Petit Lumineux', { img: 'p/j4' }, 'Une lueur magique au creux des sabots.'],
+      ['j7', 'c', 'T', 'La Fête des Cochons', { img: 'p/j7' }, 'Le loup est parti : ce soir, on fait la fête !'],
+      ['b3', 'l', 'T', 'Le Démolisseur', { img: 'p/b3' }, 'Il souffle, il souffle… et ça s’écroule.'],
+      ['c1', 'l', 'U', 'Le Faux Ami', { img: 'p/c1' }, 'Un grand sourire, des dents encore plus grandes.'],
+      ['c3', 'l', 'U', 'Le Loup Furieux', { img: 'p/c3' }, 'La maison de briques ne veut pas tomber.'],
+      ['d1', 'l', 'U', 'Toc Toc Toc', { img: 'p/d1' }, '« Petit cochon, laisse-moi entrer ! »'],
+      ['d2', 'l', 'U', 'La Poursuite', { img: 'p/d2' }, 'Cours, petit cochon, cours !'],
+      ['h1', 'l', 'T', 'Le Rôdeur', { img: 'p/h1' }, 'Il essaie toutes les portes de la ferme.'],
+      ['h7', 'l', 'T', 'Les Yeux dans le Noir', { img: 'p/h7' }, 'Derrière l’arbre, deux yeux jaunes.'],
+      ['i4', 'l', 'U', 'Le Loup Musicien', { img: 'p/i4' }, 'Il voulait jouer avec eux. Personne n’y croit.'],
+      ['i6', 'l', 'U', 'Le Ricaneur', { img: 'p/i6' }, 'Il rit déjà du festin de ce soir.'],
+      ['j5', 'l', 'T', 'Le Loup Gourmand', { img: 'p/j5' }, 'Il a volé la pomme d’or au coucher du soleil.'],
+      ['j6', 'l', 'T', 'La Nuit du Loup', { img: 'p/j6' }, 'La pleine lune, et des pas dans la forêt.'],
+      ['a1', 'm', 'U', 'La Maison de Briques', { img: 'p/a1' }, 'La seule qui a tenu bon.'],
+      ['a5', 'm', 'U', 'La Maison de Paille', { img: 'p/a5' }, 'Construite en une heure, envolée en une seconde.'],
+      ['a6', 'm', 'U', 'Le Tas de Bâtons', { img: 'p/a6' }, 'C’était une maison, avant le loup.'],
+      ['b4', 'm', 'U', 'La Maison Branlante', { img: 'p/b4' }, 'Un souffle de plus et tout tombe.'],
+      ['b5', 'm', 'U', 'La Cabane de Bois', { img: 'p/b5' }, 'Montée vite, trop vite.'],
+      ['b6', 'm', 'U', 'Le Chalet', { img: 'p/b6' }, 'Joli, mais le loup souffle fort.'],
+      ['b7', 'm', 'U', 'Le Mur de Briques', { img: 'p/b7' }, 'Brique après brique, la patience paie.'],
+      ['c4', 'm', 'T', 'La Maison en Ruine', { img: 'p/c4' }, 'Le loup est passé par là.'],
+      ['c5', 'm', 'U', 'Le Toit Troué', { img: 'p/c5' }, 'Il pleut dans le salon.'],
       ['c6', 'm', 'C', 'Le Marteau', { img: 'p/c6' }, 'L’outil préféré du grand frère.'],
       ['c7', 'm', 'C', 'La Scie et les Briques', { img: 'p/c7' }, 'Tout ce qu’il faut pour bien bâtir.'],
       ['c8', 'm', 'C', 'La Baratte', { img: 'p/c8' }, 'Pour faire le beurre de la tartine.'],
-      ['d3', 'm', 'C', 'L’Effondrement', { img: 'p/d3' }, 'Un nuage de poussière et plus de maison.'],
-      ['d4', 'm', 'C', 'La Reconstruction', { img: 'p/d4' }, 'On recommence, en plus solide.'],
-      ['d5', 'm', 'C', 'La Cheminée', { img: 'p/d5' }, 'Le loup y passera. Le chaudron l’attend.'],
+      ['d3', 'm', 'T', 'L’Effondrement', { img: 'p/d3' }, 'Un nuage de poussière et plus de maison.'],
+      ['d4', 'm', 'U', 'La Reconstruction', { img: 'p/d4' }, 'On recommence, en plus solide.'],
+      ['d5', 'm', 'U', 'La Cheminée', { img: 'p/d5' }, 'Le loup y passera. Le chaudron l’attend.'],
       ['d6', 'm', 'C', 'La Pomme Rouge', { img: 'p/d6' }, 'Croquante, sucrée, convoitée.'],
       ['d7', 'm', 'C', 'La Motte de Beurre', { img: 'p/d7' }, 'Toute fraîche, sortie de la baratte.'],
-      ['e3', 'm', 'C', 'La Maison en Feu', { img: 'p/e3' }, 'Le loup a eu une très mauvaise idée.'],
-      ['e4', 'm', 'C', 'Le Siège', { img: 'p/e4' }, 'Les cochons défendent la maison de pierre.'],
+      ['e3', 'm', 'T', 'La Maison en Feu', { img: 'p/e3' }, 'Le loup a eu une très mauvaise idée.'],
+      ['e4', 'm', 'T', 'Le Siège', { img: 'p/e4' }, 'Les cochons défendent la maison de pierre.'],
       ['g6', 'm', 'C', 'La Vieille Baratte', { img: 'p/g6' }, 'Elle était déjà là du temps de grand-mère.'],
       ['h3', 'm', 'C', 'Le Goûter', { img: 'p/h3' }, 'Une pomme et du beurre : le festin.'],
       ['h6', 'm', 'C', 'La Grande Scie', { img: 'p/h6' }, 'Elle coupe les bâtons comme du beurre.'],
-      ['i8', 'm', 'C', 'Le Foyer', { img: 'p/i8' }, 'Bien au chaud derrière les briques.'],
-      ['j3', 'm', 'C', 'Le Chantier', { img: 'p/j3' }, 'Ça fume, ça cogne, ça construit.'],
-      ['j8', 'm', 'C', 'La Nuit au Coin du Feu', { img: 'p/j8' }, 'Dehors le loup, dedans la chaleur.'],
+      ['i8', 'm', 'T', 'Le Foyer', { img: 'p/i8' }, 'Bien au chaud derrière les briques.'],
+      ['j3', 'm', 'T', 'Le Chantier', { img: 'p/j3' }, 'Ça fume, ça cogne, ça construit.'],
+      ['j8', 'm', 'T', 'La Nuit au Coin du Feu', { img: 'p/j8' }, 'Dehors le loup, dedans la chaleur.'],
       ['r3', 'c', 'R', 'La Pomme Enchantée', { img: 'p/r3' }, 'Celui qui la croque ne craint plus le loup.'],
       ['r5', 'c', 'R', 'Les Cochons Triomphants', { img: 'p/r5' }, 'Le loup est vaincu : la fête peut commencer.'],
       ['r1', 'l', 'R', 'Le Grand Méchant Loup', { img: 'p/r1' }, 'Son souffle arrache les murs.'],
@@ -20755,7 +20761,7 @@ SERIES.forEach((S) => {
     c.pow = rarOf(r, S).pow + ((i * 53) % 9) * 10;
     return (CARD[c.id] = c);
   });
-  S.by = { C: [], R: [], E: [], L: [], S: [] };
+  S.by = Object.fromEntries(RANK.split('').map((k) => [k, []]));
   S.keys = RANK.split('').filter((k) => S.by[k].length || S.list.some((c) => c.r === k));
   S.list.forEach((c) => S.by[c.r].push(c));
 });

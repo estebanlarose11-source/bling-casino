@@ -142,7 +142,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Crabe sur tous les rouleaux, multiplicateur ×1, ×2, ×3… à chaque crabe, +5 tours avec 3 coffres). Achats ×100 / ×110.
   Simulation `node tools/sim/pirates.js` (8 M tours) : RTP ≈ 92 % (façons 40, Crabe 8, Chasse 24, Tours gratuits 20), un gain
   1 tour sur 4, Chasse 1 tour sur 369 (≈ ×88), Tours gratuits 1 sur 481 (≈ ×97), GRAND ≈ 1 tour sur 135 000, achats ≈ 88 / 89 %,
-  ×50 000 ≈ 1 tour sur 6 millions.
+  ×50 000 ≈ 1 tour sur 6 millions. **Chasse au trésor rapide** (voulu par le propriétaire) : les symboles tombent dès que leur
+  colonne s'arrête, puis Tonneaux, Crabes et Ancres agissent (`respin`) ; un bonus dure ≈ 2 fois moins longtemps qu'avant.
   **Rouleaux Pixi et images larges** (bug « ça saute » du 12 novembre 2026) : `warm()` de `core/pixi.js` mesure la partie
   vraiment peinte d'une `<img>` en `object-fit: contain` (5e valeur de `BOX`) et `sideOf()` dessine la texture à cette taille ;
   avant, une image plus large que haute tournait à la hauteur de la case (bien plus petite) puis grossissait d'un coup à l'arrêt.
@@ -453,11 +454,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   découpées dans `assets/games/jcc/p/` : `a1`…`j8` = case de la planche, `r1`…`r5` rares, `s1`…`s3` secrètes ; éléments
   Cochons / Loup / Maisons). **La 1re série est fermée** : les paquets (gagnés, achetés, forge) s'ouvrent seulement dans la
   plus récente (`NOW`), les anciennes restent dans l'album (🔒) et au Marché. Une série peut changer ses raretés
-  (`rar` : Normale 500, Rare **50 000**, Secrète **200 000** KE, rareté `S` ajoutée à `RAR`), ses chances (`odds`, sans
-  carte garantie), son album (`album` : **500 000** KE) et finir à une date (`ends` : 12 décembre 2026 minuit, compte à
-  rebours sur la page et l'accueil ; après, plus de prix d'album). Secrètes voulues « hyper dures » : 0,05 / 0,2 / 0,8 %
-  par carte (bleu / violet / doré). Valeur moyenne d'un paquet ≈ 5 000 / 11 300 / 37 300 KE (sous les prix de la boutique).
-  Simulation (seul, avec la Forge, sans Marché) : album ≈ 790 paquets en médiane (320 à 1 650). Liste :
+  (`rar`), ses chances (`odds`, sans carte garantie), son album (`album` : **500 000** KE) et finir à une date (`ends` :
+  12 décembre 2026 minuit, compte à rebours sur la page et l'accueil ; après, plus de prix d'album). **5 niveaux** (`RANK`
+  = `CUTRELS`, raretés `U` et `T` ajoutées à `RAR` le 12 novembre 2026 : le propriétaire avait 60 cartes différentes après
+  18 paquets) : 30 Communes 500, 30 Peu communes 2 000, 20 Précieuses 8 000, 5 Rares **50 000**, 3 Secrètes **200 000** KE ;
+  chances par carte bleu / violet / doré : commune 89,3 / 72 / 45 %, peu commune 9 / 20 / 35, précieuse 1,2 / 6 / 12, rare
+  0,45 / 1,8 / 7,2, secrète 0,05 / 0,2 / 0,8. Après 18 paquets ≈ 40 cartes différentes ; album seul ≈ 825 paquets (médiane).
+  Valeur moyenne d'un paquet ≈ 5 550 / 13 500 / 37 550 KE (sous les prix de la boutique). Liste :
   `notes/jcc-trois-petits-cochons-cartes.txt`. **Prochaine série vers le 12 décembre** : l'ajouter à la fin de `SERIES`
   avec son `ends` (un mois plus tard).
   **Demandes de cartes** (demande du propriétaire du 12 novembre 2026, `askCard` / `fillAsk` / `handleAsks`, Firestore

@@ -365,7 +365,7 @@ class PiratesGame extends BaseGame {
     this.word(`${pic(k === 'grand' ? 'crown' : 'star', 'ap-wimg')}${JP_NAME[k]}<br><small>${kfmt(E.JPX[k] * b)}${KE}</small>`, `jp ${k}`);
     if (k === 'grand') { Sounds.horn(); Sounds.cannon(); fx.confetti(160); this.flash('rgba(255,255,255,.85)'); vibe([200, 80, 200, 80, 400]); } else { Sounds.bell(); fx.confetti(k === 'major' ? 90 : 40); vibe([80, 50, 120]); }
     sfx.jackpot();
-    await this.wait(k === 'grand' ? 2400 : k === 'major' ? 1600 : 1100);
+    await this.wait(k === 'grand' ? 2200 : k === 'major' ? 1200 : 700);
   }
 
   destroy() { document.removeEventListener('visibilitychange', this.onVis); this.tension.stop(); this.video.pause(); this.video.muted = true; super.destroy(); }
@@ -561,7 +561,7 @@ class PiratesGame extends BaseGame {
     await new Promise((resolve) => {
       let over = false;
       const done = () => { if (over) return; over = true; clearTimeout(t); ov.classList.add('out'); setTimeout(() => { ov.remove(); resolve(); }, 300); };
-      const t = setTimeout(done, this.superT ? 900 : this.turbo ? 2200 : 3800);
+      const t = setTimeout(done, this.superT ? 800 : this.turbo ? 1500 : 2400);
       ov.addEventListener('click', done);
     });
   }
@@ -601,7 +601,7 @@ class PiratesGame extends BaseGame {
     const banner = (lives) => this.setBanner(`<b>CHASSE AU TRÉSOR</b><span class="pill ap-lives">Vies <i class="ap-dots">${[0, 1, 2].map((k) => `<i class="${k < lives ? 'on' : ''}"></i>`).join('')}</i></span><span class="pill">${Object.keys(this.cur).length} / ${E.COLS * this.rows}</span><span class="pill gold">${fmtC(Math.round(Math.min(sumNow() * b, capLeft)))}</span>`);
     banner(3);
     this.msg('Les pièces restent en place : 3 vies');
-    await this.wait(800);
+    await this.wait(450);
     for (const st of run.steps) {
       if (this.dead) return 0;
       const empty = []; for (let i = 0; i < E.BN; i++) if (this.open(i) && !(i in this.cur)) empty.push(i);
@@ -611,7 +611,7 @@ class PiratesGame extends BaseGame {
       if (st.add.length) this.banner?.querySelector('.ap-lives')?.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.35)', boxShadow: '0 0 18px #d946ef' }, { transform: 'scale(1)' }], { duration: 600, easing: 'ease-out' });
       const nb = `${Object.keys(this.cur).length} / ${E.COLS * this.rows}`;
       this.msg(st.add.length ? `${nb} · ${st.add.length} nouveau${st.add.length > 1 ? 'x' : ''} : 3 vies !` : st.lives ? `${nb} · encore ${st.lives} vie${st.lives > 1 ? 's' : ''}` : `${nb} · plus de vies`);
-      await this.wait(this.turbo ? 200 : 420);
+      await this.wait(this.turbo ? 80 : 160);
     }
     // the count, cell by cell, then the full screen
     let tot = 0;
@@ -620,7 +620,7 @@ class PiratesGame extends BaseGame {
       tot += this.cur[i].v * b;
       this.cellH(i)?.classList.add('counted');
       this.winAmt.textContent = fmtC(Math.round(Math.min(tot, capLeft)));
-      sfx.tick(); await this.wait(this.turbo ? 30 : 70);
+      sfx.tick(); await this.wait(this.turbo ? 15 : 35);
     }
     if (run.full) {
       this.word('FULL SCREEN !', 'neon big'); this.flash('rgba(255,255,255,.9)'); sfx.jackpot(); vibe([200, 80, 200]);
@@ -654,60 +654,56 @@ class PiratesGame extends BaseGame {
       this.word('ANCRE · RANGÉE OUVERTE', 'boom'); Sounds.cannon(); sfx.upgrade(); this.shake(); this.flash('rgba(249,115,22,.5)'); vibe([40, 40, 80]);
       const p = center(n); fx.burst(p.x, p.y, 40, ['#fed7aa', '#f97316', '#fde047'], 9);
       n.classList.add('gone');
-      await this.wait(this.turbo ? 300 : 700);
+      await this.wait(this.turbo ? 250 : 500);
     }
   }
 
-  // One spin of the bonus: the open empty cells turn and stop column after column; then, in order, the coins land, the
-  // anchors open a row, the barrels multiply their neighbours, the crab collects
+  // One spin of the bonus (owner's wish: quick, and what lands shows as soon as its column stops): the open empty cells
+  // turn, the columns stop one after the other and their new symbols drop in at once; then, in order, the jackpots
+  // shine, the anchors open a row, the barrels multiply their neighbours, the crabs collect.
   async respin(st, b, empties, last) {
     empties.forEach((i) => this.cellH(i)?.classList.add('rolling'));
     sfx.spin?.();
-    const slow = last && !this.superT;
+    const slow = last && !this.superT, T = (ms) => (this.superT ? ms * 0.4 : this.turbo ? ms * 0.6 : ms);
     if (slow) { this.tense(this.cellH(empties[0])); this.msg('💥 UNE SEULE CASE POUR LE FULL SCREEN…'); }
-    await this.wait(slow ? 2800 : this.turbo ? 380 : 700);
-    const addAt = new Set(st.add.map((a) => a.i));
+    await this.wait(slow ? 2400 : T(380));
+    const byCol = new Map();
+    for (const a of st.add) { const c = Math.floor(a.i / E.BR); if (!byCol.has(c)) byCol.set(c, []); byCol.get(c).push(a); }
     for (let c = 0; c < E.COLS; c++) {
       if (this.dead) return;
-      empties.filter((i) => Math.floor(i / E.BR) === c).forEach((i) => { const n = this.cellH(i); if (!n) return; n.classList.remove('rolling'); if (!addAt.has(i)) n.animate([{ transform: 'translateY(-5%)' }, { transform: 'translateY(3%)' }, { transform: 'none' }], { duration: 200, easing: 'ease-out' }); });
-      sfx.tick?.(); await this.wait(slow ? 240 : this.turbo ? 40 : 90);
+      const col = empties.filter((i) => Math.floor(i / E.BR) === c);
+      if (!col.length) continue;
+      const land = byCol.get(c) || [];
+      col.forEach((i) => { const n = this.cellH(i); if (!n) return; n.classList.remove('rolling'); if (!land.some((a) => a.i === i)) n.animate([{ transform: 'translateY(-5%)' }, { transform: 'translateY(3%)' }, { transform: 'none' }], { duration: 180, easing: 'ease-out' }); });
+      // the new symbols of this column land right now (barrels show their ×, the crab waits to collect)
+      for (const a of land) {
+        const x = a.t === 'v' ? { t: 'v', v: a.v } : a.t === 'star' || a.t === 'crown' ? { t: 'jp', k: a.k, v: a.v } : a.t === 'bomb' ? { t: 'bomb', v: a.v } : a.t === 'safe' ? { t: 'safe', v: 0, m: a.m } : { t: 'coll', v: 0 };
+        this.cur[a.i] = x; this.setCell(a.i, x); this.dropIn(a.i);
+        const p = center(this.cellH(a.i));
+        fx.burst(p.x, p.y, a.t === 'v' && a.v < 10 ? 10 : 20, GOLD, 6);
+      }
+      if (land.some((a) => a.t === 'coll')) Sounds.crab(); else if (land.some((a) => a.t === 'safe')) Sounds.barrel(); else if (land.some((a) => a.t === 'bomb')) Sounds.chain(); else if (land.length) Sounds.coin(land.some((a) => a.v >= 10)); else sfx.tick?.();
+      await this.wait(slow ? 220 : T(land.length ? 170 : 90));
     }
     if (slow) this.tense(null);
+    // then the actions, in the engine's order
     for (const a of st.add) {
       if (this.dead) return;
-      const n0 = this.cellH(a.i), p = center(n0);
-      if (a.t === 'v') {
-        this.cur[a.i] = { t: 'v', v: a.v }; this.setCell(a.i, this.cur[a.i]); this.dropIn(a.i);
-        Sounds.coin(a.v >= 10); fx.burst(p.x, p.y, a.v >= 10 ? 22 : 12, GOLD, a.v >= 10 ? 7 : 5);
-        await this.wait(this.turbo ? 70 : 150);
-      } else if (a.t === 'star' || a.t === 'crown') {
-        this.cur[a.i] = { t: 'jp', k: a.k, v: a.v }; this.setCell(a.i, this.cur[a.i]); this.dropIn(a.i);
-        fx.burst(p.x, p.y, 30, GOLD, 8);
-        await this.jackpot(a.k, b);
-      } else if (a.t === 'bomb') {
-        this.cur[a.i] = { t: 'bomb', v: a.v }; this.setCell(a.i, this.cur[a.i]); this.dropIn(a.i);
-        await this.wait(this.turbo ? 150 : 350);
-        Sounds.chain(); if (a.row) await this.unlockRow(a.row); else { this.word('ANCRE', 'boom'); await this.wait(this.turbo ? 250 : 500); }
-      } else if (a.t === 'safe') {
-        this.cur[a.i] = { t: 'safe', v: 0, m: a.m }; this.setCell(a.i, this.cur[a.i]); this.dropIn(a.i);
-        Sounds.barrel(); vibe([30, 40, 60]);
-        await this.wait(this.turbo ? 200 : 450);
-        this.word(`TONNEAU ×${a.m}`, a.m >= 10 ? 'gold' : 'neon');
-        if (a.hit.length) {
-          for (const j of a.hit) { fx.trail?.(p, center(this.cellH(j)), '#22d3ee', 10); this.cur[j] = { ...this.cur[j], v: this.cur[j].v * a.m }; this.setCell(j, this.cur[j]); this.pop(j); }
-          this.flash('rgba(34,211,238,.35)'); sfx.upgrade();
-        } else this.msg('Le Tonneau n’a pas de pièce à côté de lui…');
-        await this.wait(this.turbo ? 350 : 800);
-      } else {
-        // the crab: every coin flies to it
-        this.cur[a.i] = { t: 'coll', v: 0 }; this.setCell(a.i, this.cur[a.i]); this.dropIn(a.i);
-        this.word('LE CRABE RAMASSE', 'boss'); Sounds.crab(); vibe([60, 40, 90]);
-        await this.wait(this.turbo ? 250 : 600);
+      const p = center(this.cellH(a.i));
+      if (a.t === 'star' || a.t === 'crown') await this.jackpot(a.k, b);
+      else if (a.t === 'bomb') { if (a.row) await this.unlockRow(a.row); }
+      else if (a.t === 'safe') {
+        if (!a.hit.length) continue;
+        this.word(`TONNEAU ×${a.m}`, a.m >= 10 ? 'gold' : 'neon'); vibe([30, 40, 60]);
+        for (const j of a.hit) { fx.trail?.(p, center(this.cellH(j)), '#fde047', 10); this.cur[j] = { ...this.cur[j], v: this.cur[j].v * a.m }; this.setCell(j, this.cur[j]); this.pop(j); }
+        sfx.upgrade(); await this.wait(T(500));
+      } else if (a.t === 'coll') {
+        this.word('LE CRABE RAMASSE', 'boss'); vibe([60, 40, 90]);
         for (const j in this.cur) { const x = this.cur[j]; if (x.t === 'v' || x.t === 'bomb') { fx.trail?.(center(this.cellH(+j)), p, '#facc15', 10); this.pop(+j); } }
-        await this.wait(this.turbo ? 200 : 450);
+        await this.wait(T(380));
         this.cur[a.i] = { t: 'coll', v: a.got }; this.setCell(a.i, this.cur[a.i]); this.pop(a.i);
-        fx.burst(p.x, p.y, 34, GOLD, 9); this.flash('rgba(250,204,21,.4)'); sfx.bigWin?.();
-        await this.wait(this.turbo ? 350 : 800);
+        fx.burst(p.x, p.y, 30, GOLD, 9); Sounds.coin(true);
+        await this.wait(T(450));
       }
     }
   }
