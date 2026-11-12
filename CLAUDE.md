@@ -384,7 +384,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   et restent coupés (`onFeatCalm` dans les deux moteurs, message « Turbo coupé pour profiter du bonus ») : voulu par le
   propriétaire, le joueur les remet lui-même ; **sauf** s'il coche « 🔁 Garder le turbo pendant les bonus » (« Bonus & menu »
   des deux moteurs, un seul choix pour toutes les machines : `keepTurbo()`, localStorage `spinbet_keep_turbo`, voulu par le
-  propriétaire pour ceux qui « charbonnent » les bonus). Mesuré : Le Loup 1,8 s → 0,57 s
+  propriétaire pour ceux qui « charbonnent » les bonus). **Les tours auto continuent après un bonus** (voulu par le
+  propriétaire) : l'appel `stopAuto()` d'un jeu au début de son bonus est ignoré pendant un tour de machine à sous
+  (`core/base.js`) ou supprimé (`slot/machine.js`) ; seuls le bouton tourner, « Stop » du menu et un solde trop bas les
+  arrêtent (`stopAuto(true)`). Mesuré : Le Loup 1,8 s → 0,57 s
   par tour, L'Olympe 2,0 → 1,15 s.
 - **Max win** : chaque machine à sous a un gain maximum par tour, bonus compris (`max` du catalogue → `maxX`),
   appliqué par `core/base.js` (`win()`) et `slot/machine.js` (`payOut()`). Fin de chaque tour payé : événement

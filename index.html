@@ -14231,7 +14231,7 @@ class SlotMachine {
     this.buyRound = buy;
     if (!buy && !wallet.debit(bet)) {
       toast('Solde insuffisant : rechargez votre argent fictif', 'warn');
-      this.stopAuto();
+      this.stopAuto(true);
       return;
     }
     this.setBusy(true);
@@ -14244,7 +14244,7 @@ class SlotMachine {
       await this.celebrate(res.total);
     }
     if (g.holdSpin && res.coins >= g.holdSpin.trigger) {
-      this.stopAuto();
+      // autoplay goes on through the bonus (owner's wish); the spin button stops it
       await this.featureIntro('HOLD & SPIN', `${res.coins} pièces verrouillées · 3 respins`, '🪙');
       const won = Math.min(await runHoldSpin(this, res.grid), this.capKE - this.roundPaid);
       if (won > 0) {
@@ -14256,7 +14256,6 @@ class SlotMachine {
       this.restoreAfterFeature();
     }
     if (g.freeSpins && res.scatters >= 3) {
-      this.stopAuto();
       await this.runFreeSpins(res.scatters);
     }
     if (!this.dead) __mods['core/base.js'].roundEnd(this, Math.round(bet * 100), Math.round(this.roundPaid * 100), buy);
@@ -14669,7 +14668,7 @@ class BaseGame {
       this.updateMeters();
       return true;
     }
-    if (!wallet.debit(c / 100)) { toast('Solde insuffisant : rechargez votre argent fictif', 'warn'); this.stopAuto(); return false; }
+    if (!wallet.debit(c / 100)) { toast('Solde insuffisant : rechargez votre argent fictif', 'warn'); this.stopAuto(true); return false; }
     return true;
   }
   // Max win of a slot machine for this round, in cents (0 = no cap): maxX × the stake, bonus included.
@@ -14758,7 +14757,7 @@ class BaseGame {
       sfx.unlock();
       this.music.start();
       const act = b.dataset.act;
-      if (act === 'main') { if (this.auto) this.stopAuto(); else this.onMain(); }
+      if (act === 'main') { if (this.auto) this.stopAuto(true); else this.onMain(); }
       if (act === 'bet-' || act === 'bet+') this.changeBet(act === 'bet+' ? 1 : -1);
       if (act === 'max') this.maxBet();
       if (act === 'info') this.showInfo();
@@ -14770,7 +14769,7 @@ class BaseGame {
       e.preventDefault();
       sfx.unlock();
       this.music.start();
-      if (this.auto) this.stopAuto(); else this.onMain();
+      if (this.auto) this.stopAuto(true); else this.onMain();
     };
     this.onWallet = () => this.updateMeters();
     this.root.addEventListener('click', this.onClick);
@@ -14873,7 +14872,7 @@ class BaseGame {
       this.auto--;
       this.updateMeters();
       if (this.auto > 0) setTimeout(() => { if (!this.dead && this.auto) this.onMain(); }, this.superT ? 30 : this.turbo ? 150 : 420);
-      else this.stopAuto();
+      else this.stopAuto(true);
     }
   }
 
@@ -14903,17 +14902,23 @@ class BaseGame {
     });
     if (!r || this.dead) return;
     if (r.type === 'info') this.showInfo();
-    if (r.type === 'stop') this.stopAuto();
+    if (r.type === 'stop') this.stopAuto(true);
     if (r.type === 'auto' && !this.busy) { this.auto = r.n; this.updateMeters(); this.onMain(); }
     if (r.type === 'buy') this.startBuy(r.id);
   }
 
-  stopAuto() { this.auto = 0; this.updateMeters(); }
+  // Autoplay goes on through the bonuses of a slot machine (owner's wish: no need to start it again after each bonus):
+  // a game asking to stop it when its bonus starts (stopAuto()) is ignored during a slot round; the player stops it
+  // with the spin button or « Stop » in the menu (stopAuto(true)), and so does a balance too low.
+  stopAuto(user = false) {
+    if (!user && this.busy && this.game.cat === 'slot') return;
+    this.auto = 0; this.updateMeters();
+  }
 
   startBuy(id) {
     if (this.busy) return;
     const x = this.cfg.buys.find((y) => y.id === id);
-    this.stopAuto();
+    this.stopAuto(true);
     this.round(async () => {
       this.roundBuy = true;
       this.buying = true; window.__sbBuying = true;
@@ -14935,7 +14940,7 @@ class BaseGame {
   freeBonus() {
     const x = this.cfg?.buys?.[0];
     if (!x || this.busy || this.dead || !this.onBuy) return false;
-    this.stopAuto();
+    this.stopAuto(true);
     this.round(async () => {
       this.roundBuy = true;
       this.lastStake = this.bet;
@@ -15584,7 +15589,7 @@ class BetBoard {
 
   tool(t) {
     if (t === 'autoplay') {
-      if (this.game.auto) { this.game.stopAuto(); return; }
+      if (this.game.auto) { this.game.stopAuto(true); return; }
       const pick = this.root.querySelector('.rt-autopick');
       if (pick) pick.hidden = !pick.hidden;
       return;
