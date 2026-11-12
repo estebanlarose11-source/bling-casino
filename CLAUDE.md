@@ -122,11 +122,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `node tools/sim/redk.js` (6 M tours) : RTP ≈ 92,5 % (lignes 40, Ruby Link 36,5, Pyramide d'or ≈ 15,5), un gain 1 tour
   sur 4, achat ≈ 88,5 %, max ×10 000 (atteint dans la Pyramide d'or, ≈ 1 sur 100 000). Défi spécial : Ruby Link et
   La Pyramide d'or.
-- **Le Coffre aux Pirates** (`games/pirates.js`, id `pirates`, **en travaux** : `"wip": true`, essai avec `?essai`). Cahier des
+- **Le Coffre aux Pirates** (`games/pirates.js`, id `pirates`, **ouvert à tous le 12 novembre 2026**). Cahier des
   charges du propriétaire du 12 novembre 2026 (« Apex Predators », très volatile, max ×50 000), puis **thème pirates** avec
-  **sa vidéo** (`assets/games/pirates/bg.mp4`, bateau pirate, son des vagues remonté de 9 dB ; `bg.webp` = image fixe et
-  couverture) **derrière toute la machine** (plein écran téléphone : la vidéo couvre tout l'écran, `.ap-video`) et **son son =
-  la musique du jeu** (`VideoMusic` remplace `this.music` : boutons 🎵 / 🔊). Bruits de pirates doux (`Sounds`).
+  **sa vidéo** (`assets/games/pirates/bg.mp4`, bateau pirate ; `bg.webp` = image fixe et couverture) **derrière toute la
+  machine** (plein écran téléphone : la vidéo couvre tout l'écran, `.ap-video`). Voulu par le propriétaire : **vidéo en boucle
+  sans coupure, comme un gif** (fichier refait par ffmpeg : sa fin se fond dans son début, `xfade` 1,2 s ; et retour au début
+  0,3 s avant la fin, `timeupdate`), **muette** ; la musique est **un air de pirates original** (gigue en ré mineur, 6/8,
+  `EXTRA_THEMES.pirates`) au lieu du bruit des vagues. Bruits de pirates doux (`Sounds`).
   **Ses 25 symboles, tous utilisés** (voulu par le propriétaire) : planche `tools/art/pirates/planche.webp` (noms écrits
   dessous pour nous seulement) découpée par `tools/art/pirates/cut.py` (`pip install "rembg[cpu]"` : cadre en bois entier +
   ce qui dépasse au-dessus, sans le texte) → `assets/games/pirates/<nom>.webp` (`SYM`, `PICS`). 5×4, **1 024 façons** (`ways`) :
@@ -140,8 +142,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Crabe sur tous les rouleaux, multiplicateur ×1, ×2, ×3… à chaque crabe, +5 tours avec 3 coffres). Achats ×100 / ×110.
   Simulation `node tools/sim/pirates.js` (8 M tours) : RTP ≈ 92 % (façons 40, Crabe 8, Chasse 24, Tours gratuits 20), un gain
   1 tour sur 4, Chasse 1 tour sur 369 (≈ ×88), Tours gratuits 1 sur 481 (≈ ×97), GRAND ≈ 1 tour sur 135 000, achats ≈ 88 / 89 %,
-  ×50 000 ≈ 1 tour sur 6 millions. Pour l'ouvrir : retirer `wip`, `python3 tools/build.py`, entrée `UPDATES`, captures SEO,
-  image de partage.
+  ×50 000 ≈ 1 tour sur 6 millions.
+  **Rouleaux Pixi et images larges** (bug « ça saute » du 12 novembre 2026) : `warm()` de `core/pixi.js` mesure la partie
+  vraiment peinte d'une `<img>` en `object-fit: contain` (5e valeur de `BOX`) et `sideOf()` dessine la texture à cette taille ;
+  avant, une image plus large que haute tournait à la hauteur de la case (bien plus petite) puis grossissait d'un coup à l'arrêt.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

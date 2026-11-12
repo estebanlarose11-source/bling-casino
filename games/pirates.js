@@ -3,8 +3,8 @@
 __mods['games/impl/pirates.js'] = (() => {
 // Le Coffre aux Pirates (owner's request, 12 November 2026: his specification « Apex Predators », then a pirates'
 // treasure with his video and his board of 25 symbols, all used). 5 reels × 4 rows, 1 024 ways, very high volatility,
-// max ×50 000. The owner's video (assets/games/pirates/bg.mp4: a pirate ship at sea) plays behind the whole machine and
-// its sound replaces the music (VideoMusic). Jackpots MINI / MINOR / MAJOR / GRAND shown at the top (.ap-jps).
+// max ×50 000. The owner's video (assets/games/pirates/bg.mp4: a pirate ship at sea, silent, seamless loop) plays behind
+// the whole machine; the music is an original pirate jig (EXTRA_THEMES.pirates). Jackpots MINI / MINOR / MAJOR / GRAND shown at the top (.ap-jps).
 // Base game: small frequent wins, GOLD COINS carry a value (or a LUCKY STARFISH with MINI / MINOR), the CRAB of reel 5
 // collects every coin. 3 WHIRLPOOLS = LA CHASSE AU TRÉSOR: Hold & Win on 5 × 6 (2 rows locked), 3 lives; coins,
 // BARRELS (×2 to ×50 on the coins next to them), CRAB (collects), ANCHOR (opens a row), STARFISH (MINI / MINOR / MAJOR),
@@ -13,7 +13,7 @@ __mods['games/impl/pirates.js'] = (() => {
 // Pictures: the owner's board, cut by tools/art/pirates/cut.py into assets/games/pirates/<name>.webp.
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { Reels } = __mods['core/reels.js'];
-const { EXTRA_THEMES, Music, musicOn } = __mods['core/music.js'];
+const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, audioContext, isMuted, duck } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
 
@@ -310,15 +310,6 @@ const Sounds = {
   },
 };
 
-/* ---------- the owner's video behind the machine; its sound is the music of the game (🎵 and 🔊 of the menu) ---------- */
-class VideoMusic {
-  constructor(video) { this.v = video; this.playing = false; }
-  sync() { const on = this.playing && musicOn() && !isMuted(); this.v.muted = !on; if (on) this.v.volume = 0.5; }
-  start() { if (!musicOn()) return; this.playing = true; this.sync(); this.v.play().catch(() => {}); }
-  stop() { this.playing = false; this.sync(); }
-  setEnabled(on) { Music.prototype.setEnabled.call({ start() {}, stop() {} }, on); if (on) this.start(); else this.stop(); }
-}
-
 class PiratesGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
@@ -343,12 +334,14 @@ class PiratesGame extends BaseGame {
     bg.innerHTML = `<video class="ap-video" src="${asset('assets/games/pirates/bg.mp4')}" poster="${asset('assets/games/pirates/bg.webp')}" muted autoplay loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video><div class="ap-shade"></div>`;
     this.video = bg.querySelector('video');
     this.video.muted = true;
-    this.music.stop();
-    this.music = new VideoMusic(this.video);
+    // a seamless loop, like a gif (owner's wish): the file's end fades into its start, and we go back to the start a
+    // little before the end so that the browser never stops on the last frame
+    const v = this.video, rewind = () => { if (v.duration && v.currentTime > v.duration - 0.3) v.currentTime = 0.04; };
+    v.addEventListener('timeupdate', rewind);
+    v.addEventListener('ended', () => { v.currentTime = 0; v.play().catch(() => {}); });
     const play = () => { if (!this.dead && !matchMedia('(prefers-reduced-motion: reduce)').matches) this.video.play().catch(() => {}); };
     play();
     this.root.addEventListener('pointerdown', play, { once: true }); // a phone in power-saving mode waits for a touch
-    this.syncT = setInterval(() => this.music.sync(), 700); // the 🔊 button of the menu mutes the sea too
     this.vals = {};
     this.reels = new Reels(this.q('.ap-reels'), {
       cols: E.COLS, rows: E.ROWS, game: this, random: (c) => this.filler(c),
@@ -375,7 +368,7 @@ class PiratesGame extends BaseGame {
     await this.wait(k === 'grand' ? 2400 : k === 'major' ? 1600 : 1100);
   }
 
-  destroy() { document.removeEventListener('visibilitychange', this.onVis); clearInterval(this.syncT); this.tension.stop(); this.video.pause(); this.video.muted = true; super.destroy(); }
+  destroy() { document.removeEventListener('visibilitychange', this.onVis); this.tension.stop(); this.video.pause(); this.video.muted = true; super.destroy(); }
 
   idle() { const { g, vals } = E.screen(Math.random); for (let i = 0; i < E.N; i++) if (g[i] === E.SCAT || g[i] === E.FSC || g[i] === E.COLL) g[i] = E.symbol(Math.floor(i / E.ROWS), Math.random); this.vals = vals; return g; }
   filler(c) {
