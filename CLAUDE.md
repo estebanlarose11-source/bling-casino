@@ -122,6 +122,22 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `node tools/sim/redk.js` (6 M tours) : RTP ≈ 92,5 % (lignes 40, Ruby Link 36,5, Pyramide d'or ≈ 15,5), un gain 1 tour
   sur 4, achat ≈ 88,5 %, max ×10 000 (atteint dans la Pyramide d'or, ≈ 1 sur 100 000). Défi spécial : Ruby Link et
   La Pyramide d'or.
+- **Le Coffre aux Pirates** (`games/pirates.js`, id `pirates`, **en travaux** : `"wip": true`, essai avec `?essai`). Cahier des
+  charges du propriétaire du 12 novembre 2026 (« Apex Predators : Jungle Syndicate », très volatile, max ×50 000), puis **thème
+  changé en pirates** avec **sa vidéo** (`assets/games/pirates/bg.mp4`, bateau pirate, son des vagues remonté de 9 dB ;
+  `bg.webp` = image fixe et couverture) **derrière toute la machine** (plein écran téléphone : la vidéo couvre tout l'écran,
+  `.ap-video`) et **son son = la musique du jeu** (`VideoMusic` remplace `this.music` : boutons 🎵 / 🔊 du menu). Bruits de
+  pirates doux (`Sounds` : pièce, crabe, tonneau, chaîne d'ancre, canon, cloche, conque). 5×4, 20 lignes ; pièces d'or avec
+  valeur en KE (`CASH`), **le Crabe** (collecteur, rouleau 5) ramasse toutes les pièces ; 3 **tourbillons** (scatter) =
+  **LA CHASSE AU TRÉSOR** (Hold & Win 5×6, 2 rangées verrouillées, 3 vies remises à 3, `heistRun`) : pièces, **Tonneau**
+  (×2/×5/×10/×50 sur les pièces voisines), **Crabe** (ramasse tout), **Ancre** (ouvre une rangée) ; 30 cases = LE COFFRE AUX
+  PIRATES S'OUVRE ×500 (`FULL_X`, plafonné à ×50 000). Simulation `node tools/sim/pirates.js` : RTP ≈ 92 % (lignes 49, Crabe 8,
+  bonus 35), un gain 1 tour sur 3, bonus 1 tour sur 254 (≈ ×90, médiane ×45), achat ×100 ≈ 90 %, ×50 000 ≈ 1 tour sur 3 M.
+  **Symboles** : dessins provisoires (emojis, `ART`) en attendant la planche du propriétaire (cœur, pique, trèfle, carreau,
+  requin, exploratrice, pirate, noix de coco WILD, tourbillon, pièce, crabe, tonneau, ancre ; il a aussi tiki, ara, coffre,
+  carte, masque, boussole, boulets, collier de fleurs, bouteille, couronne, étoile de mer) : découper en
+  `assets/games/pirates/<s0…s6|wild|scat|cash|coll|safe|bomb>.webp` et les lister dans `PICS`. Pour l'ouvrir : retirer `wip`,
+  `python3 tools/build.py`, entrée `UPDATES`, captures SEO, image de partage.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

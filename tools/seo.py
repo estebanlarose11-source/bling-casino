@@ -59,7 +59,7 @@ KW = {
     'zeus': 'machine à sous gratuite des dieux grecs', 'huff': 'machine à sous gratuite des trois petits cochons',
     'candy': 'machine à sous gratuite aux bonbons', 'anubis': 'machine à sous gratuite égyptienne',
     'bling': 'machine à sous gratuite aux gemmes', 'pharaon': 'machine à sous gratuite à multiplicateur',
-    'chasse': 'machine à sous gratuite de chasse', 'noel': 'machine à sous gratuite de Noël', 'redk': 'machine à sous gratuite aux rubis', 'viking': 'machine à sous viking gratuite',
+    'chasse': 'machine à sous gratuite de chasse', 'noel': 'machine à sous gratuite de Noël', 'redk': 'machine à sous gratuite aux rubis', 'pirates': 'machine à sous gratuite de pirates', 'viking': 'machine à sous viking gratuite',
     'totemx': 'machine à sous gratuite totem jusqu’à ×100', 'barillet': 'machine à sous gratuite western', 'filon': 'machine à sous gratuite de la mine d’or',
     'taco': 'machine à sous gratuite pizza', 'billets': 'machine à sous gratuite à jackpots',
     'dragons': 'machine à sous gratuite de dragons', 'labo': 'machine à sous gratuite à 3 bonus',
@@ -340,7 +340,7 @@ FREE_FAQ = [('Faut-il payer ou télécharger quelque chose ?', 'Non. Tous les je
             ('Peut-on gagner de l’argent réel ?', 'Non : les KE sont une monnaie fictive, sans valeur réelle. SpinBet Casino est un jeu de divertissement réservé aux plus de 18 ans.'),
             ('Comment avoir plus de KE ?', 'Le cadeau du jour (jusqu’à 10 000 KE au 7e jour), la roue du jour, les missions, les tournois, le cashback et les pubs récompensées que tu choisis de regarder.')]
 
-ORDER = ['fortune', 'zeus', 'cosmic', 'viking', 'redk', 'filon', 'barillet', 'totemx', 'anubis', 'huff', 'candy', 'chasse', 'noel', 'billets', 'dragons', 'labo', 'taco', 'pharaon', 'bling', 'big-bad-wolf']
+ORDER = ['fortune', 'zeus', 'cosmic', 'pirates', 'viking', 'redk', 'filon', 'barillet', 'totemx', 'anubis', 'huff', 'candy', 'chasse', 'noel', 'billets', 'dragons', 'labo', 'taco', 'pharaon', 'bling', 'big-bad-wolf']
 slots = [G[i] for i in ORDER if i in G] + [g for g in games if g['cat'] == 'slot' and g['id'] not in ORDER]
 a = ARTICLES[0]
 article(a, f"""<p class="lead">Envie de faire tourner des rouleaux sans sortir ta carte bancaire ? Voici notre sélection des {len(slots)} meilleures machines à sous gratuites de 2026, toutes jouables tout de suite dans le navigateur, sans téléchargement ni inscription.</p>

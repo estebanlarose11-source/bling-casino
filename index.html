@@ -5035,6 +5035,115 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-filon .controls { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
 /* ============ Diamants REDK (demande du propriétaire, 11 novembre 2026) : la mine de diamants en vidéo derrière toute
    la machine, logo en lettres d'or 3D, rubis avec leur valeur en KE, Ruby Link 5×6 et suspense (zoom, tremblement) ============ */
+/* ---------- Le Coffre aux Pirates (games/pirates.js): the owner's video of a pirate ship behind everything, a clean machine
+   of dark wood and gold that sits in the scenery ---------- */
+.g-pirates { --slot-bg: #0c4a6e; }
+.slot.g-pirates > .slot-bg { background: #0c4a6e url(assets/games/pirates/bg.webp?v=1) center / cover no-repeat !important; overflow: hidden; filter: none !important; border-radius: inherit; }
+.ap-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ap-shade { position: absolute; inset: 0; background: radial-gradient(75% 65% at 50% 52%, rgba(4, 18, 30, .1), rgba(4, 18, 30, .45) 100%), linear-gradient(180deg, rgba(4, 18, 30, .25), transparent 25%, transparent 70%, rgba(4, 18, 30, .55)); }
+.g-pirates.ap-heisting .ap-shade { background: radial-gradient(70% 60% at 50% 50%, rgba(4, 18, 30, .35), rgba(4, 18, 30, .7) 100%); }
+.g-pirates > .slot-bg::after { display: none; }
+.g-pirates > .slot-head { display: none !important; }
+.g-pirates > .slot-frame, .g-pirates.in-free > .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; }
+.g-pirates > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; overflow: visible; position: relative; }
+.g-pirates .controls { --accent: #f59e0b; --accent2: #78350f; background: rgba(20, 10, 4, .55); }
+.ap-stage { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 4px 0; }
+.ap-logo { display: flex; flex-direction: column; align-items: center; line-height: .9; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6)); }
+.ap-logo b { font: 400 clamp(30px, 7vw, 54px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 3px; background: linear-gradient(180deg, #fffbe6 0%, #ffe680 30%, #f7bd22 50%, #a8670a 54%, #ffd65a 78%, #8a5206 100%); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 1px #4a2a06; }
+.ap-logo small { font: 900 clamp(10px, 2.2vw, 15px)/1.2 Archivo, sans-serif; letter-spacing: 6px; color: #fff7d6; text-shadow: 0 1px 0 #78350f, 0 0 6px rgba(0, 0, 0, .8); }
+.g-pirates.ap-heisting .ap-logo { display: none; }
+.ap-board { position: relative; width: 100%; }
+.ap-reels, .ap-heist { position: relative; border-radius: 16px; padding: 6px; background: rgba(8, 20, 30, .38); box-shadow: inset 0 0 0 2px rgba(253, 224, 71, .85), inset 0 0 0 5px rgba(74, 42, 6, .85), inset 0 0 0 6px rgba(253, 224, 71, .35), 0 16px 36px rgba(0, 0, 0, .45); }
+.ap-reels { width: fit-content; max-width: 100%; margin: 0 auto; box-sizing: border-box; }
+.g-pirates.ap-heisting .ap-reels { display: none; }
+.g-pirates .rs.ap-rs { width: min(calc(100vw - 32px), calc((100vh - var(--chrome) - 150px) * 5 / 4), 820px); min-width: min(calc(100vw - 32px), 250px); gap: 4px; }
+.game-host.is-full .g-pirates .rs.ap-rs { width: min(calc(100vw - 28px), calc((100dvh - var(--chrome) - 110px) * 5 / 4)); }
+.g-pirates .rs-reel { border-radius: 10px; background: linear-gradient(180deg, rgba(10, 24, 36, .5), rgba(10, 24, 36, .28) 50%, rgba(10, 24, 36, .5)); box-shadow: inset 0 0 0 1px rgba(253, 224, 71, .18); }
+.g-pirates .rs-cell { --tg: transparent; container-type: size; }
+.g-pirates .rs-cell::before { content: ''; position: absolute; inset: 6%; z-index: 0; border-radius: 12px; background: radial-gradient(circle at 50% 45%, var(--tg), transparent 70%); }
+.g-pirates .rs-cell > * { position: relative; z-index: 1; }
+.g-pirates .rs-cell.cash { --tg: rgba(250, 204, 21, .5); } .g-pirates .rs-cell.coll { --tg: rgba(248, 113, 113, .55); }
+.g-pirates .rs-cell.scat { --tg: rgba(56, 189, 248, .6); } .g-pirates .rs-cell.wild { --tg: rgba(163, 230, 53, .45); } .g-pirates .rs-cell.hi { --tg: rgba(255, 255, 255, .08); }
+.g-pirates .rs-cell.ap-boss { animation: apBoss .5s ease-in-out infinite alternate; }
+@keyframes apBoss { to { filter: brightness(1.4) drop-shadow(0 0 14px #f87171); transform: scale(1.08); } }
+/* placeholders until the owner's pictures (emoji + label), and the pictures themselves */
+.ap-emo { display: grid; place-items: center; width: 100%; height: 100%; line-height: 1; }
+.ap-emo i { font-style: normal; font-size: 52cqh; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .7)); }
+.ap-emo small { margin-top: -8%; padding: 1px 6px; border-radius: 4px; font: 900 11cqh/1.2 Archivo, sans-serif; letter-spacing: .5px; color: #fff7d6; background: linear-gradient(180deg, #7c4a1a, #4a2a0c); box-shadow: 0 0 0 1px #fbbf24, 0 2px 4px rgba(0, 0, 0, .6); }
+.rs-cell.lo .ap-emo i { font-size: 42cqh; opacity: .92; }
+.rs-cell.wild .ap-emo small { color: #1a2e05; background: #bef264; box-shadow: 0 0 10px #84cc16; }
+.rs-cell.scat .ap-emo small { color: #fff; background: linear-gradient(90deg, #7c3aed, #0ea5e9); }
+.rs-cell.coll .ap-emo small, .ap-hc.t-coll .ap-emo small { color: #fff; background: #dc2626; box-shadow: 0 0 10px #f87171; }
+.ap-img { width: 92%; height: 92%; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .7)); }
+.ap-cs i { font-size: 40cqh; } .ap-cs.big i { font-size: 46cqh; }
+.ap-v { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); white-space: nowrap; font: 900 19cqh/1 KeCoin, Archivo, sans-serif; color: #fde047; text-shadow: 0 2px 0 #713f12, 0 0 8px #000, 0 0 2px #000; }
+.ap-v.big { color: #fff; text-shadow: 0 2px 0 #a16207, 0 0 10px #facc15, 0 0 3px #000; }
+.ap-ke { display: inline-block; width: .8em; height: .8em; margin-left: .08em; vertical-align: -.05em; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff7c2, #facc15 45%, #a16207); box-shadow: 0 0 0 1px #713f12; }
+.ap-m { position: absolute; left: 50%; bottom: 6%; transform: translateX(-50%); font: 400 30cqh/1 'Bebas Neue', Impact, sans-serif; color: #fff7d6; text-shadow: 0 0 8px #f59e0b, 0 2px 0 #78350f; }
+/* the suspense */
+.g-pirates.ap-tense .rs-reel:not(.ap-focus) { filter: brightness(.4) saturate(.6); transition: filter .4s; }
+.g-pirates .rs-reel.ap-focus, .g-pirates .ap-hc.ap-focus { box-shadow: inset 0 0 0 3px #38bdf8, 0 0 26px rgba(56, 189, 248, .95); animation: apFocus .45s ease-in-out infinite alternate; z-index: 2; }
+@keyframes apFocus { to { box-shadow: inset 0 0 0 3px #fde047, 0 0 34px rgba(250, 204, 21, .95); } }
+/* THE SYNDICATE HEIST: 5 × 6, 2 locked rows at the top */
+.ap-heist { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(6, 1fr); gap: 4px; aspect-ratio: 5 / 6; width: min(100%, 540px); margin: 0 auto; box-sizing: border-box; }
+@media (orientation: landscape) { .ap-heist { width: min(calc(100vw - 20px), calc((100vh - var(--chrome) - 40px) * 5 / 6), 620px); } .game-host.is-full .g-pirates .ap-heist { width: min(calc(100vw - 20px), calc((100dvh - var(--chrome) + 40px) * 5 / 6)); } }
+.ap-heist[hidden] { display: none; }
+.ap-hc { position: relative; container-type: size; display: grid; place-items: center; border-radius: 10px; min-width: 0; min-height: 0; }
+.ap-hc > * { grid-area: 1 / 1; }
+.ap-slotc { position: absolute; inset: 4%; border-radius: 10px; background: radial-gradient(circle at 50% 40%, rgba(20, 50, 70, .55), rgba(4, 14, 22, .9) 72%); box-shadow: inset 0 0 0 1.5px rgba(253, 224, 71, .4), inset 0 6px 14px rgba(0, 0, 0, .8); overflow: hidden; }
+.ap-hc.rolling .ap-slotc { box-shadow: inset 0 0 0 1.5px #38bdf8, inset 0 6px 14px rgba(0, 0, 0, .8); }
+.ap-hc.rolling .ap-slotc::after { content: ''; position: absolute; inset: -50% 0; background: linear-gradient(180deg, transparent, rgba(56, 189, 248, .35), rgba(224, 242, 254, .6), rgba(56, 189, 248, .35), transparent); animation: apRoll .3s linear infinite; }
+@keyframes apRoll { from { transform: translateY(-40%); } to { transform: translateY(40%); } }
+.ap-hc.on { background: radial-gradient(circle, rgba(250, 204, 21, .3), transparent 70%); }
+.ap-hc.on.t-coll { background: radial-gradient(circle, rgba(248, 113, 113, .45), transparent 70%); }
+.ap-hc.on.t-safe { background: radial-gradient(circle, rgba(217, 119, 6, .5), transparent 70%); }
+.ap-hc.on.t-bomb { background: radial-gradient(circle, rgba(56, 189, 248, .45), transparent 70%); }
+.ap-hc .ap-emo small { display: none; } .ap-hc .ap-emo i { font-size: 46cqh; transform: translateY(-10%); }
+.ap-hc .ap-v { font-size: 18cqh; } .ap-hc.t-coll .ap-v { color: #fff; text-shadow: 0 2px 0 #7f1d1d, 0 0 10px #f87171, 0 0 3px #000; }
+.ap-hc.counted { filter: brightness(1.25); }
+.ap-lock { grid-column: 1 / -1; z-index: 3; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 2px; border-radius: 10px; background: repeating-linear-gradient(90deg, rgba(92, 52, 18, .95) 0 26px, rgba(74, 40, 12, .95) 26px 28px); box-shadow: inset 0 0 0 2px rgba(253, 224, 71, .6), inset 0 0 18px rgba(0, 0, 0, .55); transition: opacity .5s, transform .5s; }
+.ap-lock i { font-style: normal; font-size: clamp(18px, 4vw, 30px); }
+.ap-lock span { display: flex; flex-direction: column; font: 800 clamp(10px, 2vw, 14px)/1.25 Archivo, sans-serif; color: #fef3c7; }
+.ap-lock em { font-style: normal; font-weight: 700; color: #fde68a; opacity: .85; }
+.ap-lock.gone { opacity: 0; transform: scale(1.2); pointer-events: none; }
+/* the words, the lives */
+.ap-word { position: absolute; left: 50%; top: 45%; z-index: 20; pointer-events: none; opacity: 0; transform: translate(-50%, -50%); white-space: nowrap; text-align: center; font: 400 clamp(34px, 8vw, 72px)/.95 'Bebas Neue', Impact, sans-serif; letter-spacing: 2px; color: #fff7d6; text-shadow: 0 0 8px #f59e0b, 0 0 22px #b45309, 4px 4px 0 #3b1d06; }
+.ap-word small { display: block; font-size: .55em; }
+.ap-word.boss { color: #fee2e2; text-shadow: 0 0 8px #f87171, 0 0 22px #dc2626, 4px 4px 0 #3b0a0a; }
+.ap-word.gold { color: #fff7d6; text-shadow: 0 0 8px #facc15, 0 0 26px #f59e0b, 4px 4px 0 #422006; }
+.ap-word.boom { color: #e0f2fe; text-shadow: 0 0 8px #38bdf8, 0 0 22px #0369a1, 4px 4px 0 #082f49; }
+.ap-word.big { font-size: clamp(40px, 10vw, 96px); }
+.ap-dots { display: inline-flex; gap: 4px; margin-left: 6px; vertical-align: middle; } .ap-dots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, .2); } .ap-dots i.on { background: #fde047; box-shadow: 0 0 8px #facc15; }
+.g-pirates.ap-boom .ap-heist { animation: apBoom .12s linear 10; }
+@keyframes apBoom { 50% { transform: translate(4px, -3px) scale(1.01); } }
+/* the opening of the heist */
+.slot-overlay.ap-intro { display: grid; place-content: center; justify-items: center; text-align: center; gap: 10px; background: radial-gradient(circle at 50% 45%, rgba(12, 74, 110, .92), rgba(3, 12, 20, .97) 70%); overflow: hidden; }
+.ap-ibeam { position: absolute; inset: -50%; background: repeating-conic-gradient(from 0deg, rgba(250, 204, 21, .16) 0 12deg, transparent 12deg 24deg); animation: apSpin 9s linear infinite; }
+@keyframes apSpin { to { transform: rotate(360deg); } }
+.ap-ititle { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: 640px; padding: 0 16px; }
+.ap-ititle small { font: 900 clamp(12px, 2.6vw, 18px)/1 Archivo, sans-serif; letter-spacing: 6px; color: #fde68a; text-shadow: 0 0 10px #b45309; }
+.ap-ititle b { font: 400 clamp(44px, 11vw, 110px)/.9 'Bebas Neue', Impact, sans-serif; color: #fff7d6; text-shadow: 0 0 10px #f59e0b, 0 0 30px #b45309, 5px 5px 0 #3b1d06; animation: apPulse .6s ease-in-out infinite alternate; }
+@keyframes apPulse { to { text-shadow: 0 0 16px #fde68a, 0 0 44px #f59e0b, 5px 5px 0 #3b1d06; } }
+.ap-ititle p { font: 600 clamp(12px, 2.4vw, 16px)/1.45 Archivo, sans-serif; color: #e0f2fe; }
+.slot-overlay.ap-intro > small { position: relative; color: #a3a3a3; }
+.slot-overlay.ap-intro.out { opacity: 0; transition: opacity .3s; }
+.ap-pay .ap-emo i { font-size: 30px; } .ap-pay .ap-emo small { font-size: 9px; }
+@media (max-width: 640px) { .game-host:not(.is-full):has(> .g-pirates) { max-width: none; margin-left: -12px; margin-right: -12px; } .slot.g-pirates { padding-left: 4px; padding-right: 4px; } }
+@media (min-width: 641px) { .game-host:not(.is-full):has(> .g-pirates) { max-width: min(1100px, 100%); } }
+@media (min-width: 900px) and (orientation: landscape) { .game-host:not(.is-full) > .slot.g-pirates { min-height: min(calc(100vh - 90px), 1000px); display: flex; flex-direction: column; justify-content: center; } }
+.slot.g-pirates { overflow: hidden; overflow: clip; }
+.game-host.is-full:has(> .slot.g-pirates) { padding: 0; background: #0c4a6e; overflow: hidden; --chrome: 200px; }
+.game-host.is-full > .slot.g-pirates { width: 100%; max-width: none !important; min-height: 100%; margin: 0; border-radius: 0; border: 0; display: flex; flex-direction: column; justify-content: center; box-sizing: border-box; }
+.game-host.is-full > .slot.g-pirates > .slot-bg { grid-column: auto !important; grid-row: auto !important; position: absolute; inset: 0; }
+/* phone on its side, full screen: the default grid of the machines (bet bar in the right column), no title */
+@media (orientation: landscape) and (max-height: 560px) {
+  .game-host.is-full:has(> .slot.g-pirates) { --chrome: 40px; }
+  .game-host.is-full > .slot.g-pirates { display: grid; padding: 4px 8px; }
+  .game-host.is-full .g-pirates .ap-logo { display: none; }
+  .game-host.is-full .g-pirates .rs.ap-rs { width: min(calc(100vw - 300px), calc((100dvh - 30px) * 5 / 4)); min-width: 0; }
+  .game-host.is-full .g-pirates .ap-heist { width: min(calc(100vw - 300px), calc((100dvh - 20px) * 5 / 6)); }
+}
+@media (prefers-reduced-motion: reduce) { .ap-ibeam, .ap-ititle b, .g-pirates .rs-cell.ap-boss { animation: none; } }
 .g-redk { --slot-bg: #050a1c; --rk-gold: linear-gradient(180deg, #fffbe6 0%, #ffe680 26%, #f7bd22 48%, #a8670a 52%, #ffd65a 74%, #8a5206 100%); }
 .slot.g-redk > .slot-bg { background: #050a1c url(assets/games/redk/bg.webp?v=1) center / cover no-repeat !important; overflow: hidden; filter: none !important; border-radius: inherit; }
 .g-redk > .slot-bg::after { display: none; }
@@ -11616,6 +11725,7 @@ const ORIGINALS = [
   {"id": "viking", "name": "Le Valhalla", "cat": "slot", "tag": "Machine à sous", "sub": "WILD collés · 15 tours gratuits", "colors": ["#38bdf8", "#0b2a3a"], "description": "Un temple viking taillé dans la pierre, au pied des montagnes. 4 Jarls lancent le BONUS VALHALLA : la valkyrie pose 5 WILD qui restent collés pendant 15 tours gratuits, et chaque nouveau WILD reste aussi : ils s’accumulent jusqu’à la fin. À gauche, les deux héros remplissent leur jauge à chaque Jarl et chaque WILD qui tombent : à 250, le Jarl lance le bonus tout seul, à 500, la valkyrie devient un WILD géant qui change de place à chaque tour et grandit quand il fait gagner : 2×2, 3×3, 4×4, puis toute la grille.", "features": ["5 rouleaux · 25 lignes", "WILD collés pendant les tours gratuits", "Bonus : 15 tours gratuits, 5 WILD au départ", "Jauge du Jarl : le bonus à 250", "Jauge de la valkyrie : la Valkyrie géante à 500", "WILD géant qui grandit jusqu’à toute la grille", "2 achats de bonus", "Max ×1 000"], "rtp": "≈ 92 %", "vol": 3, "max": "×1 000"},
   {"id": "barillet", "name": "La Roulette Russe", "cat": "slot", "tag": "Machine à sous", "sub": "576 façons · le revolver met le feu aux gains", "colors": ["#f59e0b", "#1c0f05"], "description": "Un vieux saloon, un revolver chargé à bloc. 5 rouleaux de 3, 4, 4, 4 et 3 cases, 576 façons de gagner et le cow-boy WILD qui couvre tout son rouleau. Une balle d’or et une connexion : le revolver tire 1 à 3 balles sur les cases gagnantes, qui prennent feu avec ×2 à ×10, et les multiplicateurs d’une ligne se multiplient. 3 avis de recherche lancent LE DUEL : des grosses balles à chaque gain, et les cases en feu restent jusqu’à la fin. Puis la roulette russe : 1 à 5 balles pour multiplier ton gain… ou tout perdre.", "features": ["Volatilité extrême", "576 façons de gagner", "WILD qui couvre le rouleau", "Balle d’or : le revolver tire", "Cases en feu ×2 à ×50", "Le Duel : les cases restent en feu", "Roulette russe", "2 achats de bonus", "Max ×20 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×20 000"},
   {"id": "redk", "name": "Diamants REDK", "cat": "slot", "tag": "Machine à sous", "sub": "Ruby Link très souvent · Pyramide d’or", "colors": ["#ef4444", "#0b1a3a"], "description": "Une mine de diamants qui scintille derrière toute la machine. Les rubis rouges portent leur valeur en KE : 6 rubis lancent le RUBY LINK, très souvent, où ils restent en place avec 3 re-spins. Déverrouille les 3 rangées du haut et attrape les boosters SPIN+, REELS+, MULTI+ et VALUE+. 4 pyramides lancent LA PYRAMIDE D’OR, le bonus spécial qu’on ne peut pas acheter : que des rubis dorés avec de gros multiplicateurs, jusqu’à ×10 000 la mise. Et quand il ne manque qu’un rubis… retiens ton souffle.", "features": ["5 rouleaux · 20 lignes", "Ruby Link environ tous les 75 tours", "3 rangées à déverrouiller", "Boosters SPIN+, REELS+, MULTI+, VALUE+", "La Pyramide d’or : rubis dorés ×2 à ×250", "MINI, MINOR, MAJOR, GRAND", "1 achat de bonus", "Max ×10 000"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
+  {"id": "pirates", "name": "Le Coffre aux Pirates", "cat": "slot", "tag": "Machine à sous", "sub": "Chasse au trésor · max ×50 000", "colors": ["#f59e0b", "#0c4a6e"], "description": "Un bateau pirate file sur la mer des Caraïbes, derrière toute la machine. Des petits gains souvent, des pièces d’or qui portent leur valeur en KE, et le Crabe du rouleau 5 qui ramasse toutes les pièces de l’écran. 3 tourbillons lancent LA CHASSE AU TRÉSOR : 3 vies remises à 3 à chaque nouveau symbole, des Tonneaux qui multiplient les pièces jusqu’à ×50, le Crabe qui ramasse tout, des Ancres qui agrandissent la grille. Remplis les 30 cases et le coffre aux pirates s’ouvre : ×500 sur tout le bonus, jusqu’à ×50 000 la mise.", "features": ["5 rouleaux · 20 lignes", "Volatilité extrême", "Pièces d’or et Crabe qui ramasse", "La Chasse au trésor : 3 vies", "Tonneau ×2 à ×50, Ancre, Crabe", "Full screen : ×500 sur tout le bonus", "1 achat de bonus", "Max ×50 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×50 000", "wip": true},
   {"id": "filon", "name": "Le Filon", "cat": "slot", "tag": "Machine à sous", "sub": "Mine d’or · cases jusqu’à ×8 192", "colors": ["#f59e0b", "#1c1006"], "description": "Une vieille mine d’or où chaque case de la grille 7×7 cache un multiplicateur. 10 symboles identiques n’importe où paient et tombent en cascade, et chaque gain pose un ×2 sur sa case, puis le double : ×4, ×8… jusqu’à ×8 192. Minerais mystère, dynamite et joker doré font grimper les cases. 3, 4 ou 5 BONUS lancent La Veine d’or, La Grande Galerie ou La Ruée vers l’or : la roue des bonus, et des multiplicateurs qui ne repartent jamais à zéro.", "features": ["Volatilité extrême", "Grille 7×7 Pay Anywhere", "Cascades", "Multiplicateurs des cases ×2 à ×8 192", "Minerais mystère et dynamite", "3 bonus et la roue des bonus", "Mise boostée et tour doré", "5 achats de bonus", "Max ×30 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×30 000"},
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Pas de coup de vent : la tour tient tant qu’elle est bien équilibrée, mais un cube trop raté ou une tour qui penche trop, et tout s’écroule. Chaque cube posé multiplie ta mise.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Une vraie tour qui penche si tu vises mal", "Encaisse quand tu veux"], "rtp": "≈ 96 % (très bon joueur)", "vol": 4, "max": "×22,14"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
@@ -12052,6 +12162,9 @@ const SPECS = {
       <circle r="12" fill="#1e293b" stroke="#94a3b8" stroke-width="2"/></g>
       <g transform="translate(244 236) rotate(18)"><path d="M-9 -10 Q-9 -40 0 -44 Q9 -40 9 -10Z" fill="#b87333"/><rect x="-10" y="-10" width="20" height="34" fill="url(#rrBul${u})"/></g>`,
   },
+  pirates: {
+    photo: 'assets/games/pirates/bg.webp', bg: ['#0c4a6e', '#082f49'], light: '#fde68a', title: ['LE COFFRE', 'AUX PIRATES'], font: 'bebas', metal: ['#fff7d6', '#facc15', '#92400e'], tag: 'MAX ×50 000', art: () => '',
+  },
   redk: { photo: 'assets/games/redk/cover.webp', bg: ['#7f1d1d', '#050a1c'], light: '#fecaca', title: ['DIAMANTS', 'REDK'], font: 'bebas', metal: ['#fff7d6', '#facc15', '#b91c1c'], tag: 'RUBY LINK', art: () => '' },
   filon: {
     bg: ['#78350f', '#0c0603'], light: '#fde68a', title: ['LE FILON'], font: 'bebas', metal: ['#fffbe0', '#facc15', '#92400e'], tag: 'MAX ×30 000', photo: 'assets/games/filon/cover.webp',
@@ -12233,7 +12346,7 @@ const CARD = {
   'big-bad-wolf': ['#4a5fd6', '#161c5c'], zeus: ['#3d86ff', '#1239a8'], huff: ['#45bdfc', '#1b7a3c'], candy: ['#ff62c9', '#9c1fbd'], cosmic: ['#1fb6d9', '#5b1bb5'],
   anubis: ['#1b2f36', '#d6a21c'], bling: ['#b648ff', '#4b109f'], pharaon: ['#f7b52a', '#a3540a'], bounty: ['#1cc0dc', '#0b5c8c'],
   madwheel: ['#ff579f', '#7c1cb4'], storm: ['#3169ff', '#0c1f7c'], doublespin: ['#ffb627', '#c2410c'], blackjack: ['#19a865', '#0a4a2c'], roulette: ['#2a86c8', '#0b2d52'], bataille: ['#d6a630', '#5a1020'], lightningbj: ['#4f7bff', '#14207a'], poker: ['#16b374', '#0a4a2c'],
-  chasse: ['#65a30d', '#14532d'], noel: ['#ef4444', '#1e3a8a'], totemx: ['#f97316', '#7f1d1d'], viking: ['#38bdf8', '#0b2a3a'], barillet: ['#d97706', '#451a03'], filon: ['#f59e0b', '#422006'], redk: ['#ef4444', '#0b1a3a'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], pilote: ["#38a6f5", "#0b2a6f"], foot: ["#22b45e", "#062a14"], boxe: ["#ef4444", "#3b0707"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
+  chasse: ['#65a30d', '#14532d'], noel: ['#ef4444', '#1e3a8a'], totemx: ['#f97316', '#7f1d1d'], viking: ['#38bdf8', '#0b2a3a'], barillet: ['#d97706', '#451a03'], filon: ['#f59e0b', '#422006'], redk: ['#ef4444', '#0b1a3a'], pirates: ['#f59e0b', '#0c4a6e'], mines: ['#ff8f24', '#9a3b06'], avion: ['#ff4672', '#7c0f30'], plinko: ['#38bdf8', '#4c1d95'], vortex: ['#ef4444', '#2a0a0e'], casse: ['#64748b', '#0f172a'], dragons: ["#ea580c", "#7f1d1d"], billets: ["#e0a526", "#6b4508"], fortune: ['#ef4444', '#7f1d1d'], 'taco': ["#f43f5e", "#9d174d"], 'robots': ["#1aa6d6", "#0b2a5c"], 'pileface': ["#f5b11c", "#8a4a06"], poulet: ["#f2c11d", "#7a5a06"], gratteciel: ["#38a6f5", "#3b1c8c"], pilote: ["#38a6f5", "#0b2a6f"], foot: ["#22b45e", "#062a14"], boxe: ["#ef4444", "#3b0707"], penalty: ["#22b45e", "#0b4a26"], ticket: ["#f6c21f", "#a3176b"], plateau: ["#25b860", "#0b4a26"], peche: ["#2aa8e8", "#0b3a6e"], roueor: ["#e0a526", "#2a1f06"], billes: ["#2aa8e8", "#3b1c8c"], labo: ["#9d3df0", "#14051f"],
 };
 // the wheel games' salons wear their game's poster, with the ONLINE ribbon
 ['madwheel', 'plateau', 'peche', 'roueor', 'robots'].forEach((id) => { SPECS[`${id}-online`] = { ...SPECS[id], online: true, tag: 'ONLINE' }; if (CARD[id]) CARD[`${id}-online`] = CARD[id]; });
@@ -13640,6 +13753,7 @@ const EXTRA_THEMES = {
   roueor: { sd: 0.22, len: 16, root: 146.83, pad: { wave: 'sawtooth', vol: 0.016, dur: 2, map: { 0: [0, 3, 7], 8: [-2, 2, 7] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.24, pat: [12, null, 15, null, 19, null, 17, 15, 12, null, 10, null, 12, null, null, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.4, pat: [-12, null, null, -12, null, null, -9, null, -12, null, null, -12, null, null, -7, null] }, kick: [0, 6, 8, 14], hat: [4, 12], kv: 0.2, hv: 0.02 },
   billes: { sd: 0.15, len: 16, root: 220, lead: { wave: 'square', vol: 0.024, dur: 0.1, pat: [12, 16, 19, 24, 19, 16, 12, null, 14, 17, 21, 26, 21, 17, 14, null] }, bass: { wave: 'triangle', vol: 0.12, dur: 0.16, pat: [-12, null, -12, -5, null, -5, -12, null, -10, null, -10, -3, null, -3, -10, null] }, kick: [0, 4, 8, 12], hat: [2, 6, 10, 14], kv: 0.18, hv: 0.02 },
   redk: { sd: 0.18, len: 16, root: 130.81, pad: { wave: 'sawtooth', vol: 0.012, dur: 2, map: { 0: [0, 3, 7], 8: [-4, 0, 3] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.18, pat: [12, null, 15, 19, null, 15, 12, null, 10, null, 12, 15, null, 22, 19, null] }, bass: { wave: 'sine', vol: 0.17, dur: 0.3, pat: [-12, null, -12, -5, null, -12, null, null, -16, null, -16, -9, null, -14, null, null] }, kick: [0, 6, 8, 14], hat: [4, 12], kv: 0.22, hv: 0.02 },
+  pirates: { sd: 0.2, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.012, dur: 2.4, map: { 0: [0, 3, 7], 8: [-4, 0, 3] } }, lead: { wave: 'square', vol: 0.03, dur: 0.12, pat: [12, null, null, 15, null, null, 12, null, null, null, 19, null, 17, null, 15, null] }, bass: { wave: 'sine', vol: 0.22, dur: 0.6, pat: [-12, null, null, null, null, null, -12, null, null, -12, null, null, -16, null, null, null] }, kick: [0, 6, 10], hat: [2, 4, 6, 8, 10, 12, 13, 14, 15], kv: 0.32, hv: 0.018 },
   filon: { sd: 0.17, len: 16, root: 146.83, pad: { wave: 'triangle', vol: 0.014, dur: 1.8, map: { 0: [0, 4, 7], 8: [-2, 2, 5] } }, lead: { wave: 'triangle', vol: 0.05, dur: 0.16, pat: [12, null, 14, 16, null, 19, 16, null, 14, 12, null, 9, 12, null, 7, null] }, bass: { wave: 'sine', vol: 0.15, dur: 0.22, pat: [-12, null, -5, null, -12, null, -5, null, -10, null, -3, null, -7, null, -5, null] }, kick: [0, 8, 11], hat: [4, 12], kv: 0.18, hv: 0.02 },
 };
 
@@ -15523,6 +15637,7 @@ const FILES = {
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
   filon: ['filon', 'games/impl/filon.js', 'FilonGame', '45904335f9'],
   redk: ['redk', 'games/impl/redk.js', 'RedkGame', 'bd8206438f'],
+  pirates: ['pirates', 'games/impl/pirates.js', 'PiratesGame', 'bb445fe428'],
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '1025072609'],
   boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '48602d9af5'],
 };
@@ -16512,6 +16627,7 @@ const LIST = [
   ['viking', [['b', 'Bonus Valhalla', T(/^BONUS VALHALLA/)], ['g', 'La Valkyrie géante', T(/^LA VALKYRIE GÉANTE/)]]],
   ['barillet', [['fs', 'Le Duel', T(/^LE DUEL/)]]],
   ['redk', [['l', 'Ruby Link', T(/^RUBY LINK/)], ['g', 'La Pyramide d’or', T(/^LA PYRAMIDE D’OR/)]]],
+  ['pirates', [['h', 'La Chasse au trésor', T(/^LA CHASSE AU TRÉSOR/)]]],
   ['filon', [['b1', 'La Veine d’or', T(/^LA VEINE D’OR/)], ['b2', 'La Grande Galerie', T(/^LA GRANDE GALERIE/)], ['b3', 'La Ruée vers l’or', T(/^LA RUÉE VERS L’OR/)]]],
   ['madwheel', [['cf', 'Pile ou Face'], ['ch', 'Tir aux Cibles'], ['pa', 'Pachinko'], ['ct', 'Méga Folie']]],
   ['plateau', [['b2', 'Bonus 2 lancers'], ['b4', 'Bonus 4 lancers']]],
