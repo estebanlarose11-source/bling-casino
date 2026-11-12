@@ -491,6 +491,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   bien payé ou pas : rejouer ce bonus gratuitement, 1 par jour, à la même mise au plus, carte `.rp-offer` de `mystere.js`),
   `tour_x2` (doubler un prix de tournoi, bouton dans la fenêtre du prix, 2 par jour), `jcc_pack` (un paquet bleu en plus,
   bouton dans « Acheter un paquet », 1 par jour).
+- **Le chat garde 48 heures** (voulu par le propriétaire : le site ne garde pas tous les messages) : les messages de plus de
+  48 h ne s'affichent plus (`CHAT_TTL` / `fresh` dans `cloud.js`, chat général et chats des tables) et GitHub Actions
+  **« Chat »** (`tools/admin/chat.mjs`, `.github/workflows/chat.yml`, toutes les 6 h ou à la main) les efface de Firestore
+  (secret `FIREBASE_SERVICE_ACCOUNT`).
 - **Gros gains dans le chat** (`chat.js`) : après un tour ≥ ×50 la mise ou ≥ 100 000 KE (bonus achetés exclus), le compte
   poste tout seul « 🎰 GROS GAIN ! +… KE (×…) sur <jeu> » (message normal, mêmes règles Firestore, 1 par minute au plus),
   affiché en carte dorée avec le lien du jeu.

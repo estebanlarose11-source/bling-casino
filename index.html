@@ -8214,6 +8214,9 @@ const message = (e) => ERR[e?.code] || 'Connexion impossible pour le moment, ré
 
 const users = async () => (await init()).db.collection('users');
 
+// the chat keeps 48 hours of messages (owner's wish): older ones are hidden here and deleted by tools/admin/chat.mjs
+const CHAT_TTL = 48 * 3600e3;
+const fresh = (m) => { const t = m.at?.toMillis?.() ?? (typeof m.at === 'number' ? m.at : null); return t == null || Date.now() - t < CHAT_TTL; };
 const cloud = {
   enabled,
   message,
@@ -8268,9 +8271,11 @@ const cloud = {
 
   /* ---------- General chat: chat/{id} = { uid, name, text, at } (+ chatmeta/{uid} = { last } for the 3 s rate limit) ---------- */
   // Live last n messages, oldest first: cb(list). Returns a function that stops listening.
+  // Messages older than CHAT_TTL are not shown (owner's wish) and are deleted by the GitHub task « Chat »
+  // (tools/admin/chat.mjs, every 6 hours).
   async watchChat(n, cb) {
     return (await init()).db.collection('chat').orderBy('at', 'desc').limit(n)
-      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() })).reverse()), (e) => console.error(e));
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() })).filter(fresh).reverse()), (e) => console.error(e));
   },
   async sendChat(uid, name, text, look) {
     const { db } = await init();
@@ -8308,7 +8313,7 @@ const cloud = {
   },
   async watchTableChat(game, n, cb) {
     return (await init()).db.collection('tables').doc(game).collection('chat').orderBy('at', 'desc').limit(n)
-      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() })).reverse()), (e) => console.error(e));
+      .onSnapshot((q) => cb(q.docs.map((d) => ({ id: d.id, ...d.data() })).filter(fresh).reverse()), (e) => console.error(e));
   },
   async sendTableChat(game, uid, name, text, look) {
     const { db } = await init();

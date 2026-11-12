@@ -1,0 +1,24 @@
+# Efface les messages du chat de plus de 48 heures (tools/admin/chat.mjs), toutes les 6 heures, ou à la main :
+# Actions → « Chat » → Run workflow. Secret nécessaire : FIREBASE_SERVICE_ACCOUNT.
+name: Chat
+
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  chat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+        working-directory: tools/push
+      - name: Effacer les vieux messages
+        run: cp tools/admin/chat.mjs tools/push/chat.mjs && node tools/push/chat.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
