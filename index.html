@@ -5829,6 +5829,18 @@ body.fs-on .live-tick { display: none; }
 .jc-all-sum { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 4px 0; }
 .jc-all-sum span { padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 700; background: rgba(255, 255, 255, .08); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .15); }
 .jc-all-p.p-o, .jc-all-r.r-L { color: #fde68a; box-shadow: inset 0 0 0 1px #f59e0b !important; }
+/* série 2 (Les Trois Petits Cochons) : rares 50 000 en violet brillant, secrètes 200 000 tout en or */
+.jc-card.s-p.r-R { --rc: #c084fc; box-shadow: 0 8px 22px rgba(0, 0, 0, .5), 0 0 20px rgba(192, 132, 252, .55), inset 0 0 0 2px rgba(192, 132, 252, .9); }
+.jc-card.r-S { --rc: #fcd34d; --c1: #fde68a; --c2: #7a4a06; box-shadow: 0 8px 26px rgba(0, 0, 0, .55), 0 0 30px rgba(252, 211, 77, .8), inset 0 0 0 2px #fde68a; animation: jcSecret 2.6s ease-in-out infinite; }
+@keyframes jcSecret { 50% { box-shadow: 0 8px 26px rgba(0, 0, 0, .55), 0 0 44px rgba(252, 211, 77, 1), inset 0 0 0 2px #fff7d6; } }
+.jc-card.r-S.locked { animation: none; box-shadow: 0 8px 22px rgba(0, 0, 0, .5), 0 0 16px rgba(252, 211, 77, .45), inset 0 0 0 2px rgba(252, 211, 77, .7); }
+.jc-card.s-p.r-R:not(.locked) .jc-in::before, .jc-card.r-S:not(.locked) .jc-in::before { content: ''; position: absolute; inset: -40% -100%; z-index: 2; pointer-events: none; background: linear-gradient(100deg, transparent 45%, rgba(255, 240, 200, .4) 50%, transparent 55%); animation: jcShine 3.2s ease-in-out infinite; }
+.jc-card.s-p .jc-art img { object-position: 50% 40%; }
+.jc-forge-pts li.r-S { --rc: #fcd34d; } .jc-odds th.r-S { color: #fcd34d; }
+.jc-all-r.r-S { color: #fff7d6; background: linear-gradient(90deg, #b45309, #f59e0b) !important; }
+.jc-ends { font-style: normal; font-size: 13px; font-weight: 800; color: #f9a8d4; } .jc-ends b { font-size: inherit; color: #fff; text-shadow: none; }
+.jc-ends.over { color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .jc-card.r-S, .jc-card.s-p.r-R .jc-in::before, .jc-card.r-S .jc-in::before { animation: none !important; } }
 .jc-all-p.p-v, .jc-all-r.r-E { color: #e9d5ff; box-shadow: inset 0 0 0 1px #a855f7 !important; }
 .jc-all-r.r-R { color: #bae6fd; box-shadow: inset 0 0 0 1px #38bdf8 !important; }
 .jc-all-r.new { color: #bbf7d0; box-shadow: inset 0 0 0 1px #22c55e !important; }
@@ -20300,6 +20312,8 @@ __mods['jcc.js'] = (() => {
 // when it sees its card sold) or recycled in the forge (FORGE points → a violet pack).
 // Saved in profile.jcc = { pts, packs: { b, v, o }, sv, so, n, cards: { id: [normales, brillantes] }, forge, done: { serie: t }, log }.
 // Solo simulation (forge used, no market), 78 cards: the album takes ≈ 140 packs (median), 85 for the lucky 10 %, 250 for the unlucky 10 %.
+// Only the newest series (NOW) gets packs; older ones are closed. Series 2 (88 cards, rares 50 000, secrètes 200 000,
+// album 500 000 before `ends`): ≈ 790 packs solo (median), on purpose (the owner wants the secrets very hard).
 
 const { wallet, fmt } = __mods['wallet.js'];
 const { profiles } = __mods['profile.js'];
@@ -20315,8 +20329,9 @@ const RAR = {
   R: { name: 'Rare', cote: 2000, forge: 3, pow: 380 },
   E: { name: 'Épique', cote: 8000, forge: 10, pow: 700 },
   L: { name: 'Légendaire', cote: 25000, forge: 40, pow: 1000 },
+  S: { name: 'Secrète', cote: 200000, forge: 60, pow: 1500 },
 };
-const RANK = 'CREL';
+const RANK = 'CRELS';
 const PACKS = {
   b: { name: 'Paquet bleu', sub: 'Classique', odds: { C: 0.753, R: 0.215, E: 0.03, L: 0.002 } },
   v: { name: 'Paquet violet', sub: 'Rare', odds: { C: 0.448, R: 0.42, E: 0.12, L: 0.012 }, floor: 'R' },
@@ -20415,23 +20430,142 @@ const SERIES = [
       ['e10', 'e', 'L', 'Danseuse des Lames d’Éther', { img: 'aether' }, 'Ses lames tranchent la nuit en deux.'],
     ],
   },
+  {
+    // 2nd series (owner's pictures of 12 November 2026): 80 normales, 5 rares (50 000 KE), 3 secrètes (200 000 KE,
+    // très dures à avoir), album = 500 000 KE, one month to finish it (ends), then a new series comes out.
+    id: 'p', name: 'Les Trois Petits Cochons', season: 'Saison 2 · novembre – décembre 2026',
+    ends: '2026-12-12T23:59:59+01:00', album: 500000,
+    els: { c: { name: 'Cochons', icon: '🐷', c1: '#f9a8d4', c2: '#6b1d45' }, l: { name: 'Loup', icon: '🐺', c1: '#94a3b8', c2: '#1e2533' }, m: { name: 'Maisons', icon: '🧱', c1: '#f59e0b', c2: '#5a2a0c' } },
+    rar: { C: { name: 'Normale', cote: 500, forge: 1, pow: 120 }, R: { name: 'Rare', cote: 50000, forge: 20, pow: 800 }, S: { name: 'Secrète', cote: 200000, forge: 60, pow: 1500 } },
+    // per card; no floor (one rare is worth more than a gold pack). Average value of the 5 cards (brillantes
+    // comprised) ≈ 5 000 / 11 300 / 37 300 KE: still under the shop prices.
+    odds: { b: { C: 0.9925, R: 0.007, S: 0.0005 }, v: { C: 0.973, R: 0.025, S: 0.002 }, o: { C: 0.892, R: 0.1, S: 0.008 } },
+    cards: [
+      ['a2', 'c', 'C', 'Le Petit Peintre', { img: 'p/a2' }, 'Il montre son pinceau à son frère, tout fier.'],
+      ['a3', 'c', 'C', 'Tope là !', { img: 'p/a3' }, 'Deux frères, une idée : construire la maison.'],
+      ['a4', 'c', 'C', 'Les Bavards', { img: 'p/a4' }, 'Ils parlent de briques depuis ce matin.'],
+      ['a7', 'c', 'C', 'La Pomme de la Discorde', { img: 'p/a7' }, 'Une pomme pour deux ? Il y a un problème.'],
+      ['a8', 'c', 'C', 'Retour du Potager', { img: 'p/a8' }, 'Des carottes plein les bras pour la soupe.'],
+      ['b1', 'c', 'C', 'Le Cadeau', { img: 'p/b1' }, 'Un bouquet cueilli juste pour toi.'],
+      ['b2', 'c', 'C', 'La Petite Cuisinière', { img: 'p/b2' }, 'Son tablier est toujours impeccable.'],
+      ['b8', 'c', 'C', 'Le Maçon', { img: 'p/b8' }, 'Une brique, du mortier, une autre brique.'],
+      ['c2', 'c', 'C', 'Frère et Sœur', { img: 'p/c2' }, 'Toujours ensemble, même face au loup.'],
+      ['d8', 'c', 'C', 'Le Barbouilleur', { img: 'p/d8' }, 'Il repeint la maison… et ses sabots.'],
+      ['e1', 'c', 'C', 'L’Artiste', { img: 'p/e1' }, 'Il peint la maison de ses rêves.'],
+      ['e2', 'c', 'C', 'La Danse des Planches', { img: 'p/e2' }, 'Elle danse sur le chantier, il soupire.'],
+      ['e5', 'c', 'C', 'Le Siffleur', { img: 'p/e5' }, 'Il siffle en travaillant, comme toujours.'],
+      ['e6', 'c', 'C', 'Le Frileux', { img: 'p/e6' }, 'Une écharpe, un seau, et en route !'],
+      ['e7', 'c', 'C', 'L’Écharpe Rouge', { img: 'p/e7' }, 'Il ne la quitte jamais, même en été.'],
+      ['e8', 'c', 'C', 'La Joie du Matin', { img: 'p/e8' }, 'Le loup n’est pas là : on danse !'],
+      ['f1', 'c', 'C', 'Le Paysagiste', { img: 'p/f1' }, 'Il peint la prairie depuis son tabouret.'],
+      ['f2', 'c', 'C', 'Le Guitariste', { img: 'p/f2' }, 'Trois accords et toute la ferme chante.'],
+      ['f3', 'c', 'C', 'Le Bricoleur', { img: 'p/f3' }, 'Une pince à la main, il répare tout.'],
+      ['f4', 'c', 'C', 'La Cueilleuse', { img: 'p/f4' }, 'La plus belle pomme du verger est à elle.'],
+      ['f5', 'c', 'C', 'La Pomme d’Or', { img: 'p/f5' }, 'Il l’a trouvée sous le vieux pommier.'],
+      ['f6', 'c', 'C', 'La Danseuse', { img: 'p/f6' }, 'Elle tourne, tourne et tourne encore.'],
+      ['f7', 'c', 'C', 'Le Violoneux', { img: 'p/f7' }, 'Sa musique fait fuir le loup (presque).'],
+      ['f8', 'c', 'C', 'Le Scieur', { img: 'p/f8' }, 'Du bois pour le feu de ce soir.'],
+      ['g1', 'c', 'C', 'Le Portraitiste', { img: 'p/g1' }, 'Il a peint ses deux frères. Ils râlent.'],
+      ['g2', 'c', 'C', 'Le Premier Violon', { img: 'p/g2' }, 'Il joue la mélodie des trois maisons.'],
+      ['g3', 'c', 'C', 'Le Musicien', { img: 'p/g3' }, 'Il accorde son violon depuis une heure.'],
+      ['g4', 'c', 'C', 'La Sérénade', { img: 'p/g4' }, 'Une chanson pour la voisine d’à côté.'],
+      ['g5', 'c', 'C', 'Le Charpentier', { img: 'p/g5' }, 'Son rabot ne s’arrête jamais.'],
+      ['g7', 'c', 'C', 'L’Heure du Thé', { img: 'p/g7' }, 'Une pause bien méritée entre deux murs.'],
+      ['g8', 'c', 'C', 'Les Bâtisseurs', { img: 'p/g8' }, 'À deux, le mur monte deux fois plus vite.'],
+      ['h2', 'c', 'C', 'Le Grand Frère', { img: 'p/h2' }, 'C’est lui qui a eu l’idée des briques.'],
+      ['h4', 'c', 'C', 'Bretelles Jaunes', { img: 'p/h4' }, 'Il attend le loup de pied ferme.'],
+      ['h5', 'c', 'C', 'La Couturière', { img: 'p/h5' }, 'Elle recoud les salopettes de toute la famille.'],
+      ['h8', 'c', 'C', 'La Veillée', { img: 'p/h8' }, 'Trois frères, une forêt, et des bruits bizarres.'],
+      ['i1', 'c', 'C', 'La Cuisinière', { img: 'p/i1' }, 'Elle prépare la tarte aux pommes.'],
+      ['i2', 'c', 'C', 'Le Flûtiste', { img: 'p/i2' }, 'Il joue en marchant, sans jamais trébucher.'],
+      ['i3', 'c', 'C', 'Le Troubadour', { img: 'p/i3' }, 'Il chante l’histoire des trois maisons.'],
+      ['i5', 'c', 'C', 'Le Ramoneur', { img: 'p/i5' }, 'Une cheminée propre, un loup bien reçu.'],
+      ['i7', 'c', 'C', 'Le Gardien du Feu', { img: 'p/i7' }, 'Le feu doit brûler toute la nuit.'],
+      ['j1', 'c', 'C', 'Les Retrouvailles', { img: 'p/j1' }, 'Tout le monde est sain et sauf !'],
+      ['j2', 'c', 'C', 'Coup de Foudre', { img: 'p/j2' }, 'Il a tapé sur son sabot… et il est amoureux.'],
+      ['j4', 'c', 'C', 'Le Petit Lumineux', { img: 'p/j4' }, 'Une lueur magique au creux des sabots.'],
+      ['j7', 'c', 'C', 'La Fête des Cochons', { img: 'p/j7' }, 'Le loup est parti : ce soir, on fait la fête !'],
+      ['b3', 'l', 'C', 'Le Démolisseur', { img: 'p/b3' }, 'Il souffle, il souffle… et ça s’écroule.'],
+      ['c1', 'l', 'C', 'Le Faux Ami', { img: 'p/c1' }, 'Un grand sourire, des dents encore plus grandes.'],
+      ['c3', 'l', 'C', 'Le Loup Furieux', { img: 'p/c3' }, 'La maison de briques ne veut pas tomber.'],
+      ['d1', 'l', 'C', 'Toc Toc Toc', { img: 'p/d1' }, '« Petit cochon, laisse-moi entrer ! »'],
+      ['d2', 'l', 'C', 'La Poursuite', { img: 'p/d2' }, 'Cours, petit cochon, cours !'],
+      ['h1', 'l', 'C', 'Le Rôdeur', { img: 'p/h1' }, 'Il essaie toutes les portes de la ferme.'],
+      ['h7', 'l', 'C', 'Les Yeux dans le Noir', { img: 'p/h7' }, 'Derrière l’arbre, deux yeux jaunes.'],
+      ['i4', 'l', 'C', 'Le Loup Musicien', { img: 'p/i4' }, 'Il voulait jouer avec eux. Personne n’y croit.'],
+      ['i6', 'l', 'C', 'Le Ricaneur', { img: 'p/i6' }, 'Il rit déjà du festin de ce soir.'],
+      ['j5', 'l', 'C', 'Le Loup Gourmand', { img: 'p/j5' }, 'Il a volé la pomme d’or au coucher du soleil.'],
+      ['j6', 'l', 'C', 'La Nuit du Loup', { img: 'p/j6' }, 'La pleine lune, et des pas dans la forêt.'],
+      ['a1', 'm', 'C', 'La Maison de Briques', { img: 'p/a1' }, 'La seule qui a tenu bon.'],
+      ['a5', 'm', 'C', 'La Maison de Paille', { img: 'p/a5' }, 'Construite en une heure, envolée en une seconde.'],
+      ['a6', 'm', 'C', 'Le Tas de Bâtons', { img: 'p/a6' }, 'C’était une maison, avant le loup.'],
+      ['b4', 'm', 'C', 'La Maison Branlante', { img: 'p/b4' }, 'Un souffle de plus et tout tombe.'],
+      ['b5', 'm', 'C', 'La Cabane de Bois', { img: 'p/b5' }, 'Montée vite, trop vite.'],
+      ['b6', 'm', 'C', 'Le Chalet', { img: 'p/b6' }, 'Joli, mais le loup souffle fort.'],
+      ['b7', 'm', 'C', 'Le Mur de Briques', { img: 'p/b7' }, 'Brique après brique, la patience paie.'],
+      ['c4', 'm', 'C', 'La Maison en Ruine', { img: 'p/c4' }, 'Le loup est passé par là.'],
+      ['c5', 'm', 'C', 'Le Toit Troué', { img: 'p/c5' }, 'Il pleut dans le salon.'],
+      ['c6', 'm', 'C', 'Le Marteau', { img: 'p/c6' }, 'L’outil préféré du grand frère.'],
+      ['c7', 'm', 'C', 'La Scie et les Briques', { img: 'p/c7' }, 'Tout ce qu’il faut pour bien bâtir.'],
+      ['c8', 'm', 'C', 'La Baratte', { img: 'p/c8' }, 'Pour faire le beurre de la tartine.'],
+      ['d3', 'm', 'C', 'L’Effondrement', { img: 'p/d3' }, 'Un nuage de poussière et plus de maison.'],
+      ['d4', 'm', 'C', 'La Reconstruction', { img: 'p/d4' }, 'On recommence, en plus solide.'],
+      ['d5', 'm', 'C', 'La Cheminée', { img: 'p/d5' }, 'Le loup y passera. Le chaudron l’attend.'],
+      ['d6', 'm', 'C', 'La Pomme Rouge', { img: 'p/d6' }, 'Croquante, sucrée, convoitée.'],
+      ['d7', 'm', 'C', 'La Motte de Beurre', { img: 'p/d7' }, 'Toute fraîche, sortie de la baratte.'],
+      ['e3', 'm', 'C', 'La Maison en Feu', { img: 'p/e3' }, 'Le loup a eu une très mauvaise idée.'],
+      ['e4', 'm', 'C', 'Le Siège', { img: 'p/e4' }, 'Les cochons défendent la maison de pierre.'],
+      ['g6', 'm', 'C', 'La Vieille Baratte', { img: 'p/g6' }, 'Elle était déjà là du temps de grand-mère.'],
+      ['h3', 'm', 'C', 'Le Goûter', { img: 'p/h3' }, 'Une pomme et du beurre : le festin.'],
+      ['h6', 'm', 'C', 'La Grande Scie', { img: 'p/h6' }, 'Elle coupe les bâtons comme du beurre.'],
+      ['i8', 'm', 'C', 'Le Foyer', { img: 'p/i8' }, 'Bien au chaud derrière les briques.'],
+      ['j3', 'm', 'C', 'Le Chantier', { img: 'p/j3' }, 'Ça fume, ça cogne, ça construit.'],
+      ['j8', 'm', 'C', 'La Nuit au Coin du Feu', { img: 'p/j8' }, 'Dehors le loup, dedans la chaleur.'],
+      ['r3', 'c', 'R', 'La Pomme Enchantée', { img: 'p/r3' }, 'Celui qui la croque ne craint plus le loup.'],
+      ['r5', 'c', 'R', 'Les Cochons Triomphants', { img: 'p/r5' }, 'Le loup est vaincu : la fête peut commencer.'],
+      ['r1', 'l', 'R', 'Le Grand Méchant Loup', { img: 'p/r1' }, 'Son souffle arrache les murs.'],
+      ['r4', 'l', 'R', 'L’Embuscade du Loup', { img: 'p/r4' }, 'Il attend dans la forêt, sans un bruit.'],
+      ['r2', 'm', 'R', 'La Forteresse de Briques', { img: 'p/r2' }, 'Aucun loup n’en a jamais franchi les murs.'],
+      ['s2', 'c', 'S', 'Le Vieux Sage', { img: 'p/s2' }, 'Le roi des cochons et son marteau d’or.'],
+      ['s3', 'l', 'S', 'Le Masque d’Or du Loup', { img: 'p/s3' }, 'Il ne souffle plus. Il brille.'],
+      ['s1', 'm', 'S', 'La Brique d’Or', { img: 'p/s1' }, 'La première brique de la maison qui a tenu.'],
+    ],
+  },
 ];
+// a series can change the names / values of its rarities (rar), its pack odds (odds), its album prize (album)
+// and close on a date (ends: no album prize after it)
+function rarOf(k, S) { return { ...RAR[k], ...(S?.rar?.[k] || {}) }; }
+const rarC = (c) => rarOf(c.r, SERIES.find((S) => S.id === c.sid));
 // card objects: CARD[id] = { id, sid, el, r, name, art, text, num, total, pow }
 const CARD = {};
 SERIES.forEach((S) => {
   S.list = S.cards.map(([id, el, r, name, art, text], i) => {
     const c = { id: `${S.id}-${id}`, sid: S.id, el, r, name, art, text, num: i + 1, total: S.cards.length };
-    c.pow = RAR[r].pow + ((i * 53) % 9) * 10;
+    c.pow = rarOf(r, S).pow + ((i * 53) % 9) * 10;
     return (CARD[c.id] = c);
   });
-  S.by = { C: [], R: [], E: [], L: [] };
+  S.by = { C: [], R: [], E: [], L: [], S: [] };
+  S.keys = RANK.split('').filter((k) => S.by[k].length || S.list.some((c) => c.r === k));
   S.list.forEach((c) => S.by[c.r].push(c));
 });
 const NOW = SERIES[SERIES.length - 1];
+// the series closed by a newer one: packs only open in the newest series (owner's choice, a new album each month)
+const albumOf = (S) => S.album || ALBUM;
+const endsAt = (S) => (S.ends ? Date.parse(S.ends) : 0);
+const isOver = (S) => !!endsAt(S) && Date.now() > endsAt(S);
+const oddsOf = (t, S) => S.odds?.[t] || PACKS[t].odds;
+const floorOf = (t, S) => (S.odds ? S.floor?.[t] : PACKS[t].floor);
+const big = (c) => rarC(c).cote >= 25000, mid = (c) => rarC(c).cote >= 8000;
+function leftText(S) {
+  const ms = endsAt(S) - Date.now();
+  if (ms <= 0) return 'série terminée';
+  const d = Math.floor(ms / 864e5), h = Math.floor((ms % 864e5) / 36e5), mn = Math.floor((ms % 36e5) / 6e4);
+  return d ? `${d} j ${h} h` : h ? `${h} h ${mn} min` : `${mn} min`;
+}
 const serie = (sid) => SERIES.find((S) => S.id === sid) || NOW;
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const imgSrc = (p) => { const f = `assets/games/jcc/${p}.webp`; return window.__assets?.[f] || `${f}?v=1`; };
-const cote = (c, holo) => RAR[c.r].cote * (holo ? 3 : 1);
+const cote = (c, holo) => rarC(c).cote * (holo ? 3 : 1);
 
 /* ---------- the player's data ---------- */
 const blank = () => ({ pts: 0, packs: { b: 0, v: 0, o: 0 }, sv: 0, so: 0, n: 0, cards: {}, forge: 0, done: {}, log: [] });
@@ -20480,16 +20614,16 @@ function earn(s) {
 }
 
 /* ---------- opening a pack ---------- */
-function rarity(t) {
-  const o = PACKS[t].odds;
+function rarity(t, S) {
+  const o = oddsOf(t, S);
   let r = Math.random();
   for (const k of RANK) { if (r < o[k]) return k; r -= o[k]; }
   return 'C';
 }
 function draw(t, S) {
-  const rs = Array.from({ length: 5 }, () => rarity(t)), f = PACKS[t].floor;
+  const rs = Array.from({ length: 5 }, () => rarity(t, S)), f = floorOf(t, S);
   if (f && !rs.some((k) => RANK.indexOf(k) >= RANK.indexOf(f))) {
-    let k; do k = rarity(t); while (RANK.indexOf(k) < RANK.indexOf(f));
+    let k; do k = rarity(t, S); while (RANK.indexOf(k) < RANK.indexOf(f));
     rs[4] = k;
   }
   rs.sort((a, b) => RANK.indexOf(a) - RANK.indexOf(b)); // the best card last
@@ -20499,7 +20633,7 @@ function openPack(t, fromForge) {
   if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour jouer aux cartes', 'warn');
   const s0 = st();
   if (!fromForge && !(s0.packs[t] > 0)) return;
-  const S = serie(pickSerie), hand = draw(t, S);
+  const S = NOW, hand = draw(t, S);
   save((s) => {
     if (!fromForge) s.packs[t]--;
     hand.forEach((x) => {
@@ -20519,7 +20653,7 @@ function openAll() {
   if (!profiles.current) return toast('Ouvre une partie (invité ou compte) pour jouer aux cartes', 'warn');
   const s0 = st(), counts = { o: s0.packs.o || 0, v: s0.packs.v || 0, b: s0.packs.b || 0 }, total = counts.o + counts.v + counts.b;
   if (!total) return;
-  const S = serie(pickSerie), hand = [];
+  const S = NOW, hand = [];
   for (const t of ['o', 'v', 'b']) for (let k = 0; k < counts[t]; k++) hand.push(...draw(t, S));
   save((s) => {
     for (const t of ['o', 'v', 'b']) s.packs[t] = Math.max(0, (s.packs[t] || 0) - counts[t]);
@@ -20547,15 +20681,15 @@ function showAll(counts, hand, S) {
   box.innerHTML = `<div class="jc-scene-in">
       <p class="jc-scene-t">${packs} paquets ouverts · ${hand.length} cartes · ${esc(S.name)}</p>
       <div class="jc-all-sum">${['o', 'v', 'b'].filter((t) => counts[t]).map((t) => `<span class="jc-all-p p-${t}">${counts[t]} × ${PACKS[t].name.toLowerCase()}</span>`).join('')}</div>
-      <div class="jc-all-sum">${tally.map(([k, n]) => `<span class="jc-all-r r-${k}">${n} ${RAR[k].name.toLowerCase()}${n > 1 ? 's' : ''}</span>`).join('')}${nNew ? `<span class="jc-all-r new">✨ ${nNew} nouvelle${nNew > 1 ? 's' : ''}</span>` : ''}</div>
-      <div class="jc-all-grid">${list.map((x, i) => `<div class="jc-all-c${CARD[x.id].r === 'L' || x.h ? ' wow' : ''}" style="--i:${Math.min(i, 40)}">${cardHTML(CARD[x.id], { holo: x.h, count: x.n, badge: x.isNew ? '<span class="jc-tag new">NOUVELLE</span>' : '' })}</div>`).join('')}</div>
+      <div class="jc-all-sum">${tally.map(([k, n]) => `<span class="jc-all-r r-${k}">${n} ${rarOf(k, NOW).name.toLowerCase()}${n > 1 ? 's' : ''}</span>`).join('')}${nNew ? `<span class="jc-all-r new">✨ ${nNew} nouvelle${nNew > 1 ? 's' : ''}</span>` : ''}</div>
+      <div class="jc-all-grid">${list.map((x, i) => `<div class="jc-all-c${big(CARD[x.id]) || x.h ? ' wow' : ''}" style="--i:${Math.min(i, 40)}">${cardHTML(CARD[x.id], { holo: x.h, count: x.n, badge: x.isNew ? '<span class="jc-tag new">NOUVELLE</span>' : '' })}</div>`).join('')}</div>
       <div class="jc-scene-acts"><button class="btn primary" data-jc-close>Tout est rangé dans mon album</button></div>
     </div>`;
   document.body.appendChild(box);
   scene = box;
   requestAnimationFrame(() => box.classList.add('show'));
   const top = list[0] && CARD[list[0].id].r;
-  if (top === 'L' || list.some((x) => x.h)) { sfx.bigWin?.(); fx.coins?.(60); } else if (top === 'E') sfx.win?.(); else sfx.coin?.();
+  if (big(CARD[list[0].id]) || list.some((x) => x.h)) { sfx.bigWin?.(); fx.coins?.(60); } else if (mid(CARD[list[0].id])) sfx.win?.(); else sfx.coin?.();
   const close = () => { box.classList.remove('show'); setTimeout(() => box.remove(), 200); if (scene === box) scene = null; paintPage(); };
   box.addEventListener('click', (e) => { if (e.target.closest('[data-jc-close]')) close(); });
   paintPage();
@@ -20566,12 +20700,12 @@ function showAll(counts, hand, S) {
 function checkAlbum() {
   const s = st();
   for (const S of SERIES) {
-    if (s.done[S.id] || have(s, S) < S.list.length) continue;
+    if (s.done[S.id] || have(s, S) < S.list.length || isOver(S)) continue; // too late: the series is over
     save((x) => { x.done = { ...x.done, [S.id]: Date.now() }; });
-    wallet.grant(ALBUM);
+    wallet.grant(albumOf(S));
     sfx.bigWin?.(); fx.coins?.(120);
     modal(`<div class="jc-done"><div class="jc-done-ico">🏆</div><h2>ALBUM COMPLET !</h2><p>Tu as réuni les ${S.list.length} cartes de la série <b>${esc(S.name)}</b>.</p>
-      <div class="jc-done-prize">+${fmt(ALBUM)}</div><p class="muted small">Garde tes cartes : tes doubles se vendent toujours aux autres joueurs.</p>
+      <div class="jc-done-prize">+${fmt(albumOf(S))}</div><p class="muted small">Garde tes cartes : tes doubles se vendent toujours aux autres joueurs.</p>
       <button class="btn primary lg" data-value="ok">Je récupère</button></div>`, { cls: 'jc-modal' });
   }
 }
@@ -20583,13 +20717,13 @@ function artHTML(c) {
 }
 function cardHTML(c, o = {}) {
   const S = serie(c.sid), El = S.els[c.el];
-  const cls = ['jc-card', `r-${c.r}`, `el-${c.el}`, o.holo ? 'holo' : '', o.locked ? 'locked' : '', o.cls || ''].filter(Boolean).join(' ');
+  const cls = ['jc-card', `r-${c.r}`, `el-${c.el}`, `s-${c.sid}`, o.holo ? 'holo' : '', o.locked ? 'locked' : '', o.cls || ''].filter(Boolean).join(' ');
   return `<div class="${cls}" style="--c1:${El.c1};--c2:${El.c2}" ${o.attr || ''}>
     <div class="jc-in">
-      <div class="jc-top"><span class="jc-el">${El.icon}</span><span class="jc-ribbon">${El.name}</span><span class="jc-gem" title="${RAR[c.r].name}"></span></div>
+      <div class="jc-top"><span class="jc-el">${El.icon}</span><span class="jc-ribbon">${El.name}</span><span class="jc-gem" title="${rarC(c).name}"></span></div>
       <div class="jc-art">${o.locked ? `<span class="jc-q">?</span>` : artHTML(c)}</div>
       <div class="jc-name">${o.locked ? '???' : esc(c.name)}</div>
-      <div class="jc-text">${o.locked ? `<em>${RAR[c.r].name} · à trouver</em>` : `<b>${RAR[c.r].name}${o.holo ? ' · Brillante' : ''}</b>${esc(c.text)}`}</div>
+      <div class="jc-text">${o.locked ? `<em>${rarC(c).name} · à trouver</em>` : `<b>${rarC(c).name}${o.holo ? ' · Brillante' : ''}</b>${esc(c.text)}`}</div>
       <div class="jc-foot"><span class="jc-num">${String(c.num).padStart(2, '0')}/${c.total}</span><span class="jc-pow">⚔ ${c.pow}</span><span class="jc-cote">${fmt(cote(c, o.holo))}</span></div>
     </div>
     ${o.count > 1 ? `<span class="jc-count">×${o.count}</span>` : ''}${o.badge || ''}
@@ -20630,7 +20764,7 @@ async function buyPack(t) {
   if (!SHOP[t]) return;
   if (shopToday() >= SHOP_DAY) return toast(`Tu as déjà acheté tes ${SHOP_DAY} paquets aujourd’hui : reviens demain !`, 'info');
   const v = await modal(`<h3>Acheter un ${PACKS[t].name.toLowerCase()} ?</h3><div class="jc-sell">${packHTML(t)}<div>
-      <p>${PACKS[t].sub} · 5 cartes${PACKS[t].floor ? ` · au moins une ${RAR[PACKS[t].floor].name.toLowerCase()}` : ''}</p><p class="jc-price">${fmt(SHOP[t])}</p>
+      <p>${PACKS[t].sub} · 5 cartes${floorOf(t, NOW) ? ` · au moins une ${rarOf(floorOf(t, NOW), NOW).name.toLowerCase()}` : ''}</p><p class="jc-price">${fmt(SHOP[t])}</p>
       <p class="muted small">Encore ${SHOP_DAY - shopToday()} achat${SHOP_DAY - shopToday() > 1 ? 's' : ''} possible${SHOP_DAY - shopToday() > 1 ? 's' : ''} aujourd’hui.</p></div></div>
     <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Acheter</button></div>`, { cls: 'jc-modal' });
   if (v !== 'ok' || shopToday() >= SHOP_DAY) return;
@@ -20661,7 +20795,7 @@ function showOpening(t, hand, S) {
     if (!el || el.classList.contains('on')) return;
     el.classList.add('on'); flipped++;
     const x = hand[+el.dataset.jcFlip], r = CARD[x.id].r;
-    if (r === 'L' || x.h) { sfx.bigWin?.(); fx.coins?.(40); el.classList.add('wow'); } else if (r === 'E') { sfx.win?.(); el.classList.add('wow'); } else sfx.click?.();
+    if (big(CARD[x.id]) || x.h) { sfx.bigWin?.(); fx.coins?.(40); el.classList.add('wow'); } else if (mid(CARD[x.id])) { sfx.win?.(); el.classList.add('wow'); } else sfx.click?.();
     if (flipped === hand.length) done();
   };
   const done = () => {
@@ -20707,7 +20841,7 @@ function extras(s) {
 function recycle() {
   const ex = extras(st());
   if (!ex.length) return toast('Aucun double à recycler', 'info');
-  const pts = ex.reduce((a, [id, x]) => a + RAR[CARD[id].r].forge * x, 0), n = ex.reduce((a, [, x]) => a + x, 0);
+  const pts = ex.reduce((a, [id, x]) => a + rarC(CARD[id]).forge * x, 0), n = ex.reduce((a, [, x]) => a + x, 0);
   modal(`<h3>🔥 Recycler mes doubles</h3><p>${n} carte${n > 1 ? 's' : ''} en double (les brillantes ne sont jamais recyclées, et tu gardes toujours un exemplaire de chaque carte).</p>
     <p>Tu gagnes <b>${pts} points de forge</b>.</p><p class="muted small">Astuce : une carte en double peut aussi se vendre aux autres joueurs dans le Marché.</p>
     <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Recycler</button></div>`, { cls: 'jc-modal' }).then((v) => {
@@ -20764,7 +20898,7 @@ async function sell(id, h) {
     <div class="jc-sell">${cardHTML(c, { holo: h, cls: 'sm' })}<div>
       <p>Les autres joueurs pourront l’acheter dans le Marché. La carte quitte ta collection pendant la vente (tu peux la retirer quand tu veux).</p>
       <p class="jc-price">${fmt(cote(c, h))}</p>
-      <p class="muted small">Chaque carte se vend à sa valeur (${RAR[c.r].name.toLowerCase()}${h ? ', brillante = 3 fois plus' : ''}). Tu reçois cette somme dès qu’un joueur l’achète.</p></div></div>
+      <p class="muted small">Chaque carte se vend à sa valeur (${rarC(c).name.toLowerCase()}${h ? ', brillante = 3 fois plus' : ''}). Tu reçois cette somme dès qu’un joueur l’achète.</p></div></div>
     <div class="jc-acts"><button class="btn ghost" data-value="">Annuler</button><button class="btn primary" data-value="ok">Mettre en vente</button></div>`, { cls: 'jc-modal' });
   if (v !== 'ok') return;
   const p = cote(c, h); // a card is always sold at its value
@@ -20823,7 +20957,7 @@ async function buy(oid) {
 const askAccount = () => toast('Le Marché est réservé aux comptes : crée ton compte gratuit (tes cartes sont gardées) <button class="btn sm" data-signup>Créer</button>', 'warn');
 
 /* ---------- the page ---------- */
-let root = null, tab = 'album', elf = 'all', missOnly = true, pickSerie = NOW.id, seenAlbum = SERIES[0].id;
+let root = null, tab = 'album', elf = 'all', missOnly = true, seenAlbum = NOW.id;
 const here = () => root?.isConnected && /^jcc$/.test(location.hash.replace(/^#\/?/, ''));
 function renderJcc(r) {
   root = r; flush(); watchMine(); paintPage();
@@ -20842,7 +20976,7 @@ function paintPage() {
       <span class="eyebrow">🃏 Jeu de cartes à collectionner (JCC)</span>
       <h1>${esc(S.name)} <small>${esc(S.season)}</small></h1>
       <div class="jc-hero-row">
-        <div class="jc-goal"><small>Album complet</small><b>+${fmt(ALBUM)}</b><span>${s.done[S.id] ? '✅ déjà gagné' : `${n} / ${S.list.length} cartes`}</span></div>
+        <div class="jc-goal"><small>Album complet</small><b>+${fmt(albumOf(S))}</b><span>${s.done[S.id] ? '✅ déjà gagné' : `${n} / ${S.list.length} cartes`}</span>${S.ends ? `<em class="jc-ends${isOver(S) ? ' over' : ''}">${isOver(S) ? '⌛ Série terminée' : `⏳ Fin dans <b data-jc-left>${leftText(S)}</b>`}</em>` : S !== NOW ? '<em class="jc-ends over">🔒 Série fermée : plus de paquets</em>' : ''}</div>
         <div class="jc-next"><small>Prochain paquet</small>${barHTML(s)}<span><b data-jc-pts>${Math.floor(s.pts + pending)}</b> / ${BAR} · chaque mise, dans n’importe quel jeu, remplit la barre</span></div>
       </div>
       <div class="jc-album-bar"><i style="width:${(n / S.list.length) * 100}%"></i><span>${Math.round((n / S.list.length) * 100)} %</span></div>
@@ -20852,7 +20986,7 @@ function paintPage() {
         <button class="btn ${s.packs[t] ? 'primary' : 'ghost'} sm" data-jc-open="${t}" ${s.packs[t] ? '' : 'disabled'}>Ouvrir</button></div>`).join('')}</div>
       ${np >= 2 ? `<button class="btn primary lg jc-open-all" data-jc-open-all>🃏 Ouvrir tous mes paquets d’un coup (${np})</button>` : ''}
       ${shopHTML(s)}
-      ${SERIES.length > 1 ? `<p class="jc-pick">Ouvrir les paquets dans la série : ${SERIES.map((x) => `<button class="chip${pickSerie === x.id ? ' on' : ''}" data-jc-serie="${x.id}">${esc(x.name)}</button>`).join('')}</p>` : ''}
+      ${SERIES.length > 1 ? `<p class="jc-pick muted small">Les paquets s’ouvrent dans la nouvelle série : <b>${esc(NOW.name)}</b>. Les anciennes séries sont fermées (leurs cartes restent dans ton album et au Marché).</p>` : ''}
     </section>
     <nav class="jc-tabs">${[['album', '📖 Album'], ['market', '🏪 Marché'], ['forge', '🔥 Forge'], ['sales', `🏷️ Mes ventes${sales.length ? ` (${sales.length})` : ''}`], ['rules', '❔ Règles']].map(([k, l]) => `<button class="${tab === k ? 'on' : ''}" data-jc-tab="${k}">${l}</button>`).join('')}</nav>
     ${tab === 'album' ? albumHTML(s, S) : tab === 'market' ? marketHTML(s, m) : tab === 'forge' ? forgeHTML(s) : tab === 'sales' ? salesHTML(m) : rulesHTML()}`;
@@ -20860,7 +20994,7 @@ function paintPage() {
 function albumHTML(s, S) {
   const list = S.list.filter((c) => elf === 'all' || c.el === elf);
   return `<section class="panel"><div class="sec-head"><h2>📖 Mon album</h2><small>touche une carte pour la voir</small></div>
-    ${SERIES.length > 1 ? `<p class="jc-pick">${SERIES.map((x) => `<button class="chip${seenAlbum === x.id ? ' on' : ''}" data-jc-album="${x.id}">${esc(x.name)} · ${have(s, x)}/${x.list.length}</button>`).join('')}</p>` : ''}
+    ${SERIES.length > 1 ? `<p class="jc-pick">${[...SERIES].reverse().map((x) => `<button class="chip${seenAlbum === x.id ? ' on' : ''}" data-jc-album="${x.id}">${x !== NOW ? '🔒 ' : ''}${esc(x.name)} · ${have(s, x)}/${x.list.length}</button>`).join('')}</p>` : ''}
     <p class="jc-pick"><button class="chip${elf === 'all' ? ' on' : ''}" data-jc-el="all">Toutes</button>${Object.entries(S.els).map(([k, El]) => { const L = S.list.filter((c) => c.el === k); return `<button class="chip${elf === k ? ' on' : ''}" data-jc-el="${k}">${El.icon} ${El.name} · ${L.filter((c) => owned(s, c.id)).length}/${L.length}</button>`; }).join('')}</p>
     <div class="jc-grid">${list.map((c) => { const x = s.cards[c.id] || [0, 0], n = x[0] + x[1]; return cardHTML(c, { locked: !n, holo: x[1] > 0, count: n, attr: `data-jc-card="${c.id}"` }); }).join('')}</div></section>`;
 }
@@ -20879,11 +21013,11 @@ function marketHTML(s, m) {
     <p class="muted small">Pour vendre : ouvre une carte en double dans ton album → « Vendre ». Le prix est payé tout seul dès qu’un joueur achète.</p></section>`;
 }
 function forgeHTML(s) {
-  const ex = extras(s), pts = ex.reduce((a, [id, x]) => a + RAR[CARD[id].r].forge * x, 0), n = ex.reduce((a, [, x]) => a + x, 0);
+  const ex = extras(s), pts = ex.reduce((a, [id, x]) => a + rarC(CARD[id]).forge * x, 0), n = ex.reduce((a, [, x]) => a + x, 0);
   return `<section class="panel jc-forge"><div class="sec-head"><h2>🔥 La Forge</h2><small>${s.forge || 0} / ${FORGE} points</small></div>
-    <p>Recycle tes cartes en double pour gagner des points de forge. À ${FORGE} points, tu forges un <b>paquet violet</b> (au moins une rare).</p>
+    <p>Recycle tes cartes en double pour gagner des points de forge. À ${FORGE} points, tu forges un <b>paquet violet</b>, ouvert dans la série ${esc(NOW.name)}.</p>
     <div class="jc-bar"><i style="width:${Math.min(100, ((s.forge || 0) / FORGE) * 100)}%"></i></div>
-    <ul class="jc-forge-pts">${RANK.split('').map((k) => `<li class="r-${k}"><span class="jc-gem"></span>${RAR[k].name}<b>${RAR[k].forge} pt${RAR[k].forge > 1 ? 's' : ''}</b></li>`).join('')}</ul>
+    <ul class="jc-forge-pts">${NOW.keys.map((k) => { const r = rarOf(k, NOW); return `<li class="r-${k}"><span class="jc-gem"></span>${r.name}<b>${r.forge} pt${r.forge > 1 ? 's' : ''}</b></li>`; }).join('')}</ul>
     <div class="jc-acts"><button class="btn ghost" data-jc-recycle ${n ? '' : 'disabled'}>Recycler mes ${n || ''} double${n > 1 ? 's' : ''}${n ? ` (+${pts} pts)` : ''}</button>
       <button class="btn primary" data-jc-forge ${(s.forge || 0) >= FORGE ? '' : 'disabled'}>Forger un paquet violet</button></div>
     <p class="muted small">Les cartes brillantes ne sont jamais recyclées, et tu gardes toujours un exemplaire de chaque carte.</p></section>`;
@@ -20897,22 +21031,23 @@ function salesHTML(m) {
     ${done.length ? `<h3 class="jc-h3">Vendues</h3><ul class="jc-hist">${done.map((o) => `<li><span>${esc(CARD[o.c]?.name || o.c)}${o.h ? ' ✨' : ''}</span><small>à ${esc(o.bn || '?')}</small><b>+${fmt(o.p)}</b></li>`).join('')}</ul>` : ''}</section>`;
 }
 function rulesHTML() {
-  const pc = (x) => `${(x * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %`;
+  const pc = (x) => `${(x * 100).toLocaleString('fr-FR', { maximumFractionDigits: x < 0.01 ? 2 : 1 })} %`;
   return `<section class="panel jc-rules"><h2>❔ Comment ça marche</h2>
     <ul class="jc-steps">
       <li>🎰 <b>Joue à n’importe quel jeu</b> : chaque mise remplit la barre (plus la mise est grosse, plus elle avance). Barre pleine = un paquet de 5 cartes.</li>
-      <li>🃏 <b>Trois paquets</b> : bleu (classique), violet (rare, au moins une carte rare) et doré (très rare, au moins une épique). Au moins un violet tous les ${PITY.v} paquets, un doré tous les ${PITY.o} paquets.</li>
+      <li>🃏 <b>Trois paquets</b> : bleu (classique), violet (plus de chances de rares) et doré (le meilleur pour les rares et les secrètes). Au moins un violet tous les ${PITY.v} paquets, un doré tous les ${PITY.o} paquets.</li>
       <li>✨ <b>Cartes brillantes</b> : ${pc(HOLO)} des cartes sortent en version brillante, qui vaut 3 fois sa cote.</li>
       <li>🏪 <b>Doubles</b> : vends-les aux autres joueurs dans le Marché, à la valeur de la carte, ou recycle-les dans la Forge.</li>
       <li>🛒 <b>Acheter un paquet</b> : ${SHOP_DAY} paquets par jour au maximum, au choix (bleu ${fmt(SHOP.b)}, violet ${fmt(SHOP.v)}, doré ${fmt(SHOP.o)}). Pour le reste, il faut jouer !</li>
       <li>🔒 <b>Pas de boutique de cartes</b> : une carte s’obtient seulement dans les paquets, ou en l’achetant à un autre joueur (à sa valeur).</li>
-      <li>🏆 <b>Album complet</b> : les ${NOW.list.length} cartes de la série = <b>${fmt(ALBUM)}</b>, une fois par série. Une nouvelle série arrive régulièrement avec de nouvelles cartes.</li>
+      <li>🏆 <b>Album complet</b> : les ${NOW.list.length} cartes de la série <b>${esc(NOW.name)}</b> = <b>${fmt(albumOf(NOW))}</b>${NOW.ends ? `, à finir avant le ${new Date(endsAt(NOW)).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', timeZone: 'Europe/Paris' })} (encore ${leftText(NOW)})` : ''}. Puis une nouvelle série sort et les paquets s’ouvrent dedans.</li>
+      <li>🤫 <b>Cartes secrètes</b> : les plus dures à trouver (${fmt(rarOf('S', NOW).cote)} chacune). Les paquets dorés en donnent un peu plus souvent… mais il faudra de la chance, ou le Marché.</li>
     </ul>
     <h3 class="jc-h3">Chances par carte</h3>
-    <table class="jc-odds"><tr><th></th>${RANK.split('').map((k) => `<th class="r-${k}">${RAR[k].name}</th>`).join('')}</tr>
-      ${['b', 'v', 'o'].map((t) => `<tr><td>${PACKS[t].name}</td>${RANK.split('').map((k) => `<td>${PACKS[t].odds[k] ? pc(PACKS[t].odds[k]) : '—'}</td>`).join('')}</tr>`).join('')}</table>
+    <table class="jc-odds"><tr><th></th>${NOW.keys.map((k) => `<th class="r-${k}">${rarOf(k, NOW).name}</th>`).join('')}</tr>
+      ${['b', 'v', 'o'].map((t) => `<tr><td>${PACKS[t].name}</td>${NOW.keys.map((k) => `<td>${oddsOf(t, NOW)[k] ? pc(oddsOf(t, NOW)[k]) : '—'}</td>`).join('')}</tr>`).join('')}</table>
     <h3 class="jc-h3">Cote des cartes</h3>
-    <ul class="jc-forge-pts">${RANK.split('').map((k) => `<li class="r-${k}"><span class="jc-gem"></span>${RAR[k].name}<b>${fmt(RAR[k].cote)}</b></li>`).join('')}</ul>
+    <ul class="jc-forge-pts">${NOW.keys.map((k) => `<li class="r-${k}"><span class="jc-gem"></span>${rarOf(k, NOW).name}<b>${fmt(rarOf(k, NOW).cote)}</b></li>`).join('')}</ul>
     <p class="muted small">Chaque paquet : ${pc(1 - PACK_ODDS.o - PACK_ODDS.v)} bleu, ${pc(PACK_ODDS.v)} violet, ${pc(PACK_ODDS.o)} doré. Jeu en argent fictif. Le Marché est réservé aux comptes ; en invité, tes cartes sont gardées si tu crées ton compte.</p></section>`;
 }
 // one card, big, with its copies and the sale buttons
@@ -20921,7 +21056,7 @@ function showCard(id) {
   const forSale = (offers || []).filter((o) => o.c === id && o.s !== m?.uid && o.p === cote(c, o.h)).sort((a, b) => a.p - b.p);
   modal(`<div class="jc-detail">${cardHTML(c, { locked: !n, holo: x[1] > 0, cls: 'lg' })}<div>
       <h3>${n ? esc(c.name) : 'Carte à trouver'}</h3>
-      <p class="muted">${RAR[c.r].name} · n° ${c.num}/${c.total} · cote ${fmt(cote(c))}</p>
+      <p class="muted">${rarC(c).name} · ${esc(serie(c.sid).name)} · n° ${c.num}/${c.total} · cote ${fmt(cote(c))}</p>
       <p>${n ? `Tu en as <b>${n}</b>${x[1] ? ` (dont ${x[1]} brillante${x[1] > 1 ? 's' : ''})` : ''}.` : 'Tu ne l’as pas encore.'}</p>
       ${n >= 2 ? `<div class="jc-acts">${x[0] ? '<button class="btn primary sm" data-value="sell0">🏷️ Vendre un double</button>' : ''}${x[1] ? '<button class="btn primary sm" data-value="sell1">🏷️ Vendre une brillante</button>' : ''}</div>` : n ? '<p class="muted small">Un seul exemplaire : il reste dans ton album.</p>' : ''}
       ${forSale.length ? `<p class="jc-miss">🏪 ${forSale.length} en vente au Marché, dès ${fmt(forSale[0].p)}</p><div class="jc-acts"><button class="btn ghost sm" data-value="buy">Voir au Marché</button></div>` : ''}
@@ -20941,7 +21076,6 @@ document.addEventListener('click', (e) => {
   if (q('[data-jc-ad-pack]')) return adPackClick();
   if ((b = q('[data-jc-tab]'))) { tab = b.dataset.jcTab; if (tab === 'market') loadOffers(); return paintPage(); }
   if ((b = q('[data-jc-el]'))) { elf = b.dataset.jcEl; return paintPage(); }
-  if ((b = q('[data-jc-serie]'))) { pickSerie = b.dataset.jcSerie; return paintPage(); }
   if ((b = q('[data-jc-album]'))) { seenAlbum = b.dataset.jcAlbum; return paintPage(); }
   if ((b = q('[data-jc-miss]'))) { missOnly = b.dataset.jcMiss === '1'; return paintPage(); }
   if (q('[data-jc-reload]')) return loadOffers(true);
@@ -20966,13 +21100,14 @@ E.addGamePill(() => (profiles.current ? `<a class="ev-pill jcc" href="#jcc" data
 E.addHome(() => {
   if (!profiles.current) return '';
   const s = st(), n = packCount(s);
-  return `<a class="ev-card ev-jcc" href="#jcc"><span class="ev-ico">🃏</span><div><small>CARTES À COLLECTIONNER · ${esc(NOW.name.toUpperCase())}</small><b>${s.done[NOW.id] ? '✅ Album complet !' : `${have(s, NOW)} / ${NOW.list.length} cartes · album = ${fmt(ALBUM)}`}</b><em>${n ? `${n} paquet${n > 1 ? 's' : ''} à ouvrir !` : `prochain paquet à ${Math.floor((s.pts / BAR) * 100)} %`}</em></div><span class="ev-go">${n ? 'Ouvrir ›' : 'Voir ›'}</span></a>`;
+  return `<a class="ev-card ev-jcc" href="#jcc"><span class="ev-ico">🃏</span><div><small>CARTES À COLLECTIONNER · ${esc(NOW.name.toUpperCase())}</small><b>${s.done[NOW.id] ? '✅ Album complet !' : `${have(s, NOW)} / ${NOW.list.length} cartes · album = ${fmt(albumOf(NOW))}${NOW.ends && !isOver(NOW) ? ` · ⏳ ${leftText(NOW)}` : ''}`}</b><em>${n ? `${n} paquet${n > 1 ? 's' : ''} à ouvrir !` : `prochain paquet à ${Math.floor((s.pts / BAR) * 100)} %`}</em></div><span class="ev-go">${n ? 'Ouvrir ›' : 'Voir ›'}</span></a>`;
 });
 profiles.addEventListener('change', () => { pending = 0; setTimeout(() => { paintBadge(); watchMine(); paintPage(); }, 600); });
 profiles.ready?.then(() => setTimeout(() => { paintBadge(); watchMine(); }, 2500));
 setInterval(() => { if (here() && tab === 'market') loadOffers(); }, 60000);
+setInterval(() => { if (here()) document.querySelectorAll('[data-jc-left]').forEach((el) => { el.textContent = leftText(serie(seenAlbum)); }); }, 30000);
 
-return { renderJcc, checkAlbum, adPack, givePack, SERIES, CARD, BAR, ALBUM };
+return { renderJcc, checkAlbum, adPack, givePack, SERIES, CARD, BAR, ALBUM, NOW };
 })();
 
 // ---- mystere.js ----

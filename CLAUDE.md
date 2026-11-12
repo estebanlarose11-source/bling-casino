@@ -423,6 +423,17 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   de 25 dessins (Feu, Terre, Éther), découpées dans `assets/games/jcc/o/` (`f01`…`e25` = place sur la planche, ligne par
   ligne ; suffixe `c` = dessin sans fond rendu transparent, `cut: 1` → affiché entier) ; chaque carte porte le nom de son
   dessin. Le site sait encore afficher une carte « emoji » (art en texte) pour une série pas encore dessinée.
+  **Série 2 « Les Trois Petits Cochons »** (id `p`, demande du propriétaire du 12 novembre 2026, 88 cartes de ses 2 planches
+  découpées dans `assets/games/jcc/p/` : `a1`…`j8` = case de la planche, `r1`…`r5` rares, `s1`…`s3` secrètes ; éléments
+  Cochons / Loup / Maisons). **La 1re série est fermée** : les paquets (gagnés, achetés, forge) s'ouvrent seulement dans la
+  plus récente (`NOW`), les anciennes restent dans l'album (🔒) et au Marché. Une série peut changer ses raretés
+  (`rar` : Normale 500, Rare **50 000**, Secrète **200 000** KE, rareté `S` ajoutée à `RAR`), ses chances (`odds`, sans
+  carte garantie), son album (`album` : **500 000** KE) et finir à une date (`ends` : 12 décembre 2026 minuit, compte à
+  rebours sur la page et l'accueil ; après, plus de prix d'album). Secrètes voulues « hyper dures » : 0,05 / 0,2 / 0,8 %
+  par carte (bleu / violet / doré). Valeur moyenne d'un paquet ≈ 5 000 / 11 300 / 37 300 KE (sous les prix de la boutique).
+  Simulation (seul, avec la Forge, sans Marché) : album ≈ 790 paquets en médiane (320 à 1 650). Liste :
+  `notes/jcc-trois-petits-cochons-cartes.txt`. **Prochaine série vers le 12 décembre** : l'ajouter à la fin de `SERIES`
+  avec son `ends` (un mois plus tard).
   Liste des cartes pour le propriétaire : `notes/jcc-les-origines-cartes.txt` (dossier `notes/` = ses notes) ; en faire
   une pareille pour chaque nouvelle série.
 
