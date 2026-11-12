@@ -123,24 +123,25 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   sur 4, achat ≈ 88,5 %, max ×10 000 (atteint dans la Pyramide d'or, ≈ 1 sur 100 000). Défi spécial : Ruby Link et
   La Pyramide d'or.
 - **Le Coffre aux Pirates** (`games/pirates.js`, id `pirates`, **en travaux** : `"wip": true`, essai avec `?essai`). Cahier des
-  charges du propriétaire du 12 novembre 2026 (« Apex Predators : Jungle Syndicate », très volatile, max ×50 000), puis **thème
-  changé en pirates** avec **sa vidéo** (`assets/games/pirates/bg.mp4`, bateau pirate, son des vagues remonté de 9 dB ;
-  `bg.webp` = image fixe et couverture) **derrière toute la machine** (plein écran téléphone : la vidéo couvre tout l'écran,
-  `.ap-video`) et **son son = la musique du jeu** (`VideoMusic` remplace `this.music` : boutons 🎵 / 🔊 du menu). Bruits de
-  pirates doux (`Sounds` : pièce, crabe, tonneau, chaîne d'ancre, canon, cloche, conque). 5×4, 20 lignes ; pièces d'or avec
-  valeur en KE (`CASH`), **le Crabe** (collecteur, rouleau 5) ramasse toutes les pièces ; 3 **tourbillons** (scatter) =
-  **LA CHASSE AU TRÉSOR** (Hold & Win 5×6, 2 rangées verrouillées, 3 vies remises à 3, `heistRun`) : pièces, **Tonneau**
-  (×2/×5/×10/×50 sur les pièces voisines), **Crabe** (ramasse tout), **Ancre** (ouvre une rangée) ; 30 cases = LE COFFRE AUX
-  PIRATES S'OUVRE ×500 (`FULL_X`, plafonné à ×50 000). Simulation `node tools/sim/pirates.js` : RTP ≈ 92 % (lignes 49, Crabe 8,
-  bonus 35), un gain 1 tour sur 3, bonus 1 tour sur 254 (≈ ×90, médiane ×45), achat ×100 ≈ 90 %, ×50 000 ≈ 1 tour sur 3 M.
-  **Symboles** = la planche du propriétaire (`tools/art/pirates/planche.webp`, 25 cases en bois avec leur nom écrit dessous,
-  pour nous seulement) découpée par `tools/art/pirates/cut.py` (`pip install "rembg[cpu]"`) : cadre en bois entier + ce qui
-  dépasse au-dessus, sans le texte → `assets/games/pirates/` (s0 cœur, s1 pique, s2 trèfle, s3 carreau, s4 requin, s5
-  exploratrice, s6 pirate, wild noix de coco, scat tourbillon, cash pièce, coll crabe, safe tonneau, bomb ancre, tous dans
-  `PICS`) ; les 12 autres (tiki, ara, coffre, carte, masque, boussole, boulets, couronne, collier, bouteille, coffre FREE SPINS,
-  étoile JP) dans `tools/art/pirates/extra/` pour plus tard. Cases plus larges que hautes (`--cw` 1,5, 1,15 téléphone en
-  hauteur ; grille du bonus `--hw`). Pour l'ouvrir : retirer `wip`,
-  `python3 tools/build.py`, entrée `UPDATES`, captures SEO, image de partage.
+  charges du propriétaire du 12 novembre 2026 (« Apex Predators », très volatile, max ×50 000), puis **thème pirates** avec
+  **sa vidéo** (`assets/games/pirates/bg.mp4`, bateau pirate, son des vagues remonté de 9 dB ; `bg.webp` = image fixe et
+  couverture) **derrière toute la machine** (plein écran téléphone : la vidéo couvre tout l'écran, `.ap-video`) et **son son =
+  la musique du jeu** (`VideoMusic` remplace `this.music` : boutons 🎵 / 🔊). Bruits de pirates doux (`Sounds`).
+  **Ses 25 symboles, tous utilisés** (voulu par le propriétaire) : planche `tools/art/pirates/planche.webp` (noms écrits
+  dessous pour nous seulement) découpée par `tools/art/pirates/cut.py` (`pip install "rembg[cpu]"` : cadre en bois entier +
+  ce qui dépasse au-dessus, sans le texte) → `assets/games/pirates/<nom>.webp` (`SYM`, `PICS`). 5×4, **1 024 façons** (`ways`) :
+  4 faibles (cœur, pique, trèfle, carreau), 5 moyens (collier, bouteille, carte, boussole, boulets), 6 forts (masque, ara, tiki,
+  requin, exploratrice, pirate), WILD noix de coco ; pièces d'or avec valeur en KE (`CASH`) ou **étoile de mer JP** (MINI /
+  MINOR) ; **le Crabe** (rouleau 5) ramasse toutes les pièces. **Jackpots** en haut (`.ap-jps`, plaques animées, `jackpot()`
+  quand on en gagne un) : MINI ×10, MINOR ×25, MAJOR ×100, GRAND ×1 000 (`JPX`). 3 **tourbillons** = **LA CHASSE AU TRÉSOR**
+  (Hold & Win 5×6, 2 rangées verrouillées, 3 vies, `heistRun`) : pièces, Tonneau (×2 à ×50 sur les pièces voisines), Crabe,
+  Ancre (ouvre une rangée), étoile (MINI / MINOR / MAJOR), couronne (GRAND) ; 30 cases = le coffre englouti s'ouvre ×500
+  (`FULL_X`, plafonné à ×50 000). 3 **coffres FREE SPINS** = **LES TOURS GRATUITS** (`fsRun` : 10 tours, plus de pièces, le
+  Crabe sur tous les rouleaux, multiplicateur ×1, ×2, ×3… à chaque crabe, +5 tours avec 3 coffres). Achats ×100 / ×110.
+  Simulation `node tools/sim/pirates.js` (8 M tours) : RTP ≈ 92 % (façons 40, Crabe 8, Chasse 24, Tours gratuits 20), un gain
+  1 tour sur 4, Chasse 1 tour sur 369 (≈ ×88), Tours gratuits 1 sur 481 (≈ ×97), GRAND ≈ 1 tour sur 135 000, achats ≈ 88 / 89 %,
+  ×50 000 ≈ 1 tour sur 6 millions. Pour l'ouvrir : retirer `wip`, `python3 tools/build.py`, entrée `UPDATES`, captures SEO,
+  image de partage.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10
