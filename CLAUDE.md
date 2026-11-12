@@ -442,6 +442,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   se paie en effaçant la demande payée. `ok` = « assez de solde », écrit par le demandeur seulement quand il change
   (« Pas assez de solde » chez les autres, la demande reste). Une demande s'efface toute seule si on a trouvé la carte
   ailleurs. Prix max du Marché passé à 600 000 (secrète brillante).
+  **Secrètes cachées** tant qu'on n'en a pas une (`seen` / `nm`) : ni dessin ni nom dans l'album, au Marché, dans les
+  demandes et les messages (voulu par le propriétaire : on ne les voit qu'en les obtenant).
   Liste des cartes pour le propriétaire : `notes/jcc-les-origines-cartes.txt` (dossier `notes/` = ses notes) ; en faire
   une pareille pour chaque nouvelle série.
 
