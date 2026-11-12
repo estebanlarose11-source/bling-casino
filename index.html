@@ -13648,6 +13648,11 @@ return { musicOn, Music, EXTRA_THEMES };
 
 // ---- slot/machine.js ----
 __mods['slot/machine.js'] = (() => {
+// « Garder le turbo pendant les bonus » (owner's request): one choice for every slot machine; off = Turbo and
+// Super turbo go off when a bonus starts, on = they stay on (for players hunting bonuses)
+const keepTurbo = () => { try { return localStorage.getItem('spinbet_keep_turbo') === '1'; } catch { return false; } };
+const setKeepTurbo = (v) => { try { localStorage.setItem('spinbet_keep_turbo', v ? '1' : '0'); } catch { /* private mode */ } return keepTurbo(); };
+
 const { generateGrid, evaluateLines, scatterWin, countSymbol, symbolById, randomCell, PAYLINES } = __mods['slot/math.js'];
 const { runHoldSpin } = __mods['slot/holdspin.js'];
 const { wallet, fmt, round } = __mods['wallet.js'];
@@ -13682,7 +13687,7 @@ class SlotMachine {
     // a bonus starts: Turbo and Super turbo go off so it can be watched (owner's request); the player turns them on again
     this.onFeatCalm = (e) => {
       const d = e.detail || {};
-      if (d.game !== this.game.id || d.re || d.quiet || (!this.turbo && !this.superT)) return;
+      if (d.game !== this.game.id || d.re || d.quiet || (!this.turbo && !this.superT) || keepTurbo()) return;
       this.turbo = false; this.superT = false; globalThis.__sbSuper = false;
       try { localStorage.setItem(`${this.game.id}_super`, '0'); } catch { /* private mode */ }
       toast('⚡ Turbo coupé pour profiter du bonus · tu peux le remettre dans « Bonus & menu »', 'info');
@@ -14260,6 +14265,7 @@ class SlotMachine {
       toggles: [
         { icon: '⚡', label: 'Turbo', on: this.turbo, toggle: () => (this.turbo = !this.turbo) },
         { icon: '🚀', label: 'Super turbo', on: this.superT, toggle: () => { this.superT = !this.superT; globalThis.__sbSuper = this.superT; if (this.superT) this.turbo = true; try { localStorage.setItem(`${this.game.id}_super`, this.superT ? '1' : '0'); } catch { /* private mode */ } return this.superT; } },
+        { icon: '🔁', label: 'Garder le turbo pendant les bonus', on: keepTurbo(), toggle: () => setKeepTurbo(!keepTurbo()) },
         { icon: '🎵', label: 'Musique', on: musicOn(), toggle: () => { this.music.setEnabled(!musicOn()); return musicOn(); } },
         { icon: '🔊', label: 'Effets sonores', on: !isMuted(), toggle: () => { setMuted(!isMuted()); return !isMuted(); } },
       ],
@@ -14363,6 +14369,11 @@ return { BETS, SlotMachine };
 
 // ---- core/base.js ----
 __mods['core/base.js'] = (() => {
+// « Garder le turbo pendant les bonus » (owner's request): one choice for every slot machine; off = Turbo and
+// Super turbo go off when a bonus starts, on = they stay on (for players hunting bonuses)
+const keepTurbo = () => { try { return localStorage.getItem('spinbet_keep_turbo') === '1'; } catch { return false; } };
+const setKeepTurbo = (v) => { try { localStorage.setItem('spinbet_keep_turbo', v ? '1' : '0'); } catch { /* private mode */ } return keepTurbo(); };
+
 // Shared cabinet for every rebuilt game: the same chrome, overlays and controls as Big Bad Wolf.
 // Game logic stays in each game file and works in cents, like the original games.
 
@@ -14439,7 +14450,7 @@ function guideHTML(game, html, best) {
     <div class="gd-max"><small>GAIN MAXIMUM</small><b>×${(game.maxX || 0).toLocaleString('fr-FR')}</b><span>la mise, bonus compris</span></div>
     ${b0 ? `<div class="gd-best"><small>⭐ LE SYMBOLE QUI PAIE LE PLUS</small><div class="gd-sym">${b0.sym}<div><b>${b0.name || 'Le meilleur symbole'}</b><span>${b0.val ? `la plus haute valeur de la table : <b>${fx(b0.x)}</b>` : `le plus haut de la table des gains : <b>×${fx(b0.x)}</b>`}</span></div></div>
       ${top.length > 1 ? `<div class="gd-next">Ensuite : ${top.slice(1).map((t) => `<span>${t.sym}${t.name} <b>${t.val ? fx(t.x) : `×${fx(t.x)}`}</b></span>`).join('')}</div>` : ''}</div>` : ''}
-    <div class="gd-tip"><small>🎯 POUR UN DÉFI (×50, ×200…)</small><p>${b0 ? `Vise <b>${b0.name || 'le meilleur symbole'}</b> en grande connexion${top.length > 1 ? `, puis ${top.slice(1).map((t) => t.name).filter(Boolean).join(' et ')}` : ''}. ` : ''}Les très gros gains viennent surtout ${bonus.length ? `des bonus : <b>${bonus.join('</b>, <b>')}</b>` : 'des bonus'}, où plusieurs connexions et les multiplicateurs s’additionnent sur un seul tour. Le détail de chaque symbole est dans la table ci-dessous.</p></div>
+    <div class="gd-tip"><small>🎯 POUR UN DÉFI (×50, ×100…)</small><p>${b0 ? `Vise <b>${b0.name || 'le meilleur symbole'}</b> en grande connexion${top.length > 1 ? `, puis ${top.slice(1).map((t) => t.name).filter(Boolean).join(' et ')}` : ''}. ` : ''}Les très gros gains viennent surtout ${bonus.length ? `des bonus : <b>${bonus.join('</b>, <b>')}</b>` : 'des bonus'}, où plusieurs connexions et les multiplicateurs s’additionnent sur un seul tour. Le détail de chaque symbole est dans la table ci-dessous.</p></div>
   </div>`;
 }
 
@@ -14467,7 +14478,7 @@ class BaseGame {
     // a bonus starts: Turbo and Super turbo go off so it can be watched (owner's request); the player turns them on again
     this.onFeatCalm = (e) => {
       const d = e.detail || {};
-      if (game.cat !== 'slot' || d.game !== game.id || d.re || d.quiet || (!this.turbo && !this.superT)) return;
+      if (game.cat !== 'slot' || d.game !== game.id || d.re || d.quiet || (!this.turbo && !this.superT) || keepTurbo()) return;
       this.turbo = false; this.superT = false; globalThis.__sbSuper = false;
       this.saveKey(`${game.id}_turbo`, 0); this.saveKey(`${game.id}_super`, 0);
       toast('⚡ Turbo coupé pour profiter du bonus · tu peux le remettre dans « Bonus & menu »', 'info');
@@ -14711,6 +14722,7 @@ class BaseGame {
     const toggles = [];
     if (c.turbo) toggles.push({ icon: '⚡', label: 'Turbo', on: this.turbo, toggle: () => { this.turbo = !this.turbo; this.saveKey(`${this.game.id}_turbo`, this.turbo ? 1 : 0); return this.turbo; } });
     if (c.turbo && this.game.cat === 'slot') toggles.push({ icon: '🚀', label: 'Super turbo', on: this.superT, toggle: () => { this.superT = !this.superT; globalThis.__sbSuper = this.superT; this.saveKey(`${this.game.id}_super`, this.superT ? 1 : 0); if (this.superT && !this.turbo) { this.turbo = true; this.saveKey(`${this.game.id}_turbo`, 1); } return this.superT; } });
+    if (c.turbo && this.game.cat === 'slot') toggles.push({ icon: '🔁', label: 'Garder le turbo pendant les bonus', on: keepTurbo(), toggle: () => setKeepTurbo(!keepTurbo()) });
     c.opts.forEach((o) => toggles.push({ icon: o.icon, label: o.label, on: !!this.optOn?.(o.id), toggle: () => { this.onOpt?.(o.id); return !!this.optOn?.(o.id); } }));
     toggles.push({ icon: '🎵', label: 'Musique', on: musicOn(), toggle: () => { this.music.setEnabled(!musicOn()); return musicOn(); } });
     toggles.push({ icon: '🔊', label: 'Effets sonores', on: !isMuted(), toggle: () => { setMuted(!isMuted()); return !isMuted(); } });
@@ -16192,7 +16204,7 @@ const TIERS = [
   { id: 6, k: 'x', goal: 50, icon: '💥', name: 'Gros gain', text: 'Décroche un gain d’au moins ×50', ke: 500, xp: 120, pts: 3 },
   { id: 7, k: 'b', goal: 2, icon: '🎯', name: 'Chasseur de bonus', text: 'Déclenche 2 bonus en jeu (sans les acheter)', ke: 800, xp: 160, pts: 4 },
   { id: 8, k: 'n', goal: 1000, icon: '🏃', name: 'Marathon', text: 'Joue 1 000 tours', ke: 1200, xp: 220, pts: 5 },
-  { id: 9, k: 'x', goal: 200, icon: '🔥', name: 'Méga gain', text: 'Décroche un gain d’au moins ×200', ke: 2000, xp: 300, pts: 6 },
+  { id: 9, k: 'x', goal: 100, icon: '🔥', name: 'Méga gain', text: 'Décroche un gain d’au moins ×100', ke: 2000, xp: 300, pts: 6 },
   { id: 10, k: 'b', goal: 6, icon: '👑', name: 'Légende', text: 'Déclenche 6 bonus en jeu (sans les acheter)', ke: 5000, xp: 500, pts: 8 },
 ];
 const MASTER = { ke: 3000, xp: 400, pts: 15 };
@@ -16208,10 +16220,18 @@ const PRESTIGE = { ke: (p) => 10000 * p, xp: (p) => 500 * p, pts: 20 };
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
 const tierText = (k, g) => ({ n: `Joue ${g.toLocaleString('fr-FR')} tours`, w: `Gagne ${g.toLocaleString('fr-FR')} tours`, x: `Décroche un gain d’au moins ×${g.toLocaleString('fr-FR')}`,
   a: `Joue ${g} bonus (déclenchés ou achetés)`, b: `Déclenche ${g} bonus en jeu (sans les acheter)` }[k]);
-function tiersFor(p) {
-  if (!p) return TIERS;
+// « gain d’au moins ×… » never above a share of the machine's max win (owner's request: Le Totem stops at ×500, a
+// prestige asking ×1 000 there was impossible): ×10 tier ≤ 5 %, ×50 tier ≤ 20 %, ×100 tier ≤ 50 % of the max.
+const X_CAP = { 3: 0.05, 6: 0.2, 9: 0.5 };
+const nice = (g) => (g < 20 ? Math.round(g) : g < 100 ? Math.floor(g / 5) * 5 : g < 1000 ? Math.floor(g / 25) * 25 : Math.floor(g / 50) * 50);
+const maxOf = (gid) => ALL_GAMES.find((g) => g.id === gid)?.maxX || 5000;
+function xGoal(t, p, gid) {
+  return nice(Math.min(t.goal * P_X[p], maxOf(gid) * (X_CAP[t.id] || 1)));
+}
+function tiersFor(p, gid) {
   return TIERS.map((t) => {
-    const goal = t.k === 'x' ? Math.round(t.goal * P_X[p]) : Math.round(t.goal * P_COUNT[p]);
+    if (!p && (t.k !== 'x' || xGoal(t, 0, gid) === t.goal)) return t;
+    const goal = t.k === 'x' ? xGoal(t, p, gid) : Math.round(t.goal * P_COUNT[p]);
     return { ...t, goal, text: tierText(t.k, goal), ke: Math.round(t.ke * P_REW(p)), xp: Math.round(t.xp * P_REW(p)) };
   });
 }
@@ -16234,7 +16254,7 @@ const doneT = (st, t) => have(st, t) >= goalOf(t);
 
 function gameStatus(gid) {
   const st = statsOf(gid), claimed = data().c[gid] || [], p = prestigeOf(gid);
-  const rows = tiersFor(p).map((t) => ({ ...t, have: Math.min(have(st, t), goalOf(t)), max: goalOf(t), done: doneT(st, t), claimed: claimed.includes(t.id) }));
+  const rows = tiersFor(p, gid).map((t) => ({ ...t, have: Math.min(have(st, t), goalOf(t)), max: goalOf(t), done: doneT(st, t), claimed: claimed.includes(t.id) }));
   const nClaimed = rows.filter((r) => r.claimed).length, master = !!data().m[gid];
   return { gid, st, rows, nClaimed, toClaim: rows.filter((r) => r.done && !r.claimed).length, master, masterReady: nClaimed === TIERS.length && !master,
     prestige: p, M: masterFor(p), prestigeReady: master && p < MAX_PRESTIGE };

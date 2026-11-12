@@ -357,7 +357,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `core/grid.js`, `slot/machine.js`, `slot/holdspin.js`) ×0,3, rouleaux ×0,45, cascades ×0,5, comptage des gains et
   tours auto plus courts. Remis à zéro en quittant le jeu. Ne change pas les gains. **Dès qu'un bonus démarre** (`sb:feature`, sauf relance `re`), Turbo et Super turbo se coupent tout seuls
   et restent coupés (`onFeatCalm` dans les deux moteurs, message « Turbo coupé pour profiter du bonus ») : voulu par le
-  propriétaire, le joueur les remet lui-même. Mesuré : Le Loup 1,8 s → 0,57 s
+  propriétaire, le joueur les remet lui-même ; **sauf** s'il coche « 🔁 Garder le turbo pendant les bonus » (« Bonus & menu »
+  des deux moteurs, un seul choix pour toutes les machines : `keepTurbo()`, localStorage `spinbet_keep_turbo`, voulu par le
+  propriétaire pour ceux qui « charbonnent » les bonus). Mesuré : Le Loup 1,8 s → 0,57 s
   par tour, L'Olympe 2,0 → 1,15 s.
 - **Max win** : chaque machine à sous a un gain maximum par tour, bonus compris (`max` du catalogue → `maxX`),
   appliqué par `core/base.js` (`win()`) et `slot/machine.js` (`payOut()`). Fin de chaque tour payé : événement
@@ -626,6 +628,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   plus bas), le joueur récupère la récompense dans Succès. Depuis le 9 novembre 2026, ces succès comptent aussi le
   total d'un tour bonus compris (`sb:roundend` dans `achievements.js`) : avant, seul le plus gros paiement comptait,
   et un bonus payé tour gratuit par tour gratuit (La Tour Bling…) n'atteignait jamais ×200.
+  **Objectifs « gain d'au moins ×… »** (`TIERS` 10 / 50 / **100**, demande du propriétaire du 12 novembre 2026 : ×200 au
+  1er niveau était trop dur sur Le Totem, max ×500) : montent avec les prestiges (`P_X`) mais jamais au-dessus d'une part
+  du gain max de la machine (`X_CAP` : 5 / 20 / 50 %, `xGoal`) : Le Totem s'arrête à ×25 / ×100 / ×250.
 
 - **Budget d'écritures Firebase** (forfait gratuit Spark : 20 000 écritures par jour, remis à zéro vers 9 h, heure de
   Paris) : le 9 novembre 2026 il a été épuisé vers 21 h 30 (profil enregistré toutes les 4 s + classement à chaque
