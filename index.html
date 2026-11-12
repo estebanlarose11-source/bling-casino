@@ -5056,8 +5056,10 @@ html.light .slot small { color: inherit; }
 .ap-reels, .ap-heist { position: relative; border-radius: 16px; padding: 6px; background: rgba(8, 20, 30, .38); box-shadow: inset 0 0 0 2px rgba(253, 224, 71, .85), inset 0 0 0 5px rgba(74, 42, 6, .85), inset 0 0 0 6px rgba(253, 224, 71, .35), 0 16px 36px rgba(0, 0, 0, .45); }
 .ap-reels { width: fit-content; max-width: 100%; margin: 0 auto; box-sizing: border-box; }
 .g-pirates.ap-heisting .ap-reels { display: none; }
-.g-pirates .rs.ap-rs { width: min(calc(100vw - 32px), calc((100vh - var(--chrome) - 150px) * 5 / 4), 820px); min-width: min(calc(100vw - 32px), 250px); gap: 4px; }
-.game-host.is-full .g-pirates .rs.ap-rs { width: min(calc(100vw - 28px), calc((100dvh - var(--chrome) - 110px) * 5 / 4)); }
+/* the owner's symbols are wide wooden plates: wider cells (×1.5 on a computer and a phone on its side, ×1.15 upright) */
+.g-pirates .rs.ap-rs { --cw: 1.5; aspect-ratio: calc(5 * var(--cw) / 4); width: min(calc(100vw - 32px), calc((100vh - var(--chrome) - 150px) * 5 * var(--cw) / 4), 1040px); min-width: min(calc(100vw - 32px), 250px); gap: 4px; }
+.game-host.is-full .g-pirates .rs.ap-rs { width: min(calc(100vw - 28px), calc((100dvh - var(--chrome) - 110px) * 5 * var(--cw) / 4)); }
+@media (orientation: portrait) { .g-pirates .rs.ap-rs { --cw: 1.15; } }
 .g-pirates .rs-reel { border-radius: 10px; background: linear-gradient(180deg, rgba(10, 24, 36, .5), rgba(10, 24, 36, .28) 50%, rgba(10, 24, 36, .5)); box-shadow: inset 0 0 0 1px rgba(253, 224, 71, .18); }
 .g-pirates .rs-cell { --tg: transparent; container-type: size; }
 .g-pirates .rs-cell::before { content: ''; position: absolute; inset: 6%; z-index: 0; border-radius: 12px; background: radial-gradient(circle at 50% 45%, var(--tg), transparent 70%); }
@@ -5074,8 +5076,11 @@ html.light .slot small { color: inherit; }
 .rs-cell.wild .ap-emo small { color: #1a2e05; background: #bef264; box-shadow: 0 0 10px #84cc16; }
 .rs-cell.scat .ap-emo small { color: #fff; background: linear-gradient(90deg, #7c3aed, #0ea5e9); }
 .rs-cell.coll .ap-emo small, .ap-hc.t-coll .ap-emo small { color: #fff; background: #dc2626; box-shadow: 0 0 10px #f87171; }
-.ap-img { width: 92%; height: 92%; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .7)); }
+.ap-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .6)); }
+.g-pirates .rs-cell::before { display: none; } .g-pirates .rs-cell.win .ap-img, .ap-hc.on .ap-img { filter: drop-shadow(0 0 8px #fde047) drop-shadow(0 3px 5px rgba(0, 0, 0, .6)); }
 .ap-cs i { font-size: 40cqh; } .ap-cs.big i { font-size: 46cqh; }
+.g-pirates .ap-v { bottom: 3%; font-size: 21cqh; }
+.g-pirates .ap-hc.t-safe .ap-m { top: 0; bottom: auto; left: auto; right: 2%; transform: none; padding: 1px 7px; border-radius: 8px; font-size: 30cqh; color: #fff7d6; background: linear-gradient(180deg, #b91c1c, #7f1d1d); box-shadow: 0 0 0 2px #fde047, 0 3px 8px rgba(0, 0, 0, .6); z-index: 2; } .ap-hc .ap-img.ap-cs { opacity: .95; }
 .ap-v { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); white-space: nowrap; font: 900 19cqh/1 KeCoin, Archivo, sans-serif; color: #fde047; text-shadow: 0 2px 0 #713f12, 0 0 8px #000, 0 0 2px #000; }
 .ap-v.big { color: #fff; text-shadow: 0 2px 0 #a16207, 0 0 10px #facc15, 0 0 3px #000; }
 .ap-ke { display: inline-block; width: .8em; height: .8em; margin-left: .08em; vertical-align: -.05em; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff7c2, #facc15 45%, #a16207); box-shadow: 0 0 0 1px #713f12; }
@@ -5085,8 +5090,9 @@ html.light .slot small { color: inherit; }
 .g-pirates .rs-reel.ap-focus, .g-pirates .ap-hc.ap-focus { box-shadow: inset 0 0 0 3px #38bdf8, 0 0 26px rgba(56, 189, 248, .95); animation: apFocus .45s ease-in-out infinite alternate; z-index: 2; }
 @keyframes apFocus { to { box-shadow: inset 0 0 0 3px #fde047, 0 0 34px rgba(250, 204, 21, .95); } }
 /* THE SYNDICATE HEIST: 5 × 6, 2 locked rows at the top */
-.ap-heist { display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(6, 1fr); gap: 4px; aspect-ratio: 5 / 6; width: min(100%, 540px); margin: 0 auto; box-sizing: border-box; }
-@media (orientation: landscape) { .ap-heist { width: min(calc(100vw - 20px), calc((100vh - var(--chrome) - 40px) * 5 / 6), 620px); } .game-host.is-full .g-pirates .ap-heist { width: min(calc(100vw - 20px), calc((100dvh - var(--chrome) + 40px) * 5 / 6)); } }
+.ap-heist { --hw: 1.35; display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(6, 1fr); gap: 4px; aspect-ratio: calc(5 * var(--hw) / 6); width: min(100%, 680px); margin: 0 auto; box-sizing: border-box; }
+@media (orientation: portrait) { .ap-heist { --hw: 1.1; } }
+@media (orientation: landscape) { .ap-heist { width: min(calc(100vw - 20px), calc((100vh - var(--chrome) - 40px) * 5 * var(--hw) / 6), 820px); } .game-host.is-full .g-pirates .ap-heist { width: min(calc(100vw - 20px), calc((100dvh - var(--chrome) + 40px) * 5 * var(--hw) / 6)); } }
 .ap-heist[hidden] { display: none; }
 .ap-hc { position: relative; container-type: size; display: grid; place-items: center; border-radius: 10px; min-width: 0; min-height: 0; }
 .ap-hc > * { grid-area: 1 / 1; }
@@ -5140,8 +5146,8 @@ html.light .slot small { color: inherit; }
   .game-host.is-full:has(> .slot.g-pirates) { --chrome: 40px; }
   .game-host.is-full > .slot.g-pirates { display: grid; padding: 4px 8px; }
   .game-host.is-full .g-pirates .ap-logo { display: none; }
-  .game-host.is-full .g-pirates .rs.ap-rs { width: min(calc(100vw - 300px), calc((100dvh - 30px) * 5 / 4)); min-width: 0; }
-  .game-host.is-full .g-pirates .ap-heist { width: min(calc(100vw - 300px), calc((100dvh - 20px) * 5 / 6)); }
+  .game-host.is-full .g-pirates .rs.ap-rs { width: min(calc(100vw - 300px), calc((100dvh - 30px) * 5 * var(--cw) / 4)); min-width: 0; }
+  .game-host.is-full .g-pirates .ap-heist { width: min(calc(100vw - 300px), calc((100dvh - 20px) * 5 * var(--hw) / 6)); }
 }
 @media (prefers-reduced-motion: reduce) { .ap-ibeam, .ap-ititle b, .g-pirates .rs-cell.ap-boss { animation: none; } }
 .g-redk { --slot-bg: #050a1c; --rk-gold: linear-gradient(180deg, #fffbe6 0%, #ffe680 26%, #f7bd22 48%, #a8670a 52%, #ffd65a 74%, #8a5206 100%); }
@@ -15637,7 +15643,7 @@ const FILES = {
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
   filon: ['filon', 'games/impl/filon.js', 'FilonGame', '45904335f9'],
   redk: ['redk', 'games/impl/redk.js', 'RedkGame', 'bd8206438f'],
-  pirates: ['pirates', 'games/impl/pirates.js', 'PiratesGame', 'bb445fe428'],
+  pirates: ['pirates', 'games/impl/pirates.js', 'PiratesGame', '5c81041458'],
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '1025072609'],
   boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '48602d9af5'],
 };

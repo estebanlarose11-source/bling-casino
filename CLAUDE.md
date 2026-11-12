@@ -133,10 +133,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (×2/×5/×10/×50 sur les pièces voisines), **Crabe** (ramasse tout), **Ancre** (ouvre une rangée) ; 30 cases = LE COFFRE AUX
   PIRATES S'OUVRE ×500 (`FULL_X`, plafonné à ×50 000). Simulation `node tools/sim/pirates.js` : RTP ≈ 92 % (lignes 49, Crabe 8,
   bonus 35), un gain 1 tour sur 3, bonus 1 tour sur 254 (≈ ×90, médiane ×45), achat ×100 ≈ 90 %, ×50 000 ≈ 1 tour sur 3 M.
-  **Symboles** : dessins provisoires (emojis, `ART`) en attendant la planche du propriétaire (cœur, pique, trèfle, carreau,
-  requin, exploratrice, pirate, noix de coco WILD, tourbillon, pièce, crabe, tonneau, ancre ; il a aussi tiki, ara, coffre,
-  carte, masque, boussole, boulets, collier de fleurs, bouteille, couronne, étoile de mer) : découper en
-  `assets/games/pirates/<s0…s6|wild|scat|cash|coll|safe|bomb>.webp` et les lister dans `PICS`. Pour l'ouvrir : retirer `wip`,
+  **Symboles** = la planche du propriétaire (`tools/art/pirates/planche.webp`, 25 cases en bois avec leur nom écrit dessous,
+  pour nous seulement) découpée par `tools/art/pirates/cut.py` (`pip install "rembg[cpu]"`) : cadre en bois entier + ce qui
+  dépasse au-dessus, sans le texte → `assets/games/pirates/` (s0 cœur, s1 pique, s2 trèfle, s3 carreau, s4 requin, s5
+  exploratrice, s6 pirate, wild noix de coco, scat tourbillon, cash pièce, coll crabe, safe tonneau, bomb ancre, tous dans
+  `PICS`) ; les 12 autres (tiki, ara, coffre, carte, masque, boussole, boulets, couronne, collier, bouteille, coffre FREE SPINS,
+  étoile JP) dans `tools/art/pirates/extra/` pour plus tard. Cases plus larges que hautes (`--cw` 1,5, 1,15 téléphone en
+  hauteur ; grille du bonus `--hw`). Pour l'ouvrir : retirer `wip`,
   `python3 tools/build.py`, entrée `UPDATES`, captures SEO, image de partage.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à

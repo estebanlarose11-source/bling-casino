@@ -172,7 +172,7 @@ const ENGINE = { COLS, ROWS, N, BR, BN, NS, WILD, SCAT, CASH, COLL, CAPX, LINES,
 const E = ENGINE;
 const { P: PP } = E;
 /* ---------- the pictures: the owner's images once they are in assets/games/pirates/ (listed in PICS), emojis until then ---------- */
-const PICS = new Set([]); // e.g. 's0', 's1', … 'wild', 'scat', 'cash', 'coll', 'safe', 'bomb' once the files are there
+const PICS = new Set(['s0', 's1', 's2', 's3', 's4', 's5', 's6', 'wild', 'scat', 'cash', 'coll', 'safe', 'bomb']); // the owner's board, cut by tools/art/pirates/cut.py
 const IMG_V = 1;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`;
 const ART = {
