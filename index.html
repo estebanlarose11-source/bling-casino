@@ -7277,6 +7277,34 @@ html:not(.light) .foot { border-top: 1px solid rgba(190, 140, 255, .14); backgro
 .slot-overlay.intro h3 { font: 400 clamp(38px, 8vw, 86px)/.98 'Bebas Neue', Archivo, Impact, sans-serif; letter-spacing: .05em; -webkit-text-stroke: 1px rgba(0, 0, 0, .55); filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .55)) drop-shadow(0 0 26px var(--accent)); }
 .slot-overlay.intro p { max-width: 640px; padding: 8px 18px; border-radius: 14px; background: rgba(8, 4, 16, .6); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent); line-height: 1.4; }
 .slot-overlay.intro small { padding: 4px 12px; border-radius: 999px; background: rgba(255, 255, 255, .08); animation: bwBeat 1.4s ease-in-out infinite; }
+
+/* ============ Gain max en haut de chaque machine + guide des symboles en tête des règles (12 novembre 2026) ============ */
+.mx-row { position: relative; z-index: 6; display: flex; justify-content: flex-end; margin: 0 0 4px; pointer-events: none; }
+.mx-info { pointer-events: auto; display: inline-flex; align-items: center; gap: 7px; padding: 3px 12px 3px 3px; border-radius: 999px; cursor: pointer; white-space: nowrap; color: #fff; background: linear-gradient(180deg, rgba(30, 18, 50, .92), rgba(8, 4, 16, .92)); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent, #fbbf24) 70%, #fde68a), 0 0 14px color-mix(in srgb, var(--accent, #fbbf24) 35%, transparent), 0 3px 8px rgba(0, 0, 0, .45); transition: transform .15s, filter .15s; }
+.mx-info:hover { filter: brightness(1.2); } .mx-info:active { transform: scale(.96); }
+.mx-info i { width: 22px; height: 22px; display: grid; place-items: center; border-radius: 50%; font: italic 900 14px/1 Georgia, serif; color: #14081f; background: linear-gradient(180deg, #fff7c2, #fbbf24); box-shadow: 0 0 8px rgba(251, 191, 36, .6); }
+.mx-info span { font: 800 10px/1 Archivo, sans-serif; letter-spacing: .12em; color: #e6dcf5; }
+.mx-info b { font: 400 19px/1 'Bebas Neue', KeCoin, Archivo, sans-serif; letter-spacing: .04em; color: #fde68a; text-shadow: 0 0 10px rgba(251, 191, 36, .6); }
+.game-host.is-full .mx-row { margin: 0; }
+@media (orientation: landscape) and (max-height: 560px) { .mx-info { padding: 2px 9px 2px 2px; gap: 5px; } .mx-info i { width: 18px; height: 18px; font-size: 12px; } .mx-info b { font-size: 16px; } .mx-info span { font-size: 9px; } }
+.gd { display: grid; grid-template-columns: auto 1fr; gap: 10px; margin: 0 0 16px; }
+.gd > div { padding: 12px 14px; border-radius: 14px; background: linear-gradient(180deg, rgba(44, 30, 72, .8), rgba(20, 12, 34, .9)); border: 1px solid rgba(190, 140, 255, .22); }
+.gd small { display: block; margin-bottom: 6px; font: 800 10.5px/1 Archivo, sans-serif; letter-spacing: .12em; color: #c9b6ff; }
+.gd-max { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-width: 130px; border-color: rgba(251, 191, 36, .5) !important; background: radial-gradient(120% 90% at 50% 0%, rgba(251, 191, 36, .22), transparent 70%), linear-gradient(180deg, rgba(44, 30, 72, .8), rgba(20, 12, 34, .9)) !important; }
+.gd-max b { font: 400 40px/1 'Bebas Neue', KeCoin, Archivo, sans-serif; color: #fde68a; text-shadow: 0 0 16px rgba(251, 191, 36, .6); }
+.gd-max span { font-size: 11.5px; color: var(--muted); }
+.gd-sym { display: flex; align-items: center; gap: 12px; }
+.gd-sym > :first-child, .gd-next span > :first-child { flex: none; width: 58px; height: 58px; display: grid; place-items: center; border-radius: 12px; background: rgba(8, 4, 16, .6); box-shadow: inset 0 0 0 1.5px #fbbf24, 0 0 14px rgba(251, 191, 36, .35); overflow: hidden; font-size: 34px; }
+.gd-sym > :first-child :is(img, svg), .gd-next span > :first-child :is(img, svg) { width: 100%; height: 100%; object-fit: contain; }
+.gd-sym > div:last-child { display: grid; gap: 2px; min-width: 0; } .gd-sym > div:last-child > b { font-size: 16px; } .gd-sym span { font-size: 13px; color: #e6dcf5; } .gd-sym span b { color: #fde68a; font-size: 15px; }
+.gd-next { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 8px; font-size: 12.5px; color: var(--muted); }
+.gd-next span { display: inline-flex; align-items: center; gap: 6px; color: #e6dcf5; } .gd-next span b { color: #fde68a; }
+.gd-next span > :first-child { width: 30px !important; height: 30px !important; min-width: 0; padding: 0 !important; border-radius: 8px; font-size: 18px; box-shadow: inset 0 0 0 1px rgba(190, 140, 255, .4); }
+.gd-sym > :first-child { width: 58px !important; height: 58px !important; padding: 0 !important; }
+.gd :is(.gd-sym, .gd-next) :is(img, svg) { max-width: 100%; max-height: 100%; }
+.gd-tip { grid-column: 1 / -1; } .gd-tip p { margin: 0; font-size: 13.5px; line-height: 1.45; color: #e6dcf5; } .gd-tip p b { color: #fff; }
+@media (max-width: 560px) { .gd { grid-template-columns: 1fr; } .gd-max { flex-direction: row; gap: 10px; min-width: 0; } .gd-max small { margin: 0; } .gd-max b { font-size: 30px; } }
+html.light .gd > div { background: #f7f0ff; border-color: #d9c8f5; } html.light .gd-sym span, html.light .gd-tip p, html.light .gd-next span { color: #2a1d40; } html.light .gd-tip p b { color: #000; } html.light .gd small { color: #6b3fc0; }
 </style>
 </head>
 <body>
@@ -13653,6 +13681,7 @@ class SlotMachine {
     this.root.innerHTML = `
       <div class="slot theme-${g.theme}" style="--accent:${g.colors[0]};--accent2:${g.colors[1]}${g.id === 'big-bad-wolf' ? `;--wolf-bg:url('${window.__assets?.['assets/games/wolf/bg.webp'] || 'assets/games/wolf/bg.webp?v=1'}')` : ''}">
         <div class="slot-bg"></div>
+        ${g.maxX ? `<div class="mx-row"><button class="mx-info" type="button" data-act="info" aria-label="Gain maximum et table des gains"><i>i</i><span>GAIN MAX</span><b>×${g.maxX.toLocaleString('fr-FR')}</b></button></div>` : ''}
         <div class="slot-head">
           <div class="slot-title"><span class="art gart">${coverSVG(g, { square: true })}</span><div><h2>${g.name}</h2><small>${g.subtitle}</small><em class="prov">${BRAND.provider}</em></div></div>
           ${jp ? `<div class="jackpots">${['mini', 'minor', 'major', 'grand'].map((k) => `<div class="jp jp-${k}" data-jp="${k}"><small>${k.toUpperCase()}</small><b></b></div>`).join('')}</div>` : ''}
@@ -13710,6 +13739,7 @@ class SlotMachine {
       if (act === 'spin') { if (this.auto) this.stopAuto(); else this.play(); }
       if (act === 'bet-' || act === 'bet+') this.changeBet(act === 'bet+' ? 1 : -1);
       if (act === 'max') this.maxBet();
+      if (act === 'info') this.showInfo();
       if (act === 'menu') this.openMenu();
       if (act === 'full') toggleFull(this.root);
     };
@@ -14260,7 +14290,8 @@ class SlotMachine {
       multiplier: 'Le multiplicateur commence à ×1 et augmente de +1 après chaque tour gagnant.',
       expanding: 'Un symbole relique est tiré au sort : il s’étend sur tout le rouleau et paie sur toutes les lignes, même non adjacentes.',
     }[g.freeSpins.type];
-    modal(`<h3>${g.name} — Règles</h3>
+    const best = g.symbols.filter((x) => x.pays).map((x) => ({ sym: `<div class="pay-sym ${x.cls || ''}">${x.glyph}</div>`, name: x.name || x.label || '', x: Math.max(...Object.values(x.pays)) * (x.scatter ? 1 : 1 / g.lines) })).sort((p, q) => q.x - p.x);
+    modal(`${__mods['core/base.js'].guideHTML(g, '', best)}<h3>${g.name} — Règles</h3>
       <p class="muted">${g.description}</p>
       <h4>Table des gains (mise ${fmt(this.bet)})</h4>
       <div class="paytable">${rows}</div>
@@ -14333,6 +14364,43 @@ const TIERS = [
   { x: 25, label: 'MÉGA GAIN', cls: 'mega' },
   { x: 10, label: 'GROS GAIN', cls: 'big' },
 ];
+
+/* The guide at the top of the rules (owner's request, 12 November 2026: « quel symbole rapporte le plus, à quoi
+   s'attendre pour un défi ×200 »): max win, the best-paying symbols read from the game's own pay table (or given by
+   the engine in `best`: [{ sym, name, x }]), and the bonuses, where the big wins come from. */
+function guideHTML(game, html, best) {
+  if (game.cat && game.cat !== 'slot' && !game.maxX) return '';
+  let top = best || [];
+  if (!best && html) {
+    const d = document.createElement('div'); d.innerHTML = html;
+    const num = (t) => parseFloat(t.replace(/[\s  ]/g, '').replace(',', '.'));
+    // a pay table row: .pay-item, or (Le Totem, Le Totem Extrême) the box around a lone .pay-sym
+    const rows = new Set(d.querySelectorAll('.pay-item'));
+    d.querySelectorAll('.pay-sym').forEach((n) => { if (!n.closest('.pay-item')) rows.add(n.parentElement); });
+    rows.forEach((it) => {
+      const vals = it.querySelector('.pay-vals') || [...it.children].find((n) => !n.classList.contains('pay-sym')); if (!vals) return;
+      const txt = vals.textContent;
+      if (/\btours\b/i.test(txt) && !it.querySelector('.pay-vals')) return; // the bonus symbol of the totems: no pay of its own
+      const xs = [...txt.matchAll(/×\s?(\d[\d\s\u00a0\u202f]*(?:[.,]\d+)?)/g)].map((m) => num(m[1]));
+      const v = txt.match(/Valeur\s+(\d+)/), only = !!v && !xs.length; if (only) xs.push(+v[1]);
+      const x = Math.max(0, ...xs.filter((n) => n > 0 && n < 1e7));
+      if (!x) return;
+      const sym = [...it.children].find((n) => n !== vals);
+      top.push({ sym: sym ? sym.outerHTML : '', name: (vals.querySelector('b')?.textContent || '').trim(), x, val: only });
+    });
+    top.sort((p, q) => q.x - p.x);
+  }
+  top = top.slice(0, 3);
+  const fx = (x) => (x >= 100 ? Math.round(x) : Math.round(x * 100) / 100).toLocaleString('fr-FR');
+  const bonus = (__mods['special.js']?.SPECIAL_LIST || []).find((x) => x[0] === game.id)?.[1].map((b) => b[1]) || [];
+  const b0 = top[0];
+  return `<div class="gd">
+    <div class="gd-max"><small>GAIN MAXIMUM</small><b>×${(game.maxX || 0).toLocaleString('fr-FR')}</b><span>la mise, bonus compris</span></div>
+    ${b0 ? `<div class="gd-best"><small>⭐ LE SYMBOLE QUI PAIE LE PLUS</small><div class="gd-sym">${b0.sym}<div><b>${b0.name || 'Le meilleur symbole'}</b><span>${b0.val ? `la plus haute valeur de la table : <b>${fx(b0.x)}</b>` : `le plus haut de la table des gains : <b>×${fx(b0.x)}</b>`}</span></div></div>
+      ${top.length > 1 ? `<div class="gd-next">Ensuite : ${top.slice(1).map((t) => `<span>${t.sym}${t.name} <b>${t.val ? fx(t.x) : `×${fx(t.x)}`}</b></span>`).join('')}</div>` : ''}</div>` : ''}
+    <div class="gd-tip"><small>🎯 POUR UN DÉFI (×50, ×200…)</small><p>${b0 ? `Vise <b>${b0.name || 'le meilleur symbole'}</b> en grande connexion${top.length > 1 ? `, puis ${top.slice(1).map((t) => t.name).filter(Boolean).join(' et ')}` : ''}. ` : ''}Les très gros gains viennent surtout ${bonus.length ? `des bonus : <b>${bonus.join('</b>, <b>')}</b>` : 'des bonus'}, où plusieurs connexions et les multiplicateurs s’additionnent sur un seul tour. Le détail de chaque symbole est dans la table ci-dessous.</p></div>
+  </div>`;
+}
 
 class BaseGame {
   constructor(root, game, cfg) {
@@ -14423,6 +14491,7 @@ class BaseGame {
     this.root.innerHTML = `
       <div class="slot gslot g-${g.id} ${c.cls || ''}" style="--accent:${g.colors[0]};--accent2:${g.colors[1]};--accent-glow:color-mix(in srgb, ${g.colors[0]} 45%, transparent)">
         <div class="slot-bg"></div>
+        ${g.maxX ? `<div class="mx-row"><button class="mx-info" type="button" data-act="info" aria-label="Gain maximum et table des gains"><i>i</i><span>GAIN MAX</span><b>×${g.maxX.toLocaleString('fr-FR')}</b></button></div>` : ''}
         <div class="slot-head">
           <div class="slot-title"><span class="art gart">${coverSVG(g, { square: true })}</span><div><h2>${g.name}</h2><small>${g.sub}</small><em class="prov">${BRAND.provider}</em></div></div>
           ${c.head || ''}
@@ -14479,6 +14548,7 @@ class BaseGame {
       if (act === 'main') { if (this.auto) this.stopAuto(); else this.onMain(); }
       if (act === 'bet-' || act === 'bet+') this.changeBet(act === 'bet+' ? 1 : -1);
       if (act === 'max') this.maxBet();
+      if (act === 'info') this.showInfo();
       if (act === 'menu') this.openMenu();
       if (act === 'full') toggleFull(this.root);
     };
@@ -14661,7 +14731,7 @@ class BaseGame {
     return true;
   }
 
-  showInfo() { modal(this.info(), { cls: 'wide' }); }
+  showInfo() { const html = this.info(); modal(guideHTML(this.game, html) + html, { cls: 'wide' }); }
 
   /* ---------- presentation ---------- */
   overlay(html, cls = '') {
@@ -14754,7 +14824,7 @@ function roundEnd(g, stakeC, winC, bought) {
   }
 }
 
-return { fmtC, shortC, wpick, BETS, BaseGame, art, roundEnd };
+return { fmtC, shortC, wpick, BETS, BaseGame, art, roundEnd, guideHTML };
 })();
 
 // ---- core/reels.js ----

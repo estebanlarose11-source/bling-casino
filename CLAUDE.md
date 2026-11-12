@@ -241,6 +241,12 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   anneau, montant dans une plaque à cadre lumineux, « × la mise » en pastille, une couleur par palier `--bw1…3` ;
   paliers en français dans `TIERS` / `WIN_TIERS` : GROS GAIN, MÉGA GAIN, GAIN ÉPIQUE, GAIN LÉGENDAIRE) ; écran
   d'annonce des bonus (`.slot-overlay.intro`) dans la même famille. Les tables (21, roulettes) n'ont pas été touchées.
+- **Gain max et guide des symboles** (demande du propriétaire du 12 novembre 2026) : en haut de chaque machine à sous, plaque
+  `.mx-info` « ⓘ GAIN MAX ×N » (rangée `.mx-row`, dans les deux moteurs, `data-act="info"`) qui ouvre les règles ; en tête
+  des règles, le guide `guideHTML()` (`core/base.js`) : gain maximum, **le symbole qui paie le plus** et les 2 suivants
+  (lus dans la table des gains du jeu : lignes `.pay-item`, ou `.pay-sym` seul pour les Totems ; `slot/machine.js` les
+  calcule lui-même), et un conseil « pour un défi ×50, ×200 » avec les bonus du jeu (`SPECIAL_LIST`). Nouvelle machine :
+  garder une table des gains en `.pay-item` avec les « ×N » pour que le guide la lise.
 - **Vérification complète** (`tools/verif/robot.js`) : un robot Playwright parcourt les 26 pages et les 48 jeux sur
   ordinateur et téléphone, lance une partie dans chaque jeu et relève erreurs, débordements et textes « undefined ».
   `python3 -m http.server 8123` puis `node tools/verif/robot.js`. À relancer après une grosse modification.
