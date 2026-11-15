@@ -168,7 +168,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   puis L + R côte à côte juste dessous, puis le bouton ; **en largeur** (PC, téléphone couché) T, M et la barre entière comme
   sur l'image (`bar()`), empilés au centre, rouleaux aussi hauts que possible (T et barre à ×0,91) ; écran presque carré :
   l'image carrée. Fond du plein écran : mur laqué rouge avec motif doré et lumières de lanternes (`.ft-scene.ft-fs`).
-  En plein écran `.slot-frame` / `.slot-stage` passent en `position: static` (la scène se cale sur toute la machine).
+  En plein écran `.slot-frame` / `.slot-stage` couvrent toute la machine (`position: absolute; inset: 0`, `align-self: stretch` :
+  la machine est en flex) ; **bug du 15 novembre 2026 « au spin ça efface la slot »** : avec `position: static`, le flash de
+  chaque tour (`ml-busy` → `mlCharge`, un `filter` sur `.slot-frame`) faisait de `.slot-frame` le bloc de la scène (hauteur 0)
+  pendant 0,5 s. Le flash est aussi coupé pour La Fortune.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

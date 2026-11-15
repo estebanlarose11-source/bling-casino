@@ -4561,7 +4561,10 @@ html.light .slot small { color: inherit; }
 .ft-safe { position: absolute; visibility: hidden; pointer-events: none; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
 .ft-pbg { position: absolute; display: none; background-image: url(assets/games/fortune/scene.webp?v=3); background-repeat: no-repeat; pointer-events: none; }
 .game-host.is-full > .slot.g-fortune.g-fortune { position: relative; height: 100%; padding: 0 !important; }
-.game-host.is-full > .slot.g-fortune.g-fortune > .slot-frame, .game-host.is-full > .slot.g-fortune.g-fortune > .slot-frame > .slot-stage { position: static !important; transform: none !important; }
+/* full screen: the frame and the stage cover the whole slot, so the scene always has the size of the screen
+   (a filter or transform on them, like the flash of every spin, must not shrink it: bug « ça efface la slot ») */
+.game-host.is-full > .slot.g-fortune.g-fortune > .slot-frame, .game-host.is-full > .slot.g-fortune.g-fortune > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; }
+.game-host.ml-busy > .slot.g-fortune .slot-frame, .game-host.ml-busy > .slot.g-fortune .reels { animation: none !important; }
 /* the slot's background: red lacquer wall with gold key pattern, lantern lights at the top */
 .ft-scene.ft-fs { position: absolute; inset: 0; z-index: 1; width: auto; height: auto; aspect-ratio: auto; margin: 0; border-radius: 0; box-shadow: none;
   background: radial-gradient(55% 30% at 50% 0%, rgba(255, 176, 70, .38), transparent 70%), radial-gradient(22% 16% at 6% 10%, rgba(255, 96, 40, .4), transparent 70%), radial-gradient(22% 16% at 94% 10%, rgba(255, 96, 40, .4), transparent 70%),
