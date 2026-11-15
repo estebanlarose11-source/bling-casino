@@ -188,6 +188,19 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   La Sweety) : la vidéo qui va avec la forme de l'écran le couvre, rognée sans couper médaillon, grille ni barre (zone gardée
   `[kx0, ky0, kx1, ky1]`) ; écran d'une autre forme : sa 1re image floutée autour (`.zo-bandx` / `.zo-bandy`, téléphone très fin :
   vidéo en bas, ciel flouté au-dessus). Positions en % de chaque vidéo dans le bloc CSS « L'Olympe ». Gains inchangés.
+- **Le Loup 2.0, décor animé** (`games/huff.js`, demande du propriétaire du 15 novembre 2026, comme L'Olympe) : **ses 2 vidéos**
+  `tools/art/huff/fond-large.mp4` (672 × 448, `.hf-l`) et `fond-haut.mp4` (448 × 672, `.hf-p`) : la maison en briques des cochons,
+  plaques MINI / MAJOR / GRAND JACKPOT, fenêtre étoilée, le loup. Nettoyées par `tools/art/huff/clean.py` (« $1.00 » effacé, quadrillage
+  peint de la fenêtre effacé sur le téléphone) → `assets/games/huff/fond-*.mp4` + `scene-*.webp`. Rouleaux 5×3 dans la fenêtre
+  (`.hf-win`, sans les bandes blanches), montants des jackpots sous les plaques (`.hf-art > .jp`, suivent la mise ; MINOR n'a pas de
+  plaque : il reste sur sa pièce), plaques SOLDE · GAIN sur le mur (large) ou l'herbe (haut) (`.hf-info`), compteur du bonus à leur
+  place (`.feature-banner` déplacé dans `.hf-art`), plateau du bonus dans la fenêtre (`.stage-layer` déplacé dans `.hf-win`), barre
+  cliquable (BET − / +, BONUS MENU, SPIN, MAX BET = `maxBet()` ; la vidéo haute n'a pas de BONUS MENU : plaque à nous sur l'herbe).
+  Plein écran comme L'Olympe (`layout()`, zone gardée). Gains inchangés.
+- **Décors animés, outils communs** : `tools/art/videobg.py` (lecture, effaçage, boucle sans coupure, ×2, affiche) pour les
+  `tools/art/<jeu>/clean.py`, et module `core/videobg.js` d'`index.html` : `VideoBg` (lecture muette, retour d'une boucle `loop`,
+  pause page cachée, rien avec « animations réduites », décodeur libéré à `destroy()`), `screenBox` (écran moins les zones sûres),
+  `coverFit` (plein écran couvert sans couper la zone gardée). L'Olympe et Le Loup 2.0 s'en servent : prochaine machine pareil.
 - **Le Cosmique, nouveau décor** (`games/cosmic.js`, demande du propriétaire du 15 novembre 2026) : **ses 2 images**
   `tools/art/cosmic/decor-large.jpg` (1248 × 832 : page et écrans larges, `.cz-l`) et `decor-haut.jpg` (720 × 1280 : téléphone tenu
   droit, `.cz-p`, aussi sur la page d'un téléphone), nettoyées par `tools/art/cosmic/clean.py` (quadrillage peint effacé : le jeu

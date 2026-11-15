@@ -114,6 +114,7 @@ const { COLS, ROWS, N, SC, ORB, PAYS, TUNE, SCATTER_PAY, FREE_SPINS, RETRIGGER, 
 const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el, animateNumber } = __mods['ui.js'];
+const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
 
 const IDS = ['z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8'];
 // Painted images from the owner (assets/games/zeus): the 9 symbols, the scatter (Zeus head), the multiplier orb,
@@ -130,8 +131,7 @@ const lab = (t) => `<b class="sg-lab">${t}</b>`;
 const cellArt = (c) => (c.s === ORB ? art('zorb') + lab('×' + c.m) : c.s === SC ? art('zsc') + '<i class="lbl zl">SCATTER</i>' : art(IDS[c.s]));
 const cellCls = (c) => (c.s === ORB ? 'orb' : c.s === SC ? 'scatter' : c.s >= 5 ? 'hi' : '');
 
-// The videos: a 121-frame loop (24 images/s), then its first 12 frames again: the game jumps back by one loop while they
-// play, so the video never stops on its last frame (seamless, like a gif). See tools/art/zeus/clean.py.
+// The videos: a 121-frame loop (24 images/s), then its first 12 frames again (core/videobg.js, tools/art/zeus/clean.py).
 const LOOP = 121 / 24;
 
 class ZeusGame extends BaseGame {
@@ -168,13 +168,7 @@ class ZeusGame extends BaseGame {
     this.ro.observe(this.q('.zo-scene'));
     this.onRs = () => requestAnimationFrame(() => this.layout());
     addEventListener('resize', this.onRs);
-    // the animated background: muted, plays by itself, paused when the page is hidden (and never with reduced motion)
-    const v = this.video = this.q('.zo-vid');
-    v.muted = true;
-    v.addEventListener('timeupdate', () => { if (v.currentTime >= LOOP) v.currentTime -= LOOP; });
-    this.root.addEventListener('pointerdown', () => this.playBg(), { once: true }); // a phone in power-saving mode waits for a touch
-    this.onVis = () => { if (document.hidden) v.pause(); else this.playBg(); };
-    document.addEventListener('visibilitychange', this.onVis);
+    this.vbg = new VideoBg(this.q('.zo-vid'), { loop: LOOP, root: this.root }); // the animated background
     this.meter = this.q('.zo-med');
     this.meterVal = 0;
     this.grid = new SymbolGrid(this.q('.grid-host'), { cols: COLS, rows: ROWS, game: this, art: cellArt, cls: cellCls });
@@ -237,16 +231,11 @@ class ZeusGame extends BaseGame {
     if (x >= 10) await super.celebrate(amountC, { stake: o.stake, quick: true }); // GROS GAIN ! stays everywhere
   }
 
-  playBg() { if (!this.dead && !document.hidden && this.video.src && !matchMedia('(prefers-reduced-motion: reduce)').matches) this.video.play().catch(() => {}); }
   // the wide or the tall background (and its places for the grid and the buttons, in the CSS: .zo-l / .zo-p)
   orient(port) {
     const sc = this.q('.zo-scene'), name = port ? 'haut' : 'large';
     sc.classList.toggle('zo-p', port); sc.classList.toggle('zo-l', !port);
-    if (this.vidName === name) return;
-    this.vidName = name;
-    this.video.poster = asset(`assets/games/zeus/scene-${name}.webp`);
-    this.video.src = asset(`assets/games/zeus/fond-${name}.mp4`);
-    this.playBg();
+    this.vbg.set(asset(`assets/games/zeus/fond-${name}.mp4`), asset(`assets/games/zeus/scene-${name}.webp`));
   }
   // Wide background on a computer, tall one on a phone held upright. Full screen: the one that fits the screen's shape
   // covers the whole screen, cropped on its edges but never cutting the medallion, the grid or the bar (KEY, in the
@@ -261,25 +250,14 @@ class ZeusGame extends BaseGame {
       this.orient(innerWidth < 700 && innerHeight > innerWidth);
       art.style.cssText = ''; return;
     }
-    const cs = getComputedStyle(this.q('.zo-safe')), sp = (k) => parseFloat(cs[k]) || 0;
-    const top = sp('paddingTop'), bot = sp('paddingBottom'), lft = sp('paddingLeft'), rgt = sp('paddingRight');
-    const W = sc.clientWidth - lft - rgt, H = sc.clientHeight - top - bot;
+    const { top, lft, W, H } = screenBox(sc, this.q('.zo-safe'));
     if (!W || !H) return;
-    const port = W / H < 1, iw = port ? 400 : 736, ih = port ? 736 : 400;
+    const port = W / H < 1;
     this.orient(port);
-    const [kx0, ky0, kx1, ky1] = port ? [4, 172, 396, 730] : [14, 0, 722, 398];
-    const k = Math.min(Math.max(W / iw, H / ih), W / (kx1 - kx0), H / (ky1 - ky0)), w = iw * k, h = ih * k;
-    // larger than the screen: centred, then moved so that the screen stays covered and the key part stays on it
-    const fit = (S, len, a0, a1) => {
-      if (len <= S) return null;
-      let v = (S - len) / 2;
-      v = Math.min(0, Math.max(S - len, v));
-      return Math.min(S - a1 * k, Math.max(-a0 * k, v));
-    };
-    const x = fit(W, w, kx0, kx1) ?? (W - w) / 2;
-    const y = fit(H, h, ky0, ky1) ?? (port ? H - h : (H - h) / 2); // a phone thinner than the video: the video at the bottom, sky above
-    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + x).toFixed(1)}px;top:${(top + y).toFixed(1)}px`;
-    sc.classList.toggle('zo-bandx', x > 0.5); sc.classList.toggle('zo-bandy', y > 0.5);
+    // a phone thinner than the video: the video at the bottom, sky above
+    const f = coverFit(W, H, port ? 400 : 736, port ? 736 : 400, port ? [4, 172, 396, 730] : [14, 0, 722, 398], { bottom: port });
+    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
+    sc.classList.toggle('zo-bandx', f.bandX); sc.classList.toggle('zo-bandy', f.bandY);
   }
 
   say(t) {
@@ -451,8 +429,7 @@ class ZeusGame extends BaseGame {
 
   destroy() {
     clearTimeout(this.poseT); this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs);
-    document.removeEventListener('visibilitychange', this.onVis);
-    this.video.pause(); this.video.removeAttribute('src'); this.video.load(); // frees the video decoder (phones have few)
+    this.vbg.destroy();
     super.destroy();
   }
 

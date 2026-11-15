@@ -130,6 +130,7 @@ const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el, animateNumber } = __mods['ui.js'];
 const { profiles } = __mods['profile.js'];
+const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
 const { ROWS, COLS, NC, SC, LINES, PAY, LV, JPV, JPN, CAPX, BONUS_SPINS, MEGA_SPINS, TUNE, BUYN, BUYX, BUYM,
   drawCell, genGrid, scattersIn, evalLines, spinHouse, spinMega, newBonus, stepBonus, bonusDone, reveal, } = __mods['games/impl/huff-engine.js'];
 
@@ -147,8 +148,12 @@ const MWHEEL = ['five', 'gold', 'five', 'major', 'five', 'gold', 'five', 'grand'
 const MLAB = { five: ['5 TOURS', 'Bonus 5 tours'], gold: ['MAISONS OR', 'Bonus maisons en or'], major: ['MAJOR', 'MAJOR JACKPOT'], grand: ['JACKPOT', 'GRAND JACKPOT'] };
 const BONUS_NAME = { n: 'LE SOUFFLE', x: 'GRAND SOUFFLE', g: 'MAISONS EN OR', f: 'SOUFFLE GÉANT' };
 // Painted images from the owner (assets/games/huff): the wolf, the 3 houses, the pig and the scatter coin.
-// The card symbols (A K Q J 10) keep their drawn art.
-const IMG_V = 1;
+// The card symbols (A K Q J 10) keep their drawn art. The whole machine: his 2 animated backgrounds of 15 November 2026
+// (fond-large.mp4 for computers and wide screens, fond-haut.mp4 for phones held upright: the pigs' brick house with its
+// MINI / MAJOR / GRAND JACKPOT plates and a starry window; scene-*.webp = their first frame), cleaned by
+// tools/art/huff/clean.py: a 121-frame loop (24 images/s) + its first 12 frames again (core/videobg.js).
+const IMG_V = 2;
+const LOOP = 121 / 24;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const PAINT = { wf: 'wolf', hb: 'brick', hw: 'wood', hs: 'straw', pg: 'pig', hsc: 'scatter', wolf: 'wolfplain' };
 const src = (id) => asset(`assets/games/huff/${PAINT[id]}.webp`);
@@ -170,8 +175,22 @@ class HuffGame extends BaseGame {
       defs: DEFS,
       music: MUSIC,
       betLabel: 'Mise totale',
-      head: `<div class="jackpots">${['mini', 'minor', 'major', 'grand'].map((k) => `<div class="jp jp-${k}" data-jp="${k}"><small>${JPN[k]}</small><b></b></div>`).join('')}</div>`,
-      stage: '<div class="reels-host"></div><svg class="paylines" viewBox="0 0 500 300" preserveAspectRatio="none"></svg>',
+      // the owner's house (wide video: computers, tall video: phones held upright): the reels in its starry window, the
+      // jackpot amounts under his MINI / MAJOR / GRAND plates (MINOR has no plate: it shows on its coin), his bar made
+      // clickable (BET − / +, BONUS MENU, SPIN, MAX BET; the tall video has no BONUS MENU: a plate of ours on the grass),
+      // balance and win on plates on the wall (wide) or the grass (tall), the bonus counter in their place
+      stage: `<div class="hf-scene hf-l"><i class="hf-safe"></i><div class="hf-art">
+          <video class="hf-vid" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+          ${['mini', 'major', 'grand'].map((k) => `<div class="jp jp-${k}" data-jp="${k}"><b></b></div>`).join('')}
+          <div class="hf-win"><div class="reels-host"></div><svg class="paylines" viewBox="0 0 500 300" preserveAspectRatio="none"></svg></div>
+          <div class="hf-info"><div><small>SOLDE</small><b class="hf-bal"></b></div><div><small>GAIN</small><b class="hf-gain">0</b></div></div>
+          <button class="hf-hot hf-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="hf-bet"></b>
+          <button class="hf-hot hf-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="hf-hot hf-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"><span>BONUS<br>MENU</span></button>
+          <button class="hf-hot hf-spin" type="button" data-act="main" aria-label="Lancer"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          <button class="hf-hot hf-max" type="button" data-act="max" aria-label="Mise maximum"></button>
+        </div><button class="hf-hot hf-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       buys: [
         { id: 'n', icon: '🏠', label: 'Le Souffle · 3 scatters', desc: '3 cases rouges au départ, 3 tours remis à zéro à chaque scatter', cost: (b) => b * BUYN },
         { id: 'x', icon: '🐺', label: 'Grand Souffle · 4 scatters', desc: 'Roulette des maisons : 6 cases rouges, bleues ou dorées d’entrée', cost: (b) => b * BUYX },
@@ -192,14 +211,72 @@ class HuffGame extends BaseGame {
     this.reels.el.appendChild(this.svg);
     try { localStorage.removeItem('huff_state'); } catch { /* old Hold & Spin save */ }
     Object.keys(PAINT).forEach((id) => { new Image().src = src(id); });
-    this.q('.slot-stage').style.setProperty('--hf-bg', `url("${asset('assets/games/huff/bg.webp')}")`);
+    // the bonus board goes in the window, the bonus counter on the house; the usual bar and message line are hidden
+    this.q('.hf-win').appendChild(this.layer);
+    this.q('.hf-art').appendChild(this.banner);
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    this.gainObs = new MutationObserver(() => this.paintGain());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    this.vbg = new VideoBg(this.q('.hf-vid'), { loop: LOOP, root: this.root });
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.hf-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
+    this.onMeters(); this.paintGain(); this.layout();
     this.onBetChange();
     this.resume();
     preloadStrip(this);
   }
 
   onBetChange() {
-    this.qa('.jp').forEach((n) => { n.querySelector('b').textContent = shortC(JPV[n.dataset.jp] * this.bet); });
+    this.qa('.hf-art > .jp').forEach((n) => { n.querySelector('b').textContent = shortC(JPV[n.dataset.jp] * this.bet); });
+  }
+
+  /* ---------- the owner's house: bar, plates, full screen ---------- */
+  onMeters() {
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) { n.textContent = t; n.style.setProperty('--n', Math.max(7, t.length)); } };
+    set('.hf-bet', fmtC(this.bet)); set('.hf-bal', fmtC(this.balC()));
+  }
+  paintGain() {
+    const n = this.q('.hf-gain'); if (!n) return;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    n.textContent = w || fmtC(0);
+    n.style.setProperty('--n', Math.max(7, n.textContent.length));
+    n.parentElement.classList.toggle('won', !!w);
+  }
+  // the wide or the tall house (and its places for the reels and the buttons, in the CSS: .hf-l / .hf-p)
+  orient(port) {
+    const sc = this.q('.hf-scene'), name = port ? 'haut' : 'large';
+    sc.classList.toggle('hf-p', port); sc.classList.toggle('hf-l', !port);
+    this.vbg.set(asset(`assets/games/huff/fond-${name}.mp4`), asset(`assets/games/huff/scene-${name}.webp`));
+  }
+  // Wide house on a computer, tall house on a phone held upright. Full screen: the one that fits the screen's shape covers
+  // the whole screen, cropped on its edges but never cutting the plates, the window or the bar (KEY, in the video's
+  // pixels); a screen of another shape gets the rest of the picture, blurred, around it (a thin phone: the house at the
+  // bottom, the sky above).
+  layout() {
+    if (this.dead) return;
+    const sc = this.q('.hf-scene'), art = this.q('.hf-art');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('hf-fullsc', full);
+    if (!full) {
+      sc.classList.remove('hf-bandx', 'hf-bandy');
+      this.orient(innerWidth < 700 && innerHeight > innerWidth);
+      art.style.cssText = ''; return;
+    }
+    const { top, lft, W, H } = screenBox(sc, this.q('.hf-safe'));
+    if (!W || !H) return;
+    const port = W / H < 1;
+    this.orient(port);
+    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [4, 80, 444, 640] : [6, 40, 666, 442], { bottom: port });
+    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
+    sc.classList.toggle('hf-bandx', f.bandX); sc.classList.toggle('hf-bandy', f.bandY);
+  }
+
+  destroy() {
+    this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs);
+    this.vbg?.destroy();
+    super.destroy();
   }
 
   onMain() {
