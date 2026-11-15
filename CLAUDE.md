@@ -172,14 +172,22 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   la machine est en flex) ; **bug du 15 novembre 2026 « au spin ça efface la slot »** : avec `position: static`, le flash de
   chaque tour (`ml-busy` → `mlCharge`, un `filter` sur `.slot-frame`) faisait de `.slot-frame` le bloc de la scène (hauteur 0)
   pendant 0,5 s. Le flash est aussi coupé pour La Fortune.
-- **L'Olympe, nouveau décor** (`games/zeus.js`, demande du propriétaire du 15 novembre 2026, « pareil » que La Fortune) : **son image**
-  `tools/art/zeus/decor.jpg` (ciel, temple, médaillon MULTIPLICATEUR, cadre doré, barre ☰ / BONUS / MISE / bouton bleu), nettoyée
-  par `tools/art/zeus/clean.py` (les 4 séparations peintes effacées : la grille du jeu a 6 colonnes) → `assets/games/zeus/scene.webp`
-  et `spin.webp`. Grille 6×5 dans le cadre (`.zo-win`), multiplicateur dans le médaillon (`.zo-med`, « GLOBAL » pendant les tours
-  gratuits), plaque SOLDE · GAIN (· TOURS) dans le ciel (`.zo-info`, `paintGain`), éclairs depuis la gemme ailée (`.zo-gem`, plus
-  de Zeus peint à côté), BONUS = plaque d'achat dans le cadre (`askBuy`), annonce et bilan des tours gratuits dans le cadre
-  (`panel`, `featureIntro`, `celebrate`). Plein écran comme La Fortune (`PCS` T / M / L / R / S, `layout()`, fond = ciel en CSS,
-  bas du cadre redessiné `.zo-fbot`). Gains inchangés.
+- **L'Olympe, décor animé** (`games/zeus.js`, demande du propriétaire du 15 novembre 2026 : il refait le fond de chaque machine) :
+  **ses 2 vidéos** `tools/art/zeus/fond-large.mp4` (736 × 400 : ordinateur, page et écrans larges, `.zo-l`) et `fond-haut.mp4`
+  (400 × 736 : téléphone tenu droit, `.zo-p`, aussi sur la page d'un téléphone) : éclairs, flamme bleue, nuages. Nettoyées image
+  par image par `tools/art/zeus/clean.py` (`pip install opencv-python-headless`, ffmpeg) : grille peinte effacée (5 colonnes, le jeu
+  a 6 × 5), « x1 » du médaillon et « 10,00 € » de la mise effacés, « + » de gauche du téléphone changé en « − » ; ×2 (lanczos),
+  muettes, **boucle sans coupure** (la fin se fond dans le début, puis les 12 premières images répétées : le jeu recule d'une
+  boucle `LOOP` = 121/24 s pendant qu'elles passent) → `assets/games/zeus/fond-large.mp4` / `fond-haut.mp4` + 1re image
+  `scene-large.webp` / `scene-haut.webp` (affiche de la vidéo, fond flou du plein écran). Vidéo en pause page cachée, jamais
+  avec « animations réduites », décodeur libéré en quittant (`destroy`). Grille 6×5 dans le cadre (`.zo-win`, cases larges sur
+  la vidéo large : symbole entier au centre), multiplicateur dans le médaillon (`.zo-med`, « GLOBAL » pendant les tours gratuits),
+  plaque SOLDE · GAIN (· TOURS) sous le médaillon (large) ou sous la grille (haut) (`.zo-info`, chiffres réduits selon leur
+  longueur `--n`), barre de chaque vidéo cliquable (☰, BONUS = plaque d'achat `askBuy`, MISE − / +, SPIN qui brille pendant le
+  tour), éclairs depuis `.zo-gem`, annonce et bilan des tours gratuits dans le cadre (`panel`). Plein écran (`layout()`, comme
+  La Sweety) : la vidéo qui va avec la forme de l'écran le couvre, rognée sans couper médaillon, grille ni barre (zone gardée
+  `[kx0, ky0, kx1, ky1]`) ; écran d'une autre forme : sa 1re image floutée autour (`.zo-bandx` / `.zo-bandy`, téléphone très fin :
+  vidéo en bas, ciel flouté au-dessus). Positions en % de chaque vidéo dans le bloc CSS « L'Olympe ». Gains inchangés.
 - **Le Cosmique, nouveau décor** (`games/cosmic.js`, demande du propriétaire du 15 novembre 2026) : **ses 2 images**
   `tools/art/cosmic/decor-large.jpg` (1248 × 832 : page et écrans larges, `.cz-l`) et `decor-haut.jpg` (720 × 1280 : téléphone tenu
   droit, `.cz-p`, aussi sur la page d'un téléphone), nettoyées par `tools/art/cosmic/clean.py` (quadrillage peint effacé : le jeu

@@ -117,8 +117,10 @@ const { el, animateNumber } = __mods['ui.js'];
 
 const IDS = ['z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8'];
 // Painted images from the owner (assets/games/zeus): the 9 symbols, the scatter (Zeus head), the multiplier orb,
-// the cover, and the whole machine (scene.webp, 15 November 2026: no more standing Zeus beside the grid).
-const IMG_V = 2;
+// the cover, and the whole machine: his 2 animated backgrounds of 15 November 2026 (fond-large.mp4 for computers and
+// wide screens, fond-haut.mp4 for phones held upright: lightning, blue flame, moving clouds; scene-*.webp = their first
+// frame, shown until the video plays), cleaned by tools/art/zeus/clean.py.
+const IMG_V = 3;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const PAINT = { z0: 's0', z1: 's1', z2: 's2', z3: 's3', z4: 's4', z5: 's5', z6: 's6', z7: 's7', z8: 's8', zsc: 'scatter', zorb: 'orb' };
 const svgArt = art;
@@ -128,44 +130,31 @@ const lab = (t) => `<b class="sg-lab">${t}</b>`;
 const cellArt = (c) => (c.s === ORB ? art('zorb') + lab('×' + c.m) : c.s === SC ? art('zsc') + '<i class="lbl zl">SCATTER</i>' : art(IDS[c.s]));
 const cellCls = (c) => (c.s === ORB ? 'orb' : c.s === SC ? 'scatter' : c.s >= 5 ? 'hi' : '');
 
-// Full screen (owner's request, like La Fortune): the picture is cut into pieces (its own pixels) that layout() moves
-// and enlarges to fill the screen. T sky + medallion + plaque, M the grid in its frame, L menu / BONUS / MISE,
-// R the end of the bar (behind the button), S the spin button with its wings (round, laid over the frame).
-const PCS = { T: [0, 0, 1024, 246], M: [92, 246, 932, 850], L: [20, 862, 646, 1004], R: [646, 862, 1004, 1004], S: [652, 812, 962, 1020] };
-function pbg(n) {
-  const [x0, y0, x1, y1] = PCS[n], w = x1 - x0, h = y1 - y0, pc = (v) => `${(v / 10.24).toFixed(3)}%`;
-  return `<i class="zo-pbg" style="left:${pc(x0)};top:${pc(y0)};width:${pc(w)};height:${pc(h)};background-size:${(102400 / w).toFixed(2)}% ${(102400 / h).toFixed(2)}%;background-position:${w < 1024 ? ((x0 / (1024 - w)) * 100).toFixed(3) : 0}% ${((y0 / (1024 - h)) * 100).toFixed(3)}%"></i>`;
-}
+// The videos: a 121-frame loop (24 images/s), then its first 12 frames again: the game jumps back by one loop while they
+// play, so the video never stops on its last frame (seamless, like a gif). See tools/art/zeus/clean.py.
+const LOOP = 121 / 24;
 
 class ZeusGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.zeus,
       frameCls: 'zeus-frame',
-      // the owner's picture of 15 November 2026 (scene.webp, 1024 × 1024): medallion MULTIPLICATEUR, the grid in the
-      // golden frame, his bar made clickable (menu, BONUS, MISE, spin); balance and win on a plaque in the sky
-      stage: `<div class="zo-scene"><i class="zo-safe"></i><div class="zo-art">
-          <div class="zo-pc" data-pc="T">${pbg('T')}
-            <div class="zo-med"><small>Multiplicateur</small><b><em>×</em><span class="zm-v">0</span></b></div>
-            <div class="zo-info"><div><small>SOLDE</small><b class="zo-bal"></b></div><div class="zo-mid"><small>GAIN</small><b class="zo-gain">0</b></div><div class="zo-fs"><small>TOURS</small><b class="zo-left"></b></div></div>
-          </div>
-          <div class="zo-pc" data-pc="M">${pbg('M')}
-            <i class="zo-gem"></i><i class="zo-fbot"></i>
-            <div class="zo-win"><div class="grid-host"></div></div>
-            <div class="zo-word"></div>
-            <div class="zo-ov"></div>
-          </div>
-          <div class="zo-pc" data-pc="L">${pbg('L')}
-            <button class="zo-hot zo-menu" type="button" data-act="menu" aria-label="Tours auto et réglages"></button>
-            <button class="zo-hot zo-bonus" type="button" data-zo="buy" aria-label="Acheter le bonus"></button>
-            <button class="zo-hot zo-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
-            <b class="zo-bet"></b>
-            <button class="zo-hot zo-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
-          </div>
-          <div class="zo-pc" data-pc="R">${pbg('R')}</div>
-          <div class="zo-pc" data-pc="S">${pbg('S')}
-            <button class="zo-spin" type="button" data-act="main" aria-label="Lancer"><img src="${asset('assets/games/zeus/spin.webp')}" alt="" draggable="false"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
-          </div>
+      // the owner's 2 animated backgrounds of 15 November 2026 (wide: computers, tall: phones held upright): medallion
+      // MULTIPLICATEUR, the 6 × 5 grid in the golden frame, his bar made clickable (menu, BONUS, MISE − / +, SPIN);
+      // balance and win on a plaque (under the medallion on the wide one, under the frame on the tall one)
+      stage: `<div class="zo-scene zo-l"><i class="zo-safe"></i><div class="zo-art">
+          <video class="zo-vid" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+          <div class="zo-med"><small>Multiplicateur</small><b><em>×</em><span class="zm-v">0</span></b></div>
+          <div class="zo-info"><div><small>SOLDE</small><b class="zo-bal"></b></div><div class="zo-mid"><small>GAIN</small><b class="zo-gain">0</b></div><div class="zo-fs"><small>TOURS</small><b class="zo-left"></b></div></div>
+          <i class="zo-gem"></i>
+          <div class="zo-win"><div class="grid-host"></div><div class="zo-word"></div></div>
+          <div class="zo-ov"></div>
+          <button class="zo-hot zo-menu" type="button" data-act="menu" aria-label="Tours auto et réglages"></button>
+          <button class="zo-hot zo-bonus" type="button" data-zo="buy" aria-label="Acheter le bonus"></button>
+          <button class="zo-hot zo-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="zo-bet"></b>
+          <button class="zo-hot zo-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="zo-hot zo-spin" type="button" data-act="main" aria-label="Lancer"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
         </div><button class="zo-hot zo-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       buys: [{ id: 'fs', icon: '⚡', label: `${FREE_SPINS} Free Spins · 4 scatters`, desc: 'Multiplicateur global qui ne se réinitialise pas entre les tours', cost: (b) => b * BUY_COST }],
       hello: '8 symboles identiques n’importe où pour gagner',
@@ -179,6 +168,13 @@ class ZeusGame extends BaseGame {
     this.ro.observe(this.q('.zo-scene'));
     this.onRs = () => requestAnimationFrame(() => this.layout());
     addEventListener('resize', this.onRs);
+    // the animated background: muted, plays by itself, paused when the page is hidden (and never with reduced motion)
+    const v = this.video = this.q('.zo-vid');
+    v.muted = true;
+    v.addEventListener('timeupdate', () => { if (v.currentTime >= LOOP) v.currentTime -= LOOP; });
+    this.root.addEventListener('pointerdown', () => this.playBg(), { once: true }); // a phone in power-saving mode waits for a touch
+    this.onVis = () => { if (document.hidden) v.pause(); else this.playBg(); };
+    document.addEventListener('visibilitychange', this.onVis);
     this.meter = this.q('.zo-med');
     this.meterVal = 0;
     this.grid = new SymbolGrid(this.q('.grid-host'), { cols: COLS, rows: ROWS, game: this, art: cellArt, cls: cellCls });
@@ -188,13 +184,14 @@ class ZeusGame extends BaseGame {
 
   /* ---------- the owner's picture: bar, plaque, full screen ---------- */
   onMeters() {
-    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) n.textContent = t; };
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) { n.textContent = t; n.style.setProperty('--n', Math.max(7, t.length)); } };
     set('.zo-bet', fmtC(this.bet)); set('.zo-bal', fmtC(this.balC()));
   }
   paintGain() {
     const n = this.q('.zo-gain'); if (!n) return;
     const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
-    if (this.fsTotal != null) n.textContent = fmtC(this.fsTotal); else n.textContent = w || fmtC(0);
+    n.textContent = this.fsTotal != null ? fmtC(this.fsTotal) : w || fmtC(0);
+    n.style.setProperty('--n', Math.max(7, n.textContent.length));
     n.parentElement.classList.toggle('won', !!w || !!this.fsTotal);
   }
   // BONUS button: a plaque in the frame to buy the free spins (price shown), or not
@@ -240,54 +237,49 @@ class ZeusGame extends BaseGame {
     if (x >= 10) await super.celebrate(amountC, { stake: o.stake, quick: true }); // GROS GAIN ! stays everywhere
   }
 
-  // Square picture on the page. Full screen fills the screen with the pieces, kept together: tall screen = sky and grid
-  // on the full width, then the bar (menu, BONUS, MISE) and the spin button; wide screen = sky, grid and the whole bar
-  // stacked in the middle, the grid as big as the height allows. Almost square screen: the picture.
+  playBg() { if (!this.dead && !document.hidden && this.video.src && !matchMedia('(prefers-reduced-motion: reduce)').matches) this.video.play().catch(() => {}); }
+  // the wide or the tall background (and its places for the grid and the buttons, in the CSS: .zo-l / .zo-p)
+  orient(port) {
+    const sc = this.q('.zo-scene'), name = port ? 'haut' : 'large';
+    sc.classList.toggle('zo-p', port); sc.classList.toggle('zo-l', !port);
+    if (this.vidName === name) return;
+    this.vidName = name;
+    this.video.poster = asset(`assets/games/zeus/scene-${name}.webp`);
+    this.video.src = asset(`assets/games/zeus/fond-${name}.mp4`);
+    this.playBg();
+  }
+  // Wide background on a computer, tall one on a phone held upright. Full screen: the one that fits the screen's shape
+  // covers the whole screen, cropped on its edges but never cutting the medallion, the grid or the bar (KEY, in the
+  // video's pixels); a screen of another shape gets the rest of the background, blurred, around it.
   layout() {
     if (this.dead) return;
-    const sc = this.q('.zo-scene'), art = this.q('.zo-art'), pcs = this.qa('.zo-pc');
+    const sc = this.q('.zo-scene'), art = this.q('.zo-art');
     const full = !!this.slotEl.closest('.is-full');
-    sc.classList.toggle('zo-fs', full);
-    const reset = () => pcs.forEach((p) => { p.style.transform = ''; });
-    const W0 = sc.clientWidth, H0 = sc.clientHeight;
-    if (!full || !W0 || !H0) { sc.classList.remove('zo-split', 'zo-port', 'zo-land'); art.style.cssText = ''; reset(); return; }
+    sc.classList.toggle('zo-fullsc', full);
+    if (!full) {
+      sc.classList.remove('zo-bandx', 'zo-bandy');
+      this.orient(innerWidth < 700 && innerHeight > innerWidth);
+      art.style.cssText = ''; return;
+    }
     const cs = getComputedStyle(this.q('.zo-safe')), sp = (k) => parseFloat(cs[k]) || 0;
-    const top = Math.max(6, sp('paddingTop')), bot = Math.max(6, sp('paddingBottom')), lft = sp('paddingLeft'), rgt = sp('paddingRight');
-    const W = W0 - lft - rgt, H = H0 - top - bot, r = W / H;
-    const square = () => { const S = Math.min(W, H); sc.classList.remove('zo-split', 'zo-port', 'zo-land'); art.style.cssText = `width:${S}px;height:${S}px;left:${lft + (W - S) / 2}px;top:${top + (H - S) / 2}px`; reset(); };
-    if (r >= 0.8 && r < 1.02) return square();
-    const port = r < 0.8, S = port ? W : H, u = S / 1024;
-    const box = (n, k) => { const [x0, y0, x1, y1] = PCS[n]; return { w: (x1 - x0) * u * k, h: (y1 - y0) * u * k }; };
-    const pos = {};
-    const put = (n, X, Y, k) => { pos[n] = [lft + X, top + Y, k]; };
-    if (port) {
-      const kT = 1, kM = 1024 / 840, g = 0.03 * W, kL = (W - 2 * g) / (626 * u);
-      const hT = box('T', kT).h, hM = box('M', kM).h, hL = box('L', kL).h, gap = Math.min(14, H * 0.015);
-      const kS = Math.max(0.9, Math.min((H - hT - hM - hL - 3 * gap) / (208 * u), (0.5 * W) / (310 * u)));
-      const hS = box('S', kS).h, tot = hT + hM + gap + hL + hS;
-      if (tot > H + 1) return square();
-      let y = (H - tot) / 2;
-      put('T', 0, y, kT); y += hT;
-      put('M', (W - box('M', kM).w) / 2, y, kM); y += hM + gap;
-      put('L', g, y, kL); y += hL - gap * 0.2;
-      put('S', (W - box('S', kS).w) / 2, y, kS);
-      put('R', -9999, 0, 1); // the end of the bar is not used upright
-    } else {
-      const a = 0.85, kM = Math.min((H / ((246 + 154) * a + 604)) / u, (W * 0.98) / (1024 * a * u));
-      const kB = kM * a, T = box('T', kB), M = box('M', kM), hB = 154 * u * kB, wB = 984 * u * kB;
-      let y = (H - (T.h + M.h + hB)) / 2;
-      put('T', (W - T.w) / 2, y, kB); y += T.h;
-      put('M', (W - M.w) / 2, y, kM); y += M.h;
-      const X = (W - wB) / 2;
-      const at = (n) => put(n, X + (PCS[n][0] - 20) * u * kB, y + (PCS[n][1] - 850) * u * kB, kB); // the bar as in the picture, under the frame
-      at('L'); at('R'); at('S');
-    }
-    sc.classList.add('zo-split'); sc.classList.toggle('zo-port', port); sc.classList.toggle('zo-land', !port);
-    art.style.cssText = `width:${S}px;height:${S}px;left:0;top:0`;
-    for (const p of pcs) {
-      const n = p.dataset.pc, [X, Y, k] = pos[n], [x0, y0] = PCS[n];
-      p.style.transform = `translate(${(X - k * x0 * u).toFixed(1)}px, ${(Y - k * y0 * u).toFixed(1)}px) scale(${k.toFixed(4)})`;
-    }
+    const top = sp('paddingTop'), bot = sp('paddingBottom'), lft = sp('paddingLeft'), rgt = sp('paddingRight');
+    const W = sc.clientWidth - lft - rgt, H = sc.clientHeight - top - bot;
+    if (!W || !H) return;
+    const port = W / H < 1, iw = port ? 400 : 736, ih = port ? 736 : 400;
+    this.orient(port);
+    const [kx0, ky0, kx1, ky1] = port ? [4, 172, 396, 730] : [14, 0, 722, 398];
+    const k = Math.min(Math.max(W / iw, H / ih), W / (kx1 - kx0), H / (ky1 - ky0)), w = iw * k, h = ih * k;
+    // larger than the screen: centred, then moved so that the screen stays covered and the key part stays on it
+    const fit = (S, len, a0, a1) => {
+      if (len <= S) return null;
+      let v = (S - len) / 2;
+      v = Math.min(0, Math.max(S - len, v));
+      return Math.min(S - a1 * k, Math.max(-a0 * k, v));
+    };
+    const x = fit(W, w, kx0, kx1) ?? (W - w) / 2;
+    const y = fit(H, h, ky0, ky1) ?? (port ? H - h : (H - h) / 2); // a phone thinner than the video: the video at the bottom, sky above
+    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + x).toFixed(1)}px;top:${(top + y).toFixed(1)}px`;
+    sc.classList.toggle('zo-bandx', x > 0.5); sc.classList.toggle('zo-bandy', y > 0.5);
   }
 
   say(t) {
@@ -457,7 +449,12 @@ class ZeusGame extends BaseGame {
     this.msg(`Bonus terminé : ${fmtC(total)} gagnés`);
   }
 
-  destroy() { clearTimeout(this.poseT); this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs); super.destroy(); }
+  destroy() {
+    clearTimeout(this.poseT); this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs);
+    document.removeEventListener('visibilitychange', this.onVis);
+    this.video.pause(); this.video.removeAttribute('src'); this.video.load(); // frees the video decoder (phones have few)
+    super.destroy();
+  }
 
   info() {
     const f = (x) => x.toLocaleString('fr-FR', { maximumFractionDigits: 2 });
