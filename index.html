@@ -2189,7 +2189,6 @@ body.fs-on { overflow: hidden; }
 @media (orientation: landscape) and (max-height: 560px) { .game-host.is-full > .slot.theme-wolf > .slot-frame { max-width: none; } }
 .game-host.is-full:has(> .g-anubis, > .g-bling, > .g-candy, > .g-labo) { --chrome: 175px; }
 @media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .g-anubis, > .g-bling) { --chrome: 30px; } .game-host.is-full:has(> .g-candy, > .g-labo) { --chrome: 60px; } }
-.slot.g-cosmic > .slot-bg { background: url(assets/games/cosmic/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
 .g-cosmic > .slot-bg::after { display: none; }
 .g-cosmic .slot-title { display: none !important; }
 .g-cosmic .slot-head { margin-bottom: 6px; justify-content: center; }
@@ -2197,9 +2196,6 @@ body.fs-on { overflow: hidden; }
 .g-cosmic > .slot-frame > .slot-stage { background: none !important; box-shadow: none !important; overflow: visible; }
 .g-cosmic .ch-space { display: none; }
 .g-cosmic .ch-stage { display: grid; grid-template-columns: 30% 1fr; align-items: center; gap: 6px; padding: 0; overflow: visible; contain: none; }
-.ch-fig { position: relative; z-index: 1; align-self: stretch; display: flex; align-items: center; justify-content: center; }
-.ch-fig img { width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; user-select: none; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .5)); transition: transform .35s cubic-bezier(.3, 1.4, .5, 1), filter .35s; }
-.g-cosmic.ch-boom .ch-fig img, .g-cosmic.in-free .ch-fig img { transform: scale(1.05); filter: drop-shadow(0 0 18px #f472b6) brightness(1.15); }
 .g-cosmic .ch-board .sg { width: 100% !important; padding: 4px; gap: 4px; background: rgba(6, 4, 24, .3); box-shadow: inset 0 0 0 1px rgba(165, 243, 252, .35); }
 .g-cosmic .sg-cell { background: rgba(8, 6, 30, .3) !important; }
 .c-img { width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 50%; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .5)); }
@@ -2210,15 +2206,6 @@ body.fs-on { overflow: hidden; }
 .pay-sym .c-img { width: 44px; height: 44px; }
 .g-cosmic .win-bar { text-shadow: 0 1px 3px #000, 0 0 8px #000; }
 .g-cosmic .controls { background: rgba(6, 10, 24, .5); border-color: rgba(255, 255, 255, .14); }
-.game-host:not(.is-full):has(> .g-cosmic) { max-width: max(420px, min(1040px, calc((100vh - var(--chrome) - 40px) * 6 / 5 / .7 + 40px))); }
-.game-host.is-full:has(> .g-cosmic) { padding: 0; background: #05060c; --chrome: 175px; }
-.game-host.is-full > .slot.g-cosmic { width: 100%; max-width: none !important; min-height: 100%; margin: 0; border-radius: 0; border: 0; display: flex; flex-direction: column; justify-content: center; padding: max(8px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-right, 0px)) max(8px, env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left, 0px)); }
-.game-host.is-full > .slot.g-cosmic > .slot-bg { grid-column: auto !important; grid-row: auto !important; position: absolute; inset: 0; }
-.game-host.is-full > .slot.g-cosmic .controls { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; box-sizing: border-box; }
-.game-host.is-full > .slot.g-cosmic > .slot-frame > .slot-stage { width: 100%; max-width: calc((100dvh - 200px) * 6 / 5 / .7); margin: 0 auto; }
-@container (max-width: 520px) { .g-cosmic .ch-stage { grid-template-columns: 26% 1fr; } }
-@media (orientation: portrait) { .game-host.is-full > .slot.g-cosmic > .slot-frame > .slot-stage { max-width: none; } .game-host.is-full > .slot.g-cosmic .ch-stage { grid-template-columns: 1fr; } .game-host.is-full > .slot.g-cosmic .ch-fig { height: min(26dvh, 230px); } .game-host.is-full > .slot.g-cosmic .ch-fig img { height: 100%; width: auto; } }
-@media (orientation: landscape) and (max-height: 560px) { .game-host.is-full:has(> .g-cosmic) { --chrome: 60px; } .game-host.is-full > .slot.g-cosmic > .slot-frame > .slot-stage { max-width: calc((100dvh - 20px) * 6 / 5 / .7); } }
 /* ============ Le 21 (blackjack): live-casino style room, drawn croupière, half-moon felt and a chip bar ============ */
 /* Le 21 : la table en perspective (.bjv) est dans la couche « finition » (fin du <head>). */
 .slot.g-billets > .slot-bg { background: url(assets/games/billets/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
@@ -4536,6 +4523,100 @@ html.light .slot small { color: inherit; }
 .ft-land [data-pc="S"] .ft-pbg { z-index: -1; }
 .game-host.is-full > .slot.g-fortune.g-fortune > .mx-row { z-index: 9; }
 .game-host:not(.is-full):has(> .g-fortune) { max-width: max(420px, min(1000px, calc(100svh - 200px))); }
+/* ============ Le Cosmique (games/cosmic.js): the owner's 2 pictures of 15 November 2026, scene-large.webp (1248 × 832:
+   page and wide screens, .cz-l) and scene-haut.webp (720 × 1280: phone held upright, .cz-p). Grid in the moon, his bar
+   clickable, a plaque SOLDE · GAIN · ÉNERGIE (· TOURS) in the sky; full screen = the picture as big as the screen ============ */
+.g-cosmic .slot-head, .g-cosmic > .feature-banner { display: none !important; }
+.slot.g-cosmic > .slot-bg { background: radial-gradient(40% 35% at 15% 18%, rgba(168, 85, 247, .35), transparent 70%), radial-gradient(35% 30% at 88% 20%, rgba(99, 102, 241, .28), transparent 70%), radial-gradient(60% 25% at 50% 85%, rgba(244, 114, 182, .16), transparent 70%), radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 60%, #fff, transparent), radial-gradient(1px 1px at 40% 80%, #c7d2fe, transparent), radial-gradient(1px 1px at 85% 40%, #fff, transparent), linear-gradient(180deg, #0a0826 0%, #120a3a 50%, #07051c 100%) !important; filter: none !important; }
+.cz-scene { position: relative; margin: 0 auto; overflow: hidden; border-radius: 6px; box-shadow: 0 10px 40px rgba(0, 0, 0, .55); }
+.cz-scene.cz-l { width: min(100%, max(300px, calc((100svh - 220px) * 1.5))); aspect-ratio: 1248 / 832; }
+.cz-scene.cz-p { width: min(100%, max(260px, calc((100svh - 140px) * .5625))); aspect-ratio: 720 / 1280; }
+.cz-art { position: absolute; inset: 0; container-type: size; background: url(assets/games/cosmic/scene-large.webp?v=2) center / 100% 100% no-repeat; }
+.cz-p .cz-art { background-image: url(assets/games/cosmic/scene-haut.webp?v=2); }
+.cz-safe { position: absolute; visibility: hidden; pointer-events: none; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.cz-win, .cz-ov, .cz-hot, .cz-bet, .cz-info { position: absolute; }
+.cz-l .cz-win { left: 31.65%; top: 25%; width: 40.87%; height: 39.9%; }
+.cz-l .cz-ov { left: 30.05%; top: 24.64%; width: 44.47%; height: 40.87%; }
+.cz-l .cz-bm { left: 22.44%; top: 87.14%; width: 3.21%; height: 4.81%; }
+.cz-l .cz-bp { left: 33.25%; top: 87.14%; width: 3.21%; height: 4.81%; }
+.cz-l .cz-bet { left: 26.44%; top: 84.13%; width: 7.21%; height: 5.05%; }
+.cz-l .cz-menu { left: 41.27%; top: 78.13%; width: 17.63%; height: 16.83%; }
+.cz-l .cz-speed { left: 62.1%; top: 79.93%; width: 17.23%; height: 4.93%; }
+.cz-l .cz-spin { left: 62.1%; top: 84.86%; width: 17.23%; height: 8.65%; }
+.cz-l .cz-info { left: 2.4%; top: 3.1%; width: 30%; height: 11.3%; }
+.cz-p .cz-win { left: 28.47%; top: 33.91%; width: 52.78%; height: 23.28%; }
+.cz-p .cz-ov { left: 22.92%; top: 33.44%; width: 60.83%; height: 25.94%; }
+.cz-p .cz-bm { left: 11.94%; top: 81.56%; width: 4.44%; height: 2.5%; }
+.cz-p .cz-bp { left: 27.22%; top: 81.56%; width: 4.44%; height: 2.5%; }
+.cz-p .cz-bet { left: 16.39%; top: 79.38%; width: 10.83%; height: 2.81%; }
+.cz-p .cz-menu { left: 37.5%; top: 75.39%; width: 25%; height: 11.72%; }
+.cz-p .cz-speed { left: 66.67%; top: 76.41%; width: 23.61%; height: 3.44%; }
+.cz-p .cz-spin { left: 66.67%; top: 79.84%; width: 23.61%; height: 5.47%; }
+.cz-p .cz-info { left: 13.9%; top: 10.5%; width: 72.2%; height: 6.1%; }
+.cz-win .grid-host { position: absolute; inset: 0; }
+.g-cosmic .cz-win .sg { position: absolute; inset: 0; width: 100% !important; height: 100% !important; min-width: 0; aspect-ratio: auto !important; padding: 0 !important; gap: 0 !important; margin: 0; border-radius: 0; background: none !important; box-shadow: none !important; }
+.g-cosmic .cz-win .sg-cell { aspect-ratio: auto !important; width: auto !important; height: auto !important; min-width: 0; border-radius: 0; background: radial-gradient(ellipse at 50% 45%, rgba(40, 30, 120, .35), rgba(6, 6, 30, .15) 75%) !important; box-shadow: inset 0 0 0 .5px rgba(129, 140, 248, .7), inset 0 0 6px rgba(99, 102, 241, .25) !important; }
+.g-cosmic .cz-win .sg-cell.c1 { background: linear-gradient(180deg, rgba(34, 211, 238, .45), rgba(8, 51, 68, .7)) !important; box-shadow: inset 0 0 0 2px #22d3ee !important; }
+.g-cosmic .cz-win .sg-cell.c2 { background: linear-gradient(180deg, rgba(244, 114, 182, .5), rgba(80, 7, 36, .7)) !important; box-shadow: inset 0 0 0 2px #f472b6 !important; }
+.g-cosmic .cz-win .sg-cell.c3 { background: linear-gradient(180deg, rgba(250, 204, 21, .55), rgba(113, 63, 18, .7)) !important; box-shadow: inset 0 0 0 2px #fde047 !important; }
+.g-cosmic .cz-win .sg-cell.win, .g-cosmic .cz-win .sg-cell.nvon, .g-cosmic .cz-win .sg-cell.pulse { box-shadow: inset 0 0 0 2px #fff, inset 0 0 16px #a855f7 !important; }
+.g-cosmic .cz-win .c-img { width: 92%; height: 92%; object-fit: contain; }
+.cz-hot { z-index: 5; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: box-shadow .15s, background .15s; }
+.cz-hot:hover:not([disabled]) { background: rgba(165, 180, 252, .12); box-shadow: 0 0 14px rgba(129, 140, 248, .7); }
+.cz-hot:active:not([disabled]) { background: rgba(165, 180, 252, .25); }
+.cz-hot[disabled] { cursor: default; background: rgba(0, 0, 0, .35); }
+.cz-menu { border-radius: 50% / 46%; }
+.cz-speed, .cz-spin { border-radius: 10px; }
+.g-cosmic.busy .cz-spin { box-shadow: inset 0 0 18px rgba(165, 180, 252, .55), 0 0 18px rgba(129, 140, 248, .6); animation: ftHot .5s ease-in-out infinite alternate; }
+.g-cosmic.auto-on .cz-spin { box-shadow: 0 0 0 2px #a5b4fc, 0 0 16px #818cf8; }
+.cz-spin .auto-count { position: absolute; right: 6%; top: 8%; font: 900 1.6cqw 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 0 8px #818cf8; }
+.cz-p .cz-spin .auto-count { font-size: 4cqw; }
+.cz-spin .fr-badge { position: absolute; left: 4%; top: -30%; padding: .1em .4em; border-radius: 99px; background: #16a34a; color: #fff; font: 800 1cqw Archivo, sans-serif; white-space: nowrap; }
+.cz-p .cz-spin .fr-badge { font-size: 2.6cqw; }
+.cz-lvl { position: absolute; right: 7%; top: 50%; transform: translateY(-50%); display: flex; gap: .35cqw; }
+.cz-lvl i { width: .55cqw; height: .55cqw; border-radius: 50%; background: rgba(165, 180, 252, .25); }
+.cz-lvl i.on { background: #e0e7ff; box-shadow: 0 0 6px #a5b4fc; }
+.cz-p .cz-lvl { gap: 1cqw; } .cz-p .cz-lvl i { width: 1.5cqw; height: 1.5cqw; }
+.cz-bet { z-index: 4; display: flex; align-items: center; justify-content: center; white-space: nowrap; pointer-events: none; font: 700 1.85cqw/1 Cinzel, KeCoin, Georgia, serif; color: #f1dfc0; text-shadow: 0 0 8px rgba(165, 180, 252, .6), 0 1px 0 #000; }
+.cz-p .cz-bet { font-size: 3.6cqw; }
+.cz-full { z-index: 8; position: absolute; right: 1.2%; top: 1.6%; width: clamp(28px, 3.4%, 44px); aspect-ratio: 1; border-radius: 8px; background: rgba(14, 10, 50, .6); color: #c7d2fe; font: 700 clamp(14px, 2.2vmin, 22px)/1 sans-serif; box-shadow: inset 0 0 0 1px rgba(165, 180, 252, .5); }
+/* plaque in the sky */
+.cz-info { z-index: 4; display: flex; align-items: stretch; border-radius: 1cqw; pointer-events: none; overflow: hidden; background: linear-gradient(180deg, rgba(30, 24, 90, .92), rgba(10, 8, 40, .92)); box-shadow: inset 0 0 0 .2cqw #a5b4fc, inset 0 0 0 .35cqw #312e81, 0 0 1.4cqw rgba(129, 140, 248, .5); }
+.cz-info > div { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3cqw; margin: 0 !important; padding: 0 !important; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.cz-info > div + div { border-left: .15cqw solid rgba(165, 180, 252, .45); }
+.cz-info small { display: block !important; font: 800 .85cqw Archivo, sans-serif !important; letter-spacing: .14em; color: #c7d2fe !important; text-transform: uppercase; }
+.cz-info b { font: 800 1.45cqw/1 KeCoin, Archivo, sans-serif !important; color: #fff; white-space: nowrap; text-shadow: 0 0 6px rgba(129, 140, 248, .8); }
+.cz-p .cz-info small { font-size: 2.2cqw !important; } .cz-p .cz-info b { font-size: 3.6cqw !important; }
+.cz-info .won b { color: #fde68a; text-shadow: 0 0 10px rgba(253, 224, 71, .8); }
+.cz-info .ch-lv { display: none; }
+.cz-info .ch-meter.hot b { color: #f9a8d4; }
+.cz-info .cz-fs { display: none; }
+.g-cosmic.in-free .cz-info .cz-fs { display: flex; }
+.g-cosmic.in-free .cz-l .cz-info { width: 38%; } .g-cosmic.in-free .cz-p .cz-info { left: 4%; width: 92%; }
+/* panels in the moon */
+.cz-ov { z-index: 7; display: none; place-items: center; cursor: pointer; border-radius: 0 0 45% 45% / 0 0 30% 30%; background: radial-gradient(circle, rgba(30, 20, 90, .55), rgba(4, 3, 20, .9) 75%); }
+.cz-ov.on { display: grid; animation: ftOvIn .35s ease-out; }
+.cz-ov.out { animation: ftOvOut .3s ease-in forwards; }
+.cz-pan { width: 80%; padding: 1.8cqw 1.4cqw 1.6cqw; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: .7cqw; text-align: center; border-radius: 14px;
+  background: radial-gradient(120% 90% at 50% 0%, #3b2a9a, #1a1460 60%, #0b0830); box-shadow: inset 0 0 0 2px #0b0830, inset 0 0 0 4px #c7d2fe, inset 0 0 0 5px #4338ca, 0 0 40px rgba(168, 85, 247, .5), 0 12px 30px rgba(0, 0, 0, .7); animation: ftPan .55s cubic-bezier(.2, 1.6, .4, 1); }
+.cz-pglyph img { width: 7cqw; height: 7cqw; object-fit: contain; filter: drop-shadow(0 0 12px rgba(168, 85, 247, .9)); }
+.cz-pan h3 { margin: 0; font: 900 3.4cqw/1 Cinzel, Georgia, serif; letter-spacing: .05em; color: #eef2ff; text-shadow: 0 0 10px #818cf8, 0 0 24px #a855f7; }
+.cz-pan p { margin: 0; max-width: 94%; font: 600 1.25cqw/1.3 Archivo, sans-serif; color: #e0e7ff; }
+.cz-pan small { font: 700 1cqw Archivo, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #e0e7ff; opacity: .8; animation: bwBeat 1.4s ease-in-out infinite; }
+.cz-ptot { font: 900 4cqw/1 KeCoin, Archivo, sans-serif; color: #fff; text-shadow: 0 0 16px #a855f7; padding: .2em .6em; border-radius: 8px; background: rgba(4, 3, 20, .55); box-shadow: inset 0 0 0 2px #a5b4fc; }
+.cz-p .cz-pglyph img { width: 16cqw; height: 16cqw; } .cz-p .cz-pan h3 { font-size: 6.4cqw; } .cz-p .cz-pan p { font-size: 3cqw; } .cz-p .cz-pan small { font-size: 2.4cqw; } .cz-p .cz-ptot { font-size: 8cqw; } .cz-p .cz-pan { width: 88%; gap: 1.6cqw; padding: 3.5cqw 2.6cqw; }
+.g-cosmic .cz-win .ch-word { font-size: 4.6cqw; } .cz-p .cz-win .ch-word { font-size: 9cqw; }
+.game-host:not(.is-full):has(> .g-cosmic) { max-width: max(420px, min(1250px, calc((100svh - 220px) * 1.5 + 40px))) !important; }
+/* full screen */
+.game-host.is-full:has(> .slot.g-cosmic) { padding: 0; background: #0a0826; overflow: hidden; }
+.game-host.is-full > .slot.g-cosmic.g-cosmic { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
+.game-host.is-full > .slot.g-cosmic.g-cosmic > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
+.game-host.is-full > .slot.g-cosmic.g-cosmic > .mx-row { position: absolute; z-index: 9; top: max(8px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); margin: 0; }
+.game-host.is-full > .slot.g-cosmic.g-cosmic > .slot-frame, .game-host.is-full > .slot.g-cosmic.g-cosmic > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
+.game-host.ml-busy > .slot.g-cosmic .slot-frame, .game-host.ml-busy > .slot.g-cosmic .reels { animation: none !important; }
+.cz-scene.cz-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: radial-gradient(40% 35% at 15% 18%, rgba(168, 85, 247, .35), transparent 70%), radial-gradient(35% 30% at 88% 20%, rgba(99, 102, 241, .28), transparent 70%), radial-gradient(60% 25% at 50% 85%, rgba(244, 114, 182, .16), transparent 70%), radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 60%, #fff, transparent), radial-gradient(1px 1px at 40% 80%, #c7d2fe, transparent), radial-gradient(1px 1px at 85% 40%, #fff, transparent), linear-gradient(180deg, #0a0826 0%, #120a3a 50%, #07051c 100%); }
+.cz-fullsc .cz-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 3%, #000 97%, transparent), linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(180deg, transparent, #000 3%, #000 97%, transparent), linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); mask-composite: intersect; }
+.cz-fullsc .cz-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 /* ============ L'Olympe (games/zeus.js): the owner's picture of 15 November 2026 (scene.webp, 1024 × 1024): medallion
    MULTIPLICATEUR, the 6 × 5 grid in the golden frame, his bar made clickable; full screen like La Fortune ============ */
 .g-zeus .slot-head, .g-zeus > .feature-banner { display: none !important; }
@@ -12622,6 +12703,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'cosmic', date: '2026-11-15', title: 'Nouveau décor pour Le Cosmique', items: ['Un tout nouveau décor : la grille dans un grand croissant de lune, au milieu des galaxies', 'Une image faite pour l’ordinateur et une autre pour le téléphone tenu droit', 'Nouvelle barre : BET, BONUS MENU, SPEED (3 vitesses) et SPIN', 'Solde, gain et énergie sur une plaque dans le ciel', 'Les tours gratuits s’annoncent et se terminent dans la lune', 'En plein écran, le jeu prend tout l’écran'] },
   { game: 'zeus', date: '2026-11-15', title: 'Nouveau décor pour L’Olympe', items: ['Un tout nouveau décor : le ciel de l’Olympe, le temple et le grand cadre doré', 'Le multiplicateur s’affiche dans le médaillon ailé, en haut à gauche', 'Nouvelle barre de jeu : menu, bouton BONUS, mise et le grand bouton bleu', 'Les éclairs partent de la gemme ailée au-dessus de la grille', 'Les tours gratuits s’annoncent et se terminent dans le cadre', 'En plein écran, le jeu prend tout l’écran, sur téléphone comme sur ordinateur'] },
   { game: 'fortune', date: '2026-11-15', title: 'Nouveau décor pour La Fortune', items: ['Un tout nouveau décor : le temple, les dragons d’or et les lanternes autour des rouleaux', 'Trois jackpots en haut, MINI, MAJOR et JACKPOT, qui dépendent de ta mise et grimpent à chaque spin', 'Nouvelle pièce MINI pendant le Hold & Spin', 'Nouvelle barre de jeu : mise, niveau de vitesse, tas de pièces, solde et le gros bouton rouge', 'Le Hold & Spin et le MÉGA BONUS se jouent dans le décor : annonce dans le cadre, plaque avec les respins, total en bas et nuit sur le temple', 'En plein écran, le jeu prend tout l’écran : rouleaux bien plus grands sur téléphone, sur tablette et sur ordinateur'] },
   { game: 'pirates', date: '2026-11-12', isNew: true, title: 'Nouvelle machine : Le Coffre aux Pirates', items: ['Un bateau pirate file sur la mer derrière toute la machine, avec sa musique de pirates', 'Jackpots MINI, MINOR, MAJOR et GRAND en haut de l’écran', 'La Chasse au trésor : 3 vies, Tonneaux jusqu’à ×50, Ancres, et le coffre qui s’ouvre ×500', 'Les Tours gratuits : le Crabe tombe partout et ramasse ×1, ×2, ×3…', 'Jusqu’à ×50 000 la mise'] },
@@ -15768,7 +15850,7 @@ const FILES = {
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', 'fa68b47ddf'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', '779625004b'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
-  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '0b6becec24'],
+  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '2aa3d1dd3b'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '4c519ccf57'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'fcbe76e4e1'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'c757c58318'],

@@ -180,6 +180,15 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   de Zeus peint à côté), BONUS = plaque d'achat dans le cadre (`askBuy`), annonce et bilan des tours gratuits dans le cadre
   (`panel`, `featureIntro`, `celebrate`). Plein écran comme La Fortune (`PCS` T / M / L / R / S, `layout()`, fond = ciel en CSS,
   bas du cadre redessiné `.zo-fbot`). Gains inchangés.
+- **Le Cosmique, nouveau décor** (`games/cosmic.js`, demande du propriétaire du 15 novembre 2026) : **ses 2 images**
+  `tools/art/cosmic/decor-large.jpg` (1248 × 832 : page et écrans larges, `.cz-l`) et `decor-haut.jpg` (720 × 1280 : téléphone tenu
+  droit, `.cz-p`, aussi sur la page d'un téléphone), nettoyées par `tools/art/cosmic/clean.py` (quadrillage peint effacé : le jeu
+  dessine sa grille 6×5 ; le « 2.50 » peint effacé) → `assets/games/cosmic/scene-large.webp` / `scene-haut.webp`. Grille dans la
+  lune (`.cz-win`, positions en % de chaque image dans le bloc CSS « Le Cosmique »), barre cliquable : BET − / +, BONUS MENU
+  (« Bonus & menu » : achats, radar, auto), SPEED (1 / 2 / 3 = normal / Turbo / Super turbo, points `.cz-lvl`), SPIN ; plaque
+  SOLDE · GAIN · ÉNERGIE (· TOURS en bonus) dans le ciel (`.cz-info`) ; annonce et bilan des bonus dans la lune (`panel`). Plus
+  de robot à côté de la grille (`robot.webp` et `bg.webp` supprimés). Plein écran : `layout()` prend l'image qui va avec la forme
+  de l'écran et la met aussi grande que possible, l'espace autour. Gains inchangés.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

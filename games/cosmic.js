@@ -8,8 +8,8 @@ __mods['games/impl/cosmic.js'] = (() => {
 const { BaseGame, fmtC } = __mods['core/base.js'];
 let { art } = __mods['core/base.js'];
 // Painted images from the owner (assets/games/cosmic): the 9 symbols, beacon (scatter), supernova, black hole, vacuum
-// ship, the warrior robot beside the grid, the background and the cover.
-const IMG_V = 1;
+// ship, the cover, and the whole machine (scene-large / scene-haut, 15 November 2026: no more robot beside the grid).
+const IMG_V = 2;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const PAINT = { ch0: 's0', ch1: 's1', ch2: 's2', ch3: 's3', ch4: 's4', ch5: 's5', ch6: 's6', ch7: 's7', ch8: 's8', chs: 'scatter', chn: 'nova', chh: 'hole', chv: 'ship' };
 const svgArt = art;
@@ -126,15 +126,21 @@ class CosmicGame extends BaseGame {
     super(root, game, {
       music: EXTRA_THEMES.cosmic,
       frameCls: 'cosmic-frame',
-      stage: `<div class="ch-stage">
-        <div class="ch-space"><i class="ch-neb"></i><i class="ch-stars s1"></i><i class="ch-stars s2"></i><i class="ch-shoot a"></i><i class="ch-shoot b"></i><i class="ch-shoot c"></i><i class="ch-planet"></i><i class="ch-ring"></i><i class="ch-moon"></i></div>
-        <div class="ch-fig"><img src="${asset('assets/games/cosmic/robot.webp')}" alt="" draggable="false"></div>
-        <div class="ch-board">
-          <div class="grid-host"></div>
-          <div class="ch-word"></div>
-        </div>
-      </div>`,
-      head: '<div class="ch-meter"><small>Énergie</small><b>0</b><span class="ch-lv"><i class="l1">0</i><i class="l2">0</i><i class="l3">0</i></span></div>',
+      // the owner's 2 pictures of 15 November 2026: scene-large.webp (page, wide screens) and scene-haut.webp (phone
+      // held upright). The 6 × 5 grid sits in the moon, his bar is clickable (BET − / +, BONUS MENU, SPEED, SPIN);
+      // a plaque in the sky shows the balance, the win and the energy. layout() picks the picture and fits it.
+      stage: `<div class="cz-scene cz-l"><i class="cz-safe"></i><div class="cz-art">
+          <div class="cz-info"><div><small>SOLDE</small><b class="cz-bal"></b></div><div class="cz-mid"><small>GAIN</small><b class="cz-gain">0</b></div>
+            <div class="ch-meter"><small>ÉNERGIE</small><b>0</b><span class="ch-lv"><i class="l1">0</i><i class="l2">0</i><i class="l3">0</i></span></div><div class="cz-fs"><small>TOURS</small><b class="cz-left"></b></div></div>
+          <div class="cz-win"><div class="grid-host"></div><div class="ch-word"></div></div>
+          <div class="cz-ov"></div>
+          <button class="cz-hot cz-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="cz-bet"></b>
+          <button class="cz-hot cz-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="cz-hot cz-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+          <button class="cz-hot cz-speed" type="button" data-cz="speed" aria-label="Vitesse"><span class="cz-lvl"><i></i><i></i><i></i></span></button>
+          <button class="cz-hot cz-spin" type="button" data-act="main" aria-label="Lancer"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+        </div><button class="cz-hot cz-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       opts: [{ id: 'radar', icon: '📡', label: 'Radar à balises (mise ×2, balises ×1,6)' }],
       buys: [
         { id: 'nova', icon: '💥', label: 'Supernova garantie', desc: 'Un tour avec une supernova sur la grille', cost: (b) => Math.round(b * NOVAC) },
@@ -146,6 +152,14 @@ class CosmicGame extends BaseGame {
     this.radar = false;
     Object.values(PAINT).forEach((n) => { new Image().src = asset(`assets/games/cosmic/${n}.webp`); });
     this.charge = new Array(N).fill(0);
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    this.root.addEventListener('click', (e) => { if (e.target.closest('[data-cz="speed"]')) this.setLevel(this.level() % 3 + 1); });
+    this.gainObs = new MutationObserver(() => this.paintGain());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.cz-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
     this.meter = this.q('.ch-meter');
     this.meterVal = this.q('.ch-meter b');
     this.lvEls = this.qa('.ch-lv i');
@@ -154,6 +168,82 @@ class CosmicGame extends BaseGame {
       cls: (v, i) => (this.charge[i] ? `chg c${this.charge[i]} ` : '') + (v === 9 ? 'scatter' : v === 10 ? 'nova' : v >= 7 ? 'hi' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => Math.floor(Math.random() * 9)));
+    this.onMeters(); this.paintGain(); this.layout();
+  }
+
+  destroy() { this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs); super.destroy(); }
+
+  /* ---------- the owner's pictures: bar, plaque, panels, full screen ---------- */
+  level() { return this.superT ? 3 : this.turbo ? 2 : 1; }
+  // SPEED: 1 normal, 2 Turbo, 3 Super turbo (the same switches as in « Bonus & menu »)
+  setLevel(n) {
+    this.turbo = n >= 2; this.superT = n === 3; globalThis.__sbSuper = this.superT;
+    this.saveKey(`${this.game.id}_turbo`, this.turbo ? 1 : 0); this.saveKey(`${this.game.id}_super`, this.superT ? 1 : 0);
+    sfx.click(); this.onMeters();
+    toast(['', 'Vitesse normale', 'Turbo', 'Super turbo'][n]);
+  }
+  onMeters() {
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) n.textContent = t; };
+    set('.cz-bet', fmtC(this.stakeLabel())); set('.cz-bal', fmtC(this.balC()));
+    this.qa('.cz-lvl i').forEach((n, k) => n.classList.toggle('on', k < this.level()));
+  }
+  paintGain() {
+    const n = this.q('.cz-gain'); if (!n) return;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    n.textContent = this.fsTotal != null ? fmtC(this.fsTotal) : w || fmtC(0);
+    n.parentElement.classList.toggle('won', !!w || !!this.fsTotal);
+  }
+  // a panel in the moon (bonus intro, end): silver and blue; done on a touch or after `dur`
+  panel(html, cls, dur) {
+    const ov = this.q('.cz-ov');
+    ov.className = `cz-ov on ${cls}`; ov.innerHTML = `<div class="cz-pan">${html}</div>`;
+    return new Promise((resolve) => {
+      let over = false;
+      const done = () => { if (over) return; over = true; clearTimeout(t); ov.removeEventListener('click', done); ov.classList.add('out'); setTimeout(() => { if (ov.classList.contains('out')) { ov.className = 'cz-ov'; ov.innerHTML = ''; } resolve(); }, 300); };
+      const t = setTimeout(done, this.superT ? dur / 4 : this.turbo ? dur / 2 : dur);
+      ov.addEventListener('click', done);
+    });
+  }
+  featureIntro(title, sub, glyph, dur = 2600) {
+    dispatchEvent(new CustomEvent('sb:feature', { detail: { game: this.game.id, title, bought: !!this.buyRound, re: /^\+/.test(title) } }));
+    sfx.feature(); this.flash('rgba(168,85,247,.45)');
+    const p = center(this.q('.cz-win')); fx.burst(p.x, p.y, 50, NEON, 9);
+    return this.panel(`<div class="cz-pglyph">${glyph}</div><h3>${title}</h3><p>${sub}</p><small>Touchez pour continuer</small>`, 'intro', dur);
+  }
+  async celebrate(amountC, o = {}) {
+    if (!o.summary) return super.celebrate(amountC, o);
+    dispatchEvent(new CustomEvent('sb:featureend', { detail: { game: this.game.id } }));
+    if (this.dead) return;
+    const x = amountC / (o.stake || this.bet);
+    sfx.bigWin?.(); fx.confetti(60);
+    const pr = this.panel(`<div class="cz-pglyph">${art('chs')}</div><h3>${o.summary}</h3><b class="cz-ptot">0</b><p>×${x >= 100 ? Math.round(x) : x.toFixed(1).replace('.', ',')} la mise</p><small>Touchez pour continuer</small>`, 'end', 2600 + Math.min(2400, x * 12));
+    const tot = this.q('.cz-ptot'), t0 = performance.now(), T = this.superT ? 300 : this.turbo ? 700 : Math.min(2600, 900 + x * 15);
+    const step = (ts) => { if (this.dead || !tot.isConnected) return; const k = Math.min(1, (ts - t0) / T); tot.textContent = fmtC(Math.round(amountC * k)); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+    await pr;
+    this.winAmt.textContent = fmtC(amountC);
+    if (x >= 10) await super.celebrate(amountC, { stake: o.stake, quick: true }); // GROS GAIN ! stays everywhere
+  }
+  // Wide picture on the page, tall picture on a phone held upright. Full screen: the picture that fits the screen's
+  // shape, as big as the screen allows, the space all around.
+  layout() {
+    if (this.dead) return;
+    const sc = this.q('.cz-scene'), art = this.q('.cz-art');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('cz-fullsc', full);
+    if (!full) {
+      const port = innerWidth < 700 && innerHeight > innerWidth;
+      sc.classList.toggle('cz-p', port); sc.classList.toggle('cz-l', !port);
+      art.style.cssText = ''; return;
+    }
+    const cs = getComputedStyle(this.q('.cz-safe')), sp = (k) => parseFloat(cs[k]) || 0;
+    const top = sp('paddingTop'), bot = sp('paddingBottom'), lft = sp('paddingLeft'), rgt = sp('paddingRight');
+    const W = sc.clientWidth - lft - rgt, H = sc.clientHeight - top - bot;
+    if (!W || !H) return;
+    const port = W / H < 1, ar = port ? 720 / 1280 : 1248 / 832;
+    sc.classList.toggle('cz-p', port); sc.classList.toggle('cz-l', !port);
+    const w = Math.min(W, H * ar), h = w / ar;
+    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + (W - w) / 2).toFixed(1)}px;top:${(top + (H - h) / 2).toFixed(1)}px`;
   }
 
   // Big word over the grid, restarted with WAAPI (no forced reflow).
@@ -381,7 +471,7 @@ class CosmicGame extends BaseGame {
     this.applyCharge(charge);
     while (left > 0 && tot < cap && !this.dead) {
       left--; done++;
-      this.setBanner(`<b>${MODEN[mode].toUpperCase()}</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
+      this.q('.cz-left').textContent = `${done} / ${done + left}`; this.fsTotal = Math.round(tot); this.paintGain();
       const res = spin({ bet: b, fs: true, mode, charge, forceNova: mode === 'C' || (left === 0 && !hadNova) });
       if (res.nova) hadNova = true;
       await this.play(res, true, mode);
@@ -389,12 +479,12 @@ class CosmicGame extends BaseGame {
       const add = Math.min(res.total, cap - tot);
       tot += add;
       if (add > 0) this.win(Math.round(add), MODEN[mode]);
-      this.setLast(Math.round(tot));
+      this.setLast(Math.round(tot)); this.fsTotal = Math.round(tot); this.paintGain();
       if (res.scat >= 3) { left += 3; await this.featureIntro('+3 TOURS', 'Nouvelles balises captées !', art('chs'), 1300); }
       await this.wait(300);
     }
     this.slotEl.classList.remove('in-free', `fs-${mode}`);
-    this.setBanner('');
+    this.fsTotal = null; this.paintGain();
     this.applyCharge(null);
     await this.celebrate(Math.round(tot), { summary: MODEN[mode].toUpperCase(), stake: b });
     return tot;
