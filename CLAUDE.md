@@ -188,7 +188,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (« Bonus & menu » : achats, radar, auto), SPEED (1 / 2 / 3 = normal / Turbo / Super turbo, points `.cz-lvl`), SPIN ; plaque
   SOLDE · GAIN · ÉNERGIE (· TOURS en bonus) dans le ciel (`.cz-info`) ; annonce et bilan des bonus dans la lune (`panel`). Plus
   de robot à côté de la grille (`robot.webp` et `bg.webp` supprimés). Plein écran : `layout()` prend l'image qui va avec la forme
-  de l'écran et la met aussi grande que possible, l'espace autour. Gains inchangés.
+  de l'écran et **couvre tout l'écran** (voulu par le propriétaire : « pas de rebords violets »), rognée sur les bords sans jamais
+  sortir la grille, la barre ni la plaque (zone gardée `[kx0, ky0, kx1, ky1]` dans `layout()`). Gains inchangés.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

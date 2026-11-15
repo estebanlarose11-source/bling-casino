@@ -225,13 +225,14 @@ class CosmicGame extends BaseGame {
     if (x >= 10) await super.celebrate(amountC, { stake: o.stake, quick: true }); // GROS GAIN ! stays everywhere
   }
   // Wide picture on the page, tall picture on a phone held upright. Full screen: the picture that fits the screen's
-  // shape, as big as the screen allows, the space all around.
+  // shape, covering the whole screen.
   layout() {
     if (this.dead) return;
     const sc = this.q('.cz-scene'), art = this.q('.cz-art');
     const full = !!this.slotEl.closest('.is-full');
     sc.classList.toggle('cz-fullsc', full);
     if (!full) {
+      this.q('.cz-info').style.cssText = '';
       const port = innerWidth < 700 && innerHeight > innerWidth;
       sc.classList.toggle('cz-p', port); sc.classList.toggle('cz-l', !port);
       art.style.cssText = ''; return;
@@ -240,10 +241,33 @@ class CosmicGame extends BaseGame {
     const top = sp('paddingTop'), bot = sp('paddingBottom'), lft = sp('paddingLeft'), rgt = sp('paddingRight');
     const W = sc.clientWidth - lft - rgt, H = sc.clientHeight - top - bot;
     if (!W || !H) return;
-    const port = W / H < 1, ar = port ? 720 / 1280 : 1248 / 832;
+    const port = W / H < 1, iw = port ? 720 : 1248, ih = port ? 1280 : 832;
     sc.classList.toggle('cz-p', port); sc.classList.toggle('cz-l', !port);
-    const w = Math.min(W, H * ar), h = w / ar;
-    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + (W - w) / 2).toFixed(1)}px;top:${(top + (H - h) / 2).toFixed(1)}px`;
+    // the picture covers the whole screen (owner's request: no border around), cropped on its edges, but never so much
+    // that the grid, the bar or the plaque leave the screen (KEY = the part that must stay visible, in its pixels)
+    const [kx0, ky0, kx1, ky1] = port ? [72, 120, 650, 1108] : [26, 186, 1066, 792]; // wide: the grid and the bar (the plaque follows the screen)
+    const k = Math.min(Math.max(W / iw, H / ih), W / (kx1 - kx0), H / (ky1 - ky0)), w = iw * k, h = ih * k;
+    // centred, then moved so that the screen stays covered (x ≤ 0, x ≥ W − w) and the key part stays on it
+    const fit = (S, len, a0, a1) => {
+      let v = (S - len) / 2;
+      v = Math.min(0, Math.max(S - len, v));
+      return Math.min(S - a1 * k, Math.max(-a0 * k, v));
+    };
+    const x = fit(W, w, kx0, kx1), y = fit(H, h, ky0, ky1);
+    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + x).toFixed(1)}px;top:${(top + y).toFixed(1)}px`;
+    // the plaque stays on the screen, right of the ✕ button, whatever the crop
+    const inf = this.q('.cz-info');
+    inf.classList.remove('cz-col');
+    if (port) inf.style.cssText = '';
+    else {
+      const l = Math.max(6, ((64 - x) / w) * 100), room = 31.65 - 1.5 - l; // % of the picture left of the grid
+      if (room >= 30) inf.style.cssText = `left:${l.toFixed(2)}%;top:${Math.max(5.5, ((10 - y) / h) * 100).toFixed(2)}%`;
+      else { // very wide screen: the grid starts high, the plaque goes in a column left of the moon, under the ✕
+        const lc = Math.max(1, ((12 - x) / w) * 100);
+        inf.classList.add('cz-col');
+        inf.style.cssText = `left:${lc.toFixed(2)}%;top:${(((64 - y) / h) * 100).toFixed(2)}%;width:${Math.min(16, 31.65 - 1.5 - lc).toFixed(2)}%;height:auto`;
+      }
+    }
   }
 
   // Big word over the grid, restarted with WAAPI (no forced reflow).

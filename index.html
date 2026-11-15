@@ -4614,8 +4614,12 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-cosmic.g-cosmic > .mx-row { position: absolute; z-index: 9; top: max(8px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); margin: 0; }
 .game-host.is-full > .slot.g-cosmic.g-cosmic > .slot-frame, .game-host.is-full > .slot.g-cosmic.g-cosmic > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.g-cosmic .slot-frame, .game-host.ml-busy > .slot.g-cosmic .reels { animation: none !important; }
-.cz-scene.cz-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: radial-gradient(40% 35% at 15% 18%, rgba(168, 85, 247, .35), transparent 70%), radial-gradient(35% 30% at 88% 20%, rgba(99, 102, 241, .28), transparent 70%), radial-gradient(60% 25% at 50% 85%, rgba(244, 114, 182, .16), transparent 70%), radial-gradient(1px 1px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 60%, #fff, transparent), radial-gradient(1px 1px at 40% 80%, #c7d2fe, transparent), radial-gradient(1px 1px at 85% 40%, #fff, transparent), linear-gradient(180deg, #0a0826 0%, #120a3a 50%, #07051c 100%); }
-.cz-fullsc .cz-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 3%, #000 97%, transparent), linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(180deg, transparent, #000 3%, #000 97%, transparent), linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); mask-composite: intersect; }
+.cz-scene.cz-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: url(assets/games/cosmic/scene-large.webp?v=2) center / cover no-repeat #0a0826; }
+.cz-fullsc.cz-l .cz-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
+.cz-info.cz-col { flex-direction: column; }
+.cz-info.cz-col > div { flex: none !important; height: auto !important; padding: .7cqw 0 !important; }
+.cz-info.cz-col > div + div { border-left: 0; border-top: .15cqw solid rgba(165, 180, 252, .45); }
+.cz-scene.cz-fullsc.cz-p { background-image: url(assets/games/cosmic/scene-haut.webp?v=2); }
 .cz-fullsc .cz-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 /* ============ L'Olympe (games/zeus.js): the owner's picture of 15 November 2026 (scene.webp, 1024 × 1024): medallion
    MULTIPLICATEUR, the 6 × 5 grid in the golden frame, his bar made clickable; full screen like La Fortune ============ */
@@ -15850,7 +15854,7 @@ const FILES = {
   zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', 'fa68b47ddf'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', '779625004b'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '0eefb081ec'],
-  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '2aa3d1dd3b'],
+  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '25cbd292e1'],
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '4c519ccf57'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'fcbe76e4e1'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'c757c58318'],
