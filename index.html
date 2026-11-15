@@ -4521,6 +4521,40 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-fortune.g-fortune > .mx-row { position: absolute; z-index: 6; top: max(8px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); margin: 0; }
 .game-host.is-full > .slot.g-fortune.g-fortune > .slot-frame { width: 100%; align-self: center; }
 .game-host.is-full .g-fortune .ft-scene { width: min(100%, calc(100svh - 8px)); }
+/* the bonus inside the picture: plaque on the top of the reel frame, panels in the frame (intro, total) */
+.ft-bhud { position: absolute; z-index: 6; left: 31%; top: 28.3%; width: 38%; height: 5.2%; display: flex; align-items: center; justify-content: center; gap: 4%; padding: 0 2%; box-sizing: border-box; pointer-events: none; opacity: 0; transform: translateY(-30%) scale(.9); transition: opacity .35s, transform .35s;
+  border-radius: 6px; background: linear-gradient(180deg, #8f1111, #4a0505); box-shadow: inset 0 0 0 2px #2a0202, inset 0 0 0 4px #d9a320, inset 0 0 0 5px #6b3d06, 0 4px 14px rgba(0, 0, 0, .6), 0 0 18px rgba(253, 224, 71, .35); }
+.ft-bhud.on { opacity: 1; transform: none; }
+.ft-bhud.mega { background: linear-gradient(180deg, #b8860b, #6b3d06); }
+.ft-bname { font: 900 2.3cqw/1 Cinzel, Georgia, serif; letter-spacing: .06em; white-space: nowrap; background: linear-gradient(180deg, #fff7d6, #facc15 55%, #c98a12); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 1px 0 #000); }
+.ft-bhud.mega .ft-bname { background: linear-gradient(180deg, #fff, #fff7d6); -webkit-background-clip: text; background-clip: text; }
+.ft-lights { display: flex; gap: .6cqw; height: 70%; }
+.ft-lights i { height: 100%; aspect-ratio: 1; opacity: .25; filter: grayscale(1) brightness(.6); transition: opacity .25s, filter .25s; }
+.ft-lights i.on { opacity: 1; filter: drop-shadow(0 0 4px #fde047); }
+.ft-lights .ft-img { height: 100%; width: 100%; border-radius: 50%; }
+.ft-ov { position: absolute; z-index: 7; left: 14.45%; top: 32.03%; width: 70.9%; height: 42.4%; display: none; place-items: center; cursor: pointer; background: radial-gradient(circle at 50% 50%, rgba(80, 6, 4, .55), rgba(10, 2, 1, .88) 75%); }
+.ft-ov.on { display: grid; animation: ftOvIn .35s ease-out; }
+.ft-ov.out { animation: ftOvOut .3s ease-in forwards; }
+@keyframes ftOvIn { from { opacity: 0; } } @keyframes ftOvOut { to { opacity: 0; } }
+.ft-pan { width: 78%; padding: 3cqw 2cqw 2.4cqw; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 1.1cqw; text-align: center; border-radius: 10px;
+  background: radial-gradient(120% 90% at 50% 0%, #a3191a, #5a0707 60%, #2e0303); box-shadow: inset 0 0 0 3px #2a0202, inset 0 0 0 6px #d9a320, inset 0 0 0 7px #6b3d06, inset 0 0 40px rgba(0, 0, 0, .5), 0 0 40px rgba(253, 224, 71, .45), 0 12px 30px rgba(0, 0, 0, .7); animation: ftPan .55s cubic-bezier(.2, 1.6, .4, 1); }
+.ft-ov.mega .ft-pan { background: radial-gradient(120% 90% at 50% 0%, #b07a14, #5e3a05 55%, #2e1a02); }
+@keyframes ftPan { from { transform: scale(.4) rotate(-4deg); opacity: 0; } }
+.ft-pglyph .ft-intro, .ft-pglyph img { width: 11cqw; height: 11cqw; object-fit: contain; border-radius: 50%; filter: drop-shadow(0 0 12px rgba(253, 224, 71, .9)); animation: ftCoinSpin 2.4s ease-in-out infinite; }
+.ft-ov.mega .ft-pglyph img { border-radius: 12%; animation: none; }
+@keyframes ftCoinSpin { 50% { transform: rotateY(180deg) scale(1.08); } }
+.ft-pan h3 { margin: 0; font: 900 5.4cqw/1 Cinzel, Georgia, serif; letter-spacing: .05em; background: linear-gradient(180deg, #fff7d6, #facc15 55%, #c98a12); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 3px 0 #2a0202) drop-shadow(0 0 12px rgba(253, 224, 71, .5)); }
+.ft-pan p { margin: 0; max-width: 92%; font: 600 1.9cqw/1.3 Archivo, sans-serif; color: #fde68a; text-shadow: 0 1px 2px #000; }
+.ft-pan small { font: 700 1.5cqw Archivo, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: #fff7d6; opacity: .8; animation: bwBeat 1.4s ease-in-out infinite; }
+.ft-ptot { font: 900 6.4cqw/1 KeCoin, Archivo, sans-serif; color: #fff7d6; text-shadow: 0 0 16px rgba(253, 224, 71, .9), 0 3px 0 #6b3d06; padding: .2em .6em; border-radius: 8px; background: rgba(20, 2, 1, .55); box-shadow: inset 0 0 0 2px #d9a320; }
+/* bonus mood: the temple at night, the lanterns glow, gold sparks in Méga */
+.slot.ft-hold .ft-art::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(70% 45% at 50% 52%, transparent 60%, rgba(10, 0, 0, .45)), linear-gradient(180deg, rgba(120, 10, 0, .22), transparent 30%); animation: ftMood 2.4s ease-in-out infinite alternate; }
+.slot.ft-mega .ft-art::after { background: radial-gradient(70% 45% at 50% 52%, transparent 55%, rgba(60, 30, 0, .35)), linear-gradient(180deg, rgba(253, 200, 40, .28), transparent 35%); }
+@keyframes ftMood { to { opacity: .55; } }
+.slot.ft-hold .ft-win { box-shadow: 0 0 0 2px rgba(253, 224, 71, .55), 0 0 40px rgba(253, 224, 71, .4); background: radial-gradient(circle, rgba(90, 8, 6, .35), rgba(20, 2, 1, .2)); }
+.slot.ft-hold .ft-win { z-index: 2; }
+.slot.ft-hold .ft-spin img { filter: grayscale(.4) brightness(.8); }
+.slot.g-fortune > .feature-banner { display: none !important; }
 .slot.g-fortune > .feature-banner { position: absolute; z-index: 6; top: 10px; left: 12px; margin: 0; max-width: calc(100% - 190px); }
 .game-host:not(.is-full):has(> .g-fortune) { max-width: max(420px, min(1000px, calc(100svh - 200px))); }
 .g-fortune .reels-host { position: absolute; inset: 0; }
@@ -4575,8 +4609,6 @@ html.light .slot small { color: inherit; }
 .ft-fly .ft-img { height: 100%; border-radius: 50%; }
 .ft-intro { width: 120px; height: 120px; object-fit: contain; border-radius: 12%; }
 .ft-pay { width: 54px; height: 54px; } .ft-pay .ft-img { height: 100%; }
-.slot.ft-mega .ft-art { box-shadow: inset 0 0 80px rgba(250, 204, 21, .5); }
-.slot.ft-hold .ft-win { box-shadow: 0 0 0 2px rgba(253, 224, 71, .4), 0 0 40px rgba(253, 224, 71, .35); }
 .tuto { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: rgba(3, 6, 12, .72); backdrop-filter: blur(4px); animation: ovIn .3s ease both; }
 .tuto.out { animation: ovOut .25s ease both; }
 .tuto-card { width: min(420px, 100%); padding: 26px 22px 20px; border-radius: 8px; text-align: center; background: var(--panel); border: 1px solid var(--line); box-shadow: 0 20px 60px rgba(0, 0, 0, .5); color: var(--text); }
@@ -12551,7 +12583,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'fortune', date: '2026-11-15', title: 'Nouveau décor pour La Fortune', items: ['Un tout nouveau décor : le temple, les dragons d’or et les lanternes autour des rouleaux', 'Trois jackpots en haut, MINI, MAJOR et JACKPOT, qui dépendent de ta mise et grimpent à chaque spin', 'Nouvelle pièce MINI pendant le Hold & Spin', 'Nouvelle barre de jeu : mise, niveau de vitesse, tas de pièces, solde et le gros bouton rouge'] },
+  { game: 'fortune', date: '2026-11-15', title: 'Nouveau décor pour La Fortune', items: ['Un tout nouveau décor : le temple, les dragons d’or et les lanternes autour des rouleaux', 'Trois jackpots en haut, MINI, MAJOR et JACKPOT, qui dépendent de ta mise et grimpent à chaque spin', 'Nouvelle pièce MINI pendant le Hold & Spin', 'Nouvelle barre de jeu : mise, niveau de vitesse, tas de pièces, solde et le gros bouton rouge', 'Le Hold & Spin et le MÉGA BONUS se jouent dans le décor : annonce dans le cadre, plaque avec les respins, total en bas et nuit sur le temple'] },
   { game: 'pirates', date: '2026-11-12', isNew: true, title: 'Nouvelle machine : Le Coffre aux Pirates', items: ['Un bateau pirate file sur la mer derrière toute la machine, avec sa musique de pirates', 'Jackpots MINI, MINOR, MAJOR et GRAND en haut de l’écran', 'La Chasse au trésor : 3 vies, Tonneaux jusqu’à ×50, Ancres, et le coffre qui s’ouvre ×500', 'Les Tours gratuits : le Crabe tombe partout et ramasse ×1, ×2, ×3…', 'Jusqu’à ×50 000 la mise'] },
   { game: 'viking', date: '2026-11-11', isNew: true, title: 'Nouvelle machine : Le Valhalla', items: ['4 Jarls : 15 tours gratuits avec 5 WILD qui restent collés', 'Chaque nouveau WILD reste aussi jusqu’à la fin du bonus', 'Les jauges du Jarl et de la valkyrie lancent le bonus toutes seules', 'À 500, la valkyrie devient un WILD géant qui se déplace et grandit à chaque connexion'] },
   { game: 'storm', date: '2026-11-10', title: 'Nouvelle table en 3D', items: ['La même table que La Roulette : tapis bleu, roue en bois et caméra qui suit la bille', 'Les éclairs frappent directement les numéros du tapis', 'Mise sur le cylindre : Tiers, Orphelins, Voisins, Jeu zéro', 'Tableau lumineux des derniers numéros et statistiques'] },
@@ -15716,7 +15748,7 @@ const FILES = {
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', 'e23f21079d'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'fb3eda6835'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
-  fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', '891cba6eb6'],
+  fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', '67c6869c93'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '9621261bab'],

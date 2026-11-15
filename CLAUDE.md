@@ -157,6 +157,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   **selon la mise**, progressifs : MINI ×10 (pièce verte `mini.webp`, ajoutée), MAJOR ×50 (pièce passée en violet,
   `tools/art/fortune/coins.py`), JACKPOT ×500. Simulation `node tools/sim/fortune.js` (8 M tours) : RTP ≈ 92,3 %, MINI
   1 tour sur 2 600, achats ≈ 88,4 / 87,6 %.
+  **Bonus dans le décor** (voulu par le propriétaire : « pour toute la machine ») : annonce et bilan du Hold & Spin / MÉGA BONUS
+  dans le cadre des rouleaux (`featureIntro` et `celebrate` avec `summary` redéfinis : `panel()`, `.ft-ov`, laque rouge, or
+  pour le Méga ; le grand titre « GROS GAIN ! » du site suit dès ×10), plaque du bonus sur le haut du cadre avec les respins en
+  pièces (`hud()`, `.ft-bhud`, le bandeau habituel est caché), TOTAL dans la plaque du bas, temple assombri (`.ft-hold`).
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

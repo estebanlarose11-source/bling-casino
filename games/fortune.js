@@ -151,6 +151,8 @@ class FortuneGame extends BaseGame {
           <b class="ft-val ft-bal"></b>
           <button class="ft-spin" type="button" data-act="main" aria-label="Lancer"><img src="${src('spin')}" alt="" draggable="false"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
           <b class="ft-say"></b>
+          <div class="ft-bhud"><b class="ft-bname"></b><span class="ft-lights">${[0, 1, 2].map(() => `<i>${img('coin', 'ft-img')}</i>`).join('')}</span></div>
+          <div class="ft-ov"></div>
           <div class="ft-win"><div class="reels-host"></div><div class="ft-rows">${[0, 1, 2].map((r) => `<i data-row="${r}"></i>`).join('')}</div></div>
           <div class="ft-word"></div>
           <div class="ft-dust">${Array.from({ length: 18 }, (_, k) => `<i style="left:${(k * 53) % 100}%;--dx:${((k * 29) % 60) - 30}px;animation-duration:${6 + (k % 5) * 1.7}s;animation-delay:-${(k * 1.3) % 9}s"></i>`).join('')}</div>
@@ -181,6 +183,50 @@ class FortuneGame extends BaseGame {
   }
 
   destroy() { this.sayObs?.disconnect(); super.destroy(); }
+
+  /* ---------- the bonus inside the owner's picture ---------- */
+  // plaque over the top of the reel frame: bonus name + the 3 respins as gold coins; the total in BONNE CHANCE !
+  hud(name, left = 3, total = 0) {
+    const h = this.q('.ft-bhud');
+    if (!name) { h.classList.remove('on'); this.sayTotal = null; this.paintSay(); return; }
+    h.classList.add('on'); h.classList.toggle('mega', name !== 'HOLD & SPIN');
+    this.q('.ft-bname').textContent = name;
+    this.qa('.ft-lights i').forEach((n, k) => { const on = k < left; if (n.classList.contains('on') !== on) { n.classList.toggle('on', on); if (on) n.animate([{ transform: 'scale(1.6)' }, { transform: 'none' }], { duration: 350, easing: 'ease-out' }); } });
+    this.sayTotal = total; this.paintSay();
+  }
+  // a panel drawn in the reel frame (bonus start, bonus end): red lacquer, gold border; touch to go on
+  panel(html, cls, dur) {
+    const ov = this.q('.ft-ov');
+    ov.className = `ft-ov on ${cls}`; ov.innerHTML = `<div class="ft-pan">${html}</div>`;
+    return new Promise((resolve) => {
+      let over = false;
+      const done = () => { if (over) return; over = true; clearTimeout(t); ov.classList.add('out'); setTimeout(() => { ov.className = 'ft-ov'; ov.innerHTML = ''; resolve(); }, 300); };
+      const t = setTimeout(done, this.superT ? dur / 4 : this.turbo ? dur / 2 : dur);
+      ov.addEventListener('click', done, { once: true });
+    });
+  }
+  featureIntro(title, sub, glyph, dur = 2600) {
+    dispatchEvent(new CustomEvent('sb:feature', { detail: { game: this.game.id, title, bought: !!this.buyRound, re: /^\+/.test(title) } }));
+    sfx.feature(); this.flash('rgba(253,224,71,.45)');
+    const p = center(this.q('.ft-win')); fx.burst(p.x, p.y, 50, GOLD, 9);
+    return this.panel(`<div class="ft-pglyph">${glyph}</div><h3>${title}</h3><p>${sub}</p><small>Touchez pour continuer</small>`, `intro${/MÉGA/.test(title) ? ' mega' : ''}`, dur);
+  }
+  // the bonus total in the frame, counted up; then the big title of the site if it is a big win
+  async celebrate(amountC, o = {}) {
+    if (!o.summary) return super.celebrate(amountC, o);
+    dispatchEvent(new CustomEvent('sb:featureend', { detail: { game: this.game.id } }));
+    if (this.dead) return;
+    const x = amountC / (o.stake || this.bet);
+    sfx.bigWin?.(); fx.confetti(60);
+    const pr = this.panel(`<div class="ft-pglyph">${img(o.summary === 'MÉGA BONUS' ? 'scatter' : 'coin', 'ft-intro')}</div><h3>${o.summary}</h3><b class="ft-ptot">0</b><p>×${x >= 100 ? Math.round(x) : x.toFixed(1).replace('.', ',')} la mise</p><small>Touchez pour continuer</small>`, `end${o.summary === 'MÉGA BONUS' ? ' mega' : ''}`, 2600 + Math.min(2400, x * 12));
+    const tot = this.q('.ft-ptot'), t0 = performance.now(), T = this.superT ? 300 : this.turbo ? 700 : Math.min(2600, 900 + x * 15);
+    const step = (ts) => { if (this.dead || !tot.isConnected) return; const k = Math.min(1, (ts - t0) / T); tot.textContent = fmtC(Math.round(amountC * k)); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+    await pr;
+    this.winAmt.textContent = fmtC(amountC);
+    if (x >= 10) await super.celebrate(amountC, { stake: o.stake, quick: true }); // GROS GAIN ! stays everywhere
+  }
+
   level() { return this.superT ? 3 : this.turbo ? 2 : 1; }
   setLevel(n) {
     n = Math.max(1, Math.min(3, n));
@@ -198,6 +244,7 @@ class FortuneGame extends BaseGame {
   }
   paintSay() {
     const n = this.q('.ft-say'); if (!n) return;
+    if (this.sayTotal !== undefined && this.sayTotal !== null) { n.innerHTML = `<small>TOTAL</small> ${fmtC(this.sayTotal)}`; n.classList.add('won'); return; }
     const w = this.winAmt.textContent.trim();
     n.innerHTML = w ? `<small>GAIN</small> ${w}` : 'BONNE CHANCE !';
     n.classList.toggle('won', !!w);
@@ -334,7 +381,7 @@ class FortuneGame extends BaseGame {
     for (let i = 0; i < N; i++) this.reels.set(i, i in this.vals ? COIN : BLANK);
     for (const i in firstMul) if (firstMul[i] > 1) { this.mul[i] = firstMul[i]; this.reels.set(+i, COIN); this.pop(+i); await this.wait(160); }
     let shown = this.sumNow(b);
-    const banner = (left) => this.setBanner(`<b>${mega ? 'MÉGA BONUS' : 'HOLD & SPIN'}</b><span class="pill">Respins ${left}</span><span class="pill gold">${fmtC(Math.round(Math.min(shown, cap)))}</span>`);
+    const banner = (left) => this.hud(mega ? 'MÉGA BONUS' : 'HOLD & SPIN', left, Math.round(Math.min(shown, cap)));
     banner(3);
     await this.wait(600);
     for (const st of run.steps) {
@@ -376,7 +423,7 @@ class FortuneGame extends BaseGame {
     }
     const won = Math.min(tot + pot, cap);
     if (won > 0) this.win(won, mega ? 'Méga Bonus' : 'Hold & Spin');
-    this.setBanner('');
+    this.hud(null);
     this.slotEl.classList.remove('ft-hold', 'ft-mega');
     this.qa('.ft-jp.hot').forEach((n) => n.classList.remove('hot'));
     this.msg(`${mega ? 'MÉGA BONUS' : 'HOLD & SPIN'} : ${fmtC(tot)}${pot ? ` + le tas ${fmtC(pot)}` : ''}${jps.length ? ` · ${jps.map((j) => j.toUpperCase()).join(' + ')} !` : ''}`);
