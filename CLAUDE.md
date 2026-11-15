@@ -107,8 +107,15 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   cahier des charges `notes/diamants-redk-cahier-des-charges.txt`). Images du propriétaire dans `assets/games/redk/` :
   symboles découpés de ses 2 planches (`s0`…`s4` = 10 J Q K A de la planche 2, K passé en orange ; `s5` scarabée, `s6`
   œil, `s7` Anubis, `s8` pharaon, `wild` couronne, `scat` pyramide, `ruby` diamant rouge, `ruby-gold` = le même passé en
-  or, boosters `b-spin` / `b-reels` / `b-mult` / `b-value`), sa vidéo de mine `bg.mp4` (fond animé en boucle derrière toute
-  la machine) et sa vidéo BONUS `intro.mp4` (`bonusIntro` : fondu au noir → vidéo plein écran, sur téléphone en largeur
+  or, boosters `b-spin` / `b-reels` / `b-mult` / `b-value`), **son décor animé du 15 novembre 2026** (comme L'Olympe et Le Loup
+  2.0 : `tools/art/redk/fond-large.mp4` 672 × 448 `.rk-l` et `fond-haut.mp4` 448 × 672 `.rk-p`, la mine de diamants avec plaques
+  MINI / MAJOR / GRAND JACKPOT, cadre de pierres à 5 × 3 cases peintes, wagons de gemmes ; `tools/art/redk/clean.py` efface
+  « $1.00 » → `assets/games/redk/fond-*.mp4` + `scene-*.webp`, l'ancien `bg.mp4` est supprimé) : rouleaux posés sur ses cases
+  (`.rk-reels`, sans cadre), montants des jackpots sous les plaques (`.rk-jpv`, MINOR reste sur son rubis), SOLDE · GAIN de
+  chaque côté du cadre (large) ou au-dessus de la barre (haut) (`.rk-info`), barre cliquable (BET − / +, BONUS MENU, SPIN,
+  MAX BET) ; le RUBY LINK 5 × 6 couvre le cadre (`.rk-link`), boosters à droite du cadre (large) ou sous les plaques (haut),
+  compteur du bonus à la place de SOLDE · GAIN ; plein écran `layout()` comme L'Olympe. **Piège** : le booster REELS+ porte
+  aussi la classe `.reels` du site (grille 5/3) : `.rk-art .rk-bst` remet `display: flex; aspect-ratio: auto`. Sa vidéo BONUS `intro.mp4` (`bonusIntro` : fondu au noir → vidéo plein écran, sur téléphone en largeur
   ×1,65 sur la même vidéo floutée pour que le mot BONUS soit entier → fondu au noir → le bonus ; `blackout()`).
   5×3, 20 lignes ; rubis avec leur valeur **en KE** (`kfmt`). **Voulu par le propriétaire** : le **RUBY LINK** (6 rubis ;
   grille 5×6, 3 rangées verrouillées ouvertes à 11 / 16 / 21 rubis ou par REELS+, boosters SPIN+ / REELS+ / MULTI+ /

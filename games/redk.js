@@ -2,18 +2,22 @@
 // ---- games/impl/redk.js ----
 __mods['games/impl/redk.js'] = (() => {
 // Diamants REDK (owner's request, 11 November 2026, notes/diamants-redk-cahier-des-charges.txt): 5 reels × 3 rows,
-// 20 lines, the owner's symbols (assets/games/redk) over his moving diamond-mine video (bg.mp4, the same in the bonus).
+// 20 lines, the owner's symbols (assets/games/redk). The whole machine: his 2 animated backgrounds of 15 November 2026
+// (fond-large.mp4 for computers and wide screens, fond-haut.mp4 for phones held upright: a diamond mine, MINI / MAJOR /
+// GRAND JACKPOT plates, a jewelled frame with 5 × 3 cells, mine carts full of gems), cleaned by tools/art/redk/clean.py:
+// a 121-frame loop (24 images/s) + its first 12 frames again (core/videobg.js).
 // RED RUBIES carry a value in KE (n × the bet): 6 or more = RUBY LINK (they stay, 3 re-spins put back to 3 by every new
 // ruby, 3 locked rows above the grid → up to 5×6, boosters SPIN+ / REELS+ / MULTIPLIER+ / VALUE+, MINI / MINOR / MAJOR,
 // GRAND ×1 000 for the 30 cells). 3 pyramids = LES TOURS DE LA PYRAMIDE (free spins, wins ×2, Ruby Link still possible).
-// When one ruby (or one pyramid) is missing, the last reels slow down, the camera zooms in, the screen shakes and the
-// music gives way to a heartbeat (tease). The owner's BONUS video (intro.mp4) opens every bonus, won or bought.
+// When one ruby (or one pyramid) is missing, the last reel slows down and glows, the screen shakes and the music gives
+// way to a heartbeat (tease). The owner's BONUS video (intro.mp4) opens every bonus, won or bought.
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { Reels } = __mods['core/reels.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, audioContext, isMuted, duck } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
+const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
 
 /* ===ENGINE */
 // Symbols 0-4: cards 10 J Q K A; 5 scarab, 6 eye, 7 Anubis, 8 pharaoh; 9 WILD crown (reels 2-5, replaces 0-8);
@@ -163,7 +167,8 @@ const ENGINE = { COLS, ROWS, N, BR, BN, NS, WILD, SCAT, RUBY, CAPX, LINES, GOLD_
 
 const E = ENGINE;
 const { LINES: _L, P: PP } = E;
-const IMG_V = 1;
+const IMG_V = 2;
+const LOOP = 121 / 24;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images and videos are inlined
 const src = (n) => asset(`assets/games/redk/${n}.webp`);
 const img = (n, cls = 'rk-img') => `<img class="${cls}" src="${src(n)}" alt="" draggable="false" decoding="async">`;
@@ -240,31 +245,45 @@ class RedkGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.redk, cls: 'rk-slot',
-      stage: `<div class="rk-stage">
-        <div class="rk-logo" aria-label="Diamants REDK"><small>DIAMANTS</small><b>REDK</b></div>
-        <div class="rk-jps">${['mini', 'minor', 'major', 'grand'].map((k) => `<span class="rk-jp ${k}"><i>${JP_NAME[k]}</i><b data-jp="${k}"></b></span>`).join('')}</div>
-        <div class="rk-board"><div class="rk-shake">
-          <div class="rk-boost">${Object.entries(BOOST).map(([k, b]) => `<span class="rk-bst ${k}" data-b="${k}">${img(b.pic, 'rk-bimg')}<b>${b.n}</b><em></em></span>`).join('')}</div>
-          <div class="rk-reels"></div>
-          <div class="rk-link" hidden></div>
-        </div></div>
-        <div class="rk-word"></div>
-      </div>`,
+      // the owner's mine (wide video: computers, tall video: phones held upright): the reels on his 5 × 3 painted cells, the
+      // jackpot amounts under his MINI / MAJOR / GRAND plates (MINOR has no plate: it shows on its ruby), his bar made
+      // clickable (BET − / +, BONUS MENU, SPIN, MAX BET), balance and win on plates; the RUBY LINK board (5 × 6) covers
+      // the frame, its boosters and its counter take the plates' places
+      stage: `<div class="rk-scene rk-l"><i class="rk-safe"></i><div class="rk-art">
+          <video class="rk-vid" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+          <div class="rk-shade"></div>
+          ${['mini', 'major', 'grand'].map((k) => `<b class="rk-jpv ${k}" data-jp="${k}"></b>`).join('')}
+          <div class="rk-shake">
+            <div class="rk-boost">${Object.entries(BOOST).map(([k, b]) => `<span class="rk-bst ${k}" data-b="${k}">${img(b.pic, 'rk-bimg')}<b>${b.n}</b><em></em></span>`).join('')}</div>
+            <div class="rk-reels"></div>
+            <div class="rk-link" hidden></div>
+          </div>
+          <div class="rk-info"><div><small>SOLDE</small><b class="rk-bal"></b></div><div><small>GAIN</small><b class="rk-gain">0</b></div></div>
+          <button class="rk-hot rk-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="rk-bet"></b>
+          <button class="rk-hot rk-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="rk-hot rk-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+          <button class="rk-hot rk-spin" type="button" data-act="main" aria-label="Lancer"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          <button class="rk-hot rk-max" type="button" data-act="max" aria-label="Mise maximum"></button>
+          <div class="rk-word"></div>
+        </div><button class="rk-hot rk-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       buys: [
         { id: 'link', icon: '💎', label: 'RUBY LINK · 6 rubis', desc: '6 rubis qui restent, 3 re-spins, 3 rangées à déverrouiller et les boosters', cost: (b) => b * E.BUY.link },
       ],
       hello: `6 rubis = RUBY LINK · ${E.GOLD_AT} pyramides = LA PYRAMIDE D’OR`,
     });
-    // the owner's moving diamond mine behind the whole machine (the same in the bonus)
-    const bg = this.q('.slot-bg');
-    bg.innerHTML = `<video class="rk-video" src="${asset('assets/games/redk/bg.mp4')}" poster="${src('bg')}" muted autoplay loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video><div class="rk-shade"></div><div class="rk-sparks" aria-hidden="true">${Array.from({ length: 18 }, (_, k) => `<i style="left:${(k * 41) % 100}%;top:${(k * 67) % 100}%;--d:${2.2 + (k % 5) * 0.7}s;animation-delay:-${(k * 0.9) % 4}s"></i>`).join('')}</div>`;
-    this.video = bg.querySelector('video');
-    this.video.muted = true;
-    const play = () => { if (!this.dead && !matchMedia('(prefers-reduced-motion: reduce)').matches) this.video.play().catch(() => {}); };
-    play();
-    this.onVis = () => { if (document.hidden) { this.video.pause(); this.heart.stop(); } else play(); };
+    // the bonus counter on the mine; the usual bar and message line are hidden
+    this.q('.rk-art').appendChild(this.banner);
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    this.gainObs = new MutationObserver(() => this.paintGain());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    this.vbg = new VideoBg(this.q('.rk-vid'), { loop: LOOP, root: this.root });
+    this.onVis = () => { if (document.hidden) this.heart.stop(); };
     document.addEventListener('visibilitychange', this.onVis);
-    this.root.addEventListener('pointerdown', play, { once: true }); // a phone in power-saving mode waits for a touch
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.rk-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
     this.heart = new Heart();
     this.vals = {};
     this.reels = new Reels(this.q('.rk-reels'), {
@@ -275,13 +294,57 @@ class RedkGame extends BaseGame {
     this.reels.el.classList.add('rk-rs');
     this.reels.setAll(this.idle());
     ['ruby', 'ruby-gold', 'wild', 'scat', 'b-spin', 'b-reels', 'b-mult', 'b-value', 's7', 's8'].forEach((n) => { new Image().src = src(n); });
-    this.paintJps();
+    this.onMeters(); this.paintGain(); this.layout();
   }
 
-  destroy() { document.removeEventListener('visibilitychange', this.onVis); this.video?.pause(); this.heart.stop(); super.destroy(); }
+  destroy() {
+    document.removeEventListener('visibilitychange', this.onVis); this.heart.stop();
+    this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs);
+    this.vbg?.destroy();
+    super.destroy();
+  }
   onBetChange() { this.paintJps(); }
-  onMeters() { this.paintJps(); }
+  onMeters() {
+    this.paintJps();
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) { n.textContent = t; n.style.setProperty('--n', Math.max(7, t.length)); } };
+    set('.rk-bet', fmtC(this.bet)); set('.rk-bal', fmtC(this.balC()));
+  }
   paintJps() { if (this.dead) return; this.qa('[data-jp]').forEach((n) => { n.innerHTML = `${kfmt(E.JPX[n.dataset.jp] * this.bet)}${KE}`; }); }
+  paintGain() {
+    const n = this.q('.rk-gain'); if (!n) return;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    n.textContent = w || fmtC(0);
+    n.style.setProperty('--n', Math.max(7, n.textContent.length));
+    n.parentElement.classList.toggle('won', !!w);
+  }
+
+  /* ---------- the owner's mine: wide or tall video, full screen ---------- */
+  orient(port) {
+    const sc = this.q('.rk-scene'), name = port ? 'haut' : 'large';
+    sc.classList.toggle('rk-p', port); sc.classList.toggle('rk-l', !port);
+    this.vbg.set(asset(`assets/games/redk/fond-${name}.mp4`), asset(`assets/games/redk/scene-${name}.webp`));
+  }
+  // Wide mine on a computer, tall mine on a phone held upright. Full screen: the one that fits the screen's shape covers
+  // the whole screen, cropped on its edges but never cutting the plates, the frame or the bar (KEY, in the video's
+  // pixels); a screen of another shape gets the rest of the picture, blurred, around it.
+  layout() {
+    if (this.dead) return;
+    const sc = this.q('.rk-scene'), art = this.q('.rk-art');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('rk-fullsc', full);
+    if (!full) {
+      sc.classList.remove('rk-bandx', 'rk-bandy');
+      this.orient(innerWidth < 700 && innerHeight > innerWidth);
+      art.style.cssText = ''; return;
+    }
+    const { top, lft, W, H } = screenBox(sc, this.q('.rk-safe'));
+    if (!W || !H) return;
+    const port = W / H < 1;
+    this.orient(port);
+    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [8, 2, 440, 664] : [4, 14, 668, 440], { bottom: port });
+    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
+    sc.classList.toggle('rk-bandx', f.bandX); sc.classList.toggle('rk-bandy', f.bandY);
+  }
 
   // a calm screen without bonus symbols in excess (shown at the opening and after a bonus)
   idle() { const { g, vals } = E.screen(Math.random); this.vals = vals; return g; }
