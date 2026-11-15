@@ -3124,101 +3124,66 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .plateau .pt-say .dbl { color: #c81d25; }
 
 /* ============ La Pêche ============ */
+/* the owner's glass wheel (15 November 2026): roue.webp = scene, .pe-disc = the turning glass disc (roue-disc.webp + the
+   cases in SVG, games/peche.js), roue-top.webp = crystal pointer and glass hub above it. Positions = tools/art/peche/clean.py */
 .g-peche { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(125, 211, 252, .25), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(37, 99, 235, .25), transparent 70%), linear-gradient(180deg, #071a2e 0%, #05070b 100%); }
+.slot.g-peche > .slot-bg { background: radial-gradient(ellipse at 50% 40%, #0c2d6b 0%, #051637 45%, #020818 100%) !important; filter: none; }
+.g-peche > .slot-bg::after { display: none; }
 .pe-hist span { position: relative; }
 .pe-hist em { position: absolute; right: -4px; top: -7px; font: 900 8px KeCoin, Archivo, sans-serif; font-style: normal; color: #713f12; background: #fde047; border-radius: 3px; padding: 0 2px; }
-.pe-view { position: relative; }
-.pe-hub .big { color: #0f172a; text-shadow: none; -webkit-text-stroke: 0; }
-.pe-hub { color: #7dd3fc; }
-.pe-hub .big { color: #e0f2fe; }
-.pe-lx { position: absolute; bottom: -10px; font: 900 13px KeCoin, Archivo, sans-serif; font-style: normal; color: #713f12; background: #fde047; border-radius: 3px; padding: 1px 6px; }
-.pe-flash { position: absolute; inset: -6%; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(255, 255, 255, .9), rgba(253, 224, 71, .4) 40%, transparent 70%); }
+.pe-view { position: relative; border-radius: 8px; background: linear-gradient(180deg, #020622 0%, #01061f 55%, #000c2a 100%); }
+.pe-zone { --ptz: min(500px, calc(100vw - 32px), calc((100vh - 290px) * .794)); position: relative; width: var(--ptz); min-width: 240px; aspect-ratio: 896 / 1129; margin: 6px auto 4px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 3%, #000 88%, transparent); mask-image: linear-gradient(180deg, transparent, #000 3%, #000 88%, transparent); }
+.pe-zone[hidden], .pe-bonus[hidden] { display: none !important; }
+.pe-scene, .pe-top { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+.pe-top { z-index: 3; }
+.pe-disc { position: absolute; left: 5.8%; top: 16.1%; width: 88.39%; aspect-ratio: 1; z-index: 1; }
+.pe-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.pe-wheel { transform-origin: 150px 150px; }
+.pe-disc .pt-hl { fill-opacity: .3; animation: peHl .45s ease-in-out infinite alternate; }
+@keyframes peHl { to { fill-opacity: .6; } }
+.pe-ptr { position: absolute; left: 50%; top: 13.5%; z-index: 4; width: 7%; aspect-ratio: 1; translate: -50% 0; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, #fff, rgba(186, 230, 253, .6) 40%, transparent 70%); }
+.pe-hub { position: absolute; left: 50%; top: calc(16.1% + 70.15% / 2); z-index: 4; width: 14.8%; aspect-ratio: 1; transform: translate(-50%, -50%); display: grid; place-items: center; text-align: center; border-radius: 50%; font: 900 clamp(16px, 4vw, 26px)/1 KeCoin, 'Bebas Neue', Archivo, sans-serif; color: #fde047; text-shadow: 0 2px 4px #000, 0 0 8px #000; pointer-events: none; }
+.pe-hub .big { font: 900 clamp(20px, 5vw, 32px) 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 2px 4px #000, 0 0 10px #38bdf8; }
+.pe-hubfish { width: 120%; max-width: none; height: auto; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .7)); animation: ptPulse .6s ease-in-out infinite alternate; }
+.pe-lx { position: absolute; bottom: -12px; font: 900 13px KeCoin, Archivo, sans-serif; font-style: normal; color: #713f12; background: #fde047; border-radius: 3px; padding: 1px 6px; }
+.pe-flash { position: absolute; inset: -4%; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(255, 255, 255, .9), rgba(253, 224, 71, .4) 40%, transparent 70%); }
 .pe-flash.on { animation: peFlash .4s ease-out; }
 @keyframes peFlash { 10% { opacity: 1; } to { opacity: 0; } }
 .pe-strike { animation: peStrike .5s ease-out; }
 @keyframes peStrike { from { opacity: 0; } 30% { opacity: 1; } }
-.pe-spot.w b, .pe-spot.s b { color: #0f172a; text-shadow: none; font-size: 30px; }
-.pe-spot.w small, .pe-spot.s small { color: #0f172a; text-shadow: none; }
-.pe-spot b svg { filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .3)); }
+/* the betting spots: light glass, night glass, the 3 fish */
 .pe-spots { grid-template-columns: repeat(5, 1fr); }
-.pe-bonus[hidden], .pe-zone[hidden] { display: none !important; }
-.pe-bonus { position: relative; margin: 12px auto; width: 100%; max-width: 640px; box-sizing: border-box; border-radius: 4px; overflow: hidden; box-shadow: 0 16px 40px rgba(0, 0, 0, .6), inset 0 0 0 3px #7dd3fc; }
-.pe-sky { position: relative; height: 130px; background: linear-gradient(180deg, #38bdf8, #bae6fd); }
-.pe-sun { position: absolute; right: 24px; top: 16px; width: 54px; height: 54px; border-radius: 50%; background: radial-gradient(circle, #fff7d6, #fde047 60%, #f59e0b); box-shadow: 0 0 40px #fde047; }
-.pe-title { position: absolute; left: 128px; right: 84px; top: 12px; margin: 0; text-align: center; font: 900 clamp(17px, 4.4vw, 28px)/1.05 'Bebas Neue', Impact, sans-serif; letter-spacing: 1.5px; color: #fff; text-shadow: 0 3px 0 #0c4a6e, 0 0 14px rgba(12, 74, 110, .6); }
-.pe-fisher { position: absolute; left: 4px; bottom: -18px; width: 120px; z-index: 3; }
-.pe-fisher svg { width: 100%; display: block; }
-.pe-arm { transform-origin: 64px 70px; transition: transform .4s; }
-.pe-arm.cast { transform: rotate(14deg); }
-.pe-arm.reel { animation: peReel .25s ease-in-out infinite alternate; }
-@keyframes peReel { from { transform: rotate(-6deg); } to { transform: rotate(-16deg); } }
-.pe-water { position: relative; height: clamp(250px, 44vh, 340px); background: linear-gradient(180deg, #0ea5e9 0%, #0369a1 45%, #0c4a6e 100%); overflow: hidden; }
-.pe-waves { position: absolute; left: 0; right: 0; top: 0; height: 18px; background: radial-gradient(14px 10px at 14px 0, #bae6fd 98%, transparent) 0 0 / 28px 18px repeat-x; opacity: .8; animation: peWave 3s linear infinite; }
-@keyframes peWave { to { background-position: 28px 0; } }
-.pe-water::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(170deg, transparent 0 40px, rgba(255, 255, 255, .05) 40px 44px); }
-.pe-fishes { position: absolute; inset: 18px 0 0; }
-.pe-fish { position: absolute; left: 0; animation: peSwim var(--dur) ease-in-out var(--del) infinite alternate; filter: drop-shadow(0 4px 4px rgba(0, 0, 0, .35)); }
-.pe-fish svg { display: block; transform: scaleX(var(--dir)); }
-.pe-fish svg text { transform-box: fill-box; transform-origin: center; transform: scaleX(var(--dir)); }
-@keyframes peSwim { from { left: 1%; } to { left: calc(99% - var(--w)); } }
-.pe-fish.flee { transition: opacity .8s; opacity: .25; }
-.pe-fish.hooked { z-index: 2; filter: drop-shadow(0 0 12px #fde047); }
-.pe-fish.caught { animation: peCaught .6s cubic-bezier(.3, 1.6, .5, 1) forwards; }
-@keyframes peCaught { to { transform: scale(1.5) translateY(-10px); } }
-.pe-hook { position: absolute; z-index: 4; width: 10px; height: 14px; margin: -7px 0 0 -5px; border: 2px solid #e2e8f0; border-top: 0; border-radius: 0 0 3px 3px; }
-.pe-line { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
-.pe-say { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); z-index: 6; max-width: 92%; padding: 6px 14px; border-radius: 3px; background: rgba(8, 47, 73, .82); font-weight: 800; font-size: 14px; text-align: center; color: #e0f2fe; }
-@media (max-width: 600px) { .pe-spots { grid-template-columns: repeat(3, 1fr); } .pe-fisher { width: 92px; } .pe-sky { height: 110px; } .pe-title { left: 96px; right: 60px; } .pe-sun { width: 40px; height: 40px; right: 12px; } }
-/* La Pêche · images peintes du propriétaire (assets/games/peche) */
-.slot.g-peche > .slot-bg { background: linear-gradient(180deg, rgba(6, 4, 2, .55), rgba(6, 4, 2, .3) 40%, rgba(6, 4, 2, .7)), url(assets/games/peche/bg.webp?v=1) center / cover no-repeat !important; filter: none; }
-.g-peche > .slot-bg::after { display: none; }
-.g-peche .pe-zone { --ptz: min(560px, calc(100vw - 48px), calc(100vh - 300px)); }
-.g-peche .pe-zone .pt-svg { position: absolute; left: 14.5%; top: 14.5%; width: 71%; height: 71%; filter: none; }
-.pe-frame { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; user-select: none; filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .7)); }
-.g-peche .pe-ptr { top: 2%; z-index: 3; width: 7%; height: auto; background: none; clip-path: none; transform-origin: 50% 10%; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .6)); }
-.g-peche .pe-ptr img { display: block; width: 100%; height: auto; pointer-events: none; }
-.g-peche .pe-hub { z-index: 2; width: 24%; isolation: isolate; background: none !important; border: 0 !important; box-shadow: none !important; color: #fff; text-shadow: 0 2px 4px #000, 0 0 8px #000; }
-.g-peche .pe-hub::before { content: ''; position: absolute; inset: 0; z-index: -1; background: url(assets/games/peche/hub.webp?v=1) center / contain no-repeat; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .6)); animation: peGear 14s linear infinite; }
-.g-peche .pe-hub .big { color: #fff; text-shadow: 0 2px 4px #000, 0 0 10px #000; }
-.pe-hubfish { width: 82%; height: auto; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .7)); animation: ptPulse .6s ease-in-out infinite alternate; }
-@keyframes peGear { to { transform: rotate(1turn); } }
+.pe-spot.w b, .pe-spot.w small { color: #0f172a; text-shadow: none; }
+.pe-spot.w b { font-size: 30px; }
+.pe-spot.s b { font-size: 30px; }
 .pe-ico { width: 58px; height: 30px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45)); }
 .pe-hico { width: 22px; height: 14px; object-fit: contain; vertical-align: middle; }
-/* the pond */
-.g-peche .pe-bonus { background: #0e3b3a url(assets/games/peche/pond.webp?v=1) center / cover no-repeat; }
-.g-peche .pe-sky, .g-peche .pe-water { background: transparent; }
-.g-peche .pe-sun, .g-peche .pe-waves, .g-peche .pe-water::after { display: none; }
-.g-peche .pe-title { color: #fff; text-shadow: 0 2px 0 #0c4a6e, 0 0 12px rgba(0, 0, 0, .7); }
-.g-peche .pe-fisher { width: 96px; aspect-ratio: 330 / 453; bottom: -22px; left: 6px; }
-.pe-fisher img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: bottom; pointer-events: none; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .45)); }
-.pe-fisher .pe-f2 { display: none; transform: scaleX(-1); }
-.pe-fisher:has(.pe-arm.reel) .pe-f1 { display: none; }
-.pe-fisher:has(.pe-arm.reel) .pe-f2 { display: block; animation: peTug .22s ease-in-out infinite alternate; }
-@keyframes peTug { to { transform: scaleX(-1) rotate(-2deg) translateX(2px); } }
-.pe-fisher .pe-rod { position: absolute; left: 99%; top: 6%; width: 2px; height: 2px; }
-.pe-fisher:has(.pe-arm.reel) .pe-rod { left: 96%; top: 2%; }
-.pe-fisher .pe-arm { display: none; }
-.g-peche .pe-hook { width: 14px; height: 62px; margin: -2px 0 0 -7px; border: 0; border-radius: 0; background: url(assets/games/peche/float.webp?v=1) center top / contain no-repeat; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .5)); }
-.pe-fish .pe-fimg { display: block; width: var(--w); height: auto; transform: scaleX(var(--dir)); pointer-events: none; }
-.pe-fish > b { position: absolute; left: 50%; top: 52%; translate: -50% -50%; font: 900 clamp(12px, calc(var(--w) * .2), 22px)/1 KeCoin, 'Bebas Neue', Archivo, sans-serif; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .65), 0 0 6px rgba(0, 0, 0, .7); white-space: nowrap; pointer-events: none; }
-.pe-fish.gold .pe-fimg { filter: drop-shadow(0 0 8px rgba(253, 224, 71, .9)); }
-.pe-fish.gold > b { color: #fde047; }
-@media (max-width: 600px) { .g-peche .pe-fisher { width: 76px; bottom: -16px; } .pe-ico { width: 46px; } }
-/* the pond as a normal game scene: the whole painting is visible, the fisherman stands in the shallows on the left,
-   one fish waits in each painted ring (positions set by games/peche.js) */
-.g-peche .pe-bonus { aspect-ratio: 1600 / 729; max-width: 900px; background: #0e3b3a url(assets/games/peche/pond.webp?v=1) center / cover no-repeat; }
-.g-peche .pe-sky { position: absolute; inset: 0; height: auto; z-index: 3; pointer-events: none; background: none; }
-.g-peche .pe-water { position: absolute; inset: 0; height: auto; background: none; overflow: visible; }
-.g-peche .pe-fishes { inset: 0; }
-.g-peche .pe-fisher { left: 1.5%; top: 4%; bottom: auto; width: auto; height: 50%; aspect-ratio: 330 / 453; }
-.g-peche .pe-title { left: 16%; right: 4%; top: 3%; white-space: nowrap; font-size: clamp(13px, 2.6vw, 26px); text-shadow: 0 2px 0 #0c4a6e, 0 0 14px rgba(0, 0, 0, .8); }
-.g-peche .pe-say { bottom: auto; top: 15%; font-size: clamp(11px, 2vw, 14px); padding: 4px 12px; }
-.g-peche .pe-fish { animation: peBob 2.4s ease-in-out var(--del) infinite alternate; }
-.g-peche .pe-fish.hooked, .g-peche .pe-fish.caught { animation: none; }
-.g-peche .pe-fish.caught { animation: peCaught .6s cubic-bezier(.3, 1.6, .5, 1) forwards; }
-.g-peche .pe-hook { width: 1.4%; height: 7%; min-width: 8px; margin: -2px 0 0 -0.7%; }
-@keyframes peBob { from { transform: translateY(0) rotate(-2deg); } to { transform: translateY(-6%) rotate(2deg); } }
-@media (max-width: 600px) { .g-peche .pe-bonus { aspect-ratio: 1.8; } .g-peche .pe-fisher { width: auto; height: 50%; left: 0; top: 4%; } .g-peche .pe-title { left: 18%; right: 2%; font-size: 13px; letter-spacing: 1px; } .g-peche .pe-say { top: 14%; font-size: 10px; line-height: 1.25; padding: 2px 8px; max-width: 70%; } .g-peche .pe-fish > b { font-size: 10px; } }
+.pe-buy { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 10px auto 2px; padding: 9px 22px; border: 0; border-radius: 999px; cursor: pointer; font: 900 15px/1.1 Archivo, sans-serif; color: #fff;
+  background: linear-gradient(180deg, #38bdf8, #1d4ed8); box-shadow: 0 4px 0 #1e3a8a, 0 0 18px rgba(56, 189, 248, .45); }
+.pe-buy small { font-size: 10px; font-weight: 700; opacity: .85; }
+.pe-buy:active { transform: translateY(2px); box-shadow: 0 2px 0 #1e3a8a; }
+/* the fishing: one of the owner's 9 videos (small fish = rod, medium = crane, big = helicopter) */
+.pe-bonus { position: relative; margin: 6px auto 4px; height: min(calc(100vh - 230px), 760px); min-height: 340px; max-width: calc(100vw - 24px); aspect-ratio: 448 / 672; border-radius: 10px; overflow: hidden; background: #0b1626;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .6), 0 0 0 3px color-mix(in srgb, var(--fc, #38bdf8) 80%, #fff), 0 0 30px color-mix(in srgb, var(--fc, #38bdf8) 50%, transparent); }
+.pe-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pe-btop { position: absolute; left: 0; right: 0; top: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 8px 26px; background: linear-gradient(180deg, rgba(2, 8, 23, .75), transparent); pointer-events: none; }
+.pe-title { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; margin: 0; max-width: 100%; font: 900 clamp(18px, 5vw, 30px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 1.2px; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .6), 0 0 12px rgba(0, 0, 0, .7); }
+.pe-title em { font: 900 .8em KeCoin, Archivo, sans-serif; font-style: normal; color: #713f12; background: #fde047; border-radius: 4px; padding: 1px 6px; text-shadow: none; }
+.pe-tico { width: 38px; height: 22px; object-fit: contain; }
+.pe-size { padding: 4px 12px; border-radius: 999px; font: 900 12px/1.2 Archivo, sans-serif; letter-spacing: .5px; color: #fff; background: color-mix(in srgb, var(--fc, #38bdf8) 70%, #0f172a); box-shadow: 0 0 0 2px rgba(255, 255, 255, .5); animation: peSize .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.pe-size small { font-weight: 700; opacity: .85; }
+.pe-size.z3 { font-size: 15px; background: linear-gradient(90deg, #f59e0b, #dc2626); box-shadow: 0 0 0 2px #fde047, 0 0 20px #f59e0b; }
+@keyframes peSize { from { transform: scale(.4); opacity: 0; } }
+.pe-say { position: absolute; left: 50%; bottom: 96px; z-index: 2; translate: -50% 0; max-width: 90%; padding: 5px 12px; border-radius: 6px; background: rgba(8, 47, 73, .8); font-weight: 800; font-size: 13px; text-align: center; color: #e0f2fe; }
+.pe-plate { position: absolute; left: 50%; bottom: 14px; z-index: 2; translate: -50% 0; min-width: 52%; display: flex; flex-direction: column; align-items: center; padding: 6px 18px 8px; border-radius: 12px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, .9), rgba(2, 6, 23, .92)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--fc, #38bdf8) 80%, #fff), 0 8px 20px rgba(0, 0, 0, .5); }
+.pe-plate small { font: 800 10px Archivo, sans-serif; letter-spacing: 2px; color: #93c5fd; }
+.pe-plate b { white-space: nowrap; font: 900 clamp(30px, 8vw, 46px)/1 KeCoin, 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 0 12px var(--fc, #38bdf8); font-variant-numeric: tabular-nums; }
+.pe-plate.done b { color: #fde047; text-shadow: 0 2px 0 #92400e, 0 0 18px #f59e0b; }
+.pe-plate.max { background: linear-gradient(180deg, #78350f, #1c0a02); box-shadow: 0 0 0 3px #fde047, 0 0 40px #f59e0b; }
+.pe-plate.max b { font-size: clamp(26px, 7vw, 40px); animation: ptPulse .5s ease-in-out infinite alternate; }
+@media (max-width: 600px) { .pe-spots { grid-template-columns: repeat(3, 1fr); } .pe-ico { width: 46px; } .pe-bonus { height: min(calc(100vh - 200px), calc((100vw - 24px) * 1.5)); } .pe-say { font-size: 11px; bottom: 84px; } }
 
 /* ============ La Roue d’Or ============ */
 .g-roueor { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(251, 191, 36, .25), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(75, 85, 99, .35), transparent 70%), linear-gradient(180deg, #14110a 0%, #06070b 100%); }
@@ -12679,11 +12644,11 @@ const ORIGINALS = [
   {"id": "madwheel-online", "name": "La Roue Folle Online", "cat": "table", "tag": "En ligne", "sub": "La grande roue en multijoueur : elle part quand tout le salon est prêt", "colors": ["#ff3d6e", "#5a1bff"], "description": "La Roue Folle en multijoueur : chacun pose ses jetons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). Le Boost, la roue et les 4 bonus sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Boost ×2 à ×50", "4 bonus pour tout le salon", "Chat du salon"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "robots-online", "name": "La Course Online", "cat": "table", "tag": "En ligne", "sub": "Les 6 robots en multijoueur : la course part quand tout le salon est prêt", "colors": ["#22d3ee", "#0a1020"], "description": "La Course en multijoueur : chacun choisit son robot (vainqueur ou podium) et sa mise, puis appuie sur PRÊT. La course part dès que tout le salon est prêt (tout de suite si tu es seul) : mêmes formes, même course pour tout le monde, avec les paris des autres et le chat du salon.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Vainqueur ou podium", "Chat du salon"], "rtp": "≈ 95 %", "vol": 2},
   {"id": "plateau-online", "name": "Le Plateau Online", "cat": "table", "tag": "En ligne", "sub": "Roue et plateau aux dés en multijoueur", "colors": ["#22c55e", "#0c1a14"], "description": "Le Plateau en multijoueur : chacun mise sur 1, 2, 5, 10 ou les bonus et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La roue, la case Chance et les lancers de dés du plateau sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Plateau jusqu’à ×200 par case", "Case Chance ×10", "Chat du salon"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
-  {"id": "peche-online", "name": "La Pêche Online", "cat": "table", "tag": "En ligne", "sub": "La roue à éclairs et la pêche en multijoueur", "colors": ["#38bdf8", "#071a2e"], "description": "La Pêche en multijoueur : chacun mise sur les ×2 ou les poissons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). Les éclairs, la roue et le poisson pêché sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "4 éclairs à chaque lancer", "Poisson rouge jusqu’à ×5 000", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
+  {"id": "peche-online", "name": "La Pêche Online", "cat": "table", "tag": "En ligne", "sub": "La roue à éclairs et la pêche en multijoueur", "colors": ["#38bdf8", "#071a2e"], "description": "La Pêche en multijoueur : chacun mise sur les ×2 ou les poissons et appuie sur PRÊT, la roue en verre part dès que tout le salon est prêt (tout de suite si tu es seul). Les éclairs, la roue et le poisson pêché (à la canne, à la grue ou à l’hélicoptère) sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "4 éclairs à chaque lancer", "Petit, moyen ou gros poisson", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
   {"id": "roueor-online", "name": "La Roue d’Or Online", "cat": "table", "tag": "En ligne", "sub": "Une roue pour tout le salon, chacun son niveau", "colors": ["#fbbf24", "#14110a"], "description": "La Roue d’Or en multijoueur : chacun choisit son niveau et sa mise puis appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La même roue tombe dans l’or pour certains niveaux : ces joueurs jouent leur bonus des 24 cubes. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "3 niveaux", "Bonus des 24 cubes jusqu’à ×5 000", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×5 000"},
   {"id": "doublespin", "name": "La Double Bille", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
   {"id": "plateau", "name": "Le Plateau", "cat": "table", "tag": "Jeu de roue", "sub": "Roue, dés et plateau de multiplicateurs", "colors": ["#22c55e", "#0c1a14"], "description": "Une grande roue de 78 cases : mise sur 1, 2, 5, 10 ou sur les bonus 2 lancers et 4 lancers. Dans les bonus, lance 2 dés et fais avancer ton pion sur un plateau de 28 cases jusqu’à ×200. Et si la roue tombe sur Chance, elle repart et ce tour paie ×10 !", "features": ["Cases 1, 2, 5 et 10", "Bonus 2 lancers et 4 lancers", "Plateau jusqu’à ×200 par case", "Double = lancer en plus", "Case Chance ×10"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
-  {"id": "peche", "name": "La Pêche", "cat": "table", "tag": "Jeu de roue", "sub": "Roue à éclairs et pêche aux multiplicateurs", "colors": ["#38bdf8", "#071a2e"], "description": "Une roue de 54 cases : ×2 blanc, ×2 ciel et trois poissons. À chaque lancer, des éclairs multiplient des cases. Sur un poisson, direction l’étang : le pêcheur attrape un poisson et son multiplicateur, de ×3 à ×100 (bleu), ×8 à ×500 (orange) ou ×20 à ×5 000 (rouge) !", "features": ["Cases ×2 blanc et ×2 ciel", "4 éclairs à chaque lancer", "Poisson bleu ×3 à ×100", "Poisson orange ×8 à ×500", "Poisson rouge ×20 à ×5 000"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
+  {"id": "peche", "name": "La Pêche", "cat": "table", "tag": "Jeu de roue", "sub": "Roue en verre à éclairs et pêche sur la glace", "colors": ["#38bdf8", "#071a2e"], "description": "Une roue en verre de 54 cases : ×2 glace, ×2 nuit et trois poissons. À chaque lancer, des éclairs multiplient des cases. Sur un poisson, direction le trou dans la glace : petit poisson pêché à la canne, poisson moyen sorti par la grue ou gros poisson sorti par l’hélicoptère, avec un multiplicateur à la mesure du poisson, jusqu’au MAX WIN. Les pêches s’achètent aussi !", "features": ["Roue en verre à 54 cases", "4 éclairs à chaque lancer", "Petit poisson à la canne, moyen à la grue", "Gros poisson à l’hélicoptère jusqu’au MAX WIN", "Pêches bleue, orange et rouge à acheter"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
   {"id": "roueor", "name": "La Roue d’Or", "cat": "table", "tag": "Jeu de roue", "sub": "Simple, Moyen ou Compliqué : 24 cubes à ouvrir", "colors": ["#fbbf24", "#14110a"], "description": "Une roue noire et métal avec une part en or. Choisis ton niveau : Simple (beaucoup d’or, petits cubes), Moyen ou Compliqué (peu d’or, cubes jusqu’à ×5 000). Sur l’or, place au bonus des 24 cubes : regarde les multiplicateurs, ils se cachent et se mélangent, choisis le tien et décide à chaque étape si tu encaisses ou continues !", "features": ["3 niveaux : Simple, Moyen, Compliqué", "24 cubes montrés puis mélangés", "Encaisse l’offre ou continue", "Jusqu’à ×5 000", "Tours automatiques"], "rtp": "≈ 95 %", "vol": 5, "max": "×5 000"},
   {"id": "blackjack", "name": "Le 21", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 6 pour 5", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 6 pour 5.", "features": ["Doubler", "Séparer une paire", "Blackjack 6 pour 5", "Animations de cartes"], "rtp": "≈ 98 %", "vol": 1, "max": "×2,2"},
   {"id": "lightningbj", "name": "Le 21 Électrique", "cat": "table", "tag": "Cartes", "sub": "Multiplicateurs éclair jusqu’à ×1000", "colors": ["#3b82f6", "#0b0f3a"], "description": "Le blackjack frappé par la foudre : avant chaque distribution, les scores 17, 18, 19, 20 et 21 reçoivent un multiplicateur de ×1 à ×1000. Gagne ta main sur ce score et ton gain est multiplié tout de suite. Side bets Paires Parfaites, 21+3 et Bust It.", "features": ["Multiplicateurs ×1 à ×1000", "Gain multiplié dans la manche", "Paires Parfaites", "21+3", "Bust It", "Doubler et séparer"], "rtp": "≈ 97,5 %", "vol": 4, "max": "×1 500"},
@@ -13431,6 +13396,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'peche', date: '2026-11-15', title: 'Roue en verre et pêche sur la glace', items: ['Nouvelle roue en verre qui s’arrête au hasard sur n’importe quelle case', 'La pêche se joue en vidéo sur un lac gelé : petit poisson à la canne, poisson moyen à la grue, gros poisson à l’hélicoptère', 'Plus le poisson est gros, plus le multiplicateur est gros : le gros poisson peut donner le MAX WIN', 'Nouveau : « 🎣 Acheter une pêche » bleue, orange ou rouge'] },
+  { game: 'peche-online', date: '2026-11-15', title: 'Roue en verre et pêche sur la glace', items: ['La nouvelle roue en verre et les vidéos de pêche (canne, grue, hélicoptère) pour tout le salon'] },
   { game: 'anubis', date: '2026-11-15', title: 'Nouveaux décors animés et nouveaux cubes', items: ['Le jeu se joue dans un temple animé, avec ta grille posée dans le grand cadre doré', 'En haut : ton solde, le multiplicateur et ton gain ; toute la barre se touche (mise, bonus, SPIN, mise max)', 'Les bonus ont leur propre salle : les multiplicateurs des colonnes dans les cases du haut, les relances dans les 3 barres violettes', 'Jugement : les cubes tombent en glace et se changent en pierre en touchant le fond, avec leur multiplicateur bien écrit dessus', 'Crânes de pierre qui ajoutent, crânes dorés qui multiplient, cubes de lave : tous redessinés'] },
   { game: 'barillet', date: '2026-11-15', title: 'Nouveau décor animé : le saloon', items: ['La machine se joue dans un vrai saloon animé : la lanterne brille, le cow-boy attend au bar', 'Les rouleaux sont posés dans le grand cadre en bois, le revolver tire depuis la barre', 'En haut : ton solde, les balles du barillet et ton gain ; pendant le Duel : les tours, les cases en feu et le gain du duel', 'Toute la barre se touche : mise, menu des bonus, SPIN (le garder appuyé ouvre les tours auto), mise max', 'Plein écran sur tout l’écran, sur téléphone comme sur ordinateur'] },
   { game: 'redk', date: '2026-11-15', title: 'Ruby Link : les rangées explosent', items: ['Les rangées fermées du Ruby Link sont des planches de bois avec un cadenas doré', 'À chaque rangée gagnée (rubis ou REELS+) : le bois s’illumine, le cadenas éclate et les planches volent en éclats dans la fumée', 'Les nouvelles cases s’allument une par une'] },
@@ -16678,12 +16645,12 @@ const FILES = {
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '6e1081a69e'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '17ab6a334a'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '635896e420'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
   'robots-online': ['robots', 'games/impl/robots.js', 'RobotsOnlineGame', '620d0b9f44'],
   'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', '9e528dfdf5'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
-  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '17ab6a334a'],
+  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '635896e420'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '234dd4780f'],
   totemx: ['totemx', 'games/impl/totemx.js', 'TotemXGame', '9ed53a6ac8'],

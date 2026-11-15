@@ -258,6 +258,20 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`bg.webp` supprimé). Grille 6×5 dans le cadre (`.sk-win`), barre cliquable : BET − / +, BONUS MENU, SPIN, MAX BET ; plaque SOLDE ·
   GAIN (· TOURS) (`.sk-info`) ; Bal de la Reine annoncé et fini dans le cadre (`panel`). Plein écran : l'image couvre l'écran
   (`layout()`, zone gardée) ; téléphone plus fin que l'image : image calée en bas, ciel flouté au-dessus (`.sk-band`). Gains inchangés.
+- **La Pêche, roue en verre et pêche en vidéo** (`games/peche.js`, id `peche` et `peche-online`, demande du propriétaire du
+  15 novembre 2026) : **ses 10 vidéos** dans `tools/art/peche/` : `roue.mp4` (roue en verre qui s'arrête toujours au même
+  endroit) et 9 pêches sur un lac gelé `<bleu|orange|rouge>-<canne|grue|helico>.mp4`. `tools/art/peche/clean.py` : la roue est
+  **refaite pour tourner au hasard** (voulu par le propriétaire : « que ça tombe pas toujours sur la même case ») :
+  `roue.webp` (décor, roue rendue ronde ×2), `roue-disc.webp` (disque qui tourne, refait avec les 54 cases de `SEGS` à partir des
+  parts de verre sans poisson de la vidéo : clair = ×2 glace `w`, foncé = ×2 nuit `s`, moyen = poissons), `roue-top.webp`
+  (pointeur de cristal et moyeu, au-dessus) ; **si `SEGS` change, relancer `python3 tools/art/peche/clean.py --roue`**. Les
+  pêches → `assets/games/peche/<fb|fo|fr>-<1|2|3>.mp4` (+ affiche `.webp`, taille d'origine, ≈ 0,4 à 1 Mo). **Bonus** : la taille
+  du poisson est tirée au hasard (`fishDraw`, 62 / 30 / 8 %) : 1 canne = petit multiplicateur, 2 grue = moyen, 3 hélicoptère =
+  le plus gros, avec le **MAX WIN** (×25 000, `CAPX`) dans les gros poissons (`FISH` : [poids de la taille, [[×, poids]…]]) ;
+  multiplicateur qui défile pendant la vidéo puis s'arrête (`fishing`). **Achats** (voulu par le propriétaire) : pêche bleue /
+  orange / rouge à 8,75 / 17,4 / 52 × le jeton choisi (`PRICE`, `get bet()` = jeton ; bouton « 🎣 Acheter une pêche » et
+  « Bonus & menu », pas dans le salon en ligne), taille au hasard, sans éclair. Simulation `node tools/sim/peche.js` (lit le
+  moteur, 20 M lancers) : ≈ 95 % sur chaque case (comme avant), achats ≈ 88 %, hélicoptère 1 poisson sur 12,5.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10
