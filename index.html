@@ -6013,23 +6013,51 @@ html.light .slot small { color: inherit; }
 .rk-lc.boost { background: radial-gradient(circle, rgba(255, 255, 255, .25), transparent 70%); }
 .rk-lc.boost .rk-bimg { width: 92%; height: 92%; border-radius: 12px; }
 .rk-bn { position: relative; z-index: 2; align-self: end; margin-bottom: 8%; padding: 1px 6px; border-radius: 6px; font: 900 15cqh/1.1 Archivo, sans-serif; color: #fff; background: rgba(0, 0, 0, .65); text-shadow: 0 1px 2px #000; }
-.rk-lock { grid-column: 1 / -1; position: relative; z-index: 3; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 1px; border-radius: 10px; overflow: hidden;
-  background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0) 0 18%, rgba(0, 0, 0, .25) 18% 19%), linear-gradient(180deg, #5b5249, #3a332d 45%, #2a241f 55%, #4a423a); box-shadow: inset 0 0 0 2px rgba(250, 204, 21, .6), inset 0 0 0 4px rgba(60, 35, 5, .9), inset 0 8px 18px rgba(0, 0, 0, .55); }
-.rk-lock::before, .rk-lock::after { content: ''; position: absolute; left: 0; right: 0; height: 7px; background: repeating-linear-gradient(90deg, #a8a29e 0 9px, #57534e 9px 11px, #d6d3d1 11px 18px, #57534e 18px 20px); opacity: .7; }
-.rk-lock::before { top: 22%; } .rk-lock::after { bottom: 22%; }
-.rk-lock > * { position: relative; z-index: 1; }
-.rk-pad { font-style: normal; font-size: 6cqw; filter: drop-shadow(0 2px 3px #000); }
-.rk-lock span { display: flex; flex-direction: column; align-items: center; gap: .15em; padding: .5cqw 2.4cqw; border-radius: 8px; background: rgba(10, 6, 2, .78); box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .45); white-space: nowrap; line-height: 1.05; }
+.rk-lock { grid-column: 1 / -1; position: relative; z-index: 3; display: flex; align-items: center; justify-content: center; gap: 2.4cqw; margin: 0 -1px; border-radius: 6px; container-type: size;
+  background: linear-gradient(180deg, #2a1607, #1a0d03); box-shadow: 0 3px 8px rgba(0, 0, 0, .6); }
+/* two wooden planks with their grain and dark nails */
+.rk-plank { position: absolute; left: 0; right: 0; height: 46%; border-radius: 4px;
+  background: radial-gradient(circle at 4% 50%, #1c0e03 0 2.2cqh, transparent 2.6cqh), radial-gradient(circle at 96% 50%, #1c0e03 0 2.2cqh, transparent 2.6cqh),
+    repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 5px, rgba(60, 28, 6, .35) 5px 6px, rgba(0, 0, 0, 0) 6px 11px, rgba(255, 210, 150, .08) 11px 12px),
+    linear-gradient(180deg, #b27a3e, #8b5a2b 40%, #6e4320 75%, #4f2f14);
+  box-shadow: inset 0 1px 0 rgba(255, 220, 160, .45), inset 0 -2px 0 rgba(30, 14, 3, .7), 0 2px 3px rgba(0, 0, 0, .5); transition: filter .3s, box-shadow .3s; }
+.rk-plank:nth-of-type(1) { top: 3%; transform: rotate(-.5deg); }
+.rk-plank:nth-of-type(2) { bottom: 3%; transform: rotate(.4deg); }
+/* iron straps with rivets */
+.rk-strap { position: absolute; top: -2%; bottom: -2%; width: 4.2%; transform: translateX(-50%); border-radius: 2px;
+  background: radial-gradient(circle at 50% 18%, #d6d3d1 0 14%, transparent 18%), radial-gradient(circle at 50% 82%, #d6d3d1 0 14%, transparent 18%), linear-gradient(90deg, #3f3f46, #71717a 45%, #27272a); box-shadow: 0 0 0 1px #18181b, 0 2px 3px rgba(0, 0, 0, .6); }
+/* golden padlock drawn in CSS: body + shackle */
+.rk-padl { position: relative; z-index: 2; flex: none; width: 7.5cqw; height: 58cqh; max-width: 54px; margin-top: 18cqh; border-radius: 22% 22% 30% 30%; font-style: normal;
+  background: radial-gradient(circle at 50% 46%, #3b2002 0 9%, transparent 11%), linear-gradient(180deg, transparent 50%, #3b2002 50% 70%, transparent 70%) 50% 0 / 6% 100% no-repeat, linear-gradient(160deg, #fff3b0, #fbbf24 35%, #d97706 70%, #92400e);
+  box-shadow: inset 0 0 0 1.5px rgba(80, 40, 0, .8), inset 0 2px 0 rgba(255, 255, 255, .6), 0 3px 5px rgba(0, 0, 0, .6); }
+.rk-shk { position: absolute; left: 18%; right: 18%; bottom: 88%; height: 52%; border: 3px solid #d4a017; border-bottom: 0; border-radius: 50% 50% 0 0 / 80% 80% 0 0; box-shadow: inset 0 1px 0 #fff3b0, 0 -1px 0 #6b3a03; }
+.rk-lock > span { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: .15em; padding: .5cqw 2.4cqw; border-radius: 8px; background: rgba(20, 9, 2, .82); box-shadow: inset 0 0 0 1px rgba(250, 204, 21, .5), 0 2px 6px rgba(0, 0, 0, .6); white-space: nowrap; line-height: 1.05; }
 .rk-lock b { font-size: 4.2cqw; letter-spacing: .05em; color: transparent; background: var(--rk-gold); -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: .5px #3b2002; filter: drop-shadow(0 1.5px 0 #3b2002); }
 .rk-lock em { font: 800 3.1cqw/1.1 Archivo, sans-serif; font-style: normal; color: #fde68a; }
 .rk-lock em b { font-size: 1.15em; color: #fca5a5; background: none; -webkit-text-stroke: 0; filter: none; }
-.rk-lock:not(.next) { filter: brightness(.7); }
+.rk-lock:not(.next):not(.charge) > :not(span) { filter: brightness(.72); }
+.rk-lock.next .rk-padl { animation: rkPadNext 1.4s ease-in-out infinite; }
+@keyframes rkPadNext { 0%, 70%, 100% { transform: none; } 76% { transform: rotate(-8deg); } 84% { transform: rotate(7deg); } 92% { transform: rotate(-4deg); } }
 .rk-lock.next { animation: rkNext 1.2s ease-in-out infinite alternate; }
-@keyframes rkNext { to { box-shadow: inset 0 0 0 2px #fde047, inset 0 0 0 4px rgba(60, 35, 5, .9), inset 0 8px 18px rgba(0, 0, 0, .55), 0 0 16px rgba(250, 204, 21, .6); } }
-.rk-lock.break { animation: rkBreak .6s ease-in both; }
-@keyframes rkBreak { 0% { transform: none; } 20% { transform: translateX(-4px) rotate(-.6deg); } 40% { transform: translateX(4px) rotate(.6deg); filter: brightness(1.8); } 60% { transform: translateX(-3px); } 100% { transform: none; filter: brightness(2.2); } }
-.rk-lock.gone { animation: rkGone .55s ease-in forwards; pointer-events: none; }
-@keyframes rkGone { to { opacity: 0; transform: translateY(-40%) scaleY(.4); visibility: hidden; } }
+@keyframes rkNext { to { box-shadow: 0 0 0 2px rgba(253, 224, 71, .7), 0 0 16px rgba(250, 204, 21, .6); } }
+/* the explosion: gold glow, padlock shaking, then the white flash */
+.rk-lock.charge { animation: rkCharge .62s ease-in both; }
+.rk-lock.charge .rk-plank { filter: sepia(1) saturate(3) brightness(1.55) hue-rotate(-8deg); box-shadow: inset 0 0 14px rgba(255, 247, 200, .9), 0 0 18px rgba(250, 204, 21, .9); }
+.rk-lock.charge .rk-padl { animation: rkPadShake .1s linear infinite; filter: brightness(1.4) drop-shadow(0 0 10px #fde047); }
+.rk-lock.charge > span { opacity: 0; transition: opacity .25s; }
+.rk-lock.flash .rk-padl { filter: brightness(3) drop-shadow(0 0 22px #fff); }
+@keyframes rkCharge { 0% { box-shadow: 0 0 0 rgba(250, 204, 21, 0); } 100% { box-shadow: 0 0 34px 8px rgba(250, 204, 21, .9), 0 0 0 2px #fde047; } }
+@keyframes rkPadShake { 0% { transform: rotate(-9deg) translateY(-1px); } 50% { transform: rotate(9deg) translateY(1px); } 100% { transform: rotate(-9deg) translateY(-1px); } }
+.rk-lock.gone { visibility: hidden; pointer-events: none; }
+.rk-blast { position: absolute; z-index: 6; pointer-events: none; container-type: size; }
+.rk-blast > i { position: absolute; font-style: normal; }
+.rk-bstar { left: 50%; top: 50%; width: 220cqh; height: 220cqh; border-radius: 50%; mix-blend-mode: screen;
+  background: radial-gradient(circle, #fff 0 12%, rgba(255, 244, 190, .95) 20%, rgba(250, 204, 21, .5) 38%, transparent 62%), repeating-conic-gradient(rgba(255, 250, 220, .85) 0 4deg, transparent 4deg 22deg);
+  -webkit-mask: radial-gradient(circle, #000 30%, transparent 70%); mask: radial-gradient(circle, #000 30%, transparent 70%); }
+.rk-blast .rk-fly { left: 50%; top: 50%; width: 7.5cqw; height: 58cqh; max-width: 54px; margin: 0; }
+.rk-chip { border-radius: 2px 4px 1px 5px; background: linear-gradient(180deg, #c48a48, #8b5a2b 50%, #4f2f14); box-shadow: inset 0 1px 0 rgba(255, 220, 160, .5), 0 2px 3px rgba(0, 0, 0, .5); clip-path: polygon(0 8%, 70% 0, 100% 30%, 92% 100%, 18% 90%); }
+.rk-chip.rk-half { clip-path: polygon(0 0, 88% 0, 100% 35%, 90% 60%, 97% 100%, 0 100%); border-radius: 4px; background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0) 0 5px, rgba(60, 28, 6, .35) 5px 6px), linear-gradient(180deg, #b27a3e, #8b5a2b 40%, #6e4320 75%, #4f2f14); }
+.rk-smoke { border-radius: 50%; background: radial-gradient(circle at 45% 45%, rgba(240, 232, 225, .95), rgba(190, 175, 170, .6) 45%, rgba(120, 100, 110, 0) 70%); }
 
 /* big words over the machine */
 .rk-word { position: absolute; left: 50%; top: 45%; z-index: 30; transform: translate(-50%, -50%); opacity: 0; pointer-events: none; white-space: nowrap; text-align: center; line-height: .95; font-size: clamp(30px, 8vw, 66px); letter-spacing: .02em; color: transparent; background: var(--rk-gold); -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 1.5px #4a2502; filter: drop-shadow(0 2px 0 #6e3f04) drop-shadow(0 4px 0 #3e2302) drop-shadow(0 8px 14px rgba(0, 0, 0, .8)); }
@@ -13192,6 +13220,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'redk', date: '2026-11-15', title: 'Ruby Link : les rangées explosent', items: ['Les rangées fermées du Ruby Link sont des planches de bois avec un cadenas doré', 'À chaque rangée gagnée (rubis ou REELS+) : le bois s’illumine, le cadenas éclate et les planches volent en éclats dans la fumée', 'Les nouvelles cases s’allument une par une'] },
   { game: 'dragons', date: '2026-11-15', title: 'Décor animé pour L’Hydre', items: ['Le jeu se passe dans l’antre des dragons : le grand dragon rouge bouge, le feu et la lave s’animent', 'Chaque paire de demi-têtes a sa case dans le cadre en écailles de dragon', 'Les montants des jackpots MINI, MAJEUR et JACKPOT sous leurs plaques, ils suivent ta mise', 'Nouvelle barre : BET, BONUS MENU, le gros bouton SPIN et MAX BET', 'Un décor fait pour l’ordinateur et un autre pour le téléphone tenu droit, en plein écran sur tout l’écran'] },
   { game: 'redk', date: '2026-11-15', title: 'Décor animé pour Diamants REDK', items: ['Le jeu se passe au fond de la mine de diamants : les rouleaux dans le grand cadre de pierres précieuses, les wagons de gemmes passent', 'Les montants des jackpots MINI, MAJOR et GRAND sous leurs plaques, ils suivent ta mise', 'Nouvelle barre : BET, BONUS MENU, le gros bouton SPIN et MAX BET', 'Le RUBY LINK et La Pyramide d’or se jouent dans le cadre, les boosters juste à côté', 'Un décor fait pour l’ordinateur et un autre pour le téléphone tenu droit, en plein écran sur tout l’écran'] },
   { game: 'huff', date: '2026-11-15', title: 'Décor animé pour Le Loup 2.0', items: ['Le jeu se passe dans la maison des trois petits cochons : les rouleaux dans sa fenêtre étoilée, le décor bouge', 'Les montants des jackpots MINI, MAJOR et GRAND sous leurs plaques, ils suivent ta mise', 'Nouvelle barre : BET, BONUS MENU, le gros bouton SPIN et MAX BET', 'Un décor fait pour l’ordinateur et un autre pour le téléphone tenu droit, en plein écran sur tout l’écran'] },
@@ -16448,7 +16477,7 @@ const FILES = {
   viking: ['viking', 'games/impl/viking.js', 'VikingGame', '061a87ba47'],
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', 'a74c734b15'],
   filon: ['filon', 'games/impl/filon.js', 'FilonGame', '45904335f9'],
-  redk: ['redk', 'games/impl/redk.js', 'RedkGame', 'd88cfbb20f'],
+  redk: ['redk', 'games/impl/redk.js', 'RedkGame', '427f04891a'],
   pirates: ['pirates', 'games/impl/pirates.js', 'PiratesGame', '01751bea92'],
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '1025072609'],
   boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '48602d9af5'],

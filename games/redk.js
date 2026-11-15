@@ -175,6 +175,9 @@ const img = (n, cls = 'rk-img') => `<img class="${cls}" src="${src(n)}" alt="" d
 const NAMES = ['10', 'Valet', 'Dame', 'Roi', 'As', 'Scarabée sacré', 'Œil d’Horus', 'Anubis', 'Pharaon'];
 const RUBY_C = ['#fecaca', '#ef4444', '#b91c1c', '#fff'];
 const GOLD = ['#fde047', '#facc15', '#fff7d6', '#f59e0b'];
+// locked row of the Ruby Link: two wooden planks, iron straps, a golden padlock and what it takes to open it
+const LOCK_HTML = '<i class="rk-plank"></i><i class="rk-plank"></i><i class="rk-strap" style="left:9%"></i><i class="rk-strap" style="left:50%"></i><i class="rk-strap" style="left:91%"></i>'
+  + '<i class="rk-padl"><i class="rk-shk"></i></i><span><b>POUR DÉVERROUILLER</b><em></em></span>';
 const JP_NAME = { mini: 'MINI', minor: 'MINOR', major: 'MAJOR', grand: 'GRAND' };
 const BOOST = {
   spin: { n: 'SPIN+', pic: 'b-spin', c: '#22c55e', say: '+1 RE-SPIN' },
@@ -561,19 +564,16 @@ class RedkGame extends BaseGame {
     let h = '';
     for (let i = 0; i < E.BN; i++) { const c = Math.floor(i / E.BR), r = i % E.BR; h += `<div class="rk-lc" style="grid-column:${c + 1};grid-row:${r + 1}"><i class="rk-alc"></i></div>`; }
     L.innerHTML = h;
-    this.lockEls = [0, 1, 2].map((r) => { const n = document.createElement('div'); n.className = 'rk-lock'; n.style.gridRow = `${r + 1}`; n.innerHTML = '<i class="rk-pad">🔒</i><span><b>POUR DÉVERROUILLER</b><em></em></span>'; L.appendChild(n); return n; });
+    this.lockEls = [0, 1, 2].map((r) => { const n = document.createElement('div'); n.className = 'rk-lock'; n.style.gridRow = `${r + 1}`; n.innerHTML = LOCK_HTML; L.appendChild(n); return n; });
     this.rows = rows;
     this.paintLocks();
   }
   open(i) { return (i % E.BR) >= E.BR - this.rows; }
-  paintLocks(fresh = false) {
+  paintLocks() {
     const have = Object.keys(this.lv).length;
     this.lockEls.forEach((n, r) => {
       const locked = r < E.BR - this.rows;
-      if (!locked && !n.classList.contains('gone')) {
-        n.classList.add('gone');
-        if (fresh) { const p = center(n); fx.burst(p.x, p.y, 40, GOLD, 9); }
-      }
+      if (!locked && !n.classList.contains('gone')) n.classList.add('gone');
       if (!locked) return;
       const next = r === E.BR - this.rows - 1;
       n.classList.toggle('next', next);
@@ -682,15 +682,77 @@ class RedkGame extends BaseGame {
   async unlockRows(rows) {
     while (this.rows < rows && !this.dead) {
       this.rows++;
-      const n = this.lockEls[E.BR - this.rows];
-      this.word('RANGÉE DÉVERROUILLÉE !', 'unlock');
-      sfx.huff?.(); sfx.upgrade(); this.shake(); vibe([40, 40, 80]);
-      n.classList.add('break');
-      await this.wait(this.turbo ? 300 : 650);
-      this.paintLocks(true);
-      await this.wait(this.turbo ? 200 : 500);
+      await this.blast(this.lockEls[E.BR - this.rows], E.BR - this.rows);
     }
     this.paintLocks();
+  }
+
+  // The planks of a locked row explode (owner's videos of 15 November 2026): the wood glows gold, the padlock
+  // shakes and bursts in a white star, the planks fly apart in splinters with smoke and sparks, then the cells of
+  // the new row light up one after the other. Played for every row that opens (rubies counted or REELS+).
+  async blast(n, r) {
+    if (!n || n.classList.contains('gone')) return;
+    const fast = this.turbo, L = this.linkEl, k = fast ? 0.55 : 1;
+    n.classList.remove('next'); n.classList.add('charge');
+    sfx.tease?.(); vibe([20, 30, 20]);
+    await this.wait(620 * k);
+    if (this.dead) return;
+    // the padlock bursts
+    const pad = n.querySelector('.rk-padl'), pp = center(pad || n);
+    n.classList.add('flash');
+    sfx.puff?.(); sfx.upgrade(); this.flash('rgba(255,236,170,.55)'); this.shake(); vibe([60, 30, 120]);
+    fx.burst(pp.x, pp.y, 34, ['#fff', '#fde047', '#facc15'], 10);
+    await this.wait(170 * k);
+    // the planks explode
+    const lay = document.createElement('div');
+    lay.className = 'rk-blast';
+    Object.assign(lay.style, { left: `${n.offsetLeft}px`, top: `${n.offsetTop}px`, width: `${n.offsetWidth}px`, height: `${n.offsetHeight}px` });
+    const W = n.offsetWidth, H = n.offsetHeight, R = (a, b) => a + Math.random() * (b - a);
+    const add = (cls, css) => { const e = document.createElement('i'); e.className = cls; Object.assign(e.style, css); lay.appendChild(e); return e; };
+    const anims = [], go = (e, k, o) => { const a = e.animate(k, { fill: 'forwards', ...o }); anims.push(a); return a; };
+    // star of light where the padlock was
+    const star = add('rk-bstar', {});
+    go(star, [{ transform: 'translate(-50%,-50%) scale(.2) rotate(0)', opacity: 1 }, { transform: 'translate(-50%,-50%) scale(1.5) rotate(40deg)', opacity: 1, offset: 0.35 }, { transform: 'translate(-50%,-50%) scale(2.1) rotate(70deg)', opacity: 0 }], { duration: 650 * k, easing: 'ease-out' });
+    // the padlock flies off
+    const pl = add('rk-padl rk-fly', {});
+    pl.innerHTML = '<i class="rk-shk"></i>';
+    const pdx = R(-0.25, 0.25) * W;
+    go(pl, [{ transform: 'translate(-50%,-50%)' }, { transform: `translate(calc(-50% + ${pdx * 0.5}px), calc(-50% - ${H * 1.4}px)) rotate(${R(-200, 200)}deg)`, offset: 0.35 }, { transform: `translate(calc(-50% + ${pdx}px), calc(-50% + ${H * 4}px)) rotate(${R(-520, 520)}deg)`, opacity: 0 }], { duration: 1100 * k, easing: 'cubic-bezier(.3,.1,.6,1)' });
+    // each plank breaks in two big halves that fly apart
+    for (let j = 0; j < 4; j++) {
+      const left = j % 2 === 0, top = j < 2, w = W * R(0.42, 0.5), h = H * 0.46;
+      const e = add('rk-chip rk-half', { left: left ? '0' : `${W - w}px`, top: top ? `${H * 0.03}px` : `${H * 0.51}px`, width: `${w}px`, height: `${h}px` });
+      const dx = (left ? -1 : 1) * R(0.25, 0.5) * W, rot = (left ? -1 : 1) * R(25, 70);
+      go(e, [{ transform: 'none', opacity: 1 }, { transform: `translate(${dx * 0.5}px, ${-H * R(0.6, 1.4)}px) rotate(${rot * 0.5}deg)`, opacity: 1, offset: 0.35 }, { transform: `translate(${dx}px, ${H * R(3, 5)}px) rotate(${rot * 2}deg)`, opacity: 0 }], { duration: R(1000, 1300) * k, easing: 'cubic-bezier(.3,.2,.6,1)' });
+    }
+    // wooden splinters: up, then they fall
+    for (let j = 0; j < 26; j++) {
+      const x = R(0.03, 0.97) * W, y = R(0.15, 0.85) * H, w = R(0.05, 0.14) * W, h = R(0.2, 0.5) * H;
+      const e = add('rk-chip', { left: `${x - w / 2}px`, top: `${y - h / 2}px`, width: `${w}px`, height: `${h}px` });
+      const dx = (x / W - 0.5) * R(0.5, 1.1) * W + R(-30, 30), up = R(0.8, 2.6) * H, rot = R(-720, 720);
+      go(e, [{ transform: 'none', opacity: 1 }, { transform: `translate(${dx * 0.55}px, ${-up}px) rotate(${rot * 0.4}deg)`, opacity: 1, offset: 0.4 }, { transform: `translate(${dx}px, ${H * R(2.5, 5)}px) rotate(${rot}deg)`, opacity: 0 }], { duration: R(900, 1350) * k, easing: 'cubic-bezier(.25,.6,.5,1)' });
+    }
+    // smoke
+    for (let j = 0; j < 9; j++) {
+      const x = (j + 0.5) / 9 * W + R(-12, 12), s = R(0.9, 1.5) * H;
+      const e = add('rk-smoke', { left: `${x - s / 2}px`, top: `${H / 2 - s / 2}px`, width: `${s}px`, height: `${s}px` });
+      go(e, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1.1)', opacity: 0.85, offset: 0.2 }, { transform: `translate(${R(-20, 20)}px, ${-H * R(0.4, 1)}px) scale(${R(1.8, 2.5)})`, opacity: 0 }], { duration: R(1100, 1600) * k, easing: 'ease-out' });
+    }
+    L.appendChild(lay);
+    n.classList.add('gone');
+    for (let j = 0; j < 5; j++) { const p = center(this.linkCell(j * E.BR + r)); fx.burst(p.x, p.y, 10, j % 2 ? GOLD : ['#f0abfc', '#e879f9', '#fff'], 7); }
+    this.word('RANGÉE<br>DÉVERROUILLÉE !', 'unlock');
+    await this.wait(380 * k);
+    // the cells of the new row light up
+    for (let j = 0; j < 5 && !this.dead; j++) {
+      const c = this.linkCell(j * E.BR + r);
+      c?.animate([{ boxShadow: '0 0 0 0 rgba(240,171,252,0)', filter: 'brightness(1)' }, { boxShadow: '0 0 22px 4px rgba(240,171,252,.95), inset 0 0 18px rgba(255,255,255,.8)', filter: 'brightness(2.2)', offset: 0.3 }, { boxShadow: '0 0 0 0 rgba(240,171,252,0)', filter: 'brightness(1)' }], { duration: 700 * k, easing: 'ease-out' });
+      sfx.tick();
+      await this.wait(70 * k);
+    }
+    await this.wait(380 * k);
+    Promise.all(anims.map((a) => a.finished.catch(() => 0))).then(() => lay.remove());
+    setTimeout(() => lay.remove(), 2500);
   }
 
   // One re-spin: the open empty cells turn, column after column they stop; new rubies drop, boosters act.

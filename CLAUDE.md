@@ -117,6 +117,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   compteur du bonus à la place de SOLDE · GAIN ; plein écran `layout()` comme L'Olympe. **Piège** : le booster REELS+ porte
   aussi la classe `.reels` du site (grille 5/3) : `.rk-art .rk-bst` remet `display: flex; aspect-ratio: auto`. Sa vidéo BONUS `intro.mp4` (`bonusIntro` : fondu au noir → vidéo plein écran, sur téléphone en largeur
   ×1,65 sur la même vidéo floutée pour que le mot BONUS soit entier → fondu au noir → le bonus ; `blackout()`).
+  **Rangées verrouillées du Ruby Link** (vidéos du propriétaire du 15 novembre 2026) : planches de bois, ferrures et cadenas doré en CSS (`LOCK_HTML`, `.rk-plank` / `.rk-strap` / `.rk-padl`) ; chaque rangée qui s'ouvre (rubis comptés ou REELS+) passe par `blast()` : bois doré + cadenas qui tremble, éclair blanc, planches coupées en deux et échardes qui volent (calque `.rk-blast`, animations `fill: 'forwards'`), fumée, puis les cases de la rangée s'allument.
   5×3, 20 lignes ; rubis avec leur valeur **en KE** (`kfmt`). **Voulu par le propriétaire** : le **RUBY LINK** (6 rubis ;
   grille 5×6, 3 rangées verrouillées ouvertes à 11 / 16 / 21 rubis ou par REELS+, boosters SPIN+ / REELS+ / MULTI+ /
   VALUE+, MINI / MINOR / MAJOR, GRAND ×1 000 ; **SPIN+ = un re-spin de plus à chaque remise à zéro jusqu'à la fin
