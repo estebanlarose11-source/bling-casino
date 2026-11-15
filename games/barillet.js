@@ -132,9 +132,10 @@ return { COLS, RO, OFF, N, CAPX, WAYS, NS, WILD, SC, BULLET, PAYS, FS_FOR, RETRI
 
 // ---- games/impl/barillet.js ----
 __mods['games/impl/barillet.js'] = (() => {
-// La Roulette Russe: an old saloon, 5 reels of 3-4-4-4-3 cells (576 ways, laid out like the owner's reference: wooden
-// reels, the two outer reels set apart, the WILD covering its reel), the owner's painted symbols (assets/games/barillet).
-// Beside the reels, a full revolver barrel: every shot takes one bullet out (it reloads when empty). A line win with a
+// La Roulette Russe: an old saloon, 5 reels of 3-4-4-4-3 cells (576 ways, the WILD covering its reel), the owner's
+// painted symbols (assets/games/barillet), in his animated saloon (15 November 2026: the reels on his painted cells,
+// SOLDE / BARILLET / GAIN on his plates, his bar made clickable, the shots leave from his revolver).
+// The barrel (6 bullets, on the middle plate): every shot takes one bullet out (it reloads when empty). A line win with a
 // golden bullet on the reels makes the revolver fire 1 to 3 bullets at the winning cells: they catch fire with a
 // multiplier, and the multipliers of a line multiply each other. LE DUEL: big bullets, the burning cells stay on fire.
 // At the end of the duel, the Russian roulette (1 to 5 bullets to multiply the win… or lose it all).
@@ -149,9 +150,16 @@ const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el } = __mods['ui.js'];
 const { warm } = __mods['core/pixi.js'];
+const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
 
 /* ---------- the owner's symbols ---------- */
-const IMG_V = 2;
+const IMG_V = 3;
+// The whole machine: the owner's 2 animated saloons of 15 November 2026 (fond-large.mp4 for computers and wide screens,
+// fond-haut.mp4 for phones held upright: the cowboy at the bar, the lantern, 3 plates, a wooden frame with painted cells,
+// his bar and a revolver), cleaned by tools/art/barillet/clean.py: a 121-frame loop (24 images/s) + its first 12 frames
+// again (core/videobg.js). The tall video paints 3-5-5-5-3 cells: there the reels wear the painted cell (cell.webp) and
+// cover the grid, 4 cells on the middle reels like the game.
+const LOOP = 121 / 24;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const FILE = ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 's8', 's9', 's10'];
 const NAMES = ['10', 'Valet', 'Dame', 'Roi', 'As', 'Whisky', 'Montre à gousset', 'Lingots d’or', 'Étoile du shérif', 'Revolver', 'Le Cow-boy'];
@@ -255,17 +263,22 @@ class BarilletGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.barillet,
-      frameCls: 'rr-frame',
-      stage: `<div class="rr-stage">
-        <div class="rr-board">
-          <div class="rr-machine">
-            <div class="rr-top"><span class="rr-ways">${WAYS}<small>FAÇONS</small></span><span class="rr-plaque">ROULETTE RUSSE</span><span class="rr-brand"><i class="logo-mark">S</i><span class="rr-max">MAX<b>×${CAPX.toLocaleString('fr-FR')}</b></span></span></div>
-            <div class="rr-reels"></div>
-            <i class="rr-corner l">${img('bullet')}</i><i class="rr-corner r">${img('bullet')}</i>
-          </div>
-          <div class="rr-side"><div class="rr-barrel">${barrelSVG()}<i class="rr-muzzle"></i></div><div class="rr-mult"><small>Barillet</small><b>6</b><em>balles</em></div></div>
-        </div>
-      </div>`,
+      // the owner's saloon: the reels on his painted cells, our plates (SOLDE · BARILLET · GAIN, the duel in the duel)
+      // on his 3 plates, his bar made clickable (BET − / +, BONUS MENU, SPIN (hold = auto), MAX BET); the shots leave
+      // from his revolver
+      stage: `<div class="rr-scene rr-l"><i class="rr-safe"></i><div class="rr-art">
+          <video class="rr-vid" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+          ${[0, 1, 2].map((k) => `<div class="rr-plate p${k}"><small></small><b></b></div>`).join('')}
+          <div class="rr-win"><div class="rr-reels"></div></div>
+          <div class="rr-barrel"><i class="rr-muzzle"></i></div>
+          <button class="rr-hot rr-bm" type="button" data-act="bet-" aria-label="Diminuer la mise">−</button>
+          <b class="rr-bet"></b>
+          <button class="rr-hot rr-bp" type="button" data-act="bet+" aria-label="Augmenter la mise">+</button>
+          <button class="rr-hot rr-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+          <button class="rr-hot rr-spin" type="button" data-act="main" aria-label="Lancer (maintenir : tours auto)"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          <span class="rr-hold">MAINTENIR POUR AUTO</span>
+          <button class="rr-hot rr-max" type="button" data-act="max" aria-label="Mise maximum"></button>
+        </div><button class="rr-hot rr-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       buys: [
         { id: 'fs', icon: '🔫', label: 'LE DUEL · 10 tours', desc: 'Grosses balles à chaque gain : les cases en feu restent jusqu’à la fin', cost: (b) => b * BUY_COST },
         { id: 'fsx', icon: '💀', label: `LE DUEL EXTRÊME · ${TUNE.xSpins} tours`, desc: `${TUNE.xBurn.reduce((a, x) => a + x[1], 0)} cases déjà en feu (${TUNE.xBurn.flatMap(([m, n]) => Array(n).fill(xs(m))).join(', ')})`, cost: (b) => b * BUY_X_COST },
@@ -273,9 +286,8 @@ class BarilletGame extends BaseGame {
       hello: `${WAYS} façons de gagner · une balle d’or + une connexion = le revolver tire`,
     });
     this.slotEl.style.setProperty('--rr-bg', `url("${asset('assets/games/barillet/bg.webp')}")`);
-    this.slotEl.style.setProperty('--rr-planks', `url("${asset('assets/games/barillet/planks.webp')}")`);
-    this.slotEl.style.setProperty('--rr-wood', `url("${asset('assets/games/barillet/frame.webp')}")`);
-    [...FILE, 'wild', 'wildtall', 'scat', 'bullet', 'barrel', 'prime'].forEach((f) => { new Image().src = asset(`assets/games/barillet/${f}.webp`); });
+    this.slotEl.style.setProperty('--rr-cell', `url("${asset('assets/games/barillet/cell.webp')}")`);
+    [...FILE, 'wild', 'wildtall', 'scat', 'bullet', 'barrel', 'prime', 'cell'].forEach((f) => { new Image().src = asset(`assets/games/barillet/${f}.webp`); });
     this.reels = new ShapedReels(this.q('.rr-reels'), { cols: COLS, game: this, art: cellArt, cls: cellCls, random: (c) => (c === 0 || c === 4 ? draw(c, false) : (() => { const v = draw(c, false); return v === WILD ? 0 : v; })()) });
     // over each reel: its fire cells and the expanding WILD panel
     this.fire = [];
@@ -289,20 +301,95 @@ class BarilletGame extends BaseGame {
     this.reels.setAll(Array.from({ length: N }, (_, i) => { const v = draw(colOf(i), false); return v === WILD ? 0 : v; }));
     this.ammo = 6;
     this.pendingC = 0;
+    this.duelInfo = null;
+    // the usual bar and message line are hidden: everything is on the saloon
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    this.gainObs = new MutationObserver(() => this.plates());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    // SPIN held = the autoplay sheet ("Bonus & menu")
+    const sp = this.q('.rr-spin');
+    let hold = 0, held = false;
+    sp.addEventListener('pointerdown', () => { held = false; clearTimeout(hold); hold = setTimeout(() => { if (this.busy || this.auto || this.dead) return; held = true; sfx.click(); this.openMenu(); }, 650); });
+    for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) sp.addEventListener(ev, () => clearTimeout(hold));
+    sp.addEventListener('click', (e) => { if (held) { held = false; e.stopPropagation(); } }, true);
+    this.vbg = new VideoBg(this.q('.rr-vid'), { loop: LOOP, root: this.root });
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.rr-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
     this.setAmmo(6);
+    this.onMeters(); this.layout();
+  }
+
+  /* ---------- the owner's saloon: plates, bar, full screen ---------- */
+  onMeters() {
+    const n = this.q('.rr-bet'); if (!n) return;
+    const t = fmtC(this.bet);
+    if (n.textContent !== t) { n.textContent = t; n.style.setProperty('--n', Math.max(6, t.length)); }
+    this.plates();
+  }
+  // 3 plates: SOLDE · BARILLET (the bullets left) · GAIN; during the duel: TOURS · EN FEU · DUEL
+  plates() {
+    if (!this.q('.rr-plate')) return;
+    const d = this.duelInfo;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    const pips = `<i class="rr-pips">${[0, 1, 2, 3, 4, 5].map((k) => `<i class="${k < this.ammo ? 'on' : ''}"></i>`).join('')}</i>`;
+    const set = (k, label, html, cls = '') => {
+      const p = this.q(`.rr-plate.p${k}`);
+      p.className = `rr-plate p${k} ${cls}`;
+      p.querySelector('small').textContent = label;
+      const b = p.querySelector('b');
+      if (b.innerHTML !== html) b.innerHTML = html;
+      b.style.setProperty('--n', Math.max(7, b.textContent.length));
+    };
+    if (d) {
+      set(0, 'TOURS', `${d.done} / ${d.total}`, 'duel');
+      set(1, 'EN FEU', `🔥 ${d.hot}`, 'duel');
+      set(2, d.extreme ? 'DUEL EXTRÊME' : 'LE DUEL', fmtC(d.gain), 'duel won');
+    } else {
+      set(0, 'SOLDE', fmtC(this.balC()));
+      set(1, 'BARILLET', pips, 'ammo');
+      set(2, 'GAIN', w || fmtC(0), w ? 'won' : '');
+    }
+  }
+  orient(port) {
+    const sc = this.q('.rr-scene'), name = port ? 'haut' : 'large';
+    sc.classList.toggle('rr-p', port); sc.classList.toggle('rr-l', !port);
+    this.vbg.set(asset(`assets/games/barillet/fond-${name}.mp4`), asset(`assets/games/barillet/scene-${name}.webp`));
+  }
+  // Wide saloon on a computer, tall saloon on a phone held upright. Full screen: the one that fits the screen's shape
+  // covers the whole screen, cropped on its edges but never cutting the plates, the frame or the bar (KEY, in the
+  // video's pixels); a screen of another shape gets the rest of the picture, blurred, around it.
+  layout() {
+    if (this.dead) return;
+    const sc = this.q('.rr-scene'), art = this.q('.rr-art');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('rr-fullsc', full);
+    if (!full) {
+      sc.classList.remove('rr-bandx', 'rr-bandy');
+      this.orient(innerWidth < 700 && innerHeight > innerWidth);
+      art.style.cssText = ''; return;
+    }
+    const { top, lft, W, H } = screenBox(sc, this.q('.rr-safe'));
+    if (!W || !H) return;
+    const port = W / H < 1;
+    this.orient(port);
+    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [6, 8, 446, 664] : [8, 2, 664, 444], { bottom: port });
+    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
+    sc.classList.toggle('rr-bandx', f.bandX); sc.classList.toggle('rr-bandy', f.bandY);
   }
 
   /* ---------- the barrel beside the reels: the bullets left ---------- */
   setAmmo(n) {
     this.ammo = n;
-    this.qa('.rr-barrel .rr-ch').forEach((g) => g.classList.toggle('on', +g.dataset.k < n));
-    this.q('.rr-mult b').textContent = n;
-    this.q('.rr-mult em').textContent = n > 1 ? 'balles' : 'balle';
+    if (!this.duelInfo) this.plates();
   }
   async reload() {
     this.q('.rr-barrel').classList.add('reload');
+    this.q('.rr-plate.p1')?.classList.add('reload');
     for (let k = 1; k <= 6; k++) { this.setAmmo(k); sfx.click(); await this.wait(70); }
     this.q('.rr-barrel').classList.remove('reload');
+    this.q('.rr-plate.p1')?.classList.remove('reload');
   }
 
   /* ---------- the burning cells ---------- */
@@ -413,9 +500,11 @@ class BarilletGame extends BaseGame {
       left--; done++;
       const hot = Object.keys(state.burn).length;
       this.setBanner(`<b>${extreme ? 'DUEL EXTRÊME' : 'LE DUEL'}</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill hot">🔥 ${hot} case${hot > 1 ? 's' : ''} en feu</span><span class="pill gold">Gain ${fmtC(total)}</span>`);
+      this.duelInfo = { done, total: done + left, hot, gain: total, extreme }; this.plates();
       const r = await this.playSpin(true, state);
       total = Math.min(cap, total + Math.round(r.total * bet));
       this.pendingC = total;
+      this.duelInfo = { done, total: done + left, hot: Object.keys(state.burn).length, gain: total, extreme }; this.plates();
       if (r.scat >= 3) { left += RETRIGGER; await this.featureIntro(`+${RETRIGGER} TOURS`, 'Encore des avis de recherche !', img('scat', 'intro'), 1300); }
       if (total >= cap) { this.msg(`MAX WIN ×${CAPX.toLocaleString('fr-FR')} !`); break; }
       await this.wait(380);
@@ -423,6 +512,7 @@ class BarilletGame extends BaseGame {
     if (this.dead) return;
     this.slotEl.classList.remove('in-free');
     this.setBanner('');
+    this.duelInfo = null; this.plates();
     this.reels.unmark();
     this.clearFire();
     this.setWilds([]);
@@ -499,6 +589,8 @@ class BarilletGame extends BaseGame {
   destroy() {
     // the player leaves in the middle of a duel: the bonus win so far is paid
     if (this.pendingC > 0) { const c = this.pendingC; this.pendingC = 0; this.win(c, 'Le Duel'); }
+    this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs);
+    this.vbg?.destroy();
     super.destroy();
   }
 

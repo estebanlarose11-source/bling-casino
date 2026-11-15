@@ -82,6 +82,16 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`pendingC`, payés si le joueur quitte), après la roulette russe (`GAMBLE` ×1,15 … ×5,76, retour 96 %, hors RTP).
   Simulation (3,6 M tours) : RTP ≈ 92 %, un gain 1 tour sur 4 (surtout petits), Duel 1 tour sur 385 (≈ ×130),
   achats 150 / 500 (≈ 88 %).
+  **Décor animé du 15 novembre 2026** (demande du propriétaire, comme L'Hydre ; remplace planches, plaques et barillet à côté) :
+  **ses 2 vidéos** `tools/art/barillet/fond-large.mp4` (672 × 448, `.rr-l`) et `fond-haut.mp4` (448 × 672, `.rr-p`) : le saloon, le
+  cow-boy au bar, la lanterne, 3 plaques, cadre en bois à cases peintes, barre BET / BONUS MENU / SPIN / MAX BET et un revolver.
+  `tools/art/barillet/clean.py` efface « $1.00 », les mots et montants MINI / MAJOR / GRAND (le jeu n'a pas de jackpot) et « HOLD FOR
+  AUTO » → `assets/games/barillet/fond-*.mp4` + `scene-*.webp`. Rouleaux sur ses cases (`.rr-win`) ; **la vidéo haute peint 3-5-5-5-3
+  cases** : les cases du jeu y portent la case peinte (`cell.webp`, `--rr-cell`) et couvrent sa grille (4 cases au milieu). Nos plaques
+  sur les siennes (`plates()`) : SOLDE · BARILLET (6 balles, `.rr-pips`) · GAIN, et pendant le Duel TOURS · EN FEU · gain du duel
+  (`duelInfo` ; bandeau habituel caché). Les tirs partent de son revolver (`.rr-barrel`, invisible). Barre cliquable (`.rr-hot` ;
+  la vidéo large n'a pas de − / + : boutons ajoutés de chaque côté de la mise), SPIN maintenu = « Bonus & menu » (tours auto,
+  « MAINTENIR POUR AUTO » écrit à la place de son texte). Plein écran `layout()` comme L'Hydre. Gains inchangés.
 - **Le Filon** (`games/filon.js`, id `filon`, ouvert le 9 novembre 2026 avec les images du propriétaire : symboles
   découpés de sa planche (cases en bois gardées, numéros effacés), son fond de galerie `fond.webp`, `fond-bonus.webp` =
   le même, plus doré ; couverture = centre du fond). Machine à sous faite d'après son cahier des charges
