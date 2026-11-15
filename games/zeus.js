@@ -110,15 +110,14 @@ const { BaseGame, fmtC } = __mods['core/base.js'];
 let { art } = __mods['core/base.js'];
 const { SymbolGrid } = __mods['core/grid.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
-const { ZEUS_FIG } = __mods['art/zeus.js'];
 const { COLS, ROWS, N, SC, ORB, PAYS, TUNE, SCATTER_PAY, FREE_SPINS, RETRIGGER, BUY_COST, CAPX, spin } = __mods['games/impl/zeus-engine.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el, animateNumber } = __mods['ui.js'];
 
 const IDS = ['z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8'];
-// Painted images from the owner (assets/games/zeus): the 9 symbols, the scatter (Zeus head), the multiplier orb
-// (fist and lightning), Zeus beside the grid, the background and the cover.
+// Painted images from the owner (assets/games/zeus): the 9 symbols, the scatter (Zeus head), the multiplier orb,
+// the cover, and the whole machine (scene.webp, 15 November 2026: no more standing Zeus beside the grid).
 const IMG_V = 2;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const PAINT = { z0: 's0', z1: 's1', z2: 's2', z3: 's3', z4: 's4', z5: 's5', z6: 's6', z7: 's7', z8: 's8', zsc: 'scatter', zorb: 'orb' };
