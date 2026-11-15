@@ -204,10 +204,21 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   place (`.feature-banner` déplacé dans `.hf-art`), plateau du bonus dans la fenêtre (`.stage-layer` déplacé dans `.hf-win`), barre
   cliquable (BET − / +, BONUS MENU, SPIN, MAX BET = `maxBet()` ; la vidéo haute n'a pas de BONUS MENU : plaque à nous sur l'herbe).
   Plein écran comme L'Olympe (`layout()`, zone gardée). Gains inchangés.
+- **L'Hydre, décor animé** (`games/dragons.js`, id `dragons`, demande du propriétaire du 15 novembre 2026, comme L'Olympe) :
+  **ses 2 vidéos** `tools/art/dragons/fond-large.mp4` (672 × 448, `.dg-l`) et `fond-haut.mp4` (448 × 672, `.dg-p`) : l'antre des
+  dragons, plaques MINI / MAJOR / GRAND JACKPOT (= MINI, MAJEUR, JACKPOT du jeu), cadre en écailles à 3 × 3 cases peintes, grand
+  dragon rouge, feu et lave. `tools/art/dragons/clean.py` efface « $1.00 » → `assets/games/dragons/fond-*.mp4` + `scene-*.webp`.
+  **Une case peinte = une paire** (demi-tête gauche | demi-tête droite) : grille `.dg-win .sg` à 8 colonnes `1fr 1fr 2.2% 1fr
+  1fr 2.2% 1fr 1fr` calée sur les cases ; chaque demi-tête garde la forme de la carte (5 : 4, largeur `57cqh`) et les deux
+  moitiés se rejoignent au milieu de la case ; tête fusionnée en `contain`. Montants des jackpots sous les plaques (`.dg-jpv`,
+  `jpEl(k)` pour les faire clignoter), SOLDE · GAIN à gauche du cadre (large) ou de chaque côté du SPIN (haut) (`.dg-info`),
+  compteur des tours gratuits à leur place (large) ou sur la rangée BET / BONUS MENU / MAX BET (haut), barre cliquable ; plus
+  de `frameCls: 'dg-frame'` (ses anciennes règles gênaient le plein écran). Plein écran comme L'Olympe. Gains inchangés.
 - **Décors animés, outils communs** : `tools/art/videobg.py` (lecture, effaçage, boucle sans coupure, ×2, affiche) pour les
   `tools/art/<jeu>/clean.py`, et module `core/videobg.js` d'`index.html` : `VideoBg` (lecture muette, retour d'une boucle `loop`,
   pause page cachée, rien avec « animations réduites », décodeur libéré à `destroy()`), `screenBox` (écran moins les zones sûres),
-  `coverFit` (plein écran couvert sans couper la zone gardée). L'Olympe et Le Loup 2.0 s'en servent : prochaine machine pareil.
+  `coverFit` (plein écran couvert sans couper la zone gardée). L'Olympe, Le Loup 2.0, Diamants REDK et L'Hydre s'en servent :
+  prochaine machine pareil.
 - **Le Cosmique, nouveau décor** (`games/cosmic.js`, demande du propriétaire du 15 novembre 2026) : **ses 2 images**
   `tools/art/cosmic/decor-large.jpg` (1248 × 832 : page et écrans larges, `.cz-l`) et `decor-haut.jpg` (720 × 1280 : téléphone tenu
   droit, `.cz-p`, aussi sur la page d'un téléphone), nettoyées par `tools/art/cosmic/clean.py` (quadrillage peint effacé : le jeu

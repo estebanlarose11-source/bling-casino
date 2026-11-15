@@ -1,7 +1,7 @@
 // SpinBet Casino · DragonsGame — loaded on demand by games/impl/index.js (index.html).
 // ---- games/impl/dragons.js ----
 __mods['games/impl/dragons.js'] = (() => {
-// Têtes de Dragon: 3 pairs of framed reels × 3 rows in a dragon's lair, with cascades. Left reels drop left halves of
+// L'Hydre (ex Têtes de Dragon): 3 pairs of framed reels × 3 rows in a dragon's lair, with cascades. Left reels drop left halves of
 // dragon heads, right reels right halves; when both halves of the same dragon sit side by side, the divider fades,
 // the two cells become one and the dragon pays; then it vanishes, the halves above fall into the gap, new ones drop
 // in and every new pair pays again. 3+ dragon scatters: 10 free spins with multiplier dragons; a SUPER scatter among
@@ -14,6 +14,7 @@ const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el } = __mods['ui.js'];
+const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
 
 /* ===ENGINE */
 // 3 pairs of reels × 3 rows, with cascades. Left reels drop left halves of dragon heads, right reels right halves; when
@@ -97,8 +98,12 @@ const JPN = ['MINI', 'MAJEUR', 'JACKPOT'];
 const WORDS = ['FUSION !', 'DOUBLE FUSION !', 'RUGISSEMENT !', 'TEMPÊTE DE FEU !', 'DRAGONS DÉCHAÎNÉS !'];
 // Painted art (owner's images, assets/games/dragons): each dragon card is split in two, the left reel shows its left
 // half and the right reel its right half, so two halves side by side rebuild the card. Single-cell symbols show the
-// middle of their card.
-const IMG_V = 1;
+// middle of their card. The whole machine: the owner's 2 animated backgrounds of 15 November 2026 (fond-large.mp4 for
+// computers and wide screens, fond-haut.mp4 for phones held upright: the dragons' lair, MINI / MAJOR / GRAND JACKPOT
+// plates, a dragon-scale frame with 3 × 3 painted cells: each cell holds one pair of half-heads), cleaned by
+// tools/art/dragons/clean.py: a 121-frame loop (24 images/s) + its first 12 frames again (core/videobg.js).
+const IMG_V = 2;
+const LOOP = 121 / 24;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const FILE = { dg0: 'd0', dg1: 'd1', dg2: 'd2', dg3: 'd3', dg4: 'd4', dg5: 'd5', dg6: 'd6', dg7: 'd7', dg8: 'd8', dgj: 'pearl', dgs: 'stone', dgsc: 'scat', dgsu: 'super', dgm: 'mult' };
 const src = (id) => asset(`assets/games/dragons/${FILE[id]}.webp`);
@@ -139,10 +144,23 @@ class DragonsGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.dragons,
-      frameCls: 'dg-frame',
-      stage: `<div class="dg-lair"><i class="dg-glow"></i><i class="dg-embers"></i><i class="dg-gold l"></i><i class="dg-gold r"></i></div>
-        <div class="dg-top"><div class="dg-jp mini"><small>MINI</small><b data-jp="0"></b></div><div class="dg-grand"><small>JACKPOT</small><b data-jp="2"></b></div><div class="dg-jp major"><small>MAJEUR</small><b data-jp="1"></b></div></div>
-        <div class="grid-host"></div><div class="dg-word"></div>`,
+      // the owner's lair (wide video: computers, tall video: phones held upright): the 3 pairs of reels in his 3 × 3
+      // painted cells, the jackpot amounts under his MINI / MAJOR / GRAND plates (MINI, MAJEUR, JACKPOT of the game),
+      // his bar made clickable (BET − / +, BONUS MENU, SPIN, MAX BET), balance and win on plates, the free spins
+      // counter in their place
+      stage: `<div class="dg-scene dg-l"><i class="dg-safe"></i><div class="dg-art">
+          <video class="dg-vid" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+          ${['mini', 'major', 'grand'].map((k, j) => `<b class="dg-jpv ${k}" data-jp="${j}"></b>`).join('')}
+          <div class="dg-win"><div class="grid-host"></div></div>
+          <div class="dg-info"><div><small>SOLDE</small><b class="dg-bal"></b></div><div><small>GAIN</small><b class="dg-gain">0</b></div></div>
+          <button class="dg-hot dg-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="dg-bet"></b>
+          <button class="dg-hot dg-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="dg-hot dg-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+          <button class="dg-hot dg-spin" type="button" data-act="main" aria-label="Lancer"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          <button class="dg-hot dg-max" type="button" data-act="max" aria-label="Mise maximum"></button>
+          <div class="dg-word"></div>
+        </div><button class="dg-hot dg-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       buys: [
         { id: 'A', icon: '🐉', label: `${MODEN.A} · ${FS_SPINS} tours`, desc: 'Des dragons multiplicateurs ×2 à ×10 peuvent tomber', cost: (b) => b * BUY_FS },
         { id: 'S', icon: '🔥', label: `${MODEN.S} · ${FS_SPINS} tours`, desc: 'Multiplicateurs ×2 à ×100 et cases MINI, MAJEUR, JACKPOT', cost: (b) => b * BUY_SUPER },
@@ -159,10 +177,65 @@ class DragonsGame extends BaseGame {
     const g0 = Array.from({ length: N }, () => draw({ fs: false }));
     this.deco = decoFor(g0);
     this.grid.setAll(g0);
-    this.onBetChange();
+    // the free spins counter on the lair; the usual bar and message line are hidden
+    this.q('.dg-art').appendChild(this.banner);
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    this.gainObs = new MutationObserver(() => this.paintGain());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    this.vbg = new VideoBg(this.q('.dg-vid'), { loop: LOOP, root: this.root });
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.dg-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
+    this.onBetChange(); this.onMeters(); this.paintGain(); this.layout();
   }
 
+  destroy() {
+    this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs);
+    this.vbg?.destroy();
+    super.destroy();
+  }
   onBetChange() { this.qa('[data-jp]').forEach((n) => { n.textContent = fmtC(JP[+n.dataset.jp] * this.bet); }); }
+  jpEl(k) { return this.q(`.dg-jpv.${['mini', 'major', 'grand'][k]}`); }
+
+  /* ---------- the owner's lair: bar, plates, full screen ---------- */
+  onMeters() {
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) { n.textContent = t; n.style.setProperty('--n', Math.max(7, t.length)); } };
+    set('.dg-bet', fmtC(this.bet)); set('.dg-bal', fmtC(this.balC()));
+  }
+  paintGain() {
+    const n = this.q('.dg-gain'); if (!n) return;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    n.textContent = w || fmtC(0);
+    n.style.setProperty('--n', Math.max(7, n.textContent.length));
+    n.parentElement.classList.toggle('won', !!w);
+  }
+  orient(port) {
+    const sc = this.q('.dg-scene'), name = port ? 'haut' : 'large';
+    sc.classList.toggle('dg-p', port); sc.classList.toggle('dg-l', !port);
+    this.vbg.set(asset(`assets/games/dragons/fond-${name}.mp4`), asset(`assets/games/dragons/scene-${name}.webp`));
+  }
+  // Wide lair on a computer, tall lair on a phone held upright. Full screen: the one that fits the screen's shape covers
+  // the whole screen, cropped on its edges but never cutting the plates, the frame or the bar (KEY, in the video's
+  // pixels); a screen of another shape gets the rest of the picture, blurred, around it.
+  layout() {
+    if (this.dead) return;
+    const sc = this.q('.dg-scene'), art = this.q('.dg-art');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('dg-fullsc', full);
+    if (!full) {
+      sc.classList.remove('dg-bandx', 'dg-bandy');
+      this.orient(innerWidth < 700 && innerHeight > innerWidth);
+      art.style.cssText = ''; return;
+    }
+    const { top, lft, W, H } = screenBox(sc, this.q('.dg-safe'));
+    if (!W || !H) return;
+    const port = W / H < 1;
+    this.orient(port);
+    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [4, 40, 444, 640] : [6, 4, 666, 440], { bottom: port });
+    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
+    sc.classList.toggle('dg-bandx', f.bandX); sc.classList.toggle('dg-bandy', f.bandY);
+  }
 
   word(t, cls = '') {
     const w = this.q('.dg-word');
@@ -213,7 +286,7 @@ class DragonsGame extends BaseGame {
     const amt = Math.round(f.x * b);
     fx.floatText(sx, sy - a.height * 0.3, `+${fmtC(amt)}`, f.jp ? '#fde047' : J[1], f.jp ? 30 : 24);
     this.msg(`${DNAME[f.s]}${f.s < 6 ? ` ×${POWER[f.s]}` : ''} → +${fmtC(amt)}`);
-    if (f.jp) { this.word(['MINI !', 'MAJEUR !', 'JACKPOT !'][f.s - 6], 'jp'); this.flash('rgba(253,224,71,.6)'); sfx.jackpot(); this.q(f.s === 8 ? '.dg-grand' : f.s === 7 ? '.dg-jp.major' : '.dg-jp.mini')?.classList.add('flash'); fx.confetti(80); }
+    if (f.jp) { this.word(['MINI !', 'MAJEUR !', 'JACKPOT !'][f.s - 6], 'jp'); this.flash('rgba(253,224,71,.6)'); sfx.jackpot(); this.jpEl(f.s - 6)?.classList.add('flash'); fx.confetti(80); }
     else sfx.win();
     return big;
   }
@@ -277,7 +350,7 @@ class DragonsGame extends BaseGame {
       if (this.dead) return;
       const k = res.grid[i] - JPCELL, cell = this.grid.cells[i], p = center(cell);
       cell.classList.add('pulse');
-      this.q(k === 2 ? '.dg-grand' : k === 1 ? '.dg-jp.major' : '.dg-jp.mini')?.classList.add('flash');
+      this.jpEl(k)?.classList.add('flash');
       this.word(`${JPN[k]} !`, 'jp'); this.flash('rgba(253,224,71,.6)'); sfx.jackpot();
       fx.burst(p.x, p.y, 40, ['#fde047', '#fff', '#f59e0b'], 9); if (k === 2) fx.confetti(140);
       this.msg(`Case ${JPN[k]} : +${fmtC(Math.round(JP[k] * b))}`);

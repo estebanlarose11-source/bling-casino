@@ -5090,6 +5090,117 @@ html.light .slot small { color: inherit; }
 .rk-bandy.rk-l .rk-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
 .rk-bandy.rk-p .rk-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
 .rk-fullsc .rk-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
+/* ============ L'Hydre (games/dragons.js): the owner's 2 animated backgrounds of 15 November 2026, fond-large.mp4 (672 × 448:
+   page and wide screens, .dg-l) and fond-haut.mp4 (448 × 672: phone held upright, .dg-p), first frame as poster
+   (scene-large.webp / scene-haut.webp). The dragons' lair: each of his 3 × 3 painted cells holds one pair of half-heads,
+   the jackpots under his MINI / MAJOR / GRAND plates, his bar made clickable; places in % of each video
+   (tools/art/dragons/clean.py) ============ */
+.g-dragons > .slot-frame > .slot-stage { padding: 0 !important; overflow: visible; }
+.dg-scene { position: relative; margin: 0 auto; overflow: hidden; border-radius: 6px; box-shadow: 0 10px 40px rgba(0, 0, 0, .55); }
+.dg-scene.dg-l { width: min(100%, max(300px, calc((100svh - 220px) * 1.5))); aspect-ratio: 672 / 448; }
+.dg-scene.dg-p { width: min(100%, max(260px, calc((100svh - 140px) * .6667))); aspect-ratio: 448 / 672; }
+.dg-art { position: absolute; inset: 0; container-type: size; background: url(assets/games/dragons/scene-large.webp?v=2) center / 100% 100% no-repeat #1c0a05; }
+.dg-p .dg-art { background-image: url(assets/games/dragons/scene-haut.webp?v=2); }
+.dg-vid { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; transition: filter .8s ease; }
+.g-dragons.in-free .dg-vid { filter: saturate(1.2) brightness(1.06); }
+.g-dragons.fs-S .dg-vid { filter: saturate(1.35) brightness(1.1) sepia(.2); }
+.dg-safe { position: absolute; visibility: hidden; pointer-events: none; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+/* the 3 pairs × 3 rows on the 9 painted cells: one painted cell = one pair (left half | right half) */
+.dg-win { position: absolute; z-index: 2; }
+.dg-l .dg-win { left: 24.7%; top: 24.33%; width: 50.45%; height: 48.21%; }
+.dg-p .dg-win { left: 14.06%; top: 27.68%; width: 71.65%; height: 34.97%; }
+.dg-win .grid-host { position: absolute; inset: 0; }
+.g-dragons .dg-win .sg { position: absolute; inset: 0; width: 100% !important; height: 100%; min-width: 0; aspect-ratio: auto !important; margin: 0; padding: 0; grid-template-rows: repeat(3, 1fr); grid-template-columns: 1fr 1fr 2.2% 1fr 1fr 2.2% 1fr 1fr; gap: 1.85% 0; background: none; }
+.g-dragons .dg-p .dg-win .sg { grid-template-columns: 1fr 1fr .95% 1fr 1fr .95% 1fr 1fr; row-gap: 1.3%; }
+.g-dragons .dg-win .sg-cell { background: none; box-shadow: none; border-radius: 0; }
+.g-dragons .dg-win .sg-cell.dgL::after { top: 10%; bottom: 10%; }
+/* each half keeps the card's shape (5 : 4): the two halves meet in the middle of the painted cell */
+.g-dragons .dg-win .dg-h { top: 4%; bottom: 4%; width: min(calc(100% - 3px), 57cqh); }
+.g-dragons .dg-win .dg-h.l { left: auto; right: 0; }
+.g-dragons .dg-win .dg-h.r { left: 0; right: auto; }
+.g-dragons .dg-win .dg-one { inset: 4% 3px; }
+.g-dragons .dg-win .sg-cell.scat, .g-dragons .dg-win .sg-cell.super, .g-dragons .dg-win .sg-cell.mult, .g-dragons .dg-win .sg-cell.jpc { border-radius: 4px; }
+.g-dragons .dg-win .sg-cell.fusing { border-radius: 4px; }
+.g-dragons .dg-win .dg-fused .dg-card { background-size: contain; background-color: rgba(26, 8, 4, .75); }
+/* the jackpot amounts under the owner's plates (they follow the bet) */
+.dg-jpv { position: absolute; z-index: 3; display: grid; place-items: center; border-radius: 99px; pointer-events: none; white-space: nowrap; font: 900 1.6cqw/1 KeCoin, Archivo, sans-serif; color: #fff7c2; text-shadow: 0 1px 0 #000; background: linear-gradient(180deg, #5a1606, #2a0802); box-shadow: inset 0 0 0 .22cqw #f59e0b, 0 .3cqw .8cqw rgba(0, 0, 0, .55); }
+.dg-jpv.major { font-size: 1.8cqw; color: #fde047; }
+.dg-jpv.grand { background: linear-gradient(180deg, #7c2d12, #3b0a02); }
+.dg-jpv.flash { animation: bvFlash .3s ease-in-out 6 alternate; }
+.dg-l .dg-jpv.mini { left: 21.58%; top: 10.71%; width: 11.9%; height: 3.13%; }
+.dg-l .dg-jpv.major { left: 43.9%; top: 10.27%; width: 11.9%; height: 3.13%; }
+.dg-l .dg-jpv.grand { left: 68.9%; top: 10.71%; width: 11.9%; height: 3.13%; }
+.dg-p .dg-jpv { font-size: 2.8cqw; } .dg-p .dg-jpv.major { font-size: 3.1cqw; }
+.dg-p .dg-jpv.mini { left: 12.28%; top: 20.68%; width: 16.96%; height: 2.4%; }
+.dg-p .dg-jpv.major { left: 40.85%; top: 19.2%; width: 17.86%; height: 2.4%; }
+.dg-p .dg-jpv.grand { left: 69.42%; top: 20.68%; width: 16.96%; height: 2.4%; }
+/* balance and win: stacked left of the frame (wide), each side of the SPIN button (tall) */
+.dg-info { position: absolute; z-index: 3; display: flex; pointer-events: none; transition: opacity .25s; }
+.dg-info > div { min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .25cqw; border-radius: 1cqw; background: linear-gradient(180deg, #4a1406, #220703); box-shadow: inset 0 0 0 .22cqw #f59e0b, inset 0 0 0 .4cqw #4a2004, 0 .4cqw 1cqw rgba(0, 0, 0, .55); }
+.dg-info small { font: 800 .95cqw Archivo, sans-serif; letter-spacing: .14em; color: #fde68a; }
+.dg-info b { font-weight: 800; font-family: KeCoin, Archivo, sans-serif; line-height: 1; color: #fff; white-space: nowrap; font-size: min(1.7cqw, calc(14cqw / var(--n, 10))); }
+.dg-info .won b { color: #fde047; text-shadow: 0 0 10px rgba(253, 224, 71, .8); }
+.dg-l .dg-info { left: 1.5%; top: 34%; width: 16%; height: 24%; flex-direction: column; justify-content: space-between; }
+.dg-l .dg-info > div { flex: 0 0 46%; }
+.dg-p .dg-info { left: .9%; top: 82.6%; width: 98.2%; height: 7.4%; justify-content: space-between; }
+.dg-p .dg-info > div { flex: 0 0 22.4%; border-radius: 2cqw; box-shadow: inset 0 0 0 .45cqw #f59e0b, inset 0 0 0 .8cqw #4a2004, 0 .8cqw 2cqw rgba(0, 0, 0, .55); }
+.dg-p .dg-info small { font-size: 2cqw; } .dg-p .dg-info b { font-size: min(3.4cqw, calc(21cqw / var(--n, 10))); }
+/* the free spins counter: in place of the plates (wide), over the BET / BONUS MENU / MAX BET row (tall) */
+.g-dragons .dg-art > .feature-banner { position: absolute; z-index: 4; margin: 0 !important; padding: .6cqw; box-sizing: border-box; border-radius: 1.2cqw; gap: .7cqw; border: 0; background: linear-gradient(180deg, rgba(74, 20, 6, .96), rgba(34, 7, 3, .96)); box-shadow: inset 0 0 0 .22cqw #f59e0b, 0 .4cqw 1cqw rgba(0, 0, 0, .55); }
+.g-dragons .dg-art > .feature-banner.show { max-height: none; }
+.g-dragons .dg-art > .feature-banner b { font-size: 1.5cqw; color: #fde047; text-shadow: 0 0 8px rgba(249, 115, 22, .9); text-align: center; line-height: 1.05; }
+.g-dragons .dg-art > .feature-banner .pill { padding: .3cqw .8cqw; font-size: 1.3cqw; white-space: nowrap; justify-content: center; }
+.dg-l .dg-art > .feature-banner { left: 1.5%; top: 34%; width: 16%; height: 24%; flex-direction: column; flex-wrap: nowrap; justify-content: center; }
+.dg-l .dg-art > .feature-banner .pill { width: 100%; box-sizing: border-box; }
+.dg-p .dg-art > .feature-banner { left: 1.5%; top: 67.6%; width: 97%; height: 9.4%; flex-wrap: nowrap; gap: 1.6cqw; padding: 0 2cqw; border-radius: 2cqw; }
+.dg-p .dg-art > .feature-banner b { font-size: 3.4cqw; }
+.dg-p .dg-art > .feature-banner .pill { font-size: 3cqw; padding: .6cqw 1.6cqw; }
+.g-dragons.in-free .dg-l .dg-info { opacity: 0; }
+/* the bar of each video, made clickable */
+.dg-hot { position: absolute; z-index: 5; padding: 0; border: 0; border-radius: 18%; background: transparent; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; transition: box-shadow .15s, background .15s; }
+.dg-hot:hover:not([disabled]) { background: rgba(255, 220, 150, .12); box-shadow: 0 0 14px rgba(249, 115, 22, .7); }
+.dg-hot:active:not([disabled]) { background: rgba(255, 220, 150, .26); }
+.dg-hot[disabled] { cursor: default; background: rgba(0, 0, 0, .3); }
+.dg-bm, .dg-bp { border-radius: 50%; }
+.dg-l .dg-bm { left: 3.72%; top: 88.17%; width: 4.46%; height: 6.7%; }
+.dg-l .dg-bp { left: 13.54%; top: 88.17%; width: 4.46%; height: 6.7%; }
+.dg-l .dg-bet { left: 6.55%; top: 81.7%; width: 8.93%; height: 6.25%; font-size: min(2.3cqw, calc(15cqw / var(--n, 9))); }
+.dg-l .dg-menu { left: 20.54%; top: 81.47%; width: 15.48%; height: 13.62%; }
+.dg-l .dg-spin { left: 38.39%; top: 76.34%; width: 25.6%; height: 19.64%; border-radius: 30%; }
+.dg-l .dg-max { left: 66.67%; top: 82.14%; width: 18.9%; height: 11.61%; border-radius: 30%; }
+.dg-p .dg-bm { left: 2.46%; top: 71.43%; width: 7.59%; height: 5.06%; }
+.dg-p .dg-bp { left: 26.12%; top: 71.43%; width: 7.59%; height: 5.06%; }
+.dg-p .dg-bet { left: 11.16%; top: 70.83%; width: 14.73%; height: 4.76%; font-size: min(3.8cqw, calc(24cqw / var(--n, 9))); }
+.dg-p .dg-menu { left: 37.95%; top: 69.2%; width: 25.89%; height: 7%; border-radius: 30%; }
+.dg-p .dg-max { left: 77.68%; top: 69.35%; width: 14.29%; height: 8.33%; }
+.dg-p .dg-spin { left: 26.79%; top: 78.87%; width: 46.88%; height: 15.63%; border-radius: 30%; }
+.dg-bet { position: absolute; z-index: 4; display: flex; align-items: center; justify-content: center; white-space: nowrap; pointer-events: none; font-weight: 900; font-family: KeCoin, Archivo, sans-serif; line-height: 1; color: #fde68a; text-shadow: 0 2px 0 #3b0a02, 0 0 8px rgba(249, 115, 22, .6); }
+.g-dragons.busy .dg-spin { box-shadow: 0 0 0 .3cqw rgba(253, 224, 71, .75), 0 0 2.4cqw rgba(249, 115, 22, .95); animation: dgSpinB .55s ease-in-out infinite alternate; }
+@keyframes dgSpinB { to { box-shadow: 0 0 0 .3cqw rgba(253, 224, 71, .35), 0 0 4cqw rgba(249, 115, 22, 1); background: rgba(255, 220, 150, .14); } }
+.g-dragons.auto-on .dg-spin { box-shadow: 0 0 0 .3cqw #fde047, 0 0 2cqw #f97316; }
+.dg-spin .auto-count { position: absolute; left: 50%; bottom: 100%; transform: translateX(-50%); font: 900 2.4cqw/1 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 2px 4px #000, 0 0 10px #000; pointer-events: none; }
+.dg-p .dg-spin .auto-count { font-size: 5cqw; }
+.dg-spin .fr-badge { position: absolute; right: -4%; top: -8%; padding: .1em .4em; border-radius: 99px; background: #16a34a; color: #fff; font: 800 1.2cqw Archivo, sans-serif; white-space: nowrap; }
+.dg-p .dg-spin .fr-badge { font-size: 2.6cqw; }
+.dg-full { z-index: 8; right: 1.2%; top: 1.6%; width: clamp(28px, 3.6%, 44px); height: auto; aspect-ratio: 1; border-radius: 8px; background: rgba(40, 10, 4, .6); color: #fde68a; font: 700 clamp(14px, 2.2vmin, 22px)/1 sans-serif; box-shadow: inset 0 0 0 1px rgba(249, 115, 22, .6); }
+.dg-p .dg-full { width: clamp(28px, 8%, 40px); }
+.dg-art > .dg-word { z-index: 6 !important; top: 49%; font-size: 5cqw; }
+.dg-p .dg-art > .dg-word { top: 45%; font-size: 9cqw; }
+.game-host:not(.is-full):has(> .g-dragons) { max-width: max(420px, min(1180px, calc((100svh - 220px) * 1.5 + 40px))) !important; }
+/* full screen: the video that fits the screen covers it; around it (screen of another shape), its own picture, blurred */
+.game-host.is-full:has(> .slot.g-dragons) { padding: 0; background: #1c0a05; overflow: hidden; }
+.game-host.is-full > .slot.g-dragons.g-dragons { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
+.game-host.is-full > .slot.g-dragons.g-dragons > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
+.game-host.is-full > .slot.g-dragons.g-dragons > .mx-row { position: absolute; z-index: 9; top: max(8px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); margin: 0; }
+.game-host.is-full > .slot.g-dragons.g-dragons > .slot-frame, .game-host.is-full > .slot.g-dragons.g-dragons > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
+.game-host.ml-busy > .slot.g-dragons .slot-frame { animation: none !important; }
+.dg-scene.dg-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #1c0a05; }
+.dg-scene.dg-fullsc::before { content: ''; position: absolute; inset: -40px; background: url(assets/games/dragons/scene-large.webp?v=2) center / cover no-repeat; filter: blur(18px) brightness(.7); }
+.dg-scene.dg-fullsc.dg-p::before { background-image: url(assets/games/dragons/scene-haut.webp?v=2); background-position: center top; }
+.dg-bandx .dg-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
+.dg-bandy.dg-l .dg-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
+.dg-bandy.dg-p .dg-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
+.dg-fullsc .dg-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 .g-fortune .reels-host { position: absolute; inset: 0; }
 .g-fortune .rs { width: 100%; height: 100%; aspect-ratio: auto; min-width: 0; gap: 0; }
 .g-fortune .rs-reel { background: none; border-radius: 0; }
@@ -13081,6 +13192,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'dragons', date: '2026-11-15', title: 'Décor animé pour L’Hydre', items: ['Le jeu se passe dans l’antre des dragons : le grand dragon rouge bouge, le feu et la lave s’animent', 'Chaque paire de demi-têtes a sa case dans le cadre en écailles de dragon', 'Les montants des jackpots MINI, MAJEUR et JACKPOT sous leurs plaques, ils suivent ta mise', 'Nouvelle barre : BET, BONUS MENU, le gros bouton SPIN et MAX BET', 'Un décor fait pour l’ordinateur et un autre pour le téléphone tenu droit, en plein écran sur tout l’écran'] },
   { game: 'redk', date: '2026-11-15', title: 'Décor animé pour Diamants REDK', items: ['Le jeu se passe au fond de la mine de diamants : les rouleaux dans le grand cadre de pierres précieuses, les wagons de gemmes passent', 'Les montants des jackpots MINI, MAJOR et GRAND sous leurs plaques, ils suivent ta mise', 'Nouvelle barre : BET, BONUS MENU, le gros bouton SPIN et MAX BET', 'Le RUBY LINK et La Pyramide d’or se jouent dans le cadre, les boosters juste à côté', 'Un décor fait pour l’ordinateur et un autre pour le téléphone tenu droit, en plein écran sur tout l’écran'] },
   { game: 'huff', date: '2026-11-15', title: 'Décor animé pour Le Loup 2.0', items: ['Le jeu se passe dans la maison des trois petits cochons : les rouleaux dans sa fenêtre étoilée, le décor bouge', 'Les montants des jackpots MINI, MAJOR et GRAND sous leurs plaques, ils suivent ta mise', 'Nouvelle barre : BET, BONUS MENU, le gros bouton SPIN et MAX BET', 'Un décor fait pour l’ordinateur et un autre pour le téléphone tenu droit, en plein écran sur tout l’écran'] },
   { game: 'zeus', date: '2026-11-15', title: 'Décor animé pour L’Olympe', items: ['Le décor prend vie : éclairs dans le ciel, flamme bleue et nuages qui bougent', 'Un décor fait pour l’ordinateur et un autre pour le téléphone tenu droit', 'En plein écran, le décor couvre tout l’écran', 'Le solde et le gain sous le médaillon (ordinateur) ou sous la grille (téléphone)'] },
@@ -16311,7 +16423,7 @@ const FILES = {
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'fb3eda6835'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
   fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', 'a3ee781b6e'],
-  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
+  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', 'e85a915fc6'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '9621261bab'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '620d0b9f44'],
