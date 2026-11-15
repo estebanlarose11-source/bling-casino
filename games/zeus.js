@@ -119,7 +119,7 @@ const { el, animateNumber } = __mods['ui.js'];
 const IDS = ['z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8'];
 // Painted images from the owner (assets/games/zeus): the 9 symbols, the scatter (Zeus head), the multiplier orb
 // (fist and lightning), Zeus beside the grid, the background and the cover.
-const IMG_V = 1;
+const IMG_V = 2;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const PAINT = { z0: 's0', z1: 's1', z2: 's2', z3: 's3', z4: 's4', z5: 's5', z6: 's6', z7: 's7', z8: 's8', zsc: 'scatter', zorb: 'orb' };
 const svgArt = art;
@@ -129,52 +129,186 @@ const lab = (t) => `<b class="sg-lab">${t}</b>`;
 const cellArt = (c) => (c.s === ORB ? art('zorb') + lab('×' + c.m) : c.s === SC ? art('zsc') + '<i class="lbl zl">SCATTER</i>' : art(IDS[c.s]));
 const cellCls = (c) => (c.s === ORB ? 'orb' : c.s === SC ? 'scatter' : c.s >= 5 ? 'hi' : '');
 
+// Full screen (owner's request, like La Fortune): the picture is cut into pieces (its own pixels) that layout() moves
+// and enlarges to fill the screen. T sky + medallion + plaque, M the grid in its frame, L menu / BONUS / MISE,
+// R the end of the bar (behind the button), S the spin button with its wings (round, laid over the frame).
+const PCS = { T: [0, 0, 1024, 246], M: [92, 246, 932, 850], L: [20, 862, 646, 1004], R: [646, 862, 1004, 1004], S: [652, 812, 962, 1020] };
+function pbg(n) {
+  const [x0, y0, x1, y1] = PCS[n], w = x1 - x0, h = y1 - y0, pc = (v) => `${(v / 10.24).toFixed(3)}%`;
+  return `<i class="zo-pbg" style="left:${pc(x0)};top:${pc(y0)};width:${pc(w)};height:${pc(h)};background-size:${(102400 / w).toFixed(2)}% ${(102400 / h).toFixed(2)}%;background-position:${w < 1024 ? ((x0 / (1024 - w)) * 100).toFixed(3) : 0}% ${((y0 / (1024 - h)) * 100).toFixed(3)}%"></i>`;
+}
+
 class ZeusGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.zeus,
       frameCls: 'zeus-frame',
-      stage: `<div class="zeus-stage">
-        <div class="zeus-sky"><i class="cl c1"></i><i class="cl c2"></i><i class="cl c3"></i><i class="col l"></i><i class="col r"></i></div>
-        <div class="zeus-fig painted"><img class="z-fig-img" src="${asset('assets/games/zeus/zeus.webp')}" alt="" draggable="false"><div class="zeus-say"></div></div>
-        <div class="zeus-board">
-          <div class="zeus-top">
-            <div class="zeus-plaque"><span>⚡</span>MONT OLYMPE<span>⚡</span></div>
-            <div class="zeus-mult"><small>Multiplicateur</small><b><em>×</em><span class="zm-v">0</span></b><i class="zm-sub">8+ symboles n’importe où</i></div>
+      // the owner's picture of 15 November 2026 (scene.webp, 1024 × 1024): medallion MULTIPLICATEUR, the grid in the
+      // golden frame, his bar made clickable (menu, BONUS, MISE, spin); balance and win on a plaque in the sky
+      stage: `<div class="zo-scene"><i class="zo-safe"></i><div class="zo-art">
+          <div class="zo-pc" data-pc="T">${pbg('T')}
+            <div class="zo-med"><small>Multiplicateur</small><b><em>×</em><span class="zm-v">0</span></b></div>
+            <div class="zo-info"><div><small>SOLDE</small><b class="zo-bal"></b></div><div class="zo-mid"><small>GAIN</small><b class="zo-gain">0</b></div><div class="zo-fs"><small>TOURS</small><b class="zo-left"></b></div></div>
           </div>
-          <div class="grid-host"></div>
-        </div>
-      </div>`,
+          <div class="zo-pc" data-pc="M">${pbg('M')}
+            <i class="zo-gem"></i><i class="zo-fbot"></i>
+            <div class="zo-win"><div class="grid-host"></div></div>
+            <div class="zo-word"></div>
+            <div class="zo-ov"></div>
+          </div>
+          <div class="zo-pc" data-pc="L">${pbg('L')}
+            <button class="zo-hot zo-menu" type="button" data-act="menu" aria-label="Tours auto et réglages"></button>
+            <button class="zo-hot zo-bonus" type="button" data-zo="buy" aria-label="Acheter le bonus"></button>
+            <button class="zo-hot zo-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+            <b class="zo-bet"></b>
+            <button class="zo-hot zo-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          </div>
+          <div class="zo-pc" data-pc="R">${pbg('R')}</div>
+          <div class="zo-pc" data-pc="S">${pbg('S')}
+            <button class="zo-spin" type="button" data-act="main" aria-label="Lancer"><img src="${asset('assets/games/zeus/spin.webp')}" alt="" draggable="false"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          </div>
+        </div><button class="zo-hot zo-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       buys: [{ id: 'fs', icon: '⚡', label: `${FREE_SPINS} Free Spins · 4 scatters`, desc: 'Multiplicateur global qui ne se réinitialise pas entre les tours', cost: (b) => b * BUY_COST }],
       hello: '8 symboles identiques n’importe où pour gagner',
     });
-    this.zeus = this.q('.zeus-fig');
-    this.slotEl.style.setProperty('--z-bg', `url("${asset('assets/games/zeus/bg.webp')}")`); // grid + whole machine
     Object.values(PAINT).forEach((n) => { new Image().src = asset(`assets/games/zeus/${n}.webp`); });
-    this.meter = this.q('.zeus-mult');
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    this.root.addEventListener('click', (e) => { if (e.target.closest('[data-zo="buy"]')) this.askBuy(); });
+    this.gainObs = new MutationObserver(() => this.paintGain());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.zo-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
+    this.meter = this.q('.zo-med');
     this.meterVal = 0;
     this.grid = new SymbolGrid(this.q('.grid-host'), { cols: COLS, rows: ROWS, game: this, art: cellArt, cls: cellCls });
     this.grid.setAll(Array.from({ length: N }, () => ({ s: Math.floor(Math.random() * 9) })));
+    this.onMeters(); this.paintGain(); this.layout();
+  }
+
+  /* ---------- the owner's picture: bar, plaque, full screen ---------- */
+  onMeters() {
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) n.textContent = t; };
+    set('.zo-bet', fmtC(this.bet)); set('.zo-bal', fmtC(this.balC()));
+  }
+  paintGain() {
+    const n = this.q('.zo-gain'); if (!n) return;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    if (this.fsTotal != null) n.textContent = fmtC(this.fsTotal); else n.textContent = w || fmtC(0);
+    n.parentElement.classList.toggle('won', !!w || !!this.fsTotal);
+  }
+  // BONUS button: a plaque in the frame to buy the free spins (price shown), or not
+  askBuy() {
+    if (this.busy || this.dead) return;
+    const cost = BUY_COST * this.bet;
+    this.panel(`<div class="zo-pglyph">${art('zsc')}</div><h3>${FREE_SPINS} FREE SPINS</h3><p>Multiplicateur global qui ne se remet pas à zéro</p>
+      <div class="zo-pbtns"><button type="button" class="zo-yes">ACHETER · ${fmtC(cost)}</button><button type="button" class="zo-no">Non merci</button></div>`, 'ask', 60000, (e) => {
+      if (e.target.closest('.zo-yes')) { this.startBuy('fs'); return true; }
+      return !!e.target.closest('.zo-no') || e.target === this.q('.zo-ov');
+    });
+  }
+  // a panel in the frame (bonus intro, end, buy): gold border on night blue; done on a touch (or `pick` says so)
+  panel(html, cls, dur, pick) {
+    const ov = this.q('.zo-ov');
+    ov.className = `zo-ov on ${cls}`; ov.innerHTML = `<div class="zo-pan">${html}</div>`;
+    return new Promise((resolve) => {
+      let over = false;
+      const done = () => { if (over) return; over = true; clearTimeout(t); ov.removeEventListener('click', on); ov.classList.add('out'); setTimeout(() => { if (ov.classList.contains('out')) { ov.className = 'zo-ov'; ov.innerHTML = ''; } resolve(); }, 300); };
+      const on = (e) => { if (!pick || pick(e)) done(); };
+      const t = setTimeout(done, this.superT ? dur / 4 : this.turbo ? dur / 2 : dur);
+      ov.addEventListener('click', on);
+    });
+  }
+  featureIntro(title, sub, glyph, dur = 2600) {
+    dispatchEvent(new CustomEvent('sb:feature', { detail: { game: this.game.id, title, bought: !!this.buyRound, re: /^\+/.test(title) } }));
+    sfx.feature(); this.flash('rgba(147,197,253,.45)');
+    const p = center(this.q('.zo-win')); fx.burst(p.x, p.y, 50, ['#fde047', '#fff', '#93c5fd'], 9);
+    return this.panel(`<div class="zo-pglyph">${glyph}</div><h3>${title}</h3><p>${sub}</p><small>Touchez pour continuer</small>`, 'intro', dur);
+  }
+  async celebrate(amountC, o = {}) {
+    if (!o.summary) return super.celebrate(amountC, o);
+    dispatchEvent(new CustomEvent('sb:featureend', { detail: { game: this.game.id } }));
+    if (this.dead) return;
+    const x = amountC / (o.stake || this.bet);
+    sfx.bigWin?.(); fx.confetti(60);
+    const pr = this.panel(`<div class="zo-pglyph">${art('zsc')}</div><h3>${o.summary}</h3><b class="zo-ptot">0</b><p>×${x >= 100 ? Math.round(x) : x.toFixed(1).replace('.', ',')} la mise</p><small>Touchez pour continuer</small>`, 'end', 2600 + Math.min(2400, x * 12));
+    const tot = this.q('.zo-ptot'), t0 = performance.now(), T = this.superT ? 300 : this.turbo ? 700 : Math.min(2600, 900 + x * 15);
+    const step = (ts) => { if (this.dead || !tot.isConnected) return; const k = Math.min(1, (ts - t0) / T); tot.textContent = fmtC(Math.round(amountC * k)); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+    await pr;
+    this.winAmt.textContent = fmtC(amountC);
+    if (x >= 10) await super.celebrate(amountC, { stake: o.stake, quick: true }); // GROS GAIN ! stays everywhere
+  }
+
+  // Square picture on the page. Full screen fills the screen with the pieces, kept together: tall screen = sky and grid
+  // on the full width, then the bar (menu, BONUS, MISE) and the spin button; wide screen = sky, grid and the whole bar
+  // stacked in the middle, the grid as big as the height allows. Almost square screen: the picture.
+  layout() {
+    if (this.dead) return;
+    const sc = this.q('.zo-scene'), art = this.q('.zo-art'), pcs = this.qa('.zo-pc');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('zo-fs', full);
+    const reset = () => pcs.forEach((p) => { p.style.transform = ''; });
+    const W0 = sc.clientWidth, H0 = sc.clientHeight;
+    if (!full || !W0 || !H0) { sc.classList.remove('zo-split', 'zo-port', 'zo-land'); art.style.cssText = ''; reset(); return; }
+    const cs = getComputedStyle(this.q('.zo-safe')), sp = (k) => parseFloat(cs[k]) || 0;
+    const top = Math.max(6, sp('paddingTop')), bot = Math.max(6, sp('paddingBottom')), lft = sp('paddingLeft'), rgt = sp('paddingRight');
+    const W = W0 - lft - rgt, H = H0 - top - bot, r = W / H;
+    const square = () => { const S = Math.min(W, H); sc.classList.remove('zo-split', 'zo-port', 'zo-land'); art.style.cssText = `width:${S}px;height:${S}px;left:${lft + (W - S) / 2}px;top:${top + (H - S) / 2}px`; reset(); };
+    if (r >= 0.8 && r < 1.02) return square();
+    const port = r < 0.8, S = port ? W : H, u = S / 1024;
+    const box = (n, k) => { const [x0, y0, x1, y1] = PCS[n]; return { w: (x1 - x0) * u * k, h: (y1 - y0) * u * k }; };
+    const pos = {};
+    const put = (n, X, Y, k) => { pos[n] = [lft + X, top + Y, k]; };
+    if (port) {
+      const kT = 1, kM = 1024 / 840, g = 0.03 * W, kL = (W - 2 * g) / (626 * u);
+      const hT = box('T', kT).h, hM = box('M', kM).h, hL = box('L', kL).h, gap = Math.min(14, H * 0.015);
+      const kS = Math.max(0.9, Math.min((H - hT - hM - hL - 3 * gap) / (208 * u), (0.5 * W) / (310 * u)));
+      const hS = box('S', kS).h, tot = hT + hM + gap + hL + hS;
+      if (tot > H + 1) return square();
+      let y = (H - tot) / 2;
+      put('T', 0, y, kT); y += hT;
+      put('M', (W - box('M', kM).w) / 2, y, kM); y += hM + gap;
+      put('L', g, y, kL); y += hL - gap * 0.2;
+      put('S', (W - box('S', kS).w) / 2, y, kS);
+      put('R', -9999, 0, 1); // the end of the bar is not used upright
+    } else {
+      const a = 0.85, kM = Math.min((H / ((246 + 154) * a + 604)) / u, (W * 0.98) / (1024 * a * u));
+      const kB = kM * a, T = box('T', kB), M = box('M', kM), hB = 154 * u * kB, wB = 984 * u * kB;
+      let y = (H - (T.h + M.h + hB)) / 2;
+      put('T', (W - T.w) / 2, y, kB); y += T.h;
+      put('M', (W - M.w) / 2, y, kM); y += M.h;
+      const X = (W - wB) / 2;
+      const at = (n) => put(n, X + (PCS[n][0] - 20) * u * kB, y + (PCS[n][1] - 850) * u * kB, kB); // the bar as in the picture, under the frame
+      at('L'); at('R'); at('S');
+    }
+    sc.classList.add('zo-split'); sc.classList.toggle('zo-port', port); sc.classList.toggle('zo-land', !port);
+    art.style.cssText = `width:${S}px;height:${S}px;left:0;top:0`;
+    for (const p of pcs) {
+      const n = p.dataset.pc, [X, Y, k] = pos[n], [x0, y0] = PCS[n];
+      p.style.transform = `translate(${(X - k * x0 * u).toFixed(1)}px, ${(Y - k * y0 * u).toFixed(1)}px) scale(${k.toFixed(4)})`;
+    }
   }
 
   say(t) {
-    const s = this.q('.zeus-say');
+    const s = this.q('.zo-word');
     s.textContent = t;
     s.classList.remove('on'); void s.offsetWidth; s.classList.add('on');
   }
 
+  // the winged gem on top of the frame lights up (Zeus' power) — it throws the bolts
   pose(cls, ms = 900) {
-    this.zeus.classList.remove('raise', 'flick');
-    void this.zeus.offsetWidth;
-    this.zeus.classList.add(cls);
+    const g = this.q('.zo-gem');
+    g.classList.remove('raise', 'flick'); void g.offsetWidth; g.classList.add(cls);
     clearTimeout(this.poseT);
-    this.poseT = setTimeout(() => this.zeus.classList.remove(cls), this.turbo ? ms / 2 : ms);
+    this.poseT = setTimeout(() => g.classList.remove(cls), this.turbo ? ms / 2 : ms);
   }
 
   // Framed multiplier, top right of the grid: counts up and flares when it grows.
   setMeter(v, { bump = false, label = null } = {}) {
     const box = this.meter, num = box.querySelector('.zm-v');
-    if (label) box.querySelector('small').textContent = label;
+    if (label) { box.querySelector('small').textContent = label; box.classList.toggle('glob', /global/i.test(label)); }
     const from = this.meterVal;
     this.meterVal = v;
     box.classList.toggle('hot', v > 0);
@@ -187,9 +321,8 @@ class ZeusGame extends BaseGame {
   }
 
   bolt(target) {
-    // the bolt leaves from Zeus' raised fist (top left of the painted figure)
-    const fig = this.q('.z-fig-img') || this.q('.z-hand'), r = fig.getBoundingClientRect();
-    const from = this.q('.z-hand') ? center(this.q('.z-hand')) : { x: r.left + r.width * 0.12, y: r.top + r.height * 0.1 }, to = center(target);
+    // the bolt leaves from the winged gem on top of the frame
+    const from = center(this.q('.zo-gem')), to = center(target);
     const o = el('div', 'g-bolt g-overlay');
     let d = `M ${from.x} ${from.y}`;
     for (let i = 1; i <= 8; i++) { const k = i / 8; d += ` L ${from.x + (to.x - from.x) * k + (i < 8 ? (Math.random() - 0.5) * 34 : 0)} ${from.y + (to.y - from.y) * k + (i < 8 ? (Math.random() - 0.5) * 34 : 0)}`; }
@@ -309,22 +442,23 @@ class ZeusGame extends BaseGame {
     this.setMeter(0, { label: 'Multiplicateur global' });
     while (left > 0 && !this.dead && !this.maxHit) { // stops at the max win (core/base.js)
       left--; done++;
-      this.setBanner(`<b>FREE SPINS</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill hot">Global ×${state.global || 0}</span><span class="pill gold">Gain ${fmtC(total)}</span>`);
+      this.q('.zo-left').textContent = `${done} / ${done + left}`; this.fsTotal = total; this.paintGain();
       const r = await this.playSpin(true, state);
       total = Math.min(bet * CAPX, total + Math.round(r.total * bet));
+      this.fsTotal = total; this.paintGain();
       if (r.scat >= 3) { left += RETRIGGER; this.pose('raise', 1500); await this.featureIntro(`+${RETRIGGER} TOURS`, 'Retrigger !', art('zsc'), 1300); }
       if (total >= bet * CAPX) { this.msg('MAX WIN ×5 000 !'); break; }
       await this.wait(450);
     }
     this.slotEl.classList.remove('in-free');
-    this.setBanner('');
+    this.fsTotal = null; this.paintGain();
     this.setMeter(0, { label: 'Multiplicateur' });
     this.setLast(total);
     await this.celebrate(total, { summary: 'FREE SPINS', stake: bet });
     this.msg(`Bonus terminé : ${fmtC(total)} gagnés`);
   }
 
-  destroy() { clearTimeout(this.poseT); super.destroy(); }
+  destroy() { clearTimeout(this.poseT); this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs); super.destroy(); }
 
   info() {
     const f = (x) => x.toLocaleString('fr-FR', { maximumFractionDigits: 2 });

@@ -172,6 +172,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   la machine est en flex) ; **bug du 15 novembre 2026 « au spin ça efface la slot »** : avec `position: static`, le flash de
   chaque tour (`ml-busy` → `mlCharge`, un `filter` sur `.slot-frame`) faisait de `.slot-frame` le bloc de la scène (hauteur 0)
   pendant 0,5 s. Le flash est aussi coupé pour La Fortune.
+- **L'Olympe, nouveau décor** (`games/zeus.js`, demande du propriétaire du 15 novembre 2026, « pareil » que La Fortune) : **son image**
+  `tools/art/zeus/decor.jpg` (ciel, temple, médaillon MULTIPLICATEUR, cadre doré, barre ☰ / BONUS / MISE / bouton bleu), nettoyée
+  par `tools/art/zeus/clean.py` (les 4 séparations peintes effacées : la grille du jeu a 6 colonnes) → `assets/games/zeus/scene.webp`
+  et `spin.webp`. Grille 6×5 dans le cadre (`.zo-win`), multiplicateur dans le médaillon (`.zo-med`, « GLOBAL » pendant les tours
+  gratuits), plaque SOLDE · GAIN (· TOURS) dans le ciel (`.zo-info`, `paintGain`), éclairs depuis la gemme ailée (`.zo-gem`, plus
+  de Zeus peint à côté), BONUS = plaque d'achat dans le cadre (`askBuy`), annonce et bilan des tours gratuits dans le cadre
+  (`panel`, `featureIntro`, `celebrate`). Plein écran comme La Fortune (`PCS` T / M / L / R / S, `layout()`, fond = ciel en CSS,
+  bas du cadre redessiné `.zo-fbot`). Gains inchangés.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10
