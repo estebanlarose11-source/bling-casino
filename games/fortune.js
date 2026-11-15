@@ -126,6 +126,14 @@ const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; }
 const save = (o) => { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch { /* ignore */ } };
 
 const LEVELS = ['', 'Normal', 'Turbo', 'Super turbo'];
+// Full screen (owner's request: « que ça prenne tout l'écran, comme un vrai jeu »): the picture is cut into pieces
+// (in its own pixels, 1024 × 1024) that are moved and enlarged one by one to fill a tall phone or a wide screen.
+// T jackpots and temple, M reels, L i / MISE / NIVEAU, R PIÈCES / SOLDE / menu, S spin + BONNE CHANCE !
+const PCS = { T: [90, 0, 934, 300], M: [128, 300, 896, 778], L: [22, 796, 402, 912], R: [618, 796, 1002, 912], S: [398, 762, 628, 968] };
+function pbg(n) {
+  const [x0, y0, x1, y1] = PCS[n], w = x1 - x0, h = y1 - y0, pc = (v) => `${(v / 10.24).toFixed(3)}%`;
+  return `<i class="ft-pbg" style="left:${pc(x0)};top:${pc(y0)};width:${pc(w)};height:${pc(h)};background-size:${(102400 / w).toFixed(2)}% ${(102400 / h).toFixed(2)}%;background-position:${((x0 / (1024 - w)) * 100).toFixed(3)}% ${((y0 / (1024 - h)) * 100).toFixed(3)}%"></i>`;
+}
 
 class FortuneGame extends BaseGame {
   constructor(root, game) {
@@ -135,28 +143,37 @@ class FortuneGame extends BaseGame {
       // the owner's picture (1024 × 1024): jackpot plaques at the top, the reels in the black frame, his bar at the
       // bottom made clickable (MISE, NIVEAU = speed, PIÈCES = the coin pot, SOLDE, spin, i, menu, BONNE CHANCE !)
       stage: `<div class="ft-scene"><div class="ft-art">
-          <div class="ft-jp major"><b data-jp="major"></b></div>
-          <div class="ft-jp jackpot"><b data-jp="jackpot"></b></div>
-          <div class="ft-jp mini"><b data-jp="mini"></b></div>
-          <button class="ft-hot ft-i" type="button" data-act="info" aria-label="Règles et gains"></button>
-          <button class="ft-hot ft-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
-          <button class="ft-hot ft-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button>
-          <button class="ft-hot ft-pm ft-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
-          <b class="ft-val ft-bet"></b>
-          <button class="ft-hot ft-pm ft-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
-          <button class="ft-hot ft-pm ft-lm" type="button" data-lvl="-1" aria-label="Moins vite"></button>
-          <b class="ft-val ft-lvl"></b>
-          <button class="ft-hot ft-pm ft-lp" type="button" data-lvl="1" aria-label="Plus vite"></button>
-          <b class="ft-val ft-pieces ft-bowl"></b>
-          <b class="ft-val ft-bal"></b>
-          <button class="ft-spin" type="button" data-act="main" aria-label="Lancer"><img src="${src('spin')}" alt="" draggable="false"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
-          <b class="ft-say"></b>
-          <div class="ft-bhud"><b class="ft-bname"></b><span class="ft-lights">${[0, 1, 2].map(() => `<i>${img('coin', 'ft-img')}</i>`).join('')}</span></div>
-          <div class="ft-ov"></div>
-          <div class="ft-win"><div class="reels-host"></div><div class="ft-rows">${[0, 1, 2].map((r) => `<i data-row="${r}"></i>`).join('')}</div></div>
-          <div class="ft-word"></div>
+          <div class="ft-pc" data-pc="T">${pbg('T')}
+            <div class="ft-jp major"><b data-jp="major"></b></div>
+            <div class="ft-jp jackpot"><b data-jp="jackpot"></b></div>
+            <div class="ft-jp mini"><b data-jp="mini"></b></div>
+          </div>
+          <div class="ft-pc" data-pc="M">${pbg('M')}
+            <div class="ft-win"><div class="reels-host"></div><div class="ft-rows">${[0, 1, 2].map((r) => `<i data-row="${r}"></i>`).join('')}</div></div>
+            <div class="ft-word"></div>
+            <div class="ft-bhud"><b class="ft-bname"></b><span class="ft-lights">${[0, 1, 2].map(() => `<i>${img('coin', 'ft-img')}</i>`).join('')}</span></div>
+            <div class="ft-ov"></div>
+          </div>
+          <div class="ft-pc" data-pc="L">${pbg('L')}
+            <button class="ft-hot ft-i" type="button" data-act="info" aria-label="Règles et gains"></button>
+            <button class="ft-hot ft-pm ft-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+            <b class="ft-val ft-bet"></b>
+            <button class="ft-hot ft-pm ft-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+            <button class="ft-hot ft-pm ft-lm" type="button" data-lvl="-1" aria-label="Moins vite"></button>
+            <b class="ft-val ft-lvl"></b>
+            <button class="ft-hot ft-pm ft-lp" type="button" data-lvl="1" aria-label="Plus vite"></button>
+          </div>
+          <div class="ft-pc" data-pc="R">${pbg('R')}
+            <b class="ft-val ft-pieces ft-bowl"></b>
+            <b class="ft-val ft-bal"></b>
+            <button class="ft-hot ft-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+          </div>
+          <div class="ft-pc" data-pc="S">${pbg('S')}
+            <button class="ft-spin" type="button" data-act="main" aria-label="Lancer"><img src="${src('spin')}" alt="" draggable="false"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+            <b class="ft-say"></b>
+          </div>
           <div class="ft-dust">${Array.from({ length: 18 }, (_, k) => `<i style="left:${(k * 53) % 100}%;--dx:${((k * 29) % 60) - 30}px;animation-duration:${6 + (k % 5) * 1.7}s;animation-delay:-${(k * 1.3) % 9}s"></i>`).join('')}</div>
-        </div></div>`,
+        </div><button class="ft-hot ft-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       buys: [
         { id: 'hold', icon: '🪙', label: 'Hold & Spin · 6 pièces', desc: '6 pièces d’or verrouillées, 3 respins · MINI, MAJOR et JACKPOT en jeu · lignes ×2 et ×5', cost: (b) => b * BUY_HOLD },
         { id: 'mega', icon: '🐉', label: 'MÉGA BONUS', desc: 'Hold & Spin où chaque pièce vaut ×2 à ×5 · les lignes s’allument plus souvent', cost: (b) => b * BUY_MEGA },
@@ -180,9 +197,62 @@ class FortuneGame extends BaseGame {
     this.sayObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
     this.paintSay();
     this.onBetChange();
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.ft-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
+    this.layout();
   }
 
-  destroy() { this.sayObs?.disconnect(); super.destroy(); }
+  // Square picture on the page; in full screen: square if the screen is about square, else the pieces fill it.
+  layout() {
+    if (this.dead) return;
+    const sc = this.q('.ft-scene'), art = this.q('.ft-art'), pcs = this.qa('.ft-pc');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('ft-fs', full);
+    const W = sc.clientWidth, H = sc.clientHeight, reset = () => pcs.forEach((p) => { p.style.transform = ''; });
+    if (!full || !W || !H) { sc.classList.remove('ft-split'); art.style.cssText = ''; reset(); return; }
+    const square = () => { const S = Math.min(W, H); sc.classList.remove('ft-split'); art.style.cssText = `width:${S}px;height:${S}px;left:${(W - S) / 2}px;top:${(H - S) / 2}px`; reset(); };
+    const r = W / H;
+    if (r > 0.8 && r < 1.3) return square();
+    const port = r <= 0.8, S = port ? W : H, u = S / 1024;
+    const box = (n, k) => { const [x0, y0, x1, y1] = PCS[n]; return { w: (x1 - x0) * u * k, h: (y1 - y0) * u * k }; };
+    const pos = {};
+    const put = (n, X, Y, k) => { pos[n] = [X, Y, k]; };
+    if (port) {
+      const kT = 1024 / 844, kM = 1024 / 768, g = 0.02 * W, kLR = (W - 3 * g) / ((380 + 384) * u);
+      const hT = box('T', kT).h, hM = box('M', kM).h, hLR = box('L', kLR).h;
+      const room = H - hT - hM - hLR;
+      const kS = Math.min((room * 0.7) / (206 * u), (0.44 * W) / (230 * u));
+      if (kS < 1) return square();
+      const hS = box('S', kS).h, gap = (H - hT - hM - hLR - hS) / 4;
+      let y = 0;
+      put('T', 0, y, kT); y += hT + gap * 0.8;
+      put('M', 0, y, kM); y += hM + gap * 1.1;
+      put('L', g, y, kLR); put('R', W - g - box('R', kLR).w, y, kLR); y += hLR + gap * 1.1;
+      put('S', (W - box('S', kS).w) / 2, y, kS);
+    } else {
+      let kC = (0.97 * 1024) / 778;
+      kC = Math.min(kC, (W * 0.58) / (844 * u)); // the sides keep about 21 % each for the bar
+      const T = box('T', kC), M = box('M', kC), colH = T.h + M.h, side = (W - T.w) / 2;
+      if (side < 150 || M.h < H * 0.42) return square();
+      const y0 = (H - colH) / 2, X = (W - T.w) / 2;
+      put('T', X, y0, kC); put('M', X + (T.w - M.w) / 2, y0 + T.h, kC);
+      const kLR = Math.min((side * 0.92) / (384 * u), 1.7), L = box('L', kLR), R = box('R', kLR), gap = H * 0.04;
+      const yl = (H - L.h - R.h - gap) / 2;
+      put('L', (side - L.w) / 2, yl, kLR); put('R', (side - R.w) / 2, yl + L.h + gap, kLR);
+      const kS = Math.min((side * 0.85) / (230 * u), (H * 0.55) / (206 * u)), Sb = box('S', kS);
+      put('S', W - side + (side - Sb.w) / 2, (H - Sb.h) / 2, kS);
+    }
+    sc.classList.add('ft-split');
+    art.style.cssText = `width:${S}px;height:${S}px;left:0;top:0`;
+    for (const p of pcs) {
+      const n = p.dataset.pc, [X, Y, k] = pos[n], [x0, y0] = PCS[n];
+      p.style.transform = `translate(${(X - k * x0 * u).toFixed(1)}px, ${(Y - k * y0 * u).toFixed(1)}px) scale(${k.toFixed(4)})`;
+    }
+  }
+
+  destroy() { this.sayObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs); super.destroy(); }
 
   /* ---------- the bonus inside the owner's picture ---------- */
   // plaque over the top of the reel frame: bonus name + the 3 respins as gold coins; the total in BONNE CHANCE !
@@ -245,7 +315,7 @@ class FortuneGame extends BaseGame {
   paintSay() {
     const n = this.q('.ft-say'); if (!n) return;
     if (this.sayTotal !== undefined && this.sayTotal !== null) { n.innerHTML = `<small>TOTAL</small> ${fmtC(this.sayTotal)}`; n.classList.add('won'); return; }
-    const w = this.winAmt.textContent.trim();
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, ''); // the count-up eases in with a tiny overshoot below 0
     n.innerHTML = w ? `<small>GAIN</small> ${w}` : 'BONNE CHANCE !';
     n.classList.toggle('won', !!w);
   }

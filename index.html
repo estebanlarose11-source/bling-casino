@@ -4473,7 +4473,7 @@ html.light .slot small { color: inherit; }
 
 /* ============ La Fortune (games/fortune.js): the owner's picture of 15 November 2026 (1024 × 1024, scene.webp):
    jackpot plaques MAJOR / JACKPOT / MINI, reels in the black frame, his bar made clickable (the usual bar is hidden) ============ */
-.g-fortune { --slot-bg: linear-gradient(180deg, rgba(20, 4, 2, .35), rgba(20, 4, 2, .6)), url(assets/games/fortune/back.webp?v=3) center / cover no-repeat, #1c0303; }
+.g-fortune { --slot-bg: linear-gradient(180deg, rgba(20, 4, 2, .35), rgba(20, 4, 2, .6)), url(assets/games/fortune/back.webp?v=5) center / cover no-repeat, #1c0303; }
 .g-fortune > .slot-bg { filter: none !important; }
 .g-fortune .slot-title, .g-fortune .slot-head, .g-fortune .controls, .g-fortune > .win-bar { display: none !important; }
 .ft-frame { padding: 0 !important; border-radius: 0; background: none !important; box-shadow: none !important; }
@@ -4487,7 +4487,7 @@ html.light .slot small { color: inherit; }
 .ft-hot[disabled] { cursor: default; background: rgba(0, 0, 0, .45); }
 .ft-i { left: 3.3%; top: 80.6%; width: 6.6%; height: 6.6%; }
 .ft-menu { left: 89.65%; top: 80.6%; width: 6.6%; height: 6.6%; }
-.ft-full { left: 94%; top: 1.2%; width: 4.6%; height: 4.6%; border-radius: 8px; background: rgba(20, 4, 2, .55); color: #fde68a; font: 700 2.8cqw/1 sans-serif; box-shadow: inset 0 0 0 1px rgba(253, 224, 71, .5); }
+.ft-full { z-index: 8; right: 1.2%; top: 1.2%; width: clamp(28px, 4.6%, 44px); height: clamp(28px, 4.6%, 44px); border-radius: 8px; background: rgba(20, 4, 2, .55); color: #fde68a; font: 700 clamp(14px, 2.4vmin, 22px)/1 sans-serif; box-shadow: inset 0 0 0 1px rgba(253, 224, 71, .5); }
 .ft-pm { top: 82.5%; width: 3.7%; height: 3.7%; }
 .ft-bm { left: 10.95%; } .ft-bp { left: 22.6%; } .ft-lm { left: 27.15%; } .ft-lp { left: 34.85%; }
 .ft-val { position: absolute; z-index: 4; display: flex; align-items: center; justify-content: center; white-space: nowrap; overflow: hidden; pointer-events: none;
@@ -4520,7 +4520,6 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-fortune.g-fortune > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
 .game-host.is-full > .slot.g-fortune.g-fortune > .mx-row { position: absolute; z-index: 6; top: max(8px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); margin: 0; }
 .game-host.is-full > .slot.g-fortune.g-fortune > .slot-frame { width: 100%; align-self: center; }
-.game-host.is-full .g-fortune .ft-scene { width: min(100%, calc(100svh - 8px)); }
 /* the bonus inside the picture: plaque on the top of the reel frame, panels in the frame (intro, total) */
 .ft-bhud { position: absolute; z-index: 6; left: 31%; top: 28.3%; width: 38%; height: 5.2%; display: flex; align-items: center; justify-content: center; gap: 4%; padding: 0 2%; box-sizing: border-box; pointer-events: none; opacity: 0; transform: translateY(-30%) scale(.9); transition: opacity .35s, transform .35s;
   border-radius: 6px; background: linear-gradient(180deg, #8f1111, #4a0505); box-shadow: inset 0 0 0 2px #2a0202, inset 0 0 0 4px #d9a320, inset 0 0 0 5px #6b3d06, 0 4px 14px rgba(0, 0, 0, .6), 0 0 18px rgba(253, 224, 71, .35); }
@@ -4556,6 +4555,21 @@ html.light .slot small { color: inherit; }
 .slot.ft-hold .ft-spin img { filter: grayscale(.4) brightness(.8); }
 .slot.g-fortune > .feature-banner { display: none !important; }
 .slot.g-fortune > .feature-banner { position: absolute; z-index: 6; top: 10px; left: 12px; margin: 0; max-width: calc(100% - 190px); }
+/* full screen: the scene covers the screen; the picture is square, or cut into pieces placed by layout() (ft-split) */
+.ft-pc { position: absolute; inset: 0; z-index: 2; transform-origin: 0 0; pointer-events: none; }
+.ft-hot, .ft-spin, .ft-ov { pointer-events: auto; }
+.ft-pbg { position: absolute; display: none; background-image: url(assets/games/fortune/scene.webp?v=3); background-repeat: no-repeat; pointer-events: none; }
+.ft-scene.ft-fs { position: fixed; inset: 0; z-index: 1; width: auto; height: auto; aspect-ratio: auto; margin: 0; border-radius: 0; box-shadow: none;
+  background: radial-gradient(90% 70% at 50% 45%, rgba(40, 6, 2, .35), rgba(8, 1, 0, .85)), url(assets/games/fortune/back.webp?v=5) center / cover no-repeat, #0d0302; }
+.ft-fs .ft-full { position: fixed; right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
+.ft-split .ft-art { background: none; }
+.ft-split .ft-art::after { display: none; }
+.ft-split .ft-pbg { display: block; -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(180deg, transparent, #000 5%, #000 95%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(180deg, transparent, #000 5%, #000 95%, transparent); mask-composite: intersect; }
+.ft-split [data-pc="T"] .ft-pbg { -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent), linear-gradient(180deg, #000 85%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent), linear-gradient(180deg, #000 85%, transparent); }
+.ft-split [data-pc="M"] .ft-pbg { filter: drop-shadow(0 0 20px rgba(0, 0, 0, .7)); }
+.ft-split [data-pc="S"] .ft-pbg { -webkit-mask-image: radial-gradient(closest-side, #000 75%, transparent); mask-image: radial-gradient(closest-side, #000 75%, transparent); }
+.slot.ft-hold .ft-scene.ft-split { background: radial-gradient(90% 70% at 50% 45%, rgba(90, 10, 2, .1), rgba(8, 1, 0, .85)), url(assets/games/fortune/back.webp?v=5) center / cover no-repeat, #0d0302; }
+.game-host.is-full > .slot.g-fortune.g-fortune > .mx-row { z-index: 9; }
 .game-host:not(.is-full):has(> .g-fortune) { max-width: max(420px, min(1000px, calc(100svh - 200px))); }
 .g-fortune .reels-host { position: absolute; inset: 0; }
 .g-fortune .rs { width: 100%; height: 100%; aspect-ratio: auto; min-width: 0; gap: 0; }
@@ -12583,7 +12597,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'fortune', date: '2026-11-15', title: 'Nouveau décor pour La Fortune', items: ['Un tout nouveau décor : le temple, les dragons d’or et les lanternes autour des rouleaux', 'Trois jackpots en haut, MINI, MAJOR et JACKPOT, qui dépendent de ta mise et grimpent à chaque spin', 'Nouvelle pièce MINI pendant le Hold & Spin', 'Nouvelle barre de jeu : mise, niveau de vitesse, tas de pièces, solde et le gros bouton rouge', 'Le Hold & Spin et le MÉGA BONUS se jouent dans le décor : annonce dans le cadre, plaque avec les respins, total en bas et nuit sur le temple'] },
+  { game: 'fortune', date: '2026-11-15', title: 'Nouveau décor pour La Fortune', items: ['Un tout nouveau décor : le temple, les dragons d’or et les lanternes autour des rouleaux', 'Trois jackpots en haut, MINI, MAJOR et JACKPOT, qui dépendent de ta mise et grimpent à chaque spin', 'Nouvelle pièce MINI pendant le Hold & Spin', 'Nouvelle barre de jeu : mise, niveau de vitesse, tas de pièces, solde et le gros bouton rouge', 'Le Hold & Spin et le MÉGA BONUS se jouent dans le décor : annonce dans le cadre, plaque avec les respins, total en bas et nuit sur le temple', 'En plein écran, le jeu prend tout l’écran : rouleaux bien plus grands sur téléphone, sur tablette et sur ordinateur'] },
   { game: 'pirates', date: '2026-11-12', isNew: true, title: 'Nouvelle machine : Le Coffre aux Pirates', items: ['Un bateau pirate file sur la mer derrière toute la machine, avec sa musique de pirates', 'Jackpots MINI, MINOR, MAJOR et GRAND en haut de l’écran', 'La Chasse au trésor : 3 vies, Tonneaux jusqu’à ×50, Ancres, et le coffre qui s’ouvre ×500', 'Les Tours gratuits : le Crabe tombe partout et ramasse ×1, ×2, ×3…', 'Jusqu’à ×50 000 la mise'] },
   { game: 'viking', date: '2026-11-11', isNew: true, title: 'Nouvelle machine : Le Valhalla', items: ['4 Jarls : 15 tours gratuits avec 5 WILD qui restent collés', 'Chaque nouveau WILD reste aussi jusqu’à la fin du bonus', 'Les jauges du Jarl et de la valkyrie lancent le bonus toutes seules', 'À 500, la valkyrie devient un WILD géant qui se déplace et grandit à chaque connexion'] },
   { game: 'storm', date: '2026-11-10', title: 'Nouvelle table en 3D', items: ['La même table que La Roulette : tapis bleu, roue en bois et caméra qui suit la bille', 'Les éclairs frappent directement les numéros du tapis', 'Mise sur le cylindre : Tiers, Orphelins, Voisins, Jeu zéro', 'Tableau lumineux des derniers numéros et statistiques'] },
@@ -15748,7 +15762,7 @@ const FILES = {
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', 'e23f21079d'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'fb3eda6835'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
-  fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', '67c6869c93'],
+  fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', '35ef8fe505'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '9621261bab'],
