@@ -62,6 +62,18 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Achats ×77 / ×315. Simulation `node tools/sim/viking.js` (6 M tours, jauges comprises) : RTP ≈ 92 % (lignes 54, bonus 38),
   un gain 1 tour sur 3,8, un bonus 1 tour sur 246 (4 Jarls 1/905, jauge Jarl 1/403, Valkyrie géante 1/2 090), achats ≈ 88 %,
   max ×1 000 (≈ 1 Valkyrie géante sur 120 ; grille entière dans ≈ 27 % d'entre elles).
+- **L'Anubis, décors animés** (`games/anubis.js`, demande du propriétaire du 15 novembre 2026, comme L'Hydre) : **ses 4 vidéos**
+  `tools/art/anubis/` : le temple du jeu de base `fond-large.mp4` (672 × 448, `.an-l`) / `fond-haut.mp4` (448 × 672, `.an-p`) et la salle
+  des bonus `bonus-large.mp4` / `bonus-haut.mp4` (9 s, `.an-b` : 5 cases en haut, grille, 3 barres violettes « LIVES »).
+  `tools/art/anubis/clean.py` efface MINI / MAJOR / GRAND JACKPOT (pas de jackpot : nos plaques SOLDE / MULTIPLICATEUR / GAIN,
+  `.an-plate`, le multiplicateur = `.gm-meter`), « $1.00 » et « LIVES » (on écrit RELANCES) → `assets/games/anubis/fond-*.mp4`,
+  `bonus-*.mp4` + `scene-*.webp`. Les classes `judge` / `under` sur la machine passent à la salle des bonus (`orient()`, `clsObs` ;
+  boucles différentes : `LOOP.fond` / `LOOP.bonus`, `VideoBg.loop` se change). Jugement : multiplicateurs des colonnes (`jrow`) dans
+  ses 5 cases du haut, relances = ses 3 barres (`.jbars i`, assombries quand une relance est perdue) ; Monde souterrain : `mrow`
+  dans les cases du haut, tours restants sur les barres (`.an-left`) ; plaque du bonus `.an-bhud` (`hud()`). Barre cliquable `.an-hot`
+  (base seulement). **Cubes du Jugement = son image** (`tools/art/anubis/cubes.jpg`, `cubes.py`) : glace `jc-ice` (tombe), pierre
+  `jc-stone` (posé, multiplicateur écrit dessus `.sg-lab.jv`), crâne de pierre `jc-skull` (+), crâne doré `jc-gold` (×), lave `jc-lava`.
+  Piège : le cube qui tombe (`.jfly`) a son image en `position: absolute` (sinon elle devient carrée dans une case large). Gains inchangés.
 - **Anubis, bonus Jugement** (`games/anubis.js`, voulu par le propriétaire) : une colonne pleine ne fusionne plus toute
   seule (seul un cube de lave la fait redescendre ; une colonne pleine ne reçoit que lave ou crâne doré), moins d'objets
   qui tombent (`JPC` 0,12) mais beaucoup plus de crânes (`JW` cube 40 / crâne 20 / doré 3 / lave 4, crânes ×`SKX` = +8 à

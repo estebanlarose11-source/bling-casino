@@ -11,6 +11,7 @@ const { DEFS } = __mods['art/anubis.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el } = __mods['ui.js'];
+const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
 
 /* ===ENGINE (original) */
 const C = 5, R = 6, N = 30, MINC = 5, F = 0.33, UINC = 3, CAPX = 10000;
@@ -57,11 +58,19 @@ function pickItem(cubes) {
 const MUSIC = { sd: 0.3, len: 16, root: 110, pad: { wave: 'sawtooth', vol: 0.02, dur: 2.2, map: { 0: [0, 3, 7], 8: [-4, 0, 3] } }, lead: { wave: 'triangle', vol: 0.06, dur: 0.5, pat: [null, null, null, null, 12, null, null, 15, null, null, null, null, 14, null, 12, null] }, bass: { wave: 'sine', vol: 0.16, dur: 0.9, pat: [-12, null, null, null, null, null, null, null, -16, null, null, null, null, null, null, null] }, kick: [0, 3, 8, 11], kv: 0.28 };
 const NAMES = ['Anubis', 'Masque de pharaon', 'Œil d’Horus', 'Scarabée', 'Ankh', 'Vase canope', 'Pyramide', 'Gemme turquoise', 'Gemme orange'];
 // Painted symbols: assets/games/anubis/s0..s8.webp, w.webp (joker), sc.webp (scatter).
-const IMG_V = 3, IMG_N = 9;
+// The whole machine: the owner's 4 animated backgrounds of 15 November 2026 (tools/art/anubis/clean.py): the temple of the
+// base game (fond-large.mp4 for computers and wide screens, fond-haut.mp4 for phones held upright: SOLDE / MULTIPLICATEUR
+// / GAIN on his 3 plates, the grid on his painted cells, his bar made clickable) and the hall of the bonuses (bonus-large /
+// bonus-haut: the column multipliers in his 5 cells on top, the grid, his 3 purple bars = the respins of the Judgment).
+// Loops of 121 / 193 frames (24 images/s) + their first 12 frames again (core/videobg.js).
+const IMG_V = 4, IMG_N = 9;
+const LOOP = { fond: 121 / 24, bonus: 193 / 24 };
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const imgFile = (v) => (v === -2 ? 'w' : v === -1 ? 'sc' : `s${v}`); // WILD = -2, SC = -1 (see the engine)
-// Judgment cubes painted by the owner: stone (falling cube), black-and-gold (value cube), purple skull, golden skull, lava.
-const JC = { cbb: 'jc-stone', cbx: 'jc-black', cbn: 'jc-black', cbk: 'jc-skull', cbg: 'jc-gold', cbr: 'jc-lava' };
+// Judgment cubes painted by the owner (15 November 2026, tools/art/anubis/cubes.py): an ice cube falls and turns to stone
+// when it lands (the stone cube carries its multiplier), stone skull (adds to the column), golden skull (multiplies the
+// column), lava cube.
+const JC = { cbb: 'jc-ice', cbx: 'jc-stone', cbn: 'jc-stone', cbk: 'jc-skull', cbg: 'jc-gold', cbr: 'jc-lava' };
 const cart = (id) => `<img class="an-img jc ${id}" src="${asset(`assets/games/anubis/${JC[id]}.webp`)}" alt="" draggable="false" decoding="async">`;
 const imgSym = (v) => `<img class="an-img" src="${asset(`assets/games/anubis/${imgFile(v)}.webp`)}" alt="" draggable="false" decoding="async">`;
 const BUYU = 100, BUYJ = 150;
@@ -94,8 +103,24 @@ class AnubisGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       defs: DEFS, music: MUSIC,
-      head: '<div class="head-meters"><div class="meter gm-meter"><small>Multiplicateur</small><b>×1</b></div></div>',
-      stage: '<div class="an-bg"><svg class="an-relief" viewBox="0 0 200 200" aria-hidden="true"><path d="M100 18c-22 0-34 18-34 36 0 20 16 38 26 46H56v18h36v66h16v-66h36v-18h-36c10-8 26-26 26-46 0-18-12-36-34-36zm0 16c12 0 18 10 18 20 0 14-10 28-18 36-8-8-18-22-18-36 0-10 6-20 18-20z"/></svg><i class="an-pillar l"></i><i class="an-pillar r"></i><i class="an-sun"></i><i class="an-torch l"></i><i class="an-torch r"></i><i class="an-sand"></i><i class="an-embers"></i></div><div class="an-word"></div><div class="col-row jrow"></div><div class="grid-host"></div><div class="jbars"><i></i><i></i><i></i></div><div class="col-row mrow"></div>',
+      stage: `<div class="an-scene an-l"><i class="an-safe"></i><div class="an-art">
+          <video class="an-vid" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+          <div class="an-plate p0"><small>SOLDE</small><b class="an-bal"></b></div>
+          <div class="an-plate p1 gm-meter"><small>MULTIPLICATEUR</small><b>×1</b></div>
+          <div class="an-plate p2"><small>GAIN</small><b class="an-gain"></b></div>
+          <div class="an-top"><div class="col-row jrow"></div><div class="col-row mrow"></div></div>
+          <div class="an-win"><div class="grid-host"></div></div>
+          <div class="jbars"><i></i><i></i><i></i></div><b class="an-relx">RELANCES</b>
+          <div class="an-left"></div>
+          <div class="an-bhud"><b></b><span></span></div>
+          <button class="an-hot an-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="an-bet"></b>
+          <button class="an-hot an-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="an-hot an-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+          <button class="an-hot an-spin" type="button" data-act="main" aria-label="Lancer"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          <button class="an-hot an-max" type="button" data-act="max" aria-label="Mise maximum"></button>
+          <div class="an-word"></div>
+        </div><button class="an-hot an-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       buys: [
         { id: 'U', icon: '💀', label: 'Monde souterrain · 3 scatters', desc: '10 tours, multiplicateurs par colonne et crânes dorés', cost: (b) => b * BUYU },
         { id: 'J', icon: '🟦', label: 'Jugement · 4 scatters', desc: 'Cubes multiplicateurs, crânes qui additionnent, cubes de lave, crânes dorés jusqu’à ×100', cost: (b) => b * BUYJ },
@@ -116,6 +141,76 @@ class AnubisGame extends BaseGame {
       cls: (v) => (v === WILD ? 'wild' : v === SC ? 'scatter' : v >= 1000 ? 'gskull' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => Math.floor(Math.random() * SYMN)));
+    // the usual bar, message line and bonus banner are hidden: everything is on the temple
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    this.gainObs = new MutationObserver(() => this.paintGain());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    // the bonuses (classes judge / under on the machine) play the hall of the bonuses
+    this.clsObs = new MutationObserver(() => this.layout());
+    this.clsObs.observe(this.slotEl, { attributes: true, attributeFilter: ['class'] });
+    this.vbg = new VideoBg(this.q('.an-vid'), { loop: LOOP.fond, root: this.root });
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.an-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
+    this.onMeters(); this.paintGain(); this.layout();
+  }
+
+  destroy() {
+    this.gainObs?.disconnect(); this.clsObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs);
+    this.vbg?.destroy();
+    super.destroy();
+  }
+
+  /* ---------- the owner's temple: plates, bar, full screen ---------- */
+  onMeters() {
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) { n.textContent = t; n.style.setProperty('--n', Math.max(7, t.length)); } };
+    set('.an-bet', fmtC(this.bet)); set('.an-bal', fmtC(this.balC()));
+  }
+  paintGain() {
+    const n = this.q('.an-gain'); if (!n) return;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    n.textContent = w || fmtC(0);
+    n.style.setProperty('--n', Math.max(7, n.textContent.length));
+    n.parentElement.classList.toggle('won', !!w);
+  }
+  // the plate of the bonuses (title, then what matters) and, in the Underworld, the spins left over the 3 bars
+  hud(title, info, left) {
+    const h = this.q('.an-bhud');
+    h.querySelector('b').textContent = title || '';
+    h.querySelector('span').innerHTML = info || '';
+    h.classList.toggle('on', !!title);
+    const l = this.q('.an-left');
+    l.innerHTML = left || '';
+    l.classList.toggle('on', !!left);
+  }
+  orient(port) {
+    const sc = this.q('.an-scene'), bonus = this.slotEl.classList.contains('judge') || this.slotEl.classList.contains('under');
+    const name = `${bonus ? 'bonus-' : ''}${port ? 'haut' : 'large'}`;
+    sc.classList.toggle('an-p', port); sc.classList.toggle('an-l', !port); sc.classList.toggle('an-b', bonus);
+    this.vbg.loop = bonus ? LOOP.bonus : LOOP.fond;
+    this.vbg.set(asset(`assets/games/anubis/${bonus ? name : `fond-${name}`}.mp4`), asset(`assets/games/anubis/scene-${name}.webp`));
+  }
+  // Wide temple on a computer, tall temple on a phone held upright. Full screen: the one that fits the screen's shape
+  // covers the whole screen, cropped on its edges but never cutting the plates, the grid or the bar (KEY, in the video's
+  // pixels); a screen of another shape gets the rest of the picture, blurred, around it.
+  layout() {
+    if (this.dead || !this.vbg) return;
+    const sc = this.q('.an-scene'), art = this.q('.an-art');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('an-fullsc', full);
+    if (!full) {
+      sc.classList.remove('an-bandx', 'an-bandy');
+      this.orient(innerWidth < 700 && innerHeight > innerWidth);
+      art.style.cssText = ''; return;
+    }
+    const { top, lft, W, H } = screenBox(sc, this.q('.an-safe'));
+    if (!W || !H) return;
+    const port = W / H < 1;
+    this.orient(port);
+    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [8, 30, 440, 664] : [40, 18, 632, 446], { bottom: port });
+    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
+    sc.classList.toggle('an-bandx', f.bandX); sc.classList.toggle('an-bandy', f.bandY);
   }
 
   word(k, text) {
@@ -273,6 +368,7 @@ class AnubisGame extends BaseGame {
     this.renderM(M);
     for (let s = 10; s >= 1 && sum < cap && !this.dead; s--) {
       this.setBanner(`<b>MONDE SOUTERRAIN</b><span class="pill">${s} tour${s > 1 ? 's' : ''} restant${s > 1 ? 's' : ''}</span><span class="pill gold">Gain ${fmtC(sum)}</span>`);
+      this.hud('MONDE SOUTERRAIN', `Gain <em>${fmtC(sum)}</em>`, `<b>${s}</b> TOUR${s > 1 ? 'S' : ''} RESTANT${s > 1 ? 'S' : ''}`);
       const g = Array.from({ length: N }, rndU);
       this.msg('Tour gratuit…');
       await this.grid.dropIn(g);
@@ -283,12 +379,14 @@ class AnubisGame extends BaseGame {
       const res = await this.sequence(g, 'under', M, cap - sum);
       sum += res.total;
       this.setLast(sum);
+      this.hud('MONDE SOUTERRAIN', `Gain <em>${fmtC(sum)}</em>`, `<b>${s - 1}</b> TOUR${s - 1 > 1 ? 'S' : ''} RESTANT${s - 1 > 1 ? 'S' : ''}`);
       if (res.capHit) break;
       await this.wait(450);
     }
     this.mrow.classList.remove('on');
     this.slotEl.classList.remove('in-free', 'under');
     this.setBanner('');
+    this.hud('');
     return sum;
   }
 
@@ -496,9 +594,9 @@ class AnubisGame extends BaseGame {
       if (b.dataset.v !== t) { b.dataset.v = t; b.innerHTML = `<i>×</i>${t}`; d.classList.remove('hit'); void d.offsetWidth; d.classList.add('hit'); }
       d.classList.toggle('mod', x.mod); d.classList.toggle('lit', x.n > 0 || x.mod);
     });
-    const info = () => { this.qa('.jbars i').forEach((bar, k) => bar.classList.toggle('on', k < respins)); this.setBanner(`<b>JUGEMENT</b><span class="pill respins">${[0, 1, 2].map((k) => `<i class="dot${k < respins ? ' on' : ''}"></i>`).join('')} Relances</span><span class="pill gold">Total ×${fxv(total())} · ${fmtC(Math.min(cap, Math.round(bet * total())))}</span>`); };
+    const info = () => { this.qa('.jbars i').forEach((bar, k) => bar.classList.toggle('on', k < respins)); this.setBanner(`<b>JUGEMENT</b><span class="pill respins">${[0, 1, 2].map((k) => `<i class="dot${k < respins ? ' on' : ''}"></i>`).join('')} Relances</span><span class="pill gold">Total ×${fxv(total())} · ${fmtC(Math.min(cap, Math.round(bet * total())))}</span>`); this.hud('JUGEMENT', `Total <i>×${fxv(total())}</i> <em>${fmtC(Math.min(cap, Math.round(bet * total())))}</em>`); };
 
-    await this.featureIntro('JUGEMENT', 'Les cubes de pierre tombent et deviennent des cubes noir et or avec le multiplicateur de leur colonne · crânes noirs, crânes dorés et cubes de lave', cart('cbb'));
+    await this.featureIntro('JUGEMENT', 'Les cubes de glace tombent et se changent en pierre avec le multiplicateur de leur colonne · crânes de pierre qui additionnent, crânes dorés qui multiplient, cubes de lave', cart('cbb'));
     this.slotEl.classList.add('in-free', 'judge');
     for (let i = 0; i < N; i++) this.lava(i);
     this.jrow.classList.add('on');
@@ -607,6 +705,7 @@ class AnubisGame extends BaseGame {
     this.jrow.classList.remove('on');
     this.slotEl.classList.remove('in-free', 'judge');
     this.setBanner('');
+    this.hud('');
     return maxWin ? cap : Math.min(Math.round(bet * total()), cap);
   }
 
@@ -617,7 +716,7 @@ class AnubisGame extends BaseGame {
       <div class="pay-item"><div class="pay-sym svg">${symArt(SC)}</div><div class="pay-vals"><b>Scatter</b><br><span>3 = Monde souterrain · 4+ = Jugement</span></div></div></div>
       <h4>Cascades</h4><p>Grille 5×6. Une grappe de <b>5 symboles ou plus</b> paie mise × valeur × 0,33 × (taille − 4) × multiplicateur, disparaît et les symboles tombent.</p>
       <h4>Monde souterrain</h4><p>10 tours. Chaque colonne a son multiplicateur, qui monte de +3 à chaque gain qui la touche. Un <b>crâne doré</b> multiplie sa colonne (×2 à ×100).</p>
-      <h4>Jugement</h4><p>Chaque colonne a un multiplicateur, affiché tout en haut. Un <b>cube de pierre</b> tombe dans la colonne et devient un <b>cube noir et or</b> marqué du multiplicateur de la colonne au moment où il tombe : il garde cette valeur, même si la colonne monte ensuite. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne noir</b> : ajoute de <b>+8 à +2 000</b> au multiplicateur de sa colonne (pour les prochains cubes). Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie tous les cubes de la colonne. <b>Cube de lave</b> : tous les cubes de sa colonne s’accumulent sur le dernier, qui garde la somme et redescend en bas pour libérer de la place. <b>Colonne pleine</b> : quand une colonne atteint le haut, elle ne prend plus de cube ; seul un <b>cube de lave</b> peut la faire redescendre, et un crâne doré peut encore la multiplier. À la fin, tu gagnes la somme de tous les cubes × la mise.</p>
+      <h4>Jugement</h4><p>Chaque colonne a un multiplicateur, affiché tout en haut. Un <b>cube de glace</b> tombe dans la colonne et se change en <b>cube de pierre</b> marqué du multiplicateur de la colonne au moment où il tombe : il garde cette valeur, même si la colonne monte ensuite. 3 relances, remises à 3 à chaque nouvel objet. <b>Crâne de pierre</b> : ajoute de <b>+8 à +2 000</b> au multiplicateur de sa colonne (pour les prochains cubes). Un crâne à <b>10 000</b>, très rare, donne directement le <b>MAX WIN</b> (×10 000) et arrête le bonus. <b>Crâne doré</b> : multiplie tous les cubes de la colonne. <b>Cube de lave</b> : tous les cubes de sa colonne s’accumulent sur le dernier, qui garde la somme et redescend en bas pour libérer de la place. <b>Colonne pleine</b> : quand une colonne atteint le haut, elle ne prend plus de cube ; seul un <b>cube de lave</b> peut la faire redescendre, et un crâne doré peut encore la multiplier. À la fin, tu gagnes la somme de tous les cubes × la mise.</p>
       <h4>Achats</h4><p>Monde souterrain ×${BUYU} · Jugement ×${BUYJ}. Gain maximum ×10 000.</p>`);
   }
 }
