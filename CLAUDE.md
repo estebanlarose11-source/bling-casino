@@ -161,12 +161,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   dans le cadre des rouleaux (`featureIntro` et `celebrate` avec `summary` redéfinis : `panel()`, `.ft-ov`, laque rouge, or
   pour le Méga ; le grand titre « GROS GAIN ! » du site suit dès ×10), plaque du bonus sur le haut du cadre avec les respins en
   pièces (`hud()`, `.ft-bhud`, le bandeau habituel est caché), TOTAL dans la plaque du bas, temple assombri (`.ft-hold`).
-  **Plein écran = tout l'écran** (voulu par le propriétaire, « comme un vrai jeu », téléphone et PC) : l'image est découpée en
-  morceaux `PCS` (T jackpots + temple, M rouleaux, L i / MISE / NIVEAU, R PIÈCES / SOLDE / menu, S bouton + plaque), chacun
-  avec son bout d'image (`pbg()`, bords fondus) ; `layout()` (ResizeObserver) les agrandit et les place : en hauteur
-  (téléphone) T, M, L+R côte à côte, puis gros bouton en bas ; en largeur (PC, téléphone couché) T + M au centre sur toute
-  la hauteur, L et R à gauche, bouton à droite ; écran presque carré (tablette 4:3…) ou hors plein écran : l'image carrée.
-  Fond derrière les morceaux : `back.webp` (l'image floutée, `.ft-scene.ft-split`).
+  **Plein écran = tout l'écran** (voulu par le propriétaire, « comme un vrai jeu », téléphone et PC ; 1re version avec la barre
+  éclatée sur les côtés refusée : « la barre bien rapprochée ») : l'image est découpée en morceaux `PCS` (T jackpots + temple,
+  M rouleaux, L i / MISE / NIVEAU, R PIÈCES / SOLDE / menu, S bouton + plaque), chacun avec son bout d'image (`pbg()`) ;
+  `layout()` (ResizeObserver, zones sûres lues sur `.ft-safe`) : **en hauteur** (téléphone) T et M sur toute la largeur, collés,
+  puis L + R côte à côte juste dessous, puis le bouton ; **en largeur** (PC, téléphone couché) T, M et la barre entière comme
+  sur l'image (`bar()`), empilés au centre, rouleaux aussi hauts que possible (T et barre à ×0,91) ; écran presque carré :
+  l'image carrée. Fond du plein écran : mur laqué rouge avec motif doré et lumières de lanternes (`.ft-scene.ft-fs`).
+  En plein écran `.slot-frame` / `.slot-stage` passent en `position: static` (la scène se cale sur toute la machine).
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

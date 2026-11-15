@@ -4515,7 +4515,7 @@ html.light .slot small { color: inherit; }
 .g-fortune .mx-row { margin-bottom: 4px; }
 /* full screen (phone in landscape too): the picture alone, centred, the temple blurred all around */
 .game-host.is-full:has(> .slot.g-fortune) { padding: 0; background: #0d0302; }
-.game-host.is-full > .slot.g-fortune.g-fortune { display: flex !important; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: none !important; min-height: 100%; margin: 0; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); border: 0; border-radius: 0; }
+.game-host.is-full > .slot.g-fortune.g-fortune { display: flex !important; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: none !important; min-height: 100%; margin: 0; border: 0; border-radius: 0; }
 .game-host.is-full > .slot.g-fortune.g-fortune > * { grid-column: auto; }
 .game-host.is-full > .slot.g-fortune.g-fortune > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
 .game-host.is-full > .slot.g-fortune.g-fortune > .mx-row { position: absolute; z-index: 6; top: max(8px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); margin: 0; }
@@ -4555,20 +4555,27 @@ html.light .slot small { color: inherit; }
 .slot.ft-hold .ft-spin img { filter: grayscale(.4) brightness(.8); }
 .slot.g-fortune > .feature-banner { display: none !important; }
 .slot.g-fortune > .feature-banner { position: absolute; z-index: 6; top: 10px; left: 12px; margin: 0; max-width: calc(100% - 190px); }
-/* full screen: the scene covers the screen; the picture is square, or cut into pieces placed by layout() (ft-split) */
+/* full screen: the scene covers the slot; the picture is square, or its pieces are placed by layout() (ft-split) */
 .ft-pc { position: absolute; inset: 0; z-index: 2; transform-origin: 0 0; pointer-events: none; }
 .ft-hot, .ft-spin, .ft-ov { pointer-events: auto; }
+.ft-safe { position: absolute; visibility: hidden; pointer-events: none; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
 .ft-pbg { position: absolute; display: none; background-image: url(assets/games/fortune/scene.webp?v=3); background-repeat: no-repeat; pointer-events: none; }
-.ft-scene.ft-fs { position: fixed; inset: 0; z-index: 1; width: auto; height: auto; aspect-ratio: auto; margin: 0; border-radius: 0; box-shadow: none;
-  background: radial-gradient(90% 70% at 50% 45%, rgba(40, 6, 2, .35), rgba(8, 1, 0, .85)), url(assets/games/fortune/back.webp?v=5) center / cover no-repeat, #0d0302; }
-.ft-fs .ft-full { position: fixed; right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
+.game-host.is-full > .slot.g-fortune.g-fortune { position: relative; height: 100%; padding: 0 !important; }
+.game-host.is-full > .slot.g-fortune.g-fortune > .slot-frame, .game-host.is-full > .slot.g-fortune.g-fortune > .slot-frame > .slot-stage { position: static !important; transform: none !important; }
+/* the slot's background: red lacquer wall with gold key pattern, lantern lights at the top */
+.ft-scene.ft-fs { position: absolute; inset: 0; z-index: 1; width: auto; height: auto; aspect-ratio: auto; margin: 0; border-radius: 0; box-shadow: none;
+  background: radial-gradient(55% 30% at 50% 0%, rgba(255, 176, 70, .38), transparent 70%), radial-gradient(22% 16% at 6% 10%, rgba(255, 96, 40, .4), transparent 70%), radial-gradient(22% 16% at 94% 10%, rgba(255, 96, 40, .4), transparent 70%),
+    radial-gradient(70% 22% at 50% 100%, rgba(255, 150, 60, .18), transparent 70%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cg fill='none' stroke='%23e0b04a' stroke-opacity='.08' stroke-width='2'%3E%3Cpath d='M3 3h50v50H3zM11 11h34v34H11zM19 19h18v18H19zM27 27h2v2h-2z'/%3E%3C/g%3E%3C/svg%3E") center / 56px 56px, radial-gradient(120% 90% at 50% 40%, #6a0e08, #300504 58%, #120101) !important; }
+.ft-fs .ft-full { position: absolute; right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 .ft-split .ft-art { background: none; }
 .ft-split .ft-art::after { display: none; }
-.ft-split .ft-pbg { display: block; -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(180deg, transparent, #000 5%, #000 95%, transparent); -webkit-mask-composite: source-in; mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent), linear-gradient(180deg, transparent, #000 5%, #000 95%, transparent); mask-composite: intersect; }
-.ft-split [data-pc="T"] .ft-pbg { -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent), linear-gradient(180deg, #000 85%, transparent); mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent), linear-gradient(180deg, #000 85%, transparent); }
-.ft-split [data-pc="M"] .ft-pbg { filter: drop-shadow(0 0 20px rgba(0, 0, 0, .7)); }
-.ft-split [data-pc="S"] .ft-pbg { -webkit-mask-image: radial-gradient(closest-side, #000 75%, transparent); mask-image: radial-gradient(closest-side, #000 75%, transparent); }
-.slot.ft-hold .ft-scene.ft-split { background: radial-gradient(90% 70% at 50% 45%, rgba(90, 10, 2, .1), rgba(8, 1, 0, .85)), url(assets/games/fortune/back.webp?v=5) center / cover no-repeat, #0d0302; }
+.ft-split .ft-pbg { display: block; }
+/* pieces with clean edges: the temple fades into the wall at the top, the bar pieces are rounded stone plates */
+.ft-split [data-pc="T"] .ft-pbg { -webkit-mask-image: linear-gradient(180deg, transparent, #000 14%); mask-image: linear-gradient(180deg, transparent, #000 14%); }
+.ft-split [data-pc="M"] .ft-pbg { box-shadow: 0 10px 30px rgba(0, 0, 0, .6); }
+.ft-port [data-pc="L"] .ft-pbg, .ft-port [data-pc="R"] .ft-pbg { border-radius: 10px; box-shadow: 0 0 0 1px rgba(224, 176, 74, .55), 0 6px 18px rgba(0, 0, 0, .55); }
+.ft-port [data-pc="S"] .ft-pbg { -webkit-mask-image: radial-gradient(closest-side, #000 80%, transparent); mask-image: radial-gradient(closest-side, #000 80%, transparent); }
+.ft-land [data-pc="S"] .ft-pbg { z-index: -1; }
 .game-host.is-full > .slot.g-fortune.g-fortune > .mx-row { z-index: 9; }
 .game-host:not(.is-full):has(> .g-fortune) { max-width: max(420px, min(1000px, calc(100svh - 200px))); }
 .g-fortune .reels-host { position: absolute; inset: 0; }
@@ -15762,7 +15769,7 @@ const FILES = {
   vortex: ['vortex', 'games/impl/vortex.js', 'VortexGame', 'e23f21079d'],
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'fb3eda6835'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
-  fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', '35ef8fe505'],
+  fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', 'a3ee781b6e'],
   dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', '2fcc40562a'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '9f2d36628a'],
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '9621261bab'],

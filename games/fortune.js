@@ -129,7 +129,7 @@ const LEVELS = ['', 'Normal', 'Turbo', 'Super turbo'];
 // Full screen (owner's request: « que ça prenne tout l'écran, comme un vrai jeu »): the picture is cut into pieces
 // (in its own pixels, 1024 × 1024) that are moved and enlarged one by one to fill a tall phone or a wide screen.
 // T jackpots and temple, M reels, L i / MISE / NIVEAU, R PIÈCES / SOLDE / menu, S spin + BONNE CHANCE !
-const PCS = { T: [90, 0, 934, 300], M: [128, 300, 896, 778], L: [22, 796, 402, 912], R: [618, 796, 1002, 912], S: [398, 762, 628, 968] };
+const PCS = { T: [90, 0, 934, 300], M: [128, 300, 896, 778], L: [22, 796, 402, 912], R: [618, 796, 1002, 912], S: [398, 776, 628, 968] };
 function pbg(n) {
   const [x0, y0, x1, y1] = PCS[n], w = x1 - x0, h = y1 - y0, pc = (v) => `${(v / 10.24).toFixed(3)}%`;
   return `<i class="ft-pbg" style="left:${pc(x0)};top:${pc(y0)};width:${pc(w)};height:${pc(h)};background-size:${(102400 / w).toFixed(2)}% ${(102400 / h).toFixed(2)}%;background-position:${((x0 / (1024 - w)) * 100).toFixed(3)}% ${((y0 / (1024 - h)) * 100).toFixed(3)}%"></i>`;
@@ -142,7 +142,7 @@ class FortuneGame extends BaseGame {
       frameCls: 'ft-frame',
       // the owner's picture (1024 × 1024): jackpot plaques at the top, the reels in the black frame, his bar at the
       // bottom made clickable (MISE, NIVEAU = speed, PIÈCES = the coin pot, SOLDE, spin, i, menu, BONNE CHANCE !)
-      stage: `<div class="ft-scene"><div class="ft-art">
+      stage: `<div class="ft-scene"><i class="ft-safe"></i><div class="ft-art">
           <div class="ft-pc" data-pc="T">${pbg('T')}
             <div class="ft-jp major"><b data-jp="major"></b></div>
             <div class="ft-jp jackpot"><b data-jp="jackpot"></b></div>
@@ -204,47 +204,52 @@ class FortuneGame extends BaseGame {
     this.layout();
   }
 
-  // Square picture on the page; in full screen: square if the screen is about square, else the pieces fill it.
+  // Square picture on the page. Full screen fills the whole screen with the pieces of the picture, kept together:
+  // tall screen = jackpots + reels on the full width, the bar just under them (2 rows: info, then the spin button);
+  // wide screen = jackpots, reels and the whole bar as in the picture, stacked in the middle, the reels as big as
+  // the height allows. Around them: the slot's background (.ft-scene.ft-fs). Almost square screen: the picture.
   layout() {
     if (this.dead) return;
     const sc = this.q('.ft-scene'), art = this.q('.ft-art'), pcs = this.qa('.ft-pc');
     const full = !!this.slotEl.closest('.is-full');
     sc.classList.toggle('ft-fs', full);
-    const W = sc.clientWidth, H = sc.clientHeight, reset = () => pcs.forEach((p) => { p.style.transform = ''; });
-    if (!full || !W || !H) { sc.classList.remove('ft-split'); art.style.cssText = ''; reset(); return; }
-    const square = () => { const S = Math.min(W, H); sc.classList.remove('ft-split'); art.style.cssText = `width:${S}px;height:${S}px;left:${(W - S) / 2}px;top:${(H - S) / 2}px`; reset(); };
-    const r = W / H;
-    if (r > 0.8 && r < 1.3) return square();
-    const port = r <= 0.8, S = port ? W : H, u = S / 1024;
+    const reset = () => pcs.forEach((p) => { p.style.transform = ''; });
+    const W0 = sc.clientWidth, H0 = sc.clientHeight;
+    if (!full || !W0 || !H0) { sc.classList.remove('ft-split', 'ft-port', 'ft-land'); art.style.cssText = ''; reset(); return; }
+    // safe areas (notch, home bar) and a small margin
+    const cs = getComputedStyle(this.q('.ft-safe')), sp = (k) => parseFloat(cs[k]) || 0;
+    const top = Math.max(6, sp('paddingTop')), bot = Math.max(6, sp('paddingBottom')), lft = sp('paddingLeft'), rgt = sp('paddingRight');
+    const W = W0 - lft - rgt, H = H0 - top - bot, r = W / H;
+    const square = () => { const S = Math.min(W, H); sc.classList.remove('ft-split', 'ft-port', 'ft-land'); art.style.cssText = `width:${S}px;height:${S}px;left:${lft + (W - S) / 2}px;top:${top + (H - S) / 2}px`; reset(); };
+    if (r >= 0.8 && r < 1.02) return square();
+    const port = r < 0.8, S = port ? W : H, u = S / 1024;
     const box = (n, k) => { const [x0, y0, x1, y1] = PCS[n]; return { w: (x1 - x0) * u * k, h: (y1 - y0) * u * k }; };
     const pos = {};
-    const put = (n, X, Y, k) => { pos[n] = [X, Y, k]; };
+    const put = (n, X, Y, k) => { pos[n] = [lft + X, top + Y, k]; };
+    // the bar as in the picture: L, S and R at the same scale, at their places
+    const bar = (X, Y, k) => { for (const n of ['L', 'R', 'S']) put(n, X + (PCS[n][0] - 22) * u * k, Y + (PCS[n][1] - 776) * u * k, k); };
     if (port) {
-      const kT = 1024 / 844, kM = 1024 / 768, g = 0.02 * W, kLR = (W - 3 * g) / ((380 + 384) * u);
-      const hT = box('T', kT).h, hM = box('M', kM).h, hLR = box('L', kLR).h;
-      const room = H - hT - hM - hLR;
-      const kS = Math.min((room * 0.7) / (206 * u), (0.44 * W) / (230 * u));
-      if (kS < 1) return square();
-      const hS = box('S', kS).h, gap = (H - hT - hM - hLR - hS) / 4;
-      let y = 0;
-      put('T', 0, y, kT); y += hT + gap * 0.8;
-      put('M', 0, y, kM); y += hM + gap * 1.1;
-      put('L', g, y, kLR); put('R', W - g - box('R', kLR).w, y, kLR); y += hLR + gap * 1.1;
+      const kT = 1024 / 844, kM = 1024 / 768, g = 0.025 * W, kLR = (W - 3 * g) / ((380 + 384) * u);
+      const hT = box('T', kT).h, hM = box('M', kM).h, hLR = box('L', kLR).h, gap = Math.min(14, H * 0.015);
+      const kS = Math.max(0.9, Math.min((H - hT - hM - hLR - 3 * gap) / (192 * u), (0.38 * W) / (230 * u)));
+      const hS = box('S', kS).h, tot = hT + hM + gap + hLR + gap + hS;
+      if (tot > H + 1) return square();
+      let y = (H - tot) / 2;
+      put('T', 0, y, kT); y += hT;
+      put('M', 0, y, kM); y += hM + gap;
+      put('L', g, y, kLR); put('R', W - g - box('R', kLR).w, y, kLR); y += hLR + gap * 0.4;
       put('S', (W - box('S', kS).w) / 2, y, kS);
     } else {
-      let kC = (0.97 * 1024) / 778;
-      kC = Math.min(kC, (W * 0.58) / (844 * u)); // the sides keep about 21 % each for the bar
-      const T = box('T', kC), M = box('M', kC), colH = T.h + M.h, side = (W - T.w) / 2;
-      if (side < 150 || M.h < H * 0.42) return square();
-      const y0 = (H - colH) / 2, X = (W - T.w) / 2;
-      put('T', X, y0, kC); put('M', X + (T.w - M.w) / 2, y0 + T.h, kC);
-      const kLR = Math.min((side * 0.92) / (384 * u), 1.7), L = box('L', kLR), R = box('R', kLR), gap = H * 0.04;
-      const yl = (H - L.h - R.h - gap) / 2;
-      put('L', (side - L.w) / 2, yl, kLR); put('R', (side - R.w) / 2, yl + L.h + gap, kLR);
-      const kS = Math.min((side * 0.85) / (230 * u), (H * 0.55) / (206 * u)), Sb = box('S', kS);
-      put('S', W - side + (side - Sb.w) / 2, (H - Sb.h) / 2, kS);
+      // jackpots and bar at 0,91 × the reels' scale: the jackpot row is as wide as the reel frame
+      const a = 0.91, kM = Math.min((H / ((300 + 192) * a + 478)) / u, (W * 0.96) / (980 * a * u));
+      const kT = kM * a, kB = kM * a, T = box('T', kT), M = box('M', kM), hB = 206 * u * kB, wB = 980 * u * kB;
+      const tot = T.h + M.h + hB;
+      let y = (H - tot) / 2;
+      put('T', (W - T.w) / 2, y, kT); y += T.h;
+      put('M', (W - M.w) / 2, y, kM); y += M.h;
+      bar((W - wB) / 2, y, kB);
     }
-    sc.classList.add('ft-split');
+    sc.classList.add('ft-split'); sc.classList.toggle('ft-port', port); sc.classList.toggle('ft-land', !port);
     art.style.cssText = `width:${S}px;height:${S}px;left:0;top:0`;
     for (const p of pcs) {
       const n = p.dataset.pc, [X, Y, k] = pos[n], [x0, y0] = PCS[n];
