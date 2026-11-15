@@ -147,6 +147,16 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   **Rouleaux Pixi et images larges** (bug « ça saute » du 12 novembre 2026) : `warm()` de `core/pixi.js` mesure la partie
   vraiment peinte d'une `<img>` en `object-fit: contain` (5e valeur de `BOX`) et `sideOf()` dessine la texture à cette taille ;
   avant, une image plus large que haute tournait à la hauteur de la case (bien plus petite) puis grossissait d'un coup à l'arrêt.
+- **La Fortune, nouveau décor** (`games/fortune.js`, demande du propriétaire du 15 novembre 2026) : **son image** (temple,
+  dragons d'or, plaques MAJOR / JACKPOT / MINI, barre peinte) = `tools/art/fortune/decor.jpg`, nettoyée par
+  `tools/art/fortune/clean.py` (montants peints effacés) → `assets/games/fortune/scene.webp` (1024 × 1024, toute la machine),
+  `spin.webp` (le bouton rouge, tourne pendant les tours), `back.webp` (fond flou autour). Rouleaux dans le cadre noir
+  (`.ft-win`), **sa barre rendue cliquable** (la barre habituelle et la ligne de message sont cachées) : MISE − / +,
+  NIVEAU − / + = vitesse (1 normal, 2 Turbo, 3 Super turbo, `setLevel`), PIÈCES = le tas de pièces de la mise (les pièces
+  y volent), SOLDE, i = règles, ☰ = « Bonus & menu », plaque BONNE CHANCE ! = gain du tour (`paintSay`). Jackpots en haut
+  **selon la mise**, progressifs : MINI ×10 (pièce verte `mini.webp`, ajoutée), MAJOR ×50 (pièce passée en violet,
+  `tools/art/fortune/coins.py`), JACKPOT ×500. Simulation `node tools/sim/fortune.js` (8 M tours) : RTP ≈ 92,3 %, MINI
+  1 tour sur 2 600, achats ≈ 88,4 / 87,6 %.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

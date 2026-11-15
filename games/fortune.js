@@ -1,10 +1,12 @@
 // SpinBet Casino · FortuneGame — loaded on demand by games/impl/index.js (index.html).
 // ---- games/impl/fortune.js ----
 __mods['games/impl/fortune.js'] = (() => {
-// La Fortune: Chinese New Year slot, 5×3 and 243 ways, in the owner's painted frame (assets/games/fortune). Gold coins
-// fly up into the pot when fewer than 6 land; 6 coins start the HOLD & SPIN (MAJOR and JACKPOT coins, progressive;
+// La Fortune: Chinese New Year slot, 5×3 and 243 ways, in the owner's picture of 15 November 2026 (scene.webp: MAJOR /
+// JACKPOT / MINI plaques, his bar made clickable). Gold coins fly up into PIÈCES (the pot) when fewer than 6 land;
+// 6 coins start the HOLD & SPIN (MINI, MAJOR and JACKPOT coins, progressive;
 // a row can light up ×2 or ×5); 4 scatters start the MÉGA BONUS (every coin ×2 to ×5, rows light up more often).
-// Tuned by simulation: RTP ≈ 92 % (ways 43 %, pot 12 %, Hold & Spin 19 %, Méga 16 %, progressive 0,65 %), buys ≈ 88 %.
+// Tuned by simulation (node tools/sim/fortune.js): RTP ≈ 92 % (ways 44 %, pot 12 %, Hold & Spin 19 %, Méga 16 %,
+// progressive 0,75 %), buys ≈ 88-89 %.
 
 const { BaseGame, fmtC, shortC } = __mods['core/base.js'];
 const { Reels } = __mods['core/reels.js'];
@@ -16,20 +18,20 @@ const { el } = __mods['ui.js'];
 /* ===ENGINE */
 // 5×3, 243 ways. J Q K A, lantern, gold ingots, red envelope, lucky cats; golden dragon WILD on reels 2-4.
 // Gold coins carry a value (× the bet). 6 coins or more: HOLD & SPIN (the coins stay, 3 respins, every new coin puts
-// them back to 3; MAJOR ×50 and JACKPOT ×500 coins; sometimes a whole row lights up ×2 or ×5 its coins).
+// them back to 3; MINI ×10, MAJOR ×50 and JACKPOT ×500 coins; sometimes a whole row lights up ×2 or ×5 its coins).
 // Fewer than 6 coins: they fly up into the pot (a share of their value); the pot is paid with the next bonus at
 // that stake. 4 SCATTERS: MÉGA BONUS, a Hold & Spin where every coin is ×2 to ×5 and the rows light up more often.
 const COLS = 5, ROWS = 3, N = 15, WILD = 8, COIN = 9, SCAT = 10, BLANK = 11, CAPX = 5000, NS = 8;
-const JP = { major: 50, jackpot: 500 };
+const JP = { mini: 10, major: 50, jackpot: 500 };
 // Progressive jackpots: every paid spin adds a share of the stake to MAJOR and JACKPOT (shown climbing at the top);
 // a MAJOR / JACKPOT coin pays the pot at that moment, which then goes back to ×50 / ×500.
-const PROG = { major: 0.004, jackpot: 0.0025 };
+const PROG = { mini: 0.001, major: 0.004, jackpot: 0.0025 };
 const P = {
   w: [26, 24, 22, 20, 12, 10, 8, 6], wild: 3,
   pays: [[0.2, 0.5, 1.5], [0.2, 0.5, 1.5], [0.3, 0.8, 2], [0.3, 0.8, 2], [0.5, 1.2, 4], [0.6, 1.5, 5], [0.8, 2, 7], [1.2, 4, 12]], K: 1.12,
   coin: 0.12, scat: 0.115, pot: 0.035,
   val: [[0.5, 34], [1, 28], [2, 18], [3, 9], [5, 6], [10, 3], [20, 1.2], [50, 0.3]],
-  bval: [[0.5, 34], [1, 28], [2, 18], [3, 9], [5, 6], [10, 3], [20, 1.2], [50, 0.3], ['major', 0.55], ['jackpot', 0.045]],
+  bval: [[0.5, 34], [1, 28], [2, 18], [3, 9], [5, 6], [10, 3], [20, 1.2], [50, 0.3], ['mini', 1.6], ['major', 0.55], ['jackpot', 0.045]],
   hold: { p: 0.097, light: 0.12, l5: 0.2 },
   mega: { p: 0.055, light: 0.32, l5: 0.35, cm: [[2, 50], [3, 30], [5, 20]] },
 };
@@ -111,7 +113,7 @@ function startCoins(n = 6, R = Math.random) {
 /* ===END ENGINE */
 
 const BUY_HOLD = 46, BUY_MEGA = 245;
-const IMG_V = 2;
+const IMG_V = 3;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const src = (n) => asset(`assets/games/fortune/${n}.webp`);
 const IMG = ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7', 'wild', 'coin', 'scatter'];
@@ -123,37 +125,38 @@ const KEY = 'fortune_pots_v1';
 const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
 const save = (o) => { try { localStorage.setItem(KEY, JSON.stringify(o)); } catch { /* ignore */ } };
 
-// The pot drawn as a heap of gold coins in the bowl (the gold coin of Le Loup, recycled): the more it holds
-// (in × the stake), the bigger the heap.
-const HEAP_COIN = asset('assets/games/wolf/coin.webp');
-function heapHTML(x) {
-  const n = x <= 0 ? 0 : Math.min(26, Math.round(3 + Math.sqrt(x) * 3));
-  let s = '', k = 0;
-  for (let row = 0; k < n; row++) {
-    const w = Math.max(1, 6 - row);
-    for (let j = 0; j < w && k < n; j++, k++) {
-      const left = 50 + (j - (w - 1) / 2) * 15 + (row % 2 ? 4 : -4), bottom = row * 11, rot = ((k * 37) % 50) - 25;
-      s += `<img src="${HEAP_COIN}" alt="" draggable="false" style="left:${left.toFixed(1)}%;bottom:${bottom}%;transform:translateX(-50%) rotate(${rot}deg) scaleY(${(0.62 + (k % 3) * 0.08).toFixed(2)})">`;
-    }
-  }
-  return s;
-}
+const LEVELS = ['', 'Normal', 'Turbo', 'Super turbo'];
 
 class FortuneGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.fortune,
       frameCls: 'ft-frame',
+      // the owner's picture (1024 × 1024): jackpot plaques at the top, the reels in the black frame, his bar at the
+      // bottom made clickable (MISE, NIVEAU = speed, PIÈCES = the coin pot, SOLDE, spin, i, menu, BONNE CHANCE !)
       stage: `<div class="ft-scene"><div class="ft-art">
-          <div class="ft-jp major"><small>MAJOR</small><b data-jp="major"></b></div>
-          <div class="ft-jp jackpot"><small>JACKPOT</small><b data-jp="jackpot"></b></div>
-          <div class="ft-bowl"><div class="ft-heap"></div><b class="ft-pot"></b></div>
+          <div class="ft-jp major"><b data-jp="major"></b></div>
+          <div class="ft-jp jackpot"><b data-jp="jackpot"></b></div>
+          <div class="ft-jp mini"><b data-jp="mini"></b></div>
+          <button class="ft-hot ft-i" type="button" data-act="info" aria-label="Règles et gains"></button>
+          <button class="ft-hot ft-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+          <button class="ft-hot ft-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button>
+          <button class="ft-hot ft-pm ft-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="ft-val ft-bet"></b>
+          <button class="ft-hot ft-pm ft-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="ft-hot ft-pm ft-lm" type="button" data-lvl="-1" aria-label="Moins vite"></button>
+          <b class="ft-val ft-lvl"></b>
+          <button class="ft-hot ft-pm ft-lp" type="button" data-lvl="1" aria-label="Plus vite"></button>
+          <b class="ft-val ft-pieces ft-bowl"></b>
+          <b class="ft-val ft-bal"></b>
+          <button class="ft-spin" type="button" data-act="main" aria-label="Lancer"><img src="${src('spin')}" alt="" draggable="false"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          <b class="ft-say"></b>
           <div class="ft-win"><div class="reels-host"></div><div class="ft-rows">${[0, 1, 2].map((r) => `<i data-row="${r}"></i>`).join('')}</div></div>
           <div class="ft-word"></div>
           <div class="ft-dust">${Array.from({ length: 18 }, (_, k) => `<i style="left:${(k * 53) % 100}%;--dx:${((k * 29) % 60) - 30}px;animation-duration:${6 + (k % 5) * 1.7}s;animation-delay:-${(k * 1.3) % 9}s"></i>`).join('')}</div>
         </div></div>`,
       buys: [
-        { id: 'hold', icon: '🪙', label: 'Hold & Spin · 6 pièces', desc: '6 pièces d’or verrouillées, 3 respins · MAJOR et JACKPOT en jeu · lignes ×2 et ×5', cost: (b) => b * BUY_HOLD },
+        { id: 'hold', icon: '🪙', label: 'Hold & Spin · 6 pièces', desc: '6 pièces d’or verrouillées, 3 respins · MINI, MAJOR et JACKPOT en jeu · lignes ×2 et ×5', cost: (b) => b * BUY_HOLD },
         { id: 'mega', icon: '🐉', label: 'MÉGA BONUS', desc: 'Hold & Spin où chaque pièce vaut ×2 à ×5 · les lignes s’allument plus souvent', cost: (b) => b * BUY_MEGA },
       ],
       hello: '243 façons de gagner · 6 pièces d’or = HOLD & SPIN · 4 scatters = MÉGA BONUS',
@@ -165,8 +168,39 @@ class FortuneGame extends BaseGame {
       cls: (v) => (v === COIN ? 'coin' : v === SCAT ? 'scat' : v === WILD ? 'wild' : v === BLANK ? 'blank' : `n${v}`),
     });
     this.reels.setAll(screen().g);
-    IMG.concat(['major', 'jackpot', 'bg']).forEach((n) => { new Image().src = src(n); });
+    IMG.concat(['mini', 'major', 'jackpot', 'scene', 'spin']).forEach((n) => { new Image().src = src(n); });
+    // the usual bar and message line are replaced by the owner's painted bar (inline !important: beats the bar styles)
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    // NIVEAU − / + = the speed: 1 normal, 2 Turbo, 3 Super turbo (the same switches as in « Bonus & menu »)
+    this.root.addEventListener('click', (e) => { const b = e.target.closest('[data-lvl]'); if (b) this.setLevel(this.level() + +b.dataset.lvl); });
+    // BONNE CHANCE ! plaque: the win of the round when there is one
+    this.sayObs = new MutationObserver(() => this.paintSay());
+    this.sayObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    this.paintSay();
     this.onBetChange();
+  }
+
+  destroy() { this.sayObs?.disconnect(); super.destroy(); }
+  level() { return this.superT ? 3 : this.turbo ? 2 : 1; }
+  setLevel(n) {
+    n = Math.max(1, Math.min(3, n));
+    if (n === this.level()) return;
+    this.turbo = n >= 2; this.superT = n === 3; globalThis.__sbSuper = this.superT;
+    this.saveKey(`${this.game.id}_turbo`, this.turbo ? 1 : 0); this.saveKey(`${this.game.id}_super`, this.superT ? 1 : 0);
+    sfx.click(); this.onMeters();
+  }
+  onMeters() {
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) n.textContent = t; };
+    set('.ft-bet', fmtC(this.bet)); set('.ft-bal', fmtC(this.balC())); set('.ft-lvl', String(this.level()));
+    const lv = this.q('.ft-lvl'); if (lv) lv.title = LEVELS[this.level()];
+    this.q('.ft-lm')?.toggleAttribute('disabled', this.level() === 1);
+    this.q('.ft-lp')?.toggleAttribute('disabled', this.level() === 3);
+  }
+  paintSay() {
+    const n = this.q('.ft-say'); if (!n) return;
+    const w = this.winAmt.textContent.trim();
+    n.innerHTML = w ? `<small>GAIN</small> ${w}` : 'BONNE CHANCE !';
+    n.classList.toggle('won', !!w);
   }
 
   filler(c) { const r = Math.random(); return r < P.coin ? COIN : r < P.coin + 0.04 ? SCAT : symbol(c, Math.random); }
@@ -183,14 +217,14 @@ class FortuneGame extends BaseGame {
   }
 
   /* ---------- pot and progressive jackpots (per stake) ---------- */
-  store() { const all = load(), k = String(this.bet); all[k] = { pot: 0, major: JP.major * this.bet, jackpot: JP.jackpot * this.bet, ...(all[k] || {}) }; return { all, me: all[k] }; }
+  store() { const all = load(), k = String(this.bet); all[k] = { pot: 0, mini: JP.mini * this.bet, major: JP.major * this.bet, jackpot: JP.jackpot * this.bet, ...(all[k] || {}) }; return { all, me: all[k] }; }
   jp(kind) { return this.store().me[kind]; }
   setStore(fn) { const { all, me } = this.store(); fn(me); save(all); this.paintTop(); }
   onBetChange() { this.paintTop(true); }
   // MAJOR and JACKPOT climb: the shown amount counts up to the saved one, little by little
   paintTop(now) {
     const me = this.store().me;
-    for (const kind of ['major', 'jackpot']) {
+    for (const kind of ['mini', 'major', 'jackpot']) {
       const n = this.q(`[data-jp="${kind}"]`); if (!n) continue;
       const from = now ? me[kind] : +n.dataset.v || me[kind], to = me[kind];
       n.dataset.v = to;
@@ -199,9 +233,8 @@ class FortuneGame extends BaseGame {
       const step = (ts) => { if (this.dead || +n.dataset.v !== to) return; const p = Math.min(1, (ts - t0) / T); n.textContent = fmtC(from + (to - from) * p); if (p < 1) requestAnimationFrame(step); };
       requestAnimationFrame(step);
     }
-    const potEl = this.q('.ft-pot'), heap = this.q('.ft-heap');
-    if (potEl) potEl.textContent = me.pot > 0 ? fmtC(me.pot) : '';
-    if (heap) { const h = heapHTML(me.pot / this.bet); if (heap.dataset.h !== h) { heap.dataset.h = h; heap.innerHTML = h; } }
+    const potEl = this.q('.ft-pieces');
+    if (potEl) potEl.textContent = fmtC(me.pot);
   }
 
   word(t, cls = '') {
@@ -239,7 +272,7 @@ class FortuneGame extends BaseGame {
     this.lastStake = b;
     this.setLast(0); this.winAmt.textContent = ''; this.setBanner('');
     // every paid spin feeds MAJOR and JACKPOT
-    if (!buy) this.setStore((me) => { me.major += b * PROG.major; me.jackpot += b * PROG.jackpot; });
+    if (!buy) this.setStore((me) => { me.mini += b * PROG.mini; me.major += b * PROG.major; me.jackpot += b * PROG.jackpot; });
     let total = 0;
     if (buy) {
       const start = startCoins(6);
@@ -346,7 +379,7 @@ class FortuneGame extends BaseGame {
     this.setBanner('');
     this.slotEl.classList.remove('ft-hold', 'ft-mega');
     this.qa('.ft-jp.hot').forEach((n) => n.classList.remove('hot'));
-    this.msg(`${mega ? 'MÉGA BONUS' : 'HOLD & SPIN'} : ${fmtC(tot)}${pot ? ` + le tas ${fmtC(pot)}` : ''}${jps.length ? ` · ${jps.map((j) => (j === 'jackpot' ? 'JACKPOT' : 'MAJOR')).join(' + ')} !` : ''}`);
+    this.msg(`${mega ? 'MÉGA BONUS' : 'HOLD & SPIN'} : ${fmtC(tot)}${pot ? ` + le tas ${fmtC(pot)}` : ''}${jps.length ? ` · ${jps.map((j) => j.toUpperCase()).join(' + ')} !` : ''}`);
     await this.celebrate(won, { summary: mega ? 'MÉGA BONUS' : 'HOLD & SPIN', stake: b });
     this.vals = {}; this.mul = {};
     return won;
@@ -372,7 +405,7 @@ class FortuneGame extends BaseGame {
           n?.animate([{ transform: 'translateY(-60%)', filter: 'blur(3px)' }, { transform: 'translateY(8%)', filter: 'none', offset: 0.7 }, { transform: 'none' }], { duration: 320, easing: 'ease-out' });
           n?.classList.add('ft-new'); setTimeout(() => n?.classList.remove('ft-new'), 1200);
           sfx.coin(); const p = center(n); fx.burst(p.x, p.y, 16, GOLD, 6);
-          if (typeof a.v === 'string') { this.word(a.v === 'jackpot' ? 'JACKPOT !' : 'MAJOR !', a.v); this.flash(a.v === 'jackpot' ? 'rgba(239,68,68,.6)' : 'rgba(34,197,94,.5)'); sfx.jackpot(); this.q(`.ft-jp.${a.v}`)?.classList.add('hot'); await this.wait(900); }
+          if (typeof a.v === 'string') { this.word(`${a.v.toUpperCase()} !`, a.v); this.flash(a.v === 'jackpot' ? 'rgba(239,68,68,.6)' : a.v === 'major' ? 'rgba(168,85,247,.55)' : 'rgba(34,197,94,.5)'); sfx.jackpot(); this.q(`.ft-jp.${a.v}`)?.classList.add('hot'); await this.wait(900); }
         } else {
           this.reels.set(i, BLANK);
           this.reels.cell(i)?.animate([{ transform: 'translateY(-14%)' }, { transform: 'none' }], { duration: 200, easing: 'ease-out' });
@@ -415,10 +448,11 @@ class FortuneGame extends BaseGame {
     return this.rules(`<h4>Symboles (× la mise, par façon)</h4><div class="paytable">${rows}
       <div class="pay-item"><div class="pay-sym ft-pay">${img('wild')}</div><div class="pay-vals"><b>Dragon d’or WILD</b><br><span>Rouleaux 2 à 4, remplace tous les symboles</span></div></div></div>
       <h4>243 façons de gagner</h4><p>Un symbole paie dès qu’il apparaît sur 3 rouleaux d’affilée ou plus depuis la gauche, à n’importe quelle hauteur.</p>
-      <h4>Pièces d’or et tas de pièces</h4><p>Chaque pièce d’or porte un gain (×0,5 à ×50 la mise). Avec <b>moins de 6 pièces</b>, elles s’envolent dans le bol en haut : le <b>tas de pièces</b> grandit à chaque fois. Il est gardé pour chaque mise et il est <b>gagné en entier avec le prochain bonus</b> joué à cette mise.</p>
-      <h4>HOLD & SPIN</h4><p><b>6 pièces ou plus</b> : elles restent en place et tu as 3 respins. Chaque nouvelle pièce reste et remet les respins à 3. Pendant le bonus tombent aussi des pièces <b>MAJOR</b> (verte) et <b>JACKPOT</b> (rouge). Parfois, <b>toute une ligne s’allume ×2 ou ×5</b> : les pièces de cette ligne sont multipliées, et si elle est vide… elle s’est allumée pour rien !</p>
-      <h4>MAJOR et JACKPOT progressifs</h4><p>Ils grimpent à chaque spin (départ ×${JP.major} et ×${JP.jackpot} la mise). Une pièce MAJOR ou JACKPOT paie le montant affiché, qui repart ensuite à sa valeur de départ. Un montant par mise.</p>
+      <h4>Pièces d’or et tas de pièces</h4><p>Chaque pièce d’or porte un gain (×0,5 à ×50 la mise). Avec <b>moins de 6 pièces</b>, elles s’envolent dans la case <b>PIÈCES</b> de la barre : le <b>tas de pièces</b> grandit à chaque fois. Il est gardé pour chaque mise et il est <b>gagné en entier avec le prochain bonus</b> joué à cette mise.</p>
+      <h4>HOLD & SPIN</h4><p><b>6 pièces ou plus</b> : elles restent en place et tu as 3 respins. Chaque nouvelle pièce reste et remet les respins à 3. Pendant le bonus tombent aussi des pièces <b>MINI</b> (verte), <b>MAJOR</b> (violette) et <b>JACKPOT</b> (rouge). Parfois, <b>toute une ligne s’allume ×2 ou ×5</b> : les pièces de cette ligne sont multipliées, et si elle est vide… elle s’est allumée pour rien !</p>
+      <h4>Jackpots MINI, MAJOR et JACKPOT</h4><p>Affichés en haut, ils dépendent de ta mise et grimpent à chaque spin (départ ×${JP.mini}, ×${JP.major} et ×${JP.jackpot} la mise). Une pièce MINI, MAJOR ou JACKPOT paie le montant affiché, qui repart ensuite à sa valeur de départ. Un montant par mise.</p>
       <h4>MÉGA BONUS</h4><p><b>4 SCATTERS</b> (rare !) : un Hold & Spin avec au moins 6 pièces, où <b>chaque pièce vaut ×2 à ×5</b> et où les lignes ×2 / ×5 s’allument bien plus souvent.</p>
+      <h4>La barre</h4><p><b>MISE</b> − / + : ta mise. <b>NIVEAU</b> − / + : la vitesse (1 normal, 2 turbo, 3 super turbo). <b>PIÈCES</b> : le tas de pièces gardé pour cette mise. <b>i</b> : ces règles. <b>☰</b> : tours auto, achats de bonus et réglages.</p>
       <h4>Achats</h4><p>Hold & Spin ×${BUY_HOLD} · MÉGA BONUS ×${BUY_MEGA}. Gain maximum ×${CAPX.toLocaleString('fr-FR')}.</p>`);
   }
 }
