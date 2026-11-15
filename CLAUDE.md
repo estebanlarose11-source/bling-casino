@@ -190,6 +190,12 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   de robot à côté de la grille (`robot.webp` et `bg.webp` supprimés). Plein écran : `layout()` prend l'image qui va avec la forme
   de l'écran et **couvre tout l'écran** (voulu par le propriétaire : « pas de rebords violets »), rognée sur les bords sans jamais
   sortir la grille, la barre ni la plaque (zone gardée `[kx0, ky0, kx1, ky1]` dans `layout()`). Gains inchangés.
+- **La Sweety, nouveau décor** (`games/candy.js`, demande du propriétaire du 15 novembre 2026, comme Le Cosmique) : **ses 2 images**
+  « Sweet Kingdom » `tools/art/candy/decor-large.jpg` (1280 × 720, `.sk-l`) et `decor-haut.jpg` (720 × 1280, `.sk-p`), nettoyées par
+  `tools/art/candy/clean.py` (quadrillage rose et « $1.00 » effacés) → `assets/games/candy/scene-large.webp` / `scene-haut.webp`
+  (`bg.webp` supprimé). Grille 6×5 dans le cadre (`.sk-win`), barre cliquable : BET − / +, BONUS MENU, SPIN, MAX BET ; plaque SOLDE ·
+  GAIN (· TOURS) (`.sk-info`) ; Bal de la Reine annoncé et fini dans le cadre (`panel`). Plein écran : l'image couvre l'écran
+  (`layout()`, zone gardée) ; téléphone plus fin que l'image : image calée en bas, ciel flouté au-dessus (`.sk-band`). Gains inchangés.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

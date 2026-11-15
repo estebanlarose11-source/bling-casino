@@ -8,8 +8,8 @@ __mods['games/impl/candy.js'] = (() => {
 
 const { BaseGame, fmtC, art: svgArt } = __mods['core/base.js'];
 // Painted images from the owner (assets/games/candy): the 10 sweets s0..s9, the crown (scatter), the exploding heart,
-// the candy-jar bomb and the magic wand. Background bg.webp, cover cover.webp.
-const IMG_V = 1;
+// the candy-jar bomb and the magic wand, the cover, and the whole machine (scene-large / scene-haut, 15 November 2026).
+const IMG_V = 2;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images are inlined
 const PAINT = { cq0: 's0', cq1: 's1', cq2: 's2', cq3: 's3', cq4: 's4', cq5: 's5', cq6: 's6', cq7: 's7', cq8: 's8', cq9: 's9', cqs: 'crown', cqh: 'heart', cqj: 'jar', cqw: 'wand' };
 const art = (id) => (PAINT[id] ? `<img class="cq-img" src="${asset(`assets/games/candy/${PAINT[id]}.webp`)}" alt="" draggable="false" decoding="async">` : svgArt(id));
@@ -132,13 +132,20 @@ class CandyGame extends BaseGame {
     super(root, game, {
       music: EXTRA_THEMES.candy,
       frameCls: 'candy-frame',
-      stage: `<div class="cq-stage">
-        <div class="cq-sky"><i class="cq-lolli l1"></i><i class="cq-lolli l2"></i></div>
-        <div class="cq-board">
-          <div class="grid-host"></div>
-          <div class="cq-word"></div>
-        </div>
-      </div>`,
+      // the owner's 2 pictures of 15 November 2026: scene-large.webp (computer, wide screens) and scene-haut.webp (phone
+      // held upright). The 6 × 5 grid sits in the candy frame, his bar is clickable (BET − / +, BONUS MENU, SPIN, MAX BET);
+      // a plaque shows the balance and the win. layout() picks the picture and fits it (full screen: covers the screen).
+      stage: `<div class="sk-scene sk-l"><i class="sk-safe"></i><div class="sk-art">
+          <div class="sk-info"><div><small>SOLDE</small><b class="sk-bal"></b></div><div><small>GAIN</small><b class="sk-gain">0</b></div><div class="sk-fs"><small>TOURS</small><b class="sk-left"></b></div></div>
+          <div class="sk-win"><div class="grid-host"></div><div class="cq-word"></div></div>
+          <div class="sk-ov"></div>
+          <button class="sk-hot sk-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="sk-bet"></b>
+          <button class="sk-hot sk-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="sk-hot sk-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+          <button class="sk-hot sk-spin" type="button" data-act="main" aria-label="Lancer"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          <button class="sk-hot sk-max" type="button" data-act="max" aria-label="Mise maximum"></button>
+        </div><button class="sk-hot sk-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`,
       opts: [{ id: 'hunt', icon: '👑', label: 'Chasse aux couronnes (mise ×2, couronnes ×1,58)' }],
       buys: [
         { id: 'sp', icon: '🍬', label: 'Bonbon spécial garanti', desc: 'Un tour avec un cœur, un bocal ou une baguette sur la grille', cost: (b) => Math.round(b * SPC) },
@@ -147,7 +154,13 @@ class CandyGame extends BaseGame {
       hello: 'Grappes de 5+ · chaque case gagnante prend un multiplicateur qui double à chaque connexion',
     });
     this.hunt = false;
-    this.q('.cq-sky').style.setProperty('--cq-bg', `url("${asset('assets/games/candy/bg.webp')}")`);
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    this.gainObs = new MutationObserver(() => this.paintGain());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.q('.sk-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
     Object.values(PAINT).forEach((n) => { new Image().src = asset(`assets/games/candy/${n}.webp`); });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: C, rows: R, game: this, art: sym,
@@ -155,6 +168,89 @@ class CandyGame extends BaseGame {
     });
     this.grid.setAll(Array.from({ length: N }, () => Math.floor(Math.random() * 10)));
     this.mm = new Array(N).fill(0);
+    this.onMeters(); this.paintGain(); this.layout();
+  }
+
+  destroy() { this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs); super.destroy(); }
+
+  /* ---------- the owner's pictures: bar, plaque, panels, full screen ---------- */
+  onMeters() {
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) n.textContent = t; };
+    set('.sk-bet', fmtC(this.stakeLabel())); set('.sk-bal', fmtC(this.balC()));
+  }
+  paintGain() {
+    const n = this.q('.sk-gain'); if (!n) return;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    n.textContent = this.fsTotal != null ? fmtC(this.fsTotal) : w || fmtC(0);
+    n.parentElement.classList.toggle('won', !!w || !!this.fsTotal);
+  }
+  // a panel in the candy frame (bonus intro, end); done on a touch or after `dur`
+  panel(html, cls, dur) {
+    const ov = this.q('.sk-ov');
+    ov.className = `sk-ov on ${cls}`; ov.innerHTML = `<div class="sk-pan">${html}</div>`;
+    return new Promise((resolve) => {
+      let over = false;
+      const done = () => { if (over) return; over = true; clearTimeout(t); ov.removeEventListener('click', done); ov.classList.add('out'); setTimeout(() => { if (ov.classList.contains('out')) { ov.className = 'sk-ov'; ov.innerHTML = ''; } resolve(); }, 300); };
+      const t = setTimeout(done, this.superT ? dur / 4 : this.turbo ? dur / 2 : dur);
+      ov.addEventListener('click', done);
+    });
+  }
+  featureIntro(title, sub, glyph, dur = 2600) {
+    dispatchEvent(new CustomEvent('sb:feature', { detail: { game: this.game.id, title, bought: !!this.buyRound, re: /^\+/.test(title) } }));
+    sfx.feature(); this.flash('rgba(255,79,184,.4)');
+    const p = center(this.q('.sk-win')); fx.burst(p.x, p.y, 50, ['#ff4fb8', '#fde047', '#38bdf8', '#c084fc', '#fff'], 9);
+    return this.panel(`<div class="sk-pglyph">${glyph}</div><h3>${title}</h3><p>${sub}</p><small>Touchez pour continuer</small>`, 'intro', dur);
+  }
+  async celebrate(amountC, o = {}) {
+    if (!o.summary) return super.celebrate(amountC, o);
+    dispatchEvent(new CustomEvent('sb:featureend', { detail: { game: this.game.id } }));
+    if (this.dead) return;
+    const x = amountC / (o.stake || this.bet);
+    sfx.bigWin?.(); fx.confetti(60);
+    const pr = this.panel(`<div class="sk-pglyph">${art('cqs')}</div><h3>${o.summary}</h3><b class="sk-ptot">0</b><p>×${x >= 100 ? Math.round(x) : x.toFixed(1).replace('.', ',')} la mise</p><small>Touchez pour continuer</small>`, 'end', 2600 + Math.min(2400, x * 12));
+    const tot = this.q('.sk-ptot'), t0 = performance.now(), T = this.superT ? 300 : this.turbo ? 700 : Math.min(2600, 900 + x * 15);
+    const step = (ts) => { if (this.dead || !tot.isConnected) return; const k = Math.min(1, (ts - t0) / T); tot.textContent = fmtC(Math.round(amountC * k)); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+    await pr;
+    this.winAmt.textContent = fmtC(amountC);
+    if (x >= 10) await super.celebrate(amountC, { stake: o.stake, quick: true }); // GROS GAIN ! stays everywhere
+  }
+  // Wide picture on a computer, tall picture on a phone held upright. Full screen: the picture that fits the screen's
+  // shape covers the whole screen, cropped on its edges but never cutting the grid or the bar (KEY, in its pixels).
+  layout() {
+    if (this.dead) return;
+    const sc = this.q('.sk-scene'), art = this.q('.sk-art'), inf = this.q('.sk-info');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('sk-fullsc', full);
+    inf.classList.remove('sk-col'); inf.style.cssText = '';
+    if (!full) {
+      sc.classList.remove('sk-band');
+      const port = innerWidth < 700 && innerHeight > innerWidth;
+      sc.classList.toggle('sk-p', port); sc.classList.toggle('sk-l', !port);
+      art.style.cssText = ''; return;
+    }
+    const cs = getComputedStyle(this.q('.sk-safe')), sp = (k) => parseFloat(cs[k]) || 0;
+    const top = sp('paddingTop'), bot = sp('paddingBottom'), lft = sp('paddingLeft'), rgt = sp('paddingRight');
+    const W = sc.clientWidth - lft - rgt, H = sc.clientHeight - top - bot;
+    if (!W || !H) return;
+    const port = W / H < 1, iw = port ? 720 : 1280, ih = port ? 1280 : 720;
+    sc.classList.toggle('sk-p', port); sc.classList.toggle('sk-l', !port);
+    const [kx0, ky0, kx1, ky1] = port ? [12, 330, 712, 1244] : [350, 186, 960, 716];
+    const k = Math.min(Math.max(W / iw, H / ih), W / (kx1 - kx0), H / (ky1 - ky0)), w = iw * k, h = ih * k;
+    const fit = (S, len, a0, a1) => { let v = (S - len) / 2; v = Math.min(0, Math.max(S - len, v)); return Math.min(S - a1 * k, Math.max(-a0 * k, v)); };
+    const x = fit(W, w, kx0, kx1), y = h < H ? H - h : fit(H, h, ky0, ky1); // thinner than the bar: the picture at the bottom
+    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + x).toFixed(1)}px;top:${(top + y).toFixed(1)}px`;
+    // a screen thinner than the bar: the picture cannot cover the height; the band left at the top shows its sky, blurred
+    sc.classList.toggle('sk-band', y > 0.5);
+    if (port) return;
+    // wide: the plaque stays on the screen, right of the ✕ button; in a column left of the frame if the screen is very wide
+    const l = Math.max(2.5, ((64 - x) / w) * 100), room = 31.88 - 1.5 - l;
+    if (room >= 24) inf.style.cssText = `left:${l.toFixed(2)}%;top:${Math.max(4, ((10 - y) / h) * 100).toFixed(2)}%`;
+    else {
+      const lc = Math.max(1, ((12 - x) / w) * 100);
+      inf.classList.add('sk-col');
+      inf.style.cssText = `left:${lc.toFixed(2)}%;top:${(((64 - y) / h) * 100).toFixed(2)}%;width:${Math.min(13, 31.88 - 1.5 - lc).toFixed(2)}%;height:auto`;
+    }
   }
 
   // Cell multipliers shown as badges on the grid.
@@ -291,19 +387,19 @@ class CandyGame extends BaseGame {
     this.showMM(mm, true);
     while (left > 0 && tot < cap && !this.dead) {
       left--; done++;
-      this.setBanner(`<b>BAL DE LA REINE</b><span class="pill">Tour ${done} / ${done + left}</span><span class="pill">Cases ×${P.fsStart} et plus</span><span class="pill gold">Gain ${fmtC(Math.round(tot))}</span>`);
+      this.q('.sk-left').textContent = `${done} / ${done + left}`; this.fsTotal = Math.round(tot); this.paintGain();
       const res = spin({ bet: b, fs: true, mm });
       await this.play(res);
       mm = res.mm;
       const add = Math.min(res.total, cap - tot);
       tot += add;
       if (add > 0) this.win(Math.round(add), 'Bal de la Reine');
-      this.setLast(Math.round(tot));
+      this.setLast(Math.round(tot)); this.fsTotal = Math.round(tot); this.paintGain();
       if (res.scat >= FS.retrig) { left += FS.extra; await this.featureIntro(`+${FS.extra} TOURS`, 'Encore des couronnes !', art('cqs'), 1300); }
       await this.wait(300);
     }
     this.slotEl.classList.remove('in-free');
-    this.setBanner('');
+    this.fsTotal = null; this.paintGain();
     this.showMM(new Array(N).fill(0));
     await this.celebrate(Math.round(tot), { summary: 'BAL DE LA REINE', stake: b });
     return tot;
