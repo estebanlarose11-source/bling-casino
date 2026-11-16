@@ -8740,6 +8740,241 @@ html:not(.light) .foot { border-top: 1px solid rgba(190, 140, 255, .14); backgro
 .gd-tip { grid-column: 1 / -1; } .gd-tip p { margin: 0; font-size: 13.5px; line-height: 1.45; color: #e6dcf5; } .gd-tip p b { color: #fff; }
 @media (max-width: 560px) { .gd { grid-template-columns: 1fr; } .gd-max { flex-direction: row; gap: 10px; min-width: 0; } .gd-max small { margin: 0; } .gd-max b { font-size: 30px; } }
 html.light .gd > div { background: #f7f0ff; border-color: #d9c8f5; } html.light .gd-sym span, html.light .gd-tip p, html.light .gd-next span { color: #2a1d40; } html.light .gd-tip p b { color: #000; } html.light .gd small { color: #6b3fc0; }
+
+/* ============ Style des maquettes du propriétaire (16 novembre 2026) : nuit presque noire, cases sombres à bord fin,
+   rose vif (#ff3d9a) pour ce qui est actif, icônes fines au trait rose ou blanc, menu de gauche toujours visible sur
+   ordinateur, barre du haut « avatar · solde · niveau », barre du bas Accueil · Promotions · Tournois · Caisse · Plus.
+   Dernier bloc de la finition : il passe après tout. ============ */
+:root { --mq-pink: #ff3d9a; --mq-pink2: #ff62b2; --mq-bg: #0b0a0f; --mq-card: #15121b; --mq-card2: #1b1722; --mq-line: rgba(255, 255, 255, .085); --mq-muted: #9e97ab; }
+html:not(.light) {
+  --panel: #15121b; --panel-2: #1b1722; --panel-3: #241e2c; --line: #2a2432; --muted: #9e97ab; --green: #ff3d9a;
+  --fin-panel: linear-gradient(180deg, #17131d, #121017);
+  --fin-edge: linear-gradient(135deg, rgba(255, 255, 255, .11), rgba(255, 255, 255, .05));
+}
+html:not(.light) body { background: var(--mq-bg); }
+html:not(.light) body::after {
+  background:
+    radial-gradient(800px 520px at 85% -10%, rgba(140, 40, 220, .16), transparent 65%),
+    radial-gradient(700px 500px at 0% 100%, rgba(255, 40, 150, .06), transparent 60%),
+    linear-gradient(180deg, #0d0b12 0%, #0a090d 100%) !important;
+}
+
+/* ---- logo ---- */
+.logo-mark { background: none !important; box-shadow: none !important; width: 34px; height: 34px; border-radius: 0; }
+.logo-mark svg { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 8px rgba(255, 61, 154, .35)); }
+.logo { font: 800 19px Inter, Archivo, sans-serif !important; letter-spacing: .2px; }
+.logo > span:not(.logo-mark) em { background: none !important; -webkit-background-clip: initial; background-clip: initial; color: var(--mq-pink) !important; text-shadow: none !important; }
+
+/* ---- menu de gauche ---- */
+html:not(.light) .side { background: #0e0c13 !important; border-right: 1px solid rgba(255, 255, 255, .06) !important; }
+.side { padding: 18px 14px 14px; gap: 2px; }
+.side .logo { padding: 4px 8px 18px; margin: 0 0 6px; border-bottom: 1px solid var(--mq-line); position: relative; }
+.side .logo::after { content: ''; position: absolute; left: 30%; right: 30%; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 61, 154, .7), transparent); }
+.side-label { margin: 12px 4px 4px; padding: 14px 8px 4px; border-top: 1px solid var(--mq-line); background: none !important; -webkit-background-clip: initial !important; background-clip: initial !important; color: var(--mq-pink) !important; -webkit-text-fill-color: currentColor; font: 700 11.5px Inter, sans-serif !important; letter-spacing: 2.6px !important; }
+.side .logo + .side-label { border-top: 0; margin-top: 4px; padding-top: 6px; }
+.side-sep { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--mq-line); }
+.side-nav { gap: 2px; }
+.side-nav a { gap: 14px; padding: 10px 12px; border-radius: 10px; font: 500 15px Inter, sans-serif; color: #ebe7f1; }
+.side-nav a > span:first-child { width: 24px; display: grid; place-items: center; color: #d9d3e3; }
+.side-nav a .ico { width: 22px; height: 22px; }
+.side-more a { font-size: 14px; color: #c9c3d3; padding: 8px 12px; }
+.side-more a .ico { width: 20px; height: 20px; }
+.side-nav a:hover { background: rgba(255, 255, 255, .04) !important; color: #fff; }
+.side-nav a.on { position: relative; color: var(--mq-pink2) !important; background: linear-gradient(90deg, rgba(255, 61, 154, .17), rgba(255, 61, 154, .06)) !important; box-shadow: inset 0 0 0 1px rgba(255, 61, 154, .28), inset 3px 0 0 var(--mq-pink) !important; }
+.side-nav a.on > span:first-child { color: var(--mq-pink2); }
+.side-new { margin-left: auto; padding: 3px 8px; border-radius: 6px; font: 700 10.5px Inter, sans-serif !important; letter-spacing: .6px; color: #9cc0ff !important; background: rgba(50, 110, 255, .16) !important; box-shadow: inset 0 0 0 1px rgba(100, 150, 255, .55) !important; text-shadow: none !important; animation: none !important; }
+.side-new.v { color: #dcc8ff !important; background: rgba(130, 60, 255, .3) !important; box-shadow: inset 0 0 0 1px rgba(170, 110, 255, .6) !important; }
+.side-badge + .side-new { margin-left: 6px; }
+.side-badge { border-radius: 999px !important; background: var(--mq-pink) !important; color: #fff !important; }
+.side-live { width: 8px; height: 8px; margin-left: 2px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, .8); }
+.side-nav a.side-special { display: grid !important; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; margin: 4px 0; padding: 14px 14px 14px 16px; border-radius: 12px; background: linear-gradient(135deg, rgba(255, 61, 154, .07), rgba(139, 61, 255, .04)) !important; box-shadow: inset 0 0 0 1px rgba(255, 61, 154, .3) !important; color: #fff !important; font-weight: 600; font-size: 16px; }
+.side-special .sp-ico { width: auto; color: var(--mq-pink); filter: drop-shadow(0 0 8px rgba(255, 61, 154, .7)); }
+.side-special .sp-ico .ico { width: 34px; height: 34px; }
+.side-special .sp-txt { display: grid; gap: 3px; min-width: 0; }
+.side-special .sp-badge { font: 500 13px Inter, sans-serif; color: var(--mq-muted); letter-spacing: .3px; }
+.side-special .sp-badge.ready { color: #fde68a; }
+.sp-ring { --p: 0%; width: 44px; height: 44px; border-radius: 50%; background: conic-gradient(var(--mq-pink) var(--p), rgba(255, 255, 255, .09) 0); -webkit-mask: radial-gradient(circle, transparent 15px, #000 16px); mask: radial-gradient(circle, transparent 15px, #000 16px); filter: drop-shadow(0 0 6px rgba(255, 61, 154, .5)); }
+html:not(.light) .side-vip { background: var(--mq-card) !important; border: 1px solid var(--mq-line) !important; border-radius: 12px !important; }
+.side-foot { color: var(--mq-muted); display: flex; align-items: center; gap: 8px; }
+
+/* ---- ordinateur : le menu de gauche reste ouvert (plus de menu en haut) ---- */
+@media (min-width: 1180px) {
+  :root { --side: 268px; }
+  .side { width: var(--side); transform: none !important; box-shadow: none !important; z-index: 40; }
+  body.side-open .side-scrim { display: none !important; }
+  .nx-logo, .nx-nav { display: none !important; }
+  .top { padding: 0 28px; }
+  .view, .foot { margin-left: var(--side) !important; margin-right: 0 !important; }
+  .view { max-width: 1420px; padding: 24px 32px; }
+}
+
+/* ---- barre du haut ---- */
+html:not(.light) .top { background: rgba(11, 10, 15, .97) !important; border-bottom: 1px solid rgba(255, 255, 255, .06) !important; }
+.top { gap: 12px; }
+.top > .burger:not(.burger-r), .logo.mobile, .top .jp-chip, .top .theme-btn, .top .demo-tag { display: none !important; }
+.burger-r { display: none !important; }
+.top-wallet { order: 1; margin: 0 0 0 auto !important; height: 54px; padding: 0 8px 0 18px !important; gap: 16px; border-radius: 14px 0 0 14px !important; background: var(--mq-card) !important; border: 1px solid var(--mq-line) !important; border-right: 0 !important; box-shadow: none !important; }
+.top-wallet .balance { display: grid; gap: 1px; padding: 0; line-height: 1.1; }
+.top-wallet .balance small { font: 600 10.5px Inter, sans-serif; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mq-muted); }
+.top-wallet .balance b { font: 800 19px Inter, KeCoin, sans-serif; color: #fff; white-space: nowrap; }
+.top-wallet .top-refill { width: 40px; height: 40px; padding: 0 !important; display: grid; place-items: center; border-radius: 10px !important; background: transparent !important; box-shadow: none !important; color: var(--mq-pink) !important; }
+.top-wallet .top-refill .ico { width: 27px; height: 27px; }
+.top-wallet .top-refill b { display: none !important; }
+.top-wallet .top-refill:hover { background: rgba(255, 61, 154, .1) !important; }
+.me-chip { order: 2; height: 54px; margin-left: -12px; padding: 0 20px !important; gap: 10px; border-radius: 0 14px 14px 0 !important; background: var(--mq-card) !important; border: 1px solid var(--mq-line) !important; position: relative; }
+.me-chip::before { content: ''; position: absolute; left: 0; top: 11px; bottom: 11px; width: 1px; background: rgba(255, 255, 255, .12); }
+.me-chip:hover { border-color: rgba(255, 61, 154, .4) !important; }
+.lv-shield { display: none; position: relative; width: 28px; height: 32px; flex: none; font-style: normal; clip-path: polygon(50% 0, 100% 17%, 100% 60%, 50% 100%, 0 60%, 0 17%); background: linear-gradient(160deg, #ff7cc4, #a63dff); }
+.lv-shield::before { content: ''; position: absolute; inset: 2px; clip-path: inherit; background: linear-gradient(180deg, #2a1440, #160a24); }
+.lv-shield b { position: relative; display: grid; place-items: center; height: 100%; padding-bottom: 2px; font: 800 13px Inter, sans-serif; color: #fff; }
+.me-lv { display: grid; gap: 4px; min-width: 0; }
+.me-lv small { font: 700 11px Inter, sans-serif; letter-spacing: 1.4px; text-transform: uppercase; color: #fff; white-space: nowrap; }
+.me-bar { display: block; width: 150px; height: 6px; border-radius: 6px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.me-bar b { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #ff3d9a, #ff7cc4); box-shadow: 0 0 8px rgba(255, 61, 154, .6); }
+.me-lv em { font: 500 11px Inter, sans-serif; font-style: normal; color: var(--mq-muted); white-space: nowrap; }
+.top-right { order: 3; position: static !important; margin-left: 10px; gap: 6px; }
+.top-ic { width: 44px !important; height: 44px !important; display: grid !important; place-items: center; position: relative; background: none !important; border: 0 !important; box-shadow: none !important; color: #fff !important; border-radius: 12px !important; }
+.top-ic .ico { width: 24px; height: 24px; }
+.top-ic:hover { background: rgba(255, 255, 255, .05) !important; }
+.top-gift.dot::after { content: ''; position: absolute; top: 9px; right: 9px; width: 8px; height: 8px; border-radius: 50%; background: var(--mq-pink); box-shadow: 0 0 0 2px #0b0a0f; }
+.top-av { order: 4; flex: none; width: 46px; height: 46px; margin-left: 4px; display: grid; place-items: center; border-radius: 50%; color: var(--mq-pink2); background: radial-gradient(circle at 35% 30%, #3a1656, #170b22); box-shadow: inset 0 0 0 2px var(--mq-pink), 0 0 14px rgba(255, 61, 154, .35); overflow: hidden; }
+.top-av .ico { width: 24px; height: 24px; }
+.top-av .lk-av { width: 40px !important; height: 40px !important; margin: 0 !important; font-size: 22px; }
+.rw-dot { z-index: 2; }
+
+/* ---- barre du bas (téléphone) ---- */
+html:not(.light) .bottom-nav { background: #0e0c13 !important; border-top: 1px solid rgba(255, 255, 255, .07) !important; }
+.bottom-nav a { gap: 4px; padding: 7px 2px 4px !important; background: none !important; box-shadow: none !important; color: #a9a3b5 !important; font: 500 12px Inter, sans-serif !important; }
+.bottom-nav a .ico { width: 26px !important; height: 26px !important; }
+.bottom-nav a.on { color: var(--mq-pink) !important; }
+.bottom-nav a.on > span { filter: drop-shadow(0 0 8px rgba(255, 61, 154, .55)); }
+
+/* ---- vitrine de l'accueil ---- */
+.nx-hero { grid-template-columns: minmax(0, 1fr) minmax(0, .95fr); gap: 10px; min-height: 0; padding: 48px 20px 48px 48px; border-radius: 18px;
+  background: radial-gradient(60% 85% at 78% 35%, rgba(150, 40, 255, .3), transparent 68%), radial-gradient(40% 60% at 100% 100%, rgba(255, 47, 147, .16), transparent 70%), linear-gradient(135deg, #130e1b 0%, #0e0b13 55%, #170a20 100%) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 20px 50px rgba(0, 0, 0, .4) !important; }
+.nx-hero::after { display: none; }
+.nx-stage { order: 2; align-self: stretch; display: grid; place-items: center; margin: -30px -10px -40px 0; }
+.nx-art { max-height: 380px; }
+.nx-copy { order: 1; }
+.nx-kick { display: block; margin-bottom: 8px; font: 600 13px Inter, sans-serif; letter-spacing: 5px; text-transform: uppercase; color: var(--mq-pink); }
+.nx-hero h1 { font: 900 clamp(40px, 4.9vw, 74px)/1 Inter, Archivo, sans-serif !important; letter-spacing: -.015em !important; text-shadow: 0 4px 24px rgba(0, 0, 0, .5) !important; }
+.nx-hero h1 em { font-style: normal; color: var(--mq-pink); }
+.nx-copy .nx-short { display: block !important; margin: 14px 0 22px; font: 500 clamp(14px, 1.15vw, 17px)/1.4 Inter, sans-serif !important; text-transform: none !important; letter-spacing: 0 !important; color: #cfc8da !important; }
+.nx-short b { color: var(--mq-pink); padding: 0 4px; }
+.nx-rule { display: none; }
+.nx-bonus { display: inline-flex !important; align-items: center; gap: 14px; padding: 12px 22px 12px 16px; border-radius: 12px; box-shadow: inset 0 0 0 1.5px rgba(255, 61, 154, .6); font: inherit !important; color: #fff; }
+.nx-bonus > i { color: var(--mq-pink); } .nx-bonus > i .ico { width: 34px; height: 34px; }
+.nx-bonus > span { display: grid; gap: 2px; font: inherit; color: inherit; text-shadow: none; }
+.nx-bonus small { font: 600 12.5px Inter, sans-serif; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mq-pink); }
+.nx-bonus b { font: 800 clamp(18px, 1.7vw, 23px) Inter, KeCoin, sans-serif; color: #fff; }
+.nx-cta { margin-top: 26px; gap: 14px; }
+.nx-btn { height: 54px; padding: 0 30px; gap: 10px; border-radius: 10px !important; font: 700 15px Inter, sans-serif !important; letter-spacing: .6px !important; background: linear-gradient(180deg, #ff4fae, #f0237f) !important; box-shadow: 0 10px 28px rgba(255, 46, 150, .35) !important; }
+.nx-btn.ghost { background: transparent !important; box-shadow: inset 0 0 0 1.5px var(--mq-pink) !important; }
+.nx-btn .ico { width: 22px; height: 22px; }
+.nx-cats-h h2 { position: relative; margin: 6px 0 18px; padding-bottom: 10px; font: 800 21px Inter, sans-serif; letter-spacing: .5px; text-transform: uppercase; }
+.nx-cats-h h2::after { content: ''; position: absolute; left: 0; bottom: 0; width: 64px; height: 3px; border-radius: 3px; background: var(--mq-pink); }
+.nx-cats { grid-template-columns: repeat(7, minmax(0, 1fr)) !important; gap: 14px; margin-bottom: 22px; }
+.nx-cats a { grid-column: auto !important; display: flex !important; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 24px 12px 20px !important; border-radius: 14px !important; background: var(--mq-card) !important; border: 1px solid var(--mq-line) !important; }
+.nx-cats a:hover { border-color: rgba(255, 61, 154, .45) !important; box-shadow: 0 10px 26px rgba(255, 46, 150, .14) !important; }
+.nx-cats a > i { width: auto !important; height: auto !important; margin-bottom: 8px; background: none !important; color: var(--mq-pink); filter: drop-shadow(0 0 10px rgba(255, 61, 154, .55)); }
+.nx-cats a > i .ico { width: 46px; height: 46px; stroke-width: 1.4; }
+.nx-cats b { font: 600 15px Inter, sans-serif !important; white-space: normal !important; }
+.nx-cats small { font-size: 12.5px !important; color: var(--mq-muted) !important; white-space: normal !important; }
+@media (max-width: 1400px) and (min-width: 761px) { .nx-cats { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; } }
+/* the rows of games: each in its own dark card */
+.nx-row { margin: 0 0 18px; padding: 18px 20px 20px; border-radius: 16px; background: var(--mq-card); border: 1px solid var(--mq-line); }
+.nx-row .sec-head { align-items: center; margin-bottom: 14px; }
+.nx-row .sec-head h2 { padding-left: 0; font: 700 16px Inter, sans-serif; letter-spacing: 1.2px; text-transform: uppercase; }
+.nx-row .sec-head h2::before { display: none !important; }
+.nx-row .more { display: inline-flex; align-items: center; gap: 6px; font: 600 13px Inter, sans-serif !important; letter-spacing: 1px; text-transform: uppercase; color: var(--mq-pink) !important; }
+.nx-row .more svg { width: 16px; height: 16px; }
+
+/* ---- téléphone ---- */
+@media (max-width: 900px) {
+  :root { --top: 66px; }
+  .top { padding: 0 12px !important; gap: 8px; }
+  .burger-r { display: grid !important; order: 5; flex: none; width: 40px; height: 40px; place-items: center; padding: 0; background: none !important; border: 0 !important; color: #fff !important; }
+  .burger-r .ico { width: 28px; height: 28px; }
+  .top-av { order: 0; width: 44px; height: 44px; margin: 0; }
+  .top-wallet { order: 1; margin: 0 !important; height: 46px; padding: 0 5px 0 14px !important; gap: 8px; border-radius: 999px !important; border-right: 1px solid var(--mq-line) !important; min-width: 0; }
+  .top-wallet .balance small { display: none; }
+  .top-wallet .balance b { font-size: 16.5px; overflow: hidden; text-overflow: ellipsis; }
+  .top-wallet .top-refill { width: 34px; height: 34px; border-radius: 50% !important; background: linear-gradient(180deg, #ff4fae, #e6227f) !important; color: #fff !important; }
+  .top-wallet .top-refill .ico { display: none; }
+  .top-wallet .top-refill b { display: block !important; font-size: 22px; line-height: 1; }
+  .me-chip { order: 2; margin-left: 0; height: 46px; padding: 0 12px 0 8px !important; border-radius: 999px !important; flex: none; }
+  .me-chip::before, .me-bar, .me-lv em { display: none; }
+  .lv-shield { display: block; }
+  .me-lv small { font-size: 11.5px; letter-spacing: 1px; color: #d8d2e2; }
+  .top-right { order: 3; margin-left: auto; gap: 0; }
+  .top-gift { display: none !important; }
+  .top-ic { width: 40px !important; height: 40px !important; }
+  .top-ic .ico { width: 26px; height: 26px; }
+}
+@media (max-width: 430px) { .top-bell { display: none !important; } .top-right { margin-left: auto; } .me-lv small b { display: none; } }
+@media (max-width: 370px) { .me-lv small { display: none; } .me-chip { padding: 0 8px !important; } }
+@media (max-width: 760px) {
+  .nx-hero { display: block; position: relative; padding: 34px 18px 22px !important; text-align: left !important; border-radius: 16px; overflow: hidden; }
+  .nx-stage { position: absolute; z-index: 0; top: 18px; right: -150px; width: 400px; margin: 0; pointer-events: none; }
+  .nx-art { height: auto !important; max-height: none; }
+  .nx-copy { position: relative; z-index: 1; }
+  .nx-kick { display: none; }
+  .nx-hero h1 { font-size: clamp(32px, 10.6vw, 46px) !important; white-space: nowrap; }
+  .nx-hero h1 em { color: #fff; }
+  .nx-copy .nx-short { margin: 10px 0 18px !important; font-size: 13.5px !important; color: #b9b1c5 !important; max-width: 80%; }
+  .nx-short b { color: inherit; padding: 0 2px; }
+  .nx-rule { display: block; position: relative; height: 12px; width: 78%; margin: 0 0 18px; }
+  .nx-rule::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: linear-gradient(90deg, rgba(255, 61, 154, .1), rgba(255, 61, 154, .7), rgba(255, 61, 154, .1)); }
+  .nx-rule b { position: absolute; left: 50%; top: 50%; translate: -50% -50%; padding: 0 6px; font-size: 14px; line-height: 1; color: var(--mq-pink); background: #120d18; text-shadow: 0 0 8px var(--mq-pink); }
+  .nx-bonus { display: grid !important; gap: 4px; padding: 0; box-shadow: none; }
+  .nx-bonus > i { display: none; }
+  .nx-bonus small { font-size: 15px; letter-spacing: 2px; font-weight: 700; }
+  .nx-bonus b { font: 900 clamp(30px, 9.6vw, 42px)/1 Inter, KeCoin, sans-serif !important; color: var(--mq-pink); letter-spacing: -.01em; }
+  .nx-cta { display: grid !important; grid-template-columns: 1.15fr 1fr; gap: 12px; margin-top: 22px; }
+  .nx-btn { height: 54px; padding: 0 8px; font-size: 14px !important; letter-spacing: .2px !important; }
+  .nx-btn .ico { display: none; }
+  .nx-cats-h { display: none; }
+  .nx-cats { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 8px; }
+  .nx-cats a { flex-direction: row; justify-content: flex-start; text-align: left; gap: 8px; padding: 14px 8px !important; min-height: 74px; }
+  .nx-cats a:nth-child(n+5) { display: none !important; }
+  .nx-cats a > i { margin: 0; }
+  .nx-cats a > i .ico { width: 30px; height: 30px; stroke-width: 1.6; }
+  .nx-cats b { font: 500 12.5px/1.25 Inter, sans-serif !important; overflow: visible !important; }
+  .nx-cats small { display: none; }
+  .nx-row { padding: 14px 0 14px 14px; border-radius: 14px; }
+  .nx-row .sec-head { padding-right: 14px; }
+  .nx-row .sec-head h2 { font-size: 14.5px; }
+}
+@media (max-width: 400px) { .nx-cats a { flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 10px 4px !important; } .nx-cats b { font-size: 11.5px !important; } }
+
+html:not(.light) .side-nav, .side-nav { border: 0 !important; margin: 0 !important; padding: 0 !important; background: none !important; }
+.side-nav a + a { border-top: 0 !important; }
+.side-nav a { margin: 1px 0 !important; }
+.side-label { display: block !important; }
+.side-label::before, .side-label::after { display: none !important; }
+.side-nav a > span:not(:first-child), .side-nav a { line-height: 1.25; }
+.side-special .sp-badge { background: none !important; padding: 0 !important; min-width: 0 !important; height: auto !important; display: block !important; text-align: left; }
+.side-special .sp-txt { line-height: 1.2; width: auto !important; text-align: left !important; font-size: 16px !important; color: #fff !important; white-space: nowrap; }
+.side-special .sp-ico { width: auto !important; }
+html.light .side-special .sp-txt { color: #2a1d40 !important; }
+.top .top-wallet .btn.top-refill, body:not(.ml-off) .top .top-wallet .btn.top-refill { background: transparent !important; box-shadow: none !important; text-shadow: none !important; }
+html:not(.light) .bottom-nav a.on { background: none !important; box-shadow: none !important; border: 0 !important; }
+@media (min-width: 1180px) { .nx-hero { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); } .nx-hero h1 { white-space: nowrap; font-size: clamp(40px, 4vw, 66px) !important; } }
+@media (max-width: 900px) { .top .top-wallet .btn.top-refill, body:not(.ml-off) .top .top-wallet .btn.top-refill { background: linear-gradient(180deg, #ff4fae, #e6227f) !important; } }
+html.light .top-wallet, html.light .me-chip, html.light .nx-cats a, html.light .nx-row, html.light .side-nav a.side-special { background: #fff !important; border-color: #e3d9ef !important; }
+html.light .top-wallet .balance b, html.light .me-lv small, html.light .top-ic, html.light .side-nav a, html.light .nx-cats b, html.light .side-special .sp-txt { color: #1d1430 !important; }
+html.light .side-nav a > span:first-child { color: #5b4a72; }
+html.light .side-nav a.on, html.light .side-nav a.on > span:first-child { color: #d81b74 !important; }
+html.light .bottom-nav a { color: #5b5068 !important; } html.light .bottom-nav a.on { color: #d81b74 !important; }
+@media (max-width: 760px) {
+  .nx-stage { top: -34px; right: -122px; width: 310px; }
+  .nx-copy h1, .nx-copy .nx-short, .nx-bonus { text-shadow: 0 2px 12px rgba(0, 0, 0, .85) !important; }
+  .nx-hero h1 { font-size: clamp(27px, 8.7vw, 44px) !important; }
+  .nx-copy .nx-short { max-width: 64%; }
+  .nx-bonus b { font-size: clamp(25px, 8.1vw, 40px) !important; white-space: nowrap; }
+  .nx-btn { font-size: 13px !important; }
+}
 </style>
 </head>
 <body>
@@ -8769,32 +9004,34 @@ html.light .gd > div { background: #f7f0ff; border-color: #d9c8f5; } html.light 
 <symbol id="c-huff" viewBox="0 0 120 160"><path d="M4 68 Q28 60 50 68 M8 84 Q32 76 56 84 M4 100 Q28 92 50 100" stroke="#fff" stroke-opacity=".65" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="92" y="62" width="7" height="14" fill="#8a2a22" stroke="#fff" stroke-width="1.5"/><path d="M70 98 L92 74 L114 98 Z" fill="#8a2a22" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><rect x="75" y="98" width="34" height="34" fill="#d9573f" stroke="#fff" stroke-width="2"/><path d="M75 106 H109 M75 114 H109 M75 122 H109 M84 98 V106 M100 106 V114 M88 114 V122" stroke="#ffd0c0" stroke-opacity=".6" stroke-width="1.3" fill="none"/><rect x="86" y="112" width="10" height="20" rx="1.5" fill="#5a2f14" stroke="#fff" stroke-width="1.2"/><path d="M14 22 L26 44 L52 44 L64 22 L68 60 Q68 82 40 84 Q12 82 12 60 Z" fill="#cfd8e0" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><ellipse cx="40" cy="68" rx="14" ry="10" fill="#fff"/><ellipse cx="40" cy="62" rx="4.6" ry="3.4" fill="#111"/><path d="M26 54 Q32 48 38 55 Q32 58 26 54Z M54 54 Q48 48 42 55 Q48 58 54 54Z" fill="#ffd23f" stroke="#111" stroke-width="1.5"/><path d="M26 47 L38 51 M54 47 L42 51" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M32 72 Q40 78 48 72" fill="#7a1220" stroke="#111" stroke-width="1.4"/><g fill="#d9573f" stroke="#fff" stroke-width="1.8"><rect x="12" y="116" width="26" height="14" rx="3"/><rect x="30" y="134" width="26" height="14" rx="3"/></g><g font-family="KeCoin,Georgia,serif" font-weight="900" font-size="9" fill="#fff" text-anchor="middle"><text x="25" y="126">×5</text><text x="43" y="144">×12</text></g><rect x="6" y="148" width="108" height="3" fill="none"/></symbol>
 <symbol id="c-avion" viewBox="0 0 120 160"><path d="M10 142 H112 M10 142 V22" stroke="#fff" stroke-opacity=".5" stroke-width="2" fill="none"/><path d="M12 138 C40 134 70 112 98 42" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="1 7" stroke-linecap="round"/><g transform="translate(98 40) rotate(-35)"><path d="M-14 6 L16 -4 L-4 16 L-6 8 Z M-6 8 L16 -4" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></g><rect x="6" y="6" width="70" height="28" rx="14" fill="#fff" fill-opacity=".92"/><text x="41" y="26" text-anchor="middle" font-family="KeCoin,Georgia,serif" font-weight="900" font-size="17" fill="#c4132f">×12,4</text></symbol>
 </svg>
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ui-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9v12h14V9"/><path d="M10 21v-6h4v6"/></symbol><symbol id="ui-slots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><rect x="3" y="5" width="18" height="14"/><path d="M9 5v14M15 5v14M3 12h18"/></symbol><symbol id="ui-tables" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/><path d="M12 3v6.5M12 14.5V21M3 12h6.5M14.5 12H21"/></symbol><symbol id="ui-quick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol><symbol id="ui-ach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="12" cy="15" r="6"/><path d="M8.6 10 6 3h4l2 5.2L14 3h4l-2.6 7"/></symbol><symbol id="ui-missions" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol><symbol id="ui-wheel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 8h18v4H3zM5 12v9h14v-9M12 8v13"/><path d="M12 8 8 3M12 8l4-5"/></symbol><symbol id="ui-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M5 22V3"/><path d="M5 4h14l-3 4.5 3 4.5H5"/></symbol><symbol id="ui-vip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 7l4.5 4L12 4l4.5 7L21 7l-2 12H5z"/></symbol><symbol id="ui-top" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 15v3M8 21h8v-3H8z"/></symbol><symbol id="ui-refill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 7h18v13H3z"/><path d="M5 7 16 3v4"/><path d="M15 11.5h6v5h-6z"/></symbol><symbol id="ui-ref" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5A6.5 6.5 0 0 1 21.5 20"/></symbol><symbol id="ui-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M12 15V3M7 8l5-5 5 5"/><path d="M5 12v9h14v-9"/></symbol><symbol id="ui-app" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M6 2h12v20H6z"/><path d="M10.5 18h3"/></symbol><symbol id="ui-resp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="ui-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 6h18M3 12h18M3 18h18"/></symbol><symbol id="ui-shop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M4 8h16l-1.5 13h-13z"/><path d="M8.5 10V6a3.5 3.5 0 0 1 7 0v4"/></symbol><symbol id="ui-tiktok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round" stroke-linecap="round"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 2.6 2.4 4.4 5 4.6"/></symbol><symbol id="ui-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="miter" stroke-linecap="square"><path d="M3 4h18v13H8l-5 4z"/><path d="M7.5 9h9M7.5 12.5h6"/></symbol></svg>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ui-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 10.5 12 3.8l8.5 6.7"/><path d="M5.5 9.2V20h4.6v-5.6h3.8V20h4.6V9.2"/></symbol><symbol id="ui-slots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="6.5" width="14.5" height="14" rx="2.5"/><rect x="5.6" y="9.6" width="9.3" height="5.8" rx="1"/><path d="M8.7 9.6v5.8M11.8 9.6v5.8M7 18h6.5M6.5 6.5V4.5h7.5v2"/><path d="M17.5 12.5h1.6a.9.9 0 0 0 .9-.9V8"/><circle cx="20" cy="6.6" r="1.4"/></symbol><symbol id="ui-tables" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.3"/><circle cx="12" cy="12" r="1.5"/><path d="M12 3v3.7M12 17.3V21M3 12h3.7M17.3 12H21M5.6 5.6l2.6 2.6M15.8 15.8l2.6 2.6M18.4 5.6l-2.6 2.6M8.2 15.8l-2.6 2.6"/></symbol><symbol id="ui-quick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M13.5 2.5 5 13.5h6l-1 8 8.5-11h-6z"/></symbol><symbol id="ui-online" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8" r="3.1"/><path d="M6.6 19.5c0-3 2.4-5.2 5.4-5.2s5.4 2.2 5.4 5.2"/><circle cx="5.4" cy="10.2" r="2.2"/><path d="M1.9 18.3c0-2.1 1.4-3.7 3.5-4"/><circle cx="18.6" cy="10.2" r="2.2"/><path d="M22.1 18.3c0-2.1-1.4-3.7-3.5-4"/></symbol><symbol id="ui-cards" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 9.8h18M6.5 14.6h4.5"/></symbol><symbol id="ui-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M7.8 4h8.4v5a4.2 4.2 0 0 1-8.4 0z"/><path d="M7.8 5.8H5.2A2.6 2.6 0 0 0 8 9.6M16.2 5.8h2.6A2.6 2.6 0 0 1 16 9.6M12 13.2v3.3M8.5 20.5h7M9.6 20.5l.6-4h3.6l.6 4"/></symbol><symbol id="ui-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="9" cy="6.5" rx="5.5" ry="2.5"/><path d="M3.5 6.5v4c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-4M3.5 10.5v4c0 1.4 2.5 2.5 5.5 2.5"/><ellipse cx="15" cy="14.5" rx="5.5" ry="2.5"/><path d="M9.5 14.5v3c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-3"/></symbol><symbol id="ui-swords" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 3.5h3l10 10M3.5 3.5v3l10 10M20.5 3.5h-3l-5 5M20.5 3.5v3l-5 5M12.5 17.5l5-5M18.5 18.5l-3-3M11.5 17.5l-5-5M5.5 18.5l3-3M17 20l3-3M7 20l-3-3"/></symbol><symbol id="ui-cashback" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M19.6 13.5a7.8 7.8 0 0 1-14.1 3.2M4.4 10.5a7.8 7.8 0 0 1 14.1-3.2"/><path d="M18.8 3.6v3.9h-3.9M5.2 20.4v-3.9h3.9"/><path d="M13.8 9.6c-.4-.6-1-.9-1.8-.9-1 0-1.8.6-1.8 1.4 0 1.9 3.8 1 3.8 2.9 0 .8-.8 1.4-1.9 1.4-.8 0-1.6-.4-2-1M12 7.7v1M12 14.4v1"/></symbol><symbol id="ui-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8-7.5 9.5-4.3-1.5-7.5-5-7.5-9.5V6z"/><path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6"/></symbol><symbol id="ui-ball" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l4 2.9-1.5 4.7h-5L8 10.5z"/><path d="M12 3v4.6M20.6 9.3l-4.6 1.2M17.3 19.3l-2.8-4.1M6.7 19.3l2.8-4.1M3.4 9.3 8 10.5"/></symbol><symbol id="ui-loto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.4"/><path d="M11.2 10.6l1.1-.8v4.6"/></symbol><symbol id="ui-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8.5h14V12M12 8v12.5"/><path d="M12 8C10.6 4.6 6.5 4 6.5 6.5 6.5 8 9.5 8 12 8zM12 8c1.4-3.4 5.5-4 5.5-1.5C17.5 8 14.5 8 12 8z"/></symbol><symbol id="ui-tv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M8.5 21h7M10.5 9.3v5.4l4.6-2.7z"/></symbol><symbol id="ui-ghost" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.2c2.9 0 4.8 2.1 4.8 4.9v2.4l1.9.7-1.3 1.4c.6 1.5 1.7 2.6 3.2 3.1-.8.8-2 1-2.8 1.1l-.5 1.4c-1.1-.2-2.1.1-3 .7-.7.5-1.4.8-2.3.8s-1.6-.3-2.3-.8c-.9-.6-1.9-.9-3-.7l-.5-1.4c-.8-.1-2-.3-2.8-1.1 1.5-.5 2.6-1.6 3.2-3.1l-1.3-1.4 1.9-.7V8.1c0-2.8 1.9-4.9 4.8-4.9z"/></symbol><symbol id="ui-support" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.6"/><rect x="17" y="13" width="4" height="6" rx="1.6"/><path d="M19 19c0 1.6-2.2 2.5-5.5 2.5"/></symbol><symbol id="ui-music" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M9 18V5.5l11-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></symbol><symbol id="ui-vibe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8M1.8 10.2v3.6M19.5 8v8M22.2 10.2v3.6"/></symbol><symbol id="ui-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/></symbol><symbol id="ui-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.1H4.4z"/><path d="M10 21a2.1 2.1 0 0 0 4 0"/></symbol><symbol id="ui-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7.5V18a2 2 0 0 0 2 2h14V9.5H6a2 2 0 0 1-2-2zm0 0a2 2 0 0 1 2-2h11v4"/><circle cx="16.4" cy="14.8" r="1.2"/></symbol><symbol id="ui-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></symbol><symbol id="ui-dots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></symbol><symbol id="ui-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13.2v4.2M9.9 15.3h4.2"/></symbol><symbol id="ui-ach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="14.5" r="5.8"/><path d="M8.6 9.8 6 3.5h4l2 4.4 2-4.4h4l-2.6 6.3"/><path d="m12 11.9 1 1.9 2.1.3-1.5 1.5.4 2.1-2-1-1.9 1 .4-2.1-1.5-1.5 2.1-.3z"/></symbol><symbol id="ui-missions" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/></symbol><symbol id="ui-wheel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="13" r="8.3"/><circle cx="12" cy="13" r="1.6"/><path d="M12 4.7v6.7M12 14.6v6.7M3.7 13h6.7M13.6 13h6.7M6.1 7.1l4.8 4.8M13.1 14.1l4.8 4.8M17.9 7.1l-4.8 4.8M10.9 14.1l-4.8 4.8"/><path d="M10.3 1.8h3.4L12 4.4z"/></symbol><symbol id="ui-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M5 21V3.8M5 4.3h12.5L15 8.3l2.5 4H5"/></symbol><symbol id="ui-vip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></symbol><symbol id="ui-top" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 20.5h17M5 20.5v-6h4.5v6M9.5 20.5V8.5h5v12M14.5 20.5V12H19v8.5"/></symbol><symbol id="ui-refill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7.5V18a2 2 0 0 0 2 2h14V9.5H6a2 2 0 0 1-2-2zm0 0a2 2 0 0 1 2-2h11v4"/><path d="M14.2 14.8h4.4M16.4 12.6V17"/></symbol><symbol id="ui-ref" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="9.5" cy="8.5" r="3.8"/><path d="M2.5 20c0-3.6 3-6 7-6 1.6 0 3 .4 4.1 1M18.5 13.2v6M15.5 16.2h6"/></symbol><symbol id="ui-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/></symbol><symbol id="ui-app" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M12 7v6.5M9.5 11l2.5 2.5 2.5-2.5M10.5 18.5h3"/></symbol><symbol id="ui-resp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8-7.5 9.5-4.3-1.5-7.5-5-7.5-9.5V6z"/><path d="m8.8 12 2.2 2.2 4.2-4.4"/></symbol><symbol id="ui-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol><symbol id="ui-shop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M5 8h14l-1 12.5H6z"/><path d="M9 10.5V7a3 3 0 0 1 6 0v3.5"/></symbol><symbol id="ui-tiktok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 2.6 2.4 4.4 5 4.6"/></symbol><symbol id="ui-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 4.5h16a1 1 0 0 1 1 1v10.5a1 1 0 0 1-1 1H9l-5 4v-4H4a1 1 0 0 1-1-1V5.5a1 1 0 0 1 1-1z"/><path d="M7.5 9h9M7.5 12.5h6"/></symbol><symbol id="ui-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 20s-7.8-4.7-7.8-10.4A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.8 2.4C19.8 15.3 12 20 12 20z"/></symbol><symbol id="ui-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol></svg>
   <aside class="side">
-    <a class="logo" href="#accueil"><span class="logo-mark">S</span><span>SPINBET<em>CASINO</em></span></a>
+    <a class="logo" href="#accueil"><span class="logo-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lgS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4fae"/><stop offset="1" stop-color="#8b3dff"/></linearGradient></defs><path d="M9 4.5h16.5l-4 6H5z" fill="url(#lgS)"/><path d="M6.5 13h16.2l3 4.3-6.4 10.2H4l4-6h9.4l-1.2-2H10.3z" fill="url(#lgS)"/></svg></span><span>SPINBET<em>CASINO</em></span></a>
     <div class="side-label">Jouer</div>
     <nav class="side-nav">
       <a href="#accueil" data-nav="home"><span><svg class="ico"><use href="#ui-home"/></svg></span>Accueil</a>
       <a href="#lobby-slot" data-nav="slots"><span><svg class="ico"><use href="#ui-slots"/></svg></span>Machines à sous</a>
       <a href="#lobby-table" data-nav="tables"><span><svg class="ico"><use href="#ui-tables"/></svg></span>Roues & tables</a>
       <a href="#lobby-quick" data-nav="quick"><span><svg class="ico"><use href="#ui-quick"/></svg></span>Jeux rapides</a>
-      <a href="#lobby-online" data-nav="online"><span>🟢</span>En ligne</a>
-      <a href="#jcc" data-nav="jcc"><span>🃏</span>Cartes à collectionner (JCC)<b class="side-badge" data-jc-badge hidden></b><b class="side-new">NEW</b></a>
+    </nav>
+    <nav class="side-nav side-sep">
+      <a href="#lobby-online" data-nav="online"><span><svg class="ico"><use href="#ui-online"/></svg></span>En ligne<i class="side-live"></i></a>
+      <a href="#jcc" data-nav="jcc"><span><svg class="ico"><use href="#ui-cards"/></svg></span>Cartes à collectionner<b class="side-badge" data-jc-badge hidden></b><b class="side-new">NEW</b></a>
     </nav>
     <div class="side-label">Défi spécial</div>
     <nav class="side-nav">
-      <a href="#special" data-nav="special" class="side-special"><span>🏆</span>Défi spécial<b class="side-badge sp-badge" data-sp-badge></b></a>
+      <a href="#special" data-nav="special" class="side-special"><span class="sp-ico"><svg class="ico"><use href="#ui-trophy"/></svg></span><span class="sp-txt">Défi spécial<small class="sp-badge" data-sp-badge></small></span><i class="sp-ring" data-sp-ring></i></a>
     </nav>
     <div class="side-label">Événements</div>
     <nav class="side-nav">
-      <a href="#tournois" data-nav="tournois"><span>🏁</span>Tournois<b class="side-badge ev-live-badge" data-ev-live hidden>LIVE</b></a>
-      <a href="#jackpot" data-nav="jackpot"><span>💎</span>Jackpot commun</a>
-      <a href="#duels" data-nav="duels"><span>⚔️</span>Duels entre amis<b class="side-badge" data-duel-badge hidden></b></a>
-      <a href="#cashback" data-nav="cashback"><span>💸</span>Cashback<b class="side-badge" data-cb-badge hidden></b></a>
-      <a href="#battle" data-nav="battle"><span>⚔️</span>Battle Royale<b class="side-new">NEW</b></a>
-      <a href="#paris" data-nav="paris"><span>⚽</span>Sport<b class="side-new">NEW</b></a>
-      <a href="#loto" data-nav="loto"><span>🎱</span>Loto · 1,5 M<b class="side-new">NEW</b></a>
-      <a href="#avent" data-nav="avent" data-avent-nav hidden style="display:none"><span>🎄</span>Calendrier de l’Avent<b class="side-badge" data-avent-badge hidden style="display:none">1</b><b class="side-new">NEW</b></a>
+      <a href="#tournois" data-nav="tournois"><span><svg class="ico"><use href="#ui-trophy"/></svg></span>Tournois<b class="side-badge ev-live-badge" data-ev-live hidden>LIVE</b></a>
+      <a href="#jackpot" data-nav="jackpot"><span><svg class="ico"><use href="#ui-coins"/></svg></span>Jackpot commun</a>
+      <a href="#duels" data-nav="duels"><span><svg class="ico"><use href="#ui-swords"/></svg></span>Duels entre amis<b class="side-badge" data-duel-badge hidden></b></a>
+      <a href="#cashback" data-nav="cashback"><span><svg class="ico"><use href="#ui-cashback"/></svg></span>Cashback<b class="side-badge" data-cb-badge hidden></b></a>
+      <a href="#battle" data-nav="battle"><span><svg class="ico"><use href="#ui-shield"/></svg></span>Battle Royale<b class="side-new v">NEW</b></a>
+      <a href="#paris" data-nav="paris"><span><svg class="ico"><use href="#ui-ball"/></svg></span>Sport<b class="side-new v">NEW</b></a>
+      <a href="#loto" data-nav="loto"><span><svg class="ico"><use href="#ui-loto"/></svg></span>Loto · 1,5 M<b class="side-new v">NEW</b></a>
+      <a href="#avent" data-nav="avent" data-avent-nav hidden style="display:none"><span><svg class="ico"><use href="#ui-cal"/></svg></span>Calendrier de l’Avent<b class="side-badge" data-avent-badge hidden style="display:none">1</b><b class="side-new">NEW</b></a>
     </nav>
     <div class="side-label">Récompenses</div>
     <nav class="side-nav">
@@ -8805,23 +9042,23 @@ html.light .gd > div { background: #f7f0ff; border-color: #d9c8f5; } html.light 
     </nav>
     <div class="side-label">Mon compte</div>
     <nav class="side-nav">
-      <a href="#profil" data-nav="vip"><span><svg class="ico"><use href="#ui-vip"/></svg></span>Profil & rangs</a>
+      <a href="#profil" data-nav="vip"><span><svg class="ico"><use href="#ui-user"/></svg></span>Profil & rangs</a>
       <a href="#boutique" data-nav="shop"><span><svg class="ico"><use href="#ui-shop"/></svg></span>Boutique<b class="side-new">NEW</b></a>
       <a href="#classement" data-nav="top"><span><svg class="ico"><use href="#ui-top"/></svg></span>Classement</a>
-      <a href="#recharger" data-nav="refill"><span><svg class="ico"><use href="#ui-refill"/></svg></span>Recharger</a>
-      <a href="#recompenses" data-nav="rewards"><span>📺</span>Récompenses vidéo<b class="side-badge" data-rw-badge hidden style="display:none"></b></a>
+      <a href="#recharger" data-nav="refill"><span><svg class="ico"><use href="#ui-wallet"/></svg></span>Recharger</a>
+      <a href="#recompenses" data-nav="rewards"><span><svg class="ico"><use href="#ui-tv"/></svg></span>Récompenses vidéo<b class="side-badge" data-rw-badge hidden style="display:none"></b></a>
     </nav>
     <div class="side-label">Plus</div>
     <nav class="side-nav side-more">
       <a href="#parrainage" data-nav="ref"><span><svg class="ico"><use href="#ui-ref"/></svg></span>Parrainage</a>
       <a href="https://www.tiktok.com/@spinbet_casino" data-tiktok-link target="_blank" rel="noopener"><span><svg class="ico"><use href="#ui-tiktok"/></svg></span>Notre TikTok<b class="side-new">+10K</b></a>
-      <a href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><span>👻</span>Notre Snap · code du jour</a>
-      <a href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><span>💬</span>Service client (Snap)</a>
+      <a href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><span><svg class="ico"><use href="#ui-ghost"/></svg></span>Notre Snap · code du jour</a>
+      <a href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><span><svg class="ico"><use href="#ui-support"/></svg></span>Service client (Snap)</a>
       <a href="#" data-share-site><span><svg class="ico"><use href="#ui-share"/></svg></span>Partager le site</a>
       <a href="#appli" data-nav="app"><span><svg class="ico"><use href="#ui-app"/></svg></span>Télécharger l’appli</a>
-      <a href="#" data-lounge><span>🎵</span><em>Musique d’ambiance : non</em></a>
-      <a href="#" data-vibe hidden><span>📳</span><em>Vibrations : oui</em></a>
-      <a href="#" data-theme-toggle><span class="th-ico"><b class="th-sun">☀️</b><b class="th-moon">🌙</b></span><em class="th-sun">Mode clair</em><em class="th-moon">Mode sombre</em></a>
+      <a href="#" data-lounge><span><svg class="ico"><use href="#ui-music"/></svg></span><em>Musique d’ambiance : non</em></a>
+      <a href="#" data-vibe hidden><span><svg class="ico"><use href="#ui-vibe"/></svg></span><em>Vibrations : oui</em></a>
+      <a href="#" data-theme-toggle><span><svg class="ico"><use href="#ui-moon"/></svg></span><em class="th-sun">Mode clair</em><em class="th-moon">Mode sombre</em></a>
     </nav>
     <div class="side-vip"></div>
     <a class="side-foot" href="#responsable" data-nav="resp"><svg class="ico"><use href="#ui-resp"/></svg> Jeu responsable</a>
@@ -8830,8 +9067,8 @@ html.light .gd > div { background: #f7f0ff; border-color: #d9c8f5; } html.light 
 
   <header class="top">
     <button class="icon-btn burger" data-toggle-side aria-label="Menu"><svg class="ico"><use href="#ui-menu"/></svg></button>
-    <a class="logo mobile" href="#accueil"><span class="logo-mark">S</span></a>
-    <a class="logo nx-logo" href="#accueil"><span class="logo-mark">S</span><span>SPINBET<em>CASINO</em></span></a>
+    <a class="logo mobile" href="#accueil"><span class="logo-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lgS2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4fae"/><stop offset="1" stop-color="#8b3dff"/></linearGradient></defs><path d="M9 4.5h16.5l-4 6H5z" fill="url(#lgS2)"/><path d="M6.5 13h16.2l3 4.3-6.4 10.2H4l4-6h9.4l-1.2-2H10.3z" fill="url(#lgS2)"/></svg></span></a>
+    <a class="logo nx-logo" href="#accueil"><span class="logo-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lgS3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4fae"/><stop offset="1" stop-color="#8b3dff"/></linearGradient></defs><path d="M9 4.5h16.5l-4 6H5z" fill="url(#lgS3)"/><path d="M6.5 13h16.2l3 4.3-6.4 10.2H4l4-6h9.4l-1.2-2H10.3z" fill="url(#lgS3)"/></svg></span><span>SPINBET<em>CASINO</em></span></a>
     <nav class="nx-nav" aria-label="Menu principal">
       <a href="#lobby-slot" data-nav="slots">Machines à sous</a>
       <a href="#lobby-table" data-nav="tables">Roues &amp; tables</a>
@@ -8857,11 +9094,14 @@ html.light .gd > div { background: #f7f0ff; border-color: #d9c8f5; } html.light 
         <a href="#boutique" data-nav="shop">🛍️ Boutique</a>
       </div></div>
     </nav>
+    <a class="top-av" href="#profil" aria-label="Mon profil"><svg class="ico"><use href="#ui-user"/></svg></a>
     <div class="top-wallet">
-      <div class="balance"><b data-balance>0&nbsp;&#xE1E0;</b></div>
-      <a class="btn primary top-refill" href="#recharger" aria-label="Recharger"><span>Recharger</span><b>+</b></a>
+      <div class="balance"><small>Solde</small><b data-balance>0&nbsp;&#xE1E0;</b></div>
+      <a class="btn primary top-refill" href="#recharger" aria-label="Recharger"><svg class="ico"><use href="#ui-wallet"/></svg><b>+</b></a>
     </div>
-    <div class="top-right"><a class="jp-chip" href="#jackpot" title="Jackpot commun : touche le max win d’une machine à sous"><span>💎</span><b data-jackpot="short">…</b></a><button class="icon-btn theme-btn" type="button" data-theme-toggle aria-label="Mode clair / mode sombre" title="Mode clair / mode sombre"><span class="th-sun">☀️</span><span class="th-moon">🌙</span></button><span class="demo-tag">MODE DÉMO</span></div>
+    <a class="me-chip" href="#profil"></a>
+    <div class="top-right"><a class="jp-chip" href="#jackpot" title="Jackpot commun : touche le max win d’une machine à sous"><span>💎</span><b data-jackpot="short">…</b></a><a class="icon-btn top-ic top-gift" href="#recompenses" aria-label="Récompenses" title="Récompenses"><svg class="ico"><use href="#ui-gift"/></svg></a><a class="icon-btn top-ic top-bell" href="#appli" aria-label="Notifications" title="Me prévenir (notifications)"><svg class="ico"><use href="#ui-bell"/></svg></a><button class="icon-btn theme-btn" type="button" data-theme-toggle aria-label="Mode clair / mode sombre" title="Mode clair / mode sombre"><span class="th-sun">☀️</span><span class="th-moon">🌙</span></button><span class="demo-tag">MODE DÉMO</span></div>
+    <button class="icon-btn burger burger-r" data-toggle-side aria-label="Menu"><svg class="ico"><use href="#ui-menu"/></svg></button>
   </header>
 
   <main id="view" class="view"></main>
@@ -8873,11 +9113,10 @@ html.light .gd > div { background: #f7f0ff; border-color: #d9c8f5; } html.light 
 
   <nav class="bottom-nav">
     <a href="#accueil" data-nav="home"><span><svg class="ico"><use href="#ui-home"/></svg></span>Accueil</a>
-    <a href="#lobby-slot" data-nav="slots"><span><svg class="ico"><use href="#ui-slots"/></svg></span>Jeux</a>
-    <a href="#profil" data-nav="vip"><span><svg class="ico"><use href="#ui-vip"/></svg></span>Profil</a>
-    <a href="#succes" data-nav="ach"><span><svg class="ico"><use href="#ui-ach"/></svg></span>Succès<b class="side-badge nav-badge" data-ach-badge hidden></b></a>
-    <a href="#classement" data-nav="top"><span><svg class="ico"><use href="#ui-top"/></svg></span>Top</a>
-    <a href="#boutique" data-nav="shop"><span><svg class="ico"><use href="#ui-shop"/></svg></span>Boutique</a>
+    <a href="#recompenses" data-nav="rewards"><span><svg class="ico"><use href="#ui-gift"/></svg></span>Promotions<b class="side-badge nav-badge" data-rw-badge hidden style="display:none"></b></a>
+    <a href="#tournois" data-nav="tournois"><span><svg class="ico"><use href="#ui-trophy"/></svg></span>Tournois</a>
+    <a href="#recharger" data-nav="refill"><span><svg class="ico"><use href="#ui-wallet"/></svg></span>Caisse</a>
+    <a href="#" data-toggle-side role="button"><span><svg class="ico"><use href="#ui-dots"/></svg></span>Plus<b class="side-badge nav-badge" data-ach-badge hidden></b></a>
   </nav>
 
   <script>
@@ -11574,9 +11813,12 @@ function renderChip() {
     chip.style.setProperty('--rk', p.rank.color);
     if (profiles.guest && cloud.enabled) chip.dataset.signup = '💾 Sauvegarde ta partie'; else delete chip.dataset.signup;
     const look = __mods['shop.js']?.publicLook?.(me), S = __mods['shop.js'];
-    chip.innerHTML = `<span class="lvl-ring" style="--p:${(p.pct * 100).toFixed(1)}%"><b>${p.level}</b></span>${S?.lookHTML?.(look, 'sm') || ''}
-      <span class="me-name"><b ${S?.nameStyle?.(look) || ''}>${esc(me.name)}</b><small>${profiles.guest && cloud.enabled ? '💾 Sauvegarder' : profiles.guest ? 'Non sauvegardé' : p.rank.name}${p.boosted ? ' · ⚡ XP ×2' : ''}</small></span>
-      ${d.ready ? '<i class="gift-dot" title="Bonus du jour disponible">🎁</i>' : ''}`;
+    const lv = p.level, pct = (p.pct * 100).toFixed(1), save = profiles.guest && cloud.enabled;
+    chip.innerHTML = `<i class="lv-shield"><b>${lv}</b></i><span class="me-lv"><small>Niveau ${lv}${p.boosted ? ' · ⚡ XP ×2' : ''}</small><i class="me-bar"><b style="width:${pct}%"></b></i><em>${save ? '💾 Sauvegarder' : profiles.guest ? 'Non sauvegardé' : lv >= 50 ? 'Niveau maximum' : `${Math.floor(p.xp).toLocaleString('fr-FR')} / ${p.need.toLocaleString('fr-FR')} XP`}</em></span>`;
+    chip.title = `${me.name} · ${p.rank.name} · niveau ${lv}`;
+    const av = document.querySelector('.top-av');
+    if (av) { const lk = S?.lookHTML?.(look, 'sm'); av.innerHTML = lk || '<svg class="ico"><use href="#ui-user"/></svg>'; av.classList.toggle('has-look', !!lk); }
+    document.querySelector('.top-gift')?.classList.toggle('dot', !!d.ready);
   }
   if (side) {
     side.style.setProperty('--rk', p.rank.color);
@@ -11616,7 +11858,7 @@ function mountHud() {
   if (top && !top.querySelector('.me-chip')) {
     const chip = el('a', 'me-chip');
     chip.href = '#profil';
-    top.querySelector('.top-right').prepend(chip);
+    top.querySelector('.top-wallet').after(chip);
   }
   const redraw = () => renderChip();
   profiles.addEventListener('change', () => { redraw(); if (!profiles.current) showGate(); });
@@ -14141,77 +14383,64 @@ const { challengeGame } = __mods['social.js'];
 /* Vitrine of the home page (owner's request, 11 November 2026, after a neon casino banner: a lit podium with a
    777 machine, a roulette wheel and fanned aces in purple and pink light, the big title and the welcome gift on the
    right). Drawn here in SVG (our own drawing), a single picture: no filter per frame, only the chips float. */
-const NX_ART = (() => {
-  const chip = (x, y, r, c, rot, cls = '') => `<g class="nx-chip ${cls}" transform="translate(${x} ${y}) rotate(${rot})"><ellipse rx="${r}" ry="${r * .42}" cy="${r * .16}" fill="#1a0820"/><ellipse rx="${r}" ry="${r * .42}" fill="${c}"/><ellipse rx="${r}" ry="${r * .42}" fill="none" stroke="#fff" stroke-width="${r * .2}" stroke-dasharray="${r * .32} ${r * .38}" opacity=".9"/><ellipse rx="${r * .6}" ry="${r * .25}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1"/></g>`;
-  const card = (x, rot, glow, suit, red) => `<g transform="rotate(${rot} 320 420) translate(${320 + x} 0)"><rect x="-46" y="70" width="92" height="132" rx="9" fill="url(#nxCard)" stroke="${glow}" stroke-width="2.4"/><rect x="-46" y="70" width="92" height="132" rx="9" fill="none" stroke="${glow}" stroke-width="8" opacity=".22"/><text x="-34" y="96" font-family="Archivo,Arial,sans-serif" font-weight="900" font-size="20" fill="${red ? '#ff6fae' : '#e9e2ff'}">A</text><text x="0" y="152" text-anchor="middle" font-size="40" fill="${glow}" opacity=".95">${suit}</text></g>`;
-  // the wheel: 37 pockets as one dashed ring (red / black), a green zero, a gold rim
-  const pockets = 2 * Math.PI * 70 / 37;
-  const seven = (x) => `<g transform="translate(${x} 0)"><rect x="-34" y="262" width="68" height="96" rx="10" fill="url(#nxReel)"/><rect x="-34" y="262" width="68" height="96" rx="10" fill="none" stroke="#ff9fe0" stroke-opacity=".7" stroke-width="2"/><text x="0" y="336" text-anchor="middle" font-family="'Bebas Neue',Archivo,Impact,sans-serif" font-size="78" fill="url(#nxSeven)" stroke="#ffd7f4" stroke-width="1.4" class="nx-7">7</text></g>`;
-  return `<svg class="nx-art" viewBox="0 0 640 520" role="img" aria-label="Machine à sous 777, roulette et cartes sur un podium lumineux">
+// The home showcase (owner's mock-ups of 16 November 2026): text on the left (title, short line, a pink rule, the daily
+// gift, two buttons), a roulette wheel and two cards on the right; then the category tiles with thin pink icons.
+const NX_WHEEL = (() => {
+  const N = 37, R1 = 150, R0 = 112, pk = [];
+  for (let i = 0; i < N; i++) {
+    const a0 = (i / N) * Math.PI * 2 - Math.PI / 2, a1 = ((i + 1) / N) * Math.PI * 2 - Math.PI / 2;
+    const P = (r, a) => `${(r * Math.cos(a)).toFixed(1)} ${(r * Math.sin(a)).toFixed(1)}`;
+    pk.push(`<path d="M${P(R0, a0)} L${P(R1, a0)} A${R1} ${R1} 0 0 1 ${P(R1, a1)} L${P(R0, a1)} A${R0} ${R0} 0 0 0 ${P(R0, a0)}Z" fill="${i === 0 ? '#0f8a4c' : i % 2 ? '#b3122e' : '#120a14'}"/>`);
+  }
+  const card = (x, y, rot, r, suit, col) => `<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="-62" y="-88" width="124" height="176" rx="12" fill="url(#nwCard)" stroke="#5a2a7a" stroke-width="2"/><rect x="-62" y="-88" width="124" height="176" rx="12" fill="none" stroke="#ff8fd0" stroke-opacity=".18" stroke-width="6"/><text x="-46" y="-56" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="30" fill="${col}">${r}</text><text x="-44" y="-30" font-size="22" fill="${col}">${suit}</text><text x="6" y="46" text-anchor="middle" font-size="78" fill="${col}">${suit}</text></g>`;
+  return `<svg class="nx-art" viewBox="0 0 560 460" role="img" aria-label="Roulette et cartes">
   <defs>
-    <radialGradient id="nxHalo" cx="50%" cy="55%" r="50%"><stop offset="0" stop-color="#ff3fb4" stop-opacity=".75"/><stop offset=".45" stop-color="#8b2cf5" stop-opacity=".35"/><stop offset="1" stop-color="#3b0a6b" stop-opacity="0"/></radialGradient>
-    <linearGradient id="nxCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1640"/><stop offset="1" stop-color="#0c0614"/></linearGradient>
-    <linearGradient id="nxReel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a0f57"/><stop offset=".5" stop-color="#c13ad8"/><stop offset="1" stop-color="#3a0f57"/></linearGradient>
-    <linearGradient id="nxSeven" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#ff7ad9"/><stop offset="1" stop-color="#9b2cff"/></linearGradient>
-    <linearGradient id="nxBody" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5b1a86"/><stop offset=".5" stop-color="#e15fe6"/><stop offset="1" stop-color="#5b1a86"/></linearGradient>
-    <linearGradient id="nxTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9ad8"/><stop offset="1" stop-color="#9d4dff"/></linearGradient>
-    <linearGradient id="nxSide" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b264ff"/><stop offset="1" stop-color="#3a1466"/></linearGradient>
-    <linearGradient id="nxRim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#d79a2b"/><stop offset="1" stop-color="#7a4a10"/></linearGradient>
-    <filter id="nxBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+    <radialGradient id="nwGlow" cx="55%" cy="40%" r="55%"><stop offset="0" stop-color="#b03cff" stop-opacity=".45"/><stop offset=".6" stop-color="#ff2f93" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
+    <linearGradient id="nwRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a3058"/><stop offset=".5" stop-color="#1c1222"/><stop offset="1" stop-color="#0a060c"/></linearGradient>
+    <radialGradient id="nwCone" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#6a4a3a"/><stop offset=".6" stop-color="#2a1a14"/><stop offset="1" stop-color="#120a08"/></radialGradient>
+    <linearGradient id="nwGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe7a6"/><stop offset=".5" stop-color="#c8902c"/><stop offset="1" stop-color="#6e4610"/></linearGradient>
+    <linearGradient id="nwCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c1840"/><stop offset="1" stop-color="#120a1c"/></linearGradient>
   </defs>
-  <ellipse cx="320" cy="270" rx="300" ry="250" fill="url(#nxHalo)"/>
-  ${card(-96, -22, '#4fc3ff', '♣')}${card(-34, -8, '#ff5fa8', '♥', 1)}${card(34, 8, '#c86bff', '♠')}${card(96, 22, '#ff6fd0', '♦', 1)}
-  <g transform="translate(320 228)">
-    <circle r="96" fill="#14061f" stroke="url(#nxRim)" stroke-width="9"/>
-    <circle r="96" fill="none" stroke="#ff5fd2" stroke-width="16" opacity=".25" filter="url(#nxBlur)"/>
-    <circle r="70" fill="none" stroke="#c0122f" stroke-width="22" stroke-dasharray="${pockets.toFixed(2)} ${pockets.toFixed(2)}"/>
-    <circle r="70" fill="none" stroke="#14070f" stroke-width="22" stroke-dasharray="${pockets.toFixed(2)} ${pockets.toFixed(2)}" stroke-dashoffset="${pockets.toFixed(2)}"/>
-    <circle r="70" fill="none" stroke="#11a35a" stroke-width="22" stroke-dasharray="${pockets.toFixed(2)} 999" transform="rotate(-92)"/>
-    <circle r="56" fill="#3a1a12" stroke="#d79a2b" stroke-width="2"/>
-    <g class="nx-rotor"><path d="M0-50 V50 M-50 0 H50" stroke="url(#nxRim)" stroke-width="5" stroke-linecap="round"/><circle r="12" fill="url(#nxRim)"/></g>
-    <circle cx="44" cy="-58" r="6" fill="#fff"/>
+  <ellipse cx="330" cy="200" rx="250" ry="210" fill="url(#nwGlow)"/>
+  <g transform="translate(340 190) scale(1 .78)">
+    <circle r="196" fill="#08050a" transform="translate(0 26)"/>
+    <circle r="192" fill="url(#nwRim)" stroke="#6b4a7a" stroke-width="2"/>
+    <circle r="168" fill="#0d0810" stroke="#c48b2c" stroke-width="3"/>
+    <g class="nx-rotor">${pk.join('')}<circle r="${R1}" fill="none" stroke="#d9b56a" stroke-width="1.5"/><circle r="${R0}" fill="none" stroke="#d9b56a" stroke-width="1.5"/></g>
+    <circle r="110" fill="url(#nwCone)"/>
+    <circle r="70" fill="none" stroke="#c48b2c" stroke-opacity=".5" stroke-width="2"/>
+    <g class="nx-rotor"><path d="M0-78 V78 M-78 0 H78" stroke="url(#nwGold)" stroke-width="7" stroke-linecap="round"/></g>
+    <circle r="22" fill="url(#nwGold)"/><circle r="9" fill="#fff2c8"/>
+    <circle cx="120" cy="-104" r="8" fill="#fff"/>
   </g>
-  <rect x="190" y="246" width="260" height="128" rx="22" fill="#1a0629" stroke="url(#nxBody)" stroke-width="5"/>
-  <rect x="190" y="246" width="260" height="128" rx="22" fill="none" stroke="#ff5fd2" stroke-width="16" opacity=".35" filter="url(#nxBlur)"/>
-  ${seven(246)}${seven(320)}${seven(394)}
-  <rect x="200" y="300" width="240" height="6" rx="3" fill="#fff" opacity=".18"/>
-  <g class="nx-podium">
-    <ellipse cx="320" cy="468" rx="250" ry="34" fill="#ff4fb8" opacity=".35" filter="url(#nxBlur)"/>
-    <path d="M86 448 a234 30 0 0 0 468 0 v-16 a234 30 0 0 0 -468 0 z" fill="url(#nxSide)"/>
-    <ellipse cx="320" cy="432" rx="234" ry="30" fill="#2a0f45" stroke="#ff8fe0" stroke-width="2.5"/>
-    <path d="M136 420 a184 24 0 0 0 368 0 v-30 a184 24 0 0 0 -368 0 z" fill="url(#nxSide)"/>
-    <ellipse cx="320" cy="390" rx="184" ry="24" fill="url(#nxTop)"/>
-    <ellipse cx="320" cy="390" rx="184" ry="24" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2"/>
-    <ellipse cx="320" cy="392" rx="140" ry="14" fill="#fff" opacity=".35" filter="url(#nxBlur)"/>
-  </g>
-  ${chip(70, 110, 22, '#d6157a', -20, 'a')}${chip(560, 92, 18, '#7a2cff', 25, 'b')}${chip(600, 300, 24, '#e01e6e', -35, 'c')}${chip(40, 330, 19, '#8d2fff', 30, 'b')}${chip(150, 40, 14, '#ff4fb8', 10, 'c')}${chip(480, 30, 13, '#b52cff', -10, 'a')}${chip(585, 205, 12, '#ff3f8f', 40, 'c')}${chip(48, 240, 12, '#ba3bff', -40, 'a')}
+  ${card(170, 300, -12, 'A', '♠', '#c9a3ff')}${card(300, 318, 9, 'K', '♥', '#ff4fa8')}
 </svg>`;
 })();
 
 function vitrineHTML() {
   const playable = ALL_GAMES.filter((g) => !g.wip).length;
   const guest = __mods['profile.js'].profiles.guest;
-  const fresh = UPDATES.find((u) => u.isNew && getGame(u.game) && (Date.now() - Date.parse(`${u.date}T12:00:00`)) / 864e5 <= 14);
-  const fg = fresh && getGame(fresh.game);
+  const ic = (n) => `<i><svg class="ico"><use href="#ui-${n}"/></svg></i>`;
   return `<section class="nx-hero">
-    <div class="nx-stage">${NX_ART}</div>
+    <div class="nx-stage">${NX_WHEEL}</div>
     <div class="nx-copy">
-      ${fg ? `<a class="nx-new" href="#game-${fg.id}"><b>NOUVEAU</b>${fg.name} ›</a>` : '<span class="nx-new"><b>GRATUIT</b>Casino en ligne · argent fictif</span>'}
-      <h1>SPINBET CASINO</h1>
-      <p>Machines à sous, roulettes, blackjack et jeux rapides : ${playable} jeux à jouer gratuitement, en KE, la monnaie du site. Aucun dépôt, aucun vrai pari.</p>
-      <p class="nx-short">${playable} jeux gratuits · aucun dépôt · aucun vrai pari</p>
-      <div class="nx-bonus">CADEAU DU JOUR <span>JUSQU’À ${fmt(10000)}</span></div>
-      <div class="nx-cta"><a class="nx-btn" href="#lobby-slot">JOUER MAINTENANT</a>${guest ? '<a class="nx-btn ghost" href="#" data-signup>CRÉER UN COMPTE</a>' : '<a class="nx-btn ghost" href="#recharger">RECHARGER</a>'}</div>
+      <small class="nx-kick">Bienvenue chez</small>
+      <h1>SPINBET <em>CASINO</em></h1>
+      <p class="nx-short">${playable} jeux gratuits <b>•</b> aucun dépôt <b>•</b> aucun vrai pari</p>
+      <i class="nx-rule" aria-hidden="true"><b>✦</b></i>
+      <a class="nx-bonus" href="#profil"><i><svg class="ico"><use href="#ui-gift"/></svg></i><span><small>Cadeau du jour</small><b>JUSQU’À ${fmt(10000)}</b></span></a>
+      <div class="nx-cta"><a class="nx-btn" href="#lobby-slot">JOUER MAINTENANT</a>${guest ? '<a class="nx-btn ghost" href="#" data-signup>CRÉER UN COMPTE</a>' : `<a class="nx-btn ghost" href="#recharger"><svg class="ico"><use href="#ui-wallet"/></svg>RECHARGER</a>`}</div>
     </div>
   </section>
+  <div class="nx-cats-h"><h2>Catégories de jeux</h2></div>
   <nav class="nx-cats" aria-label="Catégories">
-    <a href="#lobby-slot"><i>🎰</i><b>Machines<span class="nx-l"> à sous</span></b><small>${ALL_GAMES.filter((g) => !g.wip && FILTERS[1].test(g)).length} jeux</small></a>
-    <a href="#lobby-table"><i>🎡</i><b>Roues &amp; tables</b><small>Roulette, 21, poker</small></a>
-    <a href="#lobby-quick"><i>⚡</i><b>Jeux rapides</b><small>Mines, Pilote…</small></a>
-    <a href="#lobby-online"><i>🟢</i><b>En ligne</b><small>${ALL_GAMES.filter((g) => !g.wip && isOnline(g)).length} jeux à plusieurs</small></a>
-    <a href="#tournois"><i>🏁</i><b>Tournois</b><small>Chaque soir</small></a>
-    <a href="#jackpot"><i>💎</i><b>Jackpot</b><small data-jackpot="short">…</small></a>
-    <a href="#lobby-fav"><i>❤️</i><b>Mes favoris</b><small>Tes jeux</small></a>
+    <a href="#lobby-slot">${ic('slots')}<b>Machines à sous</b><small>${ALL_GAMES.filter((g) => !g.wip && FILTERS[1].test(g)).length} machines</small></a>
+    <a href="#lobby-table">${ic('tables')}<b>Roues &amp; tables</b><small>Roulette, 21, poker</small></a>
+    <a href="#lobby-quick">${ic('quick')}<b>Jeux rapides</b><small>Mines, Pilote…</small></a>
+    <a href="#lobby-online">${ic('online')}<b>En ligne</b><small>${ALL_GAMES.filter((g) => !g.wip && isOnline(g)).length} jeux à plusieurs</small></a>
+    <a href="#tournois">${ic('trophy')}<b>Tournois</b><small>Chaque soir</small></a>
+    <a href="#jackpot">${ic('coins')}<b>Jackpot</b><small data-jackpot="short">…</small></a>
+    <a href="#lobby-fav">${ic('heart')}<b>Mes favoris</b><small>Tes jeux</small></a>
   </nav>`;
 }
 
@@ -14276,8 +14505,8 @@ const FILTERS = [
 // the mystery machine (mystere.js): a « ? » card first among the slots, during its hour
 const mysCard = () => __mods['mystere.js']?.cardHTML?.() || '';
 const row = (title, list, more) => `
-  <section>
-    <div class="sec-head"><h2>${title}</h2>${more ? `<a class="more" href="#lobby-${more}">Tout voir</a>` : ''}</div>
+  <section class="nx-row">
+    <div class="sec-head"><h2>${title}</h2>${more ? `<a class="more" href="#lobby-${more}">Voir tout <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : ''}</div>
     <div class="game-row">${more === 'slot' ? mysCard() : ''}${list.map(gameCard).join('')}</div>
   </section>`;
 
@@ -14298,7 +14527,7 @@ function renderLobby(root, params = {}) {
 
   const body = filter === 'all'
     ? row('✨ Nouveautés', [...new Set(UPDATES.map((u) => u.game))].map(getGame).filter((g) => g && !g.wip).slice(0, 12))
-      + row('Populaires', ['fortune', 'cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
+      + row('Jeux populaires', ['fortune', 'cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
       + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
       + '<div data-ev-home></div>' + `<a class="sp-banner" href="#special"><span>🏆</span><div><b>DÉFI SPÉCIAL · ${fmt(__mods['special.js'].specialStatus().prize)}</b><small>Débloque tous les bonus du casino en jouant : ${__mods['special.js'].specialStatus().have} / ${__mods['special.js'].specialStatus().total}</small></div><em>Voir le défi ›</em></a>`
       + '<a class="snap-box" href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><svg class="snap-ghost" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c2.9 0 5.2 2.2 5.2 5.3v2.3c.5.2 1.1.1 1.5-.1.6-.2 1.2.3 1 .9-.2.5-1 .8-1.7 1-.4.1-.6.5-.4.9.9 1.8 2.4 3.1 4 3.5.4.1.5.6.2.8-.6.4-1.5.6-2.4.8-.2.3-.2.9-.5 1.1-.5.2-1.3-.1-2.2 0-1.3.2-2 1.6-4.7 1.6s-3.4-1.4-4.7-1.6c-.9-.1-1.7.2-2.2 0-.3-.2-.3-.8-.5-1.1-.9-.2-1.8-.4-2.4-.8-.3-.2-.2-.7.2-.8 1.6-.4 3.1-1.7 4-3.5.2-.4 0-.8-.4-.9-.7-.2-1.5-.5-1.7-1-.2-.6.4-1.1 1-.9.4.2 1 .3 1.5.1V7.5c0-3.1 2.3-5.3 5.2-5.3z" fill="#fff" stroke="#000" stroke-width="1.2"/></svg><div><b>Code cadeau du jour en story Snap</b><small>Ajoute <strong>spinbetcazino</strong> : chaque jour un code qui rapporte des KE (à entrer dans Recharger)</small></div><em>Ajouter ›</em></a>'
@@ -18190,6 +18419,7 @@ setTimeout(() => { payNew(); refreshBadge(); }, 3000);
 function refreshBadge() {
   const s = status();
   document.querySelectorAll('[data-sp-badge]').forEach((n) => { n.textContent = s.done ? '✓' : s.all ? '!' : `${s.have}/${s.total}`; n.classList.toggle('ready', s.all && !s.done); });
+  document.querySelectorAll('[data-sp-ring]').forEach((n) => n.style.setProperty('--p', `${s.done ? 100 : Math.round(100 * s.have / Math.max(1, s.total))}%`));
 }
 
 function renderSpecial(root) {
@@ -23997,7 +24227,7 @@ function mountPro() {
 
 // iOS ignores user-scalable=no: no pinch zoom (double-tap zoom is off through touch-action: manipulation)
 ['gesturestart', 'gesturechange'].forEach((t) => document.addEventListener(t, (e) => e.preventDefault(), { passive: false }));
-document.querySelector('[data-toggle-side]').onclick = () => document.body.classList.toggle('side-open');
+document.querySelectorAll('[data-toggle-side]').forEach((b) => { b.onclick = (e) => { e.preventDefault(); document.body.classList.toggle('side-open'); }; });
 document.querySelector('.side-scrim').onclick = () => document.body.classList.remove('side-open');
 // top menu (computer): a dropdown closes once a page is chosen (it stays open while it holds the focus)
 document.querySelector('.nx-nav')?.addEventListener('click', (e) => { if (e.target.closest('a')) setTimeout(() => document.activeElement?.blur?.(), 0); });

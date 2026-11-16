@@ -428,6 +428,21 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `.nx-cats`, puis cadeau du jour, Nouveautés, Populaires, Machines à sous, événements, encarts. Sur téléphone : dessin
   en haut, texte centré dessous. **Ordinateur (≥ 1180 px)** : menu horizontal dans la barre du haut (`.nx-nav`,
   menus déroulants Événements / Récompenses), le menu de gauche devient un tiroir ouvert par ☰ (`--side: 0`).
+- **Style des maquettes du 16 novembre 2026** (demande du propriétaire : 3 images faites par une IA, « tout pareil, presque, en
+  adaptant le site ») : **dernier bloc de la couche `finition`** (« Style des maquettes du propriétaire », il passe après le néon) :
+  nuit presque noire, cases sombres `--mq-card` à bord fin, rose vif `--mq-pink` (#ff3d9a) pour ce qui est actif, **icônes fines au
+  trait** (jeu `ui-*` refait en entier : home, slots, tables, quick, online, cards, trophy, coins, swords, cashback, shield, ball,
+  loto, gift, tv, ghost, support, music, vibe, moon, bell, wallet, user, dots, cal, heart, eye…, plus d'emoji dans le menu).
+  **Menu de gauche** : titres de rubrique roses espacés, page active = fond rose pâle + liseré rose, NEW en petites étiquettes
+  (bleue, violette `.v`), Défi spécial en carte avec anneau de progression (`data-sp-ring`, `--p`), **toujours ouvert sur
+  ordinateur** (≥ 1180 px : plus de menu en haut `.nx-nav`, caché). **Barre du haut** : ordinateur = SOLDE + portefeuille (Recharger)
+  collé au NIVEAU (barre d'XP, `.me-chip` rempli par `renderChip` : `.lv-shield`, `.me-lv`, `.me-bar`), cadeau `.top-gift` (point rose =
+  cadeau du jour prêt, lien Récompenses), cloche `.top-bell` (`#appli`), avatar rond `.top-av` ; téléphone = avatar · solde + « + » ·
+  écusson NIVEAU · cloche · ☰ à droite (`.burger-r`). **Barre du bas** : Accueil · Promotions (`#recompenses`) · Tournois · Caisse
+  (`#recharger`) · Plus (ouvre le menu, `[data-toggle-side]` peut être sur plusieurs boutons). **Accueil** : vitrine `vitrineHTML()`
+  (texte à gauche « BIENVENUE CHEZ / SPINBET CASINO », cadeau du jour, JOUER MAINTENANT / CRÉER UN COMPTE ou RECHARGER, roulette et
+  2 cartes `NX_WHEEL` à droite ; téléphone : roue derrière le texte, à droite), « Catégories de jeux » en tuiles à icône rose (4 sur
+  téléphone), rangées de jeux dans des cartes `.nx-row` (titre en capitales, « VOIR TOUT › » rose). Jeux, tables et règles inchangés.
 - **Catégorie « En ligne »** (demande du propriétaire du 16 novembre 2026 : « rassembler tous les jeux online, pour que ce soit plus
   simple ») : filtre `online` de `FILTERS` (`pages/lobby.js`, page `#lobby-online`) = `isOnline(g)` : les tables multijoueurs (`tag:
   'En ligne'`) + les duels en direct `ONLINE_DUELS` (Le Derby, Le Ring). Ils ne sont plus dans Roues & tables ni Jeux rapides (leur `cat`
