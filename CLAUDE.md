@@ -451,6 +451,17 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Plus de crête, pilier ni ciel dessinés (`CREST`, `PILLAR`, `SKY` ne sont plus utilisés). **Plein écran** : la scène prend la largeur
   (avant, téléphone couché = on ne voyait que le ciel) ; téléphone couché : la scène sur toute la hauteur, la barre de pierre en colonne
   à droite (bloc CSS après `.vkx`). Gains inchangés.
+- **Le Texas, nouvelle table** (`games/poker.js`, id `poker`, demande du propriétaire du 16 novembre 2026, d'après ses 2 maquettes :
+  téléphone = 1re, ordinateur = 2e) : table de **9 places** (`SLOTS`, 1 à 8 adversaires, 3 nouveaux bots Le Prof, Mimi, Rocky), places
+  libres affichées. Un seul HTML `.pkx`, `data-m` = `phone` (table ovale, sièges ronds sur le bord, bandeau blindes / table / tapis,
+  panneau COUCHER · PAROLE-SUIVRE · RELANCER, − mise +, ½ POT ⅔ POT POT TAPIS), `pc` (table aux coins arrondis, sièges numérotés,
+  boutons rouge / bleu / or, curseur à crans Min ½ ⅔ Pot 2× Tapis `makeAnchors`, +25 % / +50 % du pot, ×2 ×3 ×4 la mise, touches F C R
+  ↑ ↓ A) ou `land` (téléphone couché : table à gauche, panneau à droite). `layout()` (ResizeObserver) calcule tout : taille de la
+  table, rail, sièges sur le bord (ellipse ou super-ellipse), mises, tailles `--d` `--pw` `--ph` `--cw` `--hw`. Recave (☰ ou bouton du
+  haut) entre deux mains ou une fois couché. Plein écran = `100dvh`. CSS « Le Texas : la table d'après les 2 maquettes » à la fin
+  de la couche `finition` (les anciennes règles `.pk-*` sont supprimées). **Pièges** : les classes `.ph` / `.pc` sont déjà prises par le
+  site (`.pkx-qph` / `.pkx-qpc`) ; la barre `.controls.pro-ctl` des machines est forcée en `display: grid !important`, d'où la règle
+  plus forte qui la cache. Règles du jeu et bots inchangés.
 - **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
   avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série
