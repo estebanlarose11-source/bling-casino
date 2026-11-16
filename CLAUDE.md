@@ -612,6 +612,32 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `r = { a: 1, b: 0 }` pour le vainqueur, 0-0 = nul. Aucune règle Firestore à recoller. `list('boxe')` donne les
   combats, `footHist` marque les combats `g: 'b'`.
 
+## Les Échecs (demande du propriétaire du 16 novembre 2026)
+
+- **Le jeu** (`games/echecs.js`, id `echecs`, catégorie Roues & tables), d'après ses 2 maquettes : ordinateur = salon noir et or à
+  3 colonnes (joueur, solde, mode, statistiques, liens | échiquier + colonne COUPS + ANNULER / MEILLEUR COUP / PROPOSER NULLE /
+  ABANDONNER + barre d'état | adversaire, 2 pendules, ANALYSE (courbe de l'avantage), AIDES) ; téléphone = ☰, adversaire et 2 pendules
+  en haut, échiquier, 4 boutons COUPS / ANNULER / ABANDON / RÉGLAGES ; téléphone couché = échiquier à gauche. `layout()` (ResizeObserver)
+  choisit `data-m` (pc, classe `tab` sous 1 100 px = sans la colonne de gauche, phone, land) et `--bs` (côté de l'échiquier). CSS
+  « Les Échecs » à la fin de la couche `finition`.
+- **Pièces en 3D** (`tools/render3d/scenes.js`, `CH_PIECES` : tour, fou, dame, roi en tour de potier, cavalier extrudé ; ivoire / ébène)
+  → `assets/games/echecs/<w|b><P|N|B|R|Q|K>.webp` (`node render.js --pieces echecs/wK …`), couverture `SCENES.echecs`. Elles glissent
+  (transition `transform`), se soulèvent quand on les choisit, se posent avec un petit rebond et un « toc » de bois (`tock()`), les prises
+  s'envolent. Toucher-toucher ou glisser-déposer, cases possibles, dernier coup, échec en rouge, flèche d'aide, choix de la promotion.
+- **Moteur** (bloc `===ENGINE`, fonction `CHESS()`) : règles complètes (0x88, roque, en passant, promotion, mat, pat, répétition, 50 coups,
+  matériel insuffisant), notation en figurines. Vérifié par perft (5 positions de référence). L'ordinateur : alpha-bêta + recherche des
+  prises + tables de positions, dans un **Web Worker** fabriqué avec le texte de `CHESS()` (l'écran reste fluide). `LEVELS` : Léo Facile
+  ELO 800 (profondeur 1, bruit, gaffes), Margaux Moyen 1200, Le Baron Difficile 1600, La Duchesse Expert 2000 (approfondissement jusqu'à
+  1,7 s) ; petit livre d'ouvertures `BOOK`. **3 aides par partie** en solo (annuler, meilleur coup, coup d'ouverture, coup tactique).
+  Classement ELO du joueur et statistiques sur l'appareil (`spinbet_echecs_elo`, `spinbet_echecs_st`). Cadences `TCS` : sans limite,
+  5 + 3, 10 + 5, 15 + 10.
+- **Entre amis** : les défis de `foot-defis.js` (comme Le Derby et Le Ring), **`ka` = `kb` = 20**, `d` = 4 / 6 / 8 = la cadence, mise
+  **50 000 KE au plus** (`CHESS_MAX`), couleurs tirées de l'id du document (`whiteOf`). Les coups passent par le document : `mv` (coups en
+  UCI), `ck` (pendules en ms après le dernier coup), `mt` (heure serveur du dernier coup), `dr` (nulle proposée par …). Résultat `r` comme
+  la boxe (`{ a: 1, b: 0 }`, abandon `f`, nulle 0-0). Le joueur peut quitter la page : la partie continue (sa pendule tourne), « Reprendre la
+  partie » dans Mes parties. Temps écoulé = l'un des deux téléphones écrit la défaite. **Règles Firestore à recoller** (`ka` / `kb` < 32,
+  champs `mv` / `ck` / `mt` / `dr` pour `ka` ≥ 20) : sans elles, les défis d'échecs sont refusés (le solo marche).
+
 ## Immersion
 
 - **Écran d'ouverture des jeux** (`showIntro` dans `pages/game.js`) : affiche du jeu en fond flou, titre, 3 points forts

@@ -681,3 +681,81 @@ export const SPRITES = {
     p.scene.add(g); return p;
   };
 });
+// Les Échecs : les 12 pièces (ivoire w*, ébène b*), vues de 3/4 en hauteur comme sur les maquettes du propriétaire.
+// Toutes à la même échelle et au même endroit dans l'image (le roi tient juste), pour être posées telles quelles sur l'échiquier.
+const CH_MAT = {
+  w: () => new THREE.MeshPhysicalMaterial({ color: '#dcc497', roughness: 0.38, clearcoat: 0.6, clearcoatRoughness: 0.25, sheen: 0.3, sheenColor: '#fff1d0', envMapIntensity: 0.8 }),
+  b: () => new THREE.MeshPhysicalMaterial({ color: '#120e0b', roughness: 0.32, clearcoat: 0.9, clearcoatRoughness: 0.12, envMapIntensity: 0.55 }),
+};
+const CH_GOLD = () => M.gold('#e8b84a', 0.25);
+const lathe = (pts, mat) => mesh(new THREE.LatheGeometry(pts.map(([x, y]) => new THREE.Vector2(x, y)), 72), mat);
+const CH_BASE = (r = 1) => [[0, 0], [0.92 * r, 0], [0.96 * r, 0.05], [0.94 * r, 0.13], [0.82 * r, 0.19], [0.86 * r, 0.25], [0.8 * r, 0.31], [0.62 * r, 0.37]];
+const CH_PIECES = {
+  P: (m) => group(lathe([...CH_BASE(0.82), [0.46, 0.46], [0.34, 0.68], [0.26, 0.94], [0.4, 1.0], [0.42, 1.06], [0.26, 1.12], [0, 1.12]], m), mesh(new THREE.SphereGeometry(0.36, 48, 32), m, { y: 1.4 })),
+  R: (m) => {
+    const g = group(lathe([...CH_BASE(0.92), [0.6, 0.46], [0.54, 0.62], [0.48, 1.55], [0.6, 1.62], [0.64, 1.7], [0.64, 1.98], [0.48, 1.98], [0.48, 1.84], [0, 1.84]], m));
+    for (let k = 0; k < 6; k++) { const a = (k / 6) * Math.PI * 2; g.add(mesh(new THREE.BoxGeometry(0.22, 0.22, 0.17), m, { x: Math.cos(a) * 0.56, y: 2.08, z: Math.sin(a) * 0.56, ry: -a })); }
+    return g;
+  },
+  B: (m) => group(lathe([...CH_BASE(0.9), [0.48, 0.48], [0.34, 0.8], [0.26, 1.4], [0.44, 1.47], [0.46, 1.53], [0.3, 1.58], [0.34, 1.68], [0.42, 1.92], [0.38, 2.18], [0.25, 2.38], [0.1, 2.5], [0, 2.52]], m),
+    mesh(new THREE.SphereGeometry(0.11, 24, 16), m, { y: 2.6 }),
+    mesh(new THREE.BoxGeometry(0.05, 0.3, 0.5), M.matte('#0b0908', 0.9), { y: 2.1, x: 0.12, z: 0.06, rz: rad(-32), ry: rad(40) })),
+  Q: (m) => {
+    const g = group(lathe([...CH_BASE(0.98), [0.52, 0.48], [0.38, 0.9], [0.3, 1.78], [0.48, 1.86], [0.5, 1.92], [0.34, 1.98], [0.36, 2.06], [0.56, 2.5], [0.46, 2.54], [0.26, 2.6], [0, 2.64]], m),
+      mesh(new THREE.SphereGeometry(0.15, 24, 16), m, { y: 2.78 }));
+    for (let k = 0; k < 9; k++) { const a = (k / 9) * Math.PI * 2; g.add(mesh(new THREE.SphereGeometry(0.075, 16, 12), m, { x: Math.cos(a) * 0.53, y: 2.56, z: Math.sin(a) * 0.53 })); }
+    return g;
+  },
+  K: (m) => group(lathe([...CH_BASE(1), [0.56, 0.48], [0.4, 0.95], [0.32, 1.95], [0.52, 2.04], [0.54, 2.1], [0.36, 2.16], [0.4, 2.24], [0.52, 2.62], [0.3, 2.72], [0, 2.74]], m),
+    mesh(new THREE.BoxGeometry(0.13, 0.52, 0.13), m, { y: 2.98 }), mesh(new THREE.BoxGeometry(0.38, 0.13, 0.13), m, { y: 3.04 })),
+  N: (m) => {
+    const g = group(lathe([...CH_BASE(0.92), [0.56, 0.46], [0.5, 0.54], [0, 0.54]], m));
+    const s = new THREE.Shape();
+    const P = [[-0.44, 0.5], [-0.5, 1.0], [-0.42, 1.55], [-0.26, 1.98], [-0.1, 2.22], [-0.06, 2.5], [0.06, 2.3], [0.18, 2.2], [0.4, 2.02], [0.72, 1.72], [0.92, 1.5], [0.9, 1.34], [0.72, 1.28], [0.44, 1.36], [0.24, 1.2], [0.2, 0.96], [0.4, 0.66], [0.46, 0.5]];
+    s.moveTo(...P[0]); s.splineThru(P.slice(1).map(([x, y]) => new THREE.Vector2(x, y))); s.closePath();
+    const geo = new THREE.ExtrudeGeometry(s, { depth: 0.42, bevelEnabled: true, bevelThickness: 0.12, bevelSize: 0.08, bevelSegments: 6, curveSegments: 48 });
+    geo.translate(0, 0, -0.21);
+    const head = mesh(geo, m);
+    const eye = M.matte('#0b0908', 0.6);
+    head.add(mesh(new THREE.SphereGeometry(0.065, 12, 8), eye, { x: 0.32, y: 1.86, z: 0.33 }));
+    head.add(mesh(new THREE.SphereGeometry(0.065, 12, 8), eye, { x: 0.32, y: 1.86, z: -0.33 }));
+    const mane = mesh(new THREE.TorusGeometry(0.7, 0.08, 10, 40, 1.5), m, { x: 0.12, y: 1.32, rz: rad(100) });
+    head.add(mane);
+    head.rotation.y = rad(-150);
+    g.add(head);
+    return g;
+  },
+};
+['w', 'b'].forEach((c) => Object.keys(CH_PIECES).forEach((k) => {
+  SPRITES[`echecs/${c}${k}`] = async () => {
+    const p = piece({ size: 256, fov: 30, dist: 6.8, camY: 3.4, look: [0, 1.62, 0], exposure: c === 'w' ? 0.85 : 1.1, rim: c === 'w' ? '#bcdcff' : '#ffd79a' });
+    p.scene.add(CH_PIECES[k](CH_MAT[c]()));
+    return p;
+  };
+}));
+// couverture des Échecs : coin d'échiquier en bois cerclé d'or, roi ivoire, dame d'ébène, jetons du casino
+SCENES.echecs = async () => {
+  const s = studio({ colors: ['#7a4e10', '#100702'], light: '#ffd98a', rim: '#ffcf70', seed: 21, camY: 4.6, dist: 12.4, lift: 0.12, exposure: 0.72 });
+  s.bloom.strength = 0.18;
+  const { scene } = s;
+  const board = new THREE.Group();
+  const light = M.matte('#a87a4a', 0.55), dark = M.plastic('#140d08', 0.35);
+  for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) {
+    const t = box(1.3, 0.22, 1.3, 0.02, (i + j) % 2 ? dark : light);
+    t.position.set((i - 2) * 1.3, 0, (j - 2) * 1.3); t.receiveShadow = true; board.add(t);
+  }
+  const rim = box(7.0, 0.3, 7.0, 0.08, M.gold('#d9a520', 0.3)); rim.position.y = -0.1; board.add(rim);
+  board.rotation.set(rad(4), rad(-30), 0); board.position.set(0, -1.6, -0.8);
+  scene.add(board);
+  const k = CH_PIECES.K(CH_MAT.w()); k.scale.setScalar(1.18); k.position.set(-0.9, -1.45, 0.6); k.rotation.y = rad(20); k.traverse((o) => { o.castShadow = true; });
+  const q = CH_PIECES.Q(CH_MAT.b()); q.scale.setScalar(1.08); q.position.set(1.25, -1.45, -0.5); q.traverse((o) => { o.castShadow = true; });
+  const n = CH_PIECES.N(CH_MAT.w()); n.scale.setScalar(0.95); n.position.set(1.8, -1.45, 1.5); n.rotation.y = rad(-75); n.traverse((o) => { o.castShadow = true; });
+  scene.add(k, q, n);
+  const chipM = (c) => M.plastic(c, 0.25);
+  [[-2.6, 1.9, '#b91c1c', 5], [-1.9, 2.6, '#111111', 3], [2.7, -0.6, '#7c3aed', 4]].forEach(([x, z, c, h]) => {
+    for (let i = 0; i < h; i++) { const ch = mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.11, 48), chipM(c), { x, y: -1.39 + i * 0.12, z }); scene.add(ch); const ring = mesh(new THREE.TorusGeometry(0.42, 0.02, 8, 48), M.gold(), { x, y: -1.39 + i * 0.12, z, rx: Math.PI / 2 }); scene.add(ring); }
+  });
+  scene.add(shadowFloor(-1.75, 0.5));
+  scene.add(sparkles(14, 9, { spread: [8, 5, 3], center: [0, 1.8, -1], colors: ['#ffe2a8', '#ffd27a'], size: [0.06, 0.22] }));
+  return s;
+};
