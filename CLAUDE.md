@@ -566,7 +566,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **Les plus belles machines en tête de l'accueil** (demande du propriétaire du 16 novembre 2026 : « quand t'arrives, c'est directement les
   plus belles ») : rang « ⭐ Les plus belles machines » juste sous la vitrine (`bestHTML()` de `pages/lobby.js`, liste `BEST` : les machines à
   décor animé, L'Olympe, La Fortune, L'Hydre, REDK… ; machines en travaux ou retirées sautées), grandes affiches (`.nx-best`, fin de la
-  couche `finition`).
+  couche `finition`). **Partout, les plus beaux jeux d'abord** (« tout le temps en avant ») : `pretty()` trie chaque rangée de l'accueil et
+  chaque page de catégorie selon `PRETTY` (les machines de `BEST`, puis les jeux filmés : La Roue Folle, Super Keno, La Roulette, Le 21,
+  La Pêche…), les autres gardent leur ordre ; seul le rang « Nouveautés » garde l'ordre des mises à jour. Nouvelle belle machine : l'ajouter à `BEST`.
 - **Catégorie « En ligne »** (demande du propriétaire du 16 novembre 2026 : « rassembler tous les jeux online, pour que ce soit plus
   simple ») : filtre `online` de `FILTERS` (`pages/lobby.js`, page `#lobby-online`) = `isOnline(g)` : les tables multijoueurs (`tag:
   'En ligne'`) + les duels en direct `ONLINE_DUELS` (Le Derby, Le Ring). Ils ne sont plus dans Roues & tables ni Jeux rapides (leur `cat`

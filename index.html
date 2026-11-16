@@ -15836,12 +15836,17 @@ const FILTERS = [
 // the most beautiful machines (their animated sets), right under the showcase of the home page (owner's request of 16 November 2026:
 // « quand t'arrives, c'est directement les plus belles »)
 const BEST = ['zeus', 'fortune', 'dragons', 'redk', 'huff', 'anubis', 'cosmic', 'candy', 'barillet', 'viking', 'big-bad-wolf', 'pirates', 'chasse', 'bling', 'noel', 'totemx', 'billets'];
-const bestHTML = () => row('⭐ Les plus belles machines', BEST.map(getGame).filter((g) => g && !g.wip && !g.retired), 'slot').replace('class="nx-row"', 'class="nx-row nx-best"');
+// …and every list of games starts with the most beautiful ones (owner's request: « tout le temps en avant ») : the slots of BEST, then the
+// games filmed or with the owner's videos (TV show, Keno, the filmed tables, the fishing), then the others in their usual order
+const PRETTY = [...BEST, 'madwheel', 'keno', 'roulette', 'blackjack', 'lightningbj', 'peche', 'bataille', 'echecs', 'poker', 'pilote', 'madwheel-online', 'peche-online'];
+const rank = (g) => { const i = PRETTY.indexOf(g?.id); return i < 0 ? PRETTY.length : i; };
+const pretty = (list) => list.map((g, i) => [g, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map((x) => x[0]);
+const bestHTML = () => row('⭐ Les plus belles machines', BEST.map(getGame).filter((g) => g && !g.wip && !g.retired && FILTERS[1].test(g)), 'slot').replace('class="nx-row"', 'class="nx-row nx-best"');
 const mysCard = () => __mods['mystere.js']?.cardHTML?.() || '';
 const row = (title, list, more) => `
   <section class="nx-row">
-    <div class="sec-head"><h2>${title}</h2>${more ? `<a class="more" href="#lobby-${more}">Voir tout <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : ''}</div>
-    <div class="game-row">${more === 'slot' ? mysCard() : ''}${list.map(gameCard).join('')}</div>
+    <div class="sec-head"><h2>${title}</h2>${more && more !== 'new' ? `<a class="more" href="#lobby-${more}">Voir tout <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : ''}</div>
+    <div class="game-row">${more === 'slot' ? mysCard() : ''}${(more === 'new' ? list : pretty(list)).map(gameCard).join('')}</div>
   </section>`;
 
 // A game's cover as the background of a promo block (blurred and darkened under the text).
@@ -15860,7 +15865,7 @@ function renderLobby(root, params = {}) {
   };
 
   const body = filter === 'all'
-    ? row('✨ Nouveautés', [...new Set(UPDATES.map((u) => u.game))].map(getGame).filter((g) => g && !g.wip).slice(0, 12))
+    ? row('✨ Nouveautés', [...new Set(UPDATES.map((u) => u.game))].map(getGame).filter((g) => g && !g.wip).slice(0, 12), 'new')
       + row('Jeux populaires', ['fortune', 'cosmic', 'poker', 'lightningbj', 'zeus', 'big-bad-wolf', 'huff', 'candy', 'doublespin', 'madwheel', 'storm', 'anubis', 'bling'].map(getGame))
       + row('Machines à sous', ALL_GAMES.filter(FILTERS[1].test), 'slot')
       + '<div data-ev-home></div>' + `<a class="sp-banner" href="#special"><span>🏆</span><div><b>DÉFI SPÉCIAL · ${fmt(__mods['special.js'].specialStatus().prize)}</b><small>Débloque tous les bonus du casino en jouant : ${__mods['special.js'].specialStatus().have} / ${__mods['special.js'].specialStatus().total}</small></div><em>Voir le défi ›</em></a>`
@@ -15872,7 +15877,7 @@ function renderLobby(root, params = {}) {
       + row('Jeux rapides', ORIGINALS.filter(FILTERS[4].test), 'quick')
     : `<section>
         <div class="sec-head"><h2>${f.label}</h2><small>${ALL_GAMES.filter(f.test).length} jeux</small></div>
-        ${ALL_GAMES.some(f.test) ? `<div class="game-grid">${filter === 'slot' ? mysCard() : ''}${ALL_GAMES.filter(f.test).map(gameCard).join('')}</div>` : '<p class="muted">Aucun favori pour l’instant : touche le cœur en haut à droite d’une affiche pour l’ajouter ici.</p>'}
+        ${ALL_GAMES.some(f.test) ? `<div class="game-grid">${filter === 'slot' ? mysCard() : ''}${pretty(ALL_GAMES.filter(f.test)).map(gameCard).join('')}</div>` : '<p class="muted">Aucun favori pour l’instant : touche le cœur en haut à droite d’une affiche pour l’ajouter ici.</p>'}
       </section>`;
 
   // Category pages lead with their latest game update; the home page with the newest game (NOUVEAU for 14 days),
