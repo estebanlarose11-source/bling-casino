@@ -259,7 +259,7 @@ class MadWheelGame extends BaseGame {
   onMeters() { if (this.mainBtn) this.mainBtn.disabled = !this.auto && (this.busy || !this.board?.total()); }
 
   // 🔊 on the show: its sound on or off (kept on this device)
-  toggleSnd() { this.sndOn = !this.sndOn; try { localStorage.setItem('spinbet_madwheel_snd', this.sndOn ? '1' : '0'); } catch { /* ignore */ } this.paintSnd(); this.vid.muted = !this.sndOn || isMuted() || (this.inBonus && this.bLoops > 0); }
+  toggleSnd() { this.sndOn = !this.sndOn; try { localStorage.setItem('spinbet_madwheel_snd', this.sndOn ? '1' : '0'); } catch { /* ignore */ } this.paintSnd(); this.vid.muted = !this.sndOn || isMuted(); if (this.inBonus && !this.vid.muted && !this.vid.paused) duck?.(0.12, 6); }
   paintSnd() { [this.q('.mwx-snd'), this.ov?.querySelector('.mwb-snd')].forEach((b) => { if (b) { b.textContent = this.sndOn ? '🔊' : '🔇'; b.title = this.sndOn ? 'Couper le son de l’émission' : 'Remettre le son de l’émission'; } }); }
 
   /* ---------- the video and the wheel on it ---------- */
@@ -535,21 +535,21 @@ class MadWheelGame extends BaseGame {
       box.style.setProperty('--my', `${T.rows > 1 ? (Math.floor(c / T.cols) / (T.rows - 1)) * 100 : 0}%`);
     }
   }
-  // plays the bonus video (from t0 when given); Pachinko and Méga Folie go round without a cut, silent after the 1st time
+  // plays the bonus video (from t0 when given) with its sound; Pachinko and Méga Folie go round without a cut, sound kept
   bPlay(t0 = null) {
     const v = this.vid;
     if (this.vidBad || matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
     try {
       if (t0 != null) v.currentTime = t0;
       v.playbackRate = this.turbo ? 1.25 : 1;
-      v.muted = !this.sndOn || isMuted() || this.bLoops > 0;
+      v.muted = !this.sndOn || isMuted(); // the sound of the show all through the bonus, loops included (owner's request)
       const p = v.play();
       p?.catch(() => { v.muted = true; v.play().catch(() => {}); });
       if (!v.muted) duck?.(0.12, 6);
       const T = this.bT, gen = (this.bGen = (this.bGen || 0) + 1);
       const tick = (t) => {
         if (this.dead || !this.inBonus || gen !== this.bGen) return false;
-        if (T.loop && t >= T.at + 0.2) { v.currentTime = t - T.loop; this.bLoops++; v.muted = true; }
+        if (T.loop && t >= T.at + 0.2) { v.currentTime = t - T.loop; this.bLoops++; if (!v.muted) duck?.(0.12, 6); }
         this.bMask(Math.round(t * 24));
         return !v.paused && !v.ended;
       };

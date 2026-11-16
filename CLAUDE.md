@@ -474,7 +474,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   qui se mélangent puis tombent), `bonus-roue.mp4` (grande roue à 3 flèches rouge / jaune / bleue) → `python3 tools/art/madwheel/bonus.py`
   (`--fast` = sans réencoder) : vidéos recalées sur la 1re image (la caméra zoome), bille dorée de la vidéo effacée et reflet des cases sur
   le sol flouté (Plinko), écritures de la roue floutées et panneau « THE BIG SPIN » effacé (roue), boucle sans coupure au meilleur
-  endroit (`seam`, Plinko et roue : `at` / `loop`), animateur détouré → `assets/games/madwheel/b-<pa|ch|ct>.mp4` + `.webp` +
+  endroit (`seam`, Plinko et roue : `at` / `loop`), **le son de la vidéo gardé pendant tout le bonus, boucles comprises** (voulu par le propriétaire ; bouton 🔊 sur la vidéo), animateur détouré → `assets/games/madwheel/b-<pa|ch|ct>.mp4` + `.webp` +
   `bmask-*.png`, suivi `BTRACK` (zone, place des 132 canards, case du masque par image) écrit dans `games/madwheel.js`. Écran du bonus
   `openShow()` : l'élément vidéo de l'émission y est **déplacé** (déjà autorisé à jouer avec le son par le toucher de LANCER, iPhone) puis
   rendu par `closeShow()` ; nos éléments en % de la vidéo dans `.mwb-full` ; téléphone tenu droit : seule la partie `BCROP` de la vidéo.
