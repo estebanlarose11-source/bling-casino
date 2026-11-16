@@ -520,13 +520,13 @@ service cloud.firestore {
         && isPseudo(request.resource.data.an) && isPseudo(request.resource.data.bn)
         && request.resource.data.s is int && request.resource.data.s >= 0 && request.resource.data.s <= 100000000
         && request.resource.data.d in [4, 6, 8]
-        && request.resource.data.ka is int && request.resource.data.ka >= 0 && request.resource.data.ka < 16
+        && request.resource.data.ka is int && request.resource.data.ka >= 0 && request.resource.data.ka < 32
         && request.resource.data.st == 'wait' && request.resource.data.at == request.time;
       allow update: if signedIn() && request.auth.uid in resource.data.p && (
         // b accepte (dans les 15 min) ou refuse ; a annule tant que personne n'a répondu
         (resource.data.st == 'wait' && request.auth.uid == resource.data.b && request.time < resource.data.at + duration.value(15, 'm')
           && footOnly(['st', 'acc', 'kb']) && request.resource.data.st == 'go' && request.resource.data.acc == request.time
-          && request.resource.data.kb is int && request.resource.data.kb >= 0 && request.resource.data.kb < 16)
+          && request.resource.data.kb is int && request.resource.data.kb >= 0 && request.resource.data.kb < 32)
         || (resource.data.st == 'wait' && request.auth.uid == resource.data.b && footOnly(['st']) && request.resource.data.st == 'no')
         || (resource.data.st == 'wait' && request.auth.uid == resource.data.a && footOnly(['st']) && request.resource.data.st == 'x')
         // vestiaire et connexion directe entre les deux téléphones
@@ -535,6 +535,11 @@ service cloud.firestore {
         || (resource.data.st in ['go', 'live'] && request.auth.uid == resource.data.a && footOnly(['of']) && isSdp(request.resource.data.of))
         || (resource.data.st in ['go', 'live'] && request.auth.uid == resource.data.b && footOnly(['aw']) && isSdp(request.resource.data.aw))
         || (resource.data.st == 'go' && request.auth.uid == resource.data.a && footOnly(['st']) && request.resource.data.st == 'live')
+        // Les Échecs (ka ≥ 20) : les coups, les pendules et l'heure du dernier coup ; la nulle proposée
+        || (resource.data.st in ['go', 'live'] && resource.data.ka >= 20 && footOnly(['mv', 'ck', 'mt'])
+          && request.resource.data.mv is string && request.resource.data.mv.size() <= 6000
+          && request.resource.data.ck is list && request.resource.data.ck.size() == 2 && request.resource.data.mt == request.time)
+        || (resource.data.st in ['go', 'live'] && resource.data.ka >= 20 && footOnly(['dr']) && request.resource.data.dr is string && request.resource.data.dr.size() <= 128)
         // le résultat, une seule fois
         || (resource.data.st in ['go', 'live'] && !('r' in resource.data) && footOnly(['st', 'r'])
           && request.resource.data.st == 'end' && isFootRes(request.resource.data.r))

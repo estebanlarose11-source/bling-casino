@@ -469,11 +469,25 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   pas compté au Défi spécial. Les bonus eux-mêmes (écrans `bonusCF` / `CH` / `PA` / `CT`) et les gains de la roue n'ont pas changé ; le
   propriétaire enverra plus tard des vidéos ou images pour les bonus. Refaire les fichiers : `python3 tools/art/madwheel/build.py`
   (`--fast` = sans réencoder les vidéos), puis `python3 tools/build.py` et changer `CACHE` dans `sw.js`.
+- **Le Texas, nouvelle table** (`games/poker.js`, id `poker`, demande du propriétaire du 16 novembre 2026, d'après ses 2 maquettes :
+  téléphone = 1re, ordinateur = 2e) : table de **9 places** (`SLOTS`, 1 à 8 adversaires, 3 nouveaux bots Le Prof, Mimi, Rocky), places
+  libres affichées. Un seul HTML `.pkx`, `data-m` = `phone` (table ovale, sièges ronds sur le bord, bandeau blindes / table / tapis,
+  panneau COUCHER · PAROLE-SUIVRE · RELANCER, − mise +, ½ POT ⅔ POT POT TAPIS), `pc` (table aux coins arrondis, sièges numérotés,
+  boutons rouge / bleu / or, curseur à crans Min ½ ⅔ Pot 2× Tapis `makeAnchors`, +25 % / +50 % du pot, ×2 ×3 ×4 la mise, touches F C R
+  ↑ ↓ A) ou `land` (téléphone couché : table à gauche, panneau à droite). `layout()` (ResizeObserver) calcule tout : taille de la
+  table, rail, sièges sur le bord (ellipse ou super-ellipse), mises, tailles `--d` `--pw` `--ph` `--cw` `--hw`. Recave (☰ ou bouton du
+  haut) entre deux mains ou une fois couché. Plein écran = `100dvh`. CSS « Le Texas : la table d'après les 2 maquettes » à la fin
+  de la couche `finition` (les anciennes règles `.pk-*` sont supprimées). **Pièges** : les classes `.ph` / `.pc` sont déjà prises par le
+  site (`.pkx-qph` / `.pkx-qpc`) ; la barre `.controls.pro-ctl` des machines est forcée en `display: grid !important`, d'où la règle
+  plus forte qui la cache. Règles du jeu et bots inchangés.
 - **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
   avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série
   à zéro, gardée dans `spinbet_bataille_serie`) ; mise annexe ÉGALITÉ 12 pour 1. Simulation `node tools/sim/bataille.js` :
   mise principale ≈ 96 % (dont 3,5 points de série, bonus 1 main sur 86), Égalité ≈ 96 %.
+  **Table filmée depuis le 16 novembre 2026** (demande du propriétaire) : `BjVideoGame` comme Le 21 (même vidéo, même croupière) ;
+  à chaque main, clip `p1` (ta carte) puis `d1` (la sienne, posée cachée puis retournée). Cercle ÉGALITÉ à droite du cercle de mise
+  (`vx` / `vy` / `vr` de `SIDES`), résultat sous la carte (`.btl .bjx .bjv-hand .bjv-res`). Règles et gains inchangés.
 - **Paliers de prestige** (`achievements.js`, `PR_TIERS`) : Bronze 1, Argent 5, Or 10, Platine 25, Diamant 50, Légende 100
   prestiges en tout, en médailles sur le profil (`tiersHTML`) ; le total `pres` est publié dans `leaderboard` et le
   profil public (`#@pseudo`) montre le palier. **Règles Firestore à recoller** (champ `pres` ajouté) : en attendant, le
@@ -615,6 +629,32 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   documents Firestore `foot/{id}` : **`ka` / `kb` ≥ 10 = un combat de boxe** (couleur = `ka − 10`), résultat
   `r = { a: 1, b: 0 }` pour le vainqueur, 0-0 = nul. Aucune règle Firestore à recoller. `list('boxe')` donne les
   combats, `footHist` marque les combats `g: 'b'`.
+
+## Les Échecs (demande du propriétaire du 16 novembre 2026)
+
+- **Le jeu** (`games/echecs.js`, id `echecs`, catégorie Roues & tables), d'après ses 2 maquettes : ordinateur = salon noir et or à
+  3 colonnes (joueur, solde, mode, statistiques, liens | échiquier + colonne COUPS + ANNULER / MEILLEUR COUP / PROPOSER NULLE /
+  ABANDONNER + barre d'état | adversaire, 2 pendules, ANALYSE (courbe de l'avantage), AIDES) ; téléphone = ☰, adversaire et 2 pendules
+  en haut, échiquier, 4 boutons COUPS / ANNULER / ABANDON / RÉGLAGES ; téléphone couché = échiquier à gauche. `layout()` (ResizeObserver)
+  choisit `data-m` (pc, classe `tab` sous 1 100 px = sans la colonne de gauche, phone, land) et `--bs` (côté de l'échiquier). CSS
+  « Les Échecs » à la fin de la couche `finition`.
+- **Pièces en 3D** (`tools/render3d/scenes.js`, `CH_PIECES` : tour, fou, dame, roi en tour de potier, cavalier extrudé ; ivoire / ébène)
+  → `assets/games/echecs/<w|b><P|N|B|R|Q|K>.webp` (`node render.js --pieces echecs/wK …`), couverture `SCENES.echecs`. Elles glissent
+  (transition `transform`), se soulèvent quand on les choisit, se posent avec un petit rebond et un « toc » de bois (`tock()`), les prises
+  s'envolent. Toucher-toucher ou glisser-déposer, cases possibles, dernier coup, échec en rouge, flèche d'aide, choix de la promotion.
+- **Moteur** (bloc `===ENGINE`, fonction `CHESS()`) : règles complètes (0x88, roque, en passant, promotion, mat, pat, répétition, 50 coups,
+  matériel insuffisant), notation en figurines. Vérifié par perft (5 positions de référence). L'ordinateur : alpha-bêta + recherche des
+  prises + tables de positions, dans un **Web Worker** fabriqué avec le texte de `CHESS()` (l'écran reste fluide). `LEVELS` : Léo Facile
+  ELO 800 (profondeur 1, bruit, gaffes), Margaux Moyen 1200, Le Baron Difficile 1600, La Duchesse Expert 2000 (approfondissement jusqu'à
+  1,7 s) ; petit livre d'ouvertures `BOOK`. **3 aides par partie** en solo (annuler, meilleur coup, coup d'ouverture, coup tactique).
+  Classement ELO du joueur et statistiques sur l'appareil (`spinbet_echecs_elo`, `spinbet_echecs_st`). Cadences `TCS` : sans limite,
+  5 + 3, 10 + 5, 15 + 10.
+- **Entre amis** : les défis de `foot-defis.js` (comme Le Derby et Le Ring), **`ka` = `kb` = 20**, `d` = 4 / 6 / 8 = la cadence, mise
+  **50 000 KE au plus** (`CHESS_MAX`), couleurs tirées de l'id du document (`whiteOf`). Les coups passent par le document : `mv` (coups en
+  UCI), `ck` (pendules en ms après le dernier coup), `mt` (heure serveur du dernier coup), `dr` (nulle proposée par …). Résultat `r` comme
+  la boxe (`{ a: 1, b: 0 }`, abandon `f`, nulle 0-0). Le joueur peut quitter la page : la partie continue (sa pendule tourne), « Reprendre la
+  partie » dans Mes parties. Temps écoulé = l'un des deux téléphones écrit la défaite. **Règles Firestore à recoller** (`ka` / `kb` < 32,
+  champs `mv` / `ck` / `mt` / `dr` pour `ka` ≥ 20) : sans elles, les défis d'échecs sont refusés (le solo marche).
 
 ## Immersion
 

@@ -1,12 +1,15 @@
 // SpinBet Casino · PokerGame — loaded on demand by games/impl/index.js (index.html).
 // ---- games/impl/poker.js ----
 __mods['games/impl/poker.js'] = (() => {
-// Texas Hold'em No Limit against 1 to 5 bots. The buy-in comes from the wallet and goes back to it on leaving.
+// Texas Hold'em No Limit against 1 to 8 bots (table of 9). The buy-in comes from the wallet and goes back to it on leaving.
 // Bots decide from a Monte Carlo equity of their hand, their profile and some noise.
+// Table drawn after the owner's 2 mock-ups (16 November 2026): phone = oval table, seats on the rail, panel
+// COUCHER / PAROLE-SUIVRE / RELANCER, − mise +, ½ POT ⅔ POT POT TAPIS ; computer = rounded table, numbered seats,
+// red / blue / gold buttons, slider with stops, +25 % / +50 % du pot, ×2 ×3 ×4. Same DOM, `data-m` = phone | pc | land.
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
-const { sfx } = __mods['audio.js'];
+const { sfx, isMuted, setMuted } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { wallet } = __mods['wallet.js'];
 const { toast } = __mods['ui.js'];
@@ -86,62 +89,135 @@ function buildPots(players) {
 /* ===END ENGINE */
 
 const BOTS = [
-  { name: 'Tex', av: '🤠', style: 'Requin', tight: 0.04, agg: 0.6, bluff: 0.08 },
-  { name: 'Lola', av: '👩‍🦰', style: 'Agressive', tight: -0.04, agg: 0.85, bluff: 0.14 },
-  { name: 'Big Ben', av: '🐻', style: 'Prudent', tight: 0.12, agg: 0.25, bluff: 0.02 },
-  { name: 'Renard', av: '🦊', style: 'Bluffeur', tight: -0.07, agg: 0.7, bluff: 0.26 },
-  { name: 'Mamie Jo', av: '👵', style: 'Suiveuse', tight: -0.1, agg: 0.15, bluff: 0.03, station: true },
-  { name: 'Ace', av: '🕶️', style: 'Imprévisible', tight: 0, agg: 0.55, bluff: 0.18, wild: 0.14 },
+  { name: 'Tex', av: '🤠', style: 'Requin', tight: 0.04, agg: 0.6, bluff: 0.08, col: '#b45309' },
+  { name: 'Lola', av: '👩‍🦰', style: 'Agressive', tight: -0.04, agg: 0.85, bluff: 0.14, col: '#be185d' },
+  { name: 'Big Ben', av: '🐻', style: 'Prudent', tight: 0.12, agg: 0.25, bluff: 0.02, col: '#78350f' },
+  { name: 'Renard', av: '🦊', style: 'Bluffeur', tight: -0.07, agg: 0.7, bluff: 0.26, col: '#c2410c' },
+  { name: 'Mamie Jo', av: '👵', style: 'Suiveuse', tight: -0.1, agg: 0.15, bluff: 0.03, station: true, col: '#6d28d9' },
+  { name: 'Ace', av: '🕶️', style: 'Imprévisible', tight: 0, agg: 0.55, bluff: 0.18, wild: 0.14, col: '#1e3a8a' },
+  { name: 'Le Prof', av: '🧐', style: 'Calculateur', tight: 0.07, agg: 0.45, bluff: 0.05, col: '#0f766e' },
+  { name: 'Mimi', av: '🐱', style: 'Joueuse', tight: -0.05, agg: 0.5, bluff: 0.12, col: '#a21caf' },
+  { name: 'Rocky', av: '🥊', style: 'Kamikaze', tight: -0.12, agg: 0.9, bluff: 0.2, col: '#b91c1c' },
 ];
-const BLINDS = [[100, 200], [500, 1000], [2500, 5000], [10000, 20000]]; // cents: 1/2 to 100/200\u00a0\uE1E0
+const MAXB = 8;
+const BLINDS = [[100, 200], [500, 1000], [2500, 5000], [10000, 20000]]; // cents: 1/2 to 100/200 KE
 const DEPTHS = [50, 100, 200]; // starting stack in big blinds
-const SLOTS = { 2: [0, 3], 3: [0, 2, 4], 4: [0, 1, 3, 5], 5: [0, 1, 2, 4, 5], 6: [0, 1, 2, 3, 4, 5] };
-// seat centres (%) on the wide oval and on the tall (phone) oval, clockwise from the player at the bottom
-const POS = [[50, 83, 50, 87], [9, 64, 13, 67], [15, 15, 13, 27], [50, 7, 50, 7], [85, 15, 87, 27], [91, 64, 87, 67]];
-const CEN = [50, 47];
+// 9 places around the table, clockwise from the player (0 = bottom centre); which ones are taken for n players
+const SLOTS = { 2: [0, 4], 3: [0, 3, 6], 4: [0, 2, 4, 7], 5: [0, 2, 3, 6, 7], 6: [0, 2, 3, 4, 6, 7], 7: [0, 1, 2, 4, 5, 7, 8], 8: [0, 1, 2, 3, 5, 6, 7, 8], 9: [0, 1, 2, 3, 4, 5, 6, 7, 8] };
 const RANK = (c) => (c.v <= 10 ? c.v : 'JQKA'[c.v - 11]);
-const FACE = (c) => `<span class="r">${RANK(c)}<i>${c.s}</i></span><span class="c">${c.v > 10 && c.v < 14 ? `<em>${RANK(c)}</em>` : ''}${c.s}</span><span class="s">${c.s}</span>`;
 const RED = (c) => c.s === '♥' || c.s === '♦';
+const FACE = (c) => `<b class="ck">${RANK(c)}<i>${c.s}</i></b><span class="cs">${c.s}</span>`;
 const STREETS = ['Pré-flop', 'Flop', 'Turn', 'River'];
+const TABLE_NO = 1 + Math.floor(Math.random() * 24);
+
+const SPADE = '<svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="pkxGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3c4"/><stop offset=".45" stop-color="#f2c94c"/><stop offset="1" stop-color="#a06a12"/></linearGradient></defs><path d="M32 4C24 16 8 24 8 37c0 8 6 13 13 13 4 0 7-2 9-4-1 6-4 10-8 13h20c-4-3-7-7-8-13 2 2 5 4 9 4 7 0 13-5 13-13C56 24 40 16 32 4z" fill="url(#pkxGold)" stroke="#5a3a05" stroke-width="1.5"/><path d="M32 14c-5 8-14 14-15 22" stroke="#fff" stroke-opacity=".45" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+const ICONS = {
+  fold: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="6" width="13" height="19" rx="2.5" transform="rotate(-14 11 15)" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="13" y="5" width="13" height="19" rx="2.5" transform="rotate(10 19 14)" fill="currentColor" fill-opacity=".18" stroke="currentColor" stroke-width="2.2"/></svg>',
+  call: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l11 4v8c0 7-5 12-11 14C10 27 5 22 5 15V7z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M11 16l4 4 7-8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  raise: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="20" width="5" height="8" rx="1" fill="currentColor"/><rect x="12" y="15" width="5" height="13" rx="1" fill="currentColor"/><rect x="20" y="10" width="5" height="18" rx="1" fill="currentColor"/><path d="M5 15L13 8l5 4 9-8M21 4h6v6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  menu: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+  snd: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="w" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="x" d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+  cards: '<svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="6" width="15" height="21" rx="2.5" transform="rotate(-10 11 16)" fill="#16110a" stroke="url(#pkxGold)" stroke-width="1.8"/><rect x="13" y="5" width="15" height="21" rx="2.5" transform="rotate(8 20 15)" fill="#16110a" stroke="url(#pkxGold)" stroke-width="1.8"/><path d="M20.5 10c-2 3-5 4-5 7 0 2 3 3 5 1-.3 2-1 3-2 4h4c-1-1-1.7-2-2-4 2 2 5 1 5-1 0-3-3-4-5-7z" fill="url(#pkxGold)"/></svg>',
+  user: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="15" r="7.5" fill="currentColor"/><path d="M6 37c1-8 7-12 14-12s13 4 14 12z" fill="currentColor"/></svg>',
+};
+// a pile of chips (amount in cents): colours of the casino values
+const CHIP_COL = [[1000000, '#d9a520', '#fff3c4'], [100000, '#6d28d9', '#e9d5ff'], [10000, '#17181c', '#e8c25a'], [2500, '#138a52', '#d1fae5'], [500, '#c81e3a', '#fee2e2'], [100, '#e9edf3', '#2b6cb0']];
+const chipHTML = (amount) => {
+  const out = []; let left = amount;
+  for (const [v, c, e] of CHIP_COL) while (left >= v && out.length < 5) { out.push([c, e]); left -= v; }
+  if (!out.length) out.push(CHIP_COL[CHIP_COL.length - 1].slice(1));
+  return out.map(([c, e], k) => `<i style="--c:${c};--e:${e};--k:${k}"></i>`).join('');
+};
 
 class PokerGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
-      music: EXTRA_THEMES.blackjack, stepper: false, autoplay: false, turbo: true, mainLabel: 'LANCER LA PARTIE', betLabel: 'Ton tapis',
-      cls: 'table-game poker',
-      stage: `<div class="pk">
-        <div class="pk-setup">
-          <div class="pk-hero"><span>♠ ♥ ♦ ♣</span><h3>Le Texas</h3><p>No Limit · table de 2 à 6 joueurs</p></div>
-          <div class="pk-opt"><label>Adversaires</label><div class="pk-seg" data-o="bots">${[1, 2, 3, 4, 5].map((n) => `<button data-v="${n}">${n} bot${n > 1 ? 's' : ''}</button>`).join('')}</div><div class="pk-faces"></div></div>
-          <div class="pk-opt"><label>Blindes (petite / grosse)</label><div class="pk-seg" data-o="blind">${BLINDS.map((b, i) => `<button data-v="${i}">${fmtC(b[0])} / ${fmtC(b[1])}</button>`).join('')}</div></div>
-          <div class="pk-opt"><label>Tapis de départ (pour toi et chaque bot)</label><div class="pk-seg" data-o="depth"></div></div>
-          <p class="pk-note">Ton tapis est pris sur ton solde. Quand tu quittes la table, il t’est rendu avec tes gains.</p>
-          <button class="pk-go">▶ Lancer la partie</button>
-        </div>
-        <div class="pk-table" hidden>
-          <div class="pk-top"><span class="pk-info"></span><button class="pk-quit">Quitter la table</button></div>
-          <div class="pk-felt"><div class="pk-oval"></div>
-            <div class="pk-center"><div class="pk-pot">Pot <b>0</b></div><div class="pk-board">${'<i class="pk-slot"></i>'.repeat(5)}</div><div class="pk-hand"></div></div>
-            <div class="pk-seats"></div>
-            <div class="pk-over" hidden></div>
+      music: EXTRA_THEMES.blackjack, stepper: false, autoplay: false, turbo: true, mainLabel: 'S’ASSEOIR', betLabel: 'Ton tapis',
+      cls: 'table-game poker pkx-game',
+      stage: `<div class="pkx" data-m="phone" data-st="setup">
+        <div class="pkx-top">
+          <div class="pkx-logo">${SPADE}<span><b>LE TEXAS</b><small>POKER</small></span></div>
+          <div class="pkx-title"><b class="pkx-t1"></b><small><i></i>No Limit</small></div>
+          <div class="pkx-bal" title="Ton solde"><i></i><b></b></div>
+          <button class="pkx-rebuy" data-pk="rebuy" type="button">Recave <b>+</b></button>
+          <button class="pkx-sq pkx-snd" data-pk="snd" type="button" aria-label="Son">${ICONS.snd}</button>
+          <button class="pkx-sq pkx-fs" data-act="full" type="button" aria-label="Plein écran">⛶<span>Plein écran</span></button>
+          <button class="pkx-sq" data-pk="menu" type="button" aria-label="Menu">${ICONS.menu}</button>
+          <div class="pkx-menu" hidden>
+            <button data-pk="rebuy" type="button">💰 Recave (remettre mon tapis)</button>
+            <button data-pk="rules" type="button">📖 Règles du jeu</button>
+            <button data-pk="opts" type="button">⚙️ Turbo, musique et son</button>
+            <button data-pk="quit" type="button">🚪 Quitter la table</button>
           </div>
         </div>
+        <div class="pkx-strip">
+          <div><b class="pkx-s1"></b><small>NL Hold’em</small></div>
+          <div class="pkx-s-tb">${ICONS.cards}<span><b>Table ${TABLE_NO}</b><small class="pkx-s2"></small></span></div>
+          <div><b class="pkx-s3"></b><small class="pkx-s4"></small></div>
+        </div>
+        <div class="pkx-room">
+          <div class="pkx-table">
+            <div class="pkx-rail"><div class="pkx-felt"><span class="pkx-print">LE TEXAS · SPINBET</span></div></div>
+            <div class="pkx-center">
+              <div class="pkx-emb">${SPADE}</div>
+              <div class="pkx-pot"><small>POT</small><b>0</b></div>
+              <div class="pkx-board">${'<i class="pkx-slot"></i>'.repeat(5)}</div>
+              <div class="pkx-hand"></div>
+              <div class="pkx-log"></div>
+            </div>
+            <div class="pkx-seats"></div>
+          </div>
+          <div class="pkx-setup">
+            <h3>${SPADE}<span>Choisis ta table</span></h3>
+            <div class="pkx-opt"><label>Adversaires</label><div class="pkx-seg" data-o="bots">${Array.from({ length: MAXB }, (_, i) => `<button type="button" data-v="${i + 1}">${i + 1}</button>`).join('')}</div></div>
+            <div class="pkx-opt"><label>Blindes (petite / grosse)</label><div class="pkx-seg" data-o="blind">${BLINDS.map((b, i) => `<button type="button" data-v="${i}">${fmtC(b[0])} / ${fmtC(b[1])}</button>`).join('')}</div></div>
+            <div class="pkx-opt"><label>Tapis de départ (le même pour tous)</label><div class="pkx-seg" data-o="depth"></div></div>
+            <p>Ton tapis est pris sur ton solde et rendu avec tes gains quand tu quittes la table.</p>
+          </div>
+          <div class="pkx-over" hidden></div>
+        </div>
+        <div class="pkx-panel">
+          <div class="pkx-acts">
+            <button type="button" data-pa="fold" class="fold">${ICONS.fold}<b>COUCHER</b><small></small></button>
+            <button type="button" data-pa="call" class="call">${ICONS.call}<b>PAROLE</b><small></small></button>
+            <button type="button" data-pa="raise" class="raise">${ICONS.raise}<b>RELANCER</b><small></small></button>
+            <button type="button" data-pk="main" class="pkx-main"><b>S’ASSEOIR</b><small></small></button>
+          </div>
+          <div class="pkx-amtrow">
+            <button type="button" data-pq="-" aria-label="Moins">−</button>
+            <div class="pkx-amt"><b></b></div>
+            <button type="button" data-pq="+" aria-label="Plus">+</button>
+          </div>
+          <div class="pkx-slide">
+            <label>Mise</label><div class="pkx-amt2"><b></b></div>
+            <div class="pkx-track"><input type="range" class="pkx-range" min="0" max="1000" value="0" aria-label="Montant de la mise"><div class="pkx-ticks"></div></div>
+            <div class="pkx-plus"><button type="button" data-pq="p25">+25 % du pot</button><button type="button" data-pq="p50">+50 % du pot</button></div>
+          </div>
+          <div class="pkx-quick pkx-qph"><button type="button" data-pq=".5"><b>½</b><small>POT</small></button><button type="button" data-pq=".667"><b>⅔</b><small>POT</small></button><button type="button" data-pq="1"><b>POT</b></button><button type="button" data-pq="all" class="all"><b>TAPIS</b></button></div>
+          <div class="pkx-quick pkx-qpc"><button type="button" data-pq="x2"><b>×2</b><small></small></button><button type="button" data-pq="x3"><b>×3</b><small></small></button><button type="button" data-pq="x4"><b>×4</b><small></small></button><button type="button" data-pq="all" class="all"><b>TAPIS</b><small></small></button></div>
+        </div>
       </div>`,
-      below: `<div class="pk-bar off">
-        <div class="pk-quick"><button data-pq="min">Min</button><button data-pq=".5">½ pot</button><button data-pq=".75">¾ pot</button><button data-pq="1">Pot</button><button data-pq="all">Tapis</button></div>
-        <div class="pk-raise"><input type="range" class="pk-range" min="0" max="1" value="0" aria-label="Montant de la mise"><b class="pk-amt"></b></div>
-        <div class="pk-acts"><button data-pa="fold" class="fold">Se coucher</button><button data-pa="call" class="call">Parole</button><button data-pa="raise" class="raise">Miser</button></div>
-      </div>`,
-      hello: 'Choisis tes adversaires, les blindes et ton tapis, puis lance la partie.',
+      hello: 'Choisis tes adversaires, les blindes et ton tapis, puis assieds-toi.',
     });
-    this.opt = { bots: 3, blind: 0, depth: 1 };
+    this.opt = { bots: 5, blind: 0, depth: 1 };
     try { Object.assign(this.opt, JSON.parse(localStorage.getItem('poker_opt') || '{}')); } catch { /* ignore */ }
+    this.opt.bots = Math.max(1, Math.min(MAXB, +this.opt.bots || 5));
     this.state = 'setup';
     this.tok = 0;
     this.players = [];
-    this.root.addEventListener('click', (e) => this.onTap(e));
-    this.q('.pk-range').addEventListener('input', () => this.paintRaise());
+    this.raiseTo = 0;
+    this.view = this.q('.pkx');
+    this.logEl = this.q('.pkx-log');
+    this.onPk = (e) => this.onTap(e);
+    this.root.addEventListener('click', this.onPk);
+    this.q('.pkx-range').addEventListener('input', (e) => { this.raiseTo = this.fromSlider(+e.target.value); this.paintRaise(false); });
+    this.onKeys = (e) => this.keys(e);
+    addEventListener('keydown', this.onKeys);
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(this.view);
+    this.ro.observe(this.q('.pkx-room'));
     this.paintSetup();
+    requestAnimationFrame(() => this.layout());
   }
 
   /* ---------- setup ---------- */
@@ -149,37 +225,104 @@ class PokerGame extends BaseGame {
   sb() { return BLINDS[this.opt.blind][0]; }
   buyIn() { return DEPTHS[this.opt.depth] * this.bb(); }
   stakeLabel() { return this.state === 'setup' || !this.me ? (this.opt ? this.buyIn() : 0) : this.me.stack; }
-  onMeters() { if (this.mainBtn && this.state) this.paintMain(); }
+  onMeters() { if (this.view) this.paintTop(); }
 
   paintSetup() {
-    this.q('.pk-seg[data-o="depth"]').innerHTML = DEPTHS.map((d, i) => `<button data-v="${i}">${d} BB · ${fmtC(d * this.bb())}</button>`).join('');
-    this.qa('.pk-seg').forEach((s) => s.querySelectorAll('button').forEach((b) => b.classList.toggle('on', +b.dataset.v === this.opt[s.dataset.o])));
-    this.q('.pk-faces').innerHTML = BOTS.slice(0, this.opt.bots).map((b) => `<span><i>${b.av}</i><b>${b.name}</b><small>${b.style}</small></span>`).join('');
+    this.q('.pkx-seg[data-o="depth"]').innerHTML = DEPTHS.map((d, i) => `<button type="button" data-v="${i}">${fmtC(d * this.bb())}<small>${d} BB</small></button>`).join('');
+    this.qa('.pkx-seg').forEach((s) => s.querySelectorAll('button').forEach((b) => b.classList.toggle('on', +b.dataset.v === this.opt[s.dataset.o])));
     try { localStorage.setItem('poker_opt', JSON.stringify(this.opt)); } catch { /* ignore */ }
+    // the table shows who will sit down
+    const bots = BOTS.slice(0, this.opt.bots);
+    this.players = [this.meProfile(), ...bots.map((b) => ({ ...b }))].map((p, i) => ({ ...p, i, stack: this.buyIn(), cards: [], bet: 0, total: 0 }));
+    this.me = null;
+    this.buildSeats();
     this.updateMeters();
   }
 
-  paintMain() {
-    const lab = this.mainBtn.querySelector('.main-label');
-    const L = { setup: 'LANCER LA PARTIE', between: 'MAIN SUIVANTE', over: 'NOUVELLE PARTIE' };
-    lab.textContent = L[this.state] || 'EN JEU';
-    this.mainBtn.disabled = !L[this.state];
+  meProfile() {
+    const prof = __mods['profile.js']?.profiles?.current, look = __mods['shop.js']?.publicLook?.(prof);
+    const html = look ? __mods['shop.js']?.lookHTML?.(look, 'md') : '';
+    const name = String(prof?.name || 'Toi').slice(0, 14);
+    return { name, human: true, avHTML: html || `<span class="pkx-ini">${name.charAt(0).toUpperCase()}</span>`, col: '#b8860b' };
+  }
+
+  // top bar, strip and the big button
+  paintTop() {
+    const set = (s, t) => { const e = this.q(s); if (e && e.textContent !== t) e.textContent = t; };
+    set('.pkx-bal b', fmtC(this.balC()));
+    const bl = `${fmtC(this.sb())} / ${fmtC(this.bb())}`;
+    set('.pkx-t1', `Texas Hold’em · ${bl}`);
+    set('.pkx-s1', bl);
+    const seated = this.players.filter((p) => !p.out).length;
+    set('.pkx-s2', this.state === 'setup' ? `${this.opt.bots + 1} joueurs · 9 max` : `Main n°${this.handNo || 0} · ${seated} joueurs`);
+    set('.pkx-s3', `Tapis ${fmtC(this.state === 'setup' || !this.buy ? this.buyIn() : this.buy)}`);
+    set('.pkx-s4', `${DEPTHS[this.opt.depth]} grosses blindes`);
+    this.view.dataset.st = this.humanRes ? 'act' : this.state;
+    const M = { setup: ['S’ASSEOIR', `Tapis ${fmtC(this.buyIn())}`], between: ['MAIN SUIVANTE', this.cd ? `dans ${this.cd} s` : ''], over: ['NOUVELLE PARTIE', 'retour au choix de la table'] }[this.state];
+    const mb = this.q('.pkx-main');
+    if (M) { mb.querySelector('b').textContent = M[0]; mb.querySelector('small').textContent = M[1]; }
+    const rb = this.canRebuy();
+    this.qa('[data-pk="rebuy"]').forEach((b) => { b.disabled = !rb; });
+    this.q('.pkx-snd').classList.toggle('off', isMuted());
+    if (!this.humanRes) this.paintIdle();
+  }
+
+  // buttons when it is not the player's turn: greyed, with what they would do
+  paintIdle() {
+    const p = this.me;
+    this.qa('[data-pa], [data-pq], .pkx-range').forEach((b) => { b.disabled = true; });
+    const tc = p && !p.folded ? this.toCall(p) : 0;
+    this.q('[data-pa="call"] b').textContent = tc ? 'SUIVRE' : 'PAROLE';
+    this.q('[data-pa="call"] small').textContent = tc ? fmtC(Math.min(tc, p.stack)) : '';
+    this.q('[data-pa="fold"] small').textContent = '';
+    this.q('[data-pa="raise"] b').textContent = this.cur ? 'RELANCER' : 'MISER';
+    this.q('[data-pa="raise"] small').textContent = '';
+    const w = this.state === 'play' ? (p?.folded ? 'Couché · attends la main suivante' : 'En attente des autres joueurs…') : '';
+    this.q('.pkx-amt b').textContent = w || fmtC(this.bb());
+    this.q('.pkx-amt2 b').textContent = fmtC(this.bb());
+    this.q('.pkx-amt').classList.toggle('wait', !!w);
   }
 
   onTap(e) {
     const t = e.target.closest('button');
+    const menu = this.q('.pkx-menu');
+    if (!t || !t.closest('.pkx-menu, [data-pk="menu"]')) menu.hidden = true;
     if (!t || t.disabled) return;
-    const seg = t.closest('.pk-seg');
+    sfx.unlock(); this.music?.start?.();
+    const seg = t.closest('.pkx-seg');
     if (seg && this.state === 'setup') { this.opt[seg.dataset.o] = +t.dataset.v; sfx.click(); this.paintSetup(); return; }
-    if (t.classList.contains('pk-go')) return this.onMain();
-    if (t.classList.contains('pk-quit')) return this.quit();
+    const k = t.dataset.pk;
+    if (k === 'main') return this.onMain();
+    if (k === 'menu') { menu.hidden = !menu.hidden; sfx.click(); return; }
+    if (k === 'rebuy') { menu.hidden = true; return this.rebuy(); }
+    if (k === 'rules') { menu.hidden = true; return this.showInfo(); }
+    if (k === 'opts') { menu.hidden = true; return this.openMenu(); }
+    if (k === 'quit') { menu.hidden = true; return this.quit(); }
+    if (k === 'snd') { setMuted(!isMuted()); this.paintTop(); return; }
     if (t.dataset.pq) return this.quickRaise(t.dataset.pq);
-    if (t.dataset.pa && this.humanRes) {
-      const a = t.dataset.pa, res = this.humanRes; this.humanRes = null;
-      this.q('.pk-bar').classList.add('off');
-      if (a === 'raise') res({ a: 'raise', to: +this.q('.pk-range').value });
-      else res({ a: this.toCall(this.me) ? (a === 'call' ? 'call' : 'fold') : (a === 'call' ? 'check' : 'fold') });
-    }
+    if (t.dataset.pa) this.act(t.dataset.pa);
+  }
+
+  act(a) {
+    if (!this.humanRes) return;
+    const res = this.humanRes; this.humanRes = null;
+    const p = this.me;
+    if (a === 'raise') res({ a: 'raise', to: this.raiseTo });
+    else if (a === 'allin') res({ a: 'raise', to: p.bet + p.stack });
+    else res({ a: this.toCall(p) ? (a === 'call' ? 'call' : 'fold') : (a === 'call' ? 'check' : 'fold') });
+    this.paintTop();
+  }
+
+  // computer: F coucher, C parole / suivre, R relancer, ↑ ↓ the amount, A tapis
+  keys(e) {
+    if (e.target.closest?.('input:not(.pkx-range), textarea') || document.querySelector('.modal-back') || !this.humanRes) return;
+    const k = e.key.toLowerCase();
+    if (k === 'f') this.act('fold');
+    else if (k === 'c') this.act('call');
+    else if (k === 'r' || k === 'enter') this.act('raise');
+    else if (k === 'arrowup' || k === '+') { e.preventDefault(); this.quickRaise('+'); }
+    else if (k === 'arrowdown' || k === '-') { e.preventDefault(); this.quickRaise('-'); }
+    else if (k === 'a') this.quickRaise('all');
   }
 
   onMain() {
@@ -191,14 +334,12 @@ class PokerGame extends BaseGame {
   start() {
     const buy = this.buyIn();
     if (!this.pay(buy)) return;
-    this.buy = buy; this.cashed = false; this.handNo = 0; this.pot = 0; this.board = []; this.cur = 0; this.tok++;
+    this.buy = buy; this.invested = buy; this.cashed = false; this.handNo = 0; this.pot = 0; this.board = []; this.cur = 0; this.tok++;
     const bots = BOTS.slice(0, this.opt.bots);
-    this.players = [{ name: 'Toi', av: '😎', human: true }, ...bots.map((b) => ({ ...b }))].map((p, i) => ({ ...p, i, stack: buy, cards: [], folded: false, allIn: false, bet: 0, total: 0, out: false }));
+    this.players = [this.meProfile(), ...bots.map((b) => ({ ...b }))].map((p, i) => ({ ...p, i, stack: buy, cards: [], folded: false, allIn: false, bet: 0, total: 0, out: false }));
     this.me = this.players[0];
     this.dealer = Math.floor(Math.random() * this.players.length);
-    this.q('.pk-setup').hidden = true;
-    this.q('.pk-table').hidden = false;
-    this.q('.pk-over').hidden = true;
+    this.q('.pkx-over').hidden = true;
     this.buildSeats();
     this.state = 'play';
     this.updateMeters();
@@ -209,16 +350,38 @@ class PokerGame extends BaseGame {
   toSetup() {
     this.tok++;
     this.state = 'setup';
-    this.q('.pk-table').hidden = true;
-    this.q('.pk-setup').hidden = false;
-    this.q('.pk-bar').classList.add('off');
-    this.msg('Choisis tes adversaires, les blindes et ton tapis, puis lance la partie.');
+    this.q('.pkx-over').hidden = true;
+    this.clearTable();
+    this.msg('Choisis tes adversaires, les blindes et ton tapis, puis assieds-toi.');
     this.paintSetup();
+  }
+
+  clearTable() {
+    this.pot = 0; this.board = []; this.cur = 0;
+    this.qa('.pkx-slot').forEach((e) => { e.innerHTML = ''; });
+    this.q('.pkx-hand').textContent = '';
+    this.q('.pkx-pot b').textContent = fmtC(0);
+  }
+
+  canRebuy() {
+    const p = this.me;
+    return !!p && !this.cashed && !p.out && (this.state === 'between' || (this.state === 'play' && p.folded)) && p.stack < this.buy;
+  }
+
+  // Recave: tops the stack up to the starting stack, from the balance (between two hands or once folded)
+  rebuy() {
+    if (!this.canRebuy()) { toast('Recave possible entre deux mains (ou quand tu es couché), si ton tapis est sous le tapis de départ', 'info'); return; }
+    const add = this.buy - this.me.stack;
+    if (!this.pay(add)) return;
+    this.me.stack += add; this.invested += add;
+    sfx.coin();
+    toast(`Recave : +${fmtC(add)} sur ton tapis`);
+    this.paintSeats();
   }
 
   // Leaving the table: your stack goes back to your balance (chips already in the pot are lost, like a fold).
   quit() {
-    if (this.state === 'setup') return;
+    if (this.state === 'setup') { toast('Tu n’es pas encore assis à la table', 'info'); return; }
     const back = this.cashOut();
     if (this.humanRes) { const r = this.humanRes; this.humanRes = null; r({ a: 'fold' }); }
     toast(back > 0 ? `Tu quittes la table : ${fmtC(back)} rendus sur ton solde` : 'Tu quittes la table');
@@ -229,112 +392,182 @@ class PokerGame extends BaseGame {
     if (this.cashed || !this.me) return 0;
     this.cashed = true;
     const s = this.me.stack;
-    if (s > 0) wallet.credit(s / 100, s > this.buy ? { game: 'Le Texas', x: s / this.buy } : undefined);
+    if (s > 0) wallet.credit(s / 100, s > this.invested ? { game: 'Le Texas', x: s / this.invested } : undefined);
     this.updateMeters();
     return s;
   }
 
-  destroy() { this.tok++; if (this.state !== 'setup') this.cashOut(); super.destroy(); }
+  destroy() {
+    this.tok++;
+    if (this.state !== 'setup') this.cashOut();
+    this.ro?.disconnect();
+    removeEventListener('keydown', this.onKeys);
+    clearInterval(this.cdT);
+    super.destroy();
+  }
+
+  msg(t) {
+    if (this.dead || !this.logEl) return;
+    this.logEl.innerHTML = t;
+    this.logEl.classList.remove('on'); void this.logEl.offsetWidth; this.logEl.classList.add('on');
+  }
 
   /* ---------- table drawing ---------- */
   buildSeats() {
-    const n = this.players.length, slots = SLOTS[n];
-    const lerp = (a, b, k) => a + (b - a) * k;
-    this.q('.pk-seats').innerHTML = this.players.map((p, i) => {
-      const [x, y, xm, ym] = POS[slots[i]];
-      const bx = i === 0 ? 64 : lerp(x, CEN[0], 0.42), by = lerp(y, CEN[1], i === 0 ? 0.3 : 0.45), bxm = i === 0 ? 74 : lerp(xm, CEN[0], 0.4), bym = lerp(ym, CEN[1], i === 0 ? 0.28 : 0.4);
-      return `<div class="pk-seat${p.human ? ' me' : ''}" data-i="${i}" style="--x:${x}%;--y:${y}%;--xm:${xm}%;--ym:${ym}%">
-          <div class="pk-cards"></div>
-          <div class="pk-av">${p.av}<i class="pk-dbtn">D</i></div>
-          <div class="pk-plate"><b>${p.name}</b>${p.human ? '' : `<small>${p.style}</small>`}<em class="pk-stack"></em></div>
-          <div class="pk-bubble"></div><div class="pk-hn"></div>
+    const n = this.players.length, slots = SLOTS[n], used = new Set(slots);
+    let html = '';
+    for (let k = 0; k < 9; k++) {
+      if (used.has(k)) continue;
+      html += `<div class="pkx-seat empty" data-k="${k}"><i class="pkx-num">${k + 1}</i><div class="pkx-av">${ICONS.user}</div><div class="pkx-plate"><b>Place libre</b><em>${k + 1}</em></div></div>`;
+    }
+    html += this.players.map((p, i) => {
+      const k = slots[i];
+      const av = p.human ? p.avHTML : `<span class="pkx-emo">${p.av}</span>`;
+      return `<div class="pkx-seat${p.human ? ' me' : ''}" data-i="${i}" data-k="${k}" style="--col:${p.col}">
+          <i class="pkx-num">${k + 1}</i>
+          <div class="pkx-av">${av}<svg class="pkx-ring" viewBox="0 0 100 100"><circle cx="50" cy="50" r="47" pathLength="100"/></svg><i class="pkx-dbtn">D</i></div>
+          <div class="pkx-plate"><b>${p.human ? 'Toi' : p.name}</b><em class="pkx-stack"></em></div>
+          <div class="pkx-cards"></div>
+          <div class="pkx-bub"></div><div class="pkx-hn"></div>
         </div>
-        <div class="pk-bet" data-i="${i}" style="--x:${bx}%;--y:${by}%;--xm:${bxm}%;--ym:${bym}%"><i></i><b></b></div>`;
+        <div class="pkx-bet" data-i="${i}" data-k="${k}"><span class="pkx-pile"></span><b></b></div>`;
     }).join('');
+    this.q('.pkx-seats').innerHTML = html;
+    this.layout();
     this.paintSeats();
   }
 
-  seat(p) { return this.q(`.pk-seat[data-i="${p.i}"]`); }
-  betEl(p) { return this.q(`.pk-bet[data-i="${p.i}"]`); }
+  // Sizes and places everything from the room's size (ResizeObserver): mode, table box, rail, seats, bets.
+  layout() {
+    const v = this.view, room = this.q('.pkx-room'), T = this.q('.pkx-table');
+    if (!v || !room) return;
+    const W = v.clientWidth, H = v.clientHeight;
+    const mode = W > H * 1.2 && H < 600 ? 'land' : W >= 760 ? 'pc' : 'phone';
+    if (v.dataset.m !== mode) v.dataset.m = mode;
+    const rw = room.clientWidth, rh = room.clientHeight;
+    if (!rw || !rh) return;
+    const round = mode !== 'pc';
+    const [amin, amax] = round ? [0.62, 1.75] : [1.15, 2.25];
+    let w = rw, h = rh;
+    if (w / h > amax) w = h * amax;
+    if (w / h < amin) h = w / amin;
+    w = Math.floor(w); h = Math.floor(h);
+    const m = Math.min(w, h);
+    const d = Math.round(round ? Math.max(40, Math.min(66, w * 0.135, h * 0.14)) : Math.max(36, Math.min(58, m * 0.1)));
+    const pw = round ? Math.round(d * 1.62) : Math.round(Math.max(116, Math.min(170, w * 0.125))), ph = round ? 0 : Math.round(Math.max(48, Math.min(70, h * 0.11)));
+    const cw = Math.round(Math.max(28, Math.min(round ? 52 : 72, w * (round ? 0.092 : 0.06), h * (round ? 0.1 : 0.11))));
+    T.style.width = `${w}px`; T.style.height = `${h}px`;
+    T.style.setProperty('--d', `${d}px`); T.style.setProperty('--pw', `${pw}px`); T.style.setProperty('--ph', `${ph}px`); T.style.setProperty('--cw', `${cw}px`);
+    T.style.setProperty('--hw', `${Math.round(Math.max(36, Math.min(round ? 56 : 76, d * 0.9, h * (round ? 0.115 : 0.12))))}px`);
+    // rail box: seats sit on it, their boxes must stay in the table box
+    const top = round ? d / 2 + 6 : ph / 2 + 14, bottom = round ? d / 2 + 36 : ph / 2 + 10, side = round ? Math.max(pw / 2, d / 2) + 2 : pw / 2 + 6;
+    const rail = this.q('.pkx-rail');
+    Object.assign(rail.style, { left: `${side}px`, top: `${top}px`, width: `${w - 2 * side}px`, height: `${h - top - bottom}px`, borderRadius: round ? '50%' : `${Math.round(Math.min(h - top - bottom, w) * 0.2)}px` });
+    const thick = Math.max(10, Math.round(m * 0.045));
+    rail.style.setProperty('--thick', `${thick}px`);
+    this.q('.pkx-felt').style.borderRadius = round ? '50%' : `${Math.max(8, Math.round(Math.min(h - top - bottom, w) * 0.2) - thick)}px`;
+    const cx = w / 2, cy = top + (h - top - bottom) / 2, rx = (w - 2 * side) / 2 - thick / 2, ry = (h - top - bottom) / 2 - thick / 2;
+    const ex = round ? 2 : 4.5;
+    const pt = (k) => {
+      const a = (90 + 40 * k) * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+      let x = cx + rx * Math.sign(c) * Math.abs(c) ** (2 / ex), y = cy + ry * Math.sign(s) * Math.abs(s) ** (2 / ex);
+      x = Math.max(side, Math.min(w - side, x));
+      return [x, y];
+    };
+    this.P = { cx, cy };
+    this.qa('.pkx-seat').forEach((s) => { const [x, y] = pt(+s.dataset.k); s.style.left = `${x}px`; s.style.top = `${y}px`; s.dataset.side = x < cx - 4 ? 'l' : x > cx + 4 ? 'r' : 'c'; s.dataset.vy = y < cy ? 't' : 'b'; });
+    this.qa('.pkx-bet').forEach((b) => {
+      const k = +b.dataset.k; const [x, y] = pt(k);
+      let bx = x + (cx - x) * (round ? 0.34 : 0.36), by = y + (cy - y) * (round ? 0.36 : 0.42);
+      if (k === 0) { bx = cx - Math.min(w * 0.2, rx * 0.42); by = y - (y - cy) * (round ? 0.42 : 0.35); }
+      b.style.left = `${bx}px`; b.style.top = `${by}px`;
+    });
+    this.q('.pkx-center').style.top = `${cy - (round ? h * 0.07 : h * 0.05)}px`;
+  }
+
+  seat(p) { return this.q(`.pkx-seat[data-i="${p.i}"]`); }
+  betEl(p) { return this.q(`.pkx-bet[data-i="${p.i}"]`); }
 
   paintSeats() {
     for (const p of this.players) {
-      const s = this.seat(p);
-      s.querySelector('.pk-stack').textContent = p.out ? 'Éliminé' : p.allIn ? 'TAPIS' : fmtC(p.stack);
-      s.classList.toggle('out', p.out);
-      s.classList.toggle('folded', p.folded && !p.out);
-      s.classList.toggle('dealer', p.i === this.dealer);
+      const s = this.seat(p); if (!s) continue;
+      s.querySelector('.pkx-stack').textContent = p.out ? 'Éliminé' : p.allIn ? 'TAPIS' : fmtC(p.stack);
+      s.classList.toggle('out', !!p.out);
+      s.classList.toggle('folded', !!p.folded && !p.out);
+      s.classList.toggle('dealer', this.state !== 'setup' && p.i === this.dealer);
       const be = this.betEl(p);
       be.classList.toggle('on', p.bet > 0);
-      be.querySelector('b').textContent = p.bet ? fmtC(p.bet) : '';
+      if (p.bet) { be.querySelector('b').textContent = fmtC(p.bet); be.querySelector('.pkx-pile').innerHTML = chipHTML(p.bet); }
     }
-    const inPlay = this.pot + this.players.reduce((a, p) => a + p.bet, 0);
-    this.q('.pk-pot b').textContent = fmtC(inPlay || 0);
-    const alive = this.players.filter((p) => !p.out).length;
-    this.q('.pk-info').textContent = `Main n°${this.handNo} · Blindes ${fmtC(this.sb())} / ${fmtC(this.bb())} · ${alive} joueur${alive > 1 ? 's' : ''}`;
+    const inPlay = (this.pot || 0) + this.players.reduce((a, p) => a + (p.bet || 0), 0);
+    this.q('.pkx-pot b').textContent = fmtC(inPlay || 0);
     this.updateMeters();
   }
 
   say(p, text, cls = '') {
-    const b = this.seat(p).querySelector('.pk-bubble');
+    const b = this.seat(p).querySelector('.pkx-bub');
     b.textContent = text;
-    b.className = `pk-bubble on ${cls}`;
+    b.className = `pkx-bub on ${cls}`;
     clearTimeout(p.sayT);
-    p.sayT = setTimeout(() => b.classList.remove('on'), 1800);
+    p.sayT = setTimeout(() => b.classList.remove('on'), 1900);
   }
 
   cardNode(c, faceUp, cls = '') {
     const d = document.createElement('div');
-    d.className = `pk-card ${cls}${faceUp ? '' : ' back'}${RED(c) ? ' red' : ''}`;
+    d.className = `pkx-card ${cls}${faceUp ? '' : ' back'}${RED(c) ? ' red' : ''}`;
     if (faceUp) d.innerHTML = FACE(c);
     return d;
   }
 
-  // card flies from the dealer's deck in the middle of the table
+  // card flies from the dealer's deck (the spade in the middle of the table)
   fly(node, ms) {
-    const from = this.q('.pk-pot').getBoundingClientRect(), r = node.getBoundingClientRect();
-    node.animate([{ transform: `translate(${from.left + from.width / 2 - r.left - r.width / 2}px, ${from.top - r.top}px) rotate(-30deg) scale(.4)`, opacity: 0 }, { opacity: 1, offset: 0.2 }, { transform: 'none' }],
-      { duration: ms, easing: 'cubic-bezier(.25,.7,.3,1)' });
+    const from = this.q('.pkx-emb').getBoundingClientRect(), r = node.getBoundingClientRect();
+    node.animate([{ transform: `translate(${from.left + from.width / 2 - r.left - r.width / 2}px, ${from.top + from.height / 2 - r.top - r.height / 2}px) rotate(-40deg) scale(.45)`, opacity: 0 }, { opacity: 1, offset: 0.18 }, { transform: 'none', opacity: 1 }],
+      { duration: ms, easing: 'cubic-bezier(.2,.75,.3,1)' });
   }
 
   flip(node, c) {
     const d = this.turbo ? 90 : 150;
-    node.animate([{ transform: 'perspective(500px) rotateY(0) translateY(0)' }, { transform: 'perspective(500px) rotateY(90deg) translateY(-6px) scale(1.08)' }], { duration: d, easing: 'ease-in' }).finished.then(() => {
+    node.animate([{ transform: 'perspective(500px) rotateY(0)' }, { transform: 'perspective(500px) rotateY(90deg) scale(1.08)' }], { duration: d, easing: 'ease-in' }).finished.then(() => {
+      if (!node.isConnected) return;
       node.classList.remove('back'); node.innerHTML = FACE(c);
-      node.animate([{ transform: 'perspective(500px) rotateY(-90deg) translateY(-6px) scale(1.08)' }, { transform: 'perspective(500px) rotateY(0) translateY(0)' }], { duration: d * 1.4, easing: 'cubic-bezier(.3,1.5,.5,1)' });
+      node.animate([{ transform: 'perspective(500px) rotateY(-90deg) scale(1.08)' }, { transform: 'perspective(500px) rotateY(0)' }], { duration: d * 1.4, easing: 'cubic-bezier(.3,1.5,.5,1)' });
     });
   }
 
   // bets slide into the pot at the end of each betting round
   async collect() {
-    const pot = this.q('.pk-pot').getBoundingClientRect();
+    const pot = this.q('.pkx-pot').getBoundingClientRect();
     let any = false;
+    const ms = this.turbo ? 200 : 380;
     for (const p of this.players) {
       if (!p.bet) continue;
       any = true;
       const e = this.betEl(p), r = e.getBoundingClientRect();
-      e.animate([{ transform: 'translate(-50%,-50%)' }, { transform: `translate(calc(-50% + ${pot.left + pot.width / 2 - r.left - r.width / 2}px), calc(-50% + ${pot.top + pot.height / 2 - r.top - r.height / 2}px)) scale(.6)`, opacity: 0.2 }], { duration: this.turbo ? 200 : 380, easing: 'ease-in' });
+      e.animate([{ transform: 'translate(-50%,-50%)' }, { transform: `translate(calc(-50% + ${pot.left + pot.width / 2 - r.left - r.width / 2}px), calc(-50% + ${pot.top + pot.height / 2 - r.top - r.height / 2}px)) scale(.6)`, opacity: 0.1 }], { duration: ms, easing: 'cubic-bezier(.5,0,.75,0)' });
     }
-    if (any) { sfx.coin(); await sleep(this.turbo ? 200 : 380); }
+    if (any) { sfx.coin(); await sleep(ms); }
     for (const p of this.players) { this.pot += p.bet; p.bet = 0; }
     this.paintSeats();
   }
 
+  // the pot flies to the winner: a pile of chips and the amount
   chipsTo(p, amount) {
-    const pot = this.q('.pk-pot').getBoundingClientRect(), s = this.seat(p).querySelector('.pk-av').getBoundingClientRect();
+    const pot = this.q('.pkx-pot').getBoundingClientRect(), s = this.seat(p).querySelector('.pkx-av').getBoundingClientRect();
     const c = document.createElement('div');
-    c.className = 'pk-fly';
-    c.textContent = '+' + fmtC(amount);
+    c.className = 'pkx-fly';
+    c.innerHTML = `<span class="pkx-pile">${chipHTML(amount)}</span><b>+${fmtC(amount)}</b>`;
     c.style.cssText = `left:${pot.left + pot.width / 2}px;top:${pot.top + pot.height / 2}px`;
     document.body.appendChild(c);
-    c.animate([{ transform: 'translate(-50%,-50%) scale(.7)', opacity: 0 }, { opacity: 1, offset: 0.15 }, { transform: `translate(calc(-50% + ${s.left + s.width / 2 - pot.left - pot.width / 2}px), calc(-50% + ${s.top + s.height / 2 - pot.top - pot.height / 2}px)) scale(1.1)`, opacity: 1 }],
-      { duration: this.turbo ? 450 : 800, easing: 'cubic-bezier(.3,.6,.3,1)', fill: 'forwards' });
-    setTimeout(() => c.remove(), (this.turbo ? 450 : 800) + 500);
+    const ms = this.turbo ? 500 : 900;
+    c.animate([{ transform: 'translate(-50%,-50%) scale(.7)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: 0.15 }, { transform: `translate(calc(-50% + ${s.left + s.width / 2 - pot.left - pot.width / 2}px), calc(-50% + ${s.top + s.height / 2 - pot.top - pot.height / 2}px)) scale(1)`, opacity: 1, offset: 0.8 }, { transform: `translate(calc(-50% + ${s.left + s.width / 2 - pot.left - pot.width / 2}px), calc(-50% + ${s.top + s.height / 2 - pot.top - pot.height / 2 - 18}px)) scale(1.05)`, opacity: 0 }],
+      { duration: ms + 600, easing: 'cubic-bezier(.3,.6,.3,1)', fill: 'forwards' });
+    setTimeout(() => c.remove(), ms + 700);
   }
 
   paintHand() {
-    const el = this.q('.pk-hand');
-    if (!this.me.cards.length || this.me.out) { el.textContent = ''; return; }
+    const el = this.q('.pkx-hand');
+    if (!this.me?.cards.length || this.me.out) { el.textContent = ''; return; }
     const h = eval7(this.me.cards.concat(this.board));
     el.innerHTML = `${this.me.folded ? 'Couché · ' : 'Ta main : '}<b>${handName(h)}</b>`;
   }
@@ -350,8 +583,12 @@ class PokerGame extends BaseGame {
       const alive = this.players.filter((p) => !p.out);
       if (this.me.out || alive.length === 1) return this.gameOver(this.me.out ? 'lose' : 'win');
       this.state = 'between';
+      this.cd = 5;
       this.updateMeters();
-      await Promise.race([this.wait(4200), new Promise((r) => { this.nextNow = r; })]);
+      clearInterval(this.cdT);
+      this.cdT = setInterval(() => { if (this.cd > 1) { this.cd--; this.paintTop(); } }, this.turbo ? 450 : 1000);
+      await Promise.race([this.wait(5000), new Promise((r) => { this.nextNow = r; })]);
+      clearInterval(this.cdT); this.cd = 0;
       this.nextNow = null;
       if (!ok()) return;
       this.state = 'play';
@@ -361,20 +598,20 @@ class PokerGame extends BaseGame {
 
   gameOver(kind) {
     this.state = 'over';
-    const s = this.me.stack, back = this.cashOut(), net = s - this.buy;
-    const ov = this.q('.pk-over');
+    const s = this.me.stack, back = this.cashOut(), net = s - this.invested;
+    const ov = this.q('.pkx-over');
     ov.innerHTML = kind === 'win'
-      ? `<h3>🏆 Tu as raflé la table !</h3><p>Tous les bots sont éliminés.</p><p>${fmtC(back)} rendus sur ton solde (${net >= 0 ? '+' : '−'}${fmtC(Math.abs(net))})</p>`
-      : '<h3>Éliminé…</h3><p>Tu n’as plus de jetons. Retente ta chance !</p>';
+      ? `<div><h3>🏆 Tu as raflé la table !</h3><p>Tous les adversaires sont éliminés.</p><p><b>${fmtC(back)}</b> rendus sur ton solde (${net >= 0 ? '+' : '−'}${fmtC(Math.abs(net))})</p></div>`
+      : '<div><h3>Éliminé…</h3><p>Tu n’as plus de jetons. Retente ta chance !</p></div>';
     ov.hidden = false;
     if (kind === 'win') { fx.confetti(90); sfx.bigWin(); } else sfx.reelStop(0);
-    this.msg(kind === 'win' ? 'Victoire ! Lance une nouvelle partie quand tu veux.' : 'Partie terminée.');
+    this.msg(kind === 'win' ? 'Victoire ! Relance une partie quand tu veux.' : 'Partie terminée.');
     this.updateMeters();
   }
 
   live() { return this.players.filter((p) => !p.out && !p.folded); }
   nextFrom(i, f = (p) => !p.out) { const n = this.players.length; for (let k = 1; k <= n; k++) { const p = this.players[(i + k) % n]; if (f(p)) return p; } return null; }
-  toCall(p) { return Math.max(0, this.cur - p.bet); }
+  toCall(p) { return Math.max(0, (this.cur || 0) - p.bet); }
 
   put(p, amount) {
     const a = Math.min(amount, p.stack);
@@ -389,12 +626,11 @@ class PokerGame extends BaseGame {
     this.handNo++;
     this.pot = 0; this.board = []; this.cur = 0;
     for (const p of this.players) Object.assign(p, { cards: [], folded: p.out, allIn: false, bet: 0, total: 0 });
-    this.qa('.pk-cards').forEach((e) => { e.innerHTML = ''; });
-    this.qa('.pk-hn').forEach((e) => { e.textContent = ''; e.className = 'pk-hn'; });
-    this.qa('.pk-seat').forEach((e) => e.classList.remove('win', 'lose', 'turn'));
-    this.qa('.pk-slot').forEach((e) => { e.innerHTML = ''; });
-    this.q('.pk-hand').textContent = '';
-    this.setLast(0);
+    this.qa('.pkx-cards').forEach((e) => { e.innerHTML = ''; });
+    this.qa('.pkx-hn').forEach((e) => { e.textContent = ''; e.className = 'pkx-hn'; });
+    this.qa('.pkx-seat').forEach((e) => e.classList.remove('win', 'lose', 'turn', 'shown'));
+    this.qa('.pkx-slot').forEach((e) => { e.innerHTML = ''; });
+    this.q('.pkx-hand').textContent = '';
     // button and blinds (heads-up: the button posts the small blind)
     this.dealer = this.nextFrom(this.dealer).i;
     const D = this.players[this.dealer], heads = this.players.filter((p) => !p.out).length === 2;
@@ -411,10 +647,10 @@ class PokerGame extends BaseGame {
       do {
         const c = deck.pop(); p.cards.push(c);
         const node = this.cardNode(c, p.human, p.human ? 'big' : 'mini');
-        this.seat(p).querySelector('.pk-cards').appendChild(node);
-        this.fly(node, this.turbo ? 160 : 280);
+        this.seat(p).querySelector('.pkx-cards').appendChild(node);
+        this.fly(node, this.turbo ? 160 : 300);
         sfx.click();
-        await sleep(this.turbo ? 60 : 120);
+        await sleep(this.turbo ? 50 : 100);
         p = this.nextFrom(p.i);
       } while (p !== SB);
     }
@@ -429,14 +665,14 @@ class PokerGame extends BaseGame {
         for (let k = 0; k < n; k++) {
           const c = deck.pop(); this.board.push(c);
           const node = this.cardNode(c, false, 'board');
-          this.qa('.pk-slot')[this.board.length - 1].appendChild(node);
+          this.qa('.pkx-slot')[this.board.length - 1].appendChild(node);
           this.fly(node, this.turbo ? 160 : 300);
           await sleep(this.turbo ? 160 : 300);
           this.flip(node, c);
           sfx.click();
           await sleep(this.turbo ? 80 : 160);
         }
-        this.msg(`${STREETS[st]} : ${this.board.map((c) => (c.v <= 10 ? c.v : 'JQKA'[c.v - 11]) + c.s).join(' ')}`);
+        this.msg(`${STREETS[st]} : ${this.board.map((c) => RANK(c) + c.s).join(' ')}`);
         this.paintHand();
         if (!ok()) return;
         await W(350);
@@ -454,7 +690,7 @@ class PokerGame extends BaseGame {
   async betting(st, first, ok) {
     const acted = new Set();
     let p = first;
-    for (let guard = 0; guard < 200; guard++) {
+    for (let guard = 0; guard < 300; guard++) {
       if (!ok()) return;
       const live = this.live();
       if (live.length <= 1) return;
@@ -462,13 +698,15 @@ class PokerGame extends BaseGame {
       if (can.every((x) => acted.has(x) && x.bet === this.cur)) return;
       if (can.length <= 1 && can.every((x) => x.bet >= this.cur)) return;
       if (!p.folded && !p.out && !p.allIn && !(acted.has(p) && p.bet === this.cur)) {
-        this.qa('.pk-seat').forEach((e) => e.classList.remove('turn'));
-        this.seat(p).classList.add('turn');
+        this.qa('.pkx-seat').forEach((e) => e.classList.remove('turn'));
+        const s = this.seat(p);
+        if (p.human) s.style.setProperty('--think', '20000ms');
+        s.classList.add('turn');
         const act = p.human ? await this.humanAct(p) : await this.botAct(p, st);
         if (!ok()) return;
-        this.seat(p).classList.remove('turn');
+        s.classList.remove('turn');
         this.apply(p, act, acted);
-        await this.wait(p.human ? 150 : 350);
+        await this.wait(p.human ? 150 : 320);
       }
       p = this.nextFrom(p.i);
     }
@@ -477,16 +715,16 @@ class PokerGame extends BaseGame {
   apply(p, act, acted) {
     const tc = this.toCall(p), who = p.human ? 'Tu' : p.name;
     let text, cls = '';
-    if (act.a === 'fold') { p.folded = true; text = 'Se couche'; cls = 'fold'; this.msg(`${who} ${p.human ? 'te couches' : 'se couche'}.`); this.seat(p).querySelectorAll('.pk-card').forEach((c) => c.classList.add('dead')); }
-    else if (act.a === 'check' || (act.a === 'call' && !tc)) { text = 'Parole'; this.msg(`${who} ${p.human ? 'checkes' : 'checke'}.`); }
-    else if (act.a === 'call') { const a = this.put(p, tc); text = p.allIn ? `Tapis ! ${fmtC(p.total)}` : `Suit ${fmtC(a)}`; this.msg(`${who} ${p.human ? 'suis' : 'suit'} ${fmtC(a)}.`); sfx.coin(); }
+    if (act.a === 'fold') { p.folded = true; text = 'Couché'; cls = 'fold'; this.msg(`${who} ${p.human ? 'te couches' : 'se couche'}.`); this.seat(p).querySelectorAll('.pkx-card').forEach((c) => c.classList.add('dead')); }
+    else if (act.a === 'check' || (act.a === 'call' && !tc)) { text = 'Parole'; cls = 'check'; this.msg(`${who} ${p.human ? 'checkes' : 'checke'}.`); sfx.tick?.(); }
+    else if (act.a === 'call') { const a = this.put(p, tc); text = p.allIn ? 'Tapis !' : `Suit ${fmtC(a)}`; cls = p.allIn ? 'allin' : 'call'; this.msg(`${who} ${p.human ? 'suis' : 'suit'} ${fmtC(a)}.`); sfx.coin(); }
     else {
       const to = Math.min(Math.max(act.to, this.cur + this.minRaise), p.bet + p.stack);
       const before = this.cur;
       this.put(p, to - p.bet);
       if (p.bet > before) { const inc = p.bet - before; if (inc >= this.minRaise) this.minRaise = inc; this.cur = p.bet; acted.clear(); }
-      text = p.allIn ? `Tapis ! ${fmtC(p.total)}` : before ? `Relance à ${fmtC(p.bet)}` : `Mise ${fmtC(p.bet)}`;
-      cls = 'raise';
+      text = p.allIn ? 'Tapis !' : before ? `Relance ${fmtC(p.bet)}` : `Mise ${fmtC(p.bet)}`;
+      cls = p.allIn ? 'allin' : 'raise';
       this.msg(p.allIn ? `${who} ${p.human ? 'fais' : 'fait'} tapis : ${fmtC(p.total)} au total !` : before ? `${who} ${p.human ? 'relances' : 'relance'} à ${fmtC(p.bet)}.` : `${who} ${p.human ? 'mises' : 'mise'} ${fmtC(p.bet)}.`);
       sfx.coin();
     }
@@ -501,55 +739,109 @@ class PokerGame extends BaseGame {
     const max = p.bet + p.stack, min = Math.min(max, this.cur ? this.cur + this.minRaise : this.bb());
     return { min, max };
   }
+  potNow() { return this.pot + this.players.reduce((a, x) => a + x.bet, 0); }
 
   humanAct(p) {
     const tc = this.toCall(p), { min, max } = this.raiseBounds(p);
-    const bar = this.q('.pk-bar'), rg = this.q('.pk-range');
-    bar.classList.remove('off');
     const canRaise = p.stack > tc && this.live().some((x) => x !== p && !x.allIn);
-    const call = this.q('[data-pa="call"]');
-    call.textContent = tc ? (tc >= p.stack ? `Tapis ${fmtC(p.stack)}` : `Suivre ${fmtC(tc)}`) : 'Parole';
-    this.q('[data-pa="fold"]').textContent = tc ? 'Se coucher' : 'Se coucher';
-    rg.min = min; rg.max = max; rg.step = this.sb(); rg.value = min;
-    bar.classList.toggle('noraise', !canRaise);
+    this.canRaiseNow = canRaise;
+    this.qa('[data-pa], [data-pq], .pkx-range').forEach((b) => { b.disabled = false; });
     this.q('[data-pa="raise"]').disabled = !canRaise;
-    this.paintRaise();
-    this.msg(tc ? `À toi : ${fmtC(tc)} à suivre.` : 'À toi de parler.');
-    sfx.tick();
-    return new Promise((res) => { this.humanRes = res; });
+    this.qa('[data-pq]').forEach((b) => { b.disabled = !canRaise; });
+    this.q('.pkx-range').disabled = !canRaise;
+    this.q('.pkx-amt').classList.remove('wait');
+    const cb = this.q('[data-pa="call"]');
+    cb.querySelector('b').textContent = tc ? (tc >= p.stack ? 'TAPIS' : 'SUIVRE') : 'PAROLE';
+    cb.querySelector('small').textContent = tc ? fmtC(Math.min(tc, p.stack)) : '';
+    this.q('[data-pa="fold"] small').textContent = '';
+    this.raiseTo = min;
+    this.anchors = this.makeAnchors(min, max);
+    const pr = new Promise((res) => { this.humanRes = res; });
+    this.paintRaise(true);
+    this.msg(tc ? `À toi : ${fmtC(Math.min(tc, p.stack))} à suivre.` : 'À toi de parler.');
+    sfx.tick?.();
+    navigator.vibrate?.(20);
+    this.paintTop();
+    return pr;
+  }
+
+  // the slider (computer): evenly spaced stops Min, ½ pot, ⅔ pot, pot, 2× pot, Tapis, straight lines in between
+  makeAnchors(min, max) {
+    const pot = this.potNow(), tc = this.toCall(this.me), base = this.cur;
+    const val = (k) => this.snap(base + (pot + tc) * k);
+    const raw = [['Min', min], ['½ pot', val(0.5)], ['⅔ pot', val(0.667)], ['Pot', val(1)], ['2× pot', val(2)], ['Tapis', max]];
+    const out = [];
+    for (const [l, v] of raw) { const x = Math.max(min, Math.min(max, v)); if (!out.length || x > out[out.length - 1][1]) out.push([l, x]); else if (l === 'Tapis') out[out.length - 1] = [l, x]; }
+    if (out.length === 1) out.push(['Tapis', max]);
+    return out;
+  }
+  snap(v) { return Math.round(v / this.sb()) * this.sb(); }
+  fromSlider(t) {
+    const A = this.anchors; if (!A || A.length < 2) return this.raiseTo;
+    const f = (t / 1000) * (A.length - 1), i = Math.min(A.length - 2, Math.floor(f)), k = f - i;
+    let v = A[i][1] + (A[i + 1][1] - A[i][1]) * k;
+    v = t >= 1000 ? A[A.length - 1][1] : this.snap(v);
+    return Math.max(A[0][1], Math.min(A[A.length - 1][1], v));
+  }
+  toSlider(v) {
+    const A = this.anchors; if (!A || A.length < 2) return 0;
+    for (let i = 0; i < A.length - 1; i++) if (v <= A[i + 1][1]) return Math.round(((i + (v - A[i][1]) / Math.max(1, A[i + 1][1] - A[i][1])) / (A.length - 1)) * 1000);
+    return 1000;
   }
 
   quickRaise(k) {
-    const p = this.me, rg = this.q('.pk-range');
-    if (!this.humanRes) return;
+    const p = this.me;
+    if (!this.humanRes || !this.canRaiseNow) return;
     const { min, max } = this.raiseBounds(p);
-    const pot = this.pot + this.players.reduce((a, x) => a + x.bet, 0), tc = this.toCall(p);
-    let v = k === 'min' ? min : k === 'all' ? max : this.cur + Math.round((pot + tc) * +k);
-    v = Math.round(v / this.sb()) * this.sb();
-    rg.value = Math.max(min, Math.min(max, v));
+    const pot = this.potNow(), tc = this.toCall(p), step = this.bb();
+    let v = this.raiseTo;
+    if (k === '+') v += step;
+    else if (k === '-') v -= step;
+    else if (k === 'all') v = max;
+    else if (k === 'p25' || k === 'p50') v += (pot + tc) * (k === 'p25' ? 0.25 : 0.5);
+    else if (k[0] === 'x') v = Math.max(this.cur, this.bb()) * +k.slice(1);
+    else v = this.cur + (pot + tc) * +k;
+    v = k === 'all' ? max : this.snap(v);
+    this.raiseTo = Math.max(min, Math.min(max, v));
     sfx.click();
-    this.paintRaise();
+    this.paintRaise(true);
   }
 
-  paintRaise() {
-    const p = this.me; if (!p) return;
-    const v = +this.q('.pk-range').value, all = v >= p.bet + p.stack;
-    this.q('.pk-amt').textContent = fmtC(v);
-    this.q('[data-pa="raise"]').textContent = all ? `Tapis ${fmtC(v)}` : this.cur ? `Relancer à ${fmtC(v)}` : `Miser ${fmtC(v)}`;
+  paintRaise(moveSlider) {
+    const p = this.me; if (!p || !this.humanRes) return;
+    const v = this.raiseTo, all = v >= p.bet + p.stack;
+    this.q('.pkx-amt b').textContent = fmtC(v);
+    this.q('.pkx-amt2 b').textContent = fmtC(v);
+    const rb = this.q('[data-pa="raise"]');
+    rb.querySelector('b').textContent = all ? 'TAPIS' : this.cur ? 'RELANCER' : 'MISER';
+    rb.querySelector('small').textContent = this.canRaiseNow ? fmtC(all ? p.bet + p.stack : v) : '';
+    rb.classList.toggle('allin', all);
+    const rg = this.q('.pkx-range');
+    if (moveSlider) rg.value = this.toSlider(v);
+    rg.style.setProperty('--fill', `${+rg.value / 10}%`);
+    const A = this.anchors || [];
+    const key = A.map((a) => a[1]).join();
+    const tk = this.q('.pkx-ticks');
+    if (tk.dataset.k !== key) { tk.dataset.k = key; tk.innerHTML = A.map((a, i) => `<button type="button" data-tv="${a[1]}" style="left:${(i / Math.max(1, A.length - 1)) * 100}%"><i></i>${a[0]}</button>`).join(''); tk.querySelectorAll('button').forEach((b) => { b.onclick = () => { if (!this.humanRes) return; this.raiseTo = +b.dataset.tv; sfx.click(); this.paintRaise(true); }; }); }
+    const base = Math.max(this.cur, this.bb()), max = p.bet + p.stack;
+    this.qa('.pkx-quick.pkx-qpc [data-pq^="x"]').forEach((b) => { const x = Math.min(max, this.snap(base * +b.dataset.pq.slice(1))); b.querySelector('small').textContent = fmtC(x); b.disabled = !this.canRaiseNow || x < this.raiseBounds(p).min; });
+    this.qa('.pkx-quick .all small').forEach((s) => { s.textContent = fmtC(max); });
   }
 
   /* ---------- the bots ---------- */
   async botAct(p, st) {
     const seat = this.seat(p);
+    const ms = 650 + Math.random() * 800;
+    seat.style.setProperty('--think', `${Math.round(ms * (this.turbo ? 0.45 : 1))}ms`);
     seat.classList.add('think');
-    await this.wait(550 + Math.random() * 700);
+    await this.wait(ms);
     seat.classList.remove('think');
     return this.decide(p, st);
   }
 
   // Hand strength (Monte Carlo equity against the players still in) + the bot's profile + a little noise.
   decide(p, st) {
-    const opp = this.live().length - 1, eq = equity(p.cards, this.board, Math.max(1, opp), opp > 3 ? 160 : 220);
+    const opp = this.live().length - 1, eq = equity(p.cards, this.board, Math.max(1, opp), opp > 5 ? 110 : opp > 3 ? 150 : 220);
     const e = eq + (Math.random() - 0.5) * (0.08 + (p.wild || 0)) - p.tight;
     const tc = this.toCall(p), pot = this.pot + this.players.reduce((a, x) => a + x.bet, 0);
     const odds = tc / (pot + tc), fair = 1 / (opp + 1), r = Math.random();
@@ -578,11 +870,12 @@ class PokerGame extends BaseGame {
     return { a: 'fold' };
   }
 
+
   /* ---------- showdown ---------- */
   async showdown(ok) {
-    this.qa('.pk-seat').forEach((e) => e.classList.remove('turn'));
+    this.qa('.pkx-seat').forEach((e) => e.classList.remove('turn'));
     const live = this.live();
-    let lines = [];
+    const lines = [];
     if (live.length === 1) {
       const w = live[0], amt = this.pot;
       w.stack += amt;
@@ -593,11 +886,11 @@ class PokerGame extends BaseGame {
     } else {
       // reveal the bots' cards, one hand after the other
       for (const p of live) {
-        if (!p.human) { this.seat(p).querySelectorAll('.pk-card').forEach((n, k) => this.flip(n, p.cards[k])); await this.wait(300); }
+        if (!p.human) { this.seat(p).classList.add('shown'); this.seat(p).querySelectorAll('.pkx-card').forEach((n, k) => this.flip(n, p.cards[k])); await this.wait(320); }
         p.hand = eval7(p.cards.concat(this.board));
-        const hn = this.seat(p).querySelector('.pk-hn'); hn.textContent = handName(p.hand); hn.className = 'pk-hn on';
+        const hn = this.seat(p).querySelector('.pkx-hn'); hn.textContent = handName(p.hand); hn.className = 'pkx-hn on';
       }
-      await this.wait(600);
+      await this.wait(700);
       if (!ok()) return;
       const pots = buildPots(this.players);
       const winners = new Set();
@@ -611,20 +904,20 @@ class PokerGame extends BaseGame {
         lines.push(`${label} ${fmtC(pt.amount)} : ${ws.map((w) => (w.human ? 'toi' : w.name)).join(' et ')}${ws.length > 1 ? ' (partagé)' : ''} avec ${handName(ws[0].hand)}`);
       });
       live.forEach((p) => this.seat(p).classList.add(winners.has(p) ? 'win' : 'lose'));
-      if (winners.has(this.me)) { sfx.win(); const c = center(this.seat(this.me)); fx.burst(c.x, c.y, 30, ['#fde047', '#4ade80', '#fff'], 7); }
+      if (winners.has(this.me)) { sfx.win(); const c = center(this.seat(this.me).querySelector('.pkx-av')); fx.burst(c.x, c.y, 30, ['#fde047', '#f5c542', '#fff'], 7); }
     }
     this.pot = 0;
     this.players.forEach((p) => { p.allIn = false; });
     this.msg(lines.join(' · '));
     this.paintSeats();
-    this.q('.pk-pot b').textContent = fmtC(0);
+    this.q('.pkx-pot b').textContent = fmtC(0);
   }
 
   info() {
-    return this.rules(`<h4>Déroulement</h4><ul class="rules"><li>Choisis 1 à 5 bots, les blindes et ton tapis de départ (le même pour tout le monde), puis lance la partie.</li><li>Le bouton du donneur tourne à chaque main : le joueur à sa gauche paie la <b>petite blinde</b>, le suivant la <b>grosse blinde</b> (à deux joueurs, le donneur paie la petite blinde).</li><li>Chacun reçoit 2 cartes cachées. Quatre tours d’enchères : <b>pré-flop</b>, <b>flop</b> (3 cartes communes), <b>turn</b> (4e carte) et <b>river</b> (5e carte).</li><li>À ton tour : <b>Se coucher</b>, <b>Parole</b> (checker), <b>Suivre</b> ou <b>Miser / Relancer</b> (raccourcis Min, ½ pot, ¾ pot, Pot, Tapis, ou le curseur). No limit : tu peux miser tout ton tapis.</li><li>Au <b>showdown</b>, les cartes des bots encore en jeu sont retournées : la meilleure main de 5 cartes (parmi tes 2 cartes et les 5 communes) gagne. Égalité = pot partagé, avec pots secondaires si quelqu’un est à tapis.</li></ul>
+    return this.rules(`<h4>Déroulement</h4><ul class="rules"><li>Choisis 1 à 8 adversaires (table de 9 places), les blindes et ton tapis de départ (le même pour tout le monde), puis assieds-toi.</li><li>Le bouton du donneur (D) tourne à chaque main : le joueur à sa gauche paie la <b>petite blinde</b>, le suivant la <b>grosse blinde</b> (à deux joueurs, le donneur paie la petite blinde).</li><li>Chacun reçoit 2 cartes cachées. Quatre tours d’enchères : <b>pré-flop</b>, <b>flop</b> (3 cartes communes), <b>turn</b> (4e carte) et <b>river</b> (5e carte).</li><li>À ton tour : <b>Coucher</b>, <b>Parole</b> (checker), <b>Suivre</b> ou <b>Miser / Relancer</b>. Règle le montant avec − et +, les raccourcis ½ pot, ⅔ pot, Pot, ×2, ×3, ×4 la mise, +25 % / +50 % du pot, le curseur, ou <b>Tapis</b>. No limit : tu peux miser tout ton tapis.</li><li>Au <b>showdown</b>, les cartes des adversaires encore en jeu sont retournées : la meilleure main de 5 cartes (parmi tes 2 cartes et les 5 communes) gagne. Égalité = pot partagé, avec pots secondaires si quelqu’un est à tapis.</li><li>Sur ordinateur : <b>F</b> coucher, <b>C</b> parole / suivre, <b>R</b> ou Entrée relancer, <b>↑ ↓</b> le montant, <b>A</b> tapis, <b>Espace</b> main suivante.</li></ul>
       <h4>Valeur des mains (de la plus forte à la plus faible)</h4><p>Quinte flush · Carré · Full · Couleur · Quinte · Brelan · Double paire · Paire · Carte haute.</p>
-      <h4>Les bots</h4><p>Ils jouent selon la force réelle de leur main (calculée à chaque décision) et leur caractère : Big Ben est prudent, Lola agressive, Renard bluffe, Mamie Jo suit beaucoup, Tex joue solide et Ace est imprévisible.</p>
-      <h4>Jetons</h4><p>Ton tapis est pris sur ton solde au lancement et rendu (avec tes gains) quand tu quittes la table ou que tu élimines tous les bots. Si tu quittes en pleine main, les jetons déjà misés sont perdus, comme si tu te couchais.</p>`);
+      <h4>Les adversaires</h4><p>Ils jouent selon la force réelle de leur main (calculée à chaque décision) et leur caractère : Big Ben et Le Prof sont prudents, Lola et Rocky agressifs, Renard bluffe, Mamie Jo suit beaucoup, Tex joue solide, Mimi s’amuse et Ace est imprévisible.</p>
+      <h4>Jetons</h4><p>Ton tapis est pris sur ton solde quand tu t’assieds et rendu (avec tes gains) quand tu quittes la table ou que tu élimines tous les adversaires. <b>Recave</b> (menu ☰ ou bouton du haut) : entre deux mains, ou quand tu es couché, remets ton tapis au niveau du tapis de départ. Si tu quittes en pleine main, les jetons déjà misés sont perdus, comme si tu te couchais.</p>`);
   }
 }
 

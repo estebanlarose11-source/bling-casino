@@ -80,6 +80,7 @@ KW = {
     'penalty': 'jeu de penalty gratuit', 'ticket': 'ticket à gratter gratuit en ligne', 'billes': 'course de billes gratuite', 'pilote': 'jeu d’avion gratuit avec multiplicateurs',
     'foot': 'jeu de foot en ligne gratuit entre amis',
     'boxe': 'jeu de boxe en ligne gratuit entre amis',
+    'echecs': 'jeu d’échecs gratuit en ligne contre l’ordinateur ou entre amis',
 }
 KW_CAT = {'slot': 'machine à sous gratuite', 'table': 'jeu de casino gratuit', 'quick': 'jeu rapide gratuit'}
 kw_of = lambda g: KW.get(g['id']) or KW_CAT.get(g['cat'], 'jeu de casino gratuit')
@@ -109,6 +110,15 @@ def tips(g):
             "En défense, PASSE change de joueur et TIR appelle un coéquipier au pressing : à deux, le ballon se récupère beaucoup plus vite.",
             "Avec le ballon, TACLE devient DRIBBLE : un crochet rapide qui évite le tacle de l’adversaire.",
             "La mise est libre : chacun mise la même somme, le gagnant prend toute la cagnotte et un match nul rend sa mise à chacun. Tout est en KE, une monnaie fictive.",
+        ]
+    if g['id'] == 'echecs':  # Les Échecs: against the computer or a friend, not a game against the house
+        return [
+            "Commence contre Léo (Facile) ou Margaux (Moyen) : ton classement ELO monte à chaque victoire, puis attaque Le Baron et La Duchesse.",
+            "Sors tes cavaliers et tes fous tôt, occupe le centre (e4, d4) et roque vite pour mettre ton roi à l’abri.",
+            "Avant chaque coup, regarde ce que l’adversaire menace : une pièce laissée sans protection se fait prendre, surtout contre l’Expert.",
+            "Utilise tes 3 aides au bon moment : meilleur coup, coup d’ouverture, coup tactique ou annuler une erreur.",
+            "Entre amis, choisis la cadence (5, 10 ou 15 minutes) et la mise, jusqu’à 50 000 KE : le gagnant prend les deux mises, la nulle rend sa mise à chacun.",
+            "Garde un œil sur ta pendule : temps écoulé = partie perdue, même avec plus de pièces.",
         ]
     if g['id'] == 'boxe':  # Le Ring: a boxing match between friends, not a game against the house
         return [
@@ -160,6 +170,12 @@ def faq(g):
                 ("Comment défier un ami ?", "Crée ton compte, ajoute ton ami avec son pseudo (chat › Amis), puis dans Le Derby choisis-le, ta mise et la durée du match. Dès qu’il accepte, le match commence en direct sur vos deux appareils."),
                 ("Que se passe-t-il en cas de match nul ?", "Chacun récupère sa mise. Sinon le gagnant prend toute la cagnotte (les deux mises). Abandonner en cours de match fait perdre."),
                 (f"Peut-on jouer à {name} sur ordinateur ?", "Oui : les flèches ou ZQSD pour courir, K pour la passe, L ou Espace pour le tir, J pour le tacle et Maj pour sprinter. Une manette marche aussi."),
+                (f"Peut-on gagner de l’argent réel à {name} ?", "Non. SpinBet Casino est un jeu de divertissement : les KE n’ont aucune valeur réelle et ne s’échangent pas contre de l’argent.")]
+    if g['id'] == 'echecs':
+        return [(f"{name} est-il gratuit ?", f"Oui. {name} se joue gratuitement sur SpinBet Casino, dans le navigateur, sur téléphone comme sur ordinateur : aucun dépôt, rien à télécharger."),
+                ("Quel est le niveau de l’ordinateur ?", "4 adversaires : Léo (Facile, ELO 800), Margaux (Moyen, ELO 1200), Le Baron (Difficile, ELO 1600) et La Duchesse (Expert, ELO 2000). Ton propre classement ELO bouge après chaque partie."),
+                ("Comment jouer aux échecs contre un ami ?", "Crée ton compte, ajoute ton ami avec son pseudo (chat › Amis), puis dans Les Échecs choisis-le, la mise (jusqu’à 50 000 KE) et la cadence. Dès qu’il accepte, la partie commence en direct."),
+                ("Les règles sont-elles complètes ?", "Oui : roque, prise en passant, promotion au choix, échec et mat, pat, nulle par répétition, règle des 50 coups et matériel insuffisant, avec pendules et incrément."),
                 (f"Peut-on gagner de l’argent réel à {name} ?", "Non. SpinBet Casino est un jeu de divertissement : les KE n’ont aucune valeur réelle et ne s’échangent pas contre de l’argent.")]
     if g['id'] == 'boxe':
         return [(f"{name} est-il gratuit ?", f"Oui. {name} se joue gratuitement sur SpinBet Casino, dans le navigateur, sur téléphone comme sur ordinateur, avec des KE (monnaie fictive) : aucun dépôt, rien à télécharger."),

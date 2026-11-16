@@ -1,14 +1,14 @@
 // SpinBet Casino · BatailleGame — loaded on demand by games/impl/index.js (index.html), after games/bjtable.js.
 // ---- games/impl/bataille.js ----
 __mods['games/impl/bataille.js'] = (() => {
-// La Bataille (demande du propriétaire) : la table du 21 (games/bjtable.js, BjTableGame : croupière, tapis, jetons,
-// caméra, 4 boutons) avec les règles de la bataille. Une carte pour le joueur, une pour la croupière : la plus haute
+// La Bataille (demande du propriétaire) : la table filmée du 21 (games/bjtable.js, BjVideoGame : la même croupière en
+// vidéo, qui donne une carte au joueur puis une à elle à chaque main ; tapis, jetons, 4 boutons) avec les règles de la bataille. Une carte pour le joueur, une pour la croupière : la plus haute
 // gagne (As le plus fort), gain 1 pour 1 ; égalité = la banque gagne la mise principale. Mise annexe « ÉGALITÉ »
 // payée 12 pour 1. SÉRIE : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (au lieu de ×2), puis
 // la série repart à zéro (changer de mise la remet à zéro aussi). Simulation : node tools/sim/bataille.js
 // (mise principale ≈ 96 %, dont 3,5 points de bonus de série, bonus 1 main sur 86 ; mise Égalité ≈ 96 %).
 
-const { BjTableGame, CX } = __mods['games/impl/bjtable.js'];
+const { BjVideoGame: BjTableGame, CX } = __mods['games/impl/bjtable.js']; // the filmed croupière of Le 21 (owner's wish, 16 November 2026)
 const { fmtC } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
@@ -23,14 +23,14 @@ const STREAK_N = 5, STREAK_X = 5; // 5e victoire d'affilée : la main paie ×5 l
 
 const NAMES = { J: 'Valet', Q: 'Dame', K: 'Roi', A: 'As' };
 const nameOf = (c) => NAMES[c.r] || c.r;
-const SIDES = [{ id: 'tie', name: 'ÉGALITÉ', full: 'Égalité', sub: 'paie 12 pour 1', x: CX + 196, y: 560, r: 42, c: '#fde68a' }];
+const SIDES = [{ id: 'tie', name: 'ÉGALITÉ', full: 'Égalité', sub: 'paie 12 pour 1', x: CX + 196, y: 560, r: 42, c: '#fde68a', vx: 344, vy: 644, vr: 34 }];
 const SERIE_KEY = 'spinbet_bataille_serie';
 let uid = 0;
 
 class BatailleGame extends BjTableGame {
   constructor(root, game) {
     super(root, game, { music: EXTRA_THEMES.bataille || EXTRA_THEMES.blackjack, turbo: true, mainLabel: 'DISTRIBUER', cls: 'btl', hello: 'Pose tes jetons puis distribue : la carte la plus haute gagne.' }, {
-      t1: 'LA CARTE LA PLUS HAUTE GAGNE', t2: '5 VICTOIRES D’AFFILÉE : LA 5e MAIN PAIE ×5', sides: SIDES,
+      t1: 'LA CARTE LA PLUS HAUTE GAGNE', t2: 'LA CARTE LA PLUS HAUTE GAGNE · SÉRIE DE 5 VICTOIRES = ×5', sides: SIDES,
       overlay: `<div class="btl-serie"><small>SÉRIE</small><div class="btl-pips">${Array.from({ length: STREAK_N }, (_, i) => `<i data-i="${i}">${i === STREAK_N - 1 ? '×5' : i + 1}</i>`).join('')}</div><em></em></div>`,
     });
     this.shoe = [];
