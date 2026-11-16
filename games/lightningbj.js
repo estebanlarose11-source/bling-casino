@@ -6,7 +6,7 @@ __mods['games/impl/lightningbj.js'] = (() => {
 // Paires Parfaites, 21+3 et Bust It, en cercles sur le tapis (on y pose des jetons comme sur la mise principale).
 // Même table que Le 21 (games/bjtable.js, BjTableGame). RTP vérifié par simulation (jeu principal ≈ 97,5 %).
 
-const { BjTableGame, CX } = __mods['games/impl/bjtable.js'];
+const { BjVideoGame: BjTableGame, CX } = __mods['games/impl/bjtable.js']; // the filmed table (owner's video, 16 November 2026)
 const { fmtC, wpick } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
@@ -41,9 +41,10 @@ const bustPay = (n) => BUST[Math.min(n, 8)] || 0;
 /* ===END ENGINE */
 
 const SIDES = [
-  { id: 'pp', name: 'PAIRES', full: 'Paires Parfaites', sub: '25:1', x: CX - 162, y: 556, r: 38, c: '#9fd4ff' },
-  { id: 't3', name: '21+3', full: '21+3', sub: '100:1', x: CX + 162, y: 556, r: 38, c: '#9fd4ff' },
-  { id: 'bust', name: 'BUST IT', full: 'Bust It', sub: 'la croupière saute · 250:1', x: CX + 262, y: 205, r: 40, c: '#fca5a5' },
+  // x, y, r: the old 3D table; vx, vy, vr: the filmed table (video units, each side of the main circle, Bust It next to her)
+  { id: 'pp', name: 'PAIRES', full: 'Paires Parfaites', sub: '25:1', x: CX - 162, y: 556, r: 38, c: '#9fd4ff', vx: 104, vy: 644, vr: 32 },
+  { id: 't3', name: '21+3', full: '21+3', sub: '100:1', x: CX + 162, y: 556, r: 38, c: '#9fd4ff', vx: 344, vy: 644, vr: 32 },
+  { id: 'bust', name: 'BUST IT', full: 'Bust It', sub: '250:1', x: CX + 262, y: 205, r: 40, c: '#fca5a5', vx: 408, vy: 506, vr: 30 },
 ];
 const tier = (m) => (m >= 100 ? 't4' : m >= 10 ? 't3' : m >= 2 ? 't2' : 't1');
 const BOLT = '<svg class="lb-bolt" viewBox="0 0 40 60" aria-hidden="true"><path d="M24 0 L6 34 H19 L13 60 L34 22 H21 L28 0 Z"/></svg>';

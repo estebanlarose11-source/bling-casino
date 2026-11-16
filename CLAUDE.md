@@ -373,6 +373,19 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `frame()` calcule le cadrage) ; le plateau de la roue (`.rl-rotor`) et les billes (`.rl-bw` / `.rl-ballv`) sont des calques
   à part tournés par `transform` ; jetons, éclairs et cases gagnantes dans leurs propres SVG (`.rl-chipsvg`, `.rl-lksvg`,
   `.rl-hlsvg`) ; aucun filtre SVG ni `filter` CSS sur le tapis ou la roue. Ne pas les remettre.
+- **Le 21 et Le 21 Électrique : la table filmée** (demande du propriétaire du 16 novembre 2026) : **sa vidéo** d'une croupière vue
+  depuis la place du joueur (`tools/art/blackjack/donne.mp4`, 448 × 672, 10 s, 4 cartes blanches distribuées) → `tools/art/blackjack/clean.py`
+  efface chaque carte posée dès qu'elle touche le tapis (pixels blancs seulement, ses doigts restent ; `CARDS` = rectangle + image de
+  départ) → `assets/games/blackjack/donne.mp4` (×1,5, une image-clé toutes les 6 images) + `donne.webp`. `BjVideoGame` (`games/bjtable.js`,
+  utilisée par `blackjack.js` et `lightningbj.js` ; Le 21 Online et La Bataille gardent la table 3D) : `videoHTML()` (`.bjv.bjx`), mêmes
+  classes que la table 3D pour les cartes, cercles et boutons. Le jeu rejoue des morceaux de la vidéo (`CLIPS`, en images à 24 / s) :
+  `p1` 1re carte du joueur, `p2` les suivantes (tirer, doubler, séparer), `d1` 1re carte de la croupière, `d2` les suivantes (carte cachée,
+  ses tirages) ; quand sa carte touche le tapis (`land`), la nôtre apparaît là puis glisse à sa place. 2 `<video>` (`Donne`) avec fondu
+  entre deux morceaux ; le fichier est chargé **entier en mémoire** (`fetch` → blob) sinon le saut vers un morceau échoue. Vitesse ×1,5,
+  Turbo ×2,4, Super turbo ×3,2. Tout est en unités de la vidéo dans `.bjx-vp` (448 × `VH` 762 : la vidéo puis une bande de tapis avec
+  les cercles de mise `VSPOT` et les 5 jetons `VPICK`), mis à l'échelle par `fit()` ; écran large : 2 boutons de chaque côté de la
+  scène (`.bjx-wide`), téléphone : une rangée de 4 boutons et le solde en haut. Le 21 Électrique : mises annexes `vx` / `vy` / `vr` de
+  `SIDES` (Paires à gauche, 21+3 à droite du cercle, Bust It à droite de la croupière), panneau des multiplicateurs au mur. Gains inchangés.
 - **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
   avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série

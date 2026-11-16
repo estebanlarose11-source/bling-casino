@@ -8244,6 +8244,71 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
   .bjv-state { padding: 5px 9px; font-size: 10px; } .bjv-msg { top: 50px; font-size: 12px; }
 }
 
+/* ---------- Le 21 et Le 21 Électrique : la table filmée (.bjx, games/bjtable.js BjVideoGame, demande du propriétaire du
+   16 novembre 2026). Sa vidéo (assets/games/blackjack/donne.mp4) distribue chaque carte ; tout est en unités de la vidéo
+   dans .bjx-vp (448 × 762 : la vidéo puis une bande de tapis avec les cercles de mise et les jetons), mis à l'échelle par
+   fit() (--sc). ---------- */
+.bjx { background: #0b120e; }
+.bjx-bg { position: absolute; inset: -40px; background: center / cover no-repeat; filter: blur(22px) brightness(.42) saturate(1.1); pointer-events: none; }
+.bjx-vp { position: absolute; left: 0; top: 0; width: 448px; height: 762px; transform-origin: 0 0; }
+.bjx-felt { position: absolute; left: 0; right: 0; top: 500px; bottom: 0; z-index: 0; border-radius: 0 0 18px 18px; background: radial-gradient(120% 80% at 50% 0%, #1e5642 0%, #184637 45%, #10342a 100%); box-shadow: inset 0 -3px 0 rgba(231, 199, 102, .35); }
+.bjx-t { position: absolute; left: 0; right: 0; bottom: 3px; text-align: center; font: 800 9.5px/1.2 Archivo, sans-serif; letter-spacing: 1.2px; font-style: normal; color: rgba(240, 210, 122, .55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 10px; }
+.bjx-v { position: absolute; left: 0; top: 0; z-index: 1; width: 448px; height: 672px; object-fit: cover; pointer-events: none; transition: opacity .14s linear; background: #0b120e;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 526px, transparent 584px); mask-image: linear-gradient(180deg, #000 0, #000 526px, transparent 584px); }
+.bjx-v.off { opacity: 0; }
+.bjx .bjv-dcards, .bjx .bjv-hands { z-index: 3; }
+.bjx .bjv-hands { inset: 0; }
+.bjx .bjv-card { width: 108px; height: 152px; scale: .56; transform-origin: 0 0; perspective: 700px; }
+.bjx .bjv-dcards .bjv-card { scale: .52; }
+.bjx .bjv-lean, .bjx .bjv-dcards .bjv-lean { transform: none; }
+.bjx .bjv-f { box-shadow: 0 2px 0 #c9c6bd, 0 10px 18px rgba(0, 0, 0, .55); }
+.bjx .bjv-hand.act .bjv-f { box-shadow: 0 0 0 6px #fde047, 0 0 30px rgba(253, 224, 71, .8), 0 10px 18px rgba(0, 0, 0, .5); }
+.bjx .bjv-bub { top: 62px; min-width: 38px; height: 38px; padding: 0 9px; border-width: 2px; font-size: 19px; }
+.bjx .bjv-dcards .bjv-bub { top: 58px; }
+.bjx .bjv-bub .lb-x { font-size: 12px; padding: 1px 4px; margin-left: 4px; }
+.bjx .bjv-hand .bjv-res { top: 44px; transform: translate(-50%, -50%); padding: 6px 16px; font-size: 24px; letter-spacing: 1.5px; border-radius: 10px; }
+.bjx .bjv-res small { font-size: 13px; }
+.bjx-spot { z-index: 2; }
+.bjx-spot::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2.5px solid rgba(240, 210, 122, .8); background: radial-gradient(circle, rgba(0, 0, 0, .05), rgba(0, 0, 0, .22)); pointer-events: none; }
+.bjx-spot[data-t="pp"]::after, .bjx-spot[data-t="t3"]::after { border-color: rgba(159, 212, 255, .85); }
+.bjx-spot[data-t="bust"]::after { border-color: rgba(252, 165, 165, .9); background: radial-gradient(circle, rgba(127, 29, 29, .15), rgba(0, 0, 0, .3)); }
+.bjx-spot::before { z-index: 1; }
+.bjx-lab { position: absolute; left: 50%; top: 50%; z-index: 0; transform: translate(-50%, -50%); font: 900 12px/1.05 Archivo, sans-serif; font-style: normal; letter-spacing: .5px; color: rgba(253, 230, 138, .85); text-align: center; white-space: nowrap; pointer-events: none; }
+.bjx-lab small { display: block; margin-top: 2px; font: 700 9px Archivo, sans-serif; opacity: .8; }
+.bjx-spot[data-t="pp"] .bjx-lab, .bjx-spot[data-t="t3"] .bjx-lab { color: #cfe8ff; } .bjx-spot[data-t="bust"] .bjx-lab { color: #fecaca; font-size: 10px; }
+.bjx-spot.main .bjx-lab { font-size: 14px; letter-spacing: 1.5px; }
+.bjx .bjv-stack { z-index: 2; }
+.bjx .bjv-stack i { left: -29px; top: -29px; width: 58px; height: 58px; transform: translateY(calc(var(--k) * -3px)) rotate(var(--r)); filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .55)); }
+.bjx .bjv-spot.bjv-sb .bjv-stack i { left: -23px; top: -23px; width: 46px; height: 46px; }
+.bjx .bjv-amt { z-index: 3; top: 0; padding: 2px 9px; border-width: 1.5px; font-size: 14px; transform: translate(-50%, -70%); }
+.bjx .bjv-spot.bjv-sb .bjv-amt { font-size: 12px; padding: 1px 7px; }
+.bjx .bjv-sres { z-index: 6; padding: 4px 9px; border-radius: 8px; font-size: 13px; transform: translate(-50%, -50%); border-width: 1.5px; }
+.bjx .bjv-sres small { font-size: 10px; }
+.bjx .bjv-pick { z-index: 2; width: 54px; height: 54px; margin: -27px 0 0 -27px; }
+.bjx .bjv-pick svg { filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .5)) drop-shadow(0 6px 6px rgba(0, 0, 0, .35)); }
+.bjx .bjv-pick.on { transform: translateY(-5px) scale(1.1); }
+.bjx .bjv-pick.on::before { inset: -5px; border-width: 3px; }
+.bjx-fly { z-index: 5; width: 56px; height: 56px; }
+.bjx[data-phase="end"] .bjv-pick { opacity: 1; pointer-events: auto; transform: none; }
+.bjx[data-phase="end"] .bjv-pick.on { transform: translateY(-5px) scale(1.1); }
+.bjx .bjv-turn { display: none !important; }
+.bjx-solde { display: none; }
+.bjx .lbv-board { position: absolute; left: 6px; top: 92px; z-index: 4; transform: none; width: 72px; padding: 5px 5px 6px; }
+.bjx .lbv-board .lb-tiles { grid-template-columns: 1fr; gap: 5px; }
+.bjx .lbv-board .lb-tile { padding: 2px 2px 3px; } .bjx .lbv-board .lb-tile b { font-size: 16px; } .bjx .lbv-board .lb-tile small { font-size: 10px; }
+.lbj .bjx .bjv-msg { top: 60px; }
+.bjx.bjx-wide .bjv-hud { top: 50%; bottom: auto; left: 16px; right: 16px; transform: translateY(-50%); display: grid; grid-template-columns: minmax(0, 230px) 1fr minmax(0, 230px); grid-template-rows: auto auto auto; grid-template-areas: "me . b2" "b0 . b3" "b1 . ."; row-gap: 14px; align-items: center; pointer-events: none; }
+.bjx.bjx-wide .bjv-b[data-b="0"] { grid-area: b0; } .bjx.bjx-wide .bjv-b[data-b="1"] { grid-area: b1; } .bjx.bjx-wide .bjv-b[data-b="2"] { grid-area: b2; } .bjx.bjx-wide .bjv-b[data-b="3"] { grid-area: b3; }
+.bjx.bjx-wide .bjv-me { grid-area: me; }
+.bjx.bjx-wide .bjv-b { height: 64px; font-size: 26px; }
+@media (max-width: 700px) {
+  .bjx .bjv-hud { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "b0 b1 b2 b3"; }
+  .bjx .bjv-me { display: none; }
+  .bjx-solde { display: block; }
+  .bjx .bjv-state { display: none; }
+  .bjx .bjv-top .bjv-meter { flex: 1 1 0; min-width: 0; text-align: center; } .bjx .bjv-meter b { font-size: 12.5px; }
+  .lbj .bjx .bjv-msg { top: 54px; }
+}
 /* ============ Néon violet et rose (demande du propriétaire du 11 novembre 2026, d'après une bannière de casino :
    nuit violette, lumières roses, boutons en pilule rose, menu en haut sur ordinateur, vitrine sur l'accueil).
    Après tout le reste de la finition : c'est ici qu'on retouche l'allure générale. ============ */
@@ -13607,6 +13672,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'blackjack', date: '2026-11-16', title: 'Une vraie croupière', items: ['Une croupière filmée distribue chaque carte : la tienne, la sienne, et une de plus à chaque fois que tu tires', 'Tes jetons de mise sur le tapis, juste sous les cartes', 'Grand écran sur téléphone et ordinateur : toute la table, bien lisible'] },
+  { game: 'lightningbj', date: '2026-11-16', title: 'Une vraie croupière', items: ['Une croupière filmée distribue chaque carte, et une de plus à chaque fois que tu tires', 'Mises annexes à côté du cercle de mise : Paires à gauche, 21+3 à droite, Bust It près de la croupière', 'Les multiplicateurs éclair au mur, à gauche de la croupière', 'Grand écran sur téléphone et ordinateur'] },
   { game: 'big-bad-wolf', date: '2026-11-16', title: 'La forêt du loup animée', items: ['Nouveau décor animé : la forêt sous la pleine lune, le loup aux yeux qui brillent', 'Les rouleaux dans le cadre de branches', 'Tous les boutons du décor marchent : mise − / +, SPIN et BONUS', 'Jackpots, solde et gain sur le décor', 'Plein écran sur tout l’écran, téléphone et ordinateur'] },
   { game: 'chasse', date: '2026-11-16', title: 'Nouveau décor de chasse', items: ['La machine dans un grand cadre en bois au cœur de la forêt, avec cerf, sanglier, faisans et lièvre', 'Tous les boutons du décor marchent : mise − / +, SPIN, MAX BET et BONUS MENU', 'Solde, gain et gain max sur les plaques du haut', 'Plein écran sur tout l’écran, téléphone et ordinateur', 'La chasse (le bonus) ne change pas'] },
   { game: 'peche', date: '2026-11-16', title: 'Adaptée au téléphone', items: ['Sur téléphone, la roue, les mises et le bouton LANCER tiennent ensemble', 'Nouveau bouton « ⛶ Grand écran » sur la roue : tout le jeu sur un seul écran, sans rien faire défiler', 'Téléphone couché : la roue à gauche, les mises à droite', 'En grand écran, tous les boutons sont visibles : Annuler, Effacer, Rejouer, Doubler, Remise auto et Tours auto sur 2 lignes'] },
@@ -16918,9 +16985,9 @@ const FILES = {
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '9e528dfdf5'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '209ac1dbd4'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', 'a2079e2117'],
-  bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '8172f58ae6'],
-  blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '473a8559d8'],
-  lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', '419585a560'],
+  bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '5cb920e7c2'],
+  blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '0bef82d927'],
+  lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'da5341a3eb'],
   rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', 'bf9bc2722c'],
   roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', '7854b34117'],
   bataille: ['bataille', 'games/impl/bataille.js', 'BatailleGame', '39b70b1d30'],

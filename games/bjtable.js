@@ -193,7 +193,7 @@ const fromIndex = (i, id) => ({ r: RANKS[i % 13], s: SUITS[Math.floor(i / 13) % 
 class BjTableGame extends BaseGame {
   // cfg: the BaseGame options (music, mainLabel…), o: the table (see tableHTML), key: localStorage key of the stake
   constructor(root, game, cfg, o = {}) {
-    super(root, game, { autoplay: false, stepper: false, betLabel: 'Mise', ...cfg, cls: `table-game bj bjv-game ${cfg.cls || ''}`, stage: tableHTML(o) });
+    super(root, game, { autoplay: false, stepper: false, betLabel: 'Mise', ...cfg, cls: `table-game bj bjv-game ${o.video ? 'bjx-game ' : ''}${cfg.cls || ''}`, stage: o.video ? videoHTML(o) : tableHTML(o) });
     this.o = o;
     this.view = this.q('.bjv');
     this.world = this.q('.bjv-world');
@@ -459,5 +459,223 @@ class BjTableGame extends BaseGame {
   sideResult(t, k, text) { const e = this.q(`.bjv-spot[data-t="${t}"] .bjv-sres`); if (!e) return; e.hidden = !text; if (text) { e.className = `bjv-up bjv-sres ${k}`; e.innerHTML = text; } }
 }
 
-return { BjTableGame, CHIPS, MAXSTAKE, CX, SPOT, HAND, RANKS, SUITS, fromIndex, chipSVG };
+/* ===================== La table filmée (Le 21, Le 21 Électrique) =====================
+   Demande du propriétaire du 16 novembre 2026 : sa vidéo d'une croupière vue depuis la place du joueur
+   (tools/art/blackjack/donne.mp4, 448 × 672, nettoyée par tools/art/blackjack/clean.py : les cartes posées sont
+   effacées dès qu'elles touchent le tapis) distribue chaque carte. Le jeu en rejoue des morceaux (CLIPS, en images à
+   24 / s) : pour le joueur (1re carte : à gauche, les suivantes : à droite) et pour la croupière (1re carte : le grand
+   geste, les suivantes : la carte cachée). Quand la carte de la vidéo touche le tapis (`land`), notre carte apparaît
+   à cet endroit puis glisse à sa place. Tout est en coordonnées de la vidéo (448 × VH : la vidéo jusqu'à FELT, puis
+   une bande de tapis avec les cercles de mise et les 5 jetons), mis à l'échelle de l'écran par fit(). */
+const VW = 448, VH = 762, FELT = 560, VID = 'assets/games/blackjack/donne', VIDV = 1;
+const vsrc = (ext) => window.__assets?.[`${VID}.${ext}`] || `${VID}.${ext}?v=${VIDV}`;
+const CLIPS = {
+  d1: { a: 0, land: 41, b: 72, x: 311, y: 436 },      // her first card: the big gesture
+  p1: { a: 78, land: 120, b: 144, x: 179, y: 517 },   // the player's first card (left)
+  p2: { a: 144, land: 157, b: 186, x: 267, y: 514 },  // the player's next cards (right)
+  d2: { a: 186, land: 209, b: 216, x: 313, y: 432, rest: true }, // her next cards (the hidden one)
+};
+const VDEAL = { x: 311, y: 400 }, VHAND = { x: 224, y: 474 }, VSPOT = { x: 224, y: 644, r: 40 };
+const VPICK = [-2, -1, 0, 1, 2].map((k) => ({ x: 224 + k * 64, y: 716 }));
+const VCW = 108 * 0.56, VDW = 108 * 0.52; // cards on the video (base card 108 × 152, scaled)
+
+const vSpotHTML = (t, x, y, r, label, sub) => `<button class="bjv-spot bjx-spot${t === 'main' ? ' main' : ' bjv-sb'}" data-t="${t}" style="left:${x}px;top:${y}px;--d:${r * 2}px" aria-label="Poser le jeton choisi sur ${label}"><em class="bjx-lab">${label}${sub ? `<small>${sub}</small>` : ''}</em><span class="bjv-stack"></span><b class="bjv-up bjv-amt" hidden></b><b class="bjv-up bjv-sres" hidden></b></button>`;
+
+function videoHTML(o = {}) {
+  const sides = o.sides || [];
+  return `<div class="bjv bjx" data-cam="bet" data-phase="bet" style="--tilt:0deg">
+    <div class="bjx-bg" style="background-image:url('${vsrc('webp')}')"></div>
+    <div class="bjx-vp">
+      <video class="bjx-v" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+      <video class="bjx-v off" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+      <div class="bjx-felt"><i class="bjx-t">${o.t2 || 'LE BLACKJACK PAIE 6 POUR 5 · LA CROUPIÈRE TIRE À 16 ET RESTE À 17'}</i></div>
+      ${CHIP_SHADE}
+      <div class="bjv-dcards" style="left:${VDEAL.x}px;top:${VDEAL.y}px"><div class="bjv-up bjv-bub d" hidden></div></div>
+      <div class="bjv-hands"></div>
+      ${vSpotHTML('main', VSPOT.x, VSPOT.y, VSPOT.r, 'MISE')}
+      ${sides.map((s) => vSpotHTML(s.id, s.vx, s.vy, s.vr, s.name, s.sub)).join('')}
+      ${VPICK.map((p, i) => `<button class="bjv-pick" data-pick="${i}" style="left:${p.x}px;top:${p.y}px"></button>`).join('')}
+    </div>
+    <div class="bjv-top">
+      <button class="bjv-sq" data-act="menu" aria-label="Menu et règles"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+      <div class="bjv-meter"><small>Mise</small><b class="bjv-m-bet"></b></div><div class="bjv-meter"><small>Gain</small><b class="bjv-m-win"></b></div><div class="bjv-meter bjx-solde"><small>Solde</small><b class="bjx-bal"></b></div>
+      <div class="bjv-state"><i></i><b>FAITES VOS JEUX</b></div>
+      <button class="bjv-sq bjv-full" data-act="full" aria-label="Plein écran">⛶<span>Plein écran</span></button>
+    </div>
+    <div class="bjv-msg"></div>
+    ${o.overlay || ''}
+    <div class="bjv-hud">
+      <button class="bjv-b" data-b="0"></button><button class="bjv-b" data-b="1"></button>
+      <div class="bjv-me"><span class="bjv-av"></span><b class="bjv-name"></b><em class="bjv-bal"></em></div>
+      <button class="bjv-b" data-b="2"></button><button class="bjv-b" data-b="3"></button>
+    </div>
+  </div>`;
+}
+
+// The croupière's video: 2 <video> of the same file, a clip plays on one while the other waits (cross-fade between
+// clips, so the start of a clip never shows a jump). play() resolves when the card touches the felt.
+class Donne {
+  constructor(vids) {
+    this.v = vids; this.cur = 0; this.tok = 0;
+    this.ok = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // the whole file in memory once (≈ 1,4 Mo): both <video> share it and can jump to any clip at once (a server
+    // without « Range » requests, or a file still loading, would refuse to seek far)
+    vids.forEach((v) => { v.muted = true; v.playsInline = true; v.poster = vsrc('webp'); v.addEventListener('error', () => { this.ok = false; }); });
+    this.ready = !this.ok ? Promise.resolve() : fetch(vsrc('mp4')).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+      .then((b) => { if (this.dead) return; this.url = URL.createObjectURL(b); vids.forEach((v) => { v.src = this.url; v.load(); }); })
+      .catch(() => { if (!this.dead) vids.forEach((v) => { v.src = vsrc('mp4'); }); });
+    this.loaded = false; this.ready.then(() => { this.loaded = true; });
+    this.onVis = () => { if (document.hidden) this.v.forEach((v) => v.pause()); };
+    document.addEventListener('visibilitychange', this.onVis);
+  }
+  seek(v, t) {
+    return new Promise((res) => {
+      if (Math.abs(v.currentTime - t) < 0.02 && v.readyState >= 2) return res();
+      const done = () => { clearTimeout(g); v.removeEventListener('seeked', done); res(); };
+      const g = setTimeout(done, 900);
+      v.addEventListener('seeked', done);
+      try { v.currentTime = t; } catch { done(); }
+    });
+  }
+  swap(nv) { const old = this.v[this.cur]; this.cur = this.v.indexOf(nv); nv.classList.remove('off'); old.classList.add('off'); setTimeout(() => { if (this.v[this.cur] !== old) old.pause(); }, 220); }
+  // back to her first frame (hands on the shoe), still
+  async rest() {
+    const tok = ++this.tok, nv = this.v[this.cur ^ 1];
+    nv.pause(); await this.seek(nv, 0.001);
+    if (tok === this.tok && !this.dead) this.swap(nv);
+  }
+  async play(c, rate) {
+    if (!this.loaded) await Promise.race([this.ready, new Promise((r) => setTimeout(r, 2500))]);
+    if (!this.loaded || this.dead) return;
+    const tok = ++this.tok, nv = this.v[this.cur ^ 1];
+    return new Promise((res) => {
+      let landed = false;
+      const land = () => { if (!landed) { landed = true; clearTimeout(guard); res(); } };
+      const guard = setTimeout(land, ((c.land - c.a) / 24 / rate) * 1000 + 1600);
+      nv.pause();
+      this.seek(nv, c.a / 24 + 0.001).then(() => {
+        if (tok !== this.tok || this.dead) return land();
+        nv.playbackRate = rate;
+        nv.play().catch(() => land());
+        this.swap(nv);
+        const tick = () => {
+          if (tok !== this.tok || this.dead) return land();
+          const f = nv.currentTime * 24;
+          if (f >= c.land) land();
+          if (f >= c.b) { nv.pause(); if (c.rest) this.rest(); return; }
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    });
+  }
+  destroy() { this.dead = true; document.removeEventListener('visibilitychange', this.onVis); this.v.forEach((v) => { v.pause(); v.removeAttribute('src'); v.load(); }); if (this.url) URL.revokeObjectURL(this.url); }
+}
+
+class BjVideoGame extends BjTableGame {
+  constructor(root, game, cfg, o = {}) {
+    super(root, game, cfg, { ...o, video: true });
+    this.vp = this.q('.bjx-vp');
+    this.donne = new Donne(this.qa('.bjx-v'));
+    const board = this.q('.lbv-board'); if (board) this.vp.appendChild(board); // Le 21 Électrique: its board on the wall, left of her
+    this.nd = 0; this.np = 0;
+    addEventListener('resize', this.onRs = () => requestAnimationFrame(() => this.fit()));
+    requestAnimationFrame(() => this.fit());
+  }
+  destroy() { this.donne?.destroy(); removeEventListener('resize', this.onRs); super.destroy(); }
+  measure() {}
+  camera() { this.fit(); }
+  dealerDo() {}
+  // the scene (448 × VH video units) as big as the screen allows, above the buttons; around it the video, blurred
+  fit() {
+    const v = this.view, vp = this.vp; if (!v || !vp || this.dead) return;
+    const cw = v.clientWidth; if (!cw) return;
+    const full = !!this.root.closest('.is-full');
+    let ch = v.clientHeight;
+    const wideScreen = cw > 700 && innerWidth > innerHeight;
+    if (!full) {
+      const want = wideScreen ? Math.round(Math.max(560, Math.min(innerHeight - 110, 960))) : 0;
+      if (want && Math.abs(ch - want) > 2) { v.style.height = `${want}px`; ch = want; }
+    } else if (v.style.height) { v.style.height = ''; ch = v.clientHeight; }
+    // wide screen: the 4 buttons go each side of the scene (2 left, 2 right) and the scene takes the whole height
+    let wide = false;
+    if (wideScreen) { const s1 = (ch - 16) / VH; wide = cw - VW * s1 >= 500; }
+    v.classList.toggle('bjx-wide', wide);
+    const top = wide ? 8 : (this.q('.bjv-top')?.offsetHeight || 44) + 12, hud = wide ? 8 : (this.q('.bjv-hud')?.offsetHeight || 64) + 6;
+    if (!full && !wideScreen) { // a phone, not in full screen: the whole table on the screen (the ⛶ button makes it big)
+      const want = Math.round(Math.min(top + hud + (VH * Math.min(cw, 560)) / VW, Math.max(480, innerHeight - 150)));
+      if (Math.abs(ch - want) > 2) { v.style.height = `${want}px`; ch = want; }
+    }
+    const sc = Math.min(cw / VW, (ch - top - hud) / VH);
+    vp.style.transform = `translate(${((cw - VW * sc) / 2).toFixed(1)}px, ${top.toFixed(1)}px) scale(${sc.toFixed(4)})`;
+    v.style.setProperty('--sc', sc.toFixed(4));
+  }
+  paintMe() { super.paintMe(); const b = this.q('.bjx-bal'); if (b) b.textContent = fmtC(this.balC()); }
+  clearTable() { super.clearTable(); this.nd = 0; this.np = 0; }
+  // the chip slides from the tray to the circle
+  placeChip(t = 'main') {
+    if (!this.betting() || !(t in this.bets)) return;
+    const v = +this.q(`[data-pick="${this.pickI}"]`).dataset.v;
+    if (this.phase === 'end') this.clearForBet();
+    const next = { ...this.bets, [t]: this.bets[t] + v };
+    const spot = this.q(`.bjv-spot[data-t="${t}"]`);
+    if (next[t] > this.maxFor(t)) { this.msg(`Mise maximum ici : ${fmtC(this.maxFor(t))}`); this.shake(spot); return; }
+    if (this.costOf(next) > this.balC()) { this.msg('Solde insuffisant pour ce jeton : choisis-en un plus petit'); this.shake(spot); return; }
+    const p = VPICK[this.pickI], fly = document.createElement('i');
+    fly.className = 'bjv-flychip bjx-fly'; fly.innerHTML = chipSVG(CHIPS.find((c) => c[0] === v), 100);
+    fly.style.left = `${p.x}px`; fly.style.top = `${p.y}px`;
+    this.vp.appendChild(fly);
+    const dx = parseFloat(spot.style.left) - p.x, dy = parseFloat(spot.style.top) - p.y;
+    fly.animate([{ transform: 'translate(-50%,-50%)' }, { transform: `translate(calc(-50% + ${dx / 2}px), calc(-50% + ${dy / 2 - 30}px)) scale(1.15)`, offset: 0.5 }, { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))` }],
+      { duration: this.turbo ? 220 : 340, easing: 'cubic-bezier(.3,.7,.4,1)' }).finished.then(() => fly.remove());
+    sfx.click();
+    this.bets = next;
+    if (t === 'main') this.saveStake();
+    setTimeout(() => { sfx.coin?.(); this.betsChanged(); }, this.turbo ? 200 : 320);
+  }
+  // card i of n in a row, in video units: [left, top, visual width]
+  slot(i, n, row) {
+    if (row.classList.contains('bjv-dcards')) {
+      const sp = n > 4 ? 26 : 34, shift = Math.max(0, n - 2) * 20; // fans out to the left too: her bubble stays on the screen
+      return [i * sp - VDW / 2 - shift, 0, VDW];
+    }
+    const split = this.q('.bjv-hands').children.length > 1;
+    const sp = split ? (n > 3 ? 20 : 28) : n <= 2 ? 66 : n === 3 ? 50 : n === 4 ? 40 : 32;
+    return [i * sp - ((n - 1) * sp) / 2 - VCW / 2, 0, VCW];
+  }
+  layout(row) {
+    const cards = [...row.querySelectorAll(':scope > .bjv-card')];
+    cards.forEach((c, i) => { const [x, y] = this.slot(i, cards.length, row); c.style.left = `${x}px`; c.style.top = `${y}px`; c.style.zIndex = i + 1; });
+    const bub = row.querySelector(':scope > .bjv-bub');
+    if (bub && cards.length) { const [x, , w] = this.slot(cards.length - 1, cards.length, row); bub.style.left = `${x + w + 18}px`; }
+  }
+  placeHands(n) {
+    [...this.q('.bjv-hands').children].forEach((el, i) => { el.style.left = `${VHAND.x + (n === 2 ? (i ? 92 : -92) : 0)}px`; el.style.top = `${VHAND.y}px`; this.layout(el); });
+  }
+  // the croupière deals card c: her clip plays, and when her card touches the felt ours takes its place
+  async deal(row, c, down = false, to = 'p') {
+    const node = this.cardEl(c);
+    row.appendChild(node);
+    this.layout(row);
+    const clip = to === 'd' ? (this.nd++ ? CLIPS.d2 : CLIPS.d1) : (this.np++ ? CLIPS.p2 : CLIPS.p1);
+    const rate = this.superT ? 3.2 : this.turbo ? 2.4 : 1.5;
+    node.style.visibility = 'hidden';
+    const vid = this.donne.ok;
+    if (vid) await this.donne.play(clip, rate);
+    if (this.dead) return node;
+    const rx = parseFloat(row.style.left) || 0, ry = parseFloat(row.style.top) || 0;
+    const w = to === 'd' ? VDW : VCW, h = w * 152 / 108;
+    const cx = rx + parseFloat(node.style.left) + w / 2, cy = ry + parseFloat(node.style.top) + h / 2;
+    const real = vid && this.donne.loaded, from = real ? { x: clip.x, y: clip.y } : { x: 70, y: 400 };
+    node.style.visibility = '';
+    const t = this.turbo ? 180 : 300;
+    node.animate([{ transform: `translate(${from.x - cx}px, ${from.y - cy}px) scale(.9)`, opacity: real ? 1 : 0.4 }, { transform: 'none', opacity: 1 }], { duration: t, easing: 'cubic-bezier(.25,.75,.3,1)' });
+    sfx.click();
+    if (!down) setTimeout(() => node.classList.remove('down'), t * 0.4);
+    await this.wait(t + 40);
+    return node;
+  }
+}
+
+return { BjTableGame, BjVideoGame, CHIPS, MAXSTAKE, CX, SPOT, HAND, RANKS, SUITS, fromIndex, chipSVG };
 })();

@@ -4,7 +4,7 @@ __mods['games/impl/blackjack.js'] = (() => {
 // Le 21 : blackjack à 6 jeux, la croupière reste à 17, blackjack payé 6 pour 5. La table (croupière, tapis, jetons,
 // caméra, boutons) est commune aux 3 blackjacks : games/bjtable.js (BjTableGame). Ici, seulement les règles.
 
-const { BjTableGame, CX } = __mods['games/impl/bjtable.js'];
+const { BjVideoGame: BjTableGame, CX } = __mods['games/impl/bjtable.js']; // the filmed table (owner's video, 16 November 2026)
 const { fmtC } = __mods['core/base.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
