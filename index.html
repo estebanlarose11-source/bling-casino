@@ -3159,10 +3159,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pe-spot.s b { font-size: 30px; }
 .pe-ico { width: 58px; height: 30px; object-fit: contain; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45)); }
 .pe-hico { width: 22px; height: 14px; object-fit: contain; vertical-align: middle; }
-.pe-buy { display: flex; flex-direction: column; align-items: center; gap: 2px; margin: 10px auto 2px; padding: 9px 22px; border: 0; border-radius: 999px; cursor: pointer; font: 900 15px/1.1 Archivo, sans-serif; color: #fff;
-  background: linear-gradient(180deg, #38bdf8, #1d4ed8); box-shadow: 0 4px 0 #1e3a8a, 0 0 18px rgba(56, 189, 248, .45); }
-.pe-buy small { font-size: 10px; font-weight: 700; opacity: .85; }
-.pe-buy:active { transform: translateY(2px); box-shadow: 0 2px 0 #1e3a8a; }
+.rt-tools .pe-buy { border: 0; border-radius: 999px; font-weight: 900; color: #fff; background: linear-gradient(180deg, #38bdf8, #1d4ed8); box-shadow: 0 3px 0 #1e3a8a, 0 0 14px rgba(56, 189, 248, .45); }
+.rt-tools .pe-buy:active { transform: translateY(2px); box-shadow: 0 1px 0 #1e3a8a; }
 /* the fishing: one of the owner's 9 videos (small fish = rod, medium = crane, big = helicopter) */
 .pe-bonus { position: relative; margin: 6px auto 4px; height: min(calc(100vh - 230px), 760px); min-height: 340px; max-width: calc(100vw - 24px); aspect-ratio: 448 / 672; border-radius: 10px; overflow: hidden; background: #0b1626;
   box-shadow: 0 16px 40px rgba(0, 0, 0, .6), 0 0 0 3px color-mix(in srgb, var(--fc, #38bdf8) 80%, #fff), 0 0 30px color-mix(in srgb, var(--fc, #38bdf8) 50%, transparent); }
@@ -3183,7 +3181,41 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pe-plate.done b { color: #fde047; text-shadow: 0 2px 0 #92400e, 0 0 18px #f59e0b; }
 .pe-plate.max { background: linear-gradient(180deg, #78350f, #1c0a02); box-shadow: 0 0 0 3px #fde047, 0 0 40px #f59e0b; }
 .pe-plate.max b { font-size: clamp(26px, 7vw, 40px); animation: ptPulse .5s ease-in-out infinite alternate; }
-@media (max-width: 600px) { .pe-spots { grid-template-columns: repeat(3, 1fr); } .pe-ico { width: 46px; } .pe-bonus { height: min(calc(100vh - 200px), calc((100vw - 24px) * 1.5)); } .pe-say { font-size: 11px; bottom: 84px; } }
+/* Phone (owner's request, 16 November 2026: « on peut pas bouger pour miser »): the wheel, the 5 betting spots, the chips
+   and LANCER on one screen. The scene loses its empty top and reflection (negative margins), the spots go on one row,
+   chips and tools on one line each (sliding sideways if needed), the lightning note goes (it is in the rules). */
+@media (max-width: 600px) {
+  .g-peche .pe-zone { --ptz: max(200px, min(calc(100vw - 24px), calc((100dvh - 400px) / 1.12))); min-width: 0; margin: calc(var(--ptz) * -.035) auto calc(var(--ptz) * -.1); }
+  .g-peche .pe-view { overflow: hidden; }
+  .pe-bonus { height: min(calc(100dvh - 190px), calc((100vw - 24px) * 1.5)); min-height: 300px; }
+  .pe-say { font-size: 11px; bottom: 84px; }
+}
+@media (max-width: 600px), (max-height: 500px) {
+  .g-peche .pe-felt { padding: 6px 6px 8px; }
+  .pe-spots { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .pe-spot { padding: 5px 1px 4px; gap: 1px; }
+  .pe-spot b, .pe-spot.w b, .pe-spot.s b { font-size: 22px; min-height: 24px; }
+  .pe-spot small { font-size: 8px; line-height: 1.1; }
+  .pe-spot.fb small, .pe-spot.fo small, .pe-spot.fr small { font-size: 0; }
+  .pe-spot.fb small::after, .pe-spot.fo small::after, .pe-spot.fr small::after { content: attr(data-n); font-size: 8px; }
+  .pe-ico { width: 40px; height: 22px; }
+  .g-peche .pe-note { display: none; }
+  .g-peche .rt-chips { flex-wrap: nowrap; gap: 5px; margin-top: 6px; }
+  .g-peche .rchip { width: 34px; height: 34px; flex: none; }
+  .g-peche .rt-tools { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; gap: 5px; margin-top: 6px; padding-bottom: 2px; scrollbar-width: none; }
+  .g-peche .rt-tools::-webkit-scrollbar { display: none; }
+  .g-peche .rt-tools button { flex: none; padding: 6px 8px; font-size: 11px; white-space: nowrap; }
+  .g-peche .rt-tools .pe-buy { order: -1; }
+}
+/* « ⛶ Grand écran » on the wheel (phone): the site's full screen, where everything fits */
+.pe-big { display: none; position: absolute; right: 8px; top: 8px; z-index: 6; padding: 6px 11px; border: 1px solid rgba(186, 230, 253, .6); border-radius: 999px; font: 800 12px Archivo, sans-serif; color: #e0f2fe; background: rgba(2, 6, 23, .7); box-shadow: 0 0 12px rgba(56, 189, 248, .4); }
+@media (max-width: 600px) { .pe-big { display: block; } }
+.game-host.is-full .pe-big { display: none !important; }
+/* Full screen (⛶): everything fits the screen; on a wide screen the table-game grid puts the wheel on the left */
+.game-host.is-full > .slot.g-peche .pe-zone { --ptz: max(200px, min(calc(100vw - 24px), 560px, calc((100dvh - 330px) / 1.12))); }
+@media (orientation: landscape) and (min-aspect-ratio: 4/3) { .game-host.is-full > .slot.g-peche .pe-zone { --ptz: min(100%, calc((100dvh - 40px) * .794)); } .game-host.is-full > .slot.g-peche .pe-bonus { height: calc(100dvh - 60px); min-height: 0; } .game-host.is-full > .slot.g-peche .slot-title { display: none; } }
+@media (max-width: 600px) { .game-host.is-full > .slot.g-peche .slot-title { display: none; } .game-host.is-full > .slot.g-peche .slot-head { min-height: 0; margin-bottom: 4px; } .game-host.is-full > .slot.g-peche .win-bar { min-height: 0; padding-top: 2px; padding-bottom: 2px; font-size: 12px; }
+  .game-host.is-full > .slot.g-peche .pe-zone { --ptz: max(170px, min(calc(100vw - 16px), calc((100dvh - 355px) / 1.12))); } .game-host.is-full > .slot.g-peche .pe-bonus { height: min(calc(100dvh - 150px), calc((100vw - 16px) * 1.5)); } }
 
 /* ============ La Roue d’Or ============ */
 .g-roueor { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(251, 191, 36, .25), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(75, 85, 99, .35), transparent 70%), linear-gradient(180deg, #14110a 0%, #06070b 100%); }
@@ -13396,6 +13428,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'peche', date: '2026-11-16', title: 'Adaptée au téléphone', items: ['Sur téléphone, la roue, les mises et le bouton LANCER tiennent ensemble', 'Nouveau bouton « ⛶ Grand écran » sur la roue : tout le jeu sur un seul écran, sans rien faire défiler', 'Téléphone couché : la roue à gauche, les mises à droite'] },
   { game: 'peche', date: '2026-11-15', title: 'Roue en verre et pêche sur la glace', items: ['Nouvelle roue en verre qui s’arrête au hasard sur n’importe quelle case', 'La pêche se joue en vidéo sur un lac gelé : petit poisson à la canne, poisson moyen à la grue, gros poisson à l’hélicoptère', 'Plus le poisson est gros, plus le multiplicateur est gros : le gros poisson peut donner le MAX WIN', 'Nouveau : « 🎣 Acheter une pêche » bleue, orange ou rouge'] },
   { game: 'peche-online', date: '2026-11-15', title: 'Roue en verre et pêche sur la glace', items: ['La nouvelle roue en verre et les vidéos de pêche (canne, grue, hélicoptère) pour tout le salon'] },
   { game: 'anubis', date: '2026-11-15', title: 'Nouveaux décors animés et nouveaux cubes', items: ['Le jeu se joue dans un temple animé, avec ta grille posée dans le grand cadre doré', 'En haut : ton solde, le multiplicateur et ton gain ; toute la barre se touche (mise, bonus, SPIN, mise max)', 'Les bonus ont leur propre salle : les multiplicateurs des colonnes dans les cases du haut, les relances dans les 3 barres violettes', 'Jugement : les cubes tombent en glace et se changent en pierre en touchant le fond, avec leur multiplicateur bien écrit dessus', 'Crânes de pierre qui ajoutent, crânes dorés qui multiplient, cubes de lave : tous redessinés'] },
@@ -16645,12 +16678,12 @@ const FILES = {
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '6e1081a69e'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '635896e420'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', 'd17abb90c6'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
   'robots-online': ['robots', 'games/impl/robots.js', 'RobotsOnlineGame', '620d0b9f44'],
   'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', '9e528dfdf5'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
-  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '635896e420'],
+  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', 'd17abb90c6'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '234dd4780f'],
   totemx: ['totemx', 'games/impl/totemx.js', 'TotemXGame', '9ed53a6ac8'],

@@ -272,6 +272,11 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   orange / rouge à 8,75 / 17,4 / 52 × le jeton choisi (`PRICE`, `get bet()` = jeton ; bouton « 🎣 Acheter une pêche » et
   « Bonus & menu », pas dans le salon en ligne), taille au hasard, sans éclair. Simulation `node tools/sim/peche.js` (lit le
   moteur, 20 M lancers) : ≈ 95 % sur chaque case (comme avant), achats ≈ 88 %, hélicoptère 1 poisson sur 12,5.
+  **Téléphone** (demande du 16 novembre 2026 : « on peut pas bouger pour miser ») : bloc « Phone » à la fin du CSS de La Pêche :
+  roue plus petite (le haut vide et le reflet de l'image coupés par des marges négatives), 5 cases de mise sur une ligne, jetons et
+  outils sur une ligne chacun (« Acheter une pêche » en tête), note des éclairs cachée ; bouton « ⛶ Grand écran » sur la roue
+  (`.pe-big`, `data-act="full"`) : en plein écran tout tient sur l'écran (titre caché, `--ptz` calculé sur `100dvh`),
+  téléphone couché = roue à gauche, mises à droite.
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

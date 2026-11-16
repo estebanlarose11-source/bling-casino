@@ -122,7 +122,7 @@ class PecheGame extends BaseGame {
       head: '<div class="hist pt-hist pe-hist"></div>',
       // the fishing of each colour, bought at the chip chosen on the table (get bet)
       buys: ov?.online ? [] : ['fb', 'fo', 'fr'].map((k) => ({ id: k, icon: '🎣', label: `Pêche au ${NAME[k].toLowerCase()} · ${PRICE[k].toLocaleString('fr-FR')} × ton jeton`, desc: `Petit, moyen ou gros poisson au hasard : ${RANGE[k]}, gros poisson jusqu’au MAX WIN`, cost: (b) => Math.round(b * PRICE[k]) })),
-      stage: `<div class="pe-view">
+      stage: `<div class="pe-view">${ov?.online ? '' : '<button class="pe-big" type="button" data-act="full">⛶ <span>Grand écran</span></button>'}
           <div class="pe-zone"><img class="pe-scene" src="${src('roue')}" alt="" draggable="false">
             <div class="pe-disc">${wheelSVG()}<div class="pe-flash"></div></div>
             <img class="pe-top" src="${src('roue-top')}" alt="" draggable="false"><i class="pe-ptr"></i><div class="pe-hub"></div></div>
@@ -133,9 +133,8 @@ class PecheGame extends BaseGame {
             <div class="pe-plate"><small>MULTIPLICATEUR</small><b class="pe-mult">×?</b></div>
           </div>
         </div>`,
-      below: `<div class="felt pe-felt"><div class="pt-spots pe-spots">${SPOTS.map((k) => `<button class="pt-spot pe-spot ${k}" data-k="${k}" style="--sc:${COL[k]}"><b>${label(k)}</b><small>${k[0] === 'f' ? `${NAME[k]} · ${RANGE[k]}` : NAME[k]}</small></button>`).join('')}</div>
-        <p class="pt-note pe-note">⚡<span>À chaque lancer, <b>4 éclairs</b> frappent la roue : la case touchée est multipliée (jusqu’à ×10 sur les ×2, ×5 sur les poissons).</span></p>${BetBoard.chipsHTML()}
-        ${ov?.online ? '' : '<button class="pe-buy" type="button">🎣 Acheter une pêche <small>bleu · orange · rouge</small></button>'}</div>`,
+      below: `<div class="felt pe-felt"><div class="pt-spots pe-spots">${SPOTS.map((k) => `<button class="pt-spot pe-spot ${k}" data-k="${k}" style="--sc:${COL[k]}"><b>${label(k)}</b><small data-n="${k[0] === 'f' ? NAME[k].split(' ')[1] : ''}">${k[0] === 'f' ? `${NAME[k]} · ${RANGE[k]}` : NAME[k]}</small></button>`).join('')}</div>
+        <p class="pt-note pe-note">⚡<span>À chaque lancer, <b>4 éclairs</b> frappent la roue : la case touchée est multipliée (jusqu’à ×10 sur les ×2, ×5 sur les poissons).</span></p>${BetBoard.chipsHTML(ov?.online ? '' : '<button class="pe-buy" type="button">🎣 Acheter une pêche</button>')}</div>`,
       hello: 'Mise sur ×2 glace, ×2 nuit ou un poisson, puis lance la roue.',
     }));
     this.cur = 0; this.histArr = [];
