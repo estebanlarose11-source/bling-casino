@@ -82,6 +82,16 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   « EN TRAVAUX », page du jeu fermée, absent de `SLOTS`, du Défi spécial (`LIST`), des duels, du jackpot et des pages
   SEO. Pour l'ouvrir : retirer `"wip": true` puis `python3 tools/build.py`. Le propriétaire essaie un jeu en travaux
   avec `?essai` dans l'adresse (`renderGame` dans `pages/game.js`).
+- **Jeux retirés** (demande du propriétaire du 16 novembre 2026 : La Pizza Yo-Yo `taco`, Le Totem `pharaon`, Le Labo `labo`, Le
+  Coffre aux Pirates `pirates`, Le Filon `filon`, Le Plateau `plateau` ; Le Plateau Online reste) : `"wip": true, "retired": true` dans
+  leur ligne d'`ORIGINALS`. Ils sortent de `ALL_GAMES` (accueil, catégories, `SLOTS`, Défi spécial, pages SEO, affiches `UPDATES` : `LIVE`),
+  mais `getGame()` les trouve encore (`RETIRED` du catalogue) : records, historique, profils. Page du jeu = « 🚫 Machine retirée » (sauf
+  `?essai`). **Succès gardés** : `mySlots()` d'`achievements.js` ajoute une machine retirée si le joueur y a quelque chose, avec
+  l'étiquette « Machine supprimée » (`RET_TAG`), récompenses déjà gagnées encore récupérables, plus de prestige ni de bouton Jouer ;
+  trophées de prestige gardés. Retirés aussi des listes écrites à la main : `ROT` (tournois), les 2 `POOL` (flash, Battle Royale) **et
+  leurs copies** `tools/push/send.mjs` / `Notifs.java`, défis de la semaine `CATS`, missions `GAMES`, jeux préférés des joueurs de la
+  maison. **Pour en remettre un** : enlever `"wip": true, "retired": true` de sa ligne, le remettre dans ces listes (mêmes copies),
+  puis `python3 tools/build.py`.
 - **La Roulette Russe** (`games/barillet.js`, id `barillet`, volatilité extrême, images du propriétaire dans
   `assets/games/barillet/` : symboles découpés de sa planche, `wildtall.webp` pour le WILD étendu, fond `bg.webp`,
   couverture). Mise en page voulue par le propriétaire (d'après sa référence, couleurs changées) : rouleaux de
@@ -864,6 +874,15 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   - Ne jamais récompenser un clic sur une pub (interdit par les régies) : on récompense le temps d'affichage.
 
 ## Suivi et administration
+
+- **Tableau de bord** (`tableau.js`, page **`#tableau`** ou `#dashboard`, dans aucun menu, demande du propriétaire du 16 novembre 2026) :
+  réservé aux comptes de `admins/` (lecture de `stats/`, règle déjà en place). Période (aujourd'hui, 7 / 30 jours, depuis le début),
+  catégorie (machines à sous, tables, rapides, tout) ; chiffres du site (visites, nouveaux, comptes, tours, temps, KE misés, rapporté =
+  mises − gains) ; la plus visitée / jouée / où on reste le plus / la plus misée / celle qui a rapporté le plus / le plus de bonus ;
+  classements en barres, visites et tours par jour, sources, tableau de tous les jeux (tri au toucher). Données de `monitor.js` :
+  `stats/AAAA-MM-JJ` (ouvertures, tours, visites, sources, depuis le 5 novembre), **`stats/AAAA-MM-JJ_m`** (`opens` = secondes passées
+  sur la page du jeu, `spins` = KE misés) et **`stats/AAAA-MM-JJ_w`** (`opens` = KE gagnés par les joueurs, `spins` = bonus déclenchés
+  en jouant), depuis le 16 novembre : mêmes règles Firestore (rien à recoller), jusqu'à 3 écritures par joueur toutes les 5 min.
 
 - **Changer le solde d'un joueur** (triche…) : GitHub → Actions → « Solde » (`.github/workflows/solde.yml`,
   `tools/admin/solde.mjs`) avec le pseudo, le nouveau solde en KE (vide = inchangé) et en option `record` (baisse plus gros gain et meilleur

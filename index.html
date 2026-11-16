@@ -8975,6 +8975,56 @@ html.light .bottom-nav a { color: #5b5068 !important; } html.light .bottom-nav a
   .nx-bonus b { font-size: clamp(25px, 8.1vw, 40px) !important; white-space: nowrap; }
   .nx-btn { font-size: 13px !important; }
 }
+
+/* ============ Tableau de bord du propriétaire (#tableau, tableau.js) ============ */
+.tb h1 { margin: 0 0 4px; font: 800 26px Inter, sans-serif; }
+.tb-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.tb-head p { margin: 0; max-width: 640px; }
+.tb-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tb-tabs button { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--mq-line, #2a2432); background: var(--mq-card, #15121b); color: #d9d3e3; font: 600 13px Inter, sans-serif; cursor: pointer; }
+.tb-tabs button.on { color: #fff; border-color: var(--mq-pink, #ff3d9a); background: rgba(255, 61, 154, .16); }
+.tb-cats { margin: 18px 0 12px; }
+.tb-kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.tb-kpis > div, .tb-card, .tb-hero { padding: 14px 16px; border-radius: 14px; background: var(--mq-card, #15121b); border: 1px solid var(--mq-line, #2a2432); min-width: 0; }
+.tb-kpis small, .tb-hero small { display: block; font: 600 11px Inter, sans-serif; letter-spacing: 1.2px; text-transform: uppercase; color: var(--mq-muted, #9e97ab); }
+.tb-kpis b { display: block; margin: 6px 0 2px; font: 800 24px Inter, KeCoin, sans-serif; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tb-kpis i { font: 500 12px Inter, sans-serif; font-style: normal; color: var(--mq-muted, #9e97ab); }
+.tb .neg { color: #f87171 !important; }
+.tb-heroes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+.tb-hero { display: flex; align-items: center; gap: 14px; }
+.tb-cv { flex: none; width: 64px; height: 64px; border-radius: 12px; overflow: hidden; display: grid; place-items: center; background: #0e0c13; }
+.tb-cv svg, .tb-cv img { width: 100%; height: 100%; display: block; }
+.tb-hero > div { display: grid; gap: 2px; min-width: 0; }
+.tb-hero b { font: 700 17px Inter, sans-serif; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tb-hero em { font: 800 15px Inter, KeCoin, sans-serif; font-style: normal; color: var(--mq-pink, #ff3d9a); }
+.tb-hero i { font: 500 12px Inter, sans-serif; font-style: normal; color: var(--mq-muted, #9e97ab); }
+.tb-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+.tb-wide { grid-column: span 1; }
+.tb-card h2 { margin: 0 0 12px; font: 700 14px Inter, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+.tb-card h2 small { margin-left: 6px; font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--mq-muted, #9e97ab); }
+.tb-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.tb-bars li { display: grid; grid-template-columns: minmax(0, 9em) 1fr auto; align-items: center; gap: 10px; font: 500 13px Inter, sans-serif; }
+.tb-bars span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #e6e1ee; }
+.tb-bars i { height: 10px; border-radius: 0 4px 4px 0; background: rgba(255, 255, 255, .05); overflow: hidden; }
+.tb-bars i b { display: block; height: 100%; border-radius: 0 4px 4px 0; background: var(--mq-pink, #ff3d9a); }
+.tb-bars li:hover i b { background: #ff7cc4; }
+.tb-bars strong { font: 700 13px Inter, KeCoin, sans-serif; color: #fff; white-space: nowrap; }
+.ac-ret { margin-left: 4px; font: 700 10.5px Inter, sans-serif; font-style: normal; padding: 2px 7px; border-radius: 5px; color: #fca5a5; background: rgba(248, 113, 113, .14); white-space: nowrap; vertical-align: 1px; }
+.tb-ret { font: 600 10px Inter, sans-serif; font-style: normal; padding: 1px 6px; border-radius: 5px; color: #fca5a5; background: rgba(248, 113, 113, .14); }
+.tb-chart { width: 100%; height: auto; display: block; }
+.tb-chart .tb-axis { stroke: rgba(255, 255, 255, .18); }
+.tb-chart .tb-tick { fill: var(--mq-muted, #9e97ab); font: 500 10px Inter, sans-serif; }
+.tb-chart .tb-bar rect:first-child { fill: var(--mq-pink, #ff3d9a); }
+.tb-chart .tb-bar:hover rect:first-child { fill: #ff7cc4; }
+.tb-scroll { overflow-x: auto; }
+.tb-table table { width: 100%; border-collapse: collapse; font: 500 13px Inter, KeCoin, sans-serif; }
+.tb-table th, .tb-table td { padding: 9px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--mq-line, #2a2432); }
+.tb-table th:first-child, .tb-table td:first-child { text-align: left; }
+.tb-table th { font: 700 11px Inter, sans-serif; letter-spacing: 1px; text-transform: uppercase; color: var(--mq-muted, #9e97ab); cursor: pointer; }
+.tb-table th.on { color: var(--mq-pink, #ff3d9a); }
+.tb-table tbody tr:hover { background: rgba(255, 255, 255, .03); }
+@media (max-width: 1100px) { .tb-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .tb-heroes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .tb-kpis, .tb-heroes, .tb-grid { grid-template-columns: 1fr 1fr; } .tb-heroes, .tb-grid { grid-template-columns: 1fr; } .tb-kpis b { font-size: 20px; } }
 </style>
 </head>
 <body>
@@ -9107,7 +9157,7 @@ html.light .bottom-nav a { color: #5b5068 !important; } html.light .bottom-nav a
   <main id="view" class="view"></main>
 
   <footer class="foot">
-    <!-- seo-links (fabriqué par tools/seo.py : ne pas modifier à la main) --><section class="seo-foot" aria-label="Tous les jeux de SpinBet Casino"><p><b>SpinBet Casino</b>, casino gratuit en ligne : 55 jeux de casino gratuits sans téléchargement ni dépôt, en argent fictif (KE). Machines à sous avec bonus et jackpots, roulettes, blackjack, poker Texas Hold’em, roues de la fortune, tables multijoueurs et jeux rapides (mines, crash, plinko), sur téléphone comme sur ordinateur. Aucun vrai pari, aucun gain réel.</p><div class="seo-cols"><div><b>Machines à sous gratuites</b><a href="jeux/big-bad-wolf.html">Le Loup</a><a href="jeux/cosmic.html">Le Cosmique</a><a href="jeux/zeus.html">L’Olympe</a><a href="jeux/huff.html">Le Loup 2.0</a><a href="jeux/candy.html">La Sweety</a><a href="jeux/anubis.html">L’Anubis</a><a href="jeux/bling.html">La Tour Bling</a><a href="jeux/pharaon.html">Le Totem</a><a href="jeux/chasse.html">The Hunt</a><a href="jeux/noel.html">La Tournée du Père Noël</a><a href="jeux/totemx.html">Le Totem Extrême</a><a href="jeux/viking.html">Le Valhalla</a><a href="jeux/barillet.html">La Roulette Russe</a><a href="jeux/redk.html">Diamants REDK</a><a href="jeux/pirates.html">Le Coffre aux Pirates</a><a href="jeux/filon.html">Le Filon</a><a href="jeux/taco.html">La Pizza Yo-Yo</a><a href="jeux/billets.html">Le Coffre-Fort</a><a href="jeux/dragons.html">L’Hydre</a><a href="jeux/labo.html">Le Labo</a><a href="jeux/fortune.html">La Fortune</a></div><div><b>Roulette, blackjack, poker et roues</b><a href="jeux/madwheel.html">La Roue Folle</a><a href="jeux/roulette.html">La Roulette</a><a href="jeux/storm.html">L’Éclair</a><a href="jeux/doublespin.html">La Double Bille</a><a href="jeux/plateau.html">Le Plateau</a><a href="jeux/peche.html">La Pêche</a><a href="jeux/roueor.html">La Roue d’Or</a><a href="jeux/blackjack.html">Le 21</a><a href="jeux/lightningbj.html">Le 21 Électrique</a><a href="jeux/bataille.html">La Bataille</a><a href="jeux/poker.html">Le Texas</a></div><div><b>Tables multijoueurs</b><a href="jeux/storm-online.html">L’Éclair Online</a><a href="jeux/bj-online.html">Le 21 Online</a><a href="jeux/holdem-online.html">Le Texas Online</a><a href="jeux/madwheel-online.html">La Roue Folle Online</a><a href="jeux/robots-online.html">La Course Online</a><a href="jeux/plateau-online.html">Le Plateau Online</a><a href="jeux/peche-online.html">La Pêche Online</a><a href="jeux/roueor-online.html">La Roue d’Or Online</a></div><div><b>Jeux rapides gratuits</b><a href="jeux/mines.html">Le Champ de Mines</a><a href="jeux/avion.html">L’Avion</a><a href="jeux/plinko.html">La Cascade</a><a href="jeux/vortex.html">Le Vortex</a><a href="jeux/casse.html">Le Casse</a><a href="jeux/pileface.html">La Pièce</a><a href="jeux/robots.html">La Course</a><a href="jeux/poulet.html">Le Poulet</a><a href="jeux/gratteciel.html">Le Gratte-Ciel</a><a href="jeux/penalty.html">Le Penalty</a><a href="jeux/ticket.html">Le Ticket</a><a href="jeux/billes.html">La Descente</a><a href="jeux/pilote.html">Le Pilote</a><a href="jeux/foot.html">Le Derby</a><a href="jeux/boxe.html">Le Ring</a></div><div><b>Guides et astuces</b><a href="articles/meilleures-machines-a-sous-gratuites-2026.html">Les meilleures machines à sous gratuites en 2026</a><a href="articles/jeux-de-casino-gratuits-sans-telechargement.html">Roulette, blackjack et poker gratuits sans téléchargement</a><a href="articles/jeux-crash-mines-plinko-gratuits.html">Jeux crash, mines et plinko gratuits : le guide 2026</a><a href="articles/rtp-volatilite-machines-a-sous.html">RTP et volatilité : comprendre une machine à sous</a><a href="articles/comment-gagner-aux-machines-a-sous.html">Comment gagner aux machines à sous ? Vrais conseils et idées reçues</a><a href="articles/strategie-blackjack.html">Stratégie de base au blackjack : le tableau complet</a><a href="articles/martingale-roulette.html">Martingale à la roulette : est-ce que ça marche vraiment ?</a><a href="articles/casino-gratuit-sur-telephone.html">Casino gratuit sur téléphone, sans téléchargement (Android et iPhone)</a></div></div></section><!-- /seo-links -->
+    <!-- seo-links (fabriqué par tools/seo.py : ne pas modifier à la main) --><section class="seo-foot" aria-label="Tous les jeux de SpinBet Casino"><p><b>SpinBet Casino</b>, casino gratuit en ligne : 49 jeux de casino gratuits sans téléchargement ni dépôt, en argent fictif (KE). Machines à sous avec bonus et jackpots, roulettes, blackjack, poker Texas Hold’em, roues de la fortune, tables multijoueurs et jeux rapides (mines, crash, plinko), sur téléphone comme sur ordinateur. Aucun vrai pari, aucun gain réel.</p><div class="seo-cols"><div><b>Machines à sous gratuites</b><a href="jeux/big-bad-wolf.html">Le Loup</a><a href="jeux/cosmic.html">Le Cosmique</a><a href="jeux/zeus.html">L’Olympe</a><a href="jeux/huff.html">Le Loup 2.0</a><a href="jeux/candy.html">La Sweety</a><a href="jeux/anubis.html">L’Anubis</a><a href="jeux/bling.html">La Tour Bling</a><a href="jeux/chasse.html">The Hunt</a><a href="jeux/noel.html">La Tournée du Père Noël</a><a href="jeux/totemx.html">Le Totem Extrême</a><a href="jeux/viking.html">Le Valhalla</a><a href="jeux/barillet.html">La Roulette Russe</a><a href="jeux/redk.html">Diamants REDK</a><a href="jeux/billets.html">Le Coffre-Fort</a><a href="jeux/dragons.html">L’Hydre</a><a href="jeux/fortune.html">La Fortune</a></div><div><b>Roulette, blackjack, poker et roues</b><a href="jeux/madwheel.html">La Roue Folle</a><a href="jeux/roulette.html">La Roulette</a><a href="jeux/storm.html">L’Éclair</a><a href="jeux/doublespin.html">La Double Bille</a><a href="jeux/peche.html">La Pêche</a><a href="jeux/roueor.html">La Roue d’Or</a><a href="jeux/blackjack.html">Le 21</a><a href="jeux/lightningbj.html">Le 21 Électrique</a><a href="jeux/bataille.html">La Bataille</a><a href="jeux/poker.html">Le Texas</a></div><div><b>Tables multijoueurs</b><a href="jeux/storm-online.html">L’Éclair Online</a><a href="jeux/bj-online.html">Le 21 Online</a><a href="jeux/holdem-online.html">Le Texas Online</a><a href="jeux/madwheel-online.html">La Roue Folle Online</a><a href="jeux/robots-online.html">La Course Online</a><a href="jeux/plateau-online.html">Le Plateau Online</a><a href="jeux/peche-online.html">La Pêche Online</a><a href="jeux/roueor-online.html">La Roue d’Or Online</a></div><div><b>Jeux rapides gratuits</b><a href="jeux/mines.html">Le Champ de Mines</a><a href="jeux/avion.html">L’Avion</a><a href="jeux/plinko.html">La Cascade</a><a href="jeux/vortex.html">Le Vortex</a><a href="jeux/casse.html">Le Casse</a><a href="jeux/pileface.html">La Pièce</a><a href="jeux/robots.html">La Course</a><a href="jeux/poulet.html">Le Poulet</a><a href="jeux/gratteciel.html">Le Gratte-Ciel</a><a href="jeux/penalty.html">Le Penalty</a><a href="jeux/ticket.html">Le Ticket</a><a href="jeux/billes.html">La Descente</a><a href="jeux/pilote.html">Le Pilote</a><a href="jeux/foot.html">Le Derby</a><a href="jeux/boxe.html">Le Ring</a></div><div><b>Guides et astuces</b><a href="articles/meilleures-machines-a-sous-gratuites-2026.html">Les meilleures machines à sous gratuites en 2026</a><a href="articles/jeux-de-casino-gratuits-sans-telechargement.html">Roulette, blackjack et poker gratuits sans téléchargement</a><a href="articles/jeux-crash-mines-plinko-gratuits.html">Jeux crash, mines et plinko gratuits : le guide 2026</a><a href="articles/rtp-volatilite-machines-a-sous.html">RTP et volatilité : comprendre une machine à sous</a><a href="articles/comment-gagner-aux-machines-a-sous.html">Comment gagner aux machines à sous ? Vrais conseils et idées reçues</a><a href="articles/strategie-blackjack.html">Stratégie de base au blackjack : le tableau complet</a><a href="articles/martingale-roulette.html">Martingale à la roulette : est-ce que ça marche vraiment ?</a><a href="articles/casino-gratuit-sur-telephone.html">Casino gratuit sur téléphone, sans téléchargement (Android et iPhone)</a></div></div></section><!-- /seo-links -->
     <div><b>SPINBET CASINO</b> · Jeu de divertissement, argent fictif, aucun gain réel. 18+ · <a href="#responsable">Jeu responsable</a> · <a href="jeux/">Tous les jeux</a> · <a href="articles/">Guides et astuces</a> · <a href="confidentialite.html">Confidentialité</a> · <a href="ads/">Nos partenaires</a></div>
   </footer>
 
@@ -9896,6 +9946,8 @@ const cloud = {
     const inc = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, firebase.firestore.FieldValue.increment(v)]));
     await (await init()).db.collection('stats').doc(day).set({ opens: inc(opens), spins: inc(spins) }, { merge: true });
   },
+  // owner's dashboard (tableau.js): several stats/ documents at once (read allowed to admins/ only)
+  async readStats(ids) { const db = (await init()).db; const r = await Promise.all(ids.map((id) => db.collection('stats').doc(id).get())); return r.map((d) => (d.exists ? d.data() : null)); },
   async isAdmin(uid) { try { return (await (await init()).db.collection('admins').doc(uid).get()).exists; } catch { return false; } },
   async isMuted(uid) { try { return (await (await init()).db.collection('mutes').doc(uid).get()).exists; } catch { return false; } },
   async setMute(uid, on, by) {
@@ -11126,7 +11178,7 @@ const { toast } = __mods['ui.js'];
 const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
-const GAMES = [['cosmic', 'Le Cosmique'], ['taco', 'La Pizza Yo-Yo'], ['zeus', 'L’Olympe'], ['candy', 'La Sweety'], ['pileface', 'La Pièce'], ['robots', 'La Course'], ['huff', 'Le Loup 2.0'], ['mines', 'Le Champ de Mines'], ['plinko', 'La Cascade']];
+const GAMES = [['cosmic', 'Le Cosmique'], ['zeus', 'L’Olympe'], ['candy', 'La Sweety'], ['pileface', 'La Pièce'], ['robots', 'La Course'], ['huff', 'Le Loup 2.0'], ['mines', 'Le Champ de Mines'], ['plinko', 'La Cascade']];
 const CHEST = { ke: 150, xp: 120 };
 
 const dayKey = (t = Date.now()) => { const d = new Date(t); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
@@ -11348,9 +11400,9 @@ async function renderReferral(root) {
    next time the player opens the site. Players are told live when someone passes them (and when they pass someone). */
 const CATS = {
   B: { label: 'Machines à sous', short: 'Machines à sous', icon: '🎰', rule: 'Uniquement les <b>bonus achetés</b> : ton score = le gain total de ton plus gros bonus acheté, en × la mise.',
-    games: ['cosmic', 'taco', 'candy', 'zeus', 'huff', 'anubis', 'bling', 'pharaon'], prizes: [100000, 50000, 25000, 10000, 10000, 5000, 5000, 5000, 5000, 5000], off: 0 },
+    games: ['cosmic', 'candy', 'zeus', 'huff', 'anubis', 'bling'], prizes: [100000, 50000, 25000, 10000, 10000, 5000, 5000, 5000, 5000, 5000], off: 0 },
   T: { label: 'Jeux de casino', short: 'Casino', icon: '🎡', rule: 'Ton score = ton plus gros gain en un coup, en × ta mise totale.',
-    games: ['storm', 'madwheel', 'doublespin', 'lightningbj', 'roueor', 'plateau', 'peche'], prizes: [50000, 25000, 10000, 5000, 5000, 2500, 2500, 2500, 2500, 2500], off: 3 },
+    games: ['storm', 'madwheel', 'doublespin', 'lightningbj', 'roueor', 'peche'], prizes: [50000, 25000, 10000, 5000, 5000, 2500, 2500, 2500, 2500, 2500], off: 3 },
   R: { label: 'Jeux rapides', short: 'Jeux rapides', icon: '⚡', rule: 'Ton score = ton plus gros gain en un coup, en × la mise.',
     games: ['mines', 'avion', 'plinko', 'vortex', 'casse', 'poulet', 'gratteciel', 'penalty', 'ticket', 'billes', 'pilote'], prizes: [50000, 25000, 10000, 5000, 5000, 2500, 2500, 2500, 2500, 2500], off: 5 },
 };
@@ -13230,7 +13282,7 @@ const ORIGINALS = [
   {"id": "candy", "name": "La Sweety", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs sur les cases", "colors": ["#ff4fb8", "#7c3aed"], "description": "Bienvenue au royaume sucré de la Candy Queen ! Les grappes de 5 bonbons explosent en cascade et chaque case gagnante prend un multiplicateur qui double à chaque nouvelle connexion. Les grosses grappes créent des bonbons spéciaux : cœur explosif, bocal bombe et baguette magique. 4 couronnes ouvrent le Bal de la Reine, où toutes les cases démarrent à ×5 et gardent leur multiplicateur.", "features": ["Grappes de 5", "Multiplicateurs sur les cases", "Cœur explosif, bocal bombe, baguette", "Bal de la Reine : cases à ×5 au départ", "Chasse aux couronnes", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "anubis", "name": "L’Anubis", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "bling", "name": "La Tour Bling", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
-  {"id": "pharaon", "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×500"},
+  {"id": "pharaon", "wip": true, "retired": true, "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×500"},
   {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Boost, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Boost et quatre jeux bonus animés : Pile ou Face, Tir aux Cibles, Pachinko et Méga Folie.", "features": ["Boost ×2 à ×50", "Pile ou Face", "Tir aux Cibles", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "roulette", "name": "La Roulette", "cat": "table", "tag": "Roulette", "sub": "Roulette européenne en 3D : cylindre, voisins, tiers", "colors": ["#2a76a8", "#0b2d52"], "description": "Une vraie table de roulette européenne en 3D : pose tes jetons sur le tapis bleu (pleins, chevaux, carrés, douzaines, rouge ou noir) ou sur le cylindre (Tiers, Orphelins, Voisins du zéro, Jeu zéro, un numéro et ses voisins), puis la caméra file vers la roue en bois et suit la bille jusqu’au numéro gagnant. Tableau lumineux des derniers numéros et statistiques.", "features": ["Table et roue en 3D", "Plein payé 35 pour 1", "Cylindre : Tiers, Orphelins, Voisins, Jeu zéro", "Numéro + ses voisins", "Répéter, annuler, doubler", "Statistiques : numéros chauds et froids"], "rtp": "≈ 97,3 %", "vol": 3, "max": "×36"},
   {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
@@ -13243,7 +13295,7 @@ const ORIGINALS = [
   {"id": "peche-online", "name": "La Pêche Online", "cat": "table", "tag": "En ligne", "sub": "La roue à éclairs et la pêche en multijoueur", "colors": ["#38bdf8", "#071a2e"], "description": "La Pêche en multijoueur : chacun mise sur les ×2 ou les poissons et appuie sur PRÊT, la roue en verre part dès que tout le salon est prêt (tout de suite si tu es seul). Les éclairs, la roue et le poisson pêché (à la canne, à la grue ou à l’hélicoptère) sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "4 éclairs à chaque lancer", "Petit, moyen ou gros poisson", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
   {"id": "roueor-online", "name": "La Roue d’Or Online", "cat": "table", "tag": "En ligne", "sub": "Une roue pour tout le salon, chacun son niveau", "colors": ["#fbbf24", "#14110a"], "description": "La Roue d’Or en multijoueur : chacun choisit son niveau et sa mise puis appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La même roue tombe dans l’or pour certains niveaux : ces joueurs jouent leur bonus des 24 cubes. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "3 niveaux", "Bonus des 24 cubes jusqu’à ×5 000", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×5 000"},
   {"id": "doublespin", "name": "La Double Bille", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
-  {"id": "plateau", "name": "Le Plateau", "cat": "table", "tag": "Jeu de roue", "sub": "Roue, dés et plateau de multiplicateurs", "colors": ["#22c55e", "#0c1a14"], "description": "Une grande roue de 78 cases : mise sur 1, 2, 5, 10 ou sur les bonus 2 lancers et 4 lancers. Dans les bonus, lance 2 dés et fais avancer ton pion sur un plateau de 28 cases jusqu’à ×200. Et si la roue tombe sur Chance, elle repart et ce tour paie ×10 !", "features": ["Cases 1, 2, 5 et 10", "Bonus 2 lancers et 4 lancers", "Plateau jusqu’à ×200 par case", "Double = lancer en plus", "Case Chance ×10"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
+  {"id": "plateau", "wip": true, "retired": true, "name": "Le Plateau", "cat": "table", "tag": "Jeu de roue", "sub": "Roue, dés et plateau de multiplicateurs", "colors": ["#22c55e", "#0c1a14"], "description": "Une grande roue de 78 cases : mise sur 1, 2, 5, 10 ou sur les bonus 2 lancers et 4 lancers. Dans les bonus, lance 2 dés et fais avancer ton pion sur un plateau de 28 cases jusqu’à ×200. Et si la roue tombe sur Chance, elle repart et ce tour paie ×10 !", "features": ["Cases 1, 2, 5 et 10", "Bonus 2 lancers et 4 lancers", "Plateau jusqu’à ×200 par case", "Double = lancer en plus", "Case Chance ×10"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
   {"id": "peche", "name": "La Pêche", "cat": "table", "tag": "Jeu de roue", "sub": "Roue en verre à éclairs et pêche sur la glace", "colors": ["#38bdf8", "#071a2e"], "description": "Une roue en verre de 54 cases : ×2 glace, ×2 nuit et trois poissons. À chaque lancer, des éclairs multiplient des cases. Sur un poisson, direction le trou dans la glace : petit poisson pêché à la canne, poisson moyen sorti par la grue ou gros poisson sorti par l’hélicoptère, avec un multiplicateur à la mesure du poisson, jusqu’au MAX WIN. Les pêches s’achètent aussi !", "features": ["Roue en verre à 54 cases", "4 éclairs à chaque lancer", "Petit poisson à la canne, moyen à la grue", "Gros poisson à l’hélicoptère jusqu’au MAX WIN", "Pêches bleue, orange et rouge à acheter"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
   {"id": "roueor", "name": "La Roue d’Or", "cat": "table", "tag": "Jeu de roue", "sub": "Simple, Moyen ou Compliqué : 24 cubes à ouvrir", "colors": ["#fbbf24", "#14110a"], "description": "Une roue noire et métal avec une part en or. Choisis ton niveau : Simple (beaucoup d’or, petits cubes), Moyen ou Compliqué (peu d’or, cubes jusqu’à ×5 000). Sur l’or, place au bonus des 24 cubes : regarde les multiplicateurs, ils se cachent et se mélangent, choisis le tien et décide à chaque étape si tu encaisses ou continues !", "features": ["3 niveaux : Simple, Moyen, Compliqué", "24 cubes montrés puis mélangés", "Encaisse l’offre ou continue", "Jusqu’à ×5 000", "Tours automatiques"], "rtp": "≈ 95 %", "vol": 5, "max": "×5 000"},
   {"id": "blackjack", "name": "Le 21", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 6 pour 5", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 6 pour 5.", "features": ["Doubler", "Séparer une paire", "Blackjack 6 pour 5", "Animations de cartes"], "rtp": "≈ 98 %", "vol": 1, "max": "×2,2"},
@@ -13264,8 +13316,8 @@ const ORIGINALS = [
   {"id": "viking", "name": "Le Valhalla", "cat": "slot", "tag": "Machine à sous", "sub": "WILD collés · 15 tours gratuits", "colors": ["#38bdf8", "#0b2a3a"], "description": "Un temple viking taillé dans la pierre, au pied des montagnes. 4 Jarls lancent le BONUS VALHALLA : la valkyrie pose 5 WILD qui restent collés pendant 15 tours gratuits, et chaque nouveau WILD reste aussi : ils s’accumulent jusqu’à la fin. À gauche, les deux héros remplissent leur jauge à chaque Jarl et chaque WILD qui tombent : à 250, le Jarl lance le bonus tout seul, à 500, la valkyrie devient un WILD géant qui change de place à chaque tour et grandit quand il fait gagner : 2×2, 3×3, 4×4, puis toute la grille.", "features": ["5 rouleaux · 25 lignes", "WILD collés pendant les tours gratuits", "Bonus : 15 tours gratuits, 5 WILD au départ", "Jauge du Jarl : le bonus à 250", "Jauge de la valkyrie : la Valkyrie géante à 500", "WILD géant qui grandit jusqu’à toute la grille", "2 achats de bonus", "Max ×1 000"], "rtp": "≈ 92 %", "vol": 3, "max": "×1 000"},
   {"id": "barillet", "name": "La Roulette Russe", "cat": "slot", "tag": "Machine à sous", "sub": "576 façons · le revolver met le feu aux gains", "colors": ["#f59e0b", "#1c0f05"], "description": "Un vieux saloon, un revolver chargé à bloc. 5 rouleaux de 3, 4, 4, 4 et 3 cases, 576 façons de gagner et le cow-boy WILD qui couvre tout son rouleau. Une balle d’or et une connexion : le revolver tire 1 à 3 balles sur les cases gagnantes, qui prennent feu avec ×2 à ×10, et les multiplicateurs d’une ligne se multiplient. 3 avis de recherche lancent LE DUEL : des grosses balles à chaque gain, et les cases en feu restent jusqu’à la fin. Puis la roulette russe : 1 à 5 balles pour multiplier ton gain… ou tout perdre.", "features": ["Volatilité extrême", "576 façons de gagner", "WILD qui couvre le rouleau", "Balle d’or : le revolver tire", "Cases en feu ×2 à ×50", "Le Duel : les cases restent en feu", "Roulette russe", "2 achats de bonus", "Max ×20 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×20 000"},
   {"id": "redk", "name": "Diamants REDK", "cat": "slot", "tag": "Machine à sous", "sub": "Ruby Link très souvent · Pyramide d’or", "colors": ["#ef4444", "#0b1a3a"], "description": "Une mine de diamants qui scintille derrière toute la machine. Les rubis rouges portent leur valeur en KE : 6 rubis lancent le RUBY LINK, très souvent, où ils restent en place avec 3 re-spins. Déverrouille les 3 rangées du haut et attrape les boosters SPIN+, REELS+, MULTI+ et VALUE+. 4 pyramides lancent LA PYRAMIDE D’OR, le bonus spécial qu’on ne peut pas acheter : que des rubis dorés avec de gros multiplicateurs, jusqu’à ×10 000 la mise. Et quand il ne manque qu’un rubis… retiens ton souffle.", "features": ["5 rouleaux · 20 lignes", "Ruby Link environ tous les 75 tours", "3 rangées à déverrouiller", "Boosters SPIN+, REELS+, MULTI+, VALUE+", "La Pyramide d’or : rubis dorés ×2 à ×250", "MINI, MINOR, MAJOR, GRAND", "1 achat de bonus", "Max ×10 000"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
-  {"id": "pirates", "name": "Le Coffre aux Pirates", "cat": "slot", "tag": "Machine à sous", "sub": "Jackpots, Chasse au trésor · max ×50 000", "colors": ["#f59e0b", "#0c4a6e"], "description": "Un bateau pirate file sur la mer des Caraïbes, derrière toute la machine. 1 024 façons de gagner avec le pirate, l’exploratrice, le requin, le grand tiki, l’ara doré et tout le trésor de l’île. Les pièces d’or portent leur valeur en KE, les étoiles de mer des jackpots, et le Crabe du rouleau 5 ramasse tout. 3 tourbillons lancent LA CHASSE AU TRÉSOR : 3 vies, Tonneaux jusqu’à ×50, Ancres qui agrandissent la grille, jackpots MINI, MINOR, MAJOR et la couronne du GRAND. Remplis les 30 cases et le coffre aux pirates s’ouvre : ×500 sur tout le bonus, jusqu’à ×50 000 la mise. 3 coffres lancent LES TOURS GRATUITS, où le Crabe tombe partout et ramasse de plus en plus fort.", "features": ["5 rouleaux · 1 024 façons", "Volatilité extrême", "Jackpots MINI, MINOR, MAJOR, GRAND", "La Chasse au trésor : 3 vies", "Tonneau ×2 à ×50, Ancre, Crabe", "Full screen : ×500 sur tout le bonus", "Tours gratuits : Crabe ×1, ×2, ×3…", "2 achats de bonus", "Max ×50 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×50 000"},
-  {"id": "filon", "name": "Le Filon", "cat": "slot", "tag": "Machine à sous", "sub": "Mine d’or · cases jusqu’à ×8 192", "colors": ["#f59e0b", "#1c1006"], "description": "Une vieille mine d’or où chaque case de la grille 7×7 cache un multiplicateur. 10 symboles identiques n’importe où paient et tombent en cascade, et chaque gain pose un ×2 sur sa case, puis le double : ×4, ×8… jusqu’à ×8 192. Minerais mystère, dynamite et joker doré font grimper les cases. 3, 4 ou 5 BONUS lancent La Veine d’or, La Grande Galerie ou La Ruée vers l’or : la roue des bonus, et des multiplicateurs qui ne repartent jamais à zéro.", "features": ["Volatilité extrême", "Grille 7×7 Pay Anywhere", "Cascades", "Multiplicateurs des cases ×2 à ×8 192", "Minerais mystère et dynamite", "3 bonus et la roue des bonus", "Mise boostée et tour doré", "5 achats de bonus", "Max ×30 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×30 000"},
+  {"id": "pirates", "wip": true, "retired": true, "name": "Le Coffre aux Pirates", "cat": "slot", "tag": "Machine à sous", "sub": "Jackpots, Chasse au trésor · max ×50 000", "colors": ["#f59e0b", "#0c4a6e"], "description": "Un bateau pirate file sur la mer des Caraïbes, derrière toute la machine. 1 024 façons de gagner avec le pirate, l’exploratrice, le requin, le grand tiki, l’ara doré et tout le trésor de l’île. Les pièces d’or portent leur valeur en KE, les étoiles de mer des jackpots, et le Crabe du rouleau 5 ramasse tout. 3 tourbillons lancent LA CHASSE AU TRÉSOR : 3 vies, Tonneaux jusqu’à ×50, Ancres qui agrandissent la grille, jackpots MINI, MINOR, MAJOR et la couronne du GRAND. Remplis les 30 cases et le coffre aux pirates s’ouvre : ×500 sur tout le bonus, jusqu’à ×50 000 la mise. 3 coffres lancent LES TOURS GRATUITS, où le Crabe tombe partout et ramasse de plus en plus fort.", "features": ["5 rouleaux · 1 024 façons", "Volatilité extrême", "Jackpots MINI, MINOR, MAJOR, GRAND", "La Chasse au trésor : 3 vies", "Tonneau ×2 à ×50, Ancre, Crabe", "Full screen : ×500 sur tout le bonus", "Tours gratuits : Crabe ×1, ×2, ×3…", "2 achats de bonus", "Max ×50 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×50 000"},
+  {"id": "filon", "wip": true, "retired": true, "name": "Le Filon", "cat": "slot", "tag": "Machine à sous", "sub": "Mine d’or · cases jusqu’à ×8 192", "colors": ["#f59e0b", "#1c1006"], "description": "Une vieille mine d’or où chaque case de la grille 7×7 cache un multiplicateur. 10 symboles identiques n’importe où paient et tombent en cascade, et chaque gain pose un ×2 sur sa case, puis le double : ×4, ×8… jusqu’à ×8 192. Minerais mystère, dynamite et joker doré font grimper les cases. 3, 4 ou 5 BONUS lancent La Veine d’or, La Grande Galerie ou La Ruée vers l’or : la roue des bonus, et des multiplicateurs qui ne repartent jamais à zéro.", "features": ["Volatilité extrême", "Grille 7×7 Pay Anywhere", "Cascades", "Multiplicateurs des cases ×2 à ×8 192", "Minerais mystère et dynamite", "3 bonus et la roue des bonus", "Mise boostée et tour doré", "5 achats de bonus", "Max ×30 000"], "rtp": "≈ 92 %", "vol": 5, "max": "×30 000"},
   {"id": "gratteciel", "name": "Le Gratte-Ciel", "cat": "quick", "tag": "Adresse", "sub": "Lâche les cubes, vise juste", "colors": ["#38bdf8", "#0b1630"], "description": "Construis le plus haut gratte-ciel ! La grue promène un cube de plus en plus vite : lâche-le pour qu’il tombe pile sur le socle, puis sur les cubes déjà posés. Pas de coup de vent : la tour tient tant qu’elle est bien équilibrée, mais un cube trop raté ou une tour qui penche trop, et tout s’écroule. Chaque cube posé multiplie ta mise.", "features": ["Jeu d’adresse", "Jusqu’à 30 cubes", "La grue va de plus en plus vite", "Une vraie tour qui penche si tu vises mal", "Encaisse quand tu veux"], "rtp": "≈ 96 % (très bon joueur)", "vol": 4, "max": "×22,14"},
   {"id": "penalty", "name": "Le Penalty", "cat": "quick", "tag": "Instantané", "sub": "Marque ou perds tout", "colors": ["#22c55e", "#071a10"], "description": "Face au gardien, choisis où tirer. But : ton gain est multiplié par 1,5. Arrêt : tu perds tout ! Jusqu’à 10 tirs d’affilée, encaisse quand tu veux.", "features": ["6 endroits de tir", "×1,5 à chaque but", "Jusqu’à 10 tirs", "Encaisse quand tu veux"], "rtp": "96 %", "vol": 4, "max": "×55,3"},
   {"id": "ticket", "name": "Le Ticket", "cat": "quick", "tag": "Grattage", "sub": "Lot de 5 tickets à gratter", "colors": ["#facc15", "#1d0f2e"], "description": "Achète un lot de 5 tickets à gratter et découvre si tu es rentable ! 3 montants identiques sur un ticket et tu gagnes ce montant. Plus le ticket coûte cher, plus les gains sont gros.", "features": ["5 tickets par lot", "Grattage au doigt ou à la souris", "Gains selon le prix du ticket", "Bilan rentable ou non"], "rtp": "≈ 95 %", "vol": 3, "max": "×1 000 le ticket"},
@@ -13273,15 +13325,18 @@ const ORIGINALS = [
   {"id": "pilote", "name": "Le Pilote", "cat": "quick", "tag": "Vol", "sub": "Pose-toi sur le bon porte-avions", "colors": ["#38bdf8", "#0b2a6f"], "description": "Ton avion décolle avec ×1 et vole sans fin au-dessus de la mer : prends les multiplicateurs (×2 à ×10, jusqu’à +100), esquive les bombes (÷2 à ÷10), profite des boosts et tiens bon dans les trous d’air. Quand il n’a plus d’altitude, il se pose là où il est : dans la mer tu perds tout, sur un porte-avions tu gagnes ×1, ×2 ou ×5 ton gain… et avec le BONUS, tous les porte-avions sont ×10 !", "features": ["Vol sans fin, jusqu’à 30 secondes", "Multiplicateurs jusqu’à ×10 et +100", "Boosts et trous d’air", "BONUS : tous les porte-avions ×10", "Altitude, vitesse et distance en direct"], "rtp": "≈ 97 %", "vol": 5, "max": "×1 000"},
   {"id": "foot", "name": "Le Derby", "cat": "quick", "tag": "Foot entre amis", "sub": "Match de foot 11 contre 11 en direct", "colors": ["#22c55e", "#0b3d1f"], "description": "Un vrai match de foot 11 contre 11 en direct contre un ami : choisis ta mise, ton ami mise la même somme et le gagnant rafle toute la cagnotte (match nul : chacun récupère sa mise). Stick et boutons PASSE, TIR, TACLE et SPRINT sur téléphone, clavier ou manette sur ordinateur. Passes, frappes, têtes, tacles glissés, corners, coups francs et penaltys, avec la caméra de la télé et le ralenti de chaque but. Entraîne-toi d’abord contre l’ordinateur !", "features": ["11 contre 11 en direct entre amis", "Mise libre : le gagnant prend tout", "Match nul = mises rendues", "Stick + PASSE, TIR, TACLE, SPRINT", "Clavier ou manette sur ordinateur", "Caméra TV et ralenti des buts", "Entraînement contre l’ordinateur"], "rtp": "100 % (entre amis)", "vol": 3, "max": "×2 la mise"},
   {"id": "boxe", "name": "Le Ring", "cat": "quick", "tag": "Boxe entre amis", "sub": "Combat de boxe en direct", "colors": ["#ef4444", "#450a0a"], "description": "Un vrai combat de boxe en direct contre un ami : choisis ta mise, ton ami mise la même somme et le vainqueur rafle toute la bourse (match nul : chacun récupère sa mise). Droite, crochet, uppercut, coups au corps, esquives, garde haute ou basse et contres, en 1re personne (tes gants devant toi, l’adversaire en face), en 3e personne ou en vue TV. Knockdowns, compte de l’arbitre, K.-O. et décision des 3 juges. Entraîne-toi d’abord contre l’ordinateur !", "features": ["Combat de boxe en direct entre amis", "Mise libre : le vainqueur prend tout", "Match nul = mises rendues", "DROITE, CROCHET, UPPERCUT, ESQUIVE, GARDE", "1re personne, 3e personne ou vue TV", "Knockdowns, K.-O. et décision des juges", "Entraînement contre l’ordinateur"], "rtp": "100 % (entre amis)", "vol": 3, "max": "×2 la mise"},
-  {"id": "taco", "name": "La Pizza Yo-Yo", "cat": "slot", "tag": "Machine à sous", "sub": "La pizza qui tourne", "colors": ["#f97316", "#7c2d12"], "description": "Une pizza ronde qui tourne ! Elle s’arrête avec un quart ouvert où tombent les symboles : 4 identiques qui se touchent gagnent, les autres glissent vers le centre, et les grosses connexions écartent une part de plus. Les food trucks multiplient le gain. Bonus Le Four : chaque 4ᵉ pepperoni ouvre une part et donne +2 tours, jusqu’à la pizza entière.", "features": ["Pizza ronde qui tourne", "Connexions de 4 symboles", "Parts qui s’écartent", "Food trucks multiplicateurs ×2 à ×50", "Bonus Le Four et Super Four", "Pepperonis à collectionner", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
+  {"id": "taco", "wip": true, "retired": true, "name": "La Pizza Yo-Yo", "cat": "slot", "tag": "Machine à sous", "sub": "La pizza qui tourne", "colors": ["#f97316", "#7c2d12"], "description": "Une pizza ronde qui tourne ! Elle s’arrête avec un quart ouvert où tombent les symboles : 4 identiques qui se touchent gagnent, les autres glissent vers le centre, et les grosses connexions écartent une part de plus. Les food trucks multiplient le gain. Bonus Le Four : chaque 4ᵉ pepperoni ouvre une part et donne +2 tours, jusqu’à la pizza entière.", "features": ["Pizza ronde qui tourne", "Connexions de 4 symboles", "Parts qui s’écartent", "Food trucks multiplicateurs ×2 à ×50", "Bonus Le Four et Super Four", "Pepperonis à collectionner", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
   {"id": "billets", "name": "Le Coffre-Fort", "cat": "slot", "tag": "Machine à sous", "sub": "Billets, mallette et jackpots", "colors": ["#fbbf24", "#2a1a05"], "description": "Dans la chambre forte de la Banque SpinBet, les billets de 5 à 200\u00a0\uE1E0 tombent sur 5 rouleaux et 243 façons de gagner. Les billets cash cachent des gains, un MINI, un MAJEUR ou le JACKPOT ×500 : il suffit d’une mallette sur le dernier rouleau pour tout collecter. 3 billets FREE SPINS lancent 8 tours gratuits avec des mallettes partout.", "features": ["243 façons de gagner", "Billets de 5 à 200\u00a0\uE1E0", "Coffre-fort WILD", "Billets cash et mallette", "MINI ×10, MAJEUR ×50, JACKPOT ×500", "8 free spins", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
   {"id": "dragons", "name": "L’Hydre", "cat": "slot", "tag": "Machine à sous", "sub": "Fusionne les têtes, ça retombe", "colors": ["#f97316", "#1c0a05"], "description": "Dans l’antre des dragons, les rouleaux vont par paires : moitiés gauches de têtes d’un côté, moitiés droites de l’autre. Quand les deux moitiés de la même tête se rejoignent, la séparation s’efface, les deux cases n’en font plus qu’une et le dragon paie. Puis il disparaît, tout retombe et chaque nouvelle tête complète paie à nouveau. Perles jokers, dragons MINI, MAJEUR et JACKPOT ×500, dragon scatters pour 10 free spins avec des dragons multiplicateurs, et le SUPER scatter qui lance le Super Bonus : multiplicateurs jusqu’à ×100 et cases MINI, MAJEUR, JACKPOT.", "features": ["3 paires de rouleaux encadrés", "Fusion des deux moitiés", "Cascades : ça repaie", "Perle joker", "Dragon scatter : 10 free spins", "SUPER scatter : Super Bonus", "Multiplicateurs jusqu’à ×100", "Cases MINI, MAJEUR, JACKPOT", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×5 000"},
-  {"id": "labo", "name": "Le Labo", "cat": "slot", "tag": "Machine à sous", "sub": "Le Dealer, La Descente, La Mallette", "colors": ["#a855f7", "#0d0415"], "description": "Un labo clandestin multicolore où tout plane : feuilles, joints, pilules arc-en-ciel, champignons magiques, buvards, cachets roses, sachets de poudre et la brique du cartel, en plein festival, avec le Boss en symbole premium. 1024 façons de gagner. Le Dealer pose des WILD, La Descente lance un trip de tours gratuits où le multiplicateur monte à chaque gain, et La Mallette lance un bonus de taz : la fumée verte récolte leurs multiplicateurs, les feuilles les multiplient, la taz magique aspire tout, et un écran plein de taz déclenche le jackpot Le Cartel ×1000.", "features": ["5 rouleaux, 1024 façons", "WILD – Le Dealer", "Free spins – La Descente", "Multiplicateur qui monte", "Bonus – La Mallette", "Jackpot – Le Cartel ×1000", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
+  {"id": "labo", "wip": true, "retired": true, "name": "Le Labo", "cat": "slot", "tag": "Machine à sous", "sub": "Le Dealer, La Descente, La Mallette", "colors": ["#a855f7", "#0d0415"], "description": "Un labo clandestin multicolore où tout plane : feuilles, joints, pilules arc-en-ciel, champignons magiques, buvards, cachets roses, sachets de poudre et la brique du cartel, en plein festival, avec le Boss en symbole premium. 1024 façons de gagner. Le Dealer pose des WILD, La Descente lance un trip de tours gratuits où le multiplicateur monte à chaque gain, et La Mallette lance un bonus de taz : la fumée verte récolte leurs multiplicateurs, les feuilles les multiplient, la taz magique aspire tout, et un écran plein de taz déclenche le jackpot Le Cartel ×1000.", "features": ["5 rouleaux, 1024 façons", "WILD – Le Dealer", "Free spins – La Descente", "Multiplicateur qui monte", "Bonus – La Mallette", "Jackpot – Le Cartel ×1000", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×5 000"},
   {"id": "fortune", "name": "La Fortune", "cat": "slot", "tag": "Machine à sous", "sub": "Nouvel an chinois, pièces d’or et Hold & Spin", "colors": ["#ef4444", "#7f1d1d"], "description": "Le nouvel an chinois sous les lanternes : 5 rouleaux, 243 façons de gagner et un dragon d’or WILD. Les pièces d’or qui tombent montent dans le bol et le tas de pièces grandit spin après spin, jusqu’au prochain bonus. 6 pièces lancent le HOLD & SPIN avec les jackpots progressifs MINI, MAJOR et JACKPOT, et des lignes qui s’allument ×2 ou ×5. 4 scatters : le MÉGA BONUS, où chaque pièce vaut ×2 à ×5.", "features": ["243 façons de gagner", "Dragon d’or WILD", "Tas de pièces qui grandit", "Hold & Spin dès 6 pièces", "MINI, MAJOR et JACKPOT progressifs", "Lignes ×2 et ×5", "MÉGA BONUS : 4 scatters", "Achat de bonus", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×5 000"},
 ].map((g) => ({ ...g, original: true }));
 
-const ALL_GAMES = [...GAMES, ...ORIGINALS];
-const getGame = (id) => ALL_GAMES.find((g) => g.id === id);
+// Retired games (owner's request of 16 November 2026: « retirée », can come back by removing "retired" and "wip" from
+// their line): out of every list of the site, but getGame still finds them (players' achievements, records, history).
+const RETIRED = ORIGINALS.filter((g) => g.retired);
+const ALL_GAMES = [...GAMES, ...ORIGINALS.filter((g) => !g.retired)];
+const getGame = (id) => ALL_GAMES.find((g) => g.id === id) || RETIRED.find((g) => g.id === id);
 // Max win: every slot machine stops paying at maxX × the stake for one round (bonus included). Reaching it wins
 // the site's common jackpot (jackpot.js). Read from the "max" shown on the game page (×5 000 → 5000).
 const isSlot = (g) => !!g && (!g.original || g.cat === 'slot');
@@ -13289,7 +13344,8 @@ ALL_GAMES.forEach((g) => { if (!g.colors) g.colors = ['#7cc8ff', '#1e293b']; });
 ALL_GAMES.forEach((g) => { if (isSlot(g)) g.maxX = parseInt(String(g.max || '').replace(/\D/g, ''), 10) || 5000; });
 const SLOTS = ALL_GAMES.filter((g) => isSlot(g) && !g.wip); // a game "en travaux" (wip) is shown locked and counts nowhere
 
-return { GAMES, ORIGINALS, ALL_GAMES, getGame, isSlot, SLOTS };
+RETIRED.forEach((g) => { if (!g.colors) g.colors = ['#7cc8ff', '#1e293b']; if (isSlot(g)) g.maxX = parseInt(String(g.max || '').replace(/\D/g, ''), 10) || 5000; });
+return { GAMES, ORIGINALS: ORIGINALS.filter((g) => !g.retired), ALL_GAMES, RETIRED, getGame, isSlot, SLOTS };
 })();
 
 // ---- covers.js ----
@@ -14317,10 +14373,11 @@ const UPDATES = [
 const RECENT_DAYS = 14;
 
 const fmtDate = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
-const latestFor = (test) => UPDATES.filter((u) => { const g = getGame(u.game); return g && test(g); });
-const recent = (id) => UPDATES.find((u) => u.game === id && (Date.now() - Date.parse(`${u.date}T12:00:00`)) / 864e5 <= RECENT_DAYS);
+const LIVE = UPDATES.filter((u) => !getGame(u.game)?.retired); // a retired game's posters leave the site with it
+const latestFor = (test) => LIVE.filter((u) => { const g = getGame(u.game); return g && test(g); });
+const recent = (id) => LIVE.find((u) => u.game === id && (Date.now() - Date.parse(`${u.date}T12:00:00`)) / 864e5 <= RECENT_DAYS);
 
-return { UPDATES, latestFor, recent, fmtDate };
+return { UPDATES: LIVE, latestFor, recent, fmtDate };
 })();
 
 // ---- pages/lobby.js ----
@@ -17511,7 +17568,7 @@ function renderGame(root, { id }) {
   const game = getGame(id);
   if (!game) { location.hash = '#accueil'; return; }
   if (game.wip && !/[?&]essai\b/.test(location.search)) { // ?essai : the owner tries a game en travaux before it opens
-    root.innerHTML = `<section class="panel locked-game wip-page"><div class="wip-big">🔒</div><h2>${game.name}</h2><p><b>En travaux</b> : cette machine arrive bientôt.</p><a class="btn primary" href="#lobby-slot">Voir les autres machines</a></section>`;
+    root.innerHTML = `<section class="panel locked-game wip-page"><div class="wip-big">${game.retired ? '🚫' : '🔒'}</div><h2>${game.name}</h2>${game.retired ? '<p><b>Machine retirée</b> : ce jeu n’est plus disponible pour le moment. Tes succès et tes records restent sur ton profil.</p>' : '<p><b>En travaux</b> : cette machine arrive bientôt.</p>'}<a class="btn primary" href="#lobby-slot">Voir les autres machines</a></section>`;
     return;
   }
   if (!profiles.current) {
@@ -18008,7 +18065,7 @@ const { progress } = __mods['progress.js'];
 const { toast } = __mods['ui.js'];
 const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
-const { ALL_GAMES } = __mods['games/index.js'];
+const { ALL_GAMES, RETIRED } = __mods['games/index.js'];
 const { coverSVG } = __mods['covers.js'];
 
 // k: n = tours joués, w = tours gagnants, x = meilleur gain (× la mise), b = bonus déclenchés en jeu,
@@ -18057,6 +18114,11 @@ const masterFor = (p) => ({ ...MASTER, ke: Math.round(MASTER.ke * P_REW(p)), xp:
 
 const SLOTS = ALL_GAMES.filter((g) => (!g.original || g.cat === 'slot') && !g.wip);
 const isSlot = (id) => SLOTS.some((g) => g.id === id);
+// A retired machine (owner's request of 16 November 2026) keeps its achievements on the player's profile, marked
+// « Machine supprimée » : it is listed only for a player who has something there (it can no longer move forward).
+const RET_SLOTS = (RETIRED || []).filter((g) => g.cat === 'slot');
+const mySlots = () => { const d = data(); return [...SLOTS, ...RET_SLOTS.filter((g) => d.s[g.id] || d.c[g.id]?.length || d.m[g.id] || d.p[g.id])]; };
+const RET_TAG = '<em class="ac-ret">Machine supprimée</em>';
 const gameNow = () => (location.hash.match(/^#game-([\w-]+)/) || [])[1] || null;
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
@@ -18075,20 +18137,20 @@ function gameStatus(gid) {
   const rows = tiersFor(p, gid).map((t) => ({ ...t, have: Math.min(have(st, t), goalOf(t)), max: goalOf(t), done: doneT(st, t), claimed: claimed.includes(t.id) }));
   const nClaimed = rows.filter((r) => r.claimed).length, master = !!data().m[gid];
   return { gid, st, rows, nClaimed, toClaim: rows.filter((r) => r.done && !r.claimed).length, master, masterReady: nClaimed === TIERS.length && !master,
-    prestige: p, M: masterFor(p), prestigeReady: master && p < MAX_PRESTIGE };
+    prestige: p, M: masterFor(p), prestigeReady: master && p < MAX_PRESTIGE && !RET_SLOTS.some((g) => g.id === gid) };
 }
 function summary() {
-  const list = SLOTS.map((g) => gameStatus(g.id));
+  const all = mySlots(), list = all.map((g) => gameStatus(g.id));
   const d = data();
   let pts = 0;
   for (const s of list) { pts += s.rows.filter((r) => r.claimed).reduce((a, r) => a + r.pts, 0) + (s.master ? MASTER.pts : 0) + s.prestige * (PER_GAME + PRESTIGE.pts); }
-  return { list, pts, unlocked: list.reduce((a, s) => a + s.nClaimed, 0), total: SLOTS.length * TIERS.length, masters: list.filter((s) => s.master).length,
+  return { list, pts, unlocked: list.reduce((a, s) => a + s.nClaimed, 0), total: all.length * TIERS.length, masters: list.filter((s) => s.master).length,
     toClaim: list.reduce((a, s) => a + s.toClaim + (s.masterReady ? 1 : 0), 0), ke: d.ke, trophies: list.reduce((a, s) => a + s.prestige, 0) };
 }
 const points = () => summary().pts;
 
 // --- tracking ---
-const nameOf = (gid) => SLOTS.find((g) => g.id === gid)?.name || gid;
+const nameOf = (gid) => mySlots().find((g) => g.id === gid)?.name || gid;
 function bump(gid, fn) {
   if (!profiles.current || !isSlot(gid)) return;
   const before = gameStatus(gid).rows.filter((r) => r.done).map((r) => r.id);
@@ -18161,7 +18223,7 @@ const PR_TIERS = [
   { n: 1, ico: '🥉', name: 'Bronze', c: '#cd7f32' }, { n: 5, ico: '🥈', name: 'Argent', c: '#cbd5e1' }, { n: 10, ico: '🥇', name: 'Or', c: '#facc15' },
   { n: 25, ico: '💠', name: 'Platine', c: '#67e8f9' }, { n: 50, ico: '💎', name: 'Diamant', c: '#a78bfa' }, { n: 100, ico: '👑', name: 'Légende', c: '#f472b6' },
 ];
-const totalPrestige = () => SLOTS.reduce((a, g) => a + prestigeOf(g.id), 0);
+const totalPrestige = () => mySlots().reduce((a, g) => a + prestigeOf(g.id), 0);
 const prestigeTier = (n) => [...PR_TIERS].reverse().find((t) => n >= t.n) || null;
 function tiersHTML(n) {
   const next = PR_TIERS.find((t) => n < t.n);
@@ -18170,12 +18232,12 @@ function tiersHTML(n) {
 }
 // Trophies on the profile: the prestige tiers, then one trophy per machine with at least one prestige, its cover under it.
 function trophiesHTML() {
-  const list = SLOTS.map((g) => ({ g, p: prestigeOf(g.id) })).filter((x) => x.p > 0).sort((a, b) => b.p - a.p);
+  const list = mySlots().map((g) => ({ g, p: prestigeOf(g.id) })).filter((x) => x.p > 0).sort((a, b) => b.p - a.p);
   return `<section class="panel trophies"><div class="sec-head"><h2>🏆 Mes trophées de prestige</h2><a class="more" href="#succes">Succès</a></div>
     ${tiersHTML(totalPrestige())}
-    ${list.length ? `<div class="tr-grid">${list.map(({ g, p }) => `<a class="tr-item p${p}" href="#game-${g.id}" title="${esc(g.name)} · prestige ${p} / ${MAX_PRESTIGE}">
+    ${list.length ? `<div class="tr-grid">${list.map(({ g, p }) => `<a class="tr-item p${p}" href="${g.retired ? '#succes' : `#game-${g.id}`}" title="${esc(g.name)} · prestige ${p} / ${MAX_PRESTIGE}">
       <span class="tr-cup">🏆<b>${ROMAN[p]}</b></span><span class="tr-stars">${'★'.repeat(p)}${'☆'.repeat(MAX_PRESTIGE - p)}</span>
-      <span class="tr-cover">${coverSVG(g, { square: true, badge: false })}</span><small>${esc(g.name)}</small></a>`).join('')}</div>`
+      <span class="tr-cover">${coverSVG(g, { square: true, badge: false })}</span><small>${esc(g.name)}${g.retired ? `<br>${RET_TAG}` : ''}</small></a>`).join('')}</div>`
       : '<p class="muted small">Maîtrise les 10 succès d’une machine, ouvre son coffre puis passe <b>prestige</b> : tu gagnes un trophée à son nom. 7 prestiges par machine, de plus en plus durs.</p>'}</section>`;
 }
 
@@ -18193,11 +18255,11 @@ function renderAchievements(root) {
   const me = profiles.current, sm = summary();
   const pct = (a, b) => Math.round((Math.min(a, b) / b) * 100);
   const card = (s) => {
-    const g = SLOTS.find((x) => x.id === s.gid), open = openGid === s.gid;
+    const g = mySlots().find((x) => x.id === s.gid), open = openGid === s.gid;
     return `<article class="ac-game${open ? ' open' : ''}${s.master ? ' master' : ''}" data-gid="${s.gid}">
       <button class="ac-head" data-open="${s.gid}" aria-expanded="${open}">
         <span class="tile-art">${coverSVG(g, { square: true })}</span>
-        <span class="ac-title"><b>${esc(g.name)}${s.prestige ? ` <em class="ac-pr">⭐ Prestige ${ROMAN[s.prestige]}</em>` : ''}</b><small>${s.master ? (s.prestige >= MAX_PRESTIGE ? '🏆 Prestige maximum' : '👑 Machine maîtrisée · prestige disponible') : `${s.nClaimed} / ${TIERS.length} succès`}</small>
+        <span class="ac-title"><b>${esc(g.name)}${g.retired ? ` ${RET_TAG}` : ''}${s.prestige ? ` <em class="ac-pr">⭐ Prestige ${ROMAN[s.prestige]}</em>` : ''}</b><small>${s.master ? (s.prestige >= MAX_PRESTIGE ? '🏆 Prestige maximum' : '👑 Machine maîtrisée · prestige disponible') : `${s.nClaimed} / ${TIERS.length} succès`}</small>
           <span class="ac-bar"><i style="width:${pct(s.nClaimed, TIERS.length)}%"></i></span></span>
         ${s.toClaim || s.masterReady ? `<span class="ac-dot">${s.toClaim + (s.masterReady ? 1 : 0)}</span>` : ''}
         <span class="ac-chev">${open ? '▴' : '▾'}</span>
@@ -18219,7 +18281,7 @@ function renderAchievements(root) {
           <div class="ac-body"><b>${s.prestige >= MAX_PRESTIGE ? 'Prestige maximum atteint' : `Prestige ${ROMAN[s.prestige + 1]} / ${ROMAN[MAX_PRESTIGE]}`}</b><small>${s.prestige >= MAX_PRESTIGE ? `Les 7 trophées de ${esc(g.name)} sont à toi. Respect !` : `Ouvre le coffre de maîtrise puis passe prestige : un trophée ${esc(g.name)} sur ton profil, +${fmt(PRESTIGE.ke(s.prestige + 1))}, et les 10 succès recommencent, plus durs et mieux payés.`}</small></div>
           <div class="ac-rew">${s.prestigeReady ? `<button class="btn primary" data-prestige="${s.gid}">⭐ Passer prestige</button>` : s.prestige >= MAX_PRESTIGE ? '<span class="ac-ok">🏆 ×7</span>' : `<span>🏆 +${fmt(PRESTIGE.ke(s.prestige + 1))}</span>`}</div>
         </li></ol>
-        <a class="btn ghost ac-play" href="#game-${s.gid}">Jouer à ${esc(g.name)}</a>` : ''}
+        ${g.retired ? '<p class="muted small ac-play">Machine supprimée : tes succès restent sur ton profil (tu peux encore récupérer ce qui est gagné).</p>' : `<a class="btn ghost ac-play" href="#game-${s.gid}">Jouer à ${esc(g.name)}</a>`}` : ''}
     </article>`;
   };
   root.innerHTML = `
@@ -18231,8 +18293,8 @@ function renderAchievements(root) {
       <div class="ac-stats">
         <div><b>${sm.unlocked}<small> / ${sm.total}</small></b><span>Succès</span></div>
         <div><b>${sm.pts}</b><span>Points</span></div>
-        <div><b>${sm.masters}<small> / ${SLOTS.length}</small></b><span>Maîtrisées</span></div>
-        <div><b>${sm.trophies}<small> / ${SLOTS.length * MAX_PRESTIGE}</small></b><span>Trophées</span></div>
+        <div><b>${sm.masters}<small> / ${sm.list.length}</small></b><span>Maîtrisées</span></div>
+        <div><b>${sm.trophies}<small> / ${sm.list.length * MAX_PRESTIGE}</small></b><span>Trophées</span></div>
         <div><b>${fmt(sm.ke)}</b><span>Gagnés</span></div>
       </div>
       <div class="lb-tabs ac-tabs" role="tablist">
@@ -18486,17 +18548,36 @@ const NOISE = /Script error|ResizeObserver|permission|network|offline|Failed to 
 addEventListener('error', (e) => { if (!e.message || NOISE.test(e.message)) return; logError(e.message, `${e.filename || ''}:${e.lineno || 0}`, e.error?.stack); });
 addEventListener('unhandledrejection', (e) => { const r = e.reason, m = r?.message || String(r); if (NOISE.test(m)) return; logError(m, 'promise', r?.stack); });
 
-// counts, sent once a minute (and when the page is left)
-let opens = {}, spins = {}, lastOpen = '';
+// counts, sent every 5 minutes (and when the page is left). Since 16 November 2026 (owner's dashboard #tableau), also
+// per game: seconds spent on its page (visible), KE wagered, KE won, bonuses started (not bought) — in two more
+// documents of the same collection (no new Firestore rule): stats/AAAA-MM-JJ_m = { opens: seconds, spins: KE wagered }
+// and stats/AAAA-MM-JJ_w = { opens: KE won, spins: bonuses }.
+let opens = {}, spins = {}, lastOpen = '', tsec = {}, bet = {}, won = {}, bon = {};
 const day = () => new Date().toISOString().slice(0, 10);
+const add = (o, k, v) => { o[k] = Math.round(((o[k] || 0) + v) * 100) / 100; };
 function onRoute() { const g = gameNow(); if (g && g !== lastOpen) opens[g] = (opens[g] || 0) + 1; lastOpen = g; }
 addEventListener('hashchange', onRoute); setTimeout(onRoute, 1500);
-wallet.addEventListener('wager', () => { const g = gameNow(); if (g) spins[g] = (spins[g] || 0) + 1; });
+wallet.addEventListener('wager', (e) => { const g = gameNow(); if (g) { spins[g] = (spins[g] || 0) + 1; add(bet, g, +e.detail?.amount || 0); } });
+wallet.addEventListener('payout', (e) => { const g = gameNow(); if (g && e.detail?.meta) add(won, g, +e.detail.amount || 0); });
+addEventListener('sb:feature', (e) => { const g = e.detail?.game || gameNow(); if (g && !e.detail?.re && !e.detail?.bought) bon[g] = (bon[g] || 0) + 1; });
+setInterval(() => { const g = gameNow(); if (g && !document.hidden) tsec[g] = (tsec[g] || 0) + 10; }, 10000);
 const robot = /[?&]nostats\b/.test(location.search); // the Shorts robot: nothing counted
+const back = (to, from) => { for (const k in from) add(to, k, from[k]); };
 function flush() {
-  if (robot || !cloud.enabled || (!Object.keys(opens).length && !Object.keys(spins).length)) return;
-  const o = opens, s = spins; opens = {}; spins = {};
-  cloud.bumpStats(day(), o, s).catch(() => { for (const k in o) opens[k] = (opens[k] || 0) + o[k]; for (const k in s) spins[k] = (spins[k] || 0) + s[k]; });
+  if (robot || !cloud.enabled) return;
+  const d = day();
+  if (Object.keys(opens).length || Object.keys(spins).length) {
+    const o = opens, s = spins; opens = {}; spins = {};
+    cloud.bumpStats(d, o, s).catch(() => { back(opens, o); back(spins, s); });
+  }
+  if (Object.keys(tsec).length || Object.keys(bet).length) {
+    const o = tsec, s = bet; tsec = {}; bet = {};
+    cloud.bumpStats(`${d}_m`, o, s).catch(() => { back(tsec, o); back(bet, s); });
+  }
+  if (Object.keys(won).length || Object.keys(bon).length) {
+    const o = won, s = bon; won = {}; bon = {};
+    cloud.bumpStats(`${d}_w`, o, s).catch(() => { back(won, o); back(bon, s); });
+  }
 }
 setInterval(flush, 5 * 60000); // every 5 min (fewer Firebase writes) and when the page is left
 document.addEventListener('visibilitychange', () => { if (document.hidden) flush(); });
@@ -19816,12 +19897,12 @@ const BOTS = [
   ['m1', 'Mathis_92', 2, 0.3, [18, 24], 5, ['zeus', 'cosmic', 'viking']],
   ['m2', 'Clara.lyon', 1, 0.22, [12, 15, 20, 23], 2, ['candy', 'fortune', 'chasse']],
   ['m3', 'Kévin13', 2, 0.35, [19, 25], 10, ['anubis', 'redk', 'barillet']],
-  ['m4', 'Inès_bzh', 1, 0.15, [9, 12, 21, 23], 1, ['candy', 'bling', 'pharaon']],
+  ['m4', 'Inès_bzh', 1, 0.15, [9, 12, 21, 23], 1, ['candy', 'bling', 'totemx']],
   ['m5', 'Lucas.v', 2, 0.28, [17, 23], 5, ['big-bad-wolf', 'huff', 'dragons']],
-  ['m6', 'Manon_59', 1, 0.25, [13, 17, 20, 24], 2, ['filon', 'pirates', 'zeus']],
-  ['m7', 'Yanis_93', 3, 0.33, [20, 26], 10, ['redk', 'filon', 'totemx']],
+  ['m6', 'Manon_59', 1, 0.25, [13, 17, 20, 24], 2, ['dragons', 'fortune', 'zeus']],
+  ['m7', 'Yanis_93', 3, 0.33, [20, 26], 10, ['redk', 'barillet', 'totemx']],
   ['m8', 'Léa.nice', 1, 0.18, [11, 14, 18, 22], 1, ['fortune', 'candy', 'huff']],
-  ['m9', 'Théo_67', 2, 0.27, [16, 20, 22, 25], 5, ['viking', 'anubis', 'pirates']],
+  ['m9', 'Théo_67', 2, 0.27, [16, 20, 22, 25], 5, ['viking', 'anubis', 'chasse']],
   ['m10', 'Sarah.mtp', 1, 0.2, [19, 24], 3, ['cosmic', 'bling', 'big-bad-wolf']],
 ].map(([id, name, lv0, pace, hours, stake, fav]) => ({ id, uid: `maison:${id}`, name, lv0, pace, hours, stake, fav }));
 
@@ -20220,7 +20301,7 @@ const hhmm = (t) => { const p = paris(t); return p.h === 0 && p.mi === 0 ? 'minu
 const dayName = (t) => new Date(t).toLocaleDateString('fr-FR', { timeZone: 'Europe/Paris', weekday: 'long', day: 'numeric', month: 'long' });
 
 /* ---------- les tournois ---------- */
-const ROT = ['fortune', 'cosmic', 'zeus', 'huff', 'candy', 'anubis', 'bling', 'pharaon', 'taco', 'billets', 'dragons', 'labo', 'chasse', 'big-bad-wolf'].filter((g) => getGame(g));
+const ROT = ['fortune', 'cosmic', 'zeus', 'huff', 'candy', 'anubis', 'bling', 'billets', 'dragons', 'chasse', 'big-bad-wolf'].filter((g) => getGame(g));
 const KINDS = {
   soir: { label: 'Tournoi du soir', short: 'Du soir', icon: '🌙', when: 'tous les soirs de 21 h à minuit',
     prizes: [10000, 5000, 2500, 1000, 1000, 1000, 1000, 1000, 1000, 1000], part: { spins: 50, ke: 500 } },
@@ -21608,7 +21689,7 @@ paintVibe();
 const FLASH = { per: 3, minutes: 30, mult: 2, cap: 20000, from: 12, to: 21 };
 // Same draw as tools/push/send.mjs (flashesOf): keep both in step.
 const seedOf = (s) => { let h = 2166136261; for (const c of s) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return () => ((h = Math.imul(h ^ (h >>> 15), 2246822507) >>> 0) / 4294967296); };
-const POOL = ['fortune', 'cosmic', 'zeus', 'huff', 'candy', 'anubis', 'bling', 'pharaon', 'taco', 'billets', 'dragons', 'labo', 'chasse', 'big-bad-wolf', 'noel', 'totemx'];
+const POOL = ['fortune', 'cosmic', 'zeus', 'huff', 'candy', 'anubis', 'bling', 'billets', 'dragons', 'chasse', 'big-bad-wolf', 'noel', 'totemx'];
 function flashesOf(t = Date.now()) {
   const p = E.paris(t), key = `${p.y}-${p.m}-${p.d}`, rnd = seedOf(`flash-${key}`);
   const hours = [];
@@ -21982,7 +22063,7 @@ const { getGame } = __mods['games/index.js'];
 const E = __mods['events.js'];
 
 const ENTRY = 500, SPINS = 10, MANCHE = 15 * 60000, FROM = 12, TO = 23;
-const POOL = ['fortune', 'cosmic', 'zeus', 'huff', 'candy', 'anubis', 'bling', 'pharaon', 'taco', 'billets', 'dragons', 'labo', 'chasse', 'big-bad-wolf', 'noel', 'totemx'];
+const POOL = ['fortune', 'cosmic', 'zeus', 'huff', 'candy', 'anubis', 'bling', 'billets', 'dragons', 'chasse', 'big-bad-wolf', 'noel', 'totemx'];
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 const xs = (x) => `×${(Math.round(x * 10) / 10).toLocaleString('fr-FR')}`;
 const me = () => (profiles.online && profiles.current ? { uid: profiles.store.current, name: String(profiles.current.name || 'Joueur').slice(0, 16) } : null);
@@ -24077,6 +24158,131 @@ document.addEventListener('click', async (e) => {
 return { renderShorts };
 })();
 
+// ---- tableau.js ----
+__mods['tableau.js'] = (() => {
+// Tableau de bord du propriétaire (page #tableau, dans aucun menu ; demande du 16 novembre 2026) : où vont les joueurs,
+// combien de temps ils restent, ce que chaque jeu a rapporté. Lu dans Firestore stats/ (monitor.js) : stats/AAAA-MM-JJ
+// (ouvertures, tours, visites, sources) depuis le 5 novembre 2026, stats/AAAA-MM-JJ_m (secondes, KE misés) et
+// stats/AAAA-MM-JJ_w (KE gagnés par les joueurs, bonus déclenchés) depuis le 16 novembre 2026. Lecture réservée aux
+// comptes de admins/ (règles Firestore déjà en place).
+const { cloud } = __mods['cloud.js'];
+const { profiles } = __mods['profile.js'];
+const { fmt } = __mods['wallet.js'];
+const { getGame, isSlot } = __mods['games/index.js'];
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const FIRST = '2026-11-05', MONEY = '2026-11-16';
+const RANGES = [['1', 'Aujourd’hui'], ['7', '7 jours'], ['30', '30 jours'], ['all', 'Depuis le début']];
+let range = '7', cat = 'slot', sortBy = 'opens', cache = {};
+const n = (x) => Math.round(x || 0).toLocaleString('fr-FR');
+const dur = (sec) => { const m = Math.round((sec || 0) / 60); return m >= 60 ? `${Math.floor(m / 60)} h ${String(m % 60).padStart(2, '0')}` : `${m} min`; };
+const dayList = (k) => {
+  const today = new Date().toISOString().slice(0, 10);
+  const span = k === 'all' ? Math.min(180, Math.round((Date.parse(today) - Date.parse(FIRST)) / 864e5) + 1) : +k;
+  return Array.from({ length: span }, (_, i) => new Date(Date.now() - i * 864e5).toISOString().slice(0, 10)).reverse();
+};
+async function load(days) {
+  const need = days.filter((d) => !cache[d]);
+  if (need.length) {
+    const ids = need.flatMap((d) => [d, `${d}_m`, `${d}_w`]);
+    const docs = await cloud.readStats(ids);
+    need.forEach((d, i) => { cache[d] = { a: docs[i * 3] || {}, m: docs[i * 3 + 1] || {}, w: docs[i * 3 + 2] || {} }; });
+  }
+  return days.map((d) => ({ d, ...cache[d] }));
+}
+const CATS = { slot: ['Machines à sous', (g) => isSlot(g)], table: ['Roues & tables', (g) => g.cat === 'table'], quick: ['Jeux rapides', (g) => g.cat === 'quick'], all: ['Tous les jeux', () => true] };
+function compute(rows) {
+  const G = {}, T = { visit: 0, fresh: 0, acc: 0, opens: 0, spins: 0, sec: 0, bet: 0, won: 0, bonus: 0 }, src = {}, perDay = [];
+  const g = (id) => G[id] || (G[id] = { id, opens: 0, spins: 0, sec: 0, bet: 0, won: 0, bonus: 0 });
+  for (const r of rows) {
+    const o = r.a.opens || {}, s = r.a.spins || {};
+    let dv = o._visit || 0, ds = 0;
+    T.visit += dv; T.fresh += o._new || 0; T.acc += o._compte || 0;
+    for (const [k, v] of Object.entries(o)) { if (k.startsWith('_src_')) src[k.slice(5)] = (src[k.slice(5)] || 0) + v; else if (!k.startsWith('_')) g(k).opens += v; }
+    for (const [k, v] of Object.entries(s)) if (!k.startsWith('_')) { g(k).spins += v; ds += v; }
+    for (const [k, v] of Object.entries(r.m.opens || {})) g(k).sec += v;
+    for (const [k, v] of Object.entries(r.m.spins || {})) g(k).bet += v;
+    for (const [k, v] of Object.entries(r.w.opens || {})) g(k).won += v;
+    for (const [k, v] of Object.entries(r.w.spins || {})) g(k).bonus += v;
+    perDay.push({ d: r.d, visit: dv, spins: ds });
+  }
+  const list = Object.values(G).map((x) => ({ ...x, game: getGame(x.id), profit: x.bet - x.won })).filter((x) => x.game);
+  for (const x of list) for (const k of ['opens', 'spins', 'sec', 'bet', 'won', 'bonus']) T[k] += x[k];
+  return { T, list, src, perDay };
+}
+const best = (list, k) => list.filter((x) => x[k] > 0).sort((a, b) => b[k] - a[k])[0];
+function hero(label, x, val, sub) {
+  return `<div class="tb-hero">${x ? `<span class="tb-cv">${__mods['covers.js'].coverSVG(x.game, { square: true, badge: false })}</span>` : '<span class="tb-cv tb-none">—</span>'}
+    <div><small>${label}</small><b>${x ? esc(x.game.name) : 'Pas encore de données'}</b>${x ? `<em>${val}</em>` : ''}${sub ? `<i>${sub}</i>` : ''}</div></div>`;
+}
+function bars(list, k, fmtV, max = 8) {
+  const top = list.filter((x) => x[k] > 0).sort((a, b) => b[k] - a[k]).slice(0, max), m = top[0]?.[k] || 1;
+  if (!top.length) return '<p class="muted small">Pas encore de données sur cette période.</p>';
+  return `<ol class="tb-bars">${top.map((x) => `<li title="${esc(x.game.name)} : ${fmtV(x[k])}"><span>${esc(x.game.name)}${x.game.retired ? ' <em class="tb-ret">retirée</em>' : ''}</span><i><b style="width:${Math.max(2, (100 * x[k]) / m).toFixed(1)}%"></b></i><strong>${fmtV(x[k])}</strong></li>`).join('')}</ol>`;
+}
+function dayChart(perDay, k, label) {
+  const W = 640, H = 170, P = 26, m = Math.max(1, ...perDay.map((d) => d[k])), bw = (W - P) / perDay.length;
+  const lab = (d) => `${+d.slice(8)}/${+d.slice(5, 7)}`;
+  const step = Math.ceil(perDay.length / 8);
+  return `<svg class="tb-chart" viewBox="0 0 ${W} ${H + 22}" role="img" aria-label="${label} par jour">
+    <line x1="${P}" x2="${W}" y1="${H}" y2="${H}" class="tb-axis"/>
+    <text x="${P - 6}" y="12" text-anchor="end" class="tb-tick">${n(m)}</text><text x="${P - 6}" y="${H}" text-anchor="end" class="tb-tick">0</text>
+    ${perDay.map((d, i) => { const h = (d[k] / m) * (H - 10), x = P + i * bw + 1; return `<g class="tb-bar"><rect x="${x}" y="${H - h}" width="${Math.max(2, bw - 2)}" height="${h}" rx="${Math.min(4, bw / 3)}"/><rect x="${x}" y="0" width="${bw}" height="${H}" fill="transparent"><title>${lab(d.d)} : ${n(d[k])} ${label.toLowerCase()}</title></rect>${i % step === 0 ? `<text x="${x + bw / 2}" y="${H + 16}" text-anchor="middle" class="tb-tick">${lab(d.d)}</text>` : ''}</g>`; }).join('')}
+  </svg>`;
+}
+async function render(root) {
+  root.innerHTML = '<section class="panel tb"><h1>📊 Tableau de bord</h1><p class="muted">Chargement…</p></section>';
+  const uid = profiles.online ? profiles.store?.current : null;
+  if (!cloud.enabled || !uid || !(await cloud.isAdmin(uid))) {
+    root.innerHTML = '<section class="panel tb"><h1>📊 Tableau de bord</h1><p class="muted">Réservé au propriétaire du site : connecte-toi avec ton compte administrateur.</p></section>';
+    return;
+  }
+  let data;
+  try { data = compute(await load(dayList(range))); } catch (e) { root.innerHTML = `<section class="panel tb"><h1>📊 Tableau de bord</h1><p class="muted">Lecture impossible (${esc(e.message || e)}).</p></section>`; return; }
+  const { T, src, perDay } = data, list = data.list.filter((x) => CATS[cat][1](x.game));
+  const sorted = [...list].sort((a, b) => b[sortBy] - a[sortBy]);
+  const ret = (x) => (x.bet > 0 ? `${Math.round((100 * x.won) / x.bet)} %` : '—');
+  const th = (k, l) => `<th data-sort="${k}" class="${sortBy === k ? 'on' : ''}">${l}${sortBy === k ? ' ▾' : ''}</th>`;
+  const srcTop = Object.entries(src).sort((a, b) => b[1] - a[1]).slice(0, 10), sm = srcTop[0]?.[1] || 1;
+  root.innerHTML = `<section class="tb">
+    <div class="tb-head"><div><h1>📊 Tableau de bord</h1><p class="muted small">Ce que font les joueurs sur le site. Les visites et les tours sont comptés depuis le 5 novembre 2026 ; le temps passé, les mises et les gains depuis le 16 novembre 2026.</p></div>
+      <div class="tb-tabs">${RANGES.map(([k, l]) => `<button type="button" data-range="${k}" class="${range === k ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+    <div class="tb-kpis">
+      <div><small>Visites</small><b>${n(T.visit)}</b><i>${n(T.fresh)} nouveaux visiteurs</i></div>
+      <div><small>Comptes créés</small><b>${n(T.acc)}</b><i>${T.visit ? Math.round((100 * T.acc) / T.visit) : 0} % des visites</i></div>
+      <div><small>Tours joués</small><b>${n(T.spins)}</b><i>${n(T.opens)} jeux ouverts</i></div>
+      <div><small>Temps de jeu</small><b>${dur(T.sec)}</b><i>${T.opens ? dur(T.sec / T.opens) : '—'} par jeu ouvert</i></div>
+      <div><small>KE misés</small><b>${fmt(T.bet)}</b><i>${fmt(T.won)} gagnés par les joueurs</i></div>
+      <div><small>Rapporté au casino</small><b class="${T.bet - T.won < 0 ? 'neg' : ''}">${fmt(T.bet - T.won)}</b><i>retour aux joueurs ${T.bet ? Math.round((100 * T.won) / T.bet) : 0} %</i></div>
+    </div>
+    <div class="tb-tabs tb-cats">${Object.entries(CATS).map(([k, [l]]) => `<button type="button" data-cat="${k}" class="${cat === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+    <div class="tb-heroes">
+      ${hero('La plus visitée', best(list, 'opens'), `${n(best(list, 'opens')?.opens)} ouvertures`)}
+      ${hero('La plus jouée', best(list, 'spins'), `${n(best(list, 'spins')?.spins)} tours`)}
+      ${hero('Où on reste le plus longtemps', best(list, 'sec'), dur(best(list, 'sec')?.sec), best(list, 'sec') ? `${dur(best(list, 'sec').sec / Math.max(1, best(list, 'sec').opens))} par visite` : '')}
+      ${hero('La plus misée', best(list, 'bet'), fmt(best(list, 'bet')?.bet || 0))}
+      ${hero('Celle qui a rapporté le plus', best(list, 'profit'), fmt(best(list, 'profit')?.profit || 0), best(list, 'profit') ? `retour aux joueurs ${ret(best(list, 'profit'))}` : '')}
+      ${hero('Le plus de bonus déclenchés', best(list, 'bonus'), `${n(best(list, 'bonus')?.bonus)} bonus`)}
+    </div>
+    <div class="tb-grid">
+      <div class="tb-card"><h2>Où vont les joueurs <small>ouvertures</small></h2>${bars(list, 'opens', n)}</div>
+      <div class="tb-card"><h2>Temps passé</h2>${bars(list, 'sec', dur)}</div>
+      <div class="tb-card"><h2>Mises <small>KE misés</small></h2>${bars(list, 'bet', fmt)}</div>
+      <div class="tb-card"><h2>Rapporté au casino <small>mises − gains</small></h2>${bars(list, 'profit', fmt)}</div>
+      ${perDay.length > 1 ? `<div class="tb-card tb-wide"><h2>Visites par jour</h2>${dayChart(perDay, 'visit', 'Visites')}</div>
+      <div class="tb-card tb-wide"><h2>Tours joués par jour <small>tous les jeux</small></h2>${dayChart(perDay, 'spins', 'Tours')}</div>` : ''}
+      <div class="tb-card"><h2>D’où viennent les visiteurs</h2>${srcTop.length ? `<ol class="tb-bars">${srcTop.map(([k, v]) => `<li><span>${esc(k)}</span><i><b style="width:${((100 * v) / sm).toFixed(1)}%"></b></i><strong>${n(v)}</strong></li>`).join('')}</ol>` : '<p class="muted small">Pas encore de données.</p>'}</div>
+    </div>
+    <div class="tb-card tb-table"><h2>Tous les jeux · ${CATS[cat][0]} <small>touche un titre pour trier</small></h2>
+      <div class="tb-scroll"><table><thead><tr><th>Jeu</th>${th('opens', 'Ouvertures')}${th('spins', 'Tours')}${th('sec', 'Temps')}${th('bet', 'Misé')}${th('won', 'Gagné')}<th>Retour</th>${th('profit', 'Rapporté')}${th('bonus', 'Bonus')}</tr></thead>
+      <tbody>${sorted.map((x) => `<tr><td>${esc(x.game.name)}${x.game.retired ? ' <em class="tb-ret">retirée</em>' : ''}</td><td>${n(x.opens)}</td><td>${n(x.spins)}</td><td>${dur(x.sec)}</td><td>${fmt(x.bet)}</td><td>${fmt(x.won)}</td><td>${ret(x)}</td><td class="${x.profit < 0 ? 'neg' : ''}">${fmt(x.profit)}</td><td>${n(x.bonus)}</td></tr>`).join('') || '<tr><td colspan="9" class="muted">Pas encore de données.</td></tr>'}</tbody></table></div></div>
+  </section>`;
+  root.querySelectorAll('[data-range]').forEach((b) => { b.onclick = () => { range = b.dataset.range; render(root); }; });
+  root.querySelectorAll('[data-cat]').forEach((b) => { b.onclick = () => { cat = b.dataset.cat; render(root); }; });
+  root.querySelectorAll('[data-sort]').forEach((b) => { b.onclick = () => { sortBy = b.dataset.sort; render(root); }; });
+}
+return { renderTableau: render, _compute: compute };
+})();
+
 // ---- main.js ----
 __mods['main.js'] = (() => {
 const { wallet, fmt } = __mods['wallet.js'];
@@ -24132,6 +24338,7 @@ const routes = [
   { re: /^(avent|calendrier|noel-calendrier)$/, page: (r) => __mods['avent.js'].renderAvent(r), nav: 'avent' },
   { re: /^(recompenses|pubs|recompense)$/, page: (r) => __mods['recompenses.js'].renderRewards(r), nav: 'rewards' },
   { re: /^shorts$/, page: (r) => __mods['shorts.js'].renderShorts(r), nav: '' },
+  { re: /^(tableau|dashboard)$/, page: (r) => __mods['tableau.js'].renderTableau(r), nav: '' },
   { re: /^@(.+)$/, page: (r, m) => __mods['extras.js'].renderPlayer(r, decodeURIComponent(m[1])), nav: 'top' },
 ];
 

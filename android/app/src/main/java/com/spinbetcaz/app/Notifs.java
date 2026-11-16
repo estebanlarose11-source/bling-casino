@@ -45,7 +45,7 @@ public final class Notifs {
 
     // Flash events: keep in step with FLASH / POOL / flashesOf in index.html (extras.js) and tools/push/send.mjs.
     static final int FLASH_PER = 3, FLASH_FROM = 12, FLASH_TO = 21;
-    static final String[] POOL = { "fortune", "cosmic", "zeus", "huff", "candy", "anubis", "bling", "pharaon", "taco", "billets", "dragons", "labo", "chasse", "big-bad-wolf", "noel", "totemx" };
+    static final String[] POOL = { "fortune", "cosmic", "zeus", "huff", "candy", "anubis", "bling", "billets", "dragons", "chasse", "big-bad-wolf", "noel", "totemx" };
     static final String[] NAMES = { "La Fortune", "Le Cosmique", "L’Olympe", "Le Loup 2.0", "La Sweety", "L’Anubis", "La Tour Bling", "Le Totem", "La Pizza Yo-Yo", "Le Coffre-Fort", "L’Hydre", "Le Labo", "The Hunt", "Le Loup", "La Tournée du Père Noël", "Le Totem Extrême" };
 
     private Notifs() {}
