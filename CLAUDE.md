@@ -699,7 +699,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (localStorage `spinbet_back` pour les invités, dont le profil est neuf à chaque visite), mise à jour toutes les 5 min.
 
 - **Joueurs de la maison** (`maison.js`, demande du propriétaire du 16 novembre 2026, pendant ses pubs Snapchat, « pour que le site paraisse
-  vivant ») : 10 joueurs au pseudo à la française (`BOTS` : niveau de départ, niveaux par jour, heures de jeu à Paris, mise, jeux préférés),
+  vivant ») : 10 joueurs au pseudo à la française (`BOTS` : niveau de départ, niveaux par jour, heures de jeu à Paris, mise, jeux préférés), **toujours en Bronze, comme des nouveaux venus** (voulu par le propriétaire : « pas le même niveau que nous » : arrivés le
+  13 novembre 2026 (`START`), niveau 1 à 3 au départ, ≈ 0,15 à 0,35 niveau par jour qui ralentit, jamais au-dessus de `LV_MAX` = 10 ; petites mises
+  1 à 10 KE, soldes ≈ 1 000 à 10 000 KE, records de quelques centaines de KE),
   **calculés sur chaque appareil à partir de la date** (mêmes chiffres pour tous, **aucune écriture Firestore**) : niveau qui monte chaque jour,
   solde, plus gros gain / bonus (records qui ne font que monter), succès. Visibles dans le classement (mélangés aux vrais, `board()`), la liste
   des joueurs en ligne (`online()`, plus le soir, présents ou non par tranche de 20 min ; jamais assis aux tables multijoueurs) et les gros gains
