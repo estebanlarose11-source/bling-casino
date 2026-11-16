@@ -171,7 +171,7 @@ public class MainActivity extends Activity {
     private boolean immersive = false;
 
     @SuppressWarnings("deprecation")
-    void setImmersive(boolean on) {
+    void hideBars(boolean on) {
         immersive = on;
         if (Build.VERSION.SDK_INT >= 30) {
             WindowInsetsController c = getWindow().getInsetsController();
@@ -191,7 +191,7 @@ public class MainActivity extends Activity {
     @Override
     public void onWindowFocusChanged(boolean focus) {
         super.onWindowFocusChanged(focus);
-        if (focus && immersive) setImmersive(true);
+        if (focus && immersive) hideBars(true);
     }
 
     /** Called by the page (bigwin.js, push.js, daily.js). */
@@ -216,7 +216,7 @@ public class MainActivity extends Activity {
 
         /** A game goes full screen (or leaves it): hide (show) the bars of the phone. */
         @JavascriptInterface
-        public void immersive(boolean on) { runOnUiThread(() -> setImmersive(on)); }
+        public void immersive(boolean on) { runOnUiThread(() -> hideBars(on)); }
 
         /** The daily gift was taken at {@code last} (ms), series of {@code streak} days: sets the reminders. */
         @JavascriptInterface
