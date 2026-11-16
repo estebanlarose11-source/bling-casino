@@ -9,6 +9,7 @@ __mods['games/impl/chasse.js'] = (() => {
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { Reels } = __mods['core/reels.js'];
+const { fullFit } = __mods['core/videobg.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, isMuted, audioContext } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
@@ -190,23 +191,17 @@ class ChasseGame extends BaseGame {
     const full = !!this.slotEl.closest('.is-full');
     sc.classList.toggle('hu-fullsc', full);
     if (!full) {
-      sc.classList.remove('hu-band');
+      sc.querySelector(':scope > .vf')?.setAttribute('hidden', '');
       const port = innerWidth < 700 && innerHeight > innerWidth;
       sc.classList.toggle('hu-p', port); sc.classList.toggle('hu-l', !port);
       art.style.cssText = ''; return;
     }
-    const cs = getComputedStyle(this.q('.hu-safe')), sp = (k) => parseFloat(cs[k]) || 0;
-    const top = sp('paddingTop'), bot = sp('paddingBottom'), lft = sp('paddingLeft'), rgt = sp('paddingRight');
-    const W = sc.clientWidth - lft - rgt, H = sc.clientHeight - top - bot;
+    const W = sc.clientWidth, H = sc.clientHeight;
     if (!W || !H) return;
-    const port = W / H < 1, iw = port ? 784 : 1168, ih = port ? 1168 : 784;
+    const port = W / H < 1;
     sc.classList.toggle('hu-p', port); sc.classList.toggle('hu-l', !port);
-    const [kx0, ky0, kx1, ky1] = port ? [12, 112, 772, 1150] : [105, 58, 1060, 778];
-    const k = Math.min(Math.max(W / iw, H / ih), W / (kx1 - kx0), H / (ky1 - ky0)), w = iw * k, h = ih * k;
-    const fit = (S, len, a0, a1) => { let v = (S - len) / 2; v = Math.min(0, Math.max(S - len, v)); return Math.min(S - a1 * k, Math.max(-a0 * k, v)); };
-    const x = fit(W, w, kx0, kx1), y = h < H ? H - h : fit(H, h, ky0, ky1); // thinner than the bar: the picture at the bottom
-    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + x).toFixed(1)}px;top:${(top + y).toFixed(1)}px`;
-    sc.classList.toggle('hu-band', y > 0.5); // the band left at the top shows the forest, blurred
+    // covers the screen (stretched a little on a very long phone, then the picture's edges continue: fullFit)
+    fullFit(sc, art, this.q('.hu-safe'), { size: port ? [784, 1168] : [1168, 784], key: port ? [12, 112, 772, 1150] : [105, 58, 1060, 778], bottom: port });
   }
 
   word(t, cls = '') {

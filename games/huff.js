@@ -130,7 +130,7 @@ const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el, animateNumber } = __mods['ui.js'];
 const { profiles } = __mods['profile.js'];
-const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
+const { VideoBg, fullFit } = __mods['core/videobg.js'];
 const { ROWS, COLS, NC, SC, LINES, PAY, LV, JPV, JPN, CAPX, BONUS_SPINS, MEGA_SPINS, TUNE, BUYN, BUYX, BUYM,
   drawCell, genGrid, scattersIn, evalLines, spinHouse, spinMega, newBonus, stepBonus, bonusDone, reveal, } = __mods['games/impl/huff-engine.js'];
 
@@ -252,7 +252,7 @@ class HuffGame extends BaseGame {
   }
   // Wide house on a computer, tall house on a phone held upright. Full screen: the one that fits the screen's shape covers
   // the whole screen, cropped on its edges but never cutting the plates, the window or the bar (KEY, in the video's
-  // pixels); a screen of another shape gets the rest of the picture, blurred, around it (a thin phone: the house at the
+  // pixels); a screen of another shape: the picture is stretched a little, then its edges continue (fullFit) (a thin phone: the house at the
   // bottom, the sky above).
   layout() {
     if (this.dead) return;
@@ -260,17 +260,15 @@ class HuffGame extends BaseGame {
     const full = !!this.slotEl.closest('.is-full');
     sc.classList.toggle('hf-fullsc', full);
     if (!full) {
-      sc.classList.remove('hf-bandx', 'hf-bandy');
+      sc.querySelector(':scope > .vf')?.setAttribute('hidden', '');
       this.orient(innerWidth < 700 && innerHeight > innerWidth);
       art.style.cssText = ''; return;
     }
-    const { top, lft, W, H } = screenBox(sc, this.q('.hf-safe'));
+    const W = sc.clientWidth, H = sc.clientHeight;
     if (!W || !H) return;
     const port = W / H < 1;
     this.orient(port);
-    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [4, 80, 444, 640] : [6, 40, 666, 442], { bottom: port });
-    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
-    sc.classList.toggle('hf-bandx', f.bandX); sc.classList.toggle('hf-bandy', f.bandY);
+    fullFit(sc, art, this.q('.hf-safe'), { size: port ? [448, 672] : [672, 448], key: port ? [4, 80, 444, 640] : [6, 40, 666, 442], bottom: port, poster: this.vbg.v.poster });
   }
 
   destroy() {

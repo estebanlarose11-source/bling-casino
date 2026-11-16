@@ -17,7 +17,7 @@ const { Reels } = __mods['core/reels.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, audioContext, isMuted, duck } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
-const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
+const { VideoBg, fullFit } = __mods['core/videobg.js'];
 
 /* ===ENGINE */
 // Symbols 0-4: cards 10 J Q K A; 5 scarab, 6 eye, 7 Anubis, 8 pharaoh; 9 WILD crown (reels 2-5, replaces 0-8);
@@ -329,24 +329,22 @@ class RedkGame extends BaseGame {
   }
   // Wide mine on a computer, tall mine on a phone held upright. Full screen: the one that fits the screen's shape covers
   // the whole screen, cropped on its edges but never cutting the plates, the frame or the bar (KEY, in the video's
-  // pixels); a screen of another shape gets the rest of the picture, blurred, around it.
+  // pixels); a screen of another shape: the picture is stretched a little, then its edges continue (fullFit).
   layout() {
     if (this.dead) return;
     const sc = this.q('.rk-scene'), art = this.q('.rk-art');
     const full = !!this.slotEl.closest('.is-full');
     sc.classList.toggle('rk-fullsc', full);
     if (!full) {
-      sc.classList.remove('rk-bandx', 'rk-bandy');
+      sc.querySelector(':scope > .vf')?.setAttribute('hidden', '');
       this.orient(innerWidth < 700 && innerHeight > innerWidth);
       art.style.cssText = ''; return;
     }
-    const { top, lft, W, H } = screenBox(sc, this.q('.rk-safe'));
+    const W = sc.clientWidth, H = sc.clientHeight;
     if (!W || !H) return;
     const port = W / H < 1;
     this.orient(port);
-    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [8, 2, 440, 664] : [4, 14, 668, 440], { bottom: port });
-    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
-    sc.classList.toggle('rk-bandx', f.bandX); sc.classList.toggle('rk-bandy', f.bandY);
+    fullFit(sc, art, this.q('.rk-safe'), { size: port ? [448, 672] : [672, 448], key: port ? [8, 2, 440, 664] : [4, 14, 668, 440], bottom: port, poster: this.vbg.v.poster });
   }
 
   // a calm screen without bonus symbols in excess (shown at the opening and after a bonus)

@@ -150,7 +150,7 @@ const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el } = __mods['ui.js'];
 const { warm } = __mods['core/pixi.js'];
-const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
+const { VideoBg, fullFit } = __mods['core/videobg.js'];
 
 /* ---------- the owner's symbols ---------- */
 const IMG_V = 3;
@@ -359,24 +359,22 @@ class BarilletGame extends BaseGame {
   }
   // Wide saloon on a computer, tall saloon on a phone held upright. Full screen: the one that fits the screen's shape
   // covers the whole screen, cropped on its edges but never cutting the plates, the frame or the bar (KEY, in the
-  // video's pixels); a screen of another shape gets the rest of the picture, blurred, around it.
+  // video's pixels); a screen of another shape: the picture is stretched a little, then its edges continue (fullFit).
   layout() {
     if (this.dead) return;
     const sc = this.q('.rr-scene'), art = this.q('.rr-art');
     const full = !!this.slotEl.closest('.is-full');
     sc.classList.toggle('rr-fullsc', full);
     if (!full) {
-      sc.classList.remove('rr-bandx', 'rr-bandy');
+      sc.querySelector(':scope > .vf')?.setAttribute('hidden', '');
       this.orient(innerWidth < 700 && innerHeight > innerWidth);
       art.style.cssText = ''; return;
     }
-    const { top, lft, W, H } = screenBox(sc, this.q('.rr-safe'));
+    const W = sc.clientWidth, H = sc.clientHeight;
     if (!W || !H) return;
     const port = W / H < 1;
     this.orient(port);
-    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [6, 8, 446, 664] : [8, 2, 664, 444], { bottom: port });
-    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
-    sc.classList.toggle('rr-bandx', f.bandX); sc.classList.toggle('rr-bandy', f.bandY);
+    fullFit(sc, art, this.q('.rr-safe'), { size: port ? [448, 672] : [672, 448], key: port ? [6, 8, 446, 664] : [8, 2, 664, 444], bottom: port, poster: this.vbg.v.poster });
   }
 
   /* ---------- the barrel beside the reels: the bullets left ---------- */

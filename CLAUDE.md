@@ -220,15 +220,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   a 6 × 5), « x1 » du médaillon et « 10,00 € » de la mise effacés, « + » de gauche du téléphone changé en « − » ; ×2 (lanczos),
   muettes, **boucle sans coupure** (la fin se fond dans le début, puis les 12 premières images répétées : le jeu recule d'une
   boucle `LOOP` = 121/24 s pendant qu'elles passent) → `assets/games/zeus/fond-large.mp4` / `fond-haut.mp4` + 1re image
-  `scene-large.webp` / `scene-haut.webp` (affiche de la vidéo, fond flou du plein écran). Vidéo en pause page cachée, jamais
+  `scene-large.webp` / `scene-haut.webp` (affiche de la vidéo, couleurs des bords pour `fullFit`). Vidéo en pause page cachée, jamais
   avec « animations réduites », décodeur libéré en quittant (`destroy`). Grille 6×5 dans le cadre (`.zo-win`, cases larges sur
   la vidéo large : symbole entier au centre), multiplicateur dans le médaillon (`.zo-med`, « GLOBAL » pendant les tours gratuits),
   plaque SOLDE · GAIN (· TOURS) sous le médaillon (large) ou sous la grille (haut) (`.zo-info`, chiffres réduits selon leur
   longueur `--n`), barre de chaque vidéo cliquable (☰, BONUS = plaque d'achat `askBuy`, MISE − / +, SPIN qui brille pendant le
   tour), éclairs depuis `.zo-gem`, annonce et bilan des tours gratuits dans le cadre (`panel`). Plein écran (`layout()`, comme
   La Sweety) : la vidéo qui va avec la forme de l'écran le couvre, rognée sans couper médaillon, grille ni barre (zone gardée
-  `[kx0, ky0, kx1, ky1]`) ; écran d'une autre forme : sa 1re image floutée autour (`.zo-bandx` / `.zo-bandy`, téléphone très fin :
-  vidéo en bas, ciel flouté au-dessus). Positions en % de chaque vidéo dans le bloc CSS « L'Olympe ». Gains inchangés.
+  `[kx0, ky0, kx1, ky1]`) ; écran d'une autre forme : `fullFit` (étirée un peu, puis ses bords continuent). Positions en % de chaque vidéo dans le bloc CSS « L'Olympe ». Gains inchangés.
 - **Le Loup 2.0, décor animé** (`games/huff.js`, demande du propriétaire du 15 novembre 2026, comme L'Olympe) : **ses 2 vidéos**
   `tools/art/huff/fond-large.mp4` (672 × 448, `.hf-l`) et `fond-haut.mp4` (448 × 672, `.hf-p`) : la maison en briques des cochons,
   plaques MINI / MAJOR / GRAND JACKPOT, fenêtre étoilée, le loup. Nettoyées par `tools/art/huff/clean.py` (« $1.00 » effacé, quadrillage
@@ -262,7 +261,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `core/videobg.js` : image ou vidéo « large » (ordinateur) et « haute » (téléphone tenu droit), rouleaux sur la fenêtre peinte (`.sx-win`),
   barre peinte rendue cliquable (`.sx-bm` / `.sx-bet` / `.sx-bp` / `.sx-menu` / `.sx-menu2` / `.sx-spin` / `.sx-max`), plaques `.sx-pl`
   (`.sx-bal`, `.sx-gain`, `.sx-tbet`), jackpots `.sx-jp-*`, compteur du bonus à la place des plaques, plein écran qui couvre l'écran
-  (`coverFit`, zone gardée `key`, `.sx.sx-fullsc` en `position: fixed`). Chaque jeu : `stage: sceneHTML(id, { host, inWin, inArt, plates })`,
+  (`fullFit`, zone gardée `key`, scène en absolu : voir « Écran noir au spin »). Chaque jeu : `stage: sceneHTML(id, { host, inWin, inArt, plates })`,
   puis `this.sx = new Scene(this, SCENE)` ; `onMeters()` → `this.sx.meters()`. Positions en % (bloc CSS « Décors des 5 machines », fabriqué
   par un petit script à partir des boîtes en pixels de chaque image : `.sx-<id>.sx-l` / `.sx-p`). **Piège** : la classe de plaque est
   `.sx-pl` (`.sx-p` = image haute) ; un texte dimensionné en `cqh` doit être dans un enfant de la boîte `container-type: size`.
@@ -280,6 +279,25 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   pause page cachée, rien avec « animations réduites », décodeur libéré à `destroy()`), `screenBox` (écran moins les zones sûres),
   `coverFit` (plein écran couvert sans couper la zone gardée). L'Olympe, Le Loup 2.0, Diamants REDK et L'Hydre s'en servent :
   prochaine machine pareil.
+- **Plein écran des décors = tout l'écran** (demande du propriétaire du 16 novembre 2026 : « une barre floue en haut… sur le téléphone,
+  il faut que ça prenne tout l'écran ») : **une seule fonction pour toutes les machines à décor**, `fullFit(sc, art, safe, { size, key,
+  poster, bottom })` de `core/videobg.js` (L'Olympe, Le Loup 2.0, REDK, L'Hydre, Le Loup, L'Anubis, La Roulette Russe, Le Cosmique, La
+  Sweety, The Hunt et les 5 de `Scene`). Le décor couvre **tout** l'écran, sous l'encoche et la barre du téléphone aussi (seule la zone
+  gardée `key` reste dans les zones sûres) ; si la forme de l'écran l'exige, il est **étiré un peu** (`STRETCH` = 1,32 au plus, dans un
+  seul sens : vidéos en `object-fit: fill`, images en `100% 100%`, tout est placé en %) ; au-delà (rare), ses bords continuent en dégradé
+  (`.vf`, `edgesOf` : couleurs des 4 bords de l'affiche). **Plus jamais de fond flou, de `mask-image` ni de `filter` sur le décor**
+  (ils repeignaient vidéo + rouleaux à chaque image). Nouvelle machine à décor : appeler `fullFit` dans son `layout()`.
+- **« Écran noir au spin » (16 novembre 2026, les 5 décors de `Scene`)** : `.sx.sx-fullsc` était en `position: fixed` ; l'éclair du
+  lancement (`filter` sur `.slot-frame`) et les secousses (`transform` / `translate`) font d'un parent le bloc d'une boîte fixe, et la
+  scène sortait de l'écran 0,5 s. Maintenant : `.slot-frame` / `.slot-stage` en `position: absolute; inset: 0` et la scène en absolu
+  (comme L'Olympe). L'éclair du lancement n'est plus un `filter` : calque `.ml-charge` (machines sans décor seulement, `DECOR`), et
+  `.ml-flash` / `.ml-rays` sans `mix-blend-mode`. **Ne jamais remettre de `position: fixed` dans une machine, ni de `filter` animé sur
+  `.slot-frame` / `.reels`.**
+- **Rouleaux Pixi, fluidité** (16 novembre 2026) : le flou de mouvement ne travaille que sur le rectangle du rouleau (`filterArea`) et,
+  sur téléphone, sans le 2e filtre (luminosité) ; la boîte d'une image `contain` est recalculée pour la forme de la case où elle est
+  dessinée (`painted()`, `BOX` remesuré si la case change de forme) : sinon le symbole « sautait » à l'arrêt après un passage en plein
+  écran étiré. La toile Pixi d'une zone de rouleaux est créée dans un moment calme après l'ouverture du jeu (`preStage`, shaders
+  compilés à ce moment-là) et plus au premier tour (petit arrêt au 1er spin sur téléphone).
 - **Le Cosmique, nouveau décor** (`games/cosmic.js`, demande du propriétaire du 15 novembre 2026) : **ses 2 images**
   `tools/art/cosmic/decor-large.jpg` (1248 × 832 : page et écrans larges, `.cz-l`) et `decor-haut.jpg` (720 × 1280 : téléphone tenu
   droit, `.cz-p`, aussi sur la page d'un téléphone), nettoyées par `tools/art/cosmic/clean.py` (quadrillage peint effacé : le jeu
@@ -295,7 +313,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `tools/art/candy/clean.py` (quadrillage rose et « $1.00 » effacés) → `assets/games/candy/scene-large.webp` / `scene-haut.webp`
   (`bg.webp` supprimé). Grille 6×5 dans le cadre (`.sk-win`), barre cliquable : BET − / +, BONUS MENU, SPIN, MAX BET ; plaque SOLDE ·
   GAIN (· TOURS) (`.sk-info`) ; Bal de la Reine annoncé et fini dans le cadre (`panel`). Plein écran : l'image couvre l'écran
-  (`layout()`, zone gardée) ; téléphone plus fin que l'image : image calée en bas, ciel flouté au-dessus (`.sk-band`). Gains inchangés.
+  (`layout()` → `fullFit`, zone gardée). Gains inchangés.
 - **La Pêche, roue en verre et pêche en vidéo** (`games/peche.js`, id `peche` et `peche-online`, demande du propriétaire du
   15 novembre 2026) : **ses 10 vidéos** dans `tools/art/peche/` : `roue.mp4` (roue en verre qui s'arrête toujours au même
   endroit) et 9 pêches sur un lac gelé `<bleu|orange|rouge>-<canne|grue|helico>.mp4`. `tools/art/peche/clean.py` : la roue est
@@ -430,7 +448,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   **au-dessus** des rouleaux car ils chevauchent le cadre ; à moitié transparents pendant un tour et quand il y a un gain). Scène `.vkx`
   (`.vkx-scene` 2 : 3, positions en % de la vidéo) : rouleaux dans le cadre, les jauges existantes (`.vk-meter` / `.vk-por` / `.vk-bar`)
   posées sur ses médaillons et ses barres (Jarl = Jarls tombés, valkyrie = WILD tombés, mêmes règles) ; barre de mise en pierre dessous.
-  Plus de crête, pilier ni ciel dessinés (`CREST`, `PILLAR`, `SKY` ne sont plus utilisés). Gains inchangés.
+  Plus de crête, pilier ni ciel dessinés (`CREST`, `PILLAR`, `SKY` ne sont plus utilisés). **Plein écran** : la scène prend la largeur
+  (avant, téléphone couché = on ne voyait que le ciel) ; téléphone couché : la scène sur toute la hauteur, la barre de pierre en colonne
+  à droite (bloc CSS après `.vkx`). Gains inchangés.
 - **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
   avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série
@@ -852,6 +872,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   le dit à l'appli par `SpinBetApp.daily`). Message libre (Actions → « Notifications » → Run workflow) : aussi écrit dans
   `push/annonce.json` sur la branche `data`, lu par l'appli à chaque réveil (au moins toutes les 3 h, jamais la nuit).
   Android 13+ demande l'autorisation une fois ; la page `#appli` les allume / coupe (`notifStatus`, `notifOn`, `notifOff`).
+- **Vrai plein écran dans l'APK** (16 novembre 2026) : `setFull` (`core/chrome.js`) appelle `SpinBetApp.immersive(true / false)` ; l'appli
+  cache alors la barre d'état et la barre de navigation du téléphone (immersif « sticky », remis au retour dans l'appli). Les anciennes
+  versions de l'appli n'ont pas la fonction : rien ne change pour elles.
 
 ## Mot de passe oublié
 

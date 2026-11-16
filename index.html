@@ -3368,6 +3368,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .game-host.is-full > .slot.g-chasse .ht-hud { left: max(12px, env(safe-area-inset-left)); top: max(10px, env(safe-area-inset-top)); }
 .game-host.is-full > .slot.g-chasse .slot-head { position: absolute; top: max(8px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); z-index: 1300; margin: 0; pointer-events: none; }
 .game-host.is-full > .slot.g-chasse .head-meters .meter { background: rgba(5, 8, 3, .62); }
+.game-host.is-full > .slot.g-chasse > .mx-row { position: absolute; z-index: 1300; top: max(8px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); margin: 0; } /* it fell in the middle of the reels on a phone held sideways */
 .game-host.is-full > .slot.g-chasse .win-bar { position: absolute; left: 0 !important; right: 0 !important; margin: 0 auto !important; width: fit-content; top: max(10px, env(safe-area-inset-top)); z-index: 1300; margin: 0; pointer-events: none; max-width: 40%; }
 .game-host.is-full > .slot.g-chasse .controls { position: absolute; left: 0 !important; right: 0 !important; margin: 0 auto !important; bottom: max(10px, env(safe-area-inset-bottom)); z-index: 1300; width: min(720px, calc(100% - 24px)); background: rgba(5, 8, 3, .55) !important; backdrop-filter: blur(6px); }
 .game-host.is-full > .slot.g-chasse.ht-on .controls { opacity: .35; pointer-events: none; transition: opacity .3s; }
@@ -4078,18 +4079,19 @@ body:not(.ml-off) .hero-copy h1 em { background: linear-gradient(90deg, currentC
 .game-host.is-full > .ml-ring { display: none; }
 .game-host > .slot { position: relative; z-index: 1; }
 .game-host.ml-busy > .ml-ring { opacity: 1; animation-duration: 1s; filter: drop-shadow(0 0 8px #7cc8ff); }
-.game-host.ml-busy .slot-frame, .game-host.ml-busy .reels { animation: mlCharge .5s ease-out; }
-@keyframes mlCharge { 0% { filter: brightness(1.35) saturate(1.2); } 100% { filter: none; } }
+/* the flash of a spin: a light layer over the frame (no filter on the frame or the reels: a filter repainted the whole machine
+   at each frame, and made a full-screen decor leave the screen, « écran noir au spin » of 16 November 2026) */
+.ml-charge { position: absolute; inset: 0; z-index: 28; pointer-events: none; border-radius: inherit; background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, .2), rgba(124, 200, 255, .08) 55%, transparent 78%); animation: mlFlash .5s ease-out forwards; }
 body:not(.ml-off) .spin-btn { position: relative; }
 body:not(.ml-off) .spin-btn::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; pointer-events: none; border: 2px dashed rgba(255, 255, 255, .25); animation: mlSpinVarRot 12s linear infinite; }
 .game-host.ml-busy .spin-btn::before { border-color: #fbbf24; border-style: solid; border-top-color: transparent; animation-duration: .6s !important; }
 @keyframes mlSpinVarRot { to { transform: rotate(360deg); } }
 /* the orbit is for the round button only: on the wide buttons (CHOISIS UNE CASE, REJOUER…) it crossed the rectangle */
 .spin-btn.wide::before, body:not(.ml-off) .spin-btn.wide::before { display: none !important; }
-.ml-flash { position: absolute; inset: 0; z-index: 30; pointer-events: none; border-radius: inherit; mix-blend-mode: screen;
-  background: radial-gradient(circle at 50% 45%, rgba(255, 247, 194, .9), rgba(251, 191, 36, .35) 35%, transparent 70%); animation: mlFlash .7s ease-out forwards; }
+.ml-flash { position: absolute; inset: 0; z-index: 30; pointer-events: none; border-radius: inherit;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 247, 194, .5), rgba(251, 191, 36, .18) 35%, transparent 70%); animation: mlFlash .7s ease-out forwards; }
 @keyframes mlFlash { from { opacity: 1; } to { opacity: 0; } }
-.ml-rays { position: absolute; left: 50%; top: 45%; width: 160%; aspect-ratio: 1; z-index: 29; pointer-events: none; translate: -50% -50%; mix-blend-mode: screen;
+.ml-rays { position: absolute; left: 50%; top: 45%; width: 160%; aspect-ratio: 1; z-index: 29; pointer-events: none; translate: -50% -50%;
   background: repeating-conic-gradient(rgba(253, 224, 71, .28) 0 7deg, transparent 7deg 20deg); -webkit-mask: radial-gradient(circle, #000 10%, transparent 62%); mask: radial-gradient(circle, #000 10%, transparent 62%);
   animation: mlRays 2.4s ease-out forwards; }
 @keyframes mlRays { 0% { opacity: 0; transform: scale(.3) rotate(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: scale(1.1) rotate(70deg); } }
@@ -4606,11 +4608,7 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-candy.g-candy > .mx-row { position: absolute; z-index: 9; top: max(8px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); margin: 0; }
 .game-host.is-full > .slot.g-candy.g-candy > .slot-frame, .game-host.is-full > .slot.g-candy.g-candy > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.g-candy .slot-frame, .game-host.ml-busy > .slot.g-candy .reels { animation: none !important; }
-.sk-scene.sk-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: url(assets/games/candy/scene-large.webp?v=2) center / cover no-repeat #3b0a4a; }
-.sk-scene.sk-fullsc.sk-p { background-image: url(assets/games/candy/scene-haut.webp?v=2); }
-.sk-fullsc.sk-l .sk-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
-.sk-band .sk-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 7%); mask-image: linear-gradient(180deg, transparent, #000 7%); }
-.sk-scene.sk-band::before { content: ''; position: absolute; inset: -20px; background: url(assets/games/candy/scene-haut.webp?v=2) center top / 100% auto no-repeat #f5a3d8; filter: blur(14px) brightness(.95); }
+.sk-scene.sk-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #3b0a4a; }
 .sk-fullsc .sk-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 /* ============ Le Cosmique (games/cosmic.js): the owner's 2 pictures of 15 November 2026, scene-large.webp (1248 × 832:
    page and wide screens, .cz-l) and scene-haut.webp (720 × 1280: phone held upright, .cz-p). Grid in the moon, his bar
@@ -4703,12 +4701,10 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-cosmic.g-cosmic > .mx-row { position: absolute; z-index: 9; top: max(8px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); margin: 0; }
 .game-host.is-full > .slot.g-cosmic.g-cosmic > .slot-frame, .game-host.is-full > .slot.g-cosmic.g-cosmic > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.g-cosmic .slot-frame, .game-host.ml-busy > .slot.g-cosmic .reels { animation: none !important; }
-.cz-scene.cz-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: url(assets/games/cosmic/scene-large.webp?v=2) center / cover no-repeat #0a0826; }
-.cz-fullsc.cz-l .cz-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
+.cz-scene.cz-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #0a0826; }
 .cz-info.cz-col { flex-direction: column; }
 .cz-info.cz-col > div { flex: none !important; height: auto !important; padding: .7cqw 0 !important; }
 .cz-info.cz-col > div + div { border-left: 0; border-top: .15cqw solid rgba(165, 180, 252, .45); }
-.cz-scene.cz-fullsc.cz-p { background-image: url(assets/games/cosmic/scene-haut.webp?v=2); }
 .cz-fullsc .cz-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 /* ============ L'Olympe (games/zeus.js): the owner's 2 animated backgrounds of 15 November 2026, fond-large.mp4 (736 × 400:
    page and wide screens, .zo-l) and fond-haut.mp4 (400 × 736: phone held upright, .zo-p), with their first frame as poster
@@ -4827,7 +4823,7 @@ html.light .slot small { color: inherit; }
 .zo-no { color: #dbeafe; background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1px rgba(219, 234, 254, .4); }
 .slot.g-zeus.in-free .zo-art::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(70% 50% at 50% 55%, transparent 55%, rgba(30, 20, 90, .35)), linear-gradient(180deg, rgba(253, 220, 120, .2), transparent 35%); animation: ftMood 2.4s ease-in-out infinite alternate; }
 .game-host:not(.is-full):has(> .g-zeus) { max-width: max(420px, min(1360px, calc((100svh - 220px) * 1.84 + 40px))) !important; }
-/* full screen: the video that fits the screen covers it; around it (screen of another shape), its own picture, blurred */
+/* full screen: the video that fits the screen covers it (fullFit: stretched a little, then its edges continue on a screen of another shape) */
 .game-host.is-full:has(> .slot.g-zeus) { padding: 0; background: #14123f; overflow: hidden; }
 .game-host.is-full > .slot.g-zeus.g-zeus { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
 .game-host.is-full > .slot.g-zeus.g-zeus > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
@@ -4835,11 +4831,6 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-zeus.g-zeus > .slot-frame, .game-host.is-full > .slot.g-zeus.g-zeus > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.g-zeus .slot-frame, .game-host.ml-busy > .slot.g-zeus .reels { animation: none !important; }
 .zo-scene.zo-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #14123f; }
-.zo-scene.zo-fullsc::before { content: ''; position: absolute; inset: -40px; background: url(assets/games/zeus/scene-large.webp?v=3) center / cover no-repeat; filter: blur(18px) brightness(.7); }
-.zo-scene.zo-fullsc.zo-p::before { background-image: url(assets/games/zeus/scene-haut.webp?v=3); background-position: center top; }
-.zo-bandx .zo-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
-.zo-bandy.zo-l .zo-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
-.zo-bandy.zo-p .zo-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
 .zo-fullsc .zo-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 /* ============ Le Loup 2.0 (games/huff.js): the owner's 2 animated backgrounds of 15 November 2026, fond-large.mp4 (672 × 448:
    page and wide screens, .hf-l) and fond-haut.mp4 (448 × 672: phone held upright, .hf-p), first frame as poster
@@ -4939,7 +4930,7 @@ html.light .slot small { color: inherit; }
 .hf-p .hf-full { width: clamp(28px, 8%, 40px); }
 .slot.g-huff.in-hold .hf-art::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(60% 45% at 50% 45%, transparent 50%, rgba(20, 6, 50, .35)); animation: ftMood 2.4s ease-in-out infinite alternate; }
 .game-host:not(.is-full):has(> .g-huff) { max-width: max(420px, min(1180px, calc((100svh - 220px) * 1.5 + 40px))) !important; }
-/* full screen: the video that fits the screen covers it; around it (screen of another shape), its own picture, blurred */
+/* full screen: the video that fits the screen covers it (fullFit: stretched a little, then its edges continue on a screen of another shape) */
 .game-host.is-full:has(> .slot.g-huff) { padding: 0; background: #2a5d8f; overflow: hidden; }
 .game-host.is-full > .slot.g-huff.g-huff { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
 .game-host.is-full > .slot.g-huff.g-huff > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
@@ -4947,11 +4938,6 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-huff.g-huff > .slot-frame, .game-host.is-full > .slot.g-huff.g-huff > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.g-huff .slot-frame { animation: none !important; }
 .hf-scene.hf-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #2a5d8f; }
-.hf-scene.hf-fullsc::before { content: ''; position: absolute; inset: -40px; background: url(assets/games/huff/scene-large.webp?v=2) center / cover no-repeat; filter: blur(18px) brightness(.8); }
-.hf-scene.hf-fullsc.hf-p::before { background-image: url(assets/games/huff/scene-haut.webp?v=2); background-position: center top; }
-.hf-bandx .hf-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
-.hf-bandy.hf-l .hf-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
-.hf-bandy.hf-p .hf-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
 .hf-fullsc .hf-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 /* ============ Le Loup (big-bad-wolf, slot/machine.js): the owner's 2 animated backgrounds of 16 November 2026, fond-large.mp4
    (672 × 448: page and wide screens, .wl-l) and fond-haut.mp4 (448 × 672: phone held upright, .wl-p), first frame as poster
@@ -5037,7 +5023,7 @@ html.light .slot small { color: inherit; }
 .wl-p .wl-full { width: clamp(28px, 8%, 40px); right: 2%; top: 11.5%; bottom: auto; }
 .slot.theme-wolf.in-hold .wl-art::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(60% 45% at 50% 42%, transparent 50%, rgba(4, 6, 20, .45)); animation: ftMood 2.4s ease-in-out infinite alternate; }
 .game-host:not(.is-full):has(> .slot.theme-wolf) { max-width: max(420px, min(1180px, calc((100svh - 220px) * 1.5 + 40px))) !important; }
-/* full screen: the video that fits the screen covers it; around it (screen of another shape), its own picture, blurred */
+/* full screen: the video that fits the screen covers it (fullFit: stretched a little, then its edges continue on a screen of another shape) */
 .game-host.is-full:has(> .slot.theme-wolf) { padding: 0; background: #0a1020; overflow: hidden; }
 .game-host.is-full > .slot.theme-wolf.theme-wolf { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
 .game-host.is-full > .slot.theme-wolf.theme-wolf > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
@@ -5045,11 +5031,6 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.theme-wolf.theme-wolf > .slot-frame, .game-host.is-full > .slot.theme-wolf.theme-wolf > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.theme-wolf .slot-frame { animation: none !important; }
 .wl-scene.wl-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #0a1020; }
-.wl-scene.wl-fullsc::before { content: ''; position: absolute; inset: -40px; background: url(assets/games/wolf/scene-large.webp?v=2) center / cover no-repeat; filter: blur(18px) brightness(.7); }
-.wl-scene.wl-fullsc.wl-p::before { background-image: url(assets/games/wolf/scene-haut.webp?v=2); background-position: center top; }
-.wl-bandx .wl-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
-.wl-bandy.wl-l .wl-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
-.wl-bandy.wl-p .wl-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
 .wl-fullsc .wl-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); bottom: auto; width: 40px; height: 40px; }
 /* ============ Diamants REDK (games/redk.js): the owner's 2 animated backgrounds of 15 November 2026, fond-large.mp4 (672 × 448:
    page and wide screens, .rk-l) and fond-haut.mp4 (448 × 672: phone held upright, .rk-p), first frame as poster
@@ -5172,7 +5153,7 @@ html.light .slot small { color: inherit; }
 .rk-p .rk-art > .rk-word { top: 47%; }
 .game-host:not(.is-full):has(> .g-redk) { max-width: max(420px, min(1180px, calc((100svh - 220px) * 1.5 + 40px))) !important; }
 @media (min-width: 900px) and (orientation: landscape) { .game-host:not(.is-full) > .slot.g-redk.g-redk { min-height: 0; } }
-/* full screen: the video that fits the screen covers it; around it (screen of another shape), its own picture, blurred */
+/* full screen: the video that fits the screen covers it (fullFit: stretched a little, then its edges continue on a screen of another shape) */
 .game-host.is-full:has(> .slot.g-redk) { padding: 0; background: #120a2e; overflow: hidden; }
 .game-host.is-full > .slot.g-redk.g-redk { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
 .game-host.is-full > .slot.g-redk.g-redk > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
@@ -5180,11 +5161,6 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-redk.g-redk > .slot-frame, .game-host.is-full > .slot.g-redk.g-redk > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.g-redk .slot-frame { animation: none !important; }
 .rk-scene.rk-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #120a2e; }
-.rk-scene.rk-fullsc::before { content: ''; position: absolute; inset: -40px; background: url(assets/games/redk/scene-large.webp?v=2) center / cover no-repeat; filter: blur(18px) brightness(.7); }
-.rk-scene.rk-fullsc.rk-p::before { background-image: url(assets/games/redk/scene-haut.webp?v=2); background-position: center top; }
-.rk-bandx .rk-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
-.rk-bandy.rk-l .rk-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
-.rk-bandy.rk-p .rk-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
 .rk-fullsc .rk-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 /* ============ L'Hydre (games/dragons.js): the owner's 2 animated backgrounds of 15 November 2026, fond-large.mp4 (672 × 448:
    page and wide screens, .dg-l) and fond-haut.mp4 (448 × 672: phone held upright, .dg-p), first frame as poster
@@ -5283,7 +5259,7 @@ html.light .slot small { color: inherit; }
 .dg-art > .dg-word { z-index: 6 !important; top: 49%; font-size: 5cqw; }
 .dg-p .dg-art > .dg-word { top: 45%; font-size: 9cqw; }
 .game-host:not(.is-full):has(> .g-dragons) { max-width: max(420px, min(1180px, calc((100svh - 220px) * 1.5 + 40px))) !important; }
-/* full screen: the video that fits the screen covers it; around it (screen of another shape), its own picture, blurred */
+/* full screen: the video that fits the screen covers it (fullFit: stretched a little, then its edges continue on a screen of another shape) */
 .game-host.is-full:has(> .slot.g-dragons) { padding: 0; background: #1c0a05; overflow: hidden; }
 .game-host.is-full > .slot.g-dragons.g-dragons { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
 .game-host.is-full > .slot.g-dragons.g-dragons > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
@@ -5291,11 +5267,6 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-dragons.g-dragons > .slot-frame, .game-host.is-full > .slot.g-dragons.g-dragons > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.g-dragons .slot-frame { animation: none !important; }
 .dg-scene.dg-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #1c0a05; }
-.dg-scene.dg-fullsc::before { content: ''; position: absolute; inset: -40px; background: url(assets/games/dragons/scene-large.webp?v=2) center / cover no-repeat; filter: blur(18px) brightness(.7); }
-.dg-scene.dg-fullsc.dg-p::before { background-image: url(assets/games/dragons/scene-haut.webp?v=2); background-position: center top; }
-.dg-bandx .dg-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
-.dg-bandy.dg-l .dg-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
-.dg-bandy.dg-p .dg-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
 .dg-fullsc .dg-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 .g-fortune .reels-host { position: absolute; inset: 0; }
 .g-fortune .rs { width: 100%; height: 100%; aspect-ratio: auto; min-width: 0; gap: 0; }
@@ -5615,11 +5586,7 @@ html.light .slot small { color: inherit; }
 /* full screen */
 .game-host.is-full:has(> .slot.g-chasse) { background: #12180c; }
 .game-host.ml-busy > .slot.g-chasse .slot-frame, .game-host.ml-busy > .slot.g-chasse .reels { animation: none !important; }
-.hu-scene.hu-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: url(assets/games/chasse/scene-large.webp?v=3) center / cover no-repeat #12180c; }
-.hu-scene.hu-fullsc.hu-p { background-image: url(assets/games/chasse/scene-haut.webp?v=3); }
-.hu-fullsc.hu-l .hu-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
-.hu-band .hu-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 7%); mask-image: linear-gradient(180deg, transparent, #000 7%); }
-.hu-scene.hu-band::before { content: ''; position: absolute; inset: -20px; background: url(assets/games/chasse/scene-haut.webp?v=3) center top / 100% auto no-repeat #12180c; filter: blur(14px) brightness(.8); }
+.hu-scene.hu-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #12180c; }
 .hu-fullsc .hu-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 /* ============ Le Valhalla (5×4, 25 lignes, WILD collés ; symboles du propriétaire, machine en pierre dessinée par nous) ============ */
 .g-viking { --slot-bg: #0b2a3a; --vk-st: linear-gradient(180deg, #5d6874 0%, #39424d 38%, #232a33 100%); --vk-edge: inset 0 2px 0 rgba(170, 182, 196, .55), inset 0 -3px 0 rgba(0, 0, 0, .55), 0 0 0 2px #0b0f14; }
@@ -5833,6 +5800,20 @@ html.light .slot small { color: inherit; }
 .vkx .vk-por.hit { animation: vkRoar .7s cubic-bezier(.3, 1.6, .5, 1); }
 .vkx .vk-aura { inset: -4%; }
 @media (orientation: landscape) and (max-height: 520px) { .vkx-scene { width: min(100%, calc((100dvh - 90px) * 2 / 3)); } }
+/* full screen: the stage takes the width of the screen (before, a phone held sideways showed only the sky: the scene had no
+   width); sideways, the scene on the whole height and the stone bar in a column on its right */
+.game-host.is-full > .slot.g-viking > .slot-frame { align-self: stretch; }
+@media (orientation: landscape) and (max-height: 620px) {
+  .game-host.is-full > .slot.g-viking { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(150px, 22%); grid-auto-rows: min-content; column-gap: 10px; row-gap: 6px; align-content: center; }
+  .game-host.is-full > .slot.g-viking > * { grid-column: 2; min-width: 0; margin: 0 !important; }
+  .game-host.is-full > .slot.g-viking > .slot-bg { grid-column: auto; }
+  .game-host.is-full > .slot.g-viking > .slot-frame { grid-column: 1; grid-row: 1 / span 12; align-self: center; }
+  .game-host.is-full .vkx-scene { width: auto; max-width: 100%; height: calc(100dvh - 12px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)); min-width: 0; }
+  .game-host.is-full > .slot.g-viking .win-bar .msg { font-size: 11px; }
+  .game-host.is-full > .slot.g-viking .controls.vk-ctl { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important; grid-template-areas: "bal bal bal" "win win win" "bet bet bet" "max spin auto" "opts opts opts" !important; align-items: center; justify-items: center; row-gap: 6px; padding: 8px 6px; }
+  .game-host.is-full > .slot.g-viking .controls.vk-ctl .vk-auto { display: grid; }
+  .game-host.is-full > .slot.g-viking .controls.vk-ctl .vk-lines { display: none; }
+}
 .vk-pay { width: 54px; height: 54px; display: grid; place-items: center; } .vk-pay img { width: 100%; height: 100%; object-fit: contain; }
 .vk-iimg { width: min(40vw, 180px); height: auto; border-radius: 10px; filter: drop-shadow(0 0 24px rgba(250, 204, 21, .7)); }
 
@@ -6465,7 +6446,7 @@ html.light .slot small { color: inherit; }
 .g-anubis .an-art > .an-word { position: absolute; z-index: 6 !important; top: 46%; font-size: 7cqh; }
 .an-p .an-art > .an-word { font-size: 5.6cqh; }
 .game-host:not(.is-full):has(> .g-anubis) { max-width: max(420px, min(1180px, calc((100svh - 220px) * 1.5 + 40px))) !important; }
-/* full screen: the video that fits the screen covers it; around it (screen of another shape), its own picture, blurred */
+/* full screen: the video that fits the screen covers it (fullFit: stretched a little, then its edges continue on a screen of another shape) */
 .game-host.is-full:has(> .slot.g-anubis) { padding: 0; background: #07060c; overflow: hidden; }
 .game-host.is-full > .slot.g-anubis.g-anubis { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
 .game-host.is-full > .slot.g-anubis.g-anubis > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
@@ -6473,13 +6454,6 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-anubis.g-anubis > .slot-frame, .game-host.is-full > .slot.g-anubis.g-anubis > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.g-anubis .slot-frame { animation: none !important; }
 .g-anubis .slot-stage > .an-scene.an-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #07060c; }
-.an-scene.an-fullsc::before { content: ''; position: absolute; inset: -40px; background: url(assets/games/anubis/scene-large.webp?v=4) center / cover no-repeat; filter: blur(18px) brightness(.6); }
-.an-scene.an-fullsc.an-p::before { background-image: url(assets/games/anubis/scene-haut.webp?v=4); background-position: center top; }
-.an-scene.an-fullsc.an-b.an-l::before { background-image: url(assets/games/anubis/scene-bonus-large.webp?v=4); }
-.an-scene.an-fullsc.an-b.an-p::before { background-image: url(assets/games/anubis/scene-bonus-haut.webp?v=4); }
-.an-bandx .an-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
-.an-bandy.an-l .an-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
-.an-bandy.an-p .an-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
 .an-fullsc .an-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 
 /* ============ La Roulette Russe (576 façons 3-4-4-4-3, volatilité extrême, images du propriétaire) ============ */
@@ -6585,7 +6559,7 @@ html.light .slot small { color: inherit; }
 .rr-full { z-index: 8; right: 1.2%; top: auto; bottom: 22%; width: clamp(28px, 4.4%, 40px); height: auto; aspect-ratio: 1; border-radius: 8px; background: rgba(30, 14, 4, .65); color: #f4d58d; font: 700 clamp(14px, 2.2vmin, 22px)/1 sans-serif; box-shadow: inset 0 0 0 1px rgba(232, 184, 100, .6); }
 .rr-l .rr-full { top: 16%; bottom: auto; right: 1.6%; }
 .rr-p .rr-full { top: 13%; bottom: auto; right: 3%; width: clamp(28px, 8%, 40px); }
-/* full screen: the video that fits the screen covers it; around it (screen of another shape), its own picture, blurred */
+/* full screen: the video that fits the screen covers it (fullFit: stretched a little, then its edges continue on a screen of another shape) */
 .game-host.is-full:has(> .slot.g-barillet) { padding: 0; background: #1a0d05; overflow: hidden; }
 .game-host.is-full > .slot.g-barillet.g-barillet { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
 .game-host.is-full > .slot.g-barillet.g-barillet > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
@@ -6593,11 +6567,6 @@ html.light .slot small { color: inherit; }
 .game-host.is-full > .slot.g-barillet.g-barillet > .slot-frame, .game-host.is-full > .slot.g-barillet.g-barillet > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
 .game-host.ml-busy > .slot.g-barillet .slot-frame { animation: none !important; }
 .rr-scene.rr-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #1a0d05; }
-.rr-scene.rr-fullsc::before { content: ''; position: absolute; inset: -40px; background: url(assets/games/barillet/scene-large.webp?v=3) center / cover no-repeat; filter: blur(18px) brightness(.6); }
-.rr-scene.rr-fullsc.rr-p::before { background-image: url(assets/games/barillet/scene-haut.webp?v=3); background-position: center top; }
-.rr-bandx .rr-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
-.rr-bandy.rr-l .rr-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
-.rr-bandy.rr-p .rr-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
 .rr-fullsc .rr-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); bottom: auto; width: 40px; height: 40px; }
 .rr-img { width: 86%; height: 86%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .65)); pointer-events: none; user-select: none; }
 .g-barillet .rs-cell.scat .rr-img, .g-barillet .rs-cell.wild .rr-img { width: 94%; height: 94%; }
@@ -9034,6 +9003,18 @@ a.tb-hero[href]:hover { border-color: rgba(255, 61, 154, .5); }
 @media (max-width: 1100px) { .tb-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .tb-heroes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 700px) { .tb-kpis, .tb-heroes, .tb-grid { grid-template-columns: 1fr 1fr; } .tb-heroes, .tb-grid { grid-template-columns: 1fr; } .tb-kpis b { font-size: 20px; } }
 
+/* ============ Plein écran des décors (fullFit de core/videobg.js, demande du propriétaire du 16 novembre 2026 : le décor prend tout
+   l'écran du téléphone) : là où l'image ne peut pas aller sans couper la grille ou la barre (téléphone très allongé), ses bords
+   continuent en dégradé (.vf), jamais flou ni masque sur le décor (les rouleaux restent fluides) ============ */
+.vf { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+.vf[hidden], .vf > [hidden] { display: none; }
+.vf > i { position: absolute; background: 0 0 / 100% 100% no-repeat; }
+.vf > .vf-t { background-image: var(--t, none); } .vf > .vf-b { background-image: var(--b, none); } .vf > .vf-l { background-image: var(--l, none); } .vf > .vf-r { background-image: var(--r, none); }
+.vf-t { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - var(--f)), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - var(--f)), transparent); }
+.vf-b { -webkit-mask-image: linear-gradient(0deg, #000 calc(100% - var(--f)), transparent); mask-image: linear-gradient(0deg, #000 calc(100% - var(--f)), transparent); }
+.vf-l { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - var(--f)), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - var(--f)), transparent); }
+.vf-r { -webkit-mask-image: linear-gradient(270deg, #000 calc(100% - var(--f)), transparent); mask-image: linear-gradient(270deg, #000 calc(100% - var(--f)), transparent); }
+
 /* ============ Décors des 5 machines (demande du propriétaire du 16 novembre 2026 : Le Coffre-Fort, Le Coffre aux Pirates,
    La Tournée du Père Noël, Le Totem Extrême, La Tour Bling) : core/videobg.js (Scene, sceneHTML). Positions en % de chaque
    image ou vidéo (fabriquées par un petit script : sx-<jeu>.sx-l = image large, .sx-pl = image haute). ============ */
@@ -9084,11 +9065,14 @@ a.tb-hero[href]:hover { border-color: rgba(255, 61, 154, .5); }
 .sx-art > .feature-banner b { font-size: 34cqh; white-space: nowrap; }
 .sx-art > .feature-banner .pill { padding: 4cqh 1.6cqw; font-size: 30cqh; white-space: nowrap; }
 .sx-art:has(> .feature-banner.show) :is(.sx-pl, .sx-jp, .ap-jps) { opacity: 0; }
-/* full screen: the picture that fits the screen covers it (Scene.layout), its first frame blurred around */
-.sx.sx-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #000; }
-.sx.sx-fullsc::before { content: ''; position: absolute; inset: -40px; background: var(--sx-poster) center / cover no-repeat; filter: blur(18px) brightness(.7); }
+/* full screen: the picture that fits the screen covers it (Scene.layout → fullFit). The scene is absolute in the machine, itself
+   over the whole screen (never position: fixed: the flash or the shake of a spin made a filter / transform on its parents, and
+   the scene left the screen, « écran noir » of 16 November 2026) */
+.game-host.is-full:has(> .slot.sx-game) { padding: 0; background: #000; overflow: hidden; max-width: none; }
+.game-host.is-full > .slot.sx-game.sx-game { display: block !important; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; box-shadow: none; }
+.game-host.is-full > .slot.sx-game.sx-game > .slot-frame, .game-host.is-full > .slot.sx-game.sx-game > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
+.sx.sx-fullsc { position: absolute !important; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #000; }
 .sx.sx-fullsc .sx-art { inset: auto; }
-.is-full .sx.sx-fullsc { position: fixed !important; inset: 0; z-index: 20 !important; }
 .is-full .sx-game .mx-row { display: none !important; }
 
 /* ---- Le Coffre-Fort (néon) ---- */
@@ -9509,20 +9493,21 @@ function warm(nodes) {
     const v = n.querySelector('img, svg');
     if (!v) continue;
     const vis = v.tagName === 'IMG' ? { key: 'i:' + v.getAttribute('src'), img: v.getAttribute('src') } : { key: 's:' + v.outerHTML, svg: v };
-    if (!BOX.has(vis.key)) {
-      const a = n.getBoundingClientRect(), b = v.getBoundingClientRect();
+    const was = BOX.get(vis.key), a = n.getBoundingClientRect();
+    // measured again when the cell changes shape (full screen: the decor may be stretched a little, the cells get taller)
+    if (!was || (a.height > 4 && Math.abs(a.width / a.height - was.asp) > was.asp * 0.03)) {
+      const b = v.getBoundingClientRect();
       const fit = v.tagName === 'IMG' ? getComputedStyle(v).objectFit : '';
       if (a.width > 4 && b.width > 2 && (fit === 'contain' || fit === 'scale-down')) {
-        // an <img> letter-boxed by object-fit: the box of what is really painted (a wide picture in a wide cell, Le Coffre
-        // aux Pirates: before, the spinning reels drew it at the height of the cell, much smaller, then it jumped at the stop)
+        // an <img> letter-boxed by object-fit: its box and the shape of its picture; what is really painted is worked out
+        // for the cell it is drawn in (painted). Before, the spinning reels drew a wide picture at the height of the cell,
+        // much smaller, then it jumped at the stop (Le Coffre aux Pirates)
         if (v.complete && v.naturalWidth) {
-          const k = Math.min(b.width / v.naturalWidth, b.height / v.naturalHeight), w = v.naturalWidth * k, h = v.naturalHeight * k;
-          const x = b.left + (b.width - w) / 2, y = b.top + (b.height - h) / 2;
-          BOX.set(vis.key, [(x - a.left) / a.width, (y - a.top) / a.height, w / a.width, h / a.height, 1]);
+          BOX.set(vis.key, Object.assign([(b.left - a.left) / a.width, (b.top - a.top) / a.height, b.width / a.width, b.height / a.height, 1, v.naturalWidth / v.naturalHeight], { asp: a.width / a.height }));
         }
       } else if (a.width > 4 && b.width > 2) {
         // keep the picture's aspect
-        BOX.set(vis.key, [(b.left - a.left) / a.width, (b.top - a.top) / a.height, b.width / a.width, b.height / a.height]);
+        BOX.set(vis.key, Object.assign([(b.left - a.left) / a.width, (b.top - a.top) / a.height, b.width / a.width, b.height / a.height], { asp: a.width / a.height }));
       }
     }
     rasterize(vis);
@@ -9531,6 +9516,12 @@ function warm(nodes) {
 // side of the square texture (the picture fitted inside it) so that the picture covers its box: for a measured painted
 // box (5th value), its longest side; otherwise the shortest side of the element's box (as before)
 const sideOf = (box, w, h) => (box[4] ? Math.max(box[2] * w, box[3] * h) : Math.min(box[2] * w, box[3] * h));
+// the box of a letter-boxed <img> (5th value) in a cell of w × h: the part of its box its picture really paints
+function painted(box, w, h) {
+  if (!box[4] || !box[5]) return box;
+  const [bx, by, bw, bh, , na] = box, ph = Math.min(bh * h, (bw * w) / na), pw = ph * na;
+  return [bx + (bw - pw / w) / 2, by + (bh - ph / h) / 2, pw / w, ph / h, 1];
+}
 function texFor(html) {
   const vis = visualOf(html);
   if (!vis) return { empty: true };
@@ -9577,6 +9568,14 @@ class Stage {
     this.accent = getComputedStyle(host).getPropertyValue('--accent').trim() || '#fde047';
     baseTextures();
     this.resize();
+    // compile the shaders of a spin now (motion blur, additive lights), drawn once on an invisible speck
+    try {
+      const s = new PIXI.Sprite(PIXI.Texture.WHITE), l = new PIXI.Sprite(SPARK), b = new PIXI.BlurFilter(0, PHONE ? 2 : 3, 1);
+      b.blurX = 0; b.blurY = 2; s.width = s.height = l.width = l.height = 2; s.alpha = l.alpha = 0.001; l.blendMode = PIXI.BLEND_MODES.ADD;
+      s.filters = PHONE ? [b] : [b, new PIXI.ColorMatrixFilter()];
+      this.app.stage.addChild(s, l); this.app.render();
+      s.destroy(); l.destroy(); this.app.render();
+    } catch { /* the first spin compiles them */ }
   }
   get alive() { return this.host.isConnected && !this.lost; }
   resize() {
@@ -9632,10 +9631,10 @@ class Stage {
     const strip = new PIXI.Container();
     tex.forEach((t, k) => {
       if (t.empty) return;
-      const [bx, by, bw, bh] = t.box;
+      const tb = painted(t.box, r.w, ch), [bx, by, bw, bh] = tb;
       const s = new PIXI.Sprite(t.tex);
       // fit the square texture into the measured box, keeping its aspect
-      const side = sideOf(t.box, r.w, ch);
+      const side = sideOf(tb, r.w, ch);
       s.anchor.set(0.5);
       s.width = side; s.height = side;
       s.position.set((bx + bw / 2) * r.w, k * ch + (by + bh / 2) * ch);
@@ -9646,7 +9645,10 @@ class Stage {
     const blur = new PIXI.BlurFilter(0, PHONE ? 2 : 3, 1);
     blur.blurX = 0;
     const shade = new PIXI.ColorMatrixFilter();
-    strip.filters = [blur, shade];
+    // phones: the blur alone (one pass less per reel); the filters only work on the reel's own rectangle, not on the whole
+    // strip of symbols above and below it (smoother spins)
+    strip.filters = PHONE ? [blur] : [blur, shade];
+    strip.filterArea = new PIXI.Rectangle(r.x, r.y, r.w, r.h);
     // reel edge shadows (the HTML ones are under the canvas)
     const fade = new PIXI.Graphics();
     for (let i = 0; i < 12; i++) {
@@ -9679,7 +9681,7 @@ class Stage {
   drop(cellEl, html, fromDy, dur, ease, clip) {
     const PIXI = window.PIXI, t = texFor(html);
     if (!t || t.empty || !this.alive) return null;
-    const r = this.rectOf(cellEl), [bx, by, bw, bh] = t.box, side = sideOf(t.box, r.w, r.h);
+    const r = this.rectOf(cellEl), tb = painted(t.box, r.w, r.h), [bx, by, bw, bh] = tb, side = sideOf(tb, r.w, r.h);
     const s = new PIXI.Sprite(t.tex);
     s.anchor.set(0.5); s.width = s.height = side;
     const x = r.x + (bx + bw / 2) * r.w, y = r.y + (by + bh / 2) * r.h;
@@ -9824,6 +9826,13 @@ function stageFor(host) {
   return s;
 }
 const prepare = () => { if (!window.PIXI) load().catch(() => {}); };
+// The stage of a reel area made in a quiet moment after the game opens (its shaders compiled then), not at the first spin:
+// that first spin used to stop for a moment on phones.
+function preStage(host) {
+  const idle = window.requestIdleCallback || ((f) => setTimeout(f, 400));
+  const go = () => idle(() => { if (host.isConnected && host.clientWidth) stageFor(host); }, { timeout: 2500 });
+  if (window.PIXI) go(); else load().then(go).catch(() => {});
+}
 
 // CSS cubic-bezier(x1, y1, x2, y2) as a function of time 0..1
 function bezier(x1, y1, x2, y2) {
@@ -9831,7 +9840,7 @@ function bezier(x1, y1, x2, y2) {
   return (x) => { let lo = 0, hi = 1, t = x; for (let i = 0; i < 22; i++) { t = (lo + hi) / 2; if (B(x1, x2, t) < x) lo = t; else hi = t; } return B(y1, y2, t); };
 }
 
-return { stageFor, warm, prepare, bezier, pixiOn: () => usable() && !PX.broken };
+return { stageFor, warm, prepare, preStage, bezier, pixiOn: () => usable() && !PX.broken };
 })();
 
 // ---- wallet.js ----
@@ -14309,6 +14318,22 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'billets', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'Le décor prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'pirates', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'Le décor prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'noel', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'Le décor prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'totemx', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'Le temple prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'bling', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'La ville de nuit prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'viking', date: '2026-11-16', title: 'Plein écran réparé', items: ['Téléphone couché : les rouleaux sur toute la hauteur et la barre de pierre à droite', 'Rouleaux plus fluides'] },
+  { game: 'zeus', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'huff', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'redk', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'dragons', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'big-bad-wolf', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'anubis', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'barillet', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'cosmic', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'candy', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
+  { game: 'chasse', date: '2026-11-16', title: 'Plein écran sur tout l’écran', items: ['Le décor prend tout l’écran du téléphone, même sous l’encoche, sans bande floue', 'Rouleaux plus fluides'] },
   { game: 'totemx', date: '2026-11-16', title: 'Le temple et sa barre de feu', items: ['Nouveau décor : le temple animé, avec tes rouleaux au milieu', 'La barre du haut se remplit à chaque connexion : plus le totem monte, plus elle grandit', 'Full screen : la barre prend feu', 'Solde, totem et gain sur les plaques du temple, boutons directement sur l’image'] },
   { game: 'pirates', date: '2026-11-16', title: 'Le retour, en grand', items: ['Le Coffre aux Pirates revient avec un tout nouveau décor : le capitaine sur l’ordinateur, le petit pirate animé sur téléphone', 'Les jackpots sur la poutre au-dessus des rouleaux, le multiplicateur des tours gratuits sur la plaque', 'Boutons MENU, BONUS, MISE et la barre du navire SPIN directement sur l’image'] },
   { game: 'noel', date: '2026-11-16', title: 'Nouveau décor animé', items: ['L’arche enneigée et les Pères Noël qui bougent', 'MINI, MAXI et GRAND affichés sur les plaques du haut', 'Boutons de la barre directement sur l’image, plein écran sur tout l’écran'] },
@@ -15411,6 +15436,7 @@ function setFull(host, on) {
   host.classList.toggle('is-full', on);
   document.body.classList.toggle('fs-on', on);
   current = on ? host : null;
+  try { window.SpinBetApp?.immersive?.(!!on); } catch { /* older app: its bars stay */ }
   try {
     if (on && !document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
     if (!on && document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
@@ -15657,7 +15683,7 @@ const { el, toast, modal, animateNumber, fmtShort } = __mods['ui.js'];
 const { coverSVG } = __mods['covers.js'];
 const { gameMenu, toggleFull, setFull, isFull, MENU_BTN, FULL_BTN, autoFit } = __mods['core/chrome.js'];
 const { Music, musicOn, EXTRA_THEMES } = __mods['core/music.js'];
-const { stageFor, warm, prepare } = __mods['core/pixi.js'];
+const { stageFor, warm, prepare, preStage } = __mods['core/pixi.js'];
 
 const BETS = [1, 2, 3, 5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000]; // whole KE, capped by the balance
 const LINE_COLORS = ['#22d3ee', '#f43f9e', '#00e701', '#fbbf24', '#a855f7', '#fb7185', '#38bdf8', '#facc15', '#34d399', '#e879f9'];
@@ -15750,25 +15776,23 @@ class SlotMachine {
 
   // Wide forest on a computer, tall forest on a phone held upright. Full screen: the one that fits the screen's shape
   // covers the whole screen, cropped on its edges but never cutting the jackpots, the frame or the bar (KEY, in the video's
-  // pixels); around it (screen of another shape), its own picture, blurred.
+  // pixels); a screen of another shape: stretched a little, then its edges continue (fullFit).
   layout() {
     if (this.dead || !this.scene) return;
-    const { screenBox, coverFit } = __mods['core/videobg.js'];
+    const { fullFit } = __mods['core/videobg.js'];
     const sc = this.root.querySelector('.wl-scene'), art = this.root.querySelector('.wl-art');
     const full = !!this.slotEl.closest('.is-full');
     sc.classList.toggle('wl-fullsc', full);
     if (!full) {
-      sc.classList.remove('wl-bandx', 'wl-bandy');
+      sc.querySelector(':scope > .vf')?.setAttribute('hidden', '');
       this.orient(innerWidth < 700 && innerHeight > innerWidth);
       art.style.cssText = ''; return;
     }
-    const { top, lft, W, H } = screenBox(sc, this.root.querySelector('.wl-safe'));
+    const W = sc.clientWidth, H = sc.clientHeight;
     if (!W || !H) return;
     const port = W / H < 1;
     this.orient(port);
-    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [4, 8, 444, 652] : [4, 2, 668, 442], { bottom: port });
-    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
-    sc.classList.toggle('wl-bandx', f.bandX); sc.classList.toggle('wl-bandy', f.bandY);
+    fullFit(sc, art, this.root.querySelector('.wl-safe'), { size: port ? [448, 672] : [672, 448], key: port ? [4, 8, 444, 652] : [4, 2, 668, 442], bottom: port, poster: this.vbg.v.poster });
   }
 
   get bet() { return BETS[this.betIdx]; }
@@ -15837,7 +15861,7 @@ class SlotMachine {
     this.msg = q('.win-bar .msg');
     this.winAmt = q('.win-amt');
     this.reelEls.forEach((reel, r) => { reel.firstChild.innerHTML = this.grid[r].map((c) => this.cellHTML(c)).join(''); });
-    prepare(); requestAnimationFrame(() => warm(this.root.querySelectorAll('.reels .cell')));
+    prepare(); preStage(this.reelsEl); requestAnimationFrame(() => warm(this.root.querySelectorAll('.reels .cell')));
     this.updateMeters();
   }
 
@@ -16479,19 +16503,124 @@ function screenBox(scene, safe) {
 }
 
 // Full screen: a picture of iw × ih covers the W × H screen, cropped on its edges but never cutting KEY = [x0, y0, x1, y1]
-// (the part that must stay visible, in the picture's pixels). When it cannot cover a side without cutting KEY it is
-// centred on that side (or put at the bottom with `bottom`), and bandX / bandY say that the screen shows around it.
-function coverFit(W, H, iw, ih, key, { bottom = false } = {}) {
+// (the part that must stay visible, in the picture's pixels), which also stays inside the safe areas `safe` (notch, bar of
+// the phone: { top, rgt, bot, lft } in px) while the picture goes under them. When a side cannot be covered without cutting
+// KEY, the picture is stretched that way, up to `stretch` (owner's request of 16 November 2026: « sur le téléphone, ça
+// prend tout l'écran », no more blurred band); beyond, it is centred on that side (or put at the bottom with `bottom`) and
+// bandX / bandY say that the screen shows around it (fullFit fills it with the colours of the picture's edge).
+const STRETCH = 1.32;
+function coverFit(W, H, iw, ih, key, { bottom = false, safe = null, stretch = STRETCH } = {}) {
   const [kx0, ky0, kx1, ky1] = key;
-  const k = Math.min(Math.max(W / iw, H / ih), W / (kx1 - kx0), H / (ky1 - ky0)), w = iw * k, h = ih * k;
-  const fit = (S, len, a0, a1) => { // larger than the screen: centred, then moved so that the screen stays covered and KEY stays on it
-    if (len <= S) return null;
-    const v = Math.min(0, Math.max(S - len, (S - len) / 2));
-    return Math.min(S - a1 * k, Math.max(-a0 * k, v));
+  const s = safe || { top: 0, rgt: 0, bot: 0, lft: 0 }, Ws = W - s.lft - s.rgt, Hs = H - s.top - s.bot;
+  const k = Math.min(Math.max(W / iw, H / ih), Ws / (kx1 - kx0), Hs / (ky1 - ky0));
+  const kx = iw * k < W ? Math.min(W / iw, k * stretch, Ws / (kx1 - kx0)) : k;
+  const ky = ih * k < H ? Math.min(H / ih, k * stretch, Hs / (ky1 - ky0)) : k;
+  const w = iw * kx, h = ih * ky;
+  // larger than the screen: centred, then moved so that the screen stays covered; KEY always inside the safe part
+  const place = (S, len, a0, a1, sc, lo, hi, end) => {
+    const v = len >= S ? Math.min(0, Math.max(S - len, (S - len) / 2)) : end ? S - len : (S - len) / 2;
+    return Math.min(S - hi - a1 * sc, Math.max(lo - a0 * sc, v));
   };
-  const x = fit(W, w, kx0, kx1) ?? (W - w) / 2;
-  const y = fit(H, h, ky0, ky1) ?? (bottom ? H - h : (H - h) / 2);
-  return { x, y, w, h, bandX: x > 0.5, bandY: y > 0.5 };
+  const x = place(W, w, kx0, kx1, kx, s.lft, s.rgt, false), y = place(H, h, ky0, ky1, ky, s.top, s.bot, bottom);
+  return { x, y, w, h, bandX: x > 0.5 || x + w < W - 0.5, bandY: y > 0.5 || y + h < H - 0.5 };
+}
+
+// The colours of a picture's 4 edges (averaged by small groups of pixels), to continue it where it cannot cover the screen.
+const edgeCache = new Map();
+function edgesOf(url) {
+  if (edgeCache.has(url)) return edgeCache.get(url);
+  const p = new Promise((ok) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const N = 48, D = 20, iw = img.naturalWidth, ih = img.naturalHeight;
+        const c = document.createElement('canvas'), cx = c.getContext('2d', { willReadFrequently: true });
+        // one strip per edge: N samples along it, D steps from the picture (last with `toEnd`, else first) to a darker far end
+        const strip = (sx, sy, sw, sh, vertical, toEnd) => {
+          c.width = vertical ? 1 : N; c.height = vertical ? N : 1;
+          cx.imageSmoothingEnabled = true; cx.imageSmoothingQuality = 'high';
+          cx.clearRect(0, 0, c.width, c.height);
+          cx.drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+          const raw = cx.getImageData(0, 0, c.width, c.height).data, px = new Float32Array(N * 4);
+          // smoothed along the edge (no stripes when the edge has small details: snow, frames…)
+          for (let i = 0; i < N; i++) {
+            let w = 0;
+            for (let d = -3; d <= 3; d++) {
+              const j = Math.min(N - 1, Math.max(0, i + d)), k = 4 - Math.abs(d);
+              for (let ch = 0; ch < 3; ch++) px[i * 4 + ch] += raw[j * 4 + ch] * k;
+              w += k;
+            }
+            for (let ch = 0; ch < 3; ch++) px[i * 4 + ch] /= w;
+          }
+          const o = document.createElement('canvas'), ox = o.getContext('2d');
+          o.width = vertical ? D : N; o.height = vertical ? N : D;
+          const out = ox.createImageData(o.width, o.height);
+          for (let i = 0; i < N; i++) for (let j = 0; j < D; j++) {
+            const t = toEnd ? j / (D - 1) : 1 - j / (D - 1), dark = 0.42 + 0.58 * t * t; // far end darker, smooth near the picture
+            const q = (vertical ? i * D + j : j * N + i) * 4;
+            for (let ch = 0; ch < 3; ch++) out.data[q + ch] = px[i * 4 + ch] * dark;
+            out.data[q + 3] = 255;
+          }
+          ox.putImageData(out, 0, 0);
+          return o.toDataURL();
+        };
+        const e = Math.max(2, Math.round(Math.min(iw, ih) * 0.012));
+        ok({
+          t: strip(0, 0, iw, e, false, true), b: strip(0, ih - e, iw, e, false, false),
+          l: strip(0, 0, e, ih, true, true), r: strip(iw - e, 0, e, ih, true, false),
+        });
+      } catch { ok(null); }
+    };
+    img.onerror = () => ok(null);
+    img.src = url;
+  });
+  edgeCache.set(url, p);
+  return p;
+}
+
+// Full screen of a decor, shared by every machine with the owner's pictures or videos: `art` (the picture with the reels and
+// the buttons on it, placed in % of the picture) covers the whole screen of `sc`, under the notch too, with KEY kept inside
+// the safe areas read on `safe`; the rest of the screen (very long phone…) continues the picture's edges (no blur, no mask:
+// the reels stay smooth). Returns the fit, or null when the scene has no size yet.
+function fullFit(sc, art, safe, { size: [iw, ih], key, poster, bottom = false, css = '' }) {
+  const W = sc.clientWidth, H = sc.clientHeight;
+  if (!W || !H) return null;
+  const cs = getComputedStyle(safe), sp = (k) => parseFloat(cs[k]) || 0;
+  const f = coverFit(W, H, iw, ih, key, { bottom, safe: { top: sp('paddingTop'), rgt: sp('paddingRight'), bot: sp('paddingBottom'), lft: sp('paddingLeft') } });
+  // nothing written when nothing moved (some machines lay out again at each change of their classes, so at each spin)
+  const st = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${f.x.toFixed(1)}px;top:${f.y.toFixed(1)}px;${css}`;
+  if (art.vfFit !== st || !art.style.width) { art.vfFit = st; art.style.cssText = st; }
+  fillAround(sc, f, W, H, poster || /url\(["']?([^"')]+)/.exec(getComputedStyle(art).backgroundImage)?.[1]);
+  return f;
+}
+
+// The 4 bands around the picture (only those with a size), each painted with its edge's colours and fading into the picture.
+function fillAround(sc, f, W, H, poster) {
+  let box = sc.querySelector(':scope > .vf');
+  const sides = { t: f.y, b: H - f.y - f.h, l: f.x, r: W - f.x - f.w };
+  if (!Object.values(sides).some((v) => v > 0.5)) { if (box) box.hidden = true; return; }
+  const sig = `${W},${H},${f.x},${f.y},${f.w},${f.h},${poster?.length},${poster?.slice(-40)}`;
+  if (box && !box.hidden && box.vfSig === sig) return;
+  if (box) box.vfSig = sig;
+  if (!box) {
+    box = document.createElement('div'); box.className = 'vf'; box.setAttribute('aria-hidden', 'true'); box.vfSig = sig;
+    box.innerHTML = '<i class="vf-t"></i><i class="vf-b"></i><i class="vf-l"></i><i class="vf-r"></i>';
+    sc.prepend(box);
+  }
+  box.hidden = false;
+  const F = Math.round(Math.min(26, Math.max(10, Math.min(f.w, f.h) * 0.035))); // fade into the picture
+  const px = (v) => `${v.toFixed(1)}px`;
+  const set = (k, on, css) => { const n = box.querySelector(`.vf-${k}`); n.hidden = !on; if (on) n.style.cssText = css + `;--f:${F}px`; };
+  set('t', sides.t > 0.5, `left:${px(f.x)};width:${px(f.w)};top:0;height:${px(sides.t + F)}`);
+  set('b', sides.b > 0.5, `left:${px(f.x)};width:${px(f.w)};bottom:0;height:${px(sides.b + F)}`);
+  set('l', sides.l > 0.5, `top:${px(f.y)};height:${px(f.h)};left:0;width:${px(sides.l + F)}`);
+  set('r', sides.r > 0.5, `top:${px(f.y)};height:${px(f.h)};right:0;width:${px(sides.r + F)}`);
+  if (!poster || box.vfSrc === poster) return;
+  box.vfSrc = poster; // a JS property, not an attribute (in the one-file version the picture is a long data: address)
+  edgesOf(poster).then((e) => {
+    if (!e || box.vfSrc !== poster) return;
+    for (const k of ['t', 'b', 'l', 'r']) box.style.setProperty(`--${k}`, `url("${e[k]}")`);
+  });
 }
 
 // The owner's decors for whole machines (16 November 2026: Le Coffre-Fort, Le Coffre aux Pirates, La Tournée du Père Noël,
@@ -16564,20 +16693,17 @@ class Scene {
     const full = !!this.g.slotEl.closest('.is-full');
     this.sc.classList.toggle('sx-fullsc', full);
     if (!full) {
-      this.sc.classList.remove('sx-bandx', 'sx-bandy');
+      this.sc.querySelector(':scope > .vf')?.setAttribute('hidden', '');
       this.orient(innerWidth < 700 && innerHeight > innerWidth);
       this.art.style.cssText = this.art.style.backgroundImage ? `background-image:${this.art.style.backgroundImage}` : '';
       return;
     }
-    const { top, lft, W, H } = screenBox(this.sc, this.g.q('.sx-safe'));
+    const W = this.sc.clientWidth, H = this.sc.clientHeight;
     if (!W || !H) return;
     const port = W / H < 1, name = port ? 'haut' : 'large';
     this.orient(port);
-    const [iw, ih] = this.o.size[name];
-    const f = coverFit(W, H, iw, ih, this.o.key[name], { bottom: port });
     const bg = this.art.style.backgroundImage;
-    this.art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px;background-image:${bg}`;
-    this.sc.classList.toggle('sx-bandx', f.bandX); this.sc.classList.toggle('sx-bandy', f.bandY);
+    fullFit(this.sc, this.art, this.g.q('.sx-safe'), { size: this.o.size[name], key: this.o.key[name], bottom: port, poster: this.url(`assets/games/${this.o.dir}/scene-${name}.webp`), css: `background-image:${bg}` });
   }
   destroy() {
     this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs);
@@ -16586,7 +16712,7 @@ class Scene {
   }
 }
 
-return { VideoBg, screenBox, coverFit, Scene, sceneHTML };
+return { VideoBg, screenBox, coverFit, fullFit, Scene, sceneHTML };
 })();
 
 // ---- core/base.js ----
@@ -17114,7 +17240,7 @@ __mods['core/reels.js'] = (() => {
 // Values are a flat array indexed col * rows + row, like the original games.
 
 const { sfx } = __mods['audio.js'];
-const { stageFor, warm, prepare } = __mods['core/pixi.js'];
+const { stageFor, warm, prepare, preStage } = __mods['core/pixi.js'];
 
 class Reels {
   constructor(host, { cols, rows, art, cls = () => '', random, game, durK = 1 }) {
@@ -17127,7 +17253,7 @@ class Reels {
     host.appendChild(this.el);
     this.reelEls = [...this.el.children];
     this.values = new Array(cols * rows).fill(null);
-    prepare();
+    prepare(); preStage(this.el);
   }
 
   get px() { return stageFor(this.el); }
@@ -17229,7 +17355,7 @@ __mods['core/grid.js'] = (() => {
 const { fx, sleep: fxSleep, center } = __mods['fx.js'];
 const sleep = (ms) => fxSleep(globalThis.__sbSuper ? Math.max(10, ms * 0.3) : ms); // super turbo of the slots: every pause much shorter
 const { sfx } = __mods['audio.js'];
-const { stageFor, warm, prepare, bezier } = __mods['core/pixi.js'];
+const { stageFor, warm, prepare, preStage, bezier } = __mods['core/pixi.js'];
 const BOUNCE_F = bezier(0.3, 1.35, 0.55, 1);
 
 const BOUNCE = 'cubic-bezier(.3,1.35,.55,1)';
@@ -17255,7 +17381,7 @@ class SymbolGrid {
       this.cells.push(c);
     }
     host.appendChild(this.el);
-    prepare();
+    prepare(); preStage(this.el);
   }
 
   get px() { return stageFor(this.el); }
@@ -17701,11 +17827,11 @@ const FILES = {
   'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', '0a69ae2268'],
   'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '88301951af'],
   'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
-  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', 'f06eb8639d'],
-  huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a60d147925'],
-  candy: ['candy', 'games/impl/candy.js', 'CandyGame', 'f07fb4473a'],
-  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '25cbd292e1'],
-  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'a210dc3e3a'],
+  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '1f5dc4c5e4'],
+  huff: ['huff', 'games/impl/huff.js', 'HuffGame', '943b46c1ce'],
+  candy: ['candy', 'games/impl/candy.js', 'CandyGame', '68f3a18915'],
+  cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f84807ddeb'],
+  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'f6f4cf77cd'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '58092f9458'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'c757c58318'],
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '9e528dfdf5'],
@@ -17725,12 +17851,12 @@ const FILES = {
   casse: ['casse', 'games/impl/casse.js', 'CasseGame', 'fb3eda6835'],
   labo: ['labo', 'games/impl/labo.js', 'LaboGame', 'e6287e4258'],
   fortune: ['fortune', 'games/impl/fortune.js', 'FortuneGame', 'a3ee781b6e'],
-  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', 'e85a915fc6'],
+  dragons: ['dragons', 'games/impl/dragons.js', 'DragonsGame', 'c9b1c2d318'],
   billets: ['billets', 'games/impl/billets.js', 'BilletsGame', '8e0dda303b'],
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '9621261bab'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '620d0b9f44'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'b3c63b68ca'],
-  chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', 'db3570edfb'],
+  chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', 'af77228bd6'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', 'e3a4bec1eb'],
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', 'a7fe064c42'],
   pilote: ['pilote', 'games/impl/pilote.js', 'PiloteGame', '759a2adc83'],
@@ -17748,9 +17874,9 @@ const FILES = {
   totemx: ['totemx', 'games/impl/totemx.js', 'TotemXGame', '652d982842'],
   noel: ['noel', 'games/impl/noel.js', 'NoelGame', '6140064bc6'],
   viking: ['viking', 'games/impl/viking.js', 'VikingGame', '0fac86d028'],
-  barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', '8113d9a1e6'],
+  barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', '4ead0ddcd8'],
   filon: ['filon', 'games/impl/filon.js', 'FilonGame', '45904335f9'],
-  redk: ['redk', 'games/impl/redk.js', 'RedkGame', '427f04891a'],
+  redk: ['redk', 'games/impl/redk.js', 'RedkGame', 'd59c314e8a'],
   pirates: ['pirates', 'games/impl/pirates.js', 'PiratesGame', 'b240596402'],
   foot: ['foot', 'games/impl/foot.js', 'FootGame', '1025072609'],
   boxe: ['boxe', 'games/impl/boxe.js', 'BoxeGame', '48602d9af5'],
@@ -25198,6 +25324,7 @@ return {  };
   decorate(); splitHero();
 
   let lastBet = 0, busyT = 0;
+  const DECOR = '.sx, .vkx, .ft-scene, .zo-scene, .hf-scene, .wl-scene, .rk-scene, .dg-scene, .an-scene, .rr-scene, .cz-scene, .sk-scene, .hu-scene';
   function stage() {
     const h = host(); if (!h) return null;
     return h.querySelector('.slot-frame') || h.querySelector('.slot') || h;
@@ -25222,6 +25349,8 @@ return {  };
       const h = host(); if (!h || off) return;
       h.classList.remove('ml-busy'); void h.offsetWidth; h.classList.add('ml-busy');
       clearTimeout(busyT); busyT = setTimeout(() => h.classList.remove('ml-busy'), 1600);
+      const st = stage(); // machines with the owner's decor: no flash over the decor
+      if (st && st.classList.contains('slot-frame') && !st.querySelector(DECOR)) overlay(st, 'ml-charge', 600);
     });
     wallet.addEventListener('payout', (e) => {
       if (off) return;

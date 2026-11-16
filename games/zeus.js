@@ -114,7 +114,7 @@ const { COLS, ROWS, N, SC, ORB, PAYS, TUNE, SCATTER_PAY, FREE_SPINS, RETRIGGER, 
 const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el, animateNumber } = __mods['ui.js'];
-const { VideoBg, screenBox, coverFit } = __mods['core/videobg.js'];
+const { VideoBg, fullFit } = __mods['core/videobg.js'];
 
 const IDS = ['z0', 'z1', 'z2', 'z3', 'z4', 'z5', 'z6', 'z7', 'z8'];
 // Painted images from the owner (assets/games/zeus): the 9 symbols, the scatter (Zeus head), the multiplier orb,
@@ -239,25 +239,22 @@ class ZeusGame extends BaseGame {
   }
   // Wide background on a computer, tall one on a phone held upright. Full screen: the one that fits the screen's shape
   // covers the whole screen, cropped on its edges but never cutting the medallion, the grid or the bar (KEY, in the
-  // video's pixels); a screen of another shape gets the rest of the background, blurred, around it.
+  // video's pixels); a screen of another shape: the picture is stretched a little, then its edges continue (fullFit).
   layout() {
     if (this.dead) return;
     const sc = this.q('.zo-scene'), art = this.q('.zo-art');
     const full = !!this.slotEl.closest('.is-full');
     sc.classList.toggle('zo-fullsc', full);
     if (!full) {
-      sc.classList.remove('zo-bandx', 'zo-bandy');
+      sc.querySelector(':scope > .vf')?.setAttribute('hidden', '');
       this.orient(innerWidth < 700 && innerHeight > innerWidth);
       art.style.cssText = ''; return;
     }
-    const { top, lft, W, H } = screenBox(sc, this.q('.zo-safe'));
+    const W = sc.clientWidth, H = sc.clientHeight;
     if (!W || !H) return;
     const port = W / H < 1;
     this.orient(port);
-    // a phone thinner than the video: the video at the bottom, sky above
-    const f = coverFit(W, H, port ? 400 : 736, port ? 736 : 400, port ? [4, 172, 396, 730] : [14, 0, 722, 398], { bottom: port });
-    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
-    sc.classList.toggle('zo-bandx', f.bandX); sc.classList.toggle('zo-bandy', f.bandY);
+    fullFit(sc, art, this.q('.zo-safe'), { size: port ? [400, 736] : [736, 400], key: port ? [4, 172, 396, 730] : [14, 0, 722, 398], bottom: port, poster: this.vbg.v.poster });
   }
 
   say(t) {

@@ -15,6 +15,7 @@ const PAINT = { ch0: 's0', ch1: 's1', ch2: 's2', ch3: 's3', ch4: 's4', ch5: 's5'
 const svgArt = art;
 art = (id) => (PAINT[id] ? `<img class="c-img" src="${asset(`assets/games/cosmic/${PAINT[id]}.webp`)}" alt="" draggable="false" decoding="async">` : svgArt(id));
 const { SymbolGrid } = __mods['core/grid.js'];
+const { fullFit } = __mods['core/videobg.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
@@ -237,24 +238,14 @@ class CosmicGame extends BaseGame {
       sc.classList.toggle('cz-p', port); sc.classList.toggle('cz-l', !port);
       art.style.cssText = ''; return;
     }
-    const cs = getComputedStyle(this.q('.cz-safe')), sp = (k) => parseFloat(cs[k]) || 0;
-    const top = sp('paddingTop'), bot = sp('paddingBottom'), lft = sp('paddingLeft'), rgt = sp('paddingRight');
-    const W = sc.clientWidth - lft - rgt, H = sc.clientHeight - top - bot;
+    const W = sc.clientWidth, H = sc.clientHeight;
     if (!W || !H) return;
-    const port = W / H < 1, iw = port ? 720 : 1248, ih = port ? 1280 : 832;
+    const port = W / H < 1;
     sc.classList.toggle('cz-p', port); sc.classList.toggle('cz-l', !port);
     // the picture covers the whole screen (owner's request: no border around), cropped on its edges, but never so much
-    // that the grid, the bar or the plaque leave the screen (KEY = the part that must stay visible, in its pixels)
-    const [kx0, ky0, kx1, ky1] = port ? [72, 120, 650, 1108] : [26, 186, 1066, 792]; // wide: the grid and the bar (the plaque follows the screen)
-    const k = Math.min(Math.max(W / iw, H / ih), W / (kx1 - kx0), H / (ky1 - ky0)), w = iw * k, h = ih * k;
-    // centred, then moved so that the screen stays covered (x ≤ 0, x ≥ W − w) and the key part stays on it
-    const fit = (S, len, a0, a1) => {
-      let v = (S - len) / 2;
-      v = Math.min(0, Math.max(S - len, v));
-      return Math.min(S - a1 * k, Math.max(-a0 * k, v));
-    };
-    const x = fit(W, w, kx0, kx1), y = fit(H, h, ky0, ky1);
-    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + x).toFixed(1)}px;top:${(top + y).toFixed(1)}px`;
+    // that the grid, the bar or the plaque leave the screen (KEY, in its pixels); a very long phone: stretched a little,
+    // then the picture's edges continue (fullFit)
+    const { x, y, w, h } = fullFit(sc, art, this.q('.cz-safe'), { size: port ? [720, 1280] : [1248, 832], key: port ? [72, 120, 650, 1108] : [26, 186, 1066, 792], bottom: port });
     // the plaque stays on the screen, right of the ✕ button, whatever the crop
     const inf = this.q('.cz-info');
     inf.classList.remove('cz-col');

@@ -14,6 +14,7 @@ const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file v
 const PAINT = { cq0: 's0', cq1: 's1', cq2: 's2', cq3: 's3', cq4: 's4', cq5: 's5', cq6: 's6', cq7: 's7', cq8: 's8', cq9: 's9', cqs: 'crown', cqh: 'heart', cqj: 'jar', cqw: 'wand' };
 const art = (id) => (PAINT[id] ? `<img class="cq-img" src="${asset(`assets/games/candy/${PAINT[id]}.webp`)}" alt="" draggable="false" decoding="async">` : svgArt(id));
 const { SymbolGrid } = __mods['core/grid.js'];
+const { fullFit } = __mods['core/videobg.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
@@ -224,24 +225,17 @@ class CandyGame extends BaseGame {
     sc.classList.toggle('sk-fullsc', full);
     inf.classList.remove('sk-col'); inf.style.cssText = '';
     if (!full) {
-      sc.classList.remove('sk-band');
+      sc.querySelector(':scope > .vf')?.setAttribute('hidden', '');
       const port = innerWidth < 700 && innerHeight > innerWidth;
       sc.classList.toggle('sk-p', port); sc.classList.toggle('sk-l', !port);
       art.style.cssText = ''; return;
     }
-    const cs = getComputedStyle(this.q('.sk-safe')), sp = (k) => parseFloat(cs[k]) || 0;
-    const top = sp('paddingTop'), bot = sp('paddingBottom'), lft = sp('paddingLeft'), rgt = sp('paddingRight');
-    const W = sc.clientWidth - lft - rgt, H = sc.clientHeight - top - bot;
+    const W = sc.clientWidth, H = sc.clientHeight;
     if (!W || !H) return;
-    const port = W / H < 1, iw = port ? 720 : 1280, ih = port ? 1280 : 720;
+    const port = W / H < 1;
     sc.classList.toggle('sk-p', port); sc.classList.toggle('sk-l', !port);
-    const [kx0, ky0, kx1, ky1] = port ? [12, 330, 712, 1244] : [350, 186, 960, 716];
-    const k = Math.min(Math.max(W / iw, H / ih), W / (kx1 - kx0), H / (ky1 - ky0)), w = iw * k, h = ih * k;
-    const fit = (S, len, a0, a1) => { let v = (S - len) / 2; v = Math.min(0, Math.max(S - len, v)); return Math.min(S - a1 * k, Math.max(-a0 * k, v)); };
-    const x = fit(W, w, kx0, kx1), y = h < H ? H - h : fit(H, h, ky0, ky1); // thinner than the bar: the picture at the bottom
-    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + x).toFixed(1)}px;top:${(top + y).toFixed(1)}px`;
-    // a screen thinner than the bar: the picture cannot cover the height; the band left at the top shows its sky, blurred
-    sc.classList.toggle('sk-band', y > 0.5);
+    // covers the screen (stretched a little on a very long phone, then the picture's edges continue: fullFit)
+    const { x, y, w, h } = fullFit(sc, art, this.q('.sk-safe'), { size: port ? [720, 1280] : [1280, 720], key: port ? [12, 330, 712, 1244] : [350, 186, 960, 716], bottom: port });
     if (port) return;
     // wide: the plaque stays on the screen, right of the ✕ button; in a column left of the frame if the screen is very wide
     const l = Math.max(2.5, ((64 - x) / w) * 100), room = 31.88 - 1.5 - l;

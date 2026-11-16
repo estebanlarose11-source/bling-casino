@@ -27,8 +27,8 @@ import android.widget.Toast;
 /**
  * SpinBet: the site www.spinbetcaz.com in a full-screen window. Everything (games, accounts, updates) comes from the
  * site, so a new version of the site is in the app as soon as it is online. Links to other sites (TikTok, ads…)
- * open in the browser. The page can tell it runs in the app (user agent "SpinBetApp") and share a picture through
- * window.SpinBetApp.share(dataUrl, text).
+ * open in the browser. The page can tell it runs in the app (user agent "SpinBetApp"), share a picture through
+ * window.SpinBetApp.share(dataUrl, text) and hide the phone's bars while a game is in full screen (SpinBetApp.immersive).
  */
 public class MainActivity extends Activity {
     static final String HOME = "https://www.spinbetcaz.com/";
@@ -149,6 +149,25 @@ public class MainActivity extends Activity {
         web.onResume();
     }
 
+    // Full screen of a game (setFull in the page): the phone's status bar and navigation bar are hidden too, so the
+    // game takes the whole screen; a swipe from the edge shows them for a moment (immersive sticky).
+    private boolean immersive = false;
+
+    @SuppressWarnings("deprecation")
+    void setImmersive(boolean on) {
+        immersive = on;
+        View d = getWindow().getDecorView();
+        d.setSystemUiVisibility(on ? View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                : View.SYSTEM_UI_FLAG_VISIBLE);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean focus) {
+        super.onWindowFocusChanged(focus);
+        if (focus && immersive) setImmersive(true);
+    }
+
     /** Called by the page (bigwin.js, push.js, daily.js). */
     class Bridge {
         /** Notifications of the app: "on", "off" (switched off in the site) or "denied" (refused in Android). */
@@ -168,6 +187,10 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void notifOff() { Notifs.prefs(MainActivity.this).edit().putBoolean("on", false).apply(); }
+
+        /** A game goes full screen (or leaves it): hide (show) the bars of the phone. */
+        @JavascriptInterface
+        public void immersive(boolean on) { runOnUiThread(() -> setImmersive(on)); }
 
         /** The daily gift was taken at {@code last} (ms), series of {@code streak} days: sets the reminders. */
         @JavascriptInterface
