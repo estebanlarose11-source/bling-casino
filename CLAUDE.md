@@ -276,7 +276,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   roue plus petite (le haut vide et le reflet de l'image coupés par des marges négatives), 5 cases de mise sur une ligne, jetons et
   outils sur une ligne chacun (« Acheter une pêche » en tête), note des éclairs cachée ; bouton « ⛶ Grand écran » sur la roue
   (`.pe-big`, `data-act="full"`) : en plein écran tout tient sur l'écran (titre caché, `--ptz` calculé sur `100dvh`),
-  téléphone couché = roue à gauche, mises à droite.
+  téléphone couché = roue à gauche, mises à droite. Les outils (Annuler … Tours auto) sont sur 2 lignes de 4 (grille), jamais en
+  rangée qui défile (« en grand écran on n'a pas accès à tout ») ; vérifié jusqu'à un iPhone SE avec les barres de Safari (375 × 548).
 - **Le Pilote** (`games/pilote.js`, id `pilote`, jeu rapide, idée du propriétaire) : l'avion décolle d'un porte-avions
   avec ×1 et vole **sans fin fixe** au-dessus d'une mer semée de porte-avions (voulu par le propriétaire, jusqu'à
   ≈ 30 s). Objets (`ITEMS`) : ×2 / ×3 / ×5 / ×10 et +5 / +20 / +100 (l'avion monte de `UP`), bombes ÷2 / ÷3 / ÷5 / ÷10

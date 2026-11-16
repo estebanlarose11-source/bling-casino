@@ -3202,10 +3202,11 @@ body.fs-on .view { animation: none !important; transform: none !important; }
   .g-peche .pe-note { display: none; }
   .g-peche .rt-chips { flex-wrap: nowrap; gap: 5px; margin-top: 6px; }
   .g-peche .rchip { width: 34px; height: 34px; flex: none; }
-  .g-peche .rt-tools { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; gap: 5px; margin-top: 6px; padding-bottom: 2px; scrollbar-width: none; }
-  .g-peche .rt-tools::-webkit-scrollbar { display: none; }
-  .g-peche .rt-tools button { flex: none; padding: 6px 8px; font-size: 11px; white-space: nowrap; }
-  .g-peche .rt-tools .pe-buy { order: -1; }
+  /* every tool visible (owner, 16 November 2026: « en grand écran on n'a pas accès à tout »): 2 rows of 4 */
+  .g-peche .rt-tools { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; margin-top: 6px; }
+  .g-peche .rt-tools button { min-width: 0; padding: 5px 2px; font-size: 10.5px; line-height: 1.15; white-space: normal; }
+  .g-peche .rt-tools .pe-buy { order: -1; grid-column: span 2; }
+  .g-peche .rt-autopick { margin-top: 4px; }
 }
 /* « ⛶ Grand écran » on the wheel (phone): the site's full screen, where everything fits */
 .pe-big { display: none; position: absolute; right: 8px; top: 8px; z-index: 6; padding: 6px 11px; border: 1px solid rgba(186, 230, 253, .6); border-radius: 999px; font: 800 12px Archivo, sans-serif; color: #e0f2fe; background: rgba(2, 6, 23, .7); box-shadow: 0 0 12px rgba(56, 189, 248, .4); }
@@ -3214,8 +3215,8 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 /* Full screen (⛶): everything fits the screen; on a wide screen the table-game grid puts the wheel on the left */
 .game-host.is-full > .slot.g-peche .pe-zone { --ptz: max(200px, min(calc(100vw - 24px), 560px, calc((100dvh - 330px) / 1.12))); }
 @media (orientation: landscape) and (min-aspect-ratio: 4/3) { .game-host.is-full > .slot.g-peche .pe-zone { --ptz: min(100%, calc((100dvh - 40px) * .794)); } .game-host.is-full > .slot.g-peche .pe-bonus { height: calc(100dvh - 60px); min-height: 0; } .game-host.is-full > .slot.g-peche .slot-title { display: none; } }
-@media (max-width: 600px) { .game-host.is-full > .slot.g-peche .slot-title { display: none; } .game-host.is-full > .slot.g-peche .slot-head { min-height: 0; margin-bottom: 4px; } .game-host.is-full > .slot.g-peche .win-bar { min-height: 0; padding-top: 2px; padding-bottom: 2px; font-size: 12px; }
-  .game-host.is-full > .slot.g-peche .pe-zone { --ptz: max(170px, min(calc(100vw - 16px), calc((100dvh - 355px) / 1.12))); } .game-host.is-full > .slot.g-peche .pe-bonus { height: min(calc(100dvh - 150px), calc((100vw - 16px) * 1.5)); } }
+@media (max-width: 600px) { .game-host.is-full > .slot.g-peche .slot-title { display: none; } .game-host.is-full > .slot.g-peche { padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); } .game-host.is-full > .slot.g-peche .slot-head { min-height: 0; margin-bottom: 4px; } .game-host.is-full > .slot.g-peche .win-bar { min-height: 0; padding-top: 2px; padding-bottom: 2px; font-size: 12px; }
+  .game-host.is-full > .slot.g-peche .pe-zone { --ptz: max(130px, min(calc(100vw - 16px), calc((100dvh - 395px) / 1.12))); } .game-host.is-full > .slot.g-peche .pe-bonus { height: min(calc(100dvh - 150px), calc((100vw - 16px) * 1.5)); } }
 
 /* ============ La Roue d’Or ============ */
 .g-roueor { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(251, 191, 36, .25), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(75, 85, 99, .35), transparent 70%), linear-gradient(180deg, #14110a 0%, #06070b 100%); }
@@ -13428,7 +13429,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'peche', date: '2026-11-16', title: 'Adaptée au téléphone', items: ['Sur téléphone, la roue, les mises et le bouton LANCER tiennent ensemble', 'Nouveau bouton « ⛶ Grand écran » sur la roue : tout le jeu sur un seul écran, sans rien faire défiler', 'Téléphone couché : la roue à gauche, les mises à droite'] },
+  { game: 'peche', date: '2026-11-16', title: 'Adaptée au téléphone', items: ['Sur téléphone, la roue, les mises et le bouton LANCER tiennent ensemble', 'Nouveau bouton « ⛶ Grand écran » sur la roue : tout le jeu sur un seul écran, sans rien faire défiler', 'Téléphone couché : la roue à gauche, les mises à droite', 'En grand écran, tous les boutons sont visibles : Annuler, Effacer, Rejouer, Doubler, Remise auto et Tours auto sur 2 lignes'] },
   { game: 'peche', date: '2026-11-15', title: 'Roue en verre et pêche sur la glace', items: ['Nouvelle roue en verre qui s’arrête au hasard sur n’importe quelle case', 'La pêche se joue en vidéo sur un lac gelé : petit poisson à la canne, poisson moyen à la grue, gros poisson à l’hélicoptère', 'Plus le poisson est gros, plus le multiplicateur est gros : le gros poisson peut donner le MAX WIN', 'Nouveau : « 🎣 Acheter une pêche » bleue, orange ou rouge'] },
   { game: 'peche-online', date: '2026-11-15', title: 'Roue en verre et pêche sur la glace', items: ['La nouvelle roue en verre et les vidéos de pêche (canne, grue, hélicoptère) pour tout le salon'] },
   { game: 'anubis', date: '2026-11-15', title: 'Nouveaux décors animés et nouveaux cubes', items: ['Le jeu se joue dans un temple animé, avec ta grille posée dans le grand cadre doré', 'En haut : ton solde, le multiplicateur et ton gain ; toute la barre se touche (mise, bonus, SPIN, mise max)', 'Les bonus ont leur propre salle : les multiplicateurs des colonnes dans les cases du haut, les relances dans les 3 barres violettes', 'Jugement : les cubes tombent en glace et se changent en pierre en touchant le fond, avec leur multiplicateur bien écrit dessus', 'Crânes de pierre qui ajoutent, crânes dorés qui multiplient, cubes de lave : tous redessinés'] },
