@@ -698,6 +698,16 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   depuis ta dernière visite » (`UPDATES`) et le programme du jour. Dernière visite : `profile.back = { last, paid }`
   (localStorage `spinbet_back` pour les invités, dont le profil est neuf à chaque visite), mise à jour toutes les 5 min.
 
+- **Joueurs de la maison** (`maison.js`, demande du propriétaire du 16 novembre 2026, pendant ses pubs Snapchat, « pour que le site paraisse
+  vivant ») : 10 joueurs au pseudo à la française (`BOTS` : niveau de départ, niveaux par jour, heures de jeu à Paris, mise, jeux préférés),
+  **calculés sur chaque appareil à partir de la date** (mêmes chiffres pour tous, **aucune écriture Firestore**) : niveau qui monte chaque jour,
+  solde, plus gros gain / bonus (records qui ne font que monter), succès. Visibles dans le classement (mélangés aux vrais, `board()`), la liste
+  des joueurs en ligne (`online()`, plus le soir, présents ou non par tranche de 20 min ; jamais assis aux tables multijoueurs) et les gros gains
+  en direct (`bigWin()`, toutes les 7 à 18 min). **Toujours reconnaissables** (choix fait avec le propriétaire) : badge 🎰 `.mz-tag` et carte
+  « Joueur de la maison SpinBet » (`openPlayer` de `chat.js`). **Ne parlent jamais dans le chat** ; un joueur à moins de 200 KE qui demande de
+  l'aide dans le chat (`HELP_RX`) est dépanné de 300 à 1 500 KE une fois par jour (`maisonHelp`, payé sur son appareil, il poste lui-même
+  « 💸 a été dépanné de … KE par … »). **Jamais de prix** (absents des tournois, Battle Royale, défis, jackpot). Pour les retirer : `ON = false`.
+
 ## Arrivée des visiteurs et partage
 
 - **Cadeau du jour = série de connexion** (`daily.js`, carte en haut de l'accueil `dailyHomeHTML` dans `pages/lobby.js`,

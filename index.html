@@ -7484,6 +7484,8 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
   .rl-go { width: 64px; } .rl-go span { font-size: 9px; } .rl-chipbar { gap: 2px; padding: 3px 4px; } .rl-pick { width: 36px; height: 36px; }
 }
 @media (max-width: 460px) { .rl-me div { display: none; } .rl-b[data-rl="x2"] { display: none; } .rl-b { width: 38px; } .rl-b span { font-size: 7px; letter-spacing: 0; } .rl-go { width: 54px; } .rl-pick { flex: 0 1 34px; width: auto; height: auto; aspect-ratio: 1; min-width: 0; } .rl-chipbar { gap: 1px; } }
+.mz-tag { font-style: normal; margin-left: 4px; font-size: .85em; opacity: .85; cursor: help; }
+.pc-mz { margin: 6px 0 2px; text-align: center; font: 700 13px Inter, sans-serif; color: #fde68a; }
 .rl-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin: 10px 0; }
 .rl-stats div { padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, .06); }
 .rl-stats b { display: block; font-size: 12px; color: #94a3b8; } .rl-stats span { font: 800 16px Archivo, sans-serif; }
@@ -17737,13 +17739,15 @@ function renderLeaderboard(root) {
     list.innerHTML = '<li class="lb-msg">Chargement…</li>';
     if (!cloud.enabled) { list.innerHTML = '<li class="lb-msg">Le classement s’active avec les comptes en ligne.</li>'; return; }
     try {
-      const rows = (await cloud.top(b.field, TOP)).filter((e) => (e[b.field] || 0) > 0);
+      const M = __mods['maison.js'];
+      const rows = [...(await cloud.top(b.field, TOP)), ...(M?.board() || [])].filter((e) => (e[b.field] || 0) > 0)
+        .sort((x, y) => (y[b.field] || 0) - (x[b.field] || 0)).slice(0, TOP); // with the players of the house (maison.js)
       if (my !== token || !root.isConnected) return;
       list.innerHTML = rows.length ? rows.map((e, i) => `
         <li class="lb-row${e.uid === me ? ' me' : ''}${i < 3 ? ' podium' : ''}">
           <span class="lb-pos">${MEDAL[i] || i + 1}</span>
           <span class="lb-badge">${rankBadge(rankOf(e.level || 1), 30)}</span>
-          <span class="lb-name"><b class="pname" data-player="${esc(e.uid || '')}" data-pname="${esc(e.name || 'Joueur')}" role="button" tabindex="0">${look(e)}${esc(e.name || 'Joueur')}</b><small>${rankOf(e.level || 1).name}${b.id === 'level' ? '' : ` · Niv. ${e.level || 1}`}</small></span>
+          <span class="lb-name"><b class="pname" data-player="${esc(e.uid || '')}" data-pname="${esc(e.name || 'Joueur')}" role="button" tabindex="0">${look(e)}${esc(e.name || 'Joueur')}${e.maison ? M.tag : ''}</b><small>${rankOf(e.level || 1).name}${b.id === 'level' ? '' : ` · Niv. ${e.level || 1}`}</small></span>
           ${b.game ? gameCell(e[b.game]) : ''}
           <span class="lb-val">${b.value(e)}</span>
         </li>`).join('') : '<li class="lb-msg">Personne pour l’instant : à toi de jouer !</li>';
@@ -18644,8 +18648,28 @@ function setTab(t) { tab = t; root.querySelectorAll('[data-tab]').forEach((b) =>
 function badge() { const b = document.querySelector('.ct-badge'), n = unread + (__mods['friends.js']?.pendingCount?.() || 0); b.hidden = !n; b.textContent = n > 9 ? '9+' : n; }
 setTimeout(() => __mods['friends.js']?.bus.addEventListener('change', () => { if (document.querySelector('.ct-badge')) badge(); }), 0);
 
+// A player of the house helps a player short of KE who asks for it in the chat (maison.js): once a day per account,
+// only below 200 KE, 300 to 1 500 KE, paid on the asker's own device (the bots write nothing). The asker's device posts
+// « 💸 a été dépanné de … KE par … » in their own name, like a normal gift.
+const HELP_RX = /(d[ée]pann|pr[êe]te?[rz]?\b|aide[rz]?\b.*\b(ke|argent|thune|sous)|plus d['e ]?\s*(ke|argent|thune|sous)|\b0 ?ke\b|ruin[ée]|fauch[ée]|j'?ai plus rien|qui.*(donne|envoie|passe))/i;
+function maisonHelp(l) {
+  const m = me(), MZ = __mods['maison.js'];
+  if (!m || !MZ?.on || muted || wallet.cents >= 20000) return;
+  const mine = l.filter((x) => x.uid === m.uid && Date.now() - (x.at?.toMillis ? x.at.toMillis() : +x.at || Date.now()) < 120000 && HELP_RX.test(String(x.text || '')));
+  if (!mine.length) return;
+  const day = new Date().toISOString().slice(0, 10);
+  try { if (localStorage.getItem('spinbet_maison_dep') === day) return; localStorage.setItem('spinbet_maison_dep', day); } catch { return; }
+  const who = MZ.helper(), amt = 300 + Math.round(Math.random() * 12) * 100;
+  setTimeout(() => {
+    wallet.cents += amt * 100; wallet.save();
+    toast(`💸 ${esc(who.name)} 🎰 t’a dépanné de ${fmt(amt)} !`, 'ok');
+    cloud.sendChat(m.uid, m.name, `💸 a été dépanné de ${amt} KE par ${who.name}`).catch(() => {});
+  }, 4000 + Math.random() * 6000);
+}
+
 async function watch() {
   stopChat = await cloud.watchChat(KEEP, (l) => {
+    if (msgs.length) maisonHelp(l.filter((x) => !msgs.some((y) => y.id === x.id)));
     const fresh = msgs.length && l.length ? l.filter((m) => !msgs.some((x) => x.id === m.id)).length : 0;
     msgs = l; renderList();
     if (!open && fresh) { unread += fresh; badge(); }
@@ -18733,6 +18757,17 @@ async function send() {
 // and the moderator tools.
 async function openPlayer(uid, name, { msgId = null } = {}) {
   if (!uid) return;
+  const MZ = __mods['maison.js'];
+  if (MZ?.isBot(uid)) { // a player of the house: its card, said as it is
+    const e = MZ.byUid(uid); if (!e) return;
+    const { rankBadge: rb, rankOf: ro } = __mods['progress.js'], rk = ro(e.level), G = __mods['games/index.js'].getGame;
+    const st = (ico, label, v) => `<div><span>${ico}</span><small>${label}</small><b>${v}</b></div>`;
+    await modal(`<div class="pc"><div class="pc-head"><span class="pc-badge">${rb(rk, 56)}</span><div><h3>${esc(e.name)} ${MZ.tag}</h3><small class="pc-rank">${rk.name} · Niveau ${e.level}</small></div></div>
+      <p class="pc-mz">🎰 Joueur de la maison SpinBet</p>
+      <div class="pc-stats">${st('💰', 'Solde', fmt(e.bal))}${st('💥', 'Plus gros gain', `${fmt(e.best)}${G(e.bestGame) ? `<small> · ${esc(G(e.bestGame).name)}</small>` : ''}`)}${st('🎁', 'Plus gros bonus', fmt(e.bestBonus))}${st('🏅', 'Succès', `${e.ach} pts`)}</div>
+      <div class="ct-menu pc-acts"><button class="btn" data-value="ok">Fermer</button></div></div>`, { cls: 'pc-modal' });
+    return;
+  }
   const m = me(), self = !!m && uid === m.uid;
   const { rankBadge, rankOf } = __mods['progress.js'];
   const acts = [];
@@ -19534,6 +19569,93 @@ profiles.addEventListener('change', () => document.querySelectorAll('[data-tikto
 return { renderShop, publicLook, lookHTML, badgeHTML, badgeIcon, nameStyle, TIKTOK_URL, TIKTOK_KE };
 })();
 
+// ---- maison.js ----
+__mods['maison.js'] = (() => {
+// Les joueurs de la maison (demande du propriétaire du 16 novembre 2026, pour que le site paraisse vivant pendant ses
+// pubs Snapchat) : 10 joueurs au pseudo à la française, tous calculés sur l'appareil (aucune écriture Firestore), le
+// même pour tout le monde (tirages à partir de la date). Ils sont dans le classement, la liste des joueurs en ligne et
+// les gros gains en direct, avec un petit badge 🎰 et « Joueur de la maison SpinBet » sur leur carte. Ils ne parlent
+// jamais dans le chat ; un joueur fauché qui demande de l'aide dans le chat est dépanné par l'un d'eux. Ils ne gagnent
+// jamais de prix (ni tournois, ni Battle Royale, ni défis, ni jackpot : ils n'y sont pas). ON = false les retire tous.
+const ON = true;
+const START = Date.UTC(2026, 9, 20); // they « started » about 4 weeks before
+const DAY = 864e5;
+const BOTS = [
+  // id, pseudo, niveau au départ, niveaux par jour, heures de jeu (Paris), mise habituelle (KE), jeux préférés
+  ['m1', 'Mathis_92', 9, 0.9, [18, 24], 20, ['zeus', 'cosmic', 'viking']],
+  ['m2', 'Clara.lyon', 6, 0.7, [12, 15, 20, 23], 10, ['candy', 'fortune', 'chasse']],
+  ['m3', 'Kévin13', 14, 1.2, [19, 25], 50, ['anubis', 'redk', 'barillet']],
+  ['m4', 'Inès_bzh', 4, 0.6, [9, 12, 21, 23], 5, ['candy', 'bling', 'pharaon']],
+  ['m5', 'Lucas.v', 11, 1.0, [17, 23], 25, ['big-bad-wolf', 'huff', 'dragons']],
+  ['m6', 'Manon_59', 7, 0.8, [13, 17, 20, 24], 10, ['filon', 'pirates', 'zeus']],
+  ['m7', 'Yanis_93', 16, 1.4, [20, 26], 100, ['redk', 'filon', 'totemx']],
+  ['m8', 'Léa.nice', 5, 0.65, [11, 14, 18, 22], 5, ['fortune', 'candy', 'huff']],
+  ['m9', 'Théo_67', 10, 0.95, [16, 20, 22, 25], 20, ['viking', 'anubis', 'pirates']],
+  ['m10', 'Sarah.mtp', 8, 0.75, [19, 24], 15, ['cosmic', 'bling', 'big-bad-wolf']],
+].map(([id, name, lv0, pace, hours, stake, fav]) => ({ id, uid: `maison:${id}`, name, lv0, pace, hours, stake, fav }));
+
+// seeded randomness: the same numbers on every phone
+function rnd(...k) { let h = 2166136261; for (const c of k.join('|')) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } h ^= h >>> 15; h = Math.imul(h, 2246822507); h ^= h >>> 13; return ((h >>> 0) % 1e6) / 1e6; }
+const games = () => __mods['games/index.js'];
+const gameOk = (id) => { const g = games().getGame(id); return g && !g.wip ? id : null; };
+const favOf = (b, k) => gameOk(b.fav[Math.floor(rnd(b.id, 'g', k) * b.fav.length)]) || games().SLOTS[Math.floor(rnd(b.id, 'G', k) * games().SLOTS.length)].id;
+const parisHour = (t = Date.now()) => +(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Paris', hour: '2-digit', hourCycle: 'h23' }).formatToParts(t).find((x) => x.type === 'hour')?.value || 0) % 24;
+
+// a bot's public numbers today (like a leaderboard entry), growing day after day
+const cache = new Map();
+function entry(b, t = Date.now()) {
+  const days = Math.max(0, (t - START) / DAY), d = Math.floor(days), key = `${b.id}:${d}:${Math.floor(t / 36e5)}`;
+  if (cache.has(key)) return cache.get(key);
+  const lvF = b.lv0 + b.pace * days * (0.85 + 0.3 * rnd(b.id, 'lv', d)) / (1 + days / 120);
+  const level = Math.max(1, Math.floor(lvF));
+  // records: the best of every day so far (they only go up)
+  let best = 0, bestGame = null, bestBonus = 0, bestBonusGame = null;
+  for (let k = 0; k <= d; k++) {
+    const x = 20 * Math.pow(1 / Math.max(0.002, rnd(b.id, 'w', k)), 0.55), w = Math.round(b.stake * x);
+    if (w > best) { best = w; bestGame = favOf(b, 'w' + k); }
+    if (rnd(b.id, 'b?', k) < 0.6) { const xb = 40 * Math.pow(1 / Math.max(0.003, rnd(b.id, 'b', k)), 0.6), wb = Math.round(b.stake * xb); if (wb > bestBonus) { bestBonus = wb; bestBonusGame = favOf(b, 'b' + k); } }
+  }
+  const bal = Math.round(b.stake * (150 + 1400 * rnd(b.id, 'bal', d, Math.floor(t / 36e5 / 3))));
+  const ach = Math.round(level * 18 + d * 6 * rnd(b.id, 'a'));
+  const e = { uid: b.uid, name: b.name, maison: true, level, levelScore: level + (lvF % 1), bal, best, bestGame, bestBonus, bestBonusGame, ach };
+  cache.set(key, e);
+  return e;
+}
+// online now? during their hours, not every slot of 20 min (plausible comings and goings)
+function online(b, t = Date.now()) {
+  const h = parisHour(t), hs = b.hours;
+  let inside = false;
+  for (let i = 0; i < hs.length; i += 2) { const a = hs[i], z = hs[i + 1]; if ((h >= a && h < z) || (z > 24 && h < z - 24)) inside = true; }
+  const slot = Math.floor(t / 12e5);
+  return inside ? rnd(b.id, 'on', slot) < 0.72 : rnd(b.id, 'off', slot) < 0.06;
+}
+const isBot = (uid) => String(uid || '').startsWith('maison:');
+const tag = '<i class="mz-tag" title="Joueur de la maison SpinBet">🎰</i>';
+
+const api = {
+  on: ON, isBot, tag,
+  // leaderboard rows to merge with the real ones (field = levelScore, bal, best, bestBonus, ach)
+  board() { return ON ? BOTS.map((b) => entry(b)) : []; },
+  byUid(uid) { const b = BOTS.find((x) => x.uid === uid); return b ? entry(b) : null; },
+  // presence-like rows of the bots online now (live.js)
+  online() {
+    if (!ON) return [];
+    const t = Date.now();
+    return BOTS.filter((b) => online(b, t)).map((b) => { const e = entry(b, t); return { uid: b.uid, name: b.name, level: e.level, game: favOf(b, Math.floor(t / 12e5)), maison: true, at: t }; });
+  },
+  // a big win of an online bot, now and then (live ticker)
+  bigWin() {
+    const on = api.online(); if (!on.length) return null;
+    const p = on[Math.floor(Math.random() * on.length)], b = BOTS.find((x) => x.uid === p.uid);
+    const x = Math.round(50 + 450 * Math.pow(Math.random(), 3));
+    return { ...p, x, a: b.stake * x };
+  },
+  // someone short of KE asks for help in the chat: an online bot (or any) helps
+  helper() { const on = api.online(); const list = on.length ? on : BOTS.map((b) => ({ uid: b.uid, name: b.name })); return list[Math.floor(Math.random() * list.length)]; },
+};
+return api;
+})();
+
 // ---- live.js ----
 __mods['live.js'] = (() => {
 // En direct: who is online and what they are playing, in real time (Firestore presence/{uid} = { name, game,
@@ -19563,7 +19685,7 @@ const ms = (t) => (t?.toMillis ? t.toMillis() : +t || 0);
 // only friends (and me) show what they are playing; everyone else is just « en ligne »
 const isFriend = (u) => u === uid() || !!__mods['friends.js']?.isFriend(u);
 
-let players = [], stop = null, since = 0, lastWin = null, lastSent = '', lastBeat = 0, winT = 0, refused = false, first = true;
+let players = [], real = [], stop = null, since = 0, lastWin = null, lastSent = '', lastBeat = 0, winT = 0, refused = false, first = true;
 const prev = new Map(); // uid -> { game, winT } of the previous snapshot
 
 /* ---------- my presence ---------- */
@@ -19594,6 +19716,8 @@ async function watch() {
 function onList(list) {
   const now = Date.now(), me = uid();
   players = list.filter((p) => now - ms(p.at) < ONLINE_MS && p.name);
+  real = players;
+  players = [...players, ...(__mods['maison.js']?.online() || [])]; // the players of the house (maison.js)
   // tell everyone when someone opens a game, and table neighbours when someone wins
   for (const p of players) {
     const was = prev.get(p.uid);
@@ -19629,7 +19753,7 @@ function nextTick() {
 
 /* ---------- painting ---------- */
 const avatar = (p, size = 'sm') => shop()?.lookHTML?.(p.look, size) || `<span class="lk-av lk-${size} lk-none">${rankBadge(rankOf(p.level || 1), size === 'md' ? 34 : 24)}</span>`;
-const pname = (p) => `<b class="pname" data-player="${esc(p.uid)}" data-pname="${esc(p.name)}" role="button" tabindex="0" ${shop()?.nameStyle?.(p.look) || ''}>${esc(p.name)}</b>${shop()?.badgeIcon?.(p.look) || ''}`;
+const pname = (p) => `<b class="pname" data-player="${esc(p.uid)}" data-pname="${esc(p.name)}" role="button" tabindex="0" ${shop()?.nameStyle?.(p.look) || ''}>${esc(p.name)}</b>${p.maison ? __mods['maison.js'].tag : shop()?.badgeIcon?.(p.look) || ''}`;
 
 function nowHTML() {
   const list = players.slice().sort((a, b) => isFriend(b.uid) - isFriend(a.uid)).slice(0, 20);
@@ -19641,7 +19765,7 @@ function nowHTML() {
 }
 
 function tableHTML(id) {
-  const g = game(id), me = uid(), here = players.filter((p) => p.game === id);
+  const g = game(id), me = uid(), here = players.filter((p) => p.game === id && !p.maison);
   const mine = here.find((p) => p.uid === me), others = here.filter((p) => p.uid !== me);
   if (!TABLE_GAMES.includes(id)) {
     // outside the multiplayer tables, only friends are shown on a game
@@ -19697,6 +19821,15 @@ function mountLive() {
   setInterval(() => beat(true), BEAT_MS);
   setInterval(watch, 10 * 60000); // the "online since" window moves on
   setInterval(paint, 30000); // seats and "x min ago" stay fresh
+  // the players of the house: they come and go every 20 min, and one of them wins big now and then
+  const mzOn = () => { players = [...real, ...(__mods['maison.js']?.online() || [])]; paint(); };
+  setInterval(mzOn, 5 * 60000); setTimeout(mzOn, 1500);
+  const mzWin = () => setTimeout(() => {
+    const w = !document.hidden && __mods['maison.js']?.bigWin(), g = w && game(w.game);
+    if (g) tick(`💥 <b>${esc(w.name)}</b>${__mods['maison.js'].tag} gagne ${fmt(w.a)} (×${w.x.toLocaleString('fr-FR')}) sur <a href="#game-${g.id}">${esc(g.name)}</a> !`, true);
+    mzWin();
+  }, (7 + Math.random() * 11) * 60000);
+  mzWin();
   document.addEventListener('visibilitychange', () => { if (!document.hidden) beat(true); });
   addEventListener('pagehide', () => { const me = uid(); if (me && !refused) cloud.clearPresence(me).catch(() => {}); });
   profiles.ready.then(() => { watch(); beat(true); });
