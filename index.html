@@ -10085,6 +10085,11 @@ html .modal.pw-modal { width: min(380px, 100%); padding: 24px 22px 18px !importa
 .lw .btn { width: 100%; }
 .lw .lw-go { min-height: 54px; border-radius: 14px !important; font: 900 16.5px Inter, sans-serif !important; text-transform: uppercase; letter-spacing: .4px; background: linear-gradient(180deg, #ff4fae, #e6227f) !important; color: #fff !important; border: 0 !important; box-shadow: 0 10px 26px rgba(255, 61, 154, .35) !important; }
 .lw .lw-no { min-height: 40px; color: #b5aec2 !important; }
+
+/* Les plus belles machines, en tête de l'accueil (bestHTML de pages/lobby.js) : de grandes affiches */
+section.nx-row.nx-best .game-row { grid-auto-columns: minmax(220px, 250px); }
+section.nx-row.nx-best .sec-head h2 { background: linear-gradient(90deg, #fff, #ffd23f); -webkit-background-clip: text; background-clip: text; color: transparent; }
+@media (max-width: 900px) { section.nx-row.nx-best .game-row { grid-auto-columns: 46vw; } }
 </style>
 </head>
 <body>
@@ -15828,6 +15833,10 @@ const FILTERS = [
 ];
 
 // the mystery machine (mystere.js): a « ? » card first among the slots, during its hour
+// the most beautiful machines (their animated sets), right under the showcase of the home page (owner's request of 16 November 2026:
+// « quand t'arrives, c'est directement les plus belles »)
+const BEST = ['zeus', 'fortune', 'dragons', 'redk', 'huff', 'anubis', 'cosmic', 'candy', 'barillet', 'viking', 'big-bad-wolf', 'pirates', 'chasse', 'bling', 'noel', 'totemx', 'billets'];
+const bestHTML = () => row('⭐ Les plus belles machines', BEST.map(getGame).filter((g) => g && !g.wip && !g.retired), 'slot').replace('class="nx-row"', 'class="nx-row nx-best"');
 const mysCard = () => __mods['mystere.js']?.cardHTML?.() || '';
 const row = (title, list, more) => `
   <section class="nx-row">
@@ -15897,7 +15906,7 @@ function renderLobby(root, params = {}) {
       </div>
     </section>` : '';
 
-  root.innerHTML = `${filter === 'all' ? vitrineHTML() + refPromoHTML() + dailyHomeHTML() : ''}
+  root.innerHTML = `${filter === 'all' ? vitrineHTML() + bestHTML() + refPromoHTML() + dailyHomeHTML() : ''}
     ${filter === 'all' ? '' : hero || `<section class="hero">
       <div class="hero-main theme-wolf has-bg">${bgArt(wolf, 'upd-bg')}
         <div class="hero-copy">

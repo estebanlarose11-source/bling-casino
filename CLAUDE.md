@@ -563,6 +563,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (texte à gauche « BIENVENUE CHEZ / SPINBET CASINO », cadeau du jour, JOUER MAINTENANT / CRÉER UN COMPTE ou RECHARGER, roulette et
   2 cartes `NX_WHEEL` à droite ; téléphone : roue derrière le texte, à droite), « Catégories de jeux » en tuiles à icône rose (4 sur
   téléphone), rangées de jeux dans des cartes `.nx-row` (titre en capitales, « VOIR TOUT › » rose). Jeux, tables et règles inchangés.
+- **Les plus belles machines en tête de l'accueil** (demande du propriétaire du 16 novembre 2026 : « quand t'arrives, c'est directement les
+  plus belles ») : rang « ⭐ Les plus belles machines » juste sous la vitrine (`bestHTML()` de `pages/lobby.js`, liste `BEST` : les machines à
+  décor animé, L'Olympe, La Fortune, L'Hydre, REDK… ; machines en travaux ou retirées sautées), grandes affiches (`.nx-best`, fin de la
+  couche `finition`).
 - **Catégorie « En ligne »** (demande du propriétaire du 16 novembre 2026 : « rassembler tous les jeux online, pour que ce soit plus
   simple ») : filtre `online` de `FILTERS` (`pages/lobby.js`, page `#lobby-online`) = `isOnline(g)` : les tables multijoueurs (`tag:
   'En ligne'`) + les duels en direct `ONLINE_DUELS` (Le Derby, Le Ring). Ils ne sont plus dans Roues & tables ni Jeux rapides (leur `cat`
