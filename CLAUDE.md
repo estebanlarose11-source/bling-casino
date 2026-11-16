@@ -69,7 +69,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `.an-plate`, le multiplicateur = `.gm-meter`), « $1.00 » et « LIVES » (on écrit RELANCES) → `assets/games/anubis/fond-*.mp4`,
   `bonus-*.mp4` + `scene-*.webp`. Les classes `judge` / `under` sur la machine passent à la salle des bonus (`orient()`, `clsObs` ;
   boucles différentes : `LOOP.fond` / `LOOP.bonus`, `VideoBg.loop` se change). Jugement : multiplicateurs des colonnes (`jrow`) dans
-  ses 5 cases du haut, relances = ses 3 barres (`.jbars i`, assombries quand une relance est perdue) ; Monde souterrain : `mrow`
+  ses 5 cases du haut, relances = ses 3 barres (`.jbars i`, `bars()` : **une barre s'éteint au début de chaque relance** (classe `lose`, éclair puis noir), **les 3 se rallument dès qu'un objet tombe** (`gain`), voulu par le propriétaire le 16 novembre 2026) ; Monde souterrain : `mrow`
   dans les cases du haut, tours restants sur les barres (`.an-left`) ; plaque du bonus `.an-bhud` (`hud()`). Barre cliquable `.an-hot`
   (base seulement). **Cubes du Jugement = son image** (`tools/art/anubis/cubes.jpg`, `cubes.py`) : glace `jc-ice` (tombe), pierre
   `jc-stone` (posé, multiplicateur écrit dessus `.sg-lab.jv`), crâne de pierre `jc-skull` (+), crâne doré `jc-gold` (×), lave `jc-lava`.

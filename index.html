@@ -6391,6 +6391,12 @@ html.light .slot small { color: inherit; }
 .an-p .jbars { left: 8.93%; top: 87.20%; width: 82.14%; height: 3.57%; column-gap: 2.2%; }
 .g-anubis .an-art .jbars i { height: auto; border-radius: 4px; background: rgba(10, 6, 16, .82); box-shadow: inset 0 0 0 1px rgba(120, 90, 50, .6); transition: background .3s, box-shadow .3s; }
 .g-anubis .an-art .jbars i.on { background: transparent; box-shadow: 0 0 12px rgba(192, 132, 252, .55); }
+/* a relaunch used: the painted bar goes out (flash, then dark); something landed: the 3 bars come back with a glow */
+.g-anubis .an-art .jbars i:not(.on) { background: #07040c; box-shadow: inset 0 0 0 1px rgba(120, 90, 50, .5); }
+.g-anubis .an-art .jbars i.lose { animation: anBarLose .55s ease-in forwards; }
+@keyframes anBarLose { 0% { background: rgba(233, 213, 255, .9); box-shadow: 0 0 22px #c084fc; transform: scaleY(1.3); } 100% { background: #07040c; transform: none; } }
+.g-anubis .an-art .jbars i.gain { animation: anBarGain .6s ease-out; }
+@keyframes anBarGain { 0% { background: rgba(233, 213, 255, .95); box-shadow: 0 0 30px #e9d5ff; transform: scaleY(1.5); } 100% { background: transparent; transform: none; } }
 .an-relx { position: absolute; z-index: 3; display: none; place-items: center; pointer-events: none; font: 400 3cqh/1 'Bebas Neue', Impact, sans-serif; letter-spacing: .3em; color: #d6b46a; text-shadow: 0 1px 0 #000; }
 .an-b .an-relx { display: grid; }
 .an-l .an-relx { left: 38.99%; top: 87.05%; width: 16.37%; height: 4.46%; }
@@ -13742,6 +13748,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'anubis', date: '2026-11-16', title: 'Relances bien visibles', items: ['Jugement : une barre s’éteint à chaque relance, puis une autre', 'Dès qu’un objet tombe, les 3 barres se rallument'] },
   { game: 'viking', date: '2026-11-16', title: 'Nouveau décor animé', items: ['Le cadre de pierre dans les flammes bleues, entouré des guerriers vikings', 'La barre bleue du Jarl se remplit à chaque Jarl qui tombe, celle de la valkyrie à chaque WILD', 'Barre pleine : le bonus démarre tout seul'] },
   { game: 'roulette', date: '2026-11-16', title: 'Nouvelle vidéo du lancer', items: ['La croupière lance la bille et la caméra la suit au plus près', 'À la fin, le numéro gagnant et sa couleur sont annoncés en grand, tirés au hasard à chaque lancer'] },
   { game: 'roulette', date: '2026-11-16', title: 'Une vraie table filmée', items: ['Mise directement sur le tapis de la table, avec tes jetons', 'Au lancer, la caméra descend vers la roue et la croupière lance la bille', 'La bille s’arrête sur un numéro tiré au hasard à chaque fois, et la roue montre le bon numéro', 'Les cases gagnantes s’allument sur le tapis'] },
@@ -17052,7 +17059,7 @@ const FILES = {
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', 'a60d147925'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', 'f07fb4473a'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', '25cbd292e1'],
-  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '0ca991d802'],
+  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'a210dc3e3a'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', 'fcbe76e4e1'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'c757c58318'],
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '9e528dfdf5'],

@@ -594,7 +594,19 @@ class AnubisGame extends BaseGame {
       if (b.dataset.v !== t) { b.dataset.v = t; b.innerHTML = `<i>×</i>${t}`; d.classList.remove('hit'); void d.offsetWidth; d.classList.add('hit'); }
       d.classList.toggle('mod', x.mod); d.classList.toggle('lit', x.n > 0 || x.mod);
     });
-    const info = () => { this.qa('.jbars i').forEach((bar, k) => bar.classList.toggle('on', k < respins)); this.setBanner(`<b>JUGEMENT</b><span class="pill respins">${[0, 1, 2].map((k) => `<i class="dot${k < respins ? ' on' : ''}"></i>`).join('')} Relances</span><span class="pill gold">Total ×${fxv(total())} · ${fmtC(Math.min(cap, Math.round(bet * total())))}</span>`); this.hud('JUGEMENT', `Total <i>×${fxv(total())}</i> <em>${fmtC(Math.min(cap, Math.round(bet * total())))}</em>`); };
+    // the 3 bars of the bonus hall = the relaunches: one goes out as each relaunch starts, all 3 come back when something
+    // lands (owner's request of 16 November 2026); `shown` = bars lit
+    let shown = 3;
+    const bars = (n) => {
+      this.qa('.jbars i').forEach((bar, k) => {
+        const on = k < n, was = bar.classList.contains('on');
+        bar.classList.toggle('on', on);
+        if (on !== was) { bar.classList.remove('lose', 'gain'); void bar.offsetWidth; bar.classList.add(on ? 'gain' : 'lose'); }
+      });
+      if (n > shown) sfx.upgrade?.(); else if (n < shown) sfx.tick?.();
+      shown = n;
+    };
+    const info = () => { bars(shown); this.setBanner(`<b>JUGEMENT</b><span class="pill respins">${[0, 1, 2].map((k) => `<i class="dot${k < shown ? ' on' : ''}"></i>`).join('')} Relances</span><span class="pill gold">Total ×${fxv(total())} · ${fmtC(Math.min(cap, Math.round(bet * total())))}</span>`); this.hud('JUGEMENT', `Total <i>×${fxv(total())}</i> <em>${fmtC(Math.min(cap, Math.round(bet * total())))}</em>`); };
 
     await this.featureIntro('JUGEMENT', 'Les cubes de glace tombent et se changent en pierre avec le multiplicateur de leur colonne · crânes de pierre qui additionnent, crânes dorés qui multiplient, cubes de lave', cart('cbb'));
     this.slotEl.classList.add('in-free', 'judge');
@@ -680,7 +692,8 @@ class AnubisGame extends BaseGame {
     await this.wait(400); info();
     while (respins > 0 && !capHit && rounds < 120 && !this.dead) {
       rounds++;
-      this.msg('Relance…');
+      bars(respins - 1); // this relaunch uses a bar
+      this.msg(`Relance… (${respins - 1 ? `encore ${respins - 1} après celle-ci` : 'dernière relance'})`);
       // a cascade of black cubes runs through the empty cells of every column, then the columns stop one by one
       const strips = cols.map((x, c) => this.startStrip(c, x.n));
       await this.wait(this.turbo ? 220 : 480);
@@ -691,11 +704,11 @@ class AnubisGame extends BaseGame {
         const preview = k === 'cube' ? cart('cbb') : k === 'sk' ? cart('cbk') : k === 'g' ? cart('cbg') : k === 'red' ? cart('cbr') : null;
         await strips[c2].stop(preview);
         sfx.reelStop?.(c2);
-        if (k) { got = true; await apply(c2, k, true); info(); if (maxWin || total() >= CAPX) capHit = true; }
+        if (k) { if (!got) bars(3); got = true; await apply(c2, k, true); info(); if (maxWin || total() >= CAPX) capHit = true; }
       }
       strips.forEach((st) => st.cancel?.());
       respins = got ? 3 : respins - 1;
-      info();
+      bars(respins); info();
     }
     if (!maxWin && total() > 0) await this.finale(cols, bet, cap);
     else for (let c3 = 0; c3 < C; c3++) for (let j5 = 0; j5 < cols[c3].n; j5++) this.grid.cells[this.cubeCell(c3, j5)].classList.add('win');
