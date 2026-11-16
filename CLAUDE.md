@@ -523,8 +523,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   un peu les chiffres s'ils ne tiennent pas ; avant : « 500… » pour 500 000) + « + » · « NIV 25 » (`.lv-s`, « Niveau » `.lv-w` sur
   ordinateur) · cloche (cachée ≤ 430 px) · **logo S à droite** (`.logo.mobile`). **Menu de côté** : ne défile que de haut en bas
   (`overflow-x: hidden`, `touch-action: pan-y`, `overscroll-behavior: contain`, page derrière bloquée `body.side-open`) : avant, il
-  glissait parfois sur le côté et la page derrière bougeait en bout de liste. **Barre du bas** : Accueil · Promotions (`#recompenses`) · Tournois · Caisse
-  (`#recharger`) · Plus (ouvre le menu, `[data-toggle-side]` peut être sur plusieurs boutons). **Accueil** : vitrine `vitrineHTML()`
+  glissait parfois sur le côté et la page derrière bougeait en bout de liste. **Barre du bas** : Accueil · Promotions (`#recompenses`) · Classement
+  (`#classement`, ajouté le 16 novembre 2026 à la demande du propriétaire) · Tournois · Caisse (`#recharger`) · Plus (ouvre le menu,
+  `[data-toggle-side]` peut être sur plusieurs boutons) ; 6 onglets : textes en 11 px (10 px sous 370 px de large). **Accueil** : vitrine `vitrineHTML()`
   (texte à gauche « BIENVENUE CHEZ / SPINBET CASINO », cadeau du jour, JOUER MAINTENANT / CRÉER UN COMPTE ou RECHARGER, roulette et
   2 cartes `NX_WHEEL` à droite ; téléphone : roue derrière le texte, à droite), « Catégories de jeux » en tuiles à icône rose (4 sur
   téléphone), rangées de jeux dans des cartes `.nx-row` (titre en capitales, « VOIR TOUT › » rose). Jeux, tables et règles inchangés.
