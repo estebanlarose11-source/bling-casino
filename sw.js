@@ -1,6 +1,6 @@
 // SpinBet Casino service worker: makes the site installable and opens it even on a weak connection.
 // Pages are network-first (updates show up right away), the app's own images are cache-first.
-const CACHE = 'spinbet-v78';
+const CACHE = 'spinbet-v79';
 const CORE = ['./', './index.html', './manifest.webmanifest', './assets/icon-192.png', './assets/icon-512.png'];
 
 self.addEventListener('install', (e) => {

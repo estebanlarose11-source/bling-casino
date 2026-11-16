@@ -1566,73 +1566,62 @@ body.gated { overflow: hidden; }
 
 /* ============ Mad Wheel ============ */
 .g-madwheel { --slot-bg: radial-gradient(520px 260px at 50% -5%, rgba(255, 61, 110, .4), transparent 70%), linear-gradient(180deg, #2a0a5a 0%, #0c0420 100%); }
-.mw-top { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 12px auto 0; width: fit-content; padding: 8px 18px; border-radius: 3px; background: rgba(0, 0, 0, .45); border: 2px solid #ffd23f; box-shadow: 0 0 18px rgba(255, 210, 63, .35); }
+/* La Roue Folle, le jeu télé (demande du propriétaire du 16 novembre 2026, games/madwheel.js) : sa vidéo (l'animateur lance la roue,
+   avec le son), notre roue de 54 cases posée sur la roue de la vidéo (ellipse suivie image par image : --cx --cy --rx --ry en % de
+   la vidéo, --sx = largeur / hauteur), l'animateur gardé devant par un masque (.mk, planche mask-*.png). Ordinateur : la vidéo large
+   entière ; téléphone tenu droit : la vidéo haute, lignes 70 à 650 (VID.haut.crop). */
+.mwx { position: relative; width: 100%; margin: 0 auto; overflow: hidden; border-radius: 10px; background: #0b0418; box-shadow: 0 14px 40px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(255, 210, 63, .25); }
+.mwx.mwx-l { aspect-ratio: 1472 / 800; max-width: max(320px, calc((100svh - 330px) * 1.84)); }
+.mwx.mwx-p { aspect-ratio: 400 / 580; max-width: max(260px, calc((100svh - 300px) * .69)); }
+.mwx-art { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.mwx-p .mwx-art { top: calc(-70 / 580 * 100%); height: calc(736 / 580 * 100%); }
+.mwx-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; background: #0b0418; }
+.mwx-wb { position: absolute; z-index: 2; pointer-events: none; left: calc((var(--cx) - var(--rx) * 1.05) * 1%); top: calc((var(--cy) - var(--ry) * 1.16) * 1%); width: calc(var(--rx) * 2.1%); height: calc(var(--ry) * 2.21%); }
+.mwx-wb.mk { -webkit-mask-image: var(--mk); mask-image: var(--mk); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); -webkit-mask-position: var(--mx) var(--my); mask-position: var(--mx) var(--my); }
+.mwx-wh { position: absolute; left: 50%; top: calc(1.16 / 2.21 * 100%); height: calc(2 / 2.21 * 100%); aspect-ratio: 1; transform: translate(-50%, -50%) scaleX(var(--sx, 1)); }
+.mwx-rot { position: absolute; inset: 0; will-change: transform; }
+.mwx-disc, .mwx-blur { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: 50%; } /* the slices go under the rim (no slice of the video between them) */
+.mwx-blur { opacity: 0; }
+.mwx-hub { position: absolute; left: 50%; top: 50%; width: 24%; translate: -50% -50%; filter: drop-shadow(0 0 6px rgba(0, 0, 0, .6)); }
+.mwx-rim { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 6px 10px rgba(0, 0, 0, .55)); }
+.mwx-glow { position: absolute; inset: 1%; border-radius: 50%; pointer-events: none; box-shadow: 0 0 2.2cqw rgba(255, 220, 120, .45), inset 0 0 1.4cqw rgba(255, 240, 180, .35); opacity: .55; animation: mwxGlow 1.2s ease-in-out infinite alternate; }
+@keyframes mwxGlow { to { opacity: 1; } }
+.mwx-ptr { position: absolute; left: 50%; top: -6.5%; width: 9.5%; height: auto; translate: -50% 0; transform-origin: 50% 12%; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .6)); z-index: 3; }
+/* the winning case: a light under the pointer */
+.mwx-wh::after { content: ''; position: absolute; left: 50%; top: 6%; width: 8%; height: 40%; translate: -50% 0; border-radius: 50% 50% 0 0 / 12% 12% 0 0; opacity: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .85), rgba(255, 255, 255, 0)); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.mwx-wh.won::after { animation: mwxWin .55s ease-in-out 4 alternate; }
+@keyframes mwxWin { from { opacity: .15; } to { opacity: .75; } }
+.mwx-art { container-type: size; }
+.mw-top { position: absolute; z-index: 5; left: 50%; top: 4%; translate: -50% 0; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 7px 16px; border-radius: 999px; background: linear-gradient(180deg, rgba(40, 10, 70, .92), rgba(12, 4, 24, .92)); border: 2px solid #ffd23f; box-shadow: 0 0 18px rgba(255, 210, 63, .45); opacity: 0; transform: translateY(-12px); transition: opacity .3s, transform .3s; pointer-events: none; }
+.mw-top.on { opacity: 1; transform: none; }
 .mw-top small { font: 900 11px KeCoin, Archivo, sans-serif; color: #ffd23f; letter-spacing: 2px; }
-.mw-top b { font: 900 16px KeCoin, Archivo, sans-serif; display: flex; align-items: center; gap: 6px; min-width: 120px; justify-content: center; }
+.mw-top b { font: 900 16px KeCoin, Archivo, sans-serif; display: flex; align-items: center; gap: 6px; min-width: 120px; justify-content: center; color: #fff; }
 .mw-top.rolling b { filter: blur(.5px); }
 .mw-top.hit { animation: jpHit .9s cubic-bezier(.3, 1.8, .5, 1); --jc: #ffd23f; }
-.mw-view { position: relative; border-radius: 4px; }
-.mw-view.zooming { overflow: hidden; } /* clip only while zoomed: the host stands outside the wheel at rest */
-.mw-view .mw-zone { transform-origin: 50% 3%; }
-.mw-view.zooming .mw-zone { transform: scale(var(--zs, 1)); }
-.mw-view.unzoom .mw-zone { transition: transform .9s cubic-bezier(.4, 0, .2, 1); }
-.mw-view.zooming .mw-host, .mw-view.zooming .mw-hub { opacity: calc(1 - var(--zp, 0) * 2.5); }
-.mw-view.unzoom .mw-host, .mw-view.unzoom .mw-hub { transition: opacity .9s; }
-.mw-view::before { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0;
-  background: radial-gradient(60% 55% at 50% 30%, transparent 55%, rgba(0, 0, 0, .75)); }
-.mw-view::after { content: attr(data-seg); position: absolute; left: 50%; bottom: 10%; z-index: 6; transform: translate(-50%, 20px) scale(.8); opacity: 0; pointer-events: none;
-  padding: 8px 22px; border-radius: 3px; background: var(--seg, #ffd23f); color: #fff; font: 900 clamp(18px, 4vw, 30px) KeCoin, Archivo, sans-serif; letter-spacing: 1px;
-  text-shadow: 0 2px 0 rgba(0, 0, 0, .45); box-shadow: 0 8px 30px rgba(0, 0, 0, .5), 0 0 30px var(--seg, #ffd23f); transition: transform .45s cubic-bezier(.3, 1.6, .5, 1) .25s, opacity .3s .25s; }
-.mw-view.zooming::before { opacity: var(--zp, 0); }
-.mw-view.unzoom::before { transition: opacity .9s; }
-.mw-view.done::after { opacity: 1; transform: translate(-50%, 0) scale(1); }
-.mw-zone { --mwz: min(500px, 84vw, calc(100vh - 330px)); position: relative; width: var(--mwz); min-width: 240px; aspect-ratio: 1; margin: 14px auto 14px; }
-/* showman */
-.mw-host { position: absolute; z-index: 4; left: -17%; bottom: -2%; width: 24%; pointer-events: none; }
-.mw-host .fx3d { display: block; width: 100%; aspect-ratio: 140 / 260; }
-.mw-host.mw3d .mh-svg { display: none; }
+.mwx-l .mw-top { left: 30%; }
+.mwx-p .mw-top { top: calc(70 / 736 * 100% + 8px); left: 42%; padding: 5px 12px; } .mwx-p .mw-top b { min-width: 0; font-size: 14px; }
+/* the result, big, like a TV graphic */
+.mwx-res { position: absolute; z-index: 6; left: 50%; bottom: 7%; display: flex; align-items: center; gap: 10px; padding: 8px 24px; border-radius: 14px; translate: -50% 0; opacity: 0; transform: translateY(18px) scale(.85); pointer-events: none;
+  background: var(--seg, #ffd23f); color: #fff; box-shadow: 0 10px 30px rgba(0, 0, 0, .55), 0 0 34px var(--seg, #ffd23f), inset 0 0 0 3px rgba(255, 255, 255, .5); transition: opacity .3s, transform .45s cubic-bezier(.3, 1.6, .5, 1); }
+.mwx-res.on { opacity: 1; transform: none; }
+.mwx-res b { font: 900 clamp(18px, 3.6cqw, 34px) KeCoin, Archivo, sans-serif; letter-spacing: 1px; text-shadow: 0 2px 0 rgba(0, 0, 0, .45); white-space: nowrap; }
+.mwx-res b.n { font-size: clamp(30px, 6cqw, 56px); line-height: 1; }
+.mwx-p .mwx-res { bottom: calc(86 / 736 * 100% + 4%); }
+.mwx-p .mwx-res b { font-size: clamp(18px, 6cqw, 30px); } .mwx-p .mwx-res b.n { font-size: clamp(30px, 11cqw, 52px); }
+.mwx-snd { position: absolute; z-index: 6; right: 10px; top: 10px; width: 38px; height: 38px; border-radius: 50%; font-size: 18px; background: rgba(0, 0, 0, .5); box-shadow: inset 0 0 0 1px rgba(255, 210, 63, .5); }
+.mwx-p .mwx-snd { top: calc(70 / 736 * 100% + 10px); }
+@media (prefers-reduced-motion: reduce) { .mwx-glow { animation: none; } }
+.mw-felt { margin-top: 10px; }
+/* full screen: the show as big as possible (computer and phone held sideways: the show on the left, larger than for the other
+   tables; phone held upright: the show leaves room for the bets and LANCER under it) */
+@media (orientation: landscape) and (min-aspect-ratio: 4/3) {
+  .game-host.is-full > .slot.table-game:has(.mwx) { grid-template-columns: minmax(0, 1fr) minmax(300px, 36%); align-content: center; }
+  .game-host.is-full .mwx.mwx-l { max-width: none; width: min(100%, calc((100dvh - 40px) * 1.84)); }
+}
+.game-host.is-full .mwx.mwx-p { max-width: max(220px, calc((100dvh - 440px) * .69)); }
 .pe-fisher .fx3d { position: absolute; left: -30%; top: -12%; width: 160%; height: 118%; pointer-events: none; }
 .pe-fisher.pe3d > img { visibility: hidden; }
-
-.mh-svg { display: block; width: 100%; height: auto; overflow: visible; }
-.mh-svg * { transform-box: view-box; }
-.mh-body { transform-origin: 70px 250px; animation: mhBob 2.4s ease-in-out infinite; }
-@keyframes mhBob { 50% { transform: translateY(-3px) rotate(-1deg); } }
-.mh-head { transform-origin: 70px 90px; animation: mhHead 2.4s ease-in-out infinite; }
-@keyframes mhHead { 50% { transform: rotate(3deg); } }
-.mh-hat { transform-origin: 70px 49px; }
-.mh-arm { transform-origin: 96px 104px; transform: rotate(8deg); transition: transform .35s ease; }
-.mw-host.ready .mh-arm { transform: rotate(40deg); }
-.mw-host.ready .mh-body { animation: none; transform: rotate(3deg); }
-.mw-host.pull .mh-arm { animation: mhPull .5s cubic-bezier(.3, 0, .2, 1) forwards; }
-@keyframes mhPull { 0% { transform: rotate(40deg); } 55% { transform: rotate(-72deg); } 100% { transform: rotate(-38deg); } }
-.mw-host.pull .mh-body { animation: mhLean .5s ease-out; }
-@keyframes mhLean { 40% { transform: rotate(4deg) translateX(4px); } }
-.mw-host.watch .mh-arm { transform: rotate(-38deg); }
-.mw-host.watch .mh-head { animation: mhWatch .45s ease-in-out infinite alternate; }
-@keyframes mhWatch { from { transform: rotate(-4deg); } to { transform: rotate(6deg) translateX(2px); } }
-.mw-host.cheer .mh-body { animation: mhJump .45s ease-out 3; }
-@keyframes mhJump { 50% { transform: translateY(-14px); } }
-.mw-host.cheer .mh-arm { transform: rotate(-100deg); }
-.mw-host.cheer .mh-hat { animation: mhHat .45s ease-out 3; }
-@keyframes mhHat { 50% { transform: translateY(-9px) rotate(-8deg); } }
-.mw-host.sad .mh-body { animation: none; }
-.mw-host.sad .mh-head { animation: none; transform: rotate(-9deg) translateY(3px); }
-.mw-host.sad .mh-arm { transform: rotate(55deg); }
-.mw-host.sad .mh-smile { transform: translateY(5px) scaleY(-.6); transform-origin: 70px 84px; }
-@container (min-width: 900px) { .mw-host { left: -30%; bottom: -3%; width: 31%; } }
-@container (max-width: 560px) { .mw-host { left: -5%; bottom: -7%; width: 21%; } }
-.mw-svg { width: 100%; height: 100%; filter: drop-shadow(0 0 30px rgba(255, 61, 110, .45)) drop-shadow(0 14px 30px rgba(0, 0, 0, .6)); }
-.mw-wheel { transform-origin: 150px 150px; transform-box: view-box; }
-.mw-hl { opacity: .45; animation: winBox .8s ease-in-out infinite; }
-.bulb { animation: bulb 1s steps(2) infinite; }
-.mw-ptr { position: absolute; left: 50%; top: -8px; width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 30px solid #ffd23f; transform: translateX(-50%); transform-origin: 50% 0; z-index: 3; filter: drop-shadow(0 0 8px #ffd23f) drop-shadow(0 3px 2px rgba(0, 0, 0, .6)); }
-.mw-hub { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 18%; aspect-ratio: 1; display: grid; place-items: center; text-align: center; font: 900 clamp(8px, 1.6vw, 11px)/1.1 KeCoin, Archivo, sans-serif; color: #ffd23f; z-index: 2; }
-.mw-hub .big { font-size: clamp(18px, 4vw, 28px); color: #fff; text-shadow: 0 0 10px #ffd23f; }
-.mw-hub { width: 13%; }
-.mw-swirl { transform-origin: 150px 150px; animation: mwSwirl 6s linear infinite; }
-@keyframes mwSwirl { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .mw-swirl { animation: none; } }
 .mw-spots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 .mw-spot { position: relative; padding: 10px 6px; border-radius: 3px; background: linear-gradient(180deg, color-mix(in srgb, var(--sc) 85%, #fff), var(--sc)); color: #10061f; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .25), 0 4px 12px rgba(0, 0, 0, .4); display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .mw-spot b { font: 900 22px KeCoin, Archivo, sans-serif; height: 32px; display: grid; place-items: center; }
@@ -13688,7 +13677,7 @@ const ORIGINALS = [
   {"id": "anubis", "name": "L’Anubis", "cat": "slot", "tag": "Machine à sous", "sub": "Cascades, 2 bonus", "colors": ["#13a8a0", "#0e1a38"], "description": "Grille 5×6 en groupes : les symboles gagnants disparaissent et les autres tombent. Deux bonus : Monde souterrain (multiplicateurs par colonne) et Jugement (cubes de glace, crânes qui additionnent de +2 à +500, crânes dorés jusqu’à ×100). Un crâne à 10 000, très rare, donne le MAX WIN.", "features": ["Cascades", "Joker orbe rouge", "Monde souterrain : 10 tours", "Jugement : crânes +2 à +500", "Crânes dorés ×2 à ×100", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 5, "max": "×10 000"},
   {"id": "bling", "name": "La Tour Bling", "cat": "slot", "tag": "Machine à sous", "sub": "Multiplicateurs par case", "colors": ["#a22bff", "#ff2d95"], "description": "Une tour de gemmes qui s’écroule en cascade. Chaque case gagnante garde un multiplicateur qui monte à chaque nouvelle connexion.", "features": ["Cascades", "Multiplicateur sur chaque case", "Bonus 10 et 15 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 4, "max": "×10 000"},
   {"id": "pharaon", "wip": true, "retired": true, "name": "Le Totem", "cat": "slot", "tag": "Machine à sous", "sub": "Cases verrouillées", "colors": ["#d98e12", "#3d2206"], "description": "Les cases gagnantes se verrouillent et le multiplicateur grimpe à chaque connexion. Bonus de 8 ou 12 tours où le multiplicateur reste.", "features": ["Cases verrouillées", "Multiplicateur croissant", "Bonus 8 et 12 tours", "Achat de bonus", "Spins auto", "Musique"], "rtp": "≈ 92 %", "vol": 3, "max": "×500"},
-  {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "54 cases, Boost, 4 bonus", "colors": ["#ff3d6e", "#5a1bff"], "description": "La grande roue de 54 cases avec Boost et quatre jeux bonus animés : Pile ou Face, Tir aux Cibles, Pachinko et Méga Folie.", "features": ["Boost ×2 à ×50", "Pile ou Face", "Tir aux Cibles", "Pachinko", "Méga Folie", "8 mises possibles"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
+  {"id": "madwheel", "name": "La Roue Folle", "cat": "table", "tag": "Jeu de roue", "sub": "Le jeu télé : l’animateur lance la roue", "colors": ["#ff3d6e", "#5a1bff"], "description": "Le jeu télé de SpinBet : sur le plateau, l’animateur lance la grande roue de 54 cases, avec le son de l’émission. Boost ×2 à ×50 et quatre jeux bonus animés : Pile ou Face, Tir aux Cibles, Pachinko et Méga Folie, qu’on peut aussi acheter.", "features": ["L’animateur lance la roue", "Boost ×2 à ×50", "Pile ou Face", "Tir aux Cibles", "Pachinko", "Méga Folie", "Bonus à acheter"], "rtp": "≈ 94 %", "vol": 5, "max": "×25 000"},
   {"id": "roulette", "name": "La Roulette", "cat": "table", "tag": "Roulette", "sub": "Roulette européenne en 3D : cylindre, voisins, tiers", "colors": ["#2a76a8", "#0b2d52"], "description": "Une vraie table de roulette européenne en 3D : pose tes jetons sur le tapis bleu (pleins, chevaux, carrés, douzaines, rouge ou noir) ou sur le cylindre (Tiers, Orphelins, Voisins du zéro, Jeu zéro, un numéro et ses voisins), puis la caméra file vers la roue en bois et suit la bille jusqu’au numéro gagnant. Tableau lumineux des derniers numéros et statistiques.", "features": ["Table et roue en 3D", "Plein payé 35 pour 1", "Cylindre : Tiers, Orphelins, Voisins, Jeu zéro", "Numéro + ses voisins", "Répéter, annuler, doubler", "Statistiques : numéros chauds et froids"], "rtp": "≈ 97,3 %", "vol": 3, "max": "×36"},
   {"id": "storm", "name": "L’Éclair", "cat": "table", "tag": "Roulette", "sub": "Éclairs jusqu’à ×50 000", "colors": ["#1f56ff", "#071440"], "description": "Roulette européenne : avant chaque tour, la foudre frappe 1 à 5 numéros chanceux qui reçoivent un multiplicateur de ×50 à ×50 000.", "features": ["Éclairs ×50 à ×50 000", "Tapis complet", "Chevaux, carrés, douzaines", "Roue et bille réalistes"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
   {"id": "storm-online", "name": "L’Éclair Online", "cat": "table", "tag": "En ligne", "sub": "Roulette éclair multijoueur : la roue part quand tout le salon est prêt", "colors": ["#1f56ff", "#071440"], "description": "La roulette éclair en multijoueur : chacun pose ses jetons et appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La foudre et la bille sont les mêmes pour tout le monde. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "Éclairs ×50 à ×50 000", "Chat du salon"], "rtp": "≈ 95 % (pleins)", "vol": 4, "max": "×50 000"},
@@ -14453,6 +14442,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'madwheel', date: '2026-11-16', title: 'Le jeu télé', items: ['Sur le plateau, l’animateur lance la roue quand tu appuies sur LANCER', 'Le son de l’émission (bouton 🔊 pour le couper)', 'La nouvelle roue dorée à ampoules, qui suit la caméra', 'Les 4 bonus peuvent s’acheter dans « Bonus & menu »'] },
+  { game: 'madwheel-online', date: '2026-11-16', title: 'Le jeu télé', items: ['Sur le plateau, l’animateur lance la roue pour tout le salon', 'Le son de l’émission (bouton 🔊 pour le couper)', 'La nouvelle roue dorée à ampoules'] },
   { game: 'billets', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'Le décor prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
   { game: 'pirates', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'Le décor prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
   { game: 'noel', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'Le décor prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
@@ -18002,7 +17993,7 @@ const FILES = {
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'f6f4cf77cd'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '58092f9458'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'c757c58318'],
-  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', '9e528dfdf5'],
+  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', 'fe2651087f'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '209ac1dbd4'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', 'a2079e2117'],
   bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '5cb920e7c2'],
@@ -18034,7 +18025,7 @@ const FILES = {
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', 'd17abb90c6'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
   'robots-online': ['robots', 'games/impl/robots.js', 'RobotsOnlineGame', '620d0b9f44'],
-  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', '9e528dfdf5'],
+  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', 'fe2651087f'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
   'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', 'd17abb90c6'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],

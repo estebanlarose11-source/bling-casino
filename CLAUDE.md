@@ -451,6 +451,24 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Plus de crête, pilier ni ciel dessinés (`CREST`, `PILLAR`, `SKY` ne sont plus utilisés). **Plein écran** : la scène prend la largeur
   (avant, téléphone couché = on ne voyait que le ciel) ; téléphone couché : la scène sur toute la hauteur, la barre de pierre en colonne
   à droite (bloc CSS après `.vkx`). Gains inchangés.
+- **La Roue Folle = le jeu télé** (`games/madwheel.js`, ids `madwheel` et `madwheel-online`, demande du propriétaire du 16 novembre 2026 :
+  « une dinguerie ») : **ses 2 vidéos** d'un animateur qui lance une grande roue sur un plateau télé (`tools/art/madwheel/show-large.mp4`
+  736 × 400 : ordinateur ; `show-haut.mp4` 400 × 736 : téléphone tenu droit, roue vue de biais et coupée à droite) **jouées avec leur son**
+  (voix, roue, public ; bouton 🔊 sur la scène, `spinbet_madwheel_snd`, coupé aussi par « Effets sonores », musique du jeu baissée par
+  `duck`), et **sa roue** (`roue.jpg` : cadre doré à ampoules → `rim.webp`, moyeu au tourbillon → `hub.webp`). **Notre roue** (les 54 cases
+  du jeu, `discSVG()` : tranches arc-en-ciel `PAL`, valeurs dans des carrés noirs, bonus en carré de couleur avec un signe blanc `GLYPH`)
+  est **posée sur la roue de la vidéo** et tourne elle-même jusqu'au résultat tiré : `tools/art/madwheel/build.py` (opencv, rembg, ffmpeg)
+  suit la roue **image par image** (ellipse du bord doré, `CAM` = suivi par la caméra quand l'animateur la cache) et **détoure l'animateur**
+  (rembg `u2net_human_seg`) → `TRACK` dans `games/madwheel.js` (par image : centre, rayons en % de la vidéo, case du masque) + planches
+  `mask-large.png` / `mask-haut.png` (masque CSS `.mwx-wb.mk` : l'animateur reste **devant** notre roue). La vidéo démarre dans le toucher
+  de LANCER (`startShow`, sinon pas de son sur iPhone) ; Boost pendant que l'animateur se prépare ; la roue part à son lancer (`VID.throw`)
+  et s'arrête quand il réagit (`VID.stop`), suivie par `requestVideoFrameCallback` ; flou de rotation = 2e disque flouté (`blurDisc`) dont
+  l'opacité suit la vitesse. Téléphone : lignes 70 à 650 de la vidéo haute (`VID.haut.crop`, `.mwx-p`). **Bonus à acheter** (« Bonus &
+  menu », solo seulement, au jeton choisi : `get bet()` = `board.chip`) : Pile ou Face ×18, Pachinko ×17, Tir aux Cibles ×34, Méga Folie
+  ×38 (valeur moyenne par simulation ×15 / ×13,9 / ×28,8 / ×32,1 + la mise → ≈ 88 %) ; la roue s'arrête sur le bonus acheté, sans Boost,
+  pas compté au Défi spécial. Les bonus eux-mêmes (écrans `bonusCF` / `CH` / `PA` / `CT`) et les gains de la roue n'ont pas changé ; le
+  propriétaire enverra plus tard des vidéos ou images pour les bonus. Refaire les fichiers : `python3 tools/art/madwheel/build.py`
+  (`--fast` = sans réencoder les vidéos), puis `python3 tools/build.py` et changer `CACHE` dans `sw.js`.
 - **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
   avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série
