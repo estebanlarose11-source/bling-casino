@@ -1,10 +1,10 @@
 // SpinBet Casino · RouletteGame — loaded on demand by games/impl/index.js (index.html), after games/rltable.js.
 // ---- games/impl/roulette.js ----
 __mods['games/impl/roulette.js'] = (() => {
-// La Roulette : roulette européenne classique sur la table en 3D commune (games/rltable.js, RlTableGame).
+// La Roulette : roulette européenne classique, sur la table filmée du propriétaire (games/rltable.js, RlVideoGame).
 // Paiements classiques (plein 35 pour 1…) : retour 97,3 %.
 
-const { RlTableGame } = __mods['games/impl/rltable.js'];
+const { RlVideoGame: RlTableGame } = __mods['games/impl/rltable.js']; // the owner's filmed table (16 November 2026)
 const { buildDefs } = __mods['core/roulette.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 

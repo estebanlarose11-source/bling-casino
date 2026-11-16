@@ -7448,6 +7448,35 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
 .rl-sbs small { margin: 0 6px 0 -2px; color: #94a3b8; font-weight: 700; }
 .rl-sb { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font: 900 14px Archivo, sans-serif; color: #fff; background: #1f2937; border: 2px solid rgba(255, 255, 255, .3); }
 .rl-sb.r { background: #c21d30; } .rl-sb.g { background: #14883f; }
+/* ---------- La Roulette filmée (.rlx, games/rltable.js RlVideoGame, demande du propriétaire du 16 novembre 2026) : sa vidéo
+   (assets/games/roulette/lancer.mp4), son tapis (tapis.webp, 1re image) avec nos cases cliquables par-dessus, et la fin
+   du numéro tiré (fin-<n>.webp). Tout est en unités de la vidéo (672 × 448) dans .rlx-vp, cadré par applyCam(). ---------- */
+.rl.rlx { background: #0d0705; }
+.rlx-bg { position: absolute; inset: -40px; background: center / cover no-repeat; filter: blur(24px) brightness(.4) saturate(1.1); pointer-events: none; }
+.rlx-vp { position: absolute; left: 0; top: 0; width: 672px; height: 448px; transform-origin: 0 0; border-radius: 4px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, .6); }
+.rlx-v, .rlx-img { position: absolute; left: 0; top: 0; width: 672px; height: 448px; object-fit: cover; pointer-events: none; }
+.rlx-v { z-index: 0; background: #0d0705; }
+.rlx-tapis { z-index: 1; transition: opacity .3s; }
+.rlx-film .rlx-tapis { opacity: 0; transition-delay: .12s; }
+.rlx-fin { z-index: 2; opacity: 0; transition: opacity .4s; }
+.rlx-fin.on { opacity: 1; }
+.rlx-fin[hidden] { display: none; }
+.rlx-felt { position: absolute; left: 0; top: 0; z-index: 3; overflow: visible; transition: opacity .3s; }
+.rlx-film .rlx-felt, .rlx-film .rlx-led { opacity: 0; pointer-events: none; }
+.rlx-cell { fill: transparent; stroke: none; }
+.rlx-pad { fill: #133a2c; stroke: rgba(214, 180, 100, .7); stroke-width: 1.2; pointer-events: none; } /* 2 « 2 to 1 » painted by mistake in the bottom row: an empty felt case */
+.rl[data-phase="bet"] .rlx-cell:hover { fill: rgba(255, 255, 255, .16); }
+.rlx-hot { fill: transparent; }
+.rl[data-phase="bet"] .rlx-hot:hover { fill: rgba(255, 255, 255, .45); }
+polygon.rlx-cell.rl-no { animation: rlNo .45s; }
+.rlx-win { fill: rgba(255, 236, 150, .3); stroke: #ffe680; stroke-width: 1.6; animation: rlHl 1s ease-in-out infinite alternate; }
+.rlx-win.num { fill: rgba(255, 236, 150, .45); stroke-width: 2.4; }
+.rlx-led { position: absolute; left: 432px; top: 152px; z-index: 4; display: flex; gap: 3px; padding: 2px 4px; border-radius: 9px; background: rgba(10, 6, 4, .72); border: .8px solid rgba(231, 199, 102, .55); cursor: pointer; transition: opacity .3s; }
+.rlx-led i { display: grid; place-items: center; width: 17px; height: 17px; border-radius: 50%; font: 900 8.5px/1 Archivo, sans-serif; font-style: normal; color: #fff; background: #1b1d22; }
+.rlx-led i.r { background: #c21d30; } .rlx-led i.g { background: #14883f; }
+.rlx-led i.last { box-shadow: 0 0 0 1.2px #fde047; }
+.rlx-led em { font: 700 8px/17px Inter, sans-serif; font-style: normal; color: #e7d29a; padding: 0 4px; }
+.rlx .rl-wn { z-index: 7; }
 /* the other roulettes on the same table (L’Éclair, La Double Bille, L’Éclair Online) */
 .rl-wnb { display: flex; justify-content: center; gap: 8px; }
 .rl-wnb b.y { background: radial-gradient(circle at 40% 30%, #ffe680, #c8961e) !important; color: #2a1a00; }
@@ -13672,6 +13701,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'roulette', date: '2026-11-16', title: 'Une vraie table filmée', items: ['Mise directement sur le tapis de la table, avec tes jetons', 'Au lancer, la caméra descend vers la roue et la croupière lance la bille', 'La bille s’arrête sur un numéro tiré au hasard à chaque fois, et la roue montre le bon numéro', 'Les cases gagnantes s’allument sur le tapis'] },
   { game: 'blackjack', date: '2026-11-16', title: 'Une vraie croupière', items: ['Une croupière filmée distribue chaque carte : la tienne, la sienne, et une de plus à chaque fois que tu tires', 'Tes jetons de mise sur le tapis, juste sous les cartes', 'Grand écran sur téléphone et ordinateur : toute la table, bien lisible'] },
   { game: 'lightningbj', date: '2026-11-16', title: 'Une vraie croupière', items: ['Une croupière filmée distribue chaque carte, et une de plus à chaque fois que tu tires', 'Mises annexes à côté du cercle de mise : Paires à gauche, 21+3 à droite, Bust It près de la croupière', 'Les multiplicateurs éclair au mur, à gauche de la croupière', 'Grand écran sur téléphone et ordinateur'] },
   { game: 'big-bad-wolf', date: '2026-11-16', title: 'La forêt du loup animée', items: ['Nouveau décor animé : la forêt sous la pleine lune, le loup aux yeux qui brillent', 'Les rouleaux dans le cadre de branches', 'Tous les boutons du décor marchent : mise − / +, SPIN et BONUS', 'Jackpots, solde et gain sur le décor', 'Plein écran sur tout l’écran, téléphone et ordinateur'] },
@@ -16988,8 +17018,8 @@ const FILES = {
   bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '5cb920e7c2'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '0bef82d927'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'da5341a3eb'],
-  rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', 'bf9bc2722c'],
-  roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', '7854b34117'],
+  rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', '622177f498'],
+  roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', '90d6df1d84'],
   bataille: ['bataille', 'games/impl/bataille.js', 'BatailleGame', '39b70b1d30'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '4f6ae0eba7'],

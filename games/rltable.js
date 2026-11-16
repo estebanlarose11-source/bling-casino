@@ -247,7 +247,7 @@ function sceneHTML(o = {}) {
 
 class RlTableGame extends BaseGame {
   constructor(root, game, cfg = {}, o = {}) {
-    super(root, game, { stepper: false, autoplay: true, turbo: true, mainLabel: 'LANCER', betLabel: 'Mise totale', hello: 'Pose tes jetons puis lance la bille.', ...cfg, cls: `table-game rl-game ${cfg.cls || ''}`, stage: sceneHTML(o) + (cfg.stage || '') });
+    super(root, game, { stepper: false, autoplay: true, turbo: true, mainLabel: 'LANCER', betLabel: 'Mise totale', hello: 'Pose tes jetons puis lance la bille.', ...cfg, cls: `table-game rl-game ${o.video ? 'rlx-game ' : ''}${cfg.cls || ''}`, stage: (o.video ? videoScene(o) : sceneHTML(o)) + (cfg.stage || '') });
     this.o = o; this.L = o.L || L;
     this.view = this.q('.rl');
     this.world = this.q('.rl-world');
@@ -621,5 +621,230 @@ class RlTableGame extends BaseGame {
   }
 }
 
-return { RlTableGame, NP, MAXSPOT, MAXTOTAL, colName, numXY };
+/* ===================== La Roulette filmée (demande du propriétaire du 16 novembre 2026) =====================
+   Sa vidéo (tools/art/roulette/lancer.mp4, 672 × 448, nettoyée par tools/art/roulette/clean.py) : on mise sur son tapis
+   (1re image, tapis.webp : les cases sont des zones cliquables posées dessus, en coordonnées de la vidéo), la vidéo se
+   lance au LANCER (la caméra descend vers la roue, la croupière lance la bille), et sa dernière image est remplacée par
+   fin-<numéro>.webp : la même image où les numéros peints sur la roue sont ceux de la vraie roue, la bille dans la case
+   du numéro tiré au hasard (draw()). Les numéros de la vidéo pendant que la bille roule ne comptent pas. */
+const XW = 672, XH = 448, XEND = 230; // last frame of the video shown before its ending (the ball at rest)
+const xsrc = (n) => window.__assets?.[`assets/games/roulette/${n}`] || `assets/games/roulette/${n}?v=1`;
+// the felt of the video: the 12 × 3 numbers grid (bilinear from its 4 corners), u = column (0 = 1-2-3), v = row (0 = top: 3, 6…)
+const XG = { tl: [91.7, 264.3], tr: [550, 265], bl: [61.7, 343.3], br: [570, 346] };
+const XP = (u, v) => {
+  const a = u / 12, b = v / 3;
+  const t = [XG.tl[0] + (XG.tr[0] - XG.tl[0]) * a, XG.tl[1] + (XG.tr[1] - XG.tl[1]) * a];
+  const d = [XG.bl[0] + (XG.br[0] - XG.bl[0]) * a, XG.bl[1] + (XG.br[1] - XG.bl[1]) * a];
+  return [t[0] + (d[0] - t[0]) * b, t[1] + (d[1] - t[1]) * b];
+};
+const quad = (u0, v0, u1, v1) => [XP(u0, v0), XP(u1, v0), XP(u1, v1), XP(u0, v1)];
+const XCELLS = {}; // key -> polygon on the video
+XCELLS.n0 = [XP(-0.72, 0), XP(0, 0), XP(0, 3), [26, 343.5], [33, 300]];
+for (let c = 0; c < 12; c++) for (let r = 0; r < 3; r++) XCELLS['n' + (3 * (c + 1) - r)] = quad(c, r, c + 1, r + 1);
+[3, 2, 1].forEach((k, r) => { XCELLS['k' + k] = quad(12, r, 13.18, r + 1); });
+Object.assign(XCELLS, {
+  d1: [[54, 346], [208, 346], [204, 376], [47, 376]], d2: [[208, 346], [405, 346], [406, 376], [204, 376]], d3: [[405, 346], [573, 346], [580, 376], [406, 376]],
+  low: [[47, 376], [122, 376], [112, 413], [35, 413]], even: [[122, 376], [205, 376], [200, 413], [112, 413]], red: [[205, 376], [272, 376], [270, 413], [200, 413]],
+  black: [[272, 376], [340, 376], [339, 413], [270, 413]], odd: [[340, 376], [405, 376], [407, 413], [339, 413]], high: [[520, 376], [576, 376], [592, 413], [525, 413]],
+});
+const XANCH = {};
+for (const k in XCELLS) { const P = XCELLS[k]; XANCH[k] = [P.reduce((a, p) => a + p[0], 0) / P.length, P.reduce((a, p) => a + p[1], 0) / P.length]; }
+XANCH.n0 = XP(-0.38, 1.5);
+L.HOTS.forEach((h) => { const u = (h.x - 36) / 38; let v = h.y / 46; if (v > 2.7) v = 3; XANCH[h.key] = XP(u, v); });
+const XCAM = { bet: [8, 150, 664, 424], spin: [0, 0, XW, XH] }; // what each view shows (video px)
+const pts = (P) => P.map((p) => p.map((x) => x.toFixed(1)).join(',')).join(' ');
+
+function videoScene() {
+  return `<div class="rl rlx" data-cam="bet">
+    <div class="rlx-bg" style="background-image:url('${xsrc('tapis.webp')}')"></div>
+    <div class="rlx-vp">
+      <video class="rlx-v" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+      <img class="rlx-img rlx-tapis" src="${xsrc('tapis.webp')}" alt="" draggable="false">
+      <img class="rlx-img rlx-fin" alt="" draggable="false" hidden>
+      <svg class="rlx-felt" viewBox="0 0 ${XW} ${XH}" width="${XW}" height="${XH}">
+        <defs><radialGradient id="bjvChipShade" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs>
+        <polygon class="rlx-pad" points="405,377 520,377 525,412 407,412"/>
+        <g class="rl-hl"></g>
+        ${Object.entries(XCELLS).map(([k, P]) => `<polygon class="rl-cell rlx-cell" data-k="${k}" points="${pts(P)}"/>`).join('')}
+        <g class="rl-hots">${L.HOTS.map((h) => { const [x, y] = XANCH[h.key]; return `<circle class="rl-hot rlx-hot" data-k="${h.key}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5"/>`; }).join('')}</g>
+        <g class="rl-chips"></g>
+        <g class="rl-lk"></g>
+      </svg>
+      <div class="rlx-led" data-led="1" aria-label="Derniers numéros et statistiques"></div>
+    </div>
+    <div class="rl-top">
+      <button class="rl-sq" data-act="menu" aria-label="Menu et règles"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+      <div class="rl-me"><span class="rl-av"></span><div><b class="rl-name"></b><em class="rl-bal"></em></div></div>
+      <div class="rl-total"><i></i><span>Mise totale : <b class="rl-tot"></b></span></div>
+      <div class="rl-gain"><small>Gain</small><b class="rl-win"></b></div>
+      <button class="rl-sq rl-full" data-act="full" aria-label="Plein écran">⛶<span>Plein écran</span></button>
+    </div>
+    <div class="rl-tip"></div>
+    <div class="rl-wn" hidden><small>NUMÉRO GAGNANT</small><div class="rl-wnb"><b></b><b class="y" hidden></b></div><em></em></div>
+    <div class="rl-turn">📱 Tourne ton téléphone pour un plus grand tapis</div>
+    <div class="rl-hud">
+      <button class="rl-b" data-rl="clear" aria-label="Vider la table"><svg viewBox="0 0 40 40"><ellipse cx="20" cy="30" rx="13" ry="5" fill="currentColor" opacity=".55"/><ellipse cx="20" cy="25" rx="13" ry="5" fill="currentColor" opacity=".8"/><path d="M8 4 L18 14 M18 4 L8 14" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/></svg><span>Vider</span></button>
+      <button class="rl-b" data-rl="repeat" aria-label="Répéter les mises"><svg viewBox="0 0 40 40"><ellipse cx="20" cy="31" rx="13" ry="5" fill="currentColor" opacity=".55"/><ellipse cx="20" cy="26" rx="13" ry="5" fill="currentColor" opacity=".8"/><path d="M11 15 A10 10 0 1 1 20 21" stroke="currentColor" stroke-width="3.2" fill="none" stroke-linecap="round"/><path d="M6 11 L11 17 L16 11Z" fill="currentColor"/></svg><span>Répéter</span></button>
+      <button class="rl-b" data-rl="undo" aria-label="Annuler le dernier jeton"><svg viewBox="0 0 40 40"><path d="M14 10 L6 17 L14 24" stroke="currentColor" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 17 H24 A9 9 0 0 1 24 35 H16" stroke="currentColor" stroke-width="3.4" fill="none" stroke-linecap="round"/></svg><span>Annuler</span></button>
+      <div class="rl-chipbar"></div>
+      <button class="rl-b" data-rl="x2" aria-label="Doubler les mises"><b>×2</b><span>Doubler</span></button>
+      <button class="rl-b rl-go" data-act="main" aria-label="Lancer la bille"><svg viewBox="0 0 40 40"><ellipse cx="20" cy="22" rx="17" ry="11" fill="none" stroke="currentColor" stroke-width="3"/><ellipse cx="20" cy="21" rx="9" ry="5.5" fill="currentColor" opacity=".55"/><path d="M20 21 V8 M12 9 H28" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="31" cy="18" r="2.6" fill="#fff"/></svg><span class="rl-go-t">LANCER</span></button>
+    </div>
+  </div>`;
+}
+
+class RlVideoGame extends RlTableGame {
+  constructor(root, game, cfg = {}, o = {}) {
+    super(root, game, cfg, { ...o, video: true });
+    this.vp = this.q('.rlx-vp'); this.vid = this.q('.rlx-v');
+    this.vok = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const v = this.vid; v.muted = true; v.playsInline = true;
+    v.addEventListener('error', () => { this.vok = false; });
+    // the whole file in memory (≈ 2,4 Mo): it always starts at once from its first image
+    this.vready = !this.vok ? Promise.resolve() : fetch(xsrc('lancer.mp4')).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+      .then((b) => { if (this.dead) return; this.vurl = URL.createObjectURL(b); v.src = this.vurl; v.load(); })
+      .catch(() => { if (!this.dead) v.src = xsrc('lancer.mp4'); });
+    this.onVis = () => { if (document.hidden) v.pause(); };
+    document.addEventListener('visibilitychange', this.onVis);
+    addEventListener('resize', this.onRs = () => requestAnimationFrame(() => this.applyCam()));
+    this.applyCam('bet');
+  }
+  destroy() { document.removeEventListener('visibilitychange', this.onVis); removeEventListener('resize', this.onRs); try { this.vid.pause(); this.vid.removeAttribute('src'); this.vid.load(); } catch { /* ignore */ } if (this.vurl) URL.revokeObjectURL(this.vurl); super.destroy(); }
+
+  // the view: the felt (bet) or the whole video (spin), as big as the screen allows between the top bar and the buttons
+  applyCam(name = this.view?.dataset.cam || 'bet', animate = false) {
+    const v = this.view; if (!v || this.dead || !this.vp) return 0;
+    v.dataset.cam = name;
+    const cw = v.clientWidth; if (!cw) return 0;
+    const full = !!this.root.closest('.is-full');
+    const top = (this.q('.rl-top')?.offsetHeight || 46) + 10, hud = (this.q('.rl-hud')?.offsetHeight || 70) + 12;
+    if (!full) {
+      const port = innerHeight > innerWidth;
+      const want = port ? Math.round(top + hud + (XH * (cw - 8)) / XW) : Math.round(Math.max(420, Math.min(innerHeight * 0.86, cw * 0.66, 900)));
+      if (Math.abs(v.clientHeight - want) > 2) v.style.height = `${want}px`;
+    } else if (v.style.height) v.style.height = '';
+    const ch = v.clientHeight, [x0, y0, x1, y1] = XCAM[name];
+    const k = Math.min((cw - 8) / (x1 - x0), (ch - top - hud) / (y1 - y0));
+    const tx = cw / 2 - ((x0 + x1) / 2) * k, ty = top + (ch - top - hud) / 2 - ((y0 + y1) / 2) * k;
+    const ms = animate ? (this.turbo ? 500 : 800) : 0;
+    this.vp.style.transition = ms ? `transform ${ms}ms cubic-bezier(.65,0,.35,1)` : 'none';
+    this.vp.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${k.toFixed(4)})`;
+    return ms;
+  }
+  setCam(name) { const ms = this.applyCam(name, true); return this.wait0(ms + 30); }
+
+  // the chips on the video's felt
+  paintBets(fresh = []) {
+    const out = [];
+    for (const k in this.bets) {
+      const a = this.bets[k], p = XANCH[k]; if (!p || !a) continue;
+      const c = chipOf(a), n = Math.min(4, Math.max(1, Math.ceil(a / c[0])));
+      const discs = Array.from({ length: n - 1 }, (_, i) => `<ellipse cx="0" cy="${(-i * 2.4 + 1.5).toFixed(1)}" rx="11" ry="11" fill="${c[2]}" stroke="${c[3]}" stroke-width="1.5" stroke-dasharray="3 2.5"/>`).join('');
+      out.push(`<g class="rl-ch${fresh.includes(k) ? ' fresh' : ''}" data-c="${k}" transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})"><ellipse cx="1" cy="${(3 - (n - 1) * 1).toFixed(1)}" rx="12" ry="${11 + (n - 1) * 1.5}" fill="#000" opacity=".45"/>${discs}<g transform="translate(0 ${(-(n - 1) * 2.4).toFixed(1)})"><svg x="-11.5" y="-11.5" width="23" height="23" viewBox="0 0 100 100" overflow="visible">${chipSVG([c[0], fmtK(a), c[2], c[3], c[4]], 100)}</svg></g></g>`);
+    }
+    this.chipsG.innerHTML = out.join('');
+  }
+  // the last numbers, on the right above the felt (touch: statistics)
+  paintLed() {
+    const e = this.q('.rlx-led'); if (!e) return;
+    e.innerHTML = this.hist.slice(0, 9).map((n, i) => `<i class="${colr(n)}${i === 0 ? ' last' : ''}">${n}</i>`).join('') || '<em>Derniers numéros</em>';
+  }
+  clearMarks() { this.q('.rl-wn').hidden = true; this.q('.rl-hl').innerHTML = ''; }
+  showWinner(res, extra) {
+    const r = res.r, c = colr(r), wn = this.q('.rl-wn');
+    wn.className = `rl-wn ${c}`; wn.hidden = false;
+    wn.querySelector('b').textContent = r;
+    const yb = wn.querySelector('b.y'); yb.hidden = true;
+    wn.querySelector('em').innerHTML = this.winnerText(res, extra);
+  }
+  // the winning places of the felt, lit
+  lightFelt(r) {
+    const hl = [];
+    for (const k in L.DEF) if (XCELLS[k] && L.DEF[k].n.includes(r)) hl.push(`<polygon points="${pts(XCELLS[k])}" class="rlx-win${k[0] === 'n' ? ' num' : ''}"/>`);
+    this.q('.rl-hl').innerHTML = hl.join('');
+  }
+  async payAnim(placed, res, extra) {
+    const ret = this.settle(placed, res, extra);
+    const chips = this.qa('.rl-ch');
+    const wins = chips.filter((g) => this.payOf(g.dataset.c, placed[g.dataset.c] || 0, res, extra) > 0), loses = chips.filter((g) => !wins.includes(g));
+    loses.forEach((g, i) => { const p = XANCH[g.dataset.c]; g.animate([{ opacity: 1, transform: `translate(${p[0]}px, ${p[1]}px)` }, { opacity: 0, transform: `translate(${p[0] + (340 - p[0]) * 0.4}px, ${p[1] - 60}px) scale(.6)` }], { duration: this.turbo ? 300 : 650, delay: i * 25, easing: 'ease-in', fill: 'forwards' }); });
+    wins.forEach((g) => g.classList.add('win'));
+    await this.wait(loses.length ? 650 : 200);
+    if (ret > 0) wins.forEach((g) => { const k = g.dataset.c, b = g.getBoundingClientRect(); fx.floatText(b.left + b.width / 2, b.top, `+${fmtC(this.payOf(k, placed[k], res, extra))}`, '#fde047', 18); fx.burst(b.left + b.width / 2, b.top + b.height / 2, 14, ['#fde047', '#fff', '#4ade80'], 6); });
+    return ret;
+  }
+  // the video from its first image (the felt) to the ball at rest, then the ending of the drawn number
+  async film(r) {
+    const v = this.vid, fin = this.q('.rlx-fin'), tap = this.q('.rlx-tapis');
+    fin.hidden = true; fin.classList.remove('on');
+    const img = new Image(); img.src = xsrc(`fin-${r}.webp`);
+    const imgOK = img.decode().catch(() => {});
+    if (this.vok) await Promise.race([this.vready, this.wait0(3000)]);
+    const play = this.vok && v.src && !this.dead;
+    if (play) {
+      try { v.currentTime = 0; } catch { /* ignore */ }
+      v.playbackRate = this.superT ? 3.2 : this.turbo ? 2.5 : 1.6;
+      await v.play().catch(() => {});
+      this.view.classList.add('rlx-film'); // the felt image fades, the video shows
+      await new Promise((res) => {
+        const g = setTimeout(res, (XEND / 24 / v.playbackRate) * 1000 + 3000);
+        let lastTick = 0;
+        const tick = () => {
+          if (this.dead) { clearTimeout(g); return res(); }
+          const f = v.currentTime * 24;
+          if (f > 166 && f < XEND - 6 && performance.now() - lastTick > 90 + (f - 166) * 4) { lastTick = performance.now(); ballTick(0.05 + (XEND - f) / 600); }
+          if (f >= XEND || v.ended) { clearTimeout(g); return res(); }
+          requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    } else await this.wait0(1200);
+    await imgOK;
+    if (this.dead) return;
+    fin.src = img.src; fin.hidden = false; void fin.offsetWidth; fin.classList.add('on');
+    sfx.reelStop?.(0);
+    await this.wait0(350);
+    v.pause();
+  }
+  async back() {
+    const fin = this.q('.rlx-fin');
+    this.view.classList.remove('rlx-film');
+    fin.classList.remove('on');
+    await this.setCam('bet');
+    fin.hidden = true;
+  }
+  onMain() {
+    if (this.busy || this.phase !== 'bet') return;
+    if (!this.total() && this.lastBets) this.rebet();
+    if (!this.total()) { this.stopAuto(); this.tip('Pose au moins un jeton sur le tapis.', true); return; }
+    if (this.total() > this.balC()) { this.stopAuto(); this.tip('Solde insuffisant pour ces mises.', true); return; }
+    this.paintAll();
+    this.round(async () => {
+      const placed = { ...this.bets }, tt = this.total();
+      if (!this.pay(tt)) return;
+      this.roundStake = tt; this.lastStake = tt; this.lastBets = placed; this.lastPay = 0;
+      this.phase = 'spin'; this.paintTop();
+      this.clearMarks();
+      const extra = await this.beforeSpin();
+      if (this.dead) return;
+      this.tip('Rien ne va plus…');
+      const res = this.draw(extra);
+      await this.setCam('spin');
+      if (this.dead) return;
+      await this.film(res.r);
+      if (this.dead) return;
+      this.hist.unshift(res.r); this.hist = this.hist.slice(0, 500); this.saveHist();
+      this.showWinner(res, extra);
+      await this.wait(1700);
+      if (this.dead) return;
+      this.lightFelt(res.r);
+      await this.back();
+      if (this.dead) return;
+      this.paintLed();
+      await this.resolve(placed, res, tt, extra);
+    });
+  }
+}
+
+return { RlTableGame, RlVideoGame, NP, MAXSPOT, MAXTOTAL, colName, numXY };
 })();

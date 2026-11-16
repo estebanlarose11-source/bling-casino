@@ -386,6 +386,16 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   les cercles de mise `VSPOT` et les 5 jetons `VPICK`), mis à l'échelle par `fit()` ; écran large : 2 boutons de chaque côté de la
   scène (`.bjx-wide`), téléphone : une rangée de 4 boutons et le solde en haut. Le 21 Électrique : mises annexes `vx` / `vy` / `vr` de
   `SIDES` (Paires à gauche, 21+3 à droite du cercle, Bust It à droite de la croupière), panneau des multiplicateurs au mur. Gains inchangés.
+- **La Roulette : la table filmée** (`games/roulette.js` → `RlVideoGame` de `games/rltable.js`, demande du propriétaire du 16 novembre
+  2026 ; L'Éclair, La Double Bille et L'Éclair Online gardent la table 3D) : **sa vidéo** `tools/art/roulette/lancer.mp4` (672 × 448, 10 s :
+  le tapis, la caméra descend sur la roue, la croupière lance la bille, gros plan sur la bille arrêtée) → `tools/art/roulette/clean.py` :
+  `lancer.mp4` (×1,5), `tapis.webp` (1re image : on mise dessus ; 2 « 2 to 1 » peints par erreur dans la rangée du bas et la ligne illisible
+  sous ROULETTE effacés) et **37 fins `fin-<n>.webp`** : la dernière image où les numéros peints sur la roue (inventés) sont effacés et
+  redessinés dans l'ordre de la vraie roue, la bille dans la case de `<n>` (cases recolorées rouge / noir / vert, liseré doré ; `DIV` =
+  séparations des cases, `BALL` = case de la bille). **Le numéro est tiré au hasard** (`draw()`, comme avant) ; la vidéo joue jusqu'à
+  l'image `XEND` puis `fin-<numéro>` apparaît en fondu. Cases cliquables posées sur le tapis (`XCELLS`, grille bilinéaire `XG`, chevaux /
+  carrés `XANCH` des `HOTS`), case vide `.rlx-pad` sur les 2 cases en trop. Derniers numéros `.rlx-led` (toucher = statistiques). Pas de
+  cylindre (Tiers, Orphelins…) sur ce tapis. Gains inchangés (plein 35).
 - **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
   avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série
