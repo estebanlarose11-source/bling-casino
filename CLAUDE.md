@@ -483,6 +483,26 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   moyenne ×28,8 inchangée) ; la vidéo s'arrête après le mélange (3,4 s), le joueur touche un canard, puis ils tombent. **Méga Folie** :
   notre roue de **32 cases** (`CTC` : ×10 à ×200, 1 DOUBLE, 1 TRIPLE) sur la sienne, ses 3 flèches redessinées droites à leur place
   (`CTTIP`, angles `CTARR` = −27°, 2°, 32°) ; moyenne ×32,25 (×32,21 avant), achat ×38 ≈ 87,5 % comme avant. Pile ou Face n'a pas de vidéo.
+- **La Roue Folle, Pile ou Face sur sa vidéo** (demande du propriétaire du 16 novembre 2026) : **sa vidéo** `tools/art/madwheel/bonus-pileface.mp4`
+  (1080 × 1920, 12 s, avec le son : l'animateur lance un palet rouge qui retombe dans un bocal, toujours rouge) →
+  `python3 tools/art/madwheel/pileface.py` : `assets/games/madwheel/b-pf-r.mp4` (rouge) et **`b-pf-b.mp4` (le rouge du palet passé en
+  bleu image par image** : rouge très saturé partout, rouge pâle seulement hors de l'animateur détouré, pour garder sa peau), 720 × 1280.
+  `bonusCF` joue la version du côté tiré (`openShow('pf', …, src)`, écran 9 : 16 `.mwb-pf`), plaques ROUGE ×a / BLEU ×b en haut
+  (`.mwb-pf-v`), résultat à 10,2 s de la vidéo. Gains inchangés.
+- **Le Super Keno** (`games/keno.js`, id `keno`, catégorie Jeux rapides, tag Loterie, demande du propriétaire du 16 novembre 2026 : « le
+  Keno, en mode big loto ») : **ses 2 vidéos** d'un animateur qui fait tomber 20 boules dans un tube, colonne lumineuse derrière lui
+  (`tools/art/keno/keno-large.mp4` 736 × 400 ; `keno-haut.mp4` 1080 × 1920, même plateau de plus près) → `python3 tools/art/keno/build.py` :
+  `assets/games/keno/show-large.mp4` (×2) / `show-haut.mp4` (lignes 300 à 1720, téléphone tenu droit), avec le son (bouton 🔊,
+  `spinbet_keno_snd`), + affiches et `cover.webp`. Les 2 vidéos ont **le même rythme** : une boule entre dans la boîte du tube aux instants
+  `BALLS` (la 20e à 18,8 s) ; à chaque instant, **notre numéro** (tiré au hasard parmi 1 à 70) s'affiche en grand (`.kn-now`), dans la
+  rangée des 20 boules (`.kn-drawn`) et sur le tableau 1 à 70 (`.kn-board`) ; à la fin, le numéro de la dernière boule est posé sur elle
+  dans la boîte (`.kn-lastb`). **La colonne lumineuse** (vidéo large ; plaque en haut à droite sur la haute) montre le **multiplicateur de
+  la dernière boule** tiré à chaque tirage (`MULT` : ×2 60 %, ×3 22 %, ×5 12 %, ×10 5 %, ×25 0,8 %, ×50 0,2 %) : une grille gagnante qui
+  contient la dernière boule est multipliée. **Grilles** : autant qu'on veut (`MAXG` = 50), 1 à 10 numéros chacune, à la mise par grille
+  (TIRAGE = mise × grilles) : ＋ Grille (numéros touchés sur le tableau, Compléter / Vider / Valider) ou 🎲 Flash ×1 / ×5 / ×10 (grilles au
+  hasard du nombre de numéros choisi) ; gardées sur l'appareil (`spinbet_keno_grids`). Gains `PAY` (× la mise d'une grille, jusqu'à
+  ×10 000 pour 10 bons sur 10, plafond `CAPX` ×100 000). Simulation `node tools/sim/keno.js` (5 M tirages, lit le moteur) : retour 93,5 à
+  96,8 % selon le nombre de numéros (moyenne ≈ 95 %), une grille de 6 gagne 1 fois sur 4,5.
 - **Le Texas, nouvelle table** (`games/poker.js`, id `poker`, demande du propriétaire du 16 novembre 2026, d'après ses 2 maquettes :
   téléphone = 1re, ordinateur = 2e) : table de **9 places** (`SLOTS`, 1 à 8 adversaires, 3 nouveaux bots Le Prof, Mimi, Rocky), places
   libres affichées. Un seul HTML `.pkx`, `data-m` = `phone` (table ovale, sièges ronds sur le bord, bandeau blindes / table / tapis,

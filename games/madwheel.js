@@ -108,7 +108,7 @@ const smooth = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 const ARC = ['#e8222f', '#ffd21f', '#2563eb'], ARN = ['rouge', 'jaune', 'bleue']; // the 3 arrows of the owner's wheel, left to right
 const CTPAL = ['#e0283c', '#7b2fbf', '#1f6fe0', '#0ea5b7', '#f97316', '#16a34a', '#c026d3', '#2b3bd6'];
 const CTTIP = [[97.3, 47.3], [154.2, 45.8], [211.8, 51]];
-const BCROP = { pa: [0, 512], ch: [30, 440], ct: [30, 440] }; // x, width (pixels of the 672 of the video)
+const BCROP = { pa: [0, 512], ch: [30, 440], ct: [30, 440], pf: [0, 672] }; // x, width (pixels of the 672 of the video)
 const pvColor = (v) => (v === 'D' ? '#d62f9c' : v >= 500 ? '#e0283c' : v >= 250 ? '#f97316' : v >= 100 ? '#7b2fbf' : v >= 50 ? '#16a34a' : v >= 25 ? '#1f6fe0' : '#0ea5b7');
 
 function wheelTick(v) {
@@ -479,20 +479,22 @@ class MadWheelGame extends BaseGame {
   }
   tmTxt(tm) { return tm > 1 ? ` <b class="tm">Boost ×${tm}</b>` : ''; }
 
+  // Pile ou Face: his video (the host throws the disc, it lands in the jar) in its red or its blue version (pileface.py)
   async bonusCF(tm, r = coinRun()) {
-    this.openOv(`<h2>Pile ou Face</h2><p class="msgov">La pièce va tourner…${this.tmTxt(tm)}</p>
-      <div class="coin3d"><div class="cface r">×${r.v[0] * tm}</div><div class="cface b">×${r.v[1] * tm}</div></div>
-      <p class="sub">Rouge ×${r.v[0] * tm} · Bleu ×${r.v[1] * tm}</p>`);
-    await this.wait(1400);
-    const coin = this.ov.querySelector('.coin3d');
-    coin.style.transform = `rotateY(${r.face === 0 ? 1800 : 1980}deg)`;
-    sfx.spin();
-    await sleep(this.turbo ? 2000 : 3700);
-    const p = center(coin); fx.burst(p.x, p.y, 50, r.face === 0 ? ['#ef4444', '#fff'] : ['#3b82f6', '#fff'], 9);
-    this.ovp(`${r.face === 0 ? 'Rouge' : 'Bleu'} ! ×${r.M * tm}`);
+    const red = r.face === 0;
+    this.openShow('pf', 'Pile ou Face', '', '', `<div class="mwb-pf-v"><b class="r">ROUGE<i>×${r.v[0] * tm}</i></b><b class="b">BLEU<i>×${r.v[1] * tm}</i></b></div>`, red ? 'pf-r' : 'pf-b');
+    this.ovp(`L’animateur lance le palet : rouge ou bleu ?${this.tmTxt(tm)}`);
+    const vid = this.bPlay(0);
+    if (vid) await this.bUntil(10.2, 14000); else { sfx.spin(); await this.wait(2500); }
+    if (!this.ov) return r.M;
+    this.ov.querySelector(`.mwb-pf-v .${red ? 'r' : 'b'}`)?.classList.add('win');
+    this.ov.querySelector(`.mwb-pf-v .${red ? 'b' : 'r'}`)?.classList.add('lose');
+    const p = center(this.ov.querySelector('.mwb')); fx.burst(p.x, p.y, 50, red ? ['#ef4444', '#fff'] : ['#3b82f6', '#fff'], 9);
+    this.ovp(`${red ? 'Rouge' : 'Bleu'} ! ×${r.M * tm}`);
+    this.bBig(`×${r.M * tm}`);
     sfx.bigWin();
-    await this.wait(1700);
-    this.closeOv();
+    await this.wait(1900);
+    this.closeShow();
     return r.M;
   }
 
@@ -502,8 +504,8 @@ class MadWheelGame extends BaseGame {
      (BTRACK: zone of our elements, a cell of bmask-*.png per frame). The video plays in the element of the show, moved into
      the bonus screen: the tap on LANCER already allowed it to play with its sound (iPhone). */
   // (phone held upright: only the part BCROP of the video, so that the ducks are big enough to be touched)
-  openShow(k, title, inner, below = '', extra = '') {
-    const T = BTRACK[k], b = T.box, bw = b[2] - b[0], bh = b[3] - b[1];
+  openShow(k, title, inner, below = '', extra = '', src = k) {
+    const T = BTRACK[k] || { box: [0, 0, 100, 100], cols: 1, rows: 1, f: [] }, b = T.box, bw = b[2] - b[0], bh = b[3] - b[1];
     this.openOv(`<h2>${title}</h2><p class="msgov"></p>
       <div class="mwb mwb-${k}" style="--cx0:${BCROP[k][0]};--cw:${BCROP[k][1]}"><div class="mwb-st"><div class="mwb-vh"></div>
         <div class="mwb-box" style="left:${b[0]}%;top:${b[1]}%;width:${bw}%;height:${bh}%;--mk:url('${asset(`assets/games/madwheel/bmask-${k}.png`)}');--cols:${T.cols};--rows:${T.rows}">
@@ -517,8 +519,8 @@ class MadWheelGame extends BaseGame {
     try { v.pause(); } catch { /* ignore */ }
     this.vidOn = false;
     this.ov.querySelector('.mwb-vh').appendChild(v);
-    v.poster = asset(`assets/games/madwheel/b-${k}.webp`);
-    v.src = asset(`assets/games/madwheel/b-${k}.mp4`);
+    v.poster = asset(`assets/games/madwheel/b-${src}.webp`);
+    v.src = asset(`assets/games/madwheel/b-${src}.mp4`);
     v.load();
     this.bMask(0);
     return this.ov;
@@ -734,7 +736,7 @@ const MadWheelOnlineGame = withRoom(MadWheelGame, {
   cls: 'g-madwheel',
   outcome: (R) => outcome(R),
   payout: (O, d, { uid, seed }) => payout(O, d, O.seg === 'ct' ? arrowOf(seed, uid) : 0).ret,
-  resultMs: (O) => 19000 + (O.seg === 'cf' ? 6000 : O.seg === 'ch' ? 19000 : O.seg === 'pa' ? 3000 + O.pa.drops.length * 4200 : O.seg === 'ct' ? 6000 + Math.max(...O.ct.map((r) => r.spins.length)) * 4500 : 0),
+  resultMs: (O) => 19000 + (O.seg === 'cf' ? 14000 : O.seg === 'ch' ? 19000 : O.seg === 'pa' ? 3000 + O.pa.drops.length * 4200 : O.seg === 'ct' ? 6000 + Math.max(...O.ct.map((r) => r.spins.length)) * 4500 : 0),
   reset() { this.qa('.mw-spot').forEach((b) => b.classList.remove('hit', 'tsel')); this.q('.mwx-wh')?.classList.remove('won'); this.q('.mwx-res')?.classList.remove('on'); this.q('.tsv').textContent = '—'; },
   hello: 'Pose tes jetons puis appuie sur PRÊT : la roue part quand tout le salon est prêt.',
   rules: '<p>À la Méga Folie, la couleur de ta flèche est tirée au sort pour chaque joueur. Au Tir aux Cibles, tout le salon gagne le même multiplicateur.</p>',
