@@ -9746,6 +9746,145 @@ a.tb-hero[href]:hover { border-color: rgba(255, 61, 154, .5); }
 .cx[data-m="land"] .cx-moves { width: 128px; }
 .cx[data-m="land"] .cx-moves h4 { padding: 8px; }
 .cx[data-m="land"] .cx-ml li { padding: 5px 8px; font-size: 12px; grid-template-columns: 20px 1fr 1fr; }
+/* ===== La caisse : « Déposer » (depot.js, demande du propriétaire du 16 novembre 2026) =====
+   le « + » du solde ouvre une caisse de casino en ligne : montant, moyen de paiement (pub vidéo), récapitulatif, pubs à la suite, reçu */
+.top-refill .tr-lbl { display: none; font-style: normal; }
+@media (min-width: 901px) {
+  html body .top .top-wallet a.btn.top-refill.top-refill { width: auto; height: 40px; padding: 0 17px 0 13px !important; display: inline-flex; align-items: center; gap: 7px; border-radius: 999px !important; background: linear-gradient(180deg, #ff4fae, #e6227f) !important; color: #fff !important; box-shadow: 0 6px 18px rgba(255, 61, 154, .32) !important; }
+  html body .top .top-wallet a.btn.top-refill.top-refill:hover { filter: brightness(1.08); }
+  html body .top .top-wallet a.btn.top-refill.top-refill .ico { width: 19px; height: 19px; }
+  .top-refill .tr-lbl { display: block; font: 800 12.5px/1 Inter, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+}
+html .modal.dp-modal { width: min(460px, 100%); padding: 0 !important; border-radius: 18px !important; max-height: min(92dvh, 900px); overflow: hidden auto; overscroll-behavior: contain; background: linear-gradient(180deg, #1a1420, #0f0c13) !important; border: 1px solid rgba(255, 61, 154, .3) !important; box-shadow: 0 30px 90px rgba(0, 0, 0, .65) !important; color: #fff; }
+.dp-modal .modal-x { top: 10px; right: 10px; width: 30px !important; height: 30px !important; z-index: 2; border-radius: 50% !important; background: rgba(255, 255, 255, .07) !important; color: #fff !important; }
+.dp { display: grid; color: #f4eef9; font-family: Inter, KeCoin, sans-serif; }
+.dp b, .dp small, .dp span { font-family: inherit; }
+.dp-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 6px 12px; padding: 22px 20px 14px; background: radial-gradient(120% 160% at 0% 0%, rgba(255, 61, 154, .3), transparent 62%), linear-gradient(180deg, #241b2d, #1a1420); }
+.dp-head > small { grid-column: 1 / -1; font: 800 11px Inter, sans-serif; letter-spacing: 2.6px; color: var(--mq-pink); }
+.dp-head h2 { margin: 0; font: 900 31px/1 Inter, sans-serif; letter-spacing: -.6px; color: #fff; }
+.dp-bal { display: inline-flex; align-items: baseline; gap: 7px; padding: 6px 12px; max-width: 100%; overflow: hidden; border-radius: 999px; background: rgba(0, 0, 0, .3); border: 1px solid rgba(255, 255, 255, .08); }
+.dp-bal span { font-size: 11.5px; color: #b5aec2; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.dp-bal b { font: 800 16px Inter, KeCoin, sans-serif; color: #fff; }
+.dp-tabs { display: flex; gap: 6px; align-items: center; padding: 0 20px 12px; background: #1a1420; border-bottom: 1px solid rgba(255, 255, 255, .07); }
+.dp-tabs button, .dp-tabs a { height: 34px; padding: 0 14px; border-radius: 999px; font: 700 13px Inter, sans-serif; color: #c9c1d6; background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .07); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; white-space: nowrap; }
+.dp-tabs button.on { background: var(--mq-pink); border-color: var(--mq-pink); color: #fff; }
+.dp-tabs button i { font-style: normal; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: rgba(0, 0, 0, .3); font-size: 11px; display: inline-grid; place-items: center; }
+.dp-tabs a { margin-left: auto; background: none; border-color: transparent; color: #b5aec2; padding: 0 4px; }
+.dp-tabs a:hover { color: #fff; }
+.dp-body { display: grid; gap: 14px; padding: 16px 20px 20px; }
+.dp-welcome { display: grid; gap: 2px; padding: 11px 14px; border-radius: 12px; background: linear-gradient(100deg, rgba(251, 191, 36, .2), rgba(255, 61, 154, .2)); border: 1px solid rgba(251, 191, 36, .45); }
+.dp-welcome b { font: 900 12.5px Inter, sans-serif; letter-spacing: 1.4px; color: #fde68a; }
+.dp-welcome span { font: 600 13px Inter, KeCoin, sans-serif; color: #fff; }
+.dp-sec { display: grid; gap: 8px; }
+.dp-lab { font: 700 12px Inter, sans-serif !important; letter-spacing: 1.2px; text-transform: uppercase; color: #9e97ab; }
+.dp-method { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 12px; border: 1.5px solid var(--mq-pink); background: rgba(255, 61, 154, .08); }
+.dp-mi { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; background: linear-gradient(180deg, #ff4fae, #e6227f); color: #fff; flex: none; }
+.dp-mi .ico { width: 22px; height: 22px; }
+.dp-method > div { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.dp-method b { font-size: 15px; font-weight: 800; }
+.dp-method small { font-size: 12px; color: #b5aec2; }
+.dp-check { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--mq-pink); color: #fff; font: 900 13px Inter, sans-serif; font-style: normal; flex: none; }
+.dp-amts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding-top: 6px; }
+.dp-amt { position: relative; display: grid; gap: 3px; justify-items: center; padding: 13px 4px 10px; border-radius: 12px; background: #1f1827; border: 1.5px solid rgba(255, 255, 255, .08); color: #fff; cursor: pointer; transition: border-color .15s, background .15s, transform .15s; }
+.dp-amt b { font: 800 16px Inter, KeCoin, sans-serif; white-space: nowrap; letter-spacing: -.2px; }
+.dp-amt small { font-size: 11.5px; color: #9e97ab; font-weight: 600; }
+.dp-amt:hover:not(:disabled) { border-color: rgba(255, 61, 154, .5); }
+.dp-amt.on { border-color: var(--mq-pink); background: linear-gradient(180deg, rgba(255, 61, 154, .22), rgba(255, 61, 154, .08)); box-shadow: 0 0 0 3px rgba(255, 61, 154, .15), 0 8px 20px rgba(255, 61, 154, .18); }
+.dp-amt.on small { color: #ffc2e0; }
+.dp-amt:disabled { opacity: .32; cursor: not-allowed; }
+.dp-amt em { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); padding: 2px 7px; border-radius: 999px; background: var(--mq-pink); color: #fff; font: 900 8.5px/1.3 Inter, sans-serif; letter-spacing: .9px; font-style: normal; white-space: nowrap; }
+.dp-amt em.mx { background: linear-gradient(180deg, #fde68a, #f59e0b); color: #3b2300; }
+.dp-custom { display: grid; grid-template-columns: 46px minmax(0, 1fr) 46px; gap: 8px; align-items: stretch; }
+.dp-custom > button { height: 52px; border-radius: 12px; background: #251d2e; border: 1px solid rgba(255, 255, 255, .1); color: #fff; font: 800 24px/1 Inter, sans-serif; }
+.dp-custom label { display: flex; align-items: center; gap: 6px; padding: 0 14px; border-radius: 12px; background: #0e0b12; border: 1.5px solid var(--mq-pink); }
+.dp-custom input { flex: 1; min-width: 0; height: 49px; background: none; border: 0; outline: 0; color: #fff; font: 900 23px Inter, sans-serif; text-align: center; letter-spacing: .3px; padding: 0; }
+.dp-custom span { font: 700 18px KeCoin, sans-serif; color: #fbbf24; }
+.dp-hint { font-size: 12px; color: #9e97ab; text-align: center; }
+.dp-sum { display: grid; gap: 7px; padding: 13px 14px; border-radius: 12px; background: rgba(0, 0, 0, .28); border: 1px solid rgba(255, 255, 255, .07); }
+.dp-sum > div, .dp-rec > div { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 13.5px; }
+.dp-sum span, .dp-rec span { color: #a9a1b6; }
+.dp-sum b, .dp-rec b { font-weight: 700; white-space: nowrap; }
+.dp-sb span, .dp-sb b { color: #fde68a !important; }
+.dp-tot { margin-top: 3px; padding-top: 9px; border-top: 1px dashed rgba(255, 255, 255, .16); }
+.dp-tot span { color: #fff !important; font-weight: 700; font-size: 14.5px; }
+.dp-tot b { font: 900 20px Inter, KeCoin, sans-serif !important; color: #ff7cc0; }
+.dp-foot { position: sticky; bottom: 0; z-index: 3; display: grid; gap: 7px; justify-items: center; padding: 11px 20px 16px; background: #100c14; border-top: 1px solid rgba(255, 255, 255, .07); box-shadow: 0 -14px 24px rgba(10, 8, 13, .85); }
+.dp-foot small { font: 600 12.5px Inter, KeCoin, sans-serif; color: #b5aec2; } .dp-foot small b { color: #ff7cc0; font-weight: 800; }
+.dp .dp-go { width: 100%; min-height: 54px; border-radius: 14px !important; font: 900 16.5px Inter, KeCoin, sans-serif !important; letter-spacing: .4px; text-transform: uppercase; background: linear-gradient(180deg, #ff4fae, #e6227f) !important; color: #fff !important; border: 0 !important; box-shadow: 0 10px 26px rgba(255, 61, 154, .35) !important; }
+.dp .dp-go:disabled { opacity: .45; box-shadow: none !important; }
+.dp-lim { display: grid; gap: 6px; }
+.dp-lim > div { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: #9e97ab; }
+.dp-lim b { color: #d6cfe0; font-weight: 700; }
+.dp-lim i { display: block; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .08); overflow: hidden; }
+.dp-lim u { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--mq-pink), #fbbf24); text-decoration: none; }
+.dp-note { margin: 0; font-size: 11.5px; line-height: 1.45; color: #8d859b; text-align: center; }
+.dp-full { padding: 16px; border-radius: 12px; background: rgba(239, 68, 68, .1); border: 1px solid rgba(239, 68, 68, .35); display: grid; gap: 6px; }
+.dp-full p { margin: 0; font-size: 13.5px; color: #d6cfe0; }
+.dp-full a { color: var(--mq-pink2); }
+.dp-flow, .dp-ok { display: grid; justify-items: center; gap: 10px; text-align: center; padding: 6px 0 2px; }
+.dp-ring { position: relative; width: 118px; height: 118px; }
+.dp-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.dp-ring circle { fill: none; stroke: rgba(255, 255, 255, .08); stroke-width: 7; }
+.dp-ring circle.pg { stroke: var(--mq-pink); stroke-linecap: round; stroke-dasharray: 276.5; transition: stroke-dashoffset .6s ease; filter: drop-shadow(0 0 6px rgba(255, 61, 154, .6)); }
+.dp-ring > b { position: absolute; inset: 0; display: grid; place-content: center; font: 900 34px/1 Inter, sans-serif; grid-auto-flow: column; align-items: baseline; }
+.dp-ring > b small { font-size: 16px; color: #9e97ab; font-weight: 800; }
+.dp-flow.run .dp-ring::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid transparent; border-top-color: #fbbf24; animation: dpSpin 1s linear infinite; }
+@keyframes dpSpin { to { transform: rotate(360deg); } }
+.dp-k { font: 800 11.5px Inter, sans-serif !important; letter-spacing: 2.4px; color: var(--mq-pink); }
+.dp-flow h3, .dp-ok h3 { margin: 0; font: 900 38px/1.05 Inter, KeCoin, sans-serif; letter-spacing: -.5px; color: #fff; }
+.dp-ok h3 { color: #fbbf24; text-shadow: 0 0 24px rgba(251, 191, 36, .35); }
+.dp-dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 320px; }
+.dp-dots i { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, .12); transition: background .3s; }
+.dp-dots.sm i { width: 9px; height: 9px; }
+.dp-dots i.ok { background: var(--mq-pink); box-shadow: 0 0 8px rgba(255, 61, 154, .6); }
+.dp-dots i.now { background: #fbbf24; animation: dpPulse 1s ease-in-out infinite; }
+@keyframes dpPulse { 50% { transform: scale(1.35); opacity: .7; } }
+.dp-fl { margin: 0; font-size: 14px; color: #d6cfe0; }
+.dp-flow .btn, .dp-ok .btn { width: 100%; }
+.dp-cancel { min-height: 42px; color: #b5aec2 !important; }
+.dp-okico { width: 76px; height: 76px; }
+.dp-okico svg { width: 100%; height: 100%; }
+.dp-okico circle { fill: rgba(34, 197, 94, .14); stroke: #22c55e; stroke-width: 3; stroke-dasharray: 151; stroke-dashoffset: 151; animation: dpDraw .55s ease-out forwards; }
+.dp-okico path { fill: none; stroke: #4ade80; stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; animation: dpDraw .4s .45s ease-out forwards; }
+@keyframes dpDraw { to { stroke-dashoffset: 0; } }
+.dp-ok .dp-k { color: #4ade80; }
+.dp-rec { width: 100%; display: grid; gap: 8px; padding: 14px; border-radius: 12px; background: #0e0b12; border: 1px dashed rgba(255, 255, 255, .16); text-align: left; }
+.dp-rec > div:first-child b { font-family: ui-monospace, Menlo, monospace; letter-spacing: .6px; color: #fff; }
+.dp-hist { display: grid; gap: 8px; }
+.dp-hr { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; background: #1f1827; border: 1px solid rgba(255, 255, 255, .07); }
+.dp-hi { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: rgba(34, 197, 94, .15); color: #4ade80; font-weight: 900; }
+.dp-hr > div { display: grid; gap: 2px; min-width: 0; }
+.dp-hr b { font: 800 15.5px Inter, KeCoin, sans-serif; color: #4ade80; }
+.dp-hr small { font-size: 11.5px; color: #9e97ab; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dp-hs { justify-items: end; }
+.dp-hs em { font-style: normal; font-size: 11px; font-weight: 800; color: #4ade80; padding: 2px 8px; border-radius: 999px; background: rgba(34, 197, 94, .12); }
+.dp-hs small { font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; }
+.dp-empty { margin: 10px 0; text-align: center; color: #9e97ab; font-size: 14px; line-height: 1.5; }
+@media (max-width: 560px) {
+  .modal-back:has(> .dp-modal) { place-items: end center; padding: 0; }
+  html .modal.dp-modal { width: 100%; max-height: 94dvh; border-radius: 22px 22px 0 0 !important; border-bottom: 0 !important; transform: translateY(60px); }
+  .dp-body:last-child { padding-bottom: calc(18px + env(safe-area-inset-bottom)); }
+  .dp-head { padding: 18px 16px 12px; } .dp-head h2 { font-size: 28px; }
+  .dp-tabs { padding: 0 16px 10px; } .dp-tabs button, .dp-tabs a { padding: 0 11px; font-size: 12.5px; }
+  .dp-body { padding: 14px 16px 18px; gap: 12px; }
+  .dp-foot { padding: 10px 16px calc(12px + env(safe-area-inset-bottom)); }
+  .dp-amts { gap: 7px; } .dp-amt b { font-size: 15px; }
+}
+@media (max-width: 360px) { .dp-amt b { font-size: 13.5px; } .dp-tabs a { display: none; } }
+/* la caisse en tête de la page Caisse (#recharger) */
+html .panel.dp-hero { display: grid; gap: 14px; color: #fff !important; padding: 20px !important; border-radius: 16px !important; background: radial-gradient(120% 140% at 0% 0%, rgba(255, 61, 154, .26), transparent 60%), linear-gradient(180deg, #1d1624, #131017) !important; border: 1px solid rgba(255, 61, 154, .3) !important; margin-bottom: 14px; }
+.dp-ht { display: grid; gap: 6px; justify-items: start; }
+.dp-ht small { font: 800 11px Inter, sans-serif; letter-spacing: 2.6px; color: var(--mq-pink); }
+.dp-ht h1 { margin: 0; font: 900 30px/1.05 Inter, sans-serif; color: #fff !important; }
+.dp-ht p { margin: 0; color: #c9c1d6 !important; }
+.dp-hb { padding: 5px 11px; border-radius: 999px; font: 700 12.5px Inter, KeCoin, sans-serif; color: #fde68a; background: rgba(251, 191, 36, .14); border: 1px solid rgba(251, 191, 36, .4); }
+.dp-hero-amts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.dp-hero-amts button { display: grid; gap: 2px; justify-items: center; padding: 12px 4px; border-radius: 12px; background: #1f1827; border: 1.5px solid rgba(255, 255, 255, .08); color: #fff; }
+.dp-hero-amts button:hover { border-color: var(--mq-pink); }
+.dp-hero-amts b { font: 800 15px Inter, KeCoin, sans-serif; white-space: nowrap; }
+.dp-hero-amts small { font-size: 11.5px; color: #9e97ab; }
+.dp-hero .dp-hgo { width: 100%; border-radius: 14px !important; font-weight: 900 !important; text-transform: uppercase; letter-spacing: .4px; background: linear-gradient(180deg, #ff4fae, #e6227f) !important; color: #fff !important; border: 0 !important; }
+@media (max-width: 640px) { .dp-hero-amts { grid-template-columns: repeat(3, minmax(0, 1fr)); } .dp-hero-amts button:nth-child(n+4) { display: none; } .dp-ht h1 { font-size: 26px; } }
 </style>
 </head>
 <body>
@@ -9817,7 +9956,7 @@ a.tb-hero[href]:hover { border-color: rgba(255, 61, 154, .5); }
       <a href="#profil" data-nav="vip"><span><svg class="ico"><use href="#ui-user"/></svg></span>Profil & rangs</a>
       <a href="#boutique" data-nav="shop"><span><svg class="ico"><use href="#ui-shop"/></svg></span>Boutique<b class="side-new">NEW</b></a>
       <a href="#classement" data-nav="top"><span><svg class="ico"><use href="#ui-top"/></svg></span>Classement</a>
-      <a href="#recharger" data-nav="refill"><span><svg class="ico"><use href="#ui-wallet"/></svg></span>Recharger</a>
+      <a href="#recharger" data-nav="refill"><span><svg class="ico"><use href="#ui-wallet"/></svg></span>Caisse · Déposer</a>
       <a href="#recompenses" data-nav="rewards"><span><svg class="ico"><use href="#ui-tv"/></svg></span>Récompenses vidéo<b class="side-badge" data-rw-badge hidden style="display:none"></b></a>
     </nav>
     <div class="side-label">Plus</div>
@@ -9869,7 +10008,7 @@ a.tb-hero[href]:hover { border-color: rgba(255, 61, 154, .5); }
     <a class="top-av" href="#profil" aria-label="Mon profil"><svg class="ico"><use href="#ui-user"/></svg></a>
     <div class="top-wallet">
       <div class="balance"><small>Solde</small><b data-balance>0&nbsp;&#xE1E0;</b></div>
-      <a class="btn primary top-refill" href="#recharger" aria-label="Recharger"><svg class="ico"><use href="#ui-wallet"/></svg><b>+</b></a>
+      <a class="btn primary top-refill" href="#depot" data-deposit aria-label="Déposer"><svg class="ico"><use href="#ui-wallet"/></svg><b>+</b><i class="tr-lbl">Déposer</i></a>
     </div>
     <a class="me-chip" href="#profil"></a>
     <div class="top-right"><a class="jp-chip" href="#jackpot" title="Jackpot commun : touche le max win d’une machine à sous"><span>💎</span><b data-jackpot="short">…</b></a><a class="icon-btn top-ic top-gift" href="#recompenses" aria-label="Récompenses" title="Récompenses"><svg class="ico"><use href="#ui-gift"/></svg></a><a class="icon-btn top-ic top-bell" href="#appli" aria-label="Notifications" title="Me prévenir (notifications)"><svg class="ico"><use href="#ui-bell"/></svg></a><button class="icon-btn theme-btn" type="button" data-theme-toggle aria-label="Mode clair / mode sombre" title="Mode clair / mode sombre"><span class="th-sun">☀️</span><span class="th-moon">🌙</span></button><span class="demo-tag">MODE DÉMO</span></div>
@@ -13014,6 +13153,15 @@ const ads = {
     return { ok: true, message };
   },
 
+  // one ad outside watch() (the deposits, depot.js): { ok, chest } (chest = this one opens the ads chest: ads.openChest())
+  async one(id, step = 1, of = 1) {
+    let ok = true;
+    if (!adPolicy.noAds()) { try { ok = !!(await provider.show(id, { step, of }))?.completed; } catch { ok = false; } }
+    const chest = ok && !!profiles.current && countViews(1, id);
+    bus.dispatchEvent(new Event('change'));
+    return { ok, chest };
+  },
+  openChest,
   // an ad seen outside watch() (the 30 s window): counted for the chest
   addView() { if (!profiles.current) return; if (countViews(1)) setTimeout(openChest, 900); bus.dispatchEvent(new Event('change')); },
   // { views today, chests opened, next: ads before the next chest (0 = no more today) }
@@ -15323,7 +15471,7 @@ function vitrineHTML() {
       <p class="nx-short">${playable} jeux gratuits <b>•</b> aucun dépôt <b>•</b> aucun vrai pari</p>
       <i class="nx-rule" aria-hidden="true"><b>✦</b></i>
       <a class="nx-bonus" href="#profil"><i><svg class="ico"><use href="#ui-gift"/></svg></i><span><small>Cadeau du jour</small><b>JUSQU’À ${fmt(10000)}</b></span></a>
-      <div class="nx-cta"><a class="nx-btn" href="#lobby-slot">JOUER MAINTENANT</a>${guest ? '<a class="nx-btn ghost" href="#" data-signup>CRÉER UN COMPTE</a>' : `<a class="nx-btn ghost" href="#recharger"><svg class="ico"><use href="#ui-wallet"/></svg>RECHARGER</a>`}</div>
+      <div class="nx-cta"><a class="nx-btn" href="#lobby-slot">JOUER MAINTENANT</a>${guest ? '<a class="nx-btn ghost" href="#" data-signup>CRÉER UN COMPTE</a>' : `<a class="nx-btn ghost" href="#depot" data-deposit><svg class="ico"><use href="#ui-wallet"/></svg>DÉPOSER</a>`}</div>
     </div>
   </section>
   <div class="nx-cats-h"><h2>Catégories de jeux</h2></div>
@@ -18791,7 +18939,7 @@ async function redeemCode(raw) {
 
 function renderRefill(root) {
   const ok = wallet.canRefill(), rf = ads.status('refill'), ad = ads.status('credits'), daily = dailyStatus();
-  root.innerHTML = `
+  root.innerHTML = `${__mods['depot.js']?.heroHTML?.() || ''}
     <section class="panel daily">
       <div class="daily-gift${rf.ok ? ' ready' : ''}">💰</div>
       <h1>Recharger mon solde</h1>
@@ -25061,7 +25209,8 @@ function renderRewards(r) {
   };
   r.innerHTML = `<section class="rw-page">
     <div class="rw-hero panel"><span class="rw-hero-ico">📺</span><div><h1>Récompenses vidéo</h1>
-      <p class="muted">Une pub de 15 secondes contre des KE, des tours, des cartes… C’est toi qui choisis, quand tu veux : jamais de pub imposée en plein jeu.</p></div></div>
+      <p class="muted">Une pub de 15 secondes contre des KE, des tours, des cartes… C’est toi qui choisis, quand tu veux : jamais de pub imposée en plein jeu.</p>
+      <p class="muted">Besoin de plus ? <a href="#depot" data-deposit>💳 Dépose des KE à la caisse</a> : jusqu’à ${fmt(25000)} par pub.</p></div></div>
     <div class="rw-chest-bar panel"><div><b>🧰 Coffre des pubs</b><small>${c.next ? `Encore ${c.next} pub${c.next > 1 ? 's' : ''} pour ouvrir un coffre de ${fmt(c.ke)}` : 'Tous les coffres du jour sont ouverts : reviens demain !'} · ${c.chests} / ${c.max} aujourd’hui</small></div>
       <div class="rw-bar"><i style="width:${pct.toFixed(0)}%"></i></div></div>
     <h2 class="rw-h">Tout de suite <small>${ready()} disponible${ready() > 1 ? 's' : ''}</small></h2>
@@ -25134,6 +25283,284 @@ addEventListener('sb:roundend', (e) => {
 });
 
 return { renderRewards, ready, NOW, LATER };
+})();
+
+// ---- depot.js ----
+__mods['depot.js'] = (() => {
+// « Déposer » (demande du propriétaire du 16 novembre 2026) : le « + » à côté du solde (et la page Caisse) ouvre la caisse,
+// comme dans un casino en ligne : on choisit un montant, le moyen de paiement est la pub vidéo, et plus le dépôt est gros,
+// plus il y a de pubs à regarder (adsFor : 1 pub par tranche de DEP.per). Argent fictif : aucun vrai paiement.
+// Limites : DEP.max par dépôt, DEP.day par jour. Bonus de bienvenue sur le 1er dépôt (WELCOME). Un dépôt commencé puis
+// interrompu reste en attente (profile.dep.pend) : on le reprend là où on s'est arrêté. Reçus dans profile.dep.hist.
+// Le propriétaire et les appareils ?nopub (adPolicy.noAds) déposent sans pub.
+const { ads } = __mods['ads.js'];
+const { adPolicy } = __mods['adpolicy.js'];
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { modal, toast } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+
+const DEP = { per: 25000, min: 5000, max: 500000, day: 1000000, step: 5000, sec: 15 };
+const PRESETS = [20000, 50000, 100000, 250000, 500000];
+const WELCOME = { pct: 50, max: 25000 };
+const LS = 'spinbet_depot';
+const adsFor = (a) => Math.max(1, Math.ceil(a / DEP.per));
+const pubs = (n) => `${n} pub${n > 1 ? 's' : ''}`;
+const dur = (n) => { const s = n * DEP.sec; return s < 60 ? `${s} s` : `${Math.round(s / 60)} min`; };
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+const when = (t) => new Date(t).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+const newId = () => `DEP-${Date.now().toString(36).slice(-5).toUpperCase()}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+
+// guests get a fresh profile at each visit: their day total and welcome bonus are also kept on the device
+function local() { try { return JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch { return {}; } }
+function state() {
+  const d = { day: '', sum: 0, first: 0, pend: null, hist: [], ...(profiles.current?.dep || {}) };
+  if (d.day !== today()) { d.day = today(); d.sum = 0; }
+  if (!profiles.online) {
+    const l = local();
+    if (l.day === d.day) d.sum = Math.max(d.sum, l.sum || 0);
+    if (l.first && !d.first) d.first = l.first;
+  }
+  return d;
+}
+function save(fn) {
+  if (!profiles.current) return;
+  profiles.update('dep', (me) => { const d = state(); fn(d); me.dep = d; });
+  if (!profiles.online) { const d = state(); try { localStorage.setItem(LS, JSON.stringify({ day: d.day, sum: d.sum, first: d.first })); } catch { /* ignore */ } }
+}
+const bonusOf = (a, d = state()) => (d.first ? 0 : Math.min(WELCOME.max, Math.round((a * WELCOME.pct) / 100)));
+// what can still be deposited today (a deposit waiting for its ads counts already)
+const room = (d = state()) => Math.max(0, DEP.day - d.sum - (d.pend ? d.pend.a : 0));
+const capOf = (d = state()) => Math.min(DEP.max, room(d));
+
+/* ---------- the window ---------- */
+let cur = null, running = false;
+const box = () => (cur?.el?.isConnected ? cur.el : null);
+
+function openDeposit(pre) {
+  if (!profiles.current) return toast('Connecte-toi d’abord', 'warn');
+  if (box()) { if (pre) { cur.amt = +pre; cur.custom = !PRESETS.includes(+pre); cur.view = 'dep'; paint(); } return; }
+  const d = state(), cap = capOf(d);
+  let amt = +pre || 50000;
+  if (amt > cap) amt = [...PRESETS].reverse().find((a) => a <= cap) || Math.floor(cap / DEP.step) * DEP.step;
+  modal('<div class="dp" data-dp></div>', { cls: 'dp-modal' }).then(() => { cur = null; });
+  cur = { el: document.querySelector('.modal.dp-modal [data-dp]'), amt, custom: !PRESETS.includes(amt), view: 'dep', rec: null, sure: false };
+  paint();
+  wire();
+}
+
+function head(d) {
+  return `<div class="dp-head"><small>CAISSE</small><h2>Déposer</h2>
+    <div class="dp-bal"><span>Solde</span><b>${fmt(wallet.balance)}</b></div></div>
+    <div class="dp-tabs"><button class="${cur.view !== 'hist' ? 'on' : ''}" data-dp-tab="dep">Dépôt</button><button class="${cur.view === 'hist' ? 'on' : ''}" data-dp-tab="hist">Mes dépôts${d.hist?.length ? ` <i>${d.hist.length}</i>` : ''}</button><a href="#recharger" data-value="go">Codes cadeaux</a></div>`;
+}
+
+function sumHTML(d) {
+  const cap = capOf(d), a = cur.amt, n = adsFor(a), b = bonusOf(a, d), ok = a >= DEP.min && a <= cap;
+  return `<div class="dp-sum">
+      <div><span>Dépôt</span><b>${fmt(a)}</b></div>
+      ${b ? `<div class="dp-sb"><span>🎁 Bonus de bienvenue +${WELCOME.pct} %</span><b>+${fmt(b)}</b></div>` : ''}
+      <div><span>Frais</span><b>${fmt(0)}</b></div>
+      <div><span>Pubs à regarder</span><b>${pubs(n)} · ≈ ${dur(n)}</b></div>
+      <div class="dp-tot"><span>Tu reçois</span><b>${fmt(a + b)}</b></div>
+    </div>`;
+}
+// the button stays at the bottom of the window (sticky) while the player scrolls the amounts
+function footHTML(d) {
+  const cap = capOf(d), a = cur.amt, n = adsFor(a), b = bonusOf(a, d), ok = a >= DEP.min && a <= cap;
+  return `<small>${ok ? `${pubs(n)} · ≈ ${dur(n)} · tu reçois <b>${fmt(a + b)}</b>` : a > cap ? `Au plus ${fmt(cap)} pour ce dépôt` : `Au moins ${fmt(DEP.min)}`}</small>
+    <button class="btn primary lg dp-go" data-dp-go ${ok ? '' : 'disabled'}>${ok ? `Déposer ${fmt(a)}` : a > cap ? `Maximum ${fmt(cap)}` : `Minimum ${fmt(DEP.min)}`}</button>`;
+}
+
+function depHTML(d) {
+  const cap = capOf(d), pct = Math.min(100, (d.sum / DEP.day) * 100);
+  if (cap < DEP.min) return `<div class="dp-full"><b>🛑 Limite de dépôt du jour atteinte</b><p>Tu as déposé ${fmt(d.sum)} aujourd’hui (${fmt(DEP.day)} au plus par jour). Reviens demain, ou profite des <a href="#recompenses" data-value="go">récompenses vidéo</a> et du <a href="#profil" data-value="go">cadeau du jour</a>.</p></div>${limHTML(d, pct)}`;
+  return `${d.first ? '' : `<div class="dp-welcome"><b>🎁 BONUS DE BIENVENUE</b><span>+${WELCOME.pct} % sur ton 1er dépôt, jusqu’à ${fmt(WELCOME.max)} offerts</span></div>`}
+    <div class="dp-sec"><b class="dp-lab">Moyen de paiement</b>
+      <div class="dp-method"><span class="dp-mi"><svg class="ico"><use href="#ui-tv"/></svg></span><div><b>Pub vidéo</b><small>Instantané · sans frais · ${DEP.sec} s par pub</small></div><i class="dp-check">✓</i></div></div>
+    <div class="dp-sec"><b class="dp-lab">Montant</b>
+      <div class="dp-amts">${PRESETS.map((a) => `<button class="dp-amt${a === cur.amt && !cur.custom ? ' on' : ''}" data-dp-amt="${a}" ${a > cap ? 'disabled' : ''}>${a === 50000 ? '<em>POPULAIRE</em>' : a === 500000 ? '<em class="mx">MAX</em>' : ''}<b>${fmt(a)}</b><small>${pubs(adsFor(a))}</small></button>`).join('')}
+        <button class="dp-amt${cur.custom ? ' on' : ''}" data-dp-amt="custom"><b>Autre</b><small>montant libre</small></button></div>
+      ${cur.custom ? `<div class="dp-custom"><button data-dp-step="-1" aria-label="Moins">−</button><label><input type="text" inputmode="numeric" data-dp-in value="${cur.amt.toLocaleString('fr-FR')}" aria-label="Montant du dépôt"><span></span></label><button data-dp-step="1" aria-label="Plus">+</button></div>
+        <small class="dp-hint">De ${fmt(DEP.min)} à ${fmt(cap)} · 1 pub par tranche de ${fmt(DEP.per)}</small>` : ''}</div>
+    <div data-dp-sum>${sumHTML(d)}</div>
+    ${limHTML(d, pct)}`;
+}
+const limHTML = (d, pct) => `<div class="dp-lim"><div><span>Limite de dépôt du jour</span><b>${fmt(d.sum)} / ${fmt(DEP.day)}</b></div><i><u style="width:${pct.toFixed(1)}%"></u></i></div>
+    <p class="dp-note">🔒 Argent fictif : aucun vrai paiement, jamais de carte bancaire. Les KE servent seulement à jouer sur SpinBet.</p>`;
+
+function flowHTML(d) {
+  const p = d.pend, dots = Array.from({ length: p.need }, (_, i) => `<i class="${i < p.done ? 'ok' : i === p.done && running ? 'now' : ''}"></i>`).join('');
+  const noAds = adPolicy.noAds();
+  return `<div class="dp-flow${running ? ' run' : ''}">
+    <div class="dp-ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44"/><circle class="pg" cx="50" cy="50" r="44" style="stroke-dashoffset:${(276.5 * (1 - p.done / p.need)).toFixed(1)}"/></svg><b>${p.done}<small>/${p.need}</small></b></div>
+    <small class="dp-k">${running ? (noAds ? 'PAIEMENT EN COURS…' : 'DÉPÔT EN COURS…') : 'DÉPÔT EN ATTENTE'}</small>
+    <h3>${fmt(p.a)}</h3>
+    <div class="dp-dots${p.need > 12 ? ' sm' : ''}">${dots}</div>
+    <p class="dp-fl">${running ? (noAds ? 'Vérification du dépôt…' : `Pub ${Math.min(p.need, p.done + 1)} sur ${p.need} : regarde-la jusqu’au bout`) : `${p.done} pub${p.done > 1 ? 's' : ''} regardée${p.done > 1 ? 's' : ''} sur ${p.need} · il en reste ${p.need - p.done}`}</p>
+    ${running ? '' : `<button class="btn primary lg dp-go" data-dp-cont>▶ ${p.done ? 'Continuer' : 'Regarder'} · pub ${p.done + 1} / ${p.need}</button>
+      <button class="btn ghost dp-cancel" data-dp-cancel>${cur.sure ? 'Oui, annuler (les pubs vues sont perdues)' : 'Annuler ce dépôt'}</button>`}
+    <p class="dp-note">Ton dépôt est crédité dès la dernière pub. Tu peux fermer et revenir plus tard : il t’attend ici.</p></div>`;
+}
+
+function recHTML() {
+  const r = cur.rec;
+  return `<div class="dp-ok">
+    <div class="dp-okico"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24"/><path d="M14 27l8 8 16-17"/></svg></div>
+    <small class="dp-k">DÉPÔT RÉUSSI</small>
+    <h3>+${fmt(r.a + r.b)}</h3>
+    <div class="dp-rec">
+      <div><span>N° de transaction</span><b>${r.id}</b></div>
+      <div><span>Date</span><b>${when(r.t)}</b></div>
+      <div><span>Moyen de paiement</span><b>Pub vidéo · ${pubs(r.n)}</b></div>
+      <div><span>Dépôt</span><b>${fmt(r.a)}</b></div>
+      ${r.b ? `<div class="dp-sb"><span>🎁 Bonus de bienvenue</span><b>+${fmt(r.b)}</b></div>` : ''}
+      <div class="dp-tot"><span>Nouveau solde</span><b>${fmt(r.bal)}</b></div>
+    </div>
+    <button class="btn primary lg dp-go" data-value="play">🎰 C’est parti !</button>
+    <button class="btn ghost" data-dp-again>Déposer encore</button></div>`;
+}
+
+function histHTML(d) {
+  const h = d.hist || [];
+  return `<div class="dp-hist">${h.length ? h.map((r) => `<div class="dp-hr"><span class="dp-hi">✓</span><div><b>+${fmt(r.a + (r.b || 0))}</b><small>${when(r.t)} · ${pubs(r.n)}${r.b ? ' · bonus compris' : ''}</small></div><div class="dp-hs"><em>Réussi</em><small>${r.id}</small></div></div>`).join('')
+    : '<p class="dp-empty">Aucun dépôt pour l’instant.<br>Ton premier dépôt reçoit le bonus de bienvenue !</p>'}</div>
+    ${limHTML(d, Math.min(100, (d.sum / DEP.day) * 100))}`;
+}
+
+function paint() {
+  const el = box(); if (!el) return;
+  const d = state();
+  const form = cur.view !== 'hist' && !(cur.view === 'rec' && cur.rec) && !d.pend && capOf(d) >= DEP.min;
+  const body = cur.view === 'hist' ? histHTML(d) : cur.view === 'rec' && cur.rec ? recHTML() : d.pend ? flowHTML(d) : depHTML(d);
+  el.innerHTML = `${head(d)}<div class="dp-body">${body}</div>${form ? `<div class="dp-foot" data-dp-foot>${footHTML(d)}</div>` : ''}`;
+}
+function paintSum() {
+  const d = state(), s = box()?.querySelector('[data-dp-sum]'), f = box()?.querySelector('[data-dp-foot]');
+  if (s) s.innerHTML = sumHTML(d);
+  if (f) f.innerHTML = footHTML(d);
+}
+
+function setAmt(v, final) {
+  const cap = capOf();
+  let a = Math.round(+v || 0);
+  if (final) a = Math.max(DEP.min, Math.min(Math.max(DEP.min, cap), Math.round(a / DEP.step) * DEP.step));
+  cur.amt = a;
+  const inp = box()?.querySelector('[data-dp-in]');
+  if (inp && final) inp.value = a.toLocaleString('fr-FR');
+  paintSum();
+}
+
+function wire() {
+  const el = box(); if (!el) return;
+  el.addEventListener('click', (e) => {
+    const t = e.target.closest('button'); if (!t || !cur) return;
+    if (t.dataset.dpTab) { cur.view = t.dataset.dpTab; cur.sure = false; return paint(); }
+    if (t.dataset.dpAmt) {
+      if (t.dataset.dpAmt === 'custom') { cur.custom = true; paint(); const i = box()?.querySelector('[data-dp-in]'); i?.focus(); i?.select?.(); return; }
+      cur.custom = false; cur.amt = +t.dataset.dpAmt; return paint();
+    }
+    if (t.dataset.dpStep) return setAmt(cur.amt + (+t.dataset.dpStep) * DEP.step, true);
+    if ('dpGo' in t.dataset) return start();
+    if ('dpCont' in t.dataset) return run();
+    if ('dpCancel' in t.dataset) {
+      if (!cur.sure) { cur.sure = true; return paint(); }
+      cur.sure = false; save((d) => { d.pend = null; }); toast('Dépôt annulé', 'warn'); return paint();
+    }
+    if ('dpAgain' in t.dataset) { cur.view = 'dep'; cur.rec = null; return paint(); }
+  });
+  el.addEventListener('input', (e) => {
+    if (!e.target.matches('[data-dp-in]')) return;
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 7);
+    e.target.value = digits ? (+digits).toLocaleString('fr-FR') : '';
+    setAmt(+digits || 0, false);
+  });
+  el.addEventListener('change', (e) => { if (e.target.matches('[data-dp-in]')) setAmt(cur.amt, true); });
+  el.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target.matches('[data-dp-in]')) { e.preventDefault(); setAmt(cur.amt, true); } });
+}
+
+function start() {
+  const d = state(), a = cur.amt;
+  if (d.pend) return run();
+  if (!(a >= DEP.min) || a > capOf(d)) return toast(`Choisis un montant entre ${fmt(DEP.min)} et ${fmt(capOf(d))}`, 'warn');
+  save((x) => { x.pend = { id: newId(), a, need: adsFor(a), done: 0, t: Date.now() }; });
+  run();
+}
+
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+async function run() {
+  if (running || !state().pend) return;
+  running = true; cur && (cur.sure = false); paint();
+  sfx.unlock?.();
+  let chest = false;
+  if (adPolicy.noAds()) {
+    // the owner's devices: no ad, only the « payment » moment
+    await wait(1400);
+    save((d) => { if (d.pend) d.pend.done = d.pend.need; });
+  } else {
+    for (;;) {
+      const p = state().pend;
+      if (!p || p.done >= p.need) break;
+      const r = await ads.one('deposit', p.done + 1, p.need);
+      if (!r.ok) break;
+      if (r.chest) chest = true;
+      save((d) => { if (d.pend) d.pend.done = Math.min(d.pend.need, d.pend.done + 1); });
+      paint();
+    }
+  }
+  running = false;
+  const p = state().pend;
+  if (p && p.done >= p.need) finish();
+  else { paint(); if (p) toast('Pub interrompue : ton dépôt t’attend, reprends-le quand tu veux', 'warn'); }
+  if (chest) setTimeout(() => ads.openChest(), 2600);
+}
+
+function finish() {
+  let rec = null;
+  save((d) => {
+    const p = d.pend; if (!p) return;
+    const b = d.first ? 0 : Math.min(WELCOME.max, Math.round((p.a * WELCOME.pct) / 100));
+    rec = { id: p.id, t: Date.now(), a: p.a, b, n: p.need };
+    d.sum += p.a;
+    if (!d.first) d.first = rec.t;
+    d.hist = [rec, ...(d.hist || [])].slice(0, 12);
+    d.pend = null;
+  });
+  if (!rec) return;
+  wallet.grant(rec.a + rec.b);
+  rec.bal = wallet.balance;
+  profiles.flush?.();
+  if (!box()) openDeposit();
+  if (cur) { cur.view = 'rec'; cur.rec = rec; }
+  paint();
+  sfx.bigWin?.();
+  fx.confetti?.(90);
+  fx.coins?.(Math.min(70, 20 + adsFor(rec.a) * 4), box()?.querySelector('.dp-ok h3'));
+  dispatchEvent(new CustomEvent('sb:deposit', { detail: { amount: rec.a, bonus: rec.b } }));
+}
+
+// every [data-deposit] opens the cash desk (the « + » of the top bar, the Caisse page); data-deposit="50000" = preset amount
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('[data-deposit]');
+  if (!t) return;
+  e.preventDefault();
+  openDeposit(+t.dataset.deposit || 0);
+});
+
+// the cash desk at the top of the Caisse page (#recharger)
+function heroHTML() {
+  const d = state();
+  return `<section class="panel dp-hero">
+    <div class="dp-ht"><small>CAISSE</small><h1>Déposer des KE</h1>
+      <p class="muted">Choisis ton montant et paie en regardant des pubs vidéo : ton solde monte tout de suite. Plus tu déposes, plus il y a de pubs (1 pub par tranche de ${fmt(DEP.per)}).</p>
+      ${d.first ? '' : `<span class="dp-hb">🎁 +${WELCOME.pct} % sur ton 1er dépôt, jusqu’à ${fmt(WELCOME.max)}</span>`}</div>
+    <div class="dp-hero-amts">${PRESETS.map((a) => `<button data-deposit="${a}"><b>${fmt(a)}</b><small>${pubs(adsFor(a))}</small></button>`).join('')}</div>
+    <button class="btn primary lg dp-hgo" data-deposit>${d.pend ? `▶ Reprendre mon dépôt de ${fmt(d.pend.a)}` : '💳 Déposer'}</button>
+  </section>`;
+}
+
+return { openDeposit, heroHTML, DEP, PRESETS, WELCOME, adsFor };
 })();
 
 // ---- shorts.js ----
@@ -25465,6 +25892,7 @@ const routes = [
   { re: /^(profil|vip)$/, page: (r) => renderProfile(r), nav: 'vip' },
   { re: /^classement$/, page: (r) => renderLeaderboard(r), nav: 'top' },
   { re: /^(recharger|daily)$/, page: (r) => renderRefill(r), nav: 'refill' },
+  { re: /^(depot|deposer|deposit|caisse)$/, page: (r) => { renderRefill(r); setTimeout(() => __mods['depot.js'].openDeposit(), 200); }, nav: 'refill' },
   { re: /^responsable$/, page: (r) => renderResponsible(r), nav: 'resp' },
   { re: /^(appli|application|telecharger)$/, page: (r) => renderApp(r), nav: 'app' },
   { re: /^roue$/, page: (r) => renderWheel(r), nav: 'wheel' },
@@ -25524,7 +25952,7 @@ function mountAdBar() {
     put(OFFER_KEY, Date.now());
     const card = document.createElement('div');
     card.className = 'ad-offer';
-    card.innerHTML = '<b>Solde bas ?</b><p>Regarde une pub de 15 secondes et reçois <b>+1 000\u00a0\uE1E0</b> tout de suite pour continuer à jouer. Ou recharge à 10 000\u00a0\uE1E0 avec 2 pubs.</p><div><button class="btn primary" data-go>▶ +1 000\u00a0\uE1E0</button><a class="btn ghost" href="#recharger" data-no>Recharger</a><button class="btn ghost" data-x>✕</button></div>';
+    card.innerHTML = '<b>Solde bas ?</b><p>Regarde une pub de 15 secondes et reçois <b>+1 000\u00a0\uE1E0</b> tout de suite pour continuer à jouer. Ou dépose des KE à la caisse, avec quelques pubs.</p><div><button class="btn primary" data-go>▶ +1 000\u00a0\uE1E0</button><a class="btn ghost" href="#depot" data-deposit data-no>💳 Déposer</a><button class="btn ghost" data-x>✕</button></div>';
     document.body.appendChild(card);
     card.querySelector('[data-no]').onclick = () => card.remove();
     card.querySelector('[data-x]').onclick = () => card.remove();

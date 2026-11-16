@@ -836,6 +836,22 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   l'aide dans le chat (`HELP_RX`) est dépanné de 300 à 1 500 KE une fois par jour (`maisonHelp`, payé sur son appareil, il poste lui-même
   « 💸 a été dépanné de … KE par … »). **Jamais de prix** (absents des tournois, Battle Royale, défis, jackpot). Pour les retirer : `ON = false`.
 
+## La caisse : « Déposer » (demande du propriétaire du 16 novembre 2026)
+
+- **Le concept** : comme un dépôt dans un vrai casino en ligne, mais en argent fictif payé en regardant des pubs. Le « + » à côté du
+  solde (`.top-refill`, `data-deposit` ; sur ordinateur une pilule rose « DÉPOSER », `.tr-lbl`) ouvre la caisse (`depot.js`,
+  `openDeposit()`, fenêtre `.dp-modal`, en bas de l'écran sur téléphone) : moyen de paiement « Pub vidéo », montants `PRESETS`
+  (20 000 · 50 000 · 100 000 · 250 000 · 500 000) ou montant libre (par 5 000), récapitulatif (dépôt, bonus, frais 0, pubs, « tu
+  reçois »), bouton collé en bas (`.dp-foot`). **1 pub par tranche de 25 000** (`adsFor`, `DEP.per`) : 20 000 = 1 pub, 50 000 = 2,
+  100 000 = 4, 500 000 = 20. Limites : `DEP.max` 500 000 par dépôt, `DEP.day` 1 000 000 par jour. **Bonus de bienvenue** +50 % sur le
+  1er dépôt, jusqu'à 25 000 (`WELCOME`). Pubs à la suite (`ads.one(id, step, of)` d'`ads.js`, « Publicité 1 / 4 »), comptées pour le
+  coffre des pubs ; une pub fermée = dépôt **en attente** (`profile.dep.pend`, « Continuer · pub 3 / 4 » ou « Annuler ») ; reçu avec
+  n° de transaction `DEP-…`, onglet « Mes dépôts » (`profile.dep.hist`, 12 derniers). Invités : total du jour et bonus aussi gardés
+  sur l'appareil (`spinbet_depot`). Propriétaire et appareils `?nopub` : dépôt sans pub (petit moment « paiement en cours »).
+- Partout : tout élément `[data-deposit]` (ou `data-deposit="50000"`) ouvre la caisse ; adresse `#depot` (aussi `#deposer`, `#caisse`)
+  = page Caisse + fenêtre ouverte. Page Caisse (`#recharger`) : encart « Déposer des KE » en tête (`heroHTML()`), puis recharge, pubs et
+  codes. Aussi : bouton DÉPOSER de l'accueil (comptes), carte « Solde bas ? » dans les jeux, menu « Caisse · Déposer », page Récompenses.
+
 ## Arrivée des visiteurs et partage
 
 - **Cadeau du jour = série de connexion** (`daily.js`, carte en haut de l'accueil `dailyHomeHTML` dans `pages/lobby.js`,
