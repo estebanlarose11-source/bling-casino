@@ -1012,6 +1012,18 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   cache alors la barre d'état et la barre de navigation du téléphone (immersif « sticky », remis au retour dans l'appli). Les anciennes
   versions de l'appli n'ont pas la fonction : rien ne change pour elles.
 
+- **Rappel « Mets SpinBet sur ton écran d'accueil »** (`rappel-appli.js`, demande du propriétaire du 16 novembre 2026) : **qui a l'appli**
+  = ce téléphone a déjà ouvert le site depuis son icône (`display-mode: standalone`, iPhone `navigator.standalone`) ou depuis l'APK
+  (« SpinBetApp » dans le user agent) → localStorage `spinbet_pwa`, et pour un compte `profile.app = { t, os }` écrit une seule fois
+  (sur iPhone l'icône a sa propre mémoire, séparée de Safari). Impossible de savoir depuis le navigateur si un joueur a installé
+  l'appli sans jamais l'ouvrir. **Rappel** : seulement sur téléphone (iPhone, Android), dans le navigateur, à qui n'a pas l'appli, après
+  `NAG.rounds` (12) parties ou `NAG.min` (5) minutes de la visite, jamais pendant un tour / plein écran / une autre fenêtre ; puis plus
+  avant `NAG.gap` (3 jours), 7 jours après 3 « Plus tard » (`spinbet_pwa_nag`). Fenêtre `.pw-modal` (téléphone dessiné avec l'icône)
+  → « Voir comment faire » (iPhone) / « Installer l'appli » (Android) = `getApp()` de `pages/app.js` (tuto Partager → Sur l'écran
+  d'accueil, ou Chrome / APK). **Chiffres** (`monitor.js`, `count()`) dans le tableau de bord `#tableau` : chaque visite comptée `_app`
+  (icône / appli), `_mob` (navigateur d'un téléphone) ou `_pc` (ordinateur), depuis le 16 novembre 2026 ; `_nag` (rappel montré),
+  `_nago` (tuto ouvert depuis le rappel).
+
 ## App Store et Google Play (demande du propriétaire du 16 novembre 2026)
 
 - Marche à suivre et textes des fiches pour le propriétaire : `notes/app-stores-mise-en-route.md` ; captures 1320 × 2868, icône et

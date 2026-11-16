@@ -10051,6 +10051,24 @@ html .panel.dp-hero { display: grid; gap: 14px; color: #fff !important; padding:
 @media (max-width: 640px) { .dp-hero-amts { grid-template-columns: repeat(3, minmax(0, 1fr)); } .dp-hero-amts button:nth-child(n+4) { display: none; } .dp-ht h1 { font-size: 26px; } }
 /* ===== Bonus offert quand le solde est bas (bonus-bas.js, demande du propriétaire du 16 novembre 2026) ===== */
 html .modal.lw-modal { width: min(400px, 100%); padding: 26px 22px 20px !important; border-radius: 20px !important; text-align: center; color: #fff; background: radial-gradient(120% 70% at 50% 0%, rgba(255, 61, 154, .3), transparent 65%), linear-gradient(180deg, #1d1624, #0f0c13) !important; border: 1px solid rgba(255, 61, 154, .35) !important; box-shadow: 0 30px 90px rgba(0, 0, 0, .65), 0 0 60px rgba(255, 61, 154, .18) !important; }
+/* Rappel « écran d'accueil » (rappel-appli.js) : un téléphone dessiné avec l'icône SpinBet sur son écran d'accueil */
+html .modal.pw-modal { width: min(380px, 100%); padding: 24px 22px 18px !important; border-radius: 20px !important; text-align: center; color: #fff; background: radial-gradient(120% 70% at 50% 0%, rgba(255, 61, 154, .3), transparent 65%), linear-gradient(180deg, #1d1624, #0f0c13) !important; border: 1px solid rgba(255, 61, 154, .35) !important; box-shadow: 0 30px 90px rgba(0, 0, 0, .65), 0 0 60px rgba(255, 61, 154, .18) !important; }
+.pw-ph { position: relative; width: 132px; height: 176px; margin: 0 auto 12px; padding: 9px; border-radius: 24px; background: linear-gradient(160deg, #3a3346, #15121b); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .15), 0 14px 30px rgba(0, 0, 0, .5); }
+.pw-scr { height: 100%; border-radius: 16px; padding: 12px 10px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; align-content: start; background: linear-gradient(180deg, #4c1d95, #be185d); overflow: hidden; }
+.pw-scr > * { min-width: 0; width: auto; margin: 0; padding: 0; }
+.pw-scr i { display: block; aspect-ratio: 1; border-radius: 6px; background: rgba(255, 255, 255, .22); }
+.pw-scr b { grid-column: 4; grid-row: 3; display: flex; flex-direction: column; align-items: center; gap: 2px; animation: pwIcon 1.6s ease-in-out infinite; }
+.pw-scr b img { width: 100%; aspect-ratio: 1; border-radius: 7px; box-shadow: 0 0 0 2px #fff, 0 0 14px #ff3d9a; }
+.pw-scr b small { font-size: 7px; font-weight: 800; }
+@keyframes pwIcon { 50% { transform: scale(1.18); } }
+.pw-hand { position: absolute; right: -6px; top: 92px; font-size: 26px; animation: pwHand 1.6s ease-in-out infinite; }
+@keyframes pwHand { 50% { transform: translate(-6px, -6px); } }
+.pw-k { display: block; font-size: 11px; font-weight: 900; letter-spacing: .14em; color: #ff8cc6; }
+.pw-modal h2 { margin: 6px 0 10px; font-size: 21px; line-height: 1.2; }
+.pw-list { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 7px; text-align: left; font-size: 14px; color: #e8deff; }
+.pw-go { width: 100%; }
+.pw-no { width: 100%; margin-top: 8px; }
+@media (prefers-reduced-motion: reduce) { .pw-scr b, .pw-hand { animation: none; } }
 .lw-modal .modal-x { border-radius: 50% !important; background: rgba(255, 255, 255, .07) !important; color: #fff !important; }
 .lw { display: grid; justify-items: center; gap: 9px; font-family: Inter, KeCoin, sans-serif; }
 .lw-art { position: relative; width: 148px; aspect-ratio: 1; border-radius: 20px; overflow: visible; animation: lwPop .6s cubic-bezier(.3, 1.5, .5, 1); }
@@ -20082,10 +20100,91 @@ const fromReferrer = () => {
   opens._visit = (opens._visit || 0) + 1;
   if (first) opens._new = (opens._new || 0) + 1;
   opens[`_src_${src}`] = (opens[`_src_${src}`] || 0) + 1;
+  // opened from the home-screen icon / the Android app, from a phone's browser, or from a computer (owner's question of
+  // 16 November 2026: who has put SpinBet on the home screen; tableau.js)
+  const mob = /android|iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const how = app ? '_app' : mob ? '_mob' : '_pc';
+  opens[how] = (opens[how] || 0) + 1;
 })();
+// a counter of the site itself (key starting with _), sent with the others
+const count = (k) => { try { if (/[?&](nopub|nostats)\b/.test(location.search) || localStorage.getItem('spinbet_nopub') === '1') return; } catch { /* ignore */ } opens[k] = (opens[k] || 0) + 1; };
 profiles.addEventListener('change', (e) => { if (e.detail?.isNew && profiles.online) opens._compte = (opens._compte || 0) + 1; });
 
-return { logError };
+return { logError, count };
+})();
+
+// ---- rappel-appli.js ----
+__mods['rappel-appli.js'] = (() => {
+// « Mets SpinBet sur ton écran d'accueil » (demande du propriétaire du 16 novembre 2026) : sur un téléphone, à quelqu'un qui joue dans
+// le navigateur sans avoir installé SpinBet, une fenêtre de temps en temps (après NAG.rounds parties ou NAG.min minutes de cette
+// visite, puis plus avant NAG.gap, NAG.late après 3 refus) qui ouvre le bon tuto : iPhone = Partager → Sur l'écran d'accueil,
+// Android = installer avec Chrome ou l'APK (getApp de pages/app.js). Qui a l'appli : ce téléphone l'a déjà ouverte depuis son
+// icône ou depuis l'appli Android (localStorage spinbet_pwa ; sur iPhone, l'icône a sa propre mémoire, d'où aussi profile.app pour
+// les comptes, écrit une fois). Comptés dans stats (monitor.js) : _app / _mob / _pc à chaque visite, _nag (montré), _nago (tuto ouvert).
+const { profiles } = __mods['profile.js'];
+const { modal } = __mods['ui.js'];
+const A = __mods['pages/app.js'];
+const M = __mods['monitor.js'];
+const NAG = { rounds: 12, min: 5, gap: 3 * 864e5, late: 7 * 864e5, first: 45e3 };
+const UA = navigator.userAgent;
+const ios = () => /iphone|ipad|ipod/i.test(UA) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const android = () => /android/i.test(UA);
+const get = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+const put = (k, v) => { try { localStorage.setItem(k, v); } catch { /* ignore */ } };
+const cur = () => __mods['pages/game.js']?.currentGame?.();
+
+// this phone has the app: remembered on the device and, once, on the account
+function mark() {
+  put('spinbet_pwa', String(Date.now()));
+  const me = profiles.current;
+  if (me && !me.app?.t) profiles.update('app', (p) => { p.app = { t: Date.now(), os: ios() ? 'ios' : android() ? 'android' : 'autre' }; });
+}
+if (A.installed()) { mark(); profiles.addEventListener('change', () => { if (A.installed()) mark(); }); }
+addEventListener('appinstalled', mark);
+const hasApp = () => A.installed() || !!get('spinbet_pwa') || !!profiles.current?.app?.t;
+
+let rounds = 0;
+const t0 = Date.now();
+addEventListener('sb:roundend', () => { rounds++; });
+const nag = () => { try { return JSON.parse(get('spinbet_pwa_nag') || '{}') || {}; } catch { return {}; } };
+const busy = () => {
+  const g = cur();
+  return !!(document.hidden || document.fullscreenElement || document.body.classList.contains('derby-on')
+    || document.querySelector('.modal-back, .aads-modal, .ad-offer, .jc-scene, .tuto, [class*="tuto-"], .slot.busy, .featurebox, .fi-over, .slot-overlay, .ga-back, .dp-modal')
+    || (g && (g.busy || g.free || g.auto > 0 || g.playing || g.match)));
+};
+let open = false;
+function check() {
+  if (open || hasApp() || !(ios() || android()) || window.__SB_ITCH) return;
+  if (/[?&](nopub|nostats)\b/.test(location.search)) return;
+  if (rounds < NAG.rounds && Date.now() - t0 < NAG.min * 60e3) return;
+  const s = nag();
+  if (Date.now() - (s.last || 0) < ((s.no || 0) >= 3 ? NAG.late : NAG.gap)) return;
+  if (busy()) return;
+  show(s);
+}
+setTimeout(() => setInterval(check, 15e3), NAG.first);
+addEventListener('sb:roundend', () => setTimeout(check, 2500));
+
+async function show(s) {
+  open = true;
+  put('spinbet_pwa_nag', JSON.stringify({ last: Date.now(), no: s.no || 0 }));
+  M.count('_nag');
+  const i = ios();
+  const v = await modal(`<div class="pw">
+      <div class="pw-ph" aria-hidden="true"><div class="pw-scr">${Array.from({ length: 11 }, (_, k) => `<i style="--k:${k}"></i>`).join('')}<b><img src="assets/icon-192.png" alt=""><small>SpinBet</small></b></div><span class="pw-hand">👆</span></div>
+      <small class="pw-k">${i ? 'IPHONE' : 'ANDROID'} · 10 SECONDES</small>
+      <h2>Mets SpinBet sur ton écran d’accueil</h2>
+      <ul class="pw-list"><li>🚀 Tu ouvres le casino d’un seul toucher</li><li>📱 En plein écran, comme une vraie appli</li><li>🔔 On te prévient du cadeau du jour et des tournois</li></ul>
+      <button class="btn primary lg pw-go" data-value="go">${i ? '📲 Voir comment faire' : '📲 Installer l’appli'}</button>
+      <button class="btn ghost pw-no" data-value="no">Plus tard</button>
+    </div>`, { cls: 'pw-modal' });
+  open = false;
+  if (v === 'go') { M.count('_nago'); A.getApp(); return; }
+  put('spinbet_pwa_nag', JSON.stringify({ last: Date.now(), no: (s.no || 0) + 1 }));
+}
+
+return { hasApp, check };
 })();
 
 // ---- tuto.js ----
@@ -26124,12 +26223,13 @@ async function load(days) {
 }
 const CATS = { slot: ['Machines à sous', (g) => isSlot(g)], table: ['Roues & tables', (g) => g.cat === 'table'], quick: ['Jeux rapides', (g) => g.cat === 'quick'], all: ['Tous les jeux', () => true] };
 function compute(rows) {
-  const G = {}, T = { visit: 0, fresh: 0, acc: 0, opens: 0, spins: 0, sec: 0, bet: 0, won: 0, bonus: 0 }, src = {}, perDay = [];
+  const G = {}, T = { visit: 0, fresh: 0, acc: 0, app: 0, mob: 0, pc: 0, nag: 0, nago: 0, opens: 0, spins: 0, sec: 0, bet: 0, won: 0, bonus: 0 }, src = {}, perDay = [];
   const g = (id) => G[id] || (G[id] = { id, opens: 0, spins: 0, sec: 0, bet: 0, won: 0, bonus: 0 });
   for (const r of rows) {
     const o = r.a.opens || {}, s = r.a.spins || {};
     let dv = o._visit || 0, ds = 0;
     T.visit += dv; T.fresh += o._new || 0; T.acc += o._compte || 0;
+    T.app += o._app || 0; T.mob += o._mob || 0; T.pc += o._pc || 0; T.nag += o._nag || 0; T.nago += o._nago || 0;
     for (const [k, v] of Object.entries(o)) { if (k.startsWith('_src_')) src[k.slice(5)] = (src[k.slice(5)] || 0) + v; else if (!k.startsWith('_')) g(k).opens += v; }
     for (const [k, v] of Object.entries(s)) if (!k.startsWith('_')) { g(k).spins += v; ds += v; }
     for (const [k, v] of Object.entries(r.m.opens || {})) g(k).sec += v;
@@ -26182,6 +26282,8 @@ async function render(root) {
     <div class="tb-kpis">
       <div><small>Visites</small><b>${n(T.visit)}</b><i>${n(T.fresh)} nouveaux visiteurs</i></div>
       <div><small>Comptes créés</small><b>${n(T.acc)}</b><i>${T.visit ? Math.round((100 * T.acc) / T.visit) : 0} % des visites</i></div>
+      <div><small>Ouvert depuis l’icône / l’appli</small><b>${n(T.app)}</b><i>${T.app + T.mob ? Math.round((100 * T.app) / (T.app + T.mob)) : 0} % des visites sur téléphone · ${n(T.mob)} dans le navigateur · ${n(T.pc)} sur ordinateur (compté depuis le 16 novembre)</i></div>
+      <div><small>Rappel « écran d’accueil »</small><b>${n(T.nag)}</b><i>montré · ${n(T.nago)} ont ouvert le tuto</i></div>
       <div><small>Tours joués</small><b>${n(T.spins)}</b><i>${n(T.opens)} jeux ouverts</i></div>
       <div><small>Temps de jeu</small><b>${dur(T.sec)}</b><i>${T.opens ? dur(T.sec / T.opens) : '—'} par jeu ouvert</i></div>
       <div><small>KE misés</small><b>${fmt(T.bet)}</b><i>${fmt(T.won)} gagnés par les joueurs</i></div>
