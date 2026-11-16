@@ -149,7 +149,7 @@ const ENGINE = { COLS, ROWS, N, NS, WILD, SCAT, CAPX, LINES, BONUS_AT, FS, START
 
 const E = ENGINE;
 const PP = E.P;
-const IMG_V = 1;
+const IMG_V = 2;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: the images are inlined
 const src = (n) => asset(`assets/games/viking/${n}.webp`);
 const img = (n, cls = 'vk-img') => `<img class="${cls}" src="${src(n)}" alt="" draggable="false" decoding="async">`;
@@ -219,29 +219,27 @@ class VikingGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.viking, cls: 'vk-slot',
-      stage: `<div class="vk-stage">
-        <div class="vk-side">
-          <div class="vk-meter scat" data-m="s"><div class="vk-por">${img('scat-c', 'vk-pimg')}<i class="vk-aura"></i></div>
-            <div class="vk-mtxt"><b class="vk-mname">LE JARL</b><div class="vk-bar"><i></i><b>0/${E.METER.scat}</b></div><small>BONUS</small></div></div>
-          <div class="vk-meter wild" data-m="w"><div class="vk-por">${img('wild-c', 'vk-pimg')}<i class="vk-aura"></i></div>
-            <div class="vk-mtxt"><b class="vk-mname">LA VALKYRIE</b><div class="vk-bar"><i></i><b>0/${E.METER.wild}</b></div><small>VALKYRIE GÉANTE</small></div></div>
-        </div>
-        <div class="vk-machine">
-          ${CREST}
-          <div class="vk-frame"><i class="vk-knot tl"></i><i class="vk-knot tr"></i><i class="vk-knot bl"></i><i class="vk-knot br"></i>
-            <div class="vk-rwrap"><div class="vk-sticky"></div></div>
-          </div>
-        </div>
-        <div class="vk-col">${PILLAR}</div>
-        <div class="vk-word"></div>
-      </div>`,
+      // the owner's animated background of 16 November 2026 (tools/art/viking/clean.py): the stone frame in blue flames, the
+      // Jarl's medallion and bar top left, the valkyrie's medallion and bar on the right (valk.webp, above the reels: it
+      // overlaps the frame). The game fills both painted bars (Jarls and WILDs that land). Places in px of the video (448 × 672).
+      stage: `<div class="vk-stage vkx"><div class="vkx-scene"><div class="vkx-art">
+          <video class="vkx-vid" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+          <div class="vk-rwrap"><div class="vk-sticky"></div></div>
+          <img class="vkx-valk" src="${src('valk')}" alt="" draggable="false">
+          <div class="vk-meter scat" data-m="s"><div class="vk-por"><i class="vk-aura"></i></div><div class="vk-bar"><i></i><b>0/${E.METER.scat}</b></div><small class="vkx-lab">LE JARL · BONUS</small></div>
+          <div class="vk-meter wild" data-m="w"><div class="vk-por"><i class="vk-aura"></i></div><div class="vk-bar"><i></i><b>0/${E.METER.wild}</b></div><small class="vkx-lab">VALKYRIE GÉANTE</small></div>
+          <div class="vk-word"></div>
+        </div></div></div>`,
       buys: [
         { id: 'bonus', icon: '⚔️', label: 'BONUS VALHALLA · 15 tours', desc: '5 WILD collés dès le départ, chaque nouveau WILD reste jusqu’à la fin', cost: (b) => b * E.BUY.bonus },
         { id: 'giant', icon: '👑', label: `LA VALKYRIE GÉANTE · ${E.GIANT.spins} tours`, desc: 'Un WILD géant qui change de place à chaque tour et grandit quand il fait gagner : 2×2, 3×3, 4×4, puis toute la grille', cost: (b) => b * E.BUY.giant },
       ],
       hello: `${E.BONUS_AT} Jarls = BONUS · les jauges de gauche lancent le bonus toutes seules`,
     });
-    this.q('.slot-bg').innerHTML = SKY + SNOW;
+    this.q('.slot-bg').innerHTML = SNOW;
+    const { VideoBg } = __mods['core/videobg.js'];
+    this.vbg = new VideoBg(this.q('.vkx-vid'), { loop: 169 / 24, root: this.root });
+    this.vbg.set(asset('assets/games/viking/fond.mp4'), src('fond'));
     // the stone control bar, laid out like the owner's picture: lines, stake, max stake, spin, auto, win, balance
     const ctl = this.q('.controls');
     ctl.classList.add('vk-ctl');
@@ -260,6 +258,8 @@ class VikingGame extends BaseGame {
     ['wild-c', 'scat-c', 's8', 's9', 's10'].forEach((n) => { new Image().src = src(n); });
   }
 
+
+  destroy() { this.vbg?.destroy(); super.destroy(); }
 
   /* ---------- the meters (kept per stake) ---------- */
   loadMeters() { try { this.mAll = JSON.parse(localStorage.getItem(KEY)) || {}; } catch { this.mAll = {}; } }

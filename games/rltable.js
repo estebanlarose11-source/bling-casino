@@ -624,11 +624,10 @@ class RlTableGame extends BaseGame {
 /* ===================== La Roulette filmée (demande du propriétaire du 16 novembre 2026) =====================
    Sa vidéo (tools/art/roulette/lancer.mp4, 672 × 448, nettoyée par tools/art/roulette/clean.py) : on mise sur son tapis
    (1re image, tapis.webp : les cases sont des zones cliquables posées dessus, en coordonnées de la vidéo), la vidéo se
-   lance au LANCER (la caméra descend vers la roue, la croupière lance la bille), et sa dernière image est remplacée par
-   fin-<numéro>.webp : la même image où les numéros peints sur la roue sont ceux de la vraie roue, la bille dans la case
-   du numéro tiré au hasard (draw()). Les numéros de la vidéo pendant que la bille roule ne comptent pas. */
-const XW = 672, XH = 448, XEND = 230; // last frame of the video shown before its ending (the ball at rest)
-const xsrc = (n) => window.__assets?.[`assets/games/roulette/${n}`] || `assets/games/roulette/${n}?v=1`;
+   lance au LANCER (la caméra descend vers la roue, la croupière lance la bille, gros plan sur la bille qui roule : on ne
+   voit pas où elle tombe), puis le numéro tiré au hasard (draw()) est annoncé par-dessus avec sa couleur (.rlx-ann). */
+const XW = 672, XH = 448, XEND = 238; // end of the video (the ball still rolling: the drawn number is announced over it)
+const xsrc = (n) => window.__assets?.[`assets/games/roulette/${n}`] || `assets/games/roulette/${n}?v=2`;
 // the felt of the video: the 12 × 3 numbers grid (bilinear from its 4 corners), u = column (0 = 1-2-3), v = row (0 = top: 3, 6…)
 const XG = { tl: [91.7, 264.3], tr: [550, 265], bl: [61.7, 343.3], br: [570, 346] };
 const XP = (u, v) => {
@@ -660,7 +659,7 @@ function videoScene() {
     <div class="rlx-vp">
       <video class="rlx-v" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
       <img class="rlx-img rlx-tapis" src="${xsrc('tapis.webp')}" alt="" draggable="false">
-      <img class="rlx-img rlx-fin" alt="" draggable="false" hidden>
+      <div class="rlx-ann" hidden><small>RIEN NE VA PLUS</small><b></b><em></em></div>
       <svg class="rlx-felt" viewBox="0 0 ${XW} ${XH}" width="${XW}" height="${XH}">
         <defs><radialGradient id="bjvChipShade" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs>
         <polygon class="rlx-pad" points="405,377 520,377 525,412 407,412"/>
@@ -773,12 +772,10 @@ class RlVideoGame extends RlTableGame {
     if (ret > 0) wins.forEach((g) => { const k = g.dataset.c, b = g.getBoundingClientRect(); fx.floatText(b.left + b.width / 2, b.top, `+${fmtC(this.payOf(k, placed[k], res, extra))}`, '#fde047', 18); fx.burst(b.left + b.width / 2, b.top + b.height / 2, 14, ['#fde047', '#fff', '#4ade80'], 6); });
     return ret;
   }
-  // the video from its first image (the felt) to the ball at rest, then the ending of the drawn number
+  // the video from its first image (the felt) to the close-up on the ball, then the drawn number announced over it
   async film(r) {
-    const v = this.vid, fin = this.q('.rlx-fin'), tap = this.q('.rlx-tapis');
-    fin.hidden = true; fin.classList.remove('on');
-    const img = new Image(); img.src = xsrc(`fin-${r}.webp`);
-    const imgOK = img.decode().catch(() => {});
+    const v = this.vid, ann = this.q('.rlx-ann');
+    ann.hidden = true; ann.classList.remove('on');
     if (this.vok) await Promise.race([this.vready, this.wait0(3000)]);
     const play = this.vok && v.src && !this.dead;
     if (play) {
@@ -792,26 +789,31 @@ class RlVideoGame extends RlTableGame {
         const tick = () => {
           if (this.dead) { clearTimeout(g); return res(); }
           const f = v.currentTime * 24;
-          if (f > 166 && f < XEND - 6 && performance.now() - lastTick > 90 + (f - 166) * 4) { lastTick = performance.now(); ballTick(0.05 + (XEND - f) / 600); }
+          if (f > 150 && performance.now() - lastTick > 70 + (f - 150) * 2.5) { lastTick = performance.now(); ballTick(0.05 + Math.max(0, XEND - f) / 700); }
           if (f >= XEND || v.ended) { clearTimeout(g); return res(); }
           requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
       });
     } else await this.wait0(1200);
-    await imgOK;
     if (this.dead) return;
-    fin.src = img.src; fin.hidden = false; void fin.offsetWidth; fin.classList.add('on');
-    sfx.reelStop?.(0);
-    await this.wait0(350);
     v.pause();
+    // the number, its colour
+    const c = colr(r);
+    ann.className = `rlx-ann ${c}`; ann.hidden = false;
+    ann.querySelector('b').textContent = r;
+    ann.querySelector('em').textContent = r === 0 ? 'ZÉRO · VERT' : `${colName(r).toUpperCase()} · ${r % 2 ? 'IMPAIR' : 'PAIR'}`;
+    void ann.offsetWidth; ann.classList.add('on');
+    sfx.reelStop?.(0); sfx.win?.();
+    const box = ann.getBoundingClientRect(); fx.burst(box.left + box.width / 2, box.top + box.height / 2, 24, c === 'r' ? ['#ef4444', '#fff', '#fde047'] : c === 'g' ? ['#22c55e', '#fff', '#fde047'] : ['#94a3b8', '#fff', '#fde047'], 7);
+    await this.wait0(450);
   }
   async back() {
-    const fin = this.q('.rlx-fin');
+    const ann = this.q('.rlx-ann');
     this.view.classList.remove('rlx-film');
-    fin.classList.remove('on');
+    ann.classList.remove('on');
     await this.setCam('bet');
-    fin.hidden = true;
+    ann.hidden = true;
   }
   onMain() {
     if (this.busy || this.phase !== 'bet') return;

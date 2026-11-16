@@ -1,11 +1,9 @@
-# La Roulette: the owner's video of 16 November 2026 (lancer.mp4, 672 × 448, 10 s): the betting felt with the croupière,
-# the camera goes down to the wheel, she spins it, launches the ball, close-up on the ball landing in a pocket.
+# La Roulette: the owner's 2nd video of 16 November 2026 (lancer.mp4, 672 × 448, 10 s): the betting felt with the croupière,
+# the camera goes down to the wheel, she launches the ball, close-up on the ball still rolling (one does not see where it
+# lands: the game draws the number at random and announces it at the end).
 # -> assets/games/roulette/lancer.mp4 (×1,5, silent: the game plays it at each spin)
 #    tapis.webp  : its first frame, the felt where the chips go (the 2 « 2 to 1 » painted by mistake in the bottom row and
 #                  the scrambled line under ROULETTE erased)
-#    fin-<n>.webp: its last frame for each of the 37 numbers: the numbers painted on the wheel (invented ones: 38, 24…)
-#                  are erased and replaced by the real wheel order, the ball sitting in pocket <n>, tiles and pockets
-#                  recoloured red / black / green. The game shows fin-<result> at the end of the video.
 # python3 tools/art/roulette/clean.py   (pip install opencv-python-headless numpy pillow; needs ffmpeg)
 import os, subprocess, sys
 import numpy as np, cv2
@@ -127,23 +125,7 @@ def main():
                           '-vf', f'scale={w}:{h}:flags=lanczos,unsharp=5:5:0.4:5:5:0', '-c:v', 'libx264', '-preset', 'veryslow', '-crf', '26',
                           '-pix_fmt', 'yuv420p', '-g', '12', '-profile:v', 'high', '-movflags', '+faststart', '-an', os.path.join(OUT, 'lancer.mp4')], stdin=subprocess.PIPE)
     p.communicate(fr2.tobytes())
-    # 3. the 37 endings: last frame ×2, numbers erased once, then each number drawn
-    last = cv2.resize(fr[-1], (W * 2, H * 2), interpolation=cv2.INTER_LANCZOS4)
-    f = last.astype(int)
-    text = f[..., 1] > 72  # in the tiles: neither red (green channel low) nor black = the painted digits and their edges
-    band = np.zeros(last.shape[:2], bool)
-    for t in range(len(DIV) - 1):
-        (o0, n0), (o1, n1) = DIV[t], DIV[t + 1]
-        band |= poly_mask(last.shape, [o0, o1, n1, n0], 2)
-    ball = np.zeros(last.shape[:2], np.uint8); cv2.circle(ball, (340 * 2, 220 * 2), 40 * 2, 1, -1)
-    m = cv2.dilate((text & band & ~ball.astype(bool)).astype(np.uint8), np.ones((3, 3), np.uint8), iterations=2).astype(bool) & band
-    base = inpaint(last, m, 9)
-    base = inpaint(base, m, 5)  # twice: no trace of the old digits
-    only = [int(x) for x in sys.argv[1:]] or list(range(37))
-    for n in only:
-        img = ending(base, n)
-        Image.fromarray(img).resize((w, h), Image.LANCZOS).save(os.path.join(OUT, f'fin-{n}.webp'), quality=82, method=6)
-    print('ok', len(only), 'endings')
+    print('ok')
 
 
 main()

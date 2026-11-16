@@ -387,15 +387,21 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   scène (`.bjx-wide`), téléphone : une rangée de 4 boutons et le solde en haut. Le 21 Électrique : mises annexes `vx` / `vy` / `vr` de
   `SIDES` (Paires à gauche, 21+3 à droite du cercle, Bust It à droite de la croupière), panneau des multiplicateurs au mur. Gains inchangés.
 - **La Roulette : la table filmée** (`games/roulette.js` → `RlVideoGame` de `games/rltable.js`, demande du propriétaire du 16 novembre
-  2026 ; L'Éclair, La Double Bille et L'Éclair Online gardent la table 3D) : **sa vidéo** `tools/art/roulette/lancer.mp4` (672 × 448, 10 s :
-  le tapis, la caméra descend sur la roue, la croupière lance la bille, gros plan sur la bille arrêtée) → `tools/art/roulette/clean.py` :
-  `lancer.mp4` (×1,5), `tapis.webp` (1re image : on mise dessus ; 2 « 2 to 1 » peints par erreur dans la rangée du bas et la ligne illisible
-  sous ROULETTE effacés) et **37 fins `fin-<n>.webp`** : la dernière image où les numéros peints sur la roue (inventés) sont effacés et
-  redessinés dans l'ordre de la vraie roue, la bille dans la case de `<n>` (cases recolorées rouge / noir / vert, liseré doré ; `DIV` =
-  séparations des cases, `BALL` = case de la bille). **Le numéro est tiré au hasard** (`draw()`, comme avant) ; la vidéo joue jusqu'à
-  l'image `XEND` puis `fin-<numéro>` apparaît en fondu. Cases cliquables posées sur le tapis (`XCELLS`, grille bilinéaire `XG`, chevaux /
+  2026 ; L'Éclair, La Double Bille et L'Éclair Online gardent la table 3D) : **sa 2e vidéo** `tools/art/roulette/lancer.mp4` (672 × 448, 10 s :
+  le tapis, la caméra descend sur la roue, la croupière lance la bille, gros plan sur la bille **qui roule encore** : on ne voit pas où
+  elle tombe, voulu par le propriétaire) → `tools/art/roulette/clean.py` : `lancer.mp4` (×1,5) + `tapis.webp` (1re image : on mise dessus ;
+  2 « 2 to 1 » en trop et la ligne illisible sous ROULETTE effacés). **Le numéro est tiré au hasard** (`draw()`) et annoncé en grand avec sa
+  couleur à la fin de la vidéo (`.rlx-ann`, image `XEND`). Cases cliquables posées sur le tapis (`XCELLS`, grille bilinéaire `XG`, chevaux /
   carrés `XANCH` des `HOTS`), case vide `.rlx-pad` sur les 2 cases en trop. Derniers numéros `.rlx-led` (toucher = statistiques). Pas de
   cylindre (Tiers, Orphelins…) sur ce tapis. Gains inchangés (plein 35).
+- **Le Valhalla, décor animé** (`games/viking.js`, demande du propriétaire du 16 novembre 2026) : **sa vidéo** `tools/art/viking/fond-haut.mp4`
+  (448 × 672 seulement : cadre de pierre dans les flammes bleues, médaillon du Jarl et sa barre en haut à gauche, médaillon de la valkyrie
+  et sa barre à droite) → `tools/art/viking/clean.py` : grille peinte remplacée par une pierre propre fixe, remplissage bleu des 2 barres
+  effacé → `assets/games/viking/fond.mp4` (boucle 169/24 s) + `fond.webp` + `valk.webp` (médaillon et barre de la valkyrie découpés, posés
+  **au-dessus** des rouleaux car ils chevauchent le cadre ; à moitié transparents pendant un tour et quand il y a un gain). Scène `.vkx`
+  (`.vkx-scene` 2 : 3, positions en % de la vidéo) : rouleaux dans le cadre, les jauges existantes (`.vk-meter` / `.vk-por` / `.vk-bar`)
+  posées sur ses médaillons et ses barres (Jarl = Jarls tombés, valkyrie = WILD tombés, mêmes règles) ; barre de mise en pierre dessous.
+  Plus de crête, pilier ni ciel dessinés (`CREST`, `PILLAR`, `SKY` ne sont plus utilisés). Gains inchangés.
 - **La Bataille** (`games/bataille.js`, id `bataille`, demande du propriétaire) : la table du 21 (`BjTableGame`, `DEPS`)
   avec les règles de la bataille : une carte chacun, la plus haute gagne (As le plus fort) 1 pour 1, égalité = la banque
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série

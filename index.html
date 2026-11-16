@@ -5796,6 +5796,43 @@ html.light .slot small { color: inherit; }
   .vk-ctl .ctl-group b, .vk-c b { padding: 4px 6px; font-size: 13px; }
   .g-viking .win-bar { padding-top: 0; padding-bottom: 0; min-height: 0; font-size: 12px; }
 }
+/* ---------- Le Valhalla, décor animé du propriétaire (16 novembre 2026, .vkx) : sa vidéo fond.mp4 (448 × 672), rouleaux dans
+   son cadre de pierre, ses deux barres bleues remplies par les jauges (Jarl en haut à gauche, valkyrie à droite) ; la barre de
+   mise en pierre reste dessous. Positions en % de la vidéo. ---------- */
+.slot.g-viking > .slot-bg { background: url(assets/games/viking/fond.webp?v=2) center / cover no-repeat #04070d !important; filter: blur(18px) brightness(.45); transform: scale(1.1); }
+.vk-stage.vkx { display: block; padding: 0 0 4px; }
+.vkx-scene { position: relative; margin: 0 auto; width: min(100%, calc((100svh - 230px) * 2 / 3)); min-width: min(100%, 260px); aspect-ratio: 448 / 672; }
+.game-host.is-full .vkx-scene { width: min(100%, calc((100dvh - 150px) * 2 / 3)); }
+.vkx-art { position: absolute; inset: 0; container-type: size; overflow: hidden; border-radius: 8px; background: url(assets/games/viking/fond.webp?v=2) center / 100% 100% no-repeat #04070d; box-shadow: 0 14px 40px rgba(0, 0, 0, .6); }
+.vkx-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+.vkx .vk-rwrap { position: absolute; left: 18.75%; top: 29.46%; width: 63.39%; height: 52.08%; margin: 0; padding: .6cqw; max-width: none; border-radius: 3px; background: rgba(4, 8, 14, .25); box-shadow: none; z-index: 2; }
+.vkx .rs.vk-rs, .game-host.is-full .vkx .rs.vk-rs { width: 100% !important; height: 100%; min-width: 0; aspect-ratio: auto; gap: .6cqw; }
+.vkx .vk-sticky { inset: .6cqw; column-gap: .6cqw; }
+.vkx .rs-reel { background: linear-gradient(180deg, rgba(12, 18, 26, .55), rgba(20, 30, 42, .35) 50%, rgba(12, 18, 26, .55)); }
+.vkx-valk { position: absolute; left: 62.5%; top: 42.41%; width: 37.5%; height: 24.26%; z-index: 3; pointer-events: none; transition: opacity .3s; }
+.vkx-art:has(.rs.has-win) .vkx-valk, .g-viking.busy .vkx-valk { opacity: .45; }
+.vkx .vk-meter { position: absolute; display: block; padding: 0; margin: 0; background: none; box-shadow: none; border-radius: 0; z-index: 4; pointer-events: none; }
+.vkx .vk-meter.scat { left: 0; top: 0; width: 100%; height: 100%; }
+.vkx .vk-meter.wild { left: 0; top: 0; width: 100%; height: 100%; }
+.vkx .vk-por { position: absolute; width: 26%; aspect-ratio: 1; border-radius: 50%; overflow: visible; background: none; box-shadow: none; }
+.vkx .vk-meter.scat .vk-por { left: 2.9%; top: 6.4%; }
+.vkx .vk-meter.wild .vk-por { left: 74.1%; top: 43.2%; }
+.vkx .vk-bar { position: absolute; height: 2%; width: auto; border-radius: 2px; overflow: hidden; background: none; box-shadow: none; }
+.vkx .vk-meter.scat .vk-bar { left: 5.58%; top: 23.66%; width: 28.13%; }
+.vkx .vk-meter.wild .vk-bar { left: 68.97%; top: 62.05%; width: 26.12%; height: 2.38%; }
+.vkx .vk-bar i { background: linear-gradient(180deg, #bfe9ff, #38bdf8 45%, #0369a1); box-shadow: 0 0 1.4cqw #38bdf8, inset 0 0 .4cqw #e0f2fe; }
+.vkx .vk-meter.wild .vk-bar i { background: linear-gradient(180deg, #bfe9ff, #38bdf8 45%, #0369a1); }
+.vkx .vk-bar b { font: 800 2.4cqw/1 Archivo, KeCoin, sans-serif; line-height: 2.05cqh; color: #fff; }
+.vkx .vk-meter.wild .vk-bar b { line-height: 2.4cqh; }
+.vkx-lab { position: absolute; font: 900 2.1cqw/1 'Bebas Neue', Archivo, sans-serif; letter-spacing: .1em; color: #bfe9ff; text-shadow: 0 1px 2px #000, 0 0 6px #0284c7; white-space: nowrap; }
+.vkx .vk-meter.scat .vkx-lab { left: 6%; top: 26.2%; }
+.vkx .vk-meter.wild .vkx-lab { right: 3%; top: 65.2%; }
+.vkx .vk-meter.full .vk-bar i { animation: vkxFull .5s ease-in-out infinite alternate; }
+@keyframes vkxFull { to { filter: brightness(1.6); box-shadow: 0 0 3cqw #7dd3fc; } }
+.vkx .vk-word { font-size: 13cqw; }
+.vkx .vk-por.hit { animation: vkRoar .7s cubic-bezier(.3, 1.6, .5, 1); }
+.vkx .vk-aura { inset: -4%; }
+@media (orientation: landscape) and (max-height: 520px) { .vkx-scene { width: min(100%, calc((100dvh - 90px) * 2 / 3)); } }
 .vk-pay { width: 54px; height: 54px; display: grid; place-items: center; } .vk-pay img { width: 100%; height: 100%; object-fit: contain; }
 .vk-iimg { width: min(40vw, 180px); height: auto; border-radius: 10px; filter: drop-shadow(0 0 24px rgba(250, 204, 21, .7)); }
 
@@ -7449,8 +7486,8 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
 .rl-sb { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; font: 900 14px Archivo, sans-serif; color: #fff; background: #1f2937; border: 2px solid rgba(255, 255, 255, .3); }
 .rl-sb.r { background: #c21d30; } .rl-sb.g { background: #14883f; }
 /* ---------- La Roulette filmée (.rlx, games/rltable.js RlVideoGame, demande du propriétaire du 16 novembre 2026) : sa vidéo
-   (assets/games/roulette/lancer.mp4), son tapis (tapis.webp, 1re image) avec nos cases cliquables par-dessus, et la fin
-   du numéro tiré (fin-<n>.webp). Tout est en unités de la vidéo (672 × 448) dans .rlx-vp, cadré par applyCam(). ---------- */
+   (assets/games/roulette/lancer.mp4), son tapis (tapis.webp, 1re image) avec nos cases cliquables par-dessus ; à la fin
+   de la vidéo, le numéro tiré au hasard est annoncé par-dessus (.rlx-ann). Tout est en unités de la vidéo (672 × 448) dans .rlx-vp, cadré par applyCam(). ---------- */
 .rl.rlx { background: #0d0705; }
 .rlx-bg { position: absolute; inset: -40px; background: center / cover no-repeat; filter: blur(24px) brightness(.4) saturate(1.1); pointer-events: none; }
 .rlx-vp { position: absolute; left: 0; top: 0; width: 672px; height: 448px; transform-origin: 0 0; border-radius: 4px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 0, 0, .6); }
@@ -7458,9 +7495,13 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
 .rlx-v { z-index: 0; background: #0d0705; }
 .rlx-tapis { z-index: 1; transition: opacity .3s; }
 .rlx-film .rlx-tapis { opacity: 0; transition-delay: .12s; }
-.rlx-fin { z-index: 2; opacity: 0; transition: opacity .4s; }
-.rlx-fin.on { opacity: 1; }
-.rlx-fin[hidden] { display: none; }
+.rlx-ann { position: absolute; left: 50%; top: 50%; z-index: 6; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 34px 16px; border-radius: 18px; transform: translate(-50%, -50%) scale(.4); opacity: 0; transition: transform .45s cubic-bezier(.3, 1.6, .5, 1), opacity .3s; background: radial-gradient(circle at 50% 30%, rgba(40, 24, 10, .92), rgba(10, 6, 2, .95)); border: 2px solid #e7c766; box-shadow: 0 0 40px rgba(231, 199, 102, .5), 0 14px 40px rgba(0, 0, 0, .7); pointer-events: none; }
+.rlx-ann.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.rlx-ann[hidden] { display: none; }
+.rlx-ann small { font: 900 13px Cinzel, Georgia, serif; letter-spacing: 2px; color: #e7c766; }
+.rlx-ann b { display: grid; place-items: center; width: 110px; height: 110px; border-radius: 50%; font: 900 60px/1 Archivo, sans-serif; color: #fff; background: radial-gradient(circle at 40% 30%, #3a3f48, #0b0d12); border: 4px solid #f3e3b0; box-shadow: inset 0 -8px 14px rgba(0, 0, 0, .5); }
+.rlx-ann.r b { background: radial-gradient(circle at 40% 30%, #e0384b, #7a0d18); } .rlx-ann.g b { background: radial-gradient(circle at 40% 30%, #2bbf63, #0b5a2a); }
+.rlx-ann em { font: 900 18px/1.1 'Bebas Neue', Archivo, sans-serif; font-style: normal; letter-spacing: 2px; color: #fff; }
 .rlx-felt { position: absolute; left: 0; top: 0; z-index: 3; overflow: visible; transition: opacity .3s; }
 .rlx-film .rlx-felt, .rlx-film .rlx-led { opacity: 0; pointer-events: none; }
 .rlx-cell { fill: transparent; stroke: none; }
@@ -13701,6 +13742,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'viking', date: '2026-11-16', title: 'Nouveau décor animé', items: ['Le cadre de pierre dans les flammes bleues, entouré des guerriers vikings', 'La barre bleue du Jarl se remplit à chaque Jarl qui tombe, celle de la valkyrie à chaque WILD', 'Barre pleine : le bonus démarre tout seul'] },
+  { game: 'roulette', date: '2026-11-16', title: 'Nouvelle vidéo du lancer', items: ['La croupière lance la bille et la caméra la suit au plus près', 'À la fin, le numéro gagnant et sa couleur sont annoncés en grand, tirés au hasard à chaque lancer'] },
   { game: 'roulette', date: '2026-11-16', title: 'Une vraie table filmée', items: ['Mise directement sur le tapis de la table, avec tes jetons', 'Au lancer, la caméra descend vers la roue et la croupière lance la bille', 'La bille s’arrête sur un numéro tiré au hasard à chaque fois, et la roue montre le bon numéro', 'Les cases gagnantes s’allument sur le tapis'] },
   { game: 'blackjack', date: '2026-11-16', title: 'Une vraie croupière', items: ['Une croupière filmée distribue chaque carte : la tienne, la sienne, et une de plus à chaque fois que tu tires', 'Tes jetons de mise sur le tapis, juste sous les cartes', 'Grand écran sur téléphone et ordinateur : toute la table, bien lisible'] },
   { game: 'lightningbj', date: '2026-11-16', title: 'Une vraie croupière', items: ['Une croupière filmée distribue chaque carte, et une de plus à chaque fois que tu tires', 'Mises annexes à côté du cercle de mise : Paires à gauche, 21+3 à droite, Bust It près de la croupière', 'Les multiplicateurs éclair au mur, à gauche de la croupière', 'Grand écran sur téléphone et ordinateur'] },
@@ -17018,7 +17061,7 @@ const FILES = {
   bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '5cb920e7c2'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '0bef82d927'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'da5341a3eb'],
-  rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', '622177f498'],
+  rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', '9ea2baa53f'],
   roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', '90d6df1d84'],
   bataille: ['bataille', 'games/impl/bataille.js', 'BatailleGame', '39b70b1d30'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', 'e4526e8bb5'],
@@ -17051,7 +17094,7 @@ const FILES = {
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '234dd4780f'],
   totemx: ['totemx', 'games/impl/totemx.js', 'TotemXGame', '9ed53a6ac8'],
   noel: ['noel', 'games/impl/noel.js', 'NoelGame', '30948faeb5'],
-  viking: ['viking', 'games/impl/viking.js', 'VikingGame', '061a87ba47'],
+  viking: ['viking', 'games/impl/viking.js', 'VikingGame', '0fac86d028'],
   barillet: ['barillet', 'games/impl/barillet.js', 'BarilletGame', '8113d9a1e6'],
   filon: ['filon', 'games/impl/filon.js', 'FilonGame', '45904335f9'],
   redk: ['redk', 'games/impl/redk.js', 'RedkGame', '427f04891a'],
