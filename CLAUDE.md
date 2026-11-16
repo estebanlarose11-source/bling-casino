@@ -227,6 +227,15 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   place (`.feature-banner` déplacé dans `.hf-art`), plateau du bonus dans la fenêtre (`.stage-layer` déplacé dans `.hf-win`), barre
   cliquable (BET − / +, BONUS MENU, SPIN, MAX BET = `maxBet()` ; la vidéo haute n'a pas de BONUS MENU : plaque à nous sur l'herbe).
   Plein écran comme L'Olympe (`layout()`, zone gardée). Gains inchangés.
+- **Le Loup, décor animé** (`big-bad-wolf`, moteur `slot/machine.js`, demande du propriétaire du 16 novembre 2026, comme Le Loup 2.0) :
+  **ses 2 vidéos** `tools/art/wolf/fond-large.mp4` (672 × 448, `.wl-l`) et `fond-haut.mp4` (448 × 672, `.wl-p`) : forêt sous la pleine lune,
+  cadre de branches à 5 × 3 cases peintes, le loup, barre BET / SPIN / BONUS. `tools/art/wolf/clean.py` efface « $2.00 » / « 10.00 »,
+  et sur la vidéo haute le titre peint (nom d'un autre jeu) et « 2,450.00 TOTAL BALANCE » → `assets/games/wolf/fond-*.mp4` + `scene-*.webp`.
+  Dans `slot/machine.js` : `this.scene` (seulement Le Loup), `sceneHTML()` / `sceneInit()` / `layout()` : rouleaux sur ses cases (`.wl-win`),
+  jackpots dans le ciel (large) ou à la place du titre (haut) (`.wl-jps`, mêmes `.jp` que `updateMeters`), SOLDE · GAIN à gauche du cadre
+  (large) ou sur sa plaque de solde (haut) (`.wl-info`), compteur du bonus au-dessus du cadre (`.feature-banner` déplacé), barre cliquable
+  (BONUS = « Bonus & menu » ; pas de MAX BET peint : dans le menu). `VideoBg` est lu au lancement (`core/videobg.js` est plus bas dans la
+  page que `slot/machine.js`). Plein écran comme L'Olympe. Gains inchangés.
 - **L'Hydre, décor animé** (`games/dragons.js`, id `dragons`, demande du propriétaire du 15 novembre 2026, comme L'Olympe) :
   **ses 2 vidéos** `tools/art/dragons/fond-large.mp4` (672 × 448, `.dg-l`) et `fond-haut.mp4` (448 × 672, `.dg-p`) : l'antre des
   dragons, plaques MINI / MAJOR / GRAND JACKPOT (= MINI, MAJEUR, JACKPOT du jeu), cadre en écailles à 3 × 3 cases peintes, grand

@@ -4953,6 +4953,104 @@ html.light .slot small { color: inherit; }
 .hf-bandy.hf-l .hf-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
 .hf-bandy.hf-p .hf-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
 .hf-fullsc .hf-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
+/* ============ Le Loup (big-bad-wolf, slot/machine.js): the owner's 2 animated backgrounds of 16 November 2026, fond-large.mp4
+   (672 × 448: page and wide screens, .wl-l) and fond-haut.mp4 (448 × 672: phone held upright, .wl-p), first frame as poster
+   (scene-large.webp / scene-haut.webp). The dark forest under the moon: the 5 × 3 reels on his painted cells, his bar made
+   clickable, jackpots in the sky (wide) or in place of the painted title (tall), SOLDE · GAIN on the left (wide) or on his
+   balance plate (tall); places in % of each video (tools/art/wolf/clean.py) ============ */
+.slot.theme-wolf .slot-head { display: none !important; }
+.slot.theme-wolf > .slot-bg { background: url(assets/games/wolf/scene-large.webp?v=2) center / cover no-repeat !important; filter: blur(16px) brightness(.55) !important; transform: scale(1.1); }
+.slot.theme-wolf.theme-wolf .slot-frame { padding: 0 !important; background: none !important; box-shadow: none !important; }
+.slot.theme-wolf.theme-wolf .slot-frame > .slot-stage { padding: 0 !important; background: none !important; overflow: visible; }
+.wl-scene { position: relative; margin: 0 auto; overflow: hidden; border-radius: 6px; box-shadow: 0 10px 40px rgba(0, 0, 0, .55); }
+.wl-scene.wl-l { width: min(100%, max(300px, calc((100svh - 220px) * 1.5))); aspect-ratio: 672 / 448; }
+.wl-scene.wl-p { width: min(100%, max(260px, calc((100svh - 140px) * .6667))); aspect-ratio: 448 / 672; }
+.wl-art { position: absolute; inset: 0; container-type: size; background: url(assets/games/wolf/scene-large.webp?v=2) center / 100% 100% no-repeat #0a1020; }
+.wl-p .wl-art { background-image: url(assets/games/wolf/scene-haut.webp?v=2); }
+.wl-vid { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+.wl-safe { position: absolute; visibility: hidden; pointer-events: none; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.wl-win, .wl-hot, .wl-bet, .wl-info, .wl-jps, .wl-art > .feature-banner { position: absolute; }
+/* the reels on his painted cells: the stone of each cell shows behind the symbols */
+.wl-l .wl-win { left: 21.73%; top: 17.41%; width: 57%; height: 47.54%; }
+.wl-p .wl-win { left: 8.93%; top: 21.88%; width: 82.59%; height: 45.39%; }
+.wl-win { z-index: 2; }
+.slot.theme-wolf .wl-win .reels { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; gap: 1.3%; margin: 0; }
+.wl-p .wl-win .reels { gap: 1.8%; }
+.slot.theme-wolf .wl-win .reel { border-radius: 3px; background: rgba(0, 0, 0, .12); box-shadow: none; }
+.slot.theme-wolf .wl-win .reel::before, .slot.theme-wolf .wl-win .reel::after { display: none; }
+.slot.theme-wolf .wl-win .stage-layer { z-index: 4; }
+.slot.theme-wolf .wl-win .hs-board { background: rgba(6, 10, 22, .6); border-radius: 4px; }
+/* jackpots: in the sky (wide), in place of the painted title (tall) */
+.wl-jps { z-index: 3; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2cqw; pointer-events: none; }
+.wl-l .wl-jps { left: 29.17%; top: 1.6%; width: 48.21%; height: 8.2%; }
+.wl-p .wl-jps { left: 16.07%; top: 1.79%; width: 41.52%; height: 8.63%; grid-template-columns: 1fr 1fr; gap: 1cqw 1.6cqw; }
+.wl-jps .jp { min-width: 0; padding: 0; display: flex; align-items: center; justify-content: center; gap: .6cqw; border-radius: 99px; border: 0; background: linear-gradient(180deg, #2b2216, #120d07); box-shadow: inset 0 0 0 .2cqw #c9a25a, 0 .3cqw .8cqw rgba(0, 0, 0, .6); }
+.wl-jps .jp small { font: 800 1cqw Archivo, sans-serif; letter-spacing: .08em; color: #d9b874; }
+.wl-jps .jp b { font: 800 1.45cqw/1 KeCoin, Archivo, sans-serif; color: #fff4d6; white-space: nowrap; }
+.wl-jps .jp-grand b { color: #fde047; } .wl-jps .jp-major b { color: #fdba74; }
+.wl-p .wl-jps .jp { gap: 1cqw; } .wl-p .wl-jps .jp small { font-size: 2cqw; } .wl-p .wl-jps .jp b { font-size: 2.8cqw; }
+.wl-jps .jp.hit { animation: jpHit .9s cubic-bezier(.3, 1.8, .5, 1); }
+/* SOLDE · GAIN: a column in the forest left of the frame (wide), on his balance plate (tall) */
+.wl-info { z-index: 3; display: flex; flex-direction: column; gap: 3%; pointer-events: none; transition: opacity .25s; }
+.wl-info > div { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4cqw; border-radius: 1cqw; background: linear-gradient(180deg, rgba(43, 34, 22, .94), rgba(18, 13, 7, .94)); box-shadow: inset 0 0 0 .2cqw #c9a25a, 0 .4cqw 1cqw rgba(0, 0, 0, .5); }
+.wl-info small { font: 800 1.05cqw Archivo, sans-serif; letter-spacing: .14em; color: #d9b874; }
+.wl-info b { font-weight: 800; font-family: KeCoin, Archivo, sans-serif; line-height: 1; color: #fff; white-space: nowrap; font-size: min(1.8cqw, calc(12cqw / var(--n, 10))); }
+.wl-info .won b { color: #fde047; text-shadow: 0 0 10px rgba(253, 224, 71, .8); }
+.wl-l .wl-info { left: 1.2%; top: 30%; width: 13.1%; height: 22%; }
+.wl-p .wl-info { left: 71.88%; top: 3.27%; width: 25.2%; height: 6.25%; gap: 0; }
+.wl-p .wl-info > div { flex-direction: row; gap: 1.4cqw; background: none; box-shadow: none; border-radius: 0; }
+.wl-p .wl-info small { font-size: 1.9cqw; letter-spacing: .08em; } .wl-p .wl-info b { font-size: min(3.2cqw, calc(22cqw / var(--n, 10))); }
+/* the bonus counter: above the frame */
+.wl-art > .feature-banner { z-index: 4; margin: 0 !important; gap: .8cqw; flex-wrap: nowrap; padding: 0 1cqw; box-sizing: border-box; border-radius: 1.2cqw; background: linear-gradient(180deg, rgba(43, 34, 22, .95), rgba(18, 13, 7, .95)); box-shadow: inset 0 0 0 .2cqw #c9a25a, 0 .4cqw 1cqw rgba(0, 0, 0, .5); }
+.wl-art > .feature-banner.show { max-height: none; }
+.wl-art > .feature-banner b { font-size: 1.5cqw; color: #fde047; white-space: nowrap; }
+.wl-art > .feature-banner .pill { padding: .3cqw .8cqw; gap: .4cqw; font-size: 1.3cqw; white-space: nowrap; }
+.wl-art > .feature-banner .respins .dot { width: 1cqw; height: 1cqw; }
+.wl-l .wl-art > .feature-banner { left: 22.3%; top: 10.7%; width: 55.8%; height: 6.4%; }
+.wl-p .wl-art > .feature-banner { left: 2%; top: 11.6%; width: 85%; height: 5.4%; gap: 1.4cqw; border-radius: 2cqw; }
+.wl-p .wl-art > .feature-banner b { font-size: 3cqw; }
+.wl-p .wl-art > .feature-banner .pill { font-size: 2.6cqw; padding: .5cqw 1.3cqw; }
+.wl-p .wl-art > .feature-banner .respins .dot { width: 2cqw; height: 2cqw; }
+/* his bar, made clickable */
+.wl-hot { z-index: 5; padding: 0; border: 0; border-radius: 22%; background: transparent; cursor: pointer; pointer-events: auto; -webkit-tap-highlight-color: transparent; transition: box-shadow .15s, background .15s; }
+.wl-hot:hover:not([disabled]) { background: rgba(255, 240, 200, .12); box-shadow: 0 0 14px rgba(245, 158, 11, .6); }
+.wl-hot:active:not([disabled]) { background: rgba(255, 240, 200, .26); }
+.wl-hot[disabled] { cursor: default; background: rgba(0, 0, 0, .3); }
+.wl-bm, .wl-bp, .wl-spin { border-radius: 50%; }
+.wl-l .wl-bm { left: 6.55%; top: 82.14%; width: 6.55%; height: 9.82%; }
+.wl-l .wl-bp { left: 28.13%; top: 82.14%; width: 6.55%; height: 9.82%; }
+.wl-l .wl-bet { left: 13.69%; top: 82.14%; width: 14.29%; height: 9.82%; font-size: min(2.7cqw, calc(19cqw / var(--n, 9))); }
+.wl-l .wl-spin { left: 38.84%; top: 66.07%; width: 21.43%; height: 32.14%; }
+.wl-l .wl-menu { left: 71.13%; top: 73.21%; width: 19.35%; height: 20.54%; }
+.wl-p .wl-bm { left: 4.46%; top: 84.23%; width: 6.25%; height: 5.06%; border-radius: 22%; }
+.wl-p .wl-bp { left: 22.54%; top: 84.23%; width: 6.47%; height: 5.06%; border-radius: 22%; }
+.wl-p .wl-bet { left: 11.16%; top: 84.08%; width: 11.16%; height: 5.21%; font-size: min(3.6cqw, calc(17cqw / var(--n, 9))); }
+.wl-p .wl-spin { left: 32.81%; top: 71.4%; width: 35.71%; height: 23.8%; }
+.wl-p .wl-menu { left: 71.88%; top: 75.89%; width: 24.55%; height: 17.56%; }
+.wl-bet { z-index: 4; display: flex; align-items: center; justify-content: center; white-space: nowrap; pointer-events: none; font-weight: 800; font-family: KeCoin, Archivo, sans-serif; line-height: 1; color: #f1e2c0; text-shadow: 0 2px 0 #000, 0 0 8px rgba(0, 0, 0, .6); }
+.slot.theme-wolf.busy .wl-spin { box-shadow: 0 0 0 .3cqw rgba(245, 158, 11, .7), 0 0 2.4cqw rgba(245, 158, 11, .8); animation: hfSpin .55s ease-in-out infinite alternate; }
+.slot.theme-wolf.auto-on .wl-spin { box-shadow: 0 0 0 .3cqw #fde047, 0 0 2cqw #fde047; }
+.wl-spin .auto-count { position: absolute; left: 50%; bottom: 102%; transform: translateX(-50%); font: 900 2.4cqw/1 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 2px 4px #000, 0 0 10px #000; pointer-events: none; }
+.wl-p .wl-spin .auto-count { bottom: auto; top: 4%; font-size: 5cqw; }
+.wl-full { z-index: 8; position: absolute; right: 1.2%; top: auto; bottom: 1.6%; width: clamp(28px, 3.6%, 44px); height: auto; aspect-ratio: 1; border-radius: 8px; background: rgba(20, 14, 6, .65); color: #f1e2c0; font: 700 clamp(14px, 2.2vmin, 22px)/1 sans-serif; box-shadow: inset 0 0 0 1px rgba(201, 162, 90, .6); }
+.wl-l .wl-full { top: 1.6%; bottom: auto; }
+.wl-p .wl-full { width: clamp(28px, 8%, 40px); right: 2%; top: 11.5%; bottom: auto; }
+.slot.theme-wolf.in-hold .wl-art::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(60% 45% at 50% 42%, transparent 50%, rgba(4, 6, 20, .45)); animation: ftMood 2.4s ease-in-out infinite alternate; }
+.game-host:not(.is-full):has(> .slot.theme-wolf) { max-width: max(420px, min(1180px, calc((100svh - 220px) * 1.5 + 40px))) !important; }
+/* full screen: the video that fits the screen covers it; around it (screen of another shape), its own picture, blurred */
+.game-host.is-full:has(> .slot.theme-wolf) { padding: 0; background: #0a1020; overflow: hidden; }
+.game-host.is-full > .slot.theme-wolf.theme-wolf { display: flex !important; flex-direction: column; position: relative; width: 100%; max-width: none !important; height: 100%; min-height: 100%; margin: 0; padding: 0 !important; border: 0; border-radius: 0; }
+.game-host.is-full > .slot.theme-wolf.theme-wolf > .slot-bg { position: absolute; inset: 0; grid-column: auto !important; grid-row: auto !important; }
+.game-host.is-full > .slot.theme-wolf.theme-wolf > .mx-row { position: absolute; z-index: 9; top: max(8px, env(safe-area-inset-top, 0px)); right: max(10px, env(safe-area-inset-right, 0px)); margin: 0; }
+.game-host.is-full > .slot.theme-wolf.theme-wolf > .slot-frame, .game-host.is-full > .slot.theme-wolf.theme-wolf > .slot-frame > .slot-stage { position: absolute !important; inset: 0 !important; width: auto !important; height: auto !important; max-width: none !important; margin: 0 !important; padding: 0 !important; transform: none !important; align-self: stretch !important; justify-self: stretch !important; background: none !important; }
+.game-host.ml-busy > .slot.theme-wolf .slot-frame { animation: none !important; }
+.wl-scene.wl-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: #0a1020; }
+.wl-scene.wl-fullsc::before { content: ''; position: absolute; inset: -40px; background: url(assets/games/wolf/scene-large.webp?v=2) center / cover no-repeat; filter: blur(18px) brightness(.7); }
+.wl-scene.wl-fullsc.wl-p::before { background-image: url(assets/games/wolf/scene-haut.webp?v=2); background-position: center top; }
+.wl-bandx .wl-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
+.wl-bandy.wl-l .wl-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(180deg, transparent, #000 4%, #000 96%, transparent); }
+.wl-bandy.wl-p .wl-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 5%); mask-image: linear-gradient(180deg, transparent, #000 5%); }
+.wl-fullsc .wl-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); bottom: auto; width: 40px; height: 40px; }
 /* ============ Diamants REDK (games/redk.js): the owner's 2 animated backgrounds of 15 November 2026, fond-large.mp4 (672 × 448:
    page and wide screens, .rk-l) and fond-haut.mp4 (448 × 672: phone held upright, .rk-p), first frame as poster
    (scene-large.webp / scene-haut.webp). The diamond mine: the reels on his 5 × 3 painted cells, the jackpots under his
@@ -13505,6 +13603,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'big-bad-wolf', date: '2026-11-16', title: 'La forêt du loup animée', items: ['Nouveau décor animé : la forêt sous la pleine lune, le loup aux yeux qui brillent', 'Les rouleaux dans le cadre de branches', 'Tous les boutons du décor marchent : mise − / +, SPIN et BONUS', 'Jackpots, solde et gain sur le décor', 'Plein écran sur tout l’écran, téléphone et ordinateur'] },
   { game: 'chasse', date: '2026-11-16', title: 'Nouveau décor de chasse', items: ['La machine dans un grand cadre en bois au cœur de la forêt, avec cerf, sanglier, faisans et lièvre', 'Tous les boutons du décor marchent : mise − / +, SPIN, MAX BET et BONUS MENU', 'Solde, gain et gain max sur les plaques du haut', 'Plein écran sur tout l’écran, téléphone et ordinateur', 'La chasse (le bonus) ne change pas'] },
   { game: 'peche', date: '2026-11-16', title: 'Adaptée au téléphone', items: ['Sur téléphone, la roue, les mises et le bouton LANCER tiennent ensemble', 'Nouveau bouton « ⛶ Grand écran » sur la roue : tout le jeu sur un seul écran, sans rien faire défiler', 'Téléphone couché : la roue à gauche, les mises à droite', 'En grand écran, tous les boutons sont visibles : Annuler, Effacer, Rejouer, Doubler, Remise auto et Tours auto sur 2 lignes'] },
   { game: 'peche', date: '2026-11-15', title: 'Roue en verre et pêche sur la glace', items: ['Nouvelle roue en verre qui s’arrête au hasard sur n’importe quelle case', 'La pêche se joue en vidéo sur un lac gelé : petit poisson à la canne, poisson moyen à la grue, gros poisson à l’hélicoptère', 'Plus le poisson est gros, plus le multiplicateur est gros : le gros poisson peut donner le MAX WIN', 'Nouveau : « 🎣 Acheter une pêche » bleue, orange ou rouge'] },
@@ -14882,9 +14981,83 @@ class SlotMachine {
     this.forced = null;
     this.music = new Music(EXTRA_THEMES.wolf);
     this.grid = this.safeGrid();
+    this.scene = game.id === 'big-bad-wolf'; // Le Loup: the owner's animated forest (16 November 2026)
     this.render();
     this.bind();
+    if (this.scene) this.sceneInit();
     this.unfit = autoFit(this.root);
+  }
+
+  /* ---------- Le Loup: the owner's 2 videos (tools/art/wolf/clean.py), fond-large.mp4 (computer, wide screens, .wl-l)
+     and fond-haut.mp4 (phone held upright, .wl-p): the reels on his 5 × 3 painted cells, his bar clickable (BET − / +,
+     SPIN, BONUS = « Bonus & menu »), jackpots in the sky (wide) or in place of the painted title (tall), SOLDE · GAIN on
+     the left (wide) or on his balance plate (tall), the bonus counter above the frame. Places in % in the CSS « Le Loup ». */
+  sceneHTML(reels, jp) {
+    const a = (p) => window.__assets?.[p] || `${p}?v=2`;
+    this.wlSrc = (n) => [a(`assets/games/wolf/fond-${n}.mp4`), a(`assets/games/wolf/scene-${n}.webp`)];
+    return `<div class="wl-scene wl-l"><i class="wl-safe"></i><div class="wl-art">
+          <video class="wl-vid" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+          ${jp ? `<div class="wl-jps">${['mini', 'minor', 'major', 'grand'].map((k) => `<div class="jp jp-${k}" data-jp="${k}"><small>${k.toUpperCase()}</small><b></b></div>`).join('')}</div>` : ''}
+          <div class="wl-info"><div><small>SOLDE</small><b class="wl-bal"></b></div><div><small>GAIN</small><b class="wl-gain">0</b></div></div>
+          <div class="wl-win">${reels}</div>
+          <button class="wl-hot wl-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="wl-bet"></b>
+          <button class="wl-hot wl-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="wl-hot wl-spin" type="button" data-act="spin" aria-label="Lancer"><span class="auto-count"></span></button>
+          <button class="wl-hot wl-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+        </div><button class="wl-hot wl-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>`;
+  }
+
+  sceneInit() {
+    const { VideoBg } = __mods['core/videobg.js'];
+    const q = (s) => this.root.querySelector(s);
+    q('.wl-art').appendChild(this.banner); // the bonus counter above the frame
+    for (const sel of ['.controls', '.slot > .win-bar']) q(sel)?.style.setProperty('display', 'none', 'important');
+    this.gainObs = new MutationObserver(() => this.paintGain());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    this.vbg = new VideoBg(q('.wl-vid'), { loop: 121 / 24, root: this.root });
+    this.ro = new ResizeObserver(() => this.layout());
+    this.ro.observe(q('.wl-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.layout());
+    addEventListener('resize', this.onRs);
+    this.updateMeters(); this.paintGain(); this.layout();
+  }
+
+  paintGain() {
+    const n = this.root.querySelector('.wl-gain'); if (!n) return;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    n.textContent = w || fmt(0);
+    n.style.setProperty('--n', Math.max(7, n.textContent.length));
+    n.parentElement.classList.toggle('won', !!w);
+  }
+
+  orient(port) {
+    const sc = this.root.querySelector('.wl-scene');
+    sc.classList.toggle('wl-p', port); sc.classList.toggle('wl-l', !port);
+    this.vbg.set(...this.wlSrc(port ? 'haut' : 'large'));
+  }
+
+  // Wide forest on a computer, tall forest on a phone held upright. Full screen: the one that fits the screen's shape
+  // covers the whole screen, cropped on its edges but never cutting the jackpots, the frame or the bar (KEY, in the video's
+  // pixels); around it (screen of another shape), its own picture, blurred.
+  layout() {
+    if (this.dead || !this.scene) return;
+    const { screenBox, coverFit } = __mods['core/videobg.js'];
+    const sc = this.root.querySelector('.wl-scene'), art = this.root.querySelector('.wl-art');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('wl-fullsc', full);
+    if (!full) {
+      sc.classList.remove('wl-bandx', 'wl-bandy');
+      this.orient(innerWidth < 700 && innerHeight > innerWidth);
+      art.style.cssText = ''; return;
+    }
+    const { top, lft, W, H } = screenBox(sc, this.root.querySelector('.wl-safe'));
+    if (!W || !H) return;
+    const port = W / H < 1;
+    this.orient(port);
+    const f = coverFit(W, H, port ? 448 : 672, port ? 672 : 448, port ? [4, 8, 444, 652] : [4, 2, 668, 442], { bottom: port });
+    art.style.cssText = `width:${f.w.toFixed(1)}px;height:${f.h.toFixed(1)}px;left:${(lft + f.x).toFixed(1)}px;top:${(top + f.y).toFixed(1)}px`;
+    sc.classList.toggle('wl-bandx', f.bandX); sc.classList.toggle('wl-bandy', f.bandY);
   }
 
   get bet() { return BETS[this.betIdx]; }
@@ -14907,6 +15080,9 @@ class SlotMachine {
   render() {
     const g = this.game;
     const jp = g.holdSpin?.jackpots;
+    const reels = `<div class="reels">${Array.from({ length: g.reels }, () => '<div class="reel"><div class="strip"></div></div>').join('')}</div>
+            <svg class="paylines" viewBox="0 0 ${g.reels * 100} ${g.rows * 100}" preserveAspectRatio="none"></svg>
+            <div class="stage-layer"></div>`;
     this.root.innerHTML = `
       <div class="slot theme-${g.theme}" style="--accent:${g.colors[0]};--accent2:${g.colors[1]}${g.id === 'big-bad-wolf' ? `;--wolf-bg:url('${window.__assets?.['assets/games/wolf/bg.webp'] || 'assets/games/wolf/bg.webp?v=1'}')` : ''}">
         <div class="slot-bg"></div>
@@ -14917,11 +15093,7 @@ class SlotMachine {
         </div>
         <div class="feature-banner"></div>
         <div class="slot-frame">
-          <div class="slot-stage">
-            <div class="reels">${Array.from({ length: g.reels }, () => '<div class="reel"><div class="strip"></div></div>').join('')}</div>
-            <svg class="paylines" viewBox="0 0 ${g.reels * 100} ${g.rows * 100}" preserveAspectRatio="none"></svg>
-            <div class="stage-layer"></div>
-          </div>
+          <div class="slot-stage">${this.scene ? this.sceneHTML(reels, jp) : reels}</div>
         </div>
         <div class="win-bar"><span class="msg">Bonne chance !</span><b class="win-amt"></b></div>
         <div class="controls pro-ctl">
@@ -14998,6 +15170,8 @@ class SlotMachine {
     removeEventListener('keydown', this.onKey);
     removeEventListener('sb:feature', this.onFeatCalm);
     wallet.removeEventListener('change', this.onWallet);
+    this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs);
+    this.vbg?.destroy();
   }
 
   updateMeters() {
@@ -15008,6 +15182,10 @@ class SlotMachine {
     const ac = this.root.querySelector('.auto-count');
     ac.textContent = this.auto ? this.auto : '';
     this.slotEl.classList.toggle('auto-on', !!this.auto);
+    if (this.scene) {
+      const set = (c, t) => { const n = this.root.querySelector(c); if (n && n.textContent !== t) { n.textContent = t; n.style.setProperty('--n', Math.max(7, t.length)); } };
+      set('.wl-bet', fmt(this.bet)); set('.wl-bal', fmt(wallet.balance));
+    }
   }
 
   // MISE MAX (the stone bar): the highest stake the balance allows
