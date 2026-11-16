@@ -9893,6 +9893,24 @@ html .panel.dp-hero { display: grid; gap: 14px; color: #fff !important; padding:
 .dp-hero-amts small { font-size: 11.5px; color: #9e97ab; }
 .dp-hero .dp-hgo { width: 100%; border-radius: 14px !important; font-weight: 900 !important; text-transform: uppercase; letter-spacing: .4px; background: linear-gradient(180deg, #ff4fae, #e6227f) !important; color: #fff !important; border: 0 !important; }
 @media (max-width: 640px) { .dp-hero-amts { grid-template-columns: repeat(3, minmax(0, 1fr)); } .dp-hero-amts button:nth-child(n+4) { display: none; } .dp-ht h1 { font-size: 26px; } }
+/* ===== Bonus offert quand le solde est bas (bonus-bas.js, demande du propriétaire du 16 novembre 2026) ===== */
+html .modal.lw-modal { width: min(400px, 100%); padding: 26px 22px 20px !important; border-radius: 20px !important; text-align: center; color: #fff; background: radial-gradient(120% 70% at 50% 0%, rgba(255, 61, 154, .3), transparent 65%), linear-gradient(180deg, #1d1624, #0f0c13) !important; border: 1px solid rgba(255, 61, 154, .35) !important; box-shadow: 0 30px 90px rgba(0, 0, 0, .65), 0 0 60px rgba(255, 61, 154, .18) !important; }
+.lw-modal .modal-x { border-radius: 50% !important; background: rgba(255, 255, 255, .07) !important; color: #fff !important; }
+.lw { display: grid; justify-items: center; gap: 9px; font-family: Inter, KeCoin, sans-serif; }
+.lw-art { position: relative; width: 148px; aspect-ratio: 1; border-radius: 20px; overflow: visible; animation: lwPop .6s cubic-bezier(.3, 1.5, .5, 1); }
+.lw-art svg { width: 100%; height: 100%; display: block; border-radius: 20px; box-shadow: 0 14px 34px rgba(0, 0, 0, .55), 0 0 0 2px rgba(255, 61, 154, .55), 0 0 34px rgba(255, 61, 154, .35); }
+.lw-gift { position: absolute; right: -14px; top: -14px; width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-size: 25px; background: linear-gradient(180deg, #fde68a, #f59e0b); box-shadow: 0 6px 16px rgba(245, 158, 11, .45); animation: lwWob 1.6s ease-in-out infinite; }
+@keyframes lwPop { from { transform: scale(.6) rotate(-6deg); opacity: 0; } }
+@keyframes lwWob { 50% { transform: rotate(12deg) scale(1.08); } }
+.lw-k { margin-top: 6px; font: 800 11.5px Inter, sans-serif !important; letter-spacing: 2.2px; color: var(--mq-pink, #ff3d9a); }
+.lw h2 { margin: 0; font: 900 27px/1.1 Inter, sans-serif; letter-spacing: -.4px; color: #fff; }
+.lw p { margin: 0; font-size: 14px; line-height: 1.5; color: #d6cfe0; }
+.lw p b { color: #fff; }
+.lw-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 2px 0 4px; }
+.lw-tags span { padding: 4px 10px; border-radius: 999px; font: 700 12px Inter, KeCoin, sans-serif; color: #fde68a; background: rgba(251, 191, 36, .12); border: 1px solid rgba(251, 191, 36, .35); }
+.lw .btn { width: 100%; }
+.lw .lw-go { min-height: 54px; border-radius: 14px !important; font: 900 16.5px Inter, sans-serif !important; text-transform: uppercase; letter-spacing: .4px; background: linear-gradient(180deg, #ff4fae, #e6227f) !important; color: #fff !important; border: 0 !important; box-shadow: 0 10px 26px rgba(255, 61, 154, .35) !important; }
+.lw .lw-no { min-height: 40px; color: #b5aec2 !important; }
 </style>
 </head>
 <body>
@@ -17095,10 +17113,10 @@ class SlotMachine {
 
   // A bonus given by the site (rewarded ad, mystery machine): the first bonus of the list, at the stake, for free.
   stakeKE() { return this.bet; }
-  freeBonus() {
+  freeBonus(id) {
     if (this.busy || this.free || this.dead) return false;
     this.stopAuto();
-    this.forced = this.forcedGrid(this.buyList()[0].id);
+    this.forced = this.forcedGrid((this.buyList().find((b) => b.id === id) || this.buyList()[0]).id);
     this.play({ buy: true });
     return true;
   }
@@ -17862,8 +17880,8 @@ class BaseGame {
   // A bonus given by the site (rewarded ad « rejoue ton bonus », mystery machine): the first bonus of the buy list,
   // at the current stake, without paying. Counted as a bought round (tournaments, duels, Défi spécial skip it).
   stakeKE() { return this.bet / 100; }
-  freeBonus() {
-    const x = this.cfg?.buys?.[0];
+  freeBonus(id) {
+    const x = (id && this.cfg?.buys?.find((b) => b.id === id)) || this.cfg?.buys?.[0];
     if (!x || this.busy || this.dead || !this.onBuy) return false;
     this.stopAuto(true);
     this.round(async () => {
@@ -25605,6 +25623,151 @@ function heroHTML() {
 return { openDeposit, heroHTML, DEP, PACKS, PRESETS, CHEAP, LOCK, CUSTOM_PER, WELCOME, adsFor };
 })();
 
+// ---- bonus-bas.js ----
+__mods['bonus-bas.js'] = (() => {
+// « Bonus offert » quand le solde passe sous LOW.below (demande du propriétaire du 16 novembre 2026) : une fenêtre propose un
+// bonus gratuit sur une machine à sous tirée au hasard (une autre à chaque fois, LOW.keep dernières évitées : ça fait découvrir
+// les machines), joué à LOW.bet de mise : le 1er bonus de sa liste d'achat (freeBonus des deux moteurs, compté comme un bonus
+// acheté : ni tournois, ni duels, ni Défi spécial). LOW.day par jour, LOW.gap entre deux fenêtres (acceptée ou refusée),
+// jamais pendant un tour, en plein écran ou par-dessus une autre fenêtre. profile.lowb (+ localStorage pour les invités).
+const { profiles } = __mods['profile.js'];
+const { wallet, fmt } = __mods['wallet.js'];
+const { modal, toast } = __mods['ui.js'];
+const { fx } = __mods['fx.js'];
+const { sfx } = __mods['audio.js'];
+
+const LOW = { below: 1000, bet: 50, day: 3, gap: 30 * 60e3, keep: 6, first: 8000, real: 15 };
+const LS = 'spinbet_lowbonus';
+const today = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+const cur = () => __mods['pages/game.js']?.currentGame?.();
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function local() { try { return JSON.parse(localStorage.getItem(LS) || '{}') || {}; } catch { return {}; } }
+function state() {
+  const s = { day: '', n: 0, last: 0, seen: [], ...(profiles.current?.lowb || {}) }, l = local();
+  if (s.day !== today()) { s.day = today(); s.n = 0; }
+  if (l.day === s.day) s.n = Math.max(s.n, l.n || 0);
+  s.last = Math.max(s.last || 0, l.last || 0);
+  return s;
+}
+function save(fn) {
+  const s = state(); fn(s);
+  if (profiles.current) profiles.update('lowb', (me) => { me.lowb = s; });
+  try { localStorage.setItem(LS, JSON.stringify({ day: s.day, n: s.n, last: s.last })); } catch { /* ignore */ }
+}
+
+// a slot machine the player was not offered lately, never the one open now
+function pick(s) {
+  const { SLOTS } = __mods['games/index.js'], now = cur()?.game?.id;
+  const all = SLOTS.filter((g) => g.cat === 'slot' && !g.wip && !g.retired && g.id !== now);
+  const fresh = all.filter((g) => !(s.seen || []).includes(g.id));
+  const list = fresh.length ? fresh : all;
+  return list[Math.floor(Math.random() * list.length)];
+}
+
+// not now: a spin, a bonus, a window, a full-screen game, a match, a hidden tab
+const busy = () => {
+  const g = cur();
+  return !!(document.hidden || document.fullscreenElement || document.body.classList.contains('derby-on')
+    || document.querySelector('.modal-back, .aads-modal, .ad-offer, .jc-scene, .tuto, [class*="tuto-"], .slot.busy, .featurebox, .fi-over, .slot-overlay')
+    || (g && (g.busy || g.free || g.auto > 0 || g.playing)));
+};
+
+let open = false, timer = 0;
+function check() {
+  clearTimeout(timer);
+  if (open || !profiles.current || !(wallet.balance < LOW.below)) return;
+  const s = state();
+  if (s.n >= LOW.day) return;
+  const left = s.last + LOW.gap - Date.now();
+  if (left > 0) { timer = setTimeout(check, Math.min(left + 500, 10 * 60e3)); return; }
+  if (busy()) { timer = setTimeout(check, 3000); return; }
+  offer(s);
+}
+
+async function offer(s) {
+  const game = pick(s);
+  if (!game) return;
+  open = true;
+  save((x) => { x.last = Date.now(); });
+  const { coverSVG } = __mods['covers.js'];
+  sfx.unlock?.(); sfx.feature?.();
+  const v = await modal(`<div class="lw">
+      <div class="lw-art">${coverSVG(game, { square: true, badge: false })}<span class="lw-gift">🎁</span></div>
+      <small class="lw-k">BONUS OFFERT · SOLDE BAS</small>
+      <h2>${esc(game.name)}</h2>
+      <p>Ton solde est passé sous ${fmt(LOW.below)} : on t’offre <b>un bonus gratuit</b> sur cette machine, joué à <b>${fmt(LOW.bet)}</b> de mise. L’occasion de la découvrir !</p>
+      <div class="lw-tags"><span>Mise ${fmt(LOW.bet)}</span>${game.max ? `<span>Gain max ${esc(game.max)}</span>` : ''}<span>${s.n + 1} / ${LOW.day} aujourd’hui</span></div>
+      <button class="btn primary lg lw-go" data-value="go">🎰 Jouer mon bonus</button>
+      <button class="btn ghost lw-no" data-value="no">Non merci</button>
+    </div>`, { cls: 'lw-modal' });
+  open = false;
+  if (v !== 'go') { check(); return; }
+  save((x) => { x.n += 1; x.seen = [game.id, ...(x.seen || []).filter((i) => i !== game.id)].slice(0, LOW.keep); });
+  launch(game);
+}
+
+// the stake of the open game set to `ke` (both engines); returns how to put the old stake back
+function setStake(g, ke) {
+  if (Array.isArray(g.cfg?.bets) && typeof g.bi === 'number') { // core/base.js: stakes in cents
+    const bets = g.cfg.bets, old = g.bi;
+    let i = bets.indexOf(ke * 100);
+    if (i < 0) i = Math.max(0, bets.reduce((k, b, j) => (b <= ke * 100 ? j : k), 0));
+    g.bi = i; g.updateMeters?.(); g.onBetChange?.();
+    return () => { if (g.dead) return; g.bi = old; g.updateMeters?.(); g.onBetChange?.(); };
+  }
+  if (typeof g.betIdx === 'number') { // slot/machine.js: stakes in KE
+    const old = g.betIdx;
+    for (let i = 0; i < 40; i++) { g.betIdx = i; if (g.bet === undefined) { g.betIdx = old; break; } if (g.bet >= ke) break; }
+    g.updateMeters?.();
+    return () => { if (g.dead) return; g.betIdx = old; g.updateMeters?.(); };
+  }
+  return () => {};
+}
+
+// the first real bonus of the buy list: Le Cosmique, La Sweety, Le Coffre-Fort start theirs with a single special spin (3 to 5 ×)
+function realBonus(g) {
+  const list = g.cfg?.buys || (g.buyList ? g.buyList() : []);
+  const k = (x) => (typeof x.cost === 'function' ? x.cost(10000) / 10000 : +x.cost || 0);
+  return (list.find((x) => k(x) >= LOW.real) || list[0])?.id;
+}
+
+async function launch(game) {
+  location.hash = `#game-${game.id}`;
+  const t0 = Date.now();
+  while (Date.now() - t0 < 90000) {
+    await wait(400);
+    if (!location.hash.startsWith(`#game-${game.id}`)) return toast('Bonus offert annulé : tu as quitté la machine', 'warn');
+    const g = cur();
+    // the game is loading, its opening screen is shown, or a round is running
+    if (!g || g.game?.id !== game.id || g.dead || document.querySelector('.modal-back') || g.busy || g.free) continue;
+    g.stopAuto?.(true);
+    const back = setStake(g, LOW.bet);
+    if (!g.freeBonus?.(realBonus(g))) { back(); continue; }
+    sfx.bigWin?.(); fx.confetti?.(90);
+    toast(`🎁 <b>BONUS OFFERT</b> sur ${esc(game.name)}, à ${fmt(LOW.bet)} de mise. Bonne chance !`, 'ok');
+    // the old stake comes back once the bonus is over
+    let was = false;
+    const iv = setInterval(() => {
+      if (cur() !== g || g.dead) return clearInterval(iv);
+      if (g.busy || g.free) was = true;
+      else if (was) { clearInterval(iv); back(); }
+    }, 500);
+    return;
+  }
+  toast('Le bonus offert n’a pas pu démarrer : réessaie plus tard', 'warn');
+  save((x) => { x.n = Math.max(0, x.n - 1); });
+}
+
+wallet.addEventListener('change', () => { if (!open && wallet.balance < LOW.below) { clearTimeout(timer); timer = setTimeout(check, 1500); } });
+addEventListener('sb:roundend', () => { clearTimeout(timer); timer = setTimeout(check, 2500); });
+profiles.addEventListener('change', () => { clearTimeout(timer); timer = setTimeout(check, 3000); });
+setTimeout(check, LOW.first);
+
+return { LOW, check };
+})();
+
 // ---- shorts.js ----
 __mods['shorts.js'] = (() => {
 // Les Shorts du jour (page #shorts, pour le propriétaire : pas dans les menus) : chaque matin, GitHub Actions filme
@@ -25989,7 +26152,7 @@ function mountAdBar() {
   const put = (k, v) => { try { localStorage.setItem(k, String(v)); } catch { /* ignore */ } };
   // low balance inside a game (under 150 KE): offer one ad for +1 000 KE (at most once every 5 min)
   wallet.addEventListener('change', () => {
-    if (!profiles.current || wallet.balance >= 150 || !/^#game-/.test(location.hash) || document.querySelector('.ad-offer')) return;
+    if (!profiles.current || wallet.balance >= 150 || !/^#game-/.test(location.hash) || document.querySelector('.ad-offer, .modal-back')) return;
     if (Date.now() - get(OFFER_KEY) < 5 * 60000 || !ads.status('rescue').ok) return;
     put(OFFER_KEY, Date.now());
     const card = document.createElement('div');

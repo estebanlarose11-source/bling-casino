@@ -855,6 +855,19 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   = page Caisse + fenêtre ouverte. Page Caisse (`#recharger`) : encart « Déposer des KE » en tête (`heroHTML()`), puis recharge, pubs et
   codes. Aussi : bouton DÉPOSER de l'accueil (comptes), carte « Solde bas ? » dans les jeux, menu « Caisse · Déposer », page Récompenses.
 
+## Bonus offert quand le solde est bas (demande du propriétaire du 16 novembre 2026)
+
+- `bonus-bas.js` : dès que le solde passe **sous 1 000 KE** (`LOW.below`), une fenêtre (`.lw-modal`) propose **un bonus gratuit sur une
+  machine à sous tirée au hasard**, une autre à chaque fois (les `LOW.keep` = 6 dernières proposées sont évitées, jamais celle qui est
+  ouverte : « ça fait découvrir une machine »), **joué à 50 KE de mise** (`LOW.bet`). « Jouer mon bonus » ouvre la machine (son écran
+  d'ouverture d'abord s'il apparaît), met la mise à 50, lance `freeBonus(id)` puis remet l'ancienne mise à la fin du bonus (`setStake`,
+  les deux moteurs). Le bonus lancé = le 1er **vrai** bonus de la liste d'achat (`realBonus` : coût ≥ 15 × la mise, `LOW.real` ; Le
+  Cosmique, La Sweety et Le Coffre-Fort commencent leur liste par un simple tour spécial à 3–5 ×). `freeBonus(id)` des deux moteurs
+  accepte maintenant l'id d'un bonus (sans id : le 1er, comme avant pour la machine mystère et « rejoue ton bonus »). Compté comme un
+  bonus acheté (ni tournois, ni duels, ni Défi spécial). **3 par jour** (`LOW.day`), **30 min** entre deux fenêtres, acceptée ou
+  refusée (`LOW.gap`) ; jamais pendant un tour, en tours auto, en plein écran, pendant un match ou par-dessus une autre fenêtre (elle
+  attend). `profile.lowb = { day, n, last, seen }` + localStorage `spinbet_lowbonus` (invités). Gratuit, sans pub.
+
 ## Arrivée des visiteurs et partage
 
 - **Cadeau du jour = série de connexion** (`daily.js`, carte en haut de l'accueil `dailyHomeHTML` dans `pages/lobby.js`,
