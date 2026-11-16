@@ -978,6 +978,22 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   cache alors la barre d'état et la barre de navigation du téléphone (immersif « sticky », remis au retour dans l'appli). Les anciennes
   versions de l'appli n'ont pas la fonction : rien ne change pour elles.
 
+## App Store et Google Play (demande du propriétaire du 16 novembre 2026)
+
+- Marche à suivre et textes des fiches pour le propriétaire : `notes/app-stores-mise-en-route.md` ; captures 1320 × 2868, icône et
+  bannière Google dans `store/`.
+- **Android** : `targetSdk` / `compileSdk` 36 (AGP 8.9.1, Gradle 8.11.1). Android 15+ dessine l'appli sous les barres du téléphone :
+  `MainActivity` met la page entre elles (marges de `root` lues dans les insets), sauf en plein écran (seulement l'encoche).
+  `android.yml` fabrique aussi `spinbet-play` (`.aab` pour la Play Console, dans les Artifacts du lancement).
+- **iPhone** (`ios/`, Swift, WKWebView, iOS 15+, iPhone seulement, id `com.spinbetcaz.app`) : projet Xcode fabriqué par XcodeGen
+  (`ios/project.yml`) sur un Mac de GitHub (`.github/workflows/ios.yml`, « Appli iPhone ») puis envoyé à TestFlight avec la clé API
+  d'App Store Connect (secrets `APPSTORE_KEY_ID`, `APPSTORE_ISSUER_ID`, `APPSTORE_KEY_P8`, `APPLE_TEAM_ID` ; sans eux : simple
+  essai de compilation). Même `window.SpinBetApp` que l'APK (injecté au chargement : `share`, `immersive`, `notifStatus` / `notifOn`
+  / `notifOff`, `daily`), plus `navigator.vibrate` (retour haptique). User agent `SpinBetApp/1 SpinBetiOS/1`. Notifications locales
+  (`Notifs.swift`, comme `Notifs.java` sans les événements flash). Liens hors du site → Safari.
+- **Supprimer mon compte** (page Profil, comptes connectés, exigé par Apple et Google) : `profiles.deleteAccount(motDePasse)` →
+  `cloud.reauth` puis `cloud.deleteAccount` (presence, leaderboard, users, puis le compte Firebase). Règles Firestore déjà bonnes.
+
 ## Mot de passe oublié
 
 - Écran « 🔑 Mot de passe oublié » (`forgotPassword` dans `hud.js`) : e-mail Firebase avec lien de retour vers

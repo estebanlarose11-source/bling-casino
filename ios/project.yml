@@ -1,0 +1,42 @@
+# SpinBet iPhone: the site www.spinbetcaz.com in a full-screen window (like android/). The Xcode project is made
+# from this file by XcodeGen on a Mac of GitHub Actions (.github/workflows/ios.yml): no Mac needed here.
+name: SpinBet
+options:
+  deploymentTarget:
+    iOS: "15.0"
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  SpinBet:
+    type: application
+    platform: iOS
+    sources: [SpinBet]
+    info:
+      path: SpinBet/Info.plist
+      properties:
+        CFBundleDisplayName: SpinBet
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSApplicationCategoryType: public.app-category.casino-games
+        ITSAppUsesNonExemptEncryption: false
+        UIRequiresFullScreen: true
+        UIStatusBarStyle: UIStatusBarStyleLightContent
+        UIViewControllerBasedStatusBarAppearance: true
+        UILaunchScreen:
+          UIColorName: LaunchBg
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.spinbetcaz.app
+        PRODUCT_NAME: SpinBet
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ${APPLE_TEAM_ID}
+        SWIFT_VERSION: "5.0"
+    scheme: {}

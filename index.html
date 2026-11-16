@@ -10709,6 +10709,20 @@ const cloud = {
   async signUp(email, password) { return (await (await init()).auth.createUserWithEmailAndPassword(email, password)).user; },
   async signIn(email, password) { return (await (await init()).auth.signInWithEmailAndPassword(email, password)).user; },
   async signOut() { await (await init()).auth.signOut(); },
+  // Account deletion (asked by the App Store and Google Play): password asked again by Firebase, then the player's
+  // documents (presence, leaderboard, users) and the login itself are deleted. The rules already allow it (isMe).
+  async reauth(password) {
+    const { auth } = await init();
+    const u = auth.currentUser;
+    if (!u) throw Object.assign(new Error('no user'), { code: 'auth/no-current-user' });
+    await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, password));
+  },
+  async deleteAccount(uid) {
+    const { auth, db } = await init();
+    await Promise.allSettled(['presence', 'leaderboard'].map((c) => db.collection(c).doc(uid).delete()));
+    await db.collection('users').doc(uid).delete();
+    await auth.currentUser.delete();
+  },
   // The e-mail's link opens Firebase's page to choose the new password, then comes back to the site (when the domain
   // is allowed in Firebase; otherwise the plain e-mail is sent).
   async resetPassword(email) {
@@ -11296,6 +11310,21 @@ class Profiles extends EventTarget {
       this.store = { current: null, users: {} };
       wallet.load(START, null); // nothing from the last player stays on screen behind the gate
     }
+    this.dispatchEvent(new CustomEvent('change', { detail: {} }));
+  }
+
+  // « Supprimer mon compte » (page Profil): nothing is saved any more while the documents are deleted.
+  async deleteAccount(password) {
+    if (this.mode !== 'cloud' || !this.store.current) return;
+    const uid = this.store.current;
+    await cloud.reauth(password);
+    clearTimeout(this.saveT); this.saveT = null;
+    this.mode = 'deleting';
+    try { await cloud.deleteAccount(uid); } catch (e) { this.mode = 'cloud'; throw e; }
+    try { localStorage.removeItem(BAK); } catch { /* ignore */ }
+    this.mode = null;
+    this.store = { current: null, users: {} };
+    wallet.load(START, null);
     this.dispatchEvent(new CustomEvent('change', { detail: {} }));
   }
 
@@ -13224,6 +13253,41 @@ function recentHTML(me) {
     ${list.length ? `<div class="game-row">${list.map(gameCard).join('')}</div>` : '<p class="muted panel">Tu n’as encore joué à aucun jeu. Lance une machine et elle apparaîtra ici pour la retrouver facilement.</p>'}</section>`;
 }
 
+// Account deletion (App Store / Google Play rule): confirm with the password, everything is erased for good.
+function deleteAccountModal() {
+  document.querySelector('.da-back')?.remove();
+  const back = document.createElement('div');
+  back.className = 'modal-back da-back';
+  back.innerHTML = `<div class="modal fp"><button class="modal-x" data-x aria-label="Fermer">✕</button>
+    <h3>Supprimer mon compte</h3>
+    <p class="muted">Ton compte, ton solde, ta progression, tes succès et ta place au classement seront effacés pour toujours. Ce n’est pas réversible.</p>
+    <input class="gate-input" type="password" placeholder="Ton mot de passe" autocomplete="current-password" data-pw>
+    <small class="gate-err" data-err></small>
+    <button class="btn primary lg ga-wide da-go" data-go>Supprimer définitivement</button>
+    <button class="gate-link" data-x>Annuler</button>
+  </div>`;
+  document.body.appendChild(back);
+  requestAnimationFrame(() => back.classList.add('show'));
+  const close = () => { back.classList.remove('show'); setTimeout(() => back.remove(), 200); };
+  back.addEventListener('click', (e) => { if (e.target === back || e.target.closest('[data-x]')) close(); });
+  const go = back.querySelector('[data-go]');
+  go.onclick = async () => {
+    const pw = back.querySelector('[data-pw]').value;
+    const err = back.querySelector('[data-err]');
+    if (!pw) { err.textContent = 'Entre ton mot de passe'; return; }
+    go.disabled = true; err.textContent = '';
+    try {
+      await profiles.deleteAccount(pw);
+      close();
+      toast('Ton compte a été supprimé', 'ok');
+      location.hash = '#accueil';
+    } catch (e) {
+      err.textContent = __mods['cloud.js'].cloud.message(e);
+      go.disabled = false;
+    }
+  };
+}
+
 function renderProfile(root) {
   clearInterval(timer);
   const me = profiles.current;
@@ -13246,6 +13310,7 @@ function renderProfile(root) {
         <div class="xp-row"><span>${p.level >= MAX_LEVEL ? 'Niveau maximum atteint' : `${n0(p.xp)} / ${n0(p.need)} XP`}</span>${p.level < MAX_LEVEL ? `<span>Niveau ${p.level + 1} : <b>+${fmt(levelReward(p.level + 1))}</b></span>` : ''}</div>
       </div>
       <button class="btn ghost me-switch" data-switch>${profiles.online ? 'Se déconnecter' : profiles.guest ? 'Créer un compte ou se connecter' : 'Changer de pseudo'}</button>
+      ${profiles.online ? '<button class="gate-link me-del" data-del-account>Supprimer mon compte</button>' : ''}
     </section>
 ${recentHTML(me)}
 ${__mods['achievements.js']?.trophiesHTML?.() || ''}
@@ -13295,6 +13360,7 @@ ${__mods['achievements.js']?.trophiesHTML?.() || ''}
       </section>
     </div>`;
 
+  root.querySelector('[data-del-account]')?.addEventListener('click', () => deleteAccountModal());
   root.querySelector('[data-switch]').onclick = () => (profiles.guest && __mods['cloud.js'].cloud.enabled ? __mods['hud.js'].signUp('💾 Sauvegarde ta partie') : profiles.logout());
   root.querySelector('[data-claim]')?.addEventListener('click', (e) => {
     const r = claimDaily();

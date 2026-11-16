@@ -5,3 +5,5 @@ android/build/
 android/app/build/
 android/.gradle/
 tools/shorts/out/
+ios/SpinBet.xcodeproj/
+ios/SpinBet/Info.plist

@@ -1,6 +1,7 @@
 # Builds the SpinBet Android app (android/) and puts it on the site: app/spinbet.apk (www.spinbetcaz.com/app/spinbet.apk).
 # The app shows the site, so site updates need no new APK: this only runs when android/ changes, or by hand
 # (Actions → « Appli Android » → Run workflow).
+# It also makes the Google Play file (spinbet-play.aab, in the run's « Artifacts »): that one is sent to the Play Console.
 # Secret needed (Settings → Secrets and variables → Actions): ANDROID_KEYSTORE = the signing key, in base64.
 # Always the same key: phones only accept an update signed like the installed app.
 name: Appli Android
@@ -42,20 +43,26 @@ jobs:
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: '8.11.1'
       - name: Fabriquer l'APK
         working-directory: android
         env:
           KEYSTORE_FILE: ${{ runner.temp }}/spinbet.jks
           KEYSTORE_PASSWORD: spinbet-app
           VERSION_CODE: ${{ github.run_number }}
-        run: gradle --no-daemon ${{ steps.key.outputs.ok == 'true' && 'assembleRelease' || 'assembleDebug' }}
+        run: gradle --no-daemon ${{ steps.key.outputs.ok == 'true' && 'assembleRelease bundleRelease' || 'assembleDebug' }}
       - name: APK d'essai (sans clé)
         if: steps.key.outputs.ok != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: spinbet-essai
           path: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Fichier pour Google Play (.aab)
+        if: steps.key.outputs.ok == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: spinbet-play
+          path: android/app/build/outputs/bundle/release/app-release.aab
       - name: Mettre l'APK sur le site
         if: steps.key.outputs.ok == 'true'
         run: |

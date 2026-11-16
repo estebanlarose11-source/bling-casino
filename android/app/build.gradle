@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace 'com.spinbetcaz.app'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId 'com.spinbetcaz.app'
         minSdk 24
-        targetSdk 34
+        targetSdk 36
         versionCode Integer.parseInt(System.getenv('VERSION_CODE') ?: '1')
         versionName "1.0.${System.getenv('VERSION_CODE') ?: '1'}"
     }

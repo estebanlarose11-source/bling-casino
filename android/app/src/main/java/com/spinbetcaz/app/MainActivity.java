@@ -14,6 +14,9 @@ import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
+import android.widget.FrameLayout;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -33,13 +36,27 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     static final String HOME = "https://www.spinbetcaz.com/";
     private WebView web;
+    private FrameLayout root;
 
     @Override
     protected void onCreate(Bundle state) {
         super.onCreate(state);
         web = new WebView(this);
         web.setBackgroundColor(Color.parseColor("#0B0F17"));
-        setContentView(web);
+        root = new FrameLayout(this);
+        root.setBackgroundColor(Color.parseColor("#0B0F17"));
+        root.addView(web, new FrameLayout.LayoutParams(-1, -1));
+        setContentView(root);
+        // Android 15+ draws the app under the phone's bars (edge to edge, forced by targetSdk 35+): the page is kept
+        // between them with a padding, except in a game's full screen (bars hidden, only the notch is kept clear).
+        if (Build.VERSION.SDK_INT >= 35) {
+            root.setOnApplyWindowInsetsListener((v, in) -> {
+                android.graphics.Insets b = in.getInsets(immersive ? WindowInsets.Type.displayCutout()
+                    : WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout() | WindowInsets.Type.ime());
+                v.setPadding(b.left, b.top, b.right, b.bottom);
+                return WindowInsets.CONSUMED;
+            });
+        }
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -156,6 +173,15 @@ public class MainActivity extends Activity {
     @SuppressWarnings("deprecation")
     void setImmersive(boolean on) {
         immersive = on;
+        if (Build.VERSION.SDK_INT >= 30) {
+            WindowInsetsController c = getWindow().getInsetsController();
+            if (c != null) {
+                c.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+                if (on) c.hide(WindowInsets.Type.systemBars()); else c.show(WindowInsets.Type.systemBars());
+            }
+            root.requestApplyInsets();
+            return;
+        }
         View d = getWindow().getDecorView();
         d.setSystemUiVisibility(on ? View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
