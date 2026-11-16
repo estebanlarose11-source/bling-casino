@@ -502,7 +502,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (TIRAGE = mise × grilles) : ＋ Grille (numéros touchés sur le tableau, Compléter / Vider / Valider) ou 🎲 Flash ×1 / ×5 / ×10 (grilles au
   hasard du nombre de numéros choisi) ; gardées sur l'appareil (`spinbet_keno_grids`). Gains `PAY` (× la mise d'une grille, jusqu'à
   ×10 000 pour 10 bons sur 10, plafond `CAPX` ×100 000). Simulation `node tools/sim/keno.js` (5 M tirages, lit le moteur) : retour 93,5 à
-  96,8 % selon le nombre de numéros (moyenne ≈ 95 %), une grille de 6 gagne 1 fois sur 4,5.
+  96,8 % selon le nombre de numéros (moyenne ≈ 95 %), une grille de 6 gagne 1 fois sur 4,5. **Pas dans les nouveautés** (voulu par le propriétaire le 16 novembre 2026 : pas d'entrée `UPDATES`, donc ni rang « Nouveautés », ni étiquette NOUVEAU, ni affiche).
 - **Le Texas, nouvelle table** (`games/poker.js`, id `poker`, demande du propriétaire du 16 novembre 2026, d'après ses 2 maquettes :
   téléphone = 1re, ordinateur = 2e) : table de **9 places** (`SLOTS`, 1 à 8 adversaires, 3 nouveaux bots Le Prof, Mimi, Rocky), places
   libres affichées. Un seul HTML `.pkx`, `data-m` = `phone` (table ovale, sièges ronds sur le bord, bandeau blindes / table / tapis,
