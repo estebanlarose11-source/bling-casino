@@ -466,9 +466,23 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   l'opacité suit la vitesse. Téléphone : lignes 70 à 650 de la vidéo haute (`VID.haut.crop`, `.mwx-p`). **Bonus à acheter** (« Bonus &
   menu », solo seulement, au jeton choisi : `get bet()` = `board.chip`) : Pile ou Face ×18, Pachinko ×17, Tir aux Cibles ×34, Méga Folie
   ×38 (valeur moyenne par simulation ×15 / ×13,9 / ×28,8 / ×32,1 + la mise → ≈ 88 %) ; la roue s'arrête sur le bonus acheté, sans Boost,
-  pas compté au Défi spécial. Les bonus eux-mêmes (écrans `bonusCF` / `CH` / `PA` / `CT`) et les gains de la roue n'ont pas changé ; le
-  propriétaire enverra plus tard des vidéos ou images pour les bonus. Refaire les fichiers : `python3 tools/art/madwheel/build.py`
+  pas compté au Défi spécial. Les gains de la roue n'ont pas changé ; les bonus Pachinko, Tir aux Cibles et Méga Folie se jouent sur ses
+  vidéos de bonus (voir « La Roue Folle, les bonus sur ses vidéos »). Refaire les fichiers : `python3 tools/art/madwheel/build.py`
   (`--fast` = sans réencoder les vidéos), puis `python3 tools/build.py` et changer `CACHE` dans `sw.js`.
+- **La Roue Folle, les bonus sur ses vidéos** (`games/madwheel.js`, demande du propriétaire du 16 novembre 2026) : **ses 3 vidéos**
+  (672 × 448, 6 s, avec le son) `tools/art/madwheel/bonus-pachinko.mp4` (plateau de Plinko), `bonus-canards.mp4` (mur de 12 × 11 canards
+  qui se mélangent puis tombent), `bonus-roue.mp4` (grande roue à 3 flèches rouge / jaune / bleue) → `python3 tools/art/madwheel/bonus.py`
+  (`--fast` = sans réencoder) : vidéos recalées sur la 1re image (la caméra zoome), bille dorée de la vidéo effacée et reflet des cases sur
+  le sol flouté (Plinko), écritures de la roue floutées et panneau « THE BIG SPIN » effacé (roue), boucle sans coupure au meilleur
+  endroit (`seam`, Plinko et roue : `at` / `loop`), animateur détouré → `assets/games/madwheel/b-<pa|ch|ct>.mp4` + `.webp` +
+  `bmask-*.png`, suivi `BTRACK` (zone, place des 132 canards, case du masque par image) écrit dans `games/madwheel.js`. Écran du bonus
+  `openShow()` : l'élément vidéo de l'émission y est **déplacé** (déjà autorisé à jouer avec le son par le toucher de LANCER, iPhone) puis
+  rendu par `closeShow()` ; nos éléments en % de la vidéo dans `.mwb-full` ; téléphone tenu droit : seule la partie `BCROP` de la vidéo.
+  **Pachinko** : nos 16 cases sur ses cases peintes, notre bille qui rebondit sur ses picots (moteur inchangé). **Tir aux Cibles** :
+  132 canards, chacun avec un multiplicateur **tiré au hasard à chaque bonus** (`chBoard` : mêmes chances que les 108 cibles d'avant,
+  moyenne ×28,8 inchangée) ; la vidéo s'arrête après le mélange (3,4 s), le joueur touche un canard, puis ils tombent. **Méga Folie** :
+  notre roue de **32 cases** (`CTC` : ×10 à ×200, 1 DOUBLE, 1 TRIPLE) sur la sienne, ses 3 flèches redessinées droites à leur place
+  (`CTTIP`, angles `CTARR` = −27°, 2°, 32°) ; moyenne ×32,25 (×32,21 avant), achat ×38 ≈ 87,5 % comme avant. Pile ou Face n'a pas de vidéo.
 - **Le Texas, nouvelle table** (`games/poker.js`, id `poker`, demande du propriétaire du 16 novembre 2026, d'après ses 2 maquettes :
   téléphone = 1re, ordinateur = 2e) : table de **9 places** (`SLOTS`, 1 à 8 adversaires, 3 nouveaux bots Le Prof, Mimi, Rocky), places
   libres affichées. Un seul HTML `.pkx`, `data-m` = `phone` (table ovale, sièges ronds sur le bord, bandeau blindes / table / tapis,

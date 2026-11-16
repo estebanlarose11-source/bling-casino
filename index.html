@@ -1641,26 +1641,70 @@ body.gated { overflow: hidden; }
 .cface { position: absolute; inset: 0; border-radius: 50%; display: grid; place-items: center; font: 900 32px KeCoin, Archivo, sans-serif; color: #fff; backface-visibility: hidden; border: 6px solid #ffe27a; box-shadow: 0 0 30px rgba(255, 226, 122, .6), inset 0 0 30px rgba(0, 0, 0, .35); }
 .cface.r { background: radial-gradient(circle at 35% 30%, #ff8a8a, #c81e1e); }
 .cface.b { background: radial-gradient(circle at 35% 30%, #8ac4ff, #1e4ec8); transform: rotateY(180deg); }
-.grid12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 3px; width: 100%; }
-.ch-t { aspect-ratio: 1; border-radius: 3px; background: linear-gradient(180deg, #8bd93b, #3f8a12); color: #10200a; font: 900 clamp(8px, 1.8vw, 12px) KeCoin, Archivo, sans-serif; display: grid; place-items: center; transition: transform .2s; }
-.ch-t.hi { background: linear-gradient(180deg, #fde047, #d97706); }
-.ch-t.hidden { background: linear-gradient(180deg, #2a3a5a, #121a2e); font-size: clamp(10px, 2.4vw, 16px); }
-.ch-t.hidden:hover { transform: scale(1.15); box-shadow: 0 0 12px #8bd93b; }
-.ch-t.pick { background: linear-gradient(180deg, #fff, #fde047); transform: scale(1.4); z-index: 2; box-shadow: 0 0 24px #fde047; }
-.ch-t.dimmed { opacity: .45; }
-.pach { position: relative; width: 340px; height: 370px; max-width: 100%; border-radius: 4px; background: radial-gradient(ellipse at 50% 0%, rgba(255, 138, 61, .2), transparent 70%), #10061f; border: 1px solid rgba(255, 138, 61, .35); overflow: hidden; }
 .peg { position: absolute; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px #fff; }
-.pslot { position: absolute; bottom: 6px; width: 20px; margin-left: -10px; height: 28px; border-radius: 3px; display: grid; place-items: center; font: 900 7px KeCoin, Archivo, sans-serif; background: #3a1d5c; color: #fff; }
-.pslot.d { background: #d62f9c; }
-.pslot.hit { background: #fde047; color: #10061f; box-shadow: 0 0 14px #fde047; transform: scale(1.2); }
-.puck { position: absolute; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #ff8a3d); box-shadow: 0 0 12px #ff8a3d; transition: left .14s ease-in, top .14s ease-in; z-index: 2; }
 .flaps { display: flex; gap: 16px; }
 .apick { width: 80px; height: 90px; border-radius: 4px; background: rgba(0, 0, 0, .4); border: 3px solid var(--c); color: var(--c); font-size: 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 0 18px color-mix(in srgb, var(--c) 50%, transparent); }
 .apick small { font-size: 12px; font-weight: 800; color: #fff; }
 .apick:hover { transform: translateY(-4px) scale(1.05); }
-.mw-mini { width: min(340px, 80vw); aspect-ratio: 1; }
-.mw-mini svg { width: 100%; height: 100%; filter: drop-shadow(0 0 30px rgba(214, 47, 156, .5)); }
 .mwheel { transform-origin: 150px 150px; transform-box: view-box; }
+/* La Roue Folle, les bonus sur les vidéos du propriétaire (16 novembre 2026, games/madwheel.js openShow) : sa vidéo en 3 : 2 (.mwb,
+   l'élément vidéo de l'émission y est déplacé), nos éléments posés en % de la vidéo (.mwb-full), l'animateur gardé devant par son
+   masque (.mwb-box.mk, planche bmask-*.png, une case par image). Pachinko : nos 16 cases sur ses cases peintes, notre bille ;
+   Tir aux Cibles : un multiplicateur sur chacun de ses 132 canards ; Méga Folie : notre roue (32 cases) sur la sienne, ses 3 flèches. */
+.mw-show .mw-ov-in { max-width: none; gap: 8px; }
+.mw-show h2 { font-size: clamp(22px, 4.6vw, 34px); }
+.mwb { position: relative; width: min(96vw, calc((100dvh - 170px) * 1.5), 1080px); aspect-ratio: 3 / 2; border-radius: 12px; overflow: hidden; background: #0b0418; box-shadow: 0 14px 40px rgba(0, 0, 0, .6), inset 0 0 0 1px rgba(255, 210, 63, .3); }
+.mwb-st { position: absolute; inset: 0; container-type: size; }
+@media (orientation: portrait) and (max-width: 700px) {
+  .mwb { aspect-ratio: auto; width: 96vw; height: min(calc(96vw * 448 / var(--cw)), calc(100dvh - 210px)); }
+  .mwb-st { left: calc(var(--cx0) / var(--cw) * -100%); right: auto; width: calc(672 / var(--cw) * 100%); }
+}
+.mwb-vh { position: absolute; inset: 0; }
+.mwb-box { position: absolute; z-index: 2; pointer-events: none; }
+.mwb-box.mk { -webkit-mask-image: var(--mk); mask-image: var(--mk); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); -webkit-mask-position: var(--mx) var(--my); mask-position: var(--mx) var(--my); }
+.mwb-full { position: absolute; }
+.mwb .mwb-snd { z-index: 6; width: 34px; height: 34px; font-size: 16px; right: 8px; top: 8px; }
+.mwb-big { position: absolute; z-index: 5; left: 37.5%; top: 45%; translate: -50% -50%; padding: .6cqw 2.6cqw; border-radius: 1.4cqw; pointer-events: none; opacity: 0; transform: scale(.5);
+  font: 900 7.5cqw/1 KeCoin, Archivo, sans-serif; color: #fff; background: linear-gradient(180deg, rgba(60, 14, 100, .92), rgba(16, 4, 30, .92)); box-shadow: 0 0 0 .35cqw #ffd23f, 0 0 3cqw rgba(255, 210, 63, .6), 0 1cqw 3cqw rgba(0, 0, 0, .6);
+  text-shadow: 0 .3cqw 0 rgba(0, 0, 0, .5), 0 0 2cqw #ffd23f; transition: opacity .25s, transform .45s cubic-bezier(.3, 1.7, .5, 1); }
+.mwb-big.on { opacity: 1; transform: none; }
+.mwb-ct .mwb-big { top: 82%; font-size: 5.5cqw; }
+/* Pachinko */
+.mwb-slots { position: absolute; left: 2.1%; top: 76.8%; width: 71.5%; height: 13%; display: flex; gap: .22cqw; padding: .35cqw; border-radius: .9cqw; background: linear-gradient(180deg, #2a1450, #0f0520); box-shadow: inset 0 0 0 .28cqw #ffd76a, 0 .4cqw 1.2cqw rgba(0, 0, 0, .6); }
+.mwb-ps { flex: 1; min-width: 0; border-radius: .55cqw; display: grid; place-items: center; font: 900 1.85cqw KeCoin, Archivo, sans-serif; color: #fff; letter-spacing: -.02em; text-shadow: 0 .15cqw 0 rgba(0, 0, 0, .55);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--c) 70%, #fff), var(--c) 55%, color-mix(in srgb, var(--c) 70%, #000)); box-shadow: inset 0 0 0 .14cqw rgba(255, 255, 255, .55), inset 0 -.45cqw 0 rgba(0, 0, 0, .3); transition: transform .2s; }
+.mwb-ps.d { font-size: 2.1cqw; }
+.mwb-ps.hit { transform: scale(1.22); z-index: 1; box-shadow: 0 0 0 .3cqw #fff, 0 0 2.4cqw #ffd23f; animation: winBox .8s ease-in-out infinite; }
+.mwb-ball { position: absolute; width: 3.2%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; z-index: 2; left: 42.1%; top: 18.3%;
+  background: radial-gradient(circle at 34% 30%, #fffbe6 0 12%, #ffd23f 38%, #c0820c 72%, #6b4200); box-shadow: 0 0 1.4cqw rgba(255, 210, 63, .85), 0 .4cqw .6cqw rgba(0, 0, 0, .55); }
+/* Tir aux Cibles */
+.mwb-duck { position: absolute; width: 4.3%; height: 6.8%; translate: -50% -50%; padding: 0; border: 0; background: none; display: grid; place-items: end center; pointer-events: none; border-radius: 1cqw; }
+.mwb-duck b { font: 900 1.45cqw/1 KeCoin, Archivo, sans-serif; padding: .28cqw .38cqw .22cqw; border-radius: .6cqw; translate: 0 32%; color: #ffe27a; background: rgba(12, 4, 26, .86); box-shadow: 0 0 0 .14cqw #ffd23f, 0 .2cqw .5cqw rgba(0, 0, 0, .6); white-space: nowrap;
+  animation: mwbPop .35s cubic-bezier(.3, 1.8, .5, 1) var(--d, 0ms) both; transition: transform .25s, opacity .3s; }
+@keyframes mwbPop { from { opacity: 0; transform: scale(.2); } }
+.mwb-duck.hi b { color: #10061f; background: linear-gradient(180deg, #fff3a0, #f5b81c); }
+.mwb-duck.q b { color: #fff; background: linear-gradient(180deg, #ff5f7a, #c81e3c); box-shadow: 0 0 0 .14cqw #fff; animation: mwbPop .3s ease-out both; }
+.mwb.pick .mwb-duck { pointer-events: auto; cursor: crosshair; }
+.mwb.pick .mwb-duck:hover, .mwb.pick .mwb-duck:focus-visible { box-shadow: 0 0 0 .25cqw #fff, 0 0 1.6cqw #8bd93b; outline: none; }
+.mwb-duck.pick { z-index: 3; }
+.mwb-duck.pick b { transform: scale(2.4); color: #10061f; background: linear-gradient(180deg, #fff, #fde047); box-shadow: 0 0 0 .2cqw #fff, 0 0 2cqw #fde047; }
+.mwb-duck.dim b { opacity: .55; }
+.mwb.fall .mwb-duck b { opacity: 0; transform: translateY(4cqw) scale(.6); transition: opacity .4s, transform .6s ease-in; }
+/* Méga Folie */
+.mwb-wh { position: absolute; left: 5.86%; top: -.36%; width: 63.57%; height: 90%; }
+.mwb-wsvg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 .5cqw .8cqw rgba(0, 0, 0, .45)); }
+.mwb-arr { transition: opacity .3s; }
+.mwb-arr.off { filter: brightness(.45) saturate(.6); }
+.mwb-arr.me { animation: mwbArr .7s ease-in-out infinite alternate; }
+@keyframes mwbArr { to { opacity: .65; } }
+.mwb.pick .mwb-arr { pointer-events: auto; cursor: pointer; }
+.mwb-sign { position: absolute; z-index: 2; left: 88.6%; top: 34.5%; width: 11.4%; height: 23%; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none;
+  font: 900 3.3cqw/1.02 KeCoin, Archivo, Impact, sans-serif; color: #ffe27a; text-shadow: 0 0 .5cqw #ff9a1f, 0 0 1.4cqw #ff3d6e, 0 .2cqw 0 #6b1d00; letter-spacing: .05em; }
+.mwb-sign b:last-child { color: #ff5fa8; text-shadow: 0 0 .5cqw #ff3d9a, 0 0 1.4cqw #ff3d9a, 0 .2cqw 0 #5a0030; }
+.mw-show .flaps .apick { width: 70px; height: 62px; font-size: 24px; }
+.mw-show .apick.on { transform: translateY(-4px) scale(1.08); box-shadow: 0 0 0 3px #fff, 0 0 24px var(--c); }
+.mw-show .apick:disabled:not(.on) { opacity: .4; }
+@media (max-height: 520px) { .mw-show h2 { display: none; } .mwb { width: min(96vw, calc((100dvh - 110px) * 1.5)); } .mw-show .sub { display: none; } .mw-show .flaps .apick { height: 44px; } }
 @media (max-width: 600px) { .mw-spots { grid-template-columns: repeat(4, 1fr); gap: 5px; } .mw-spot b { font-size: 17px; } .mw-spot small { font-size: 9px; } }
 
 /* ============ Blackjack ============ */
@@ -15100,6 +15144,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'madwheel', date: '2026-11-16', title: 'Les bonus sur le plateau', items: ['Pachinko, Tir aux Cibles et Méga Folie se jouent maintenant sur le plateau de l’émission, avec l’animateur', 'Pachinko : la bille dorée rebondit sur les picots et tombe dans les multiplicateurs', 'Tir aux Cibles : un multiplicateur sur chacun des 132 canards, différent à chaque fois', 'Méga Folie : la grande roue à 3 flèches avec des multiplicateurs moyens et gros, DOUBLE et TRIPLE'] },
   { game: 'madwheel', date: '2026-11-16', title: 'Le jeu télé', items: ['Sur le plateau, l’animateur lance la roue quand tu appuies sur LANCER', 'Le son de l’émission (bouton 🔊 pour le couper)', 'La nouvelle roue dorée à ampoules, qui suit la caméra', 'Les 4 bonus peuvent s’acheter dans « Bonus & menu »'] },
   { game: 'madwheel-online', date: '2026-11-16', title: 'Le jeu télé', items: ['Sur le plateau, l’animateur lance la roue pour tout le salon', 'Le son de l’émission (bouton 🔊 pour le couper)', 'La nouvelle roue dorée à ampoules'] },
   { game: 'echecs', date: '2026-11-16', isNew: true, title: 'Nouveau : Les Échecs', items: ['Un vrai jeu d’échecs dans un salon noir et or, avec des pièces sculptées qui glissent sur l’échiquier', '4 adversaires de Facile à Expert, chacun avec son ELO, et ton propre classement', 'Défie tes amis en direct et misez jusqu’à 50 000 : le gagnant prend tout', 'Pendules, aides (meilleur coup, ouverture, coup tactique) et analyse de la partie'] },
@@ -18655,7 +18700,7 @@ const FILES = {
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'f6f4cf77cd'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '58092f9458'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'c757c58318'],
-  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', 'fe2651087f'],
+  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', 'abfa43b255'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '209ac1dbd4'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', 'a2079e2117'],
   bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '5cb920e7c2'],
@@ -18688,7 +18733,7 @@ const FILES = {
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', 'd17abb90c6'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
   'robots-online': ['robots', 'games/impl/robots.js', 'RobotsOnlineGame', '620d0b9f44'],
-  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', 'fe2651087f'],
+  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', 'abfa43b255'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
   'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', 'd17abb90c6'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
