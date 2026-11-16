@@ -83,7 +83,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   SEO. Pour l'ouvrir : retirer `"wip": true` puis `python3 tools/build.py`. Le propriétaire essaie un jeu en travaux
   avec `?essai` dans l'adresse (`renderGame` dans `pages/game.js`).
 - **Jeux retirés** (demande du propriétaire du 16 novembre 2026 : La Pizza Yo-Yo `taco`, Le Totem `pharaon`, Le Labo `labo`, Le
-  Coffre aux Pirates `pirates`, Le Filon `filon`, Le Plateau `plateau` ; Le Plateau Online reste) : `"wip": true, "retired": true` dans
+  Coffre aux Pirates `pirates`, Le Filon `filon`, Le Plateau `plateau`, puis Le Plateau Online `plateau-online`) : `"wip": true, "retired": true` dans
   leur ligne d'`ORIGINALS`. Ils sortent de `ALL_GAMES` (accueil, catégories, `SLOTS`, Défi spécial, pages SEO, affiches `UPDATES` : `LIVE`),
   mais `getGame()` les trouve encore (`RETIRED` du catalogue) : records, historique, profils. Page du jeu = « 🚫 Machine retirée » (sauf
   `?essai`). **Succès gardés** : `mySlots()` d'`achievements.js` ajoute une machine retirée si le joueur y a quelque chose, avec
@@ -875,6 +875,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 
 ## Suivi et administration
 
+- **Les jeux du moment, pour tous les joueurs** (page **`#stats`** / `#tendances`, menu « Tendances », encart « 🔥 Les machines les plus
+  jouées cette semaine » en tête de l'accueil ; demande du propriétaire du 16 novembre 2026 : « pour donner envie de jouer là où tout
+  le monde joue ») : `renderPublic` de `tableau.js`, lit `stats/public.json` de la branche **`data`** (raw.githubusercontent.com,
+  aucune lecture Firestore par les joueurs), fabriqué **chaque heure** par GitHub Actions **« Tendances »**
+  (`.github/workflows/tendances.yml`, `tools/admin/public-stats.mjs`, secret `FIREBASE_SERVICE_ACCOUNT`) : aujourd'hui / 7 / 30 jours,
+  par jeu ouvertures, tours, temps, KE misés, bonus ; tours par jour. **Jamais les gains des joueurs ni ce que rapporte le casino**
+  (seulement dans `#tableau`). Chaque jeu de la page a son lien « Jouer ».
 - **Tableau de bord** (`tableau.js`, page **`#tableau`** ou `#dashboard`, dans aucun menu, demande du propriétaire du 16 novembre 2026) :
   réservé aux comptes de `admins/` (lecture de `stats/`, règle déjà en place). Période (aujourd'hui, 7 / 30 jours, depuis le début),
   catégorie (machines à sous, tables, rapides, tout) ; chiffres du site (visites, nouveaux, comptes, tours, temps, KE misés, rapporté =
