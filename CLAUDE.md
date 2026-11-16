@@ -705,8 +705,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   **calculés sur chaque appareil à partir de la date** (mêmes chiffres pour tous, **aucune écriture Firestore**) : niveau qui monte chaque jour,
   solde, plus gros gain / bonus (records qui ne font que monter), succès. Visibles dans le classement (mélangés aux vrais, `board()`), la liste
   des joueurs en ligne (`online()`, plus le soir, présents ou non par tranche de 20 min ; jamais assis aux tables multijoueurs) et les gros gains
-  en direct (`bigWin()`, toutes les 7 à 18 min). **Toujours reconnaissables** (choix fait avec le propriétaire) : badge 🎰 `.mz-tag` et carte
-  « Joueur de la maison SpinBet » (`openPlayer` de `chat.js`). **Ne parlent jamais dans le chat** ; un joueur à moins de 200 KE qui demande de
+  en direct (`bigWin()`, toutes les 7 à 18 min). **Reconnaissables sur leur carte** : « Joueur de la maison SpinBet » (`openPlayer` de `chat.js`) ; le logo 🎰 à côté
+  du pseudo a été retiré le 16 novembre 2026 à la demande du propriétaire (`tag` vide). **Ne parlent jamais dans le chat** ; un joueur à moins de 200 KE qui demande de
   l'aide dans le chat (`HELP_RX`) est dépanné de 300 à 1 500 KE une fois par jour (`maisonHelp`, payé sur son appareil, il poste lui-même
   « 💸 a été dépanné de … KE par … »). **Jamais de prix** (absents des tournois, Battle Royale, défis, jackpot). Pour les retirer : `ON = false`.
 

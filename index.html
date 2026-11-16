@@ -18762,7 +18762,7 @@ async function openPlayer(uid, name, { msgId = null } = {}) {
     const e = MZ.byUid(uid); if (!e) return;
     const { rankBadge: rb, rankOf: ro } = __mods['progress.js'], rk = ro(e.level), G = __mods['games/index.js'].getGame;
     const st = (ico, label, v) => `<div><span>${ico}</span><small>${label}</small><b>${v}</b></div>`;
-    await modal(`<div class="pc"><div class="pc-head"><span class="pc-badge">${rb(rk, 56)}</span><div><h3>${esc(e.name)} ${MZ.tag}</h3><small class="pc-rank">${rk.name} · Niveau ${e.level}</small></div></div>
+    await modal(`<div class="pc"><div class="pc-head"><span class="pc-badge">${rb(rk, 56)}</span><div><h3>${esc(e.name)}</h3><small class="pc-rank">${rk.name} · Niveau ${e.level}</small></div></div>
       <p class="pc-mz">🎰 Joueur de la maison SpinBet</p>
       <div class="pc-stats">${st('💰', 'Solde', fmt(e.bal))}${st('💥', 'Plus gros gain', `${fmt(e.best)}${G(e.bestGame) ? `<small> · ${esc(G(e.bestGame).name)}</small>` : ''}`)}${st('🎁', 'Plus gros bonus', fmt(e.bestBonus))}${st('🏅', 'Succès', `${e.ach} pts`)}</div>
       <div class="ct-menu pc-acts"><button class="btn" data-value="ok">Fermer</button></div></div>`, { cls: 'pc-modal' });
@@ -19631,7 +19631,7 @@ function online(b, t = Date.now()) {
   return inside ? rnd(b.id, 'on', slot) < 0.72 : rnd(b.id, 'off', slot) < 0.06;
 }
 const isBot = (uid) => String(uid || '').startsWith('maison:');
-const tag = '<i class="mz-tag" title="Joueur de la maison SpinBet">🎰</i>';
+const tag = ''; // plus de logo 🎰 à côté du pseudo (voulu par le propriétaire) ; leur carte dit toujours « Joueur de la maison SpinBet »
 
 const api = {
   on: ON, isBot, tag,
