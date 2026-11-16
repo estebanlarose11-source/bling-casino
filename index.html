@@ -9836,6 +9836,10 @@ html .modal.dp-modal { width: min(460px, 100%); padding: 0 !important; border-ra
 .dp-dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 320px; }
 .dp-dots i { width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 255, 255, .12); transition: background .3s; }
 .dp-dots.sm i { width: 9px; height: 9px; }
+.dp-dots.xs { gap: 4px; } .dp-dots.xs i { width: 7px; height: 7px; }
+.dp-ck { margin-top: -2px; } .dp-ck.on { color: #fbbf24; font-weight: 600; }
+.dp-amt.lock { opacity: .55 !important; } .dp-amt.lock small { color: #fbbf24; }
+.dp-hero-amts button:disabled { opacity: .5; cursor: not-allowed; }
 .dp-dots i.ok { background: var(--mq-pink); box-shadow: 0 0 8px rgba(255, 61, 154, .6); }
 .dp-dots i.now { background: #fbbf24; animation: dpPulse 1s ease-in-out infinite; }
 @keyframes dpPulse { 50% { transform: scale(1.35); opacity: .7; } }
@@ -25210,7 +25214,7 @@ function renderRewards(r) {
   r.innerHTML = `<section class="rw-page">
     <div class="rw-hero panel"><span class="rw-hero-ico">📺</span><div><h1>Récompenses vidéo</h1>
       <p class="muted">Une pub de 15 secondes contre des KE, des tours, des cartes… C’est toi qui choisis, quand tu veux : jamais de pub imposée en plein jeu.</p>
-      <p class="muted">Besoin de plus ? <a href="#depot" data-deposit>💳 Dépose des KE à la caisse</a> : jusqu’à ${fmt(25000)} par pub.</p></div></div>
+      <p class="muted">Besoin de plus ? <a href="#depot" data-deposit>💳 Dépose des KE à la caisse</a> : dès 1 pub pour ${fmt(20000)}.</p></div></div>
     <div class="rw-chest-bar panel"><div><b>🧰 Coffre des pubs</b><small>${c.next ? `Encore ${c.next} pub${c.next > 1 ? 's' : ''} pour ouvrir un coffre de ${fmt(c.ke)}` : 'Tous les coffres du jour sont ouverts : reviens demain !'} · ${c.chests} / ${c.max} aujourd’hui</small></div>
       <div class="rw-bar"><i style="width:${pct.toFixed(0)}%"></i></div></div>
     <h2 class="rw-h">Tout de suite <small>${ready()} disponible${ready() > 1 ? 's' : ''}</small></h2>
@@ -25289,7 +25293,9 @@ return { renderRewards, ready, NOW, LATER };
 __mods['depot.js'] = (() => {
 // « Déposer » (demande du propriétaire du 16 novembre 2026) : le « + » à côté du solde (et la page Caisse) ouvre la caisse,
 // comme dans un casino en ligne : on choisit un montant, le moyen de paiement est la pub vidéo, et plus le dépôt est gros,
-// plus il y a de pubs à regarder (adsFor : 1 pub par tranche de DEP.per). Argent fictif : aucun vrai paiement.
+// plus il y a de pubs à regarder (PACKS ; montant libre : 1 pub par tranche de CUSTOM_PER, toujours plus cher que l'offre à
+// 500 000). Les 2 petites offres (1 et 2 pubs, CHEAP) : LOCK.uses dépôts puis LOCK.min minutes de pause (profile.dep.ck).
+// Argent fictif : aucun vrai paiement.
 // Limites : DEP.max par dépôt, DEP.day par jour. Bonus de bienvenue sur le 1er dépôt (WELCOME). Un dépôt commencé puis
 // interrompu reste en attente (profile.dep.pend) : on le reprend là où on s'est arrêté. Reçus dans profile.dep.hist.
 // Le propriétaire et les appareils ?nopub (adPolicy.noAds) déposent sans pub.
@@ -25301,11 +25307,20 @@ const { modal, toast } = __mods['ui.js'];
 const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
-const DEP = { per: 25000, min: 5000, max: 500000, day: 1000000, step: 5000, sec: 15 };
-const PRESETS = [20000, 50000, 100000, 250000, 500000];
+const DEP = { min: 5000, max: 500000, day: 1000000, step: 5000, sec: 15 };
+// amount → ads (voulu par le propriétaire le 16 novembre 2026 : 20 000 = 1 pub, 50 000 = 2, 100 000 = 10, 250 000 = 30, 500 000 = 60)
+const PACKS = { 20000: 1, 50000: 2, 100000: 10, 250000: 30, 500000: 60 };
+const PRESETS = Object.keys(PACKS).map(Number);
+// the 2 small packs: LOCK.uses deposits with them, then both are locked LOCK.min minutes (the others stay open)
+const CHEAP = [20000, 50000];
+const LOCK = { uses: 2, min: 30 };
+// a free amount always costs more ads than the 500 000 pack (60 ads, 1 per 8 333): 1 ad per CUSTOM_PER
+const CUSTOM_PER = 7500;
 const WELCOME = { pct: 50, max: 25000 };
 const LS = 'spinbet_depot';
-const adsFor = (a) => Math.max(1, Math.ceil(a / DEP.per));
+const adsFor = (a, custom) => (!custom && PACKS[a]) || Math.max(1, Math.ceil(a / CUSTOM_PER));
+const isCheap = (a, custom) => !custom && CHEAP.includes(a);
+const mins = (ms) => Math.max(1, Math.ceil(ms / 60000));
 const pubs = (n) => `${n} pub${n > 1 ? 's' : ''}`;
 const dur = (n) => { const s = n * DEP.sec; return s < 60 ? `${s} s` : `${Math.round(s / 60)} min`; };
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
@@ -25321,18 +25336,29 @@ function state() {
     const l = local();
     if (l.day === d.day) d.sum = Math.max(d.sum, l.sum || 0);
     if (l.first && !d.first) d.first = l.first;
+    if (l.ck && !d.ck) d.ck = l.ck;
   }
   return d;
 }
 function save(fn) {
   if (!profiles.current) return;
   profiles.update('dep', (me) => { const d = state(); fn(d); me.dep = d; });
-  if (!profiles.online) { const d = state(); try { localStorage.setItem(LS, JSON.stringify({ day: d.day, sum: d.sum, first: d.first })); } catch { /* ignore */ } }
+  if (!profiles.online) { const d = state(); try { localStorage.setItem(LS, JSON.stringify({ day: d.day, sum: d.sum, first: d.first, ck: d.ck })); } catch { /* ignore */ } }
 }
 const bonusOf = (a, d = state()) => (d.first ? 0 : Math.min(WELCOME.max, Math.round((a * WELCOME.pct) / 100)));
 // what can still be deposited today (a deposit waiting for its ads counts already)
 const room = (d = state()) => Math.max(0, DEP.day - d.sum - (d.pend ? d.pend.a : 0));
 const capOf = (d = state()) => Math.min(DEP.max, room(d));
+// time left before the 2 small packs open again (0 = open)
+const lockLeft = (d = state()) => Math.max(0, (d.ck?.until || 0) - Date.now());
+const usable = (a, d) => a <= capOf(d) && !(CHEAP.includes(a) && lockLeft(d));
+// the amount shown when the window opens: the one asked for if it can be taken, else 50 000, 100 000…
+function pickAmt(pre) {
+  const d = state(), cap = capOf(d);
+  if (pre && !PACKS[pre]) return { amt: Math.max(DEP.min, Math.min(cap, Math.round(pre / DEP.step) * DEP.step)), custom: true };
+  const a = [pre, 50000, 100000, 20000, 250000, 500000].find((x) => x && usable(x, d));
+  return a ? { amt: a, custom: false } : { amt: Math.max(DEP.min, Math.floor(cap / DEP.step) * DEP.step), custom: true };
+}
 
 /* ---------- the window ---------- */
 let cur = null, running = false;
@@ -25340,12 +25366,9 @@ const box = () => (cur?.el?.isConnected ? cur.el : null);
 
 function openDeposit(pre) {
   if (!profiles.current) return toast('Connecte-toi d’abord', 'warn');
-  if (box()) { if (pre) { cur.amt = +pre; cur.custom = !PRESETS.includes(+pre); cur.view = 'dep'; paint(); } return; }
-  const d = state(), cap = capOf(d);
-  let amt = +pre || 50000;
-  if (amt > cap) amt = [...PRESETS].reverse().find((a) => a <= cap) || Math.floor(cap / DEP.step) * DEP.step;
-  modal('<div class="dp" data-dp></div>', { cls: 'dp-modal' }).then(() => { cur = null; });
-  cur = { el: document.querySelector('.modal.dp-modal [data-dp]'), amt, custom: !PRESETS.includes(amt), view: 'dep', rec: null, sure: false };
+  if (box()) { if (pre) { Object.assign(cur, pickAmt(+pre)); cur.view = 'dep'; paint(); } return; }
+  modal('<div class="dp" data-dp></div>', { cls: 'dp-modal' }).then(() => { clearTimeout(cur?.lt); cur = null; });
+  cur = { el: document.querySelector('.modal.dp-modal [data-dp]'), ...pickAmt(+pre || 0), view: 'dep', rec: null, sure: false };
   paint();
   wire();
 }
@@ -25357,7 +25380,7 @@ function head(d) {
 }
 
 function sumHTML(d) {
-  const cap = capOf(d), a = cur.amt, n = adsFor(a), b = bonusOf(a, d), ok = a >= DEP.min && a <= cap;
+  const a = cur.amt, n = adsFor(a, cur.custom), b = bonusOf(a, d);
   return `<div class="dp-sum">
       <div><span>Dépôt</span><b>${fmt(a)}</b></div>
       ${b ? `<div class="dp-sb"><span>🎁 Bonus de bienvenue +${WELCOME.pct} %</span><b>+${fmt(b)}</b></div>` : ''}
@@ -25368,22 +25391,24 @@ function sumHTML(d) {
 }
 // the button stays at the bottom of the window (sticky) while the player scrolls the amounts
 function footHTML(d) {
-  const cap = capOf(d), a = cur.amt, n = adsFor(a), b = bonusOf(a, d), ok = a >= DEP.min && a <= cap;
-  return `<small>${ok ? `${pubs(n)} · ≈ ${dur(n)} · tu reçois <b>${fmt(a + b)}</b>` : a > cap ? `Au plus ${fmt(cap)} pour ce dépôt` : `Au moins ${fmt(DEP.min)}`}</small>
-    <button class="btn primary lg dp-go" data-dp-go ${ok ? '' : 'disabled'}>${ok ? `Déposer ${fmt(a)}` : a > cap ? `Maximum ${fmt(cap)}` : `Minimum ${fmt(DEP.min)}`}</button>`;
+  const cap = capOf(d), a = cur.amt, n = adsFor(a, cur.custom), b = bonusOf(a, d), lk = isCheap(a, cur.custom) && lockLeft(d);
+  const ok = a >= DEP.min && a <= cap && !lk;
+  return `<small>${ok ? `${pubs(n)} · ≈ ${dur(n)} · tu reçois <b>${fmt(a + b)}</b>` : lk ? `Offre en pause encore ${mins(lk)} min` : a > cap ? `Au plus ${fmt(cap)} pour ce dépôt` : `Au moins ${fmt(DEP.min)}`}</small>
+    <button class="btn primary lg dp-go" data-dp-go ${ok ? '' : 'disabled'}>${ok ? `Déposer ${fmt(a)}` : lk ? 'Choisis un autre montant' : a > cap ? `Maximum ${fmt(cap)}` : `Minimum ${fmt(DEP.min)}`}</button>`;
 }
 
 function depHTML(d) {
-  const cap = capOf(d), pct = Math.min(100, (d.sum / DEP.day) * 100);
+  const cap = capOf(d), pct = Math.min(100, (d.sum / DEP.day) * 100), lk = lockLeft(d), used = d.ck?.n || 0;
   if (cap < DEP.min) return `<div class="dp-full"><b>🛑 Limite de dépôt du jour atteinte</b><p>Tu as déposé ${fmt(d.sum)} aujourd’hui (${fmt(DEP.day)} au plus par jour). Reviens demain, ou profite des <a href="#recompenses" data-value="go">récompenses vidéo</a> et du <a href="#profil" data-value="go">cadeau du jour</a>.</p></div>${limHTML(d, pct)}`;
   return `${d.first ? '' : `<div class="dp-welcome"><b>🎁 BONUS DE BIENVENUE</b><span>+${WELCOME.pct} % sur ton 1er dépôt, jusqu’à ${fmt(WELCOME.max)} offerts</span></div>`}
     <div class="dp-sec"><b class="dp-lab">Moyen de paiement</b>
       <div class="dp-method"><span class="dp-mi"><svg class="ico"><use href="#ui-tv"/></svg></span><div><b>Pub vidéo</b><small>Instantané · sans frais · ${DEP.sec} s par pub</small></div><i class="dp-check">✓</i></div></div>
     <div class="dp-sec"><b class="dp-lab">Montant</b>
-      <div class="dp-amts">${PRESETS.map((a) => `<button class="dp-amt${a === cur.amt && !cur.custom ? ' on' : ''}" data-dp-amt="${a}" ${a > cap ? 'disabled' : ''}>${a === 50000 ? '<em>POPULAIRE</em>' : a === 500000 ? '<em class="mx">MAX</em>' : ''}<b>${fmt(a)}</b><small>${pubs(adsFor(a))}</small></button>`).join('')}
+      <div class="dp-amts">${PRESETS.map((a) => { const locked = lk && CHEAP.includes(a); return `<button class="dp-amt${a === cur.amt && !cur.custom ? ' on' : ''}${locked ? ' lock' : ''}" data-dp-amt="${a}" ${a > cap || locked ? 'disabled' : ''}>${locked ? '' : a === 50000 ? '<em>POPULAIRE</em>' : a === 500000 ? '<em class="mx">MAX</em>' : ''}<b>${fmt(a)}</b><small>${locked ? `🔒 <span data-dp-lk>${mins(lk)}</span> min` : pubs(PACKS[a])}</small></button>`; }).join('')}
         <button class="dp-amt${cur.custom ? ' on' : ''}" data-dp-amt="custom"><b>Autre</b><small>montant libre</small></button></div>
+      <small class="dp-hint dp-ck${lk ? ' on' : ''}">${lk ? `🔒 Offres à 1 et 2 pubs en pause : encore <span data-dp-lk>${mins(lk)}</span> min` : `Offres à 1 et 2 pubs : ${LOCK.uses} dépôts${used ? ` (encore ${LOCK.uses - used})` : ''}, puis ${LOCK.min} min de pause`}</small>
       ${cur.custom ? `<div class="dp-custom"><button data-dp-step="-1" aria-label="Moins">−</button><label><input type="text" inputmode="numeric" data-dp-in value="${cur.amt.toLocaleString('fr-FR')}" aria-label="Montant du dépôt"><span></span></label><button data-dp-step="1" aria-label="Plus">+</button></div>
-        <small class="dp-hint">De ${fmt(DEP.min)} à ${fmt(cap)} · 1 pub par tranche de ${fmt(DEP.per)}</small>` : ''}</div>
+        <small class="dp-hint">De ${fmt(DEP.min)} à ${fmt(cap)} · 1 pub par tranche de ${fmt(CUSTOM_PER)}</small>` : ''}</div>
     <div data-dp-sum>${sumHTML(d)}</div>
     ${limHTML(d, pct)}`;
 }
@@ -25397,7 +25422,7 @@ function flowHTML(d) {
     <div class="dp-ring"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44"/><circle class="pg" cx="50" cy="50" r="44" style="stroke-dashoffset:${(276.5 * (1 - p.done / p.need)).toFixed(1)}"/></svg><b>${p.done}<small>/${p.need}</small></b></div>
     <small class="dp-k">${running ? (noAds ? 'PAIEMENT EN COURS…' : 'DÉPÔT EN COURS…') : 'DÉPÔT EN ATTENTE'}</small>
     <h3>${fmt(p.a)}</h3>
-    <div class="dp-dots${p.need > 12 ? ' sm' : ''}">${dots}</div>
+    <div class="dp-dots${p.need > 30 ? ' xs' : p.need > 12 ? ' sm' : ''}">${dots}</div>
     <p class="dp-fl">${running ? (noAds ? 'Vérification du dépôt…' : `Pub ${Math.min(p.need, p.done + 1)} sur ${p.need} : regarde-la jusqu’au bout`) : `${p.done} pub${p.done > 1 ? 's' : ''} regardée${p.done > 1 ? 's' : ''} sur ${p.need} · il en reste ${p.need - p.done}`}</p>
     ${running ? '' : `<button class="btn primary lg dp-go" data-dp-cont>▶ ${p.done ? 'Continuer' : 'Regarder'} · pub ${p.done + 1} / ${p.need}</button>
       <button class="btn ghost dp-cancel" data-dp-cancel>${cur.sure ? 'Oui, annuler (les pubs vues sont perdues)' : 'Annuler ce dépôt'}</button>`}
@@ -25435,6 +25460,16 @@ function paint() {
   const form = cur.view !== 'hist' && !(cur.view === 'rec' && cur.rec) && !d.pend && capOf(d) >= DEP.min;
   const body = cur.view === 'hist' ? histHTML(d) : cur.view === 'rec' && cur.rec ? recHTML() : d.pend ? flowHTML(d) : depHTML(d);
   el.innerHTML = `${head(d)}<div class="dp-body">${body}</div>${form ? `<div class="dp-foot" data-dp-foot>${footHTML(d)}</div>` : ''}`;
+  clearTimeout(cur.lt);
+  if (form && lockLeft(d)) cur.lt = setTimeout(lockTick, 20000);
+}
+// the small packs' countdown: the minutes go down, and the window opens them again when the pause is over
+function lockTick() {
+  const el = box(); if (!el || running) return;
+  const lk = lockLeft();
+  if (!lk) { if (el.contains(document.activeElement) && document.activeElement.matches('input')) { cur.lt = setTimeout(lockTick, 5000); return; } return paint(); }
+  el.querySelectorAll('[data-dp-lk]').forEach((x) => { x.textContent = mins(lk); });
+  cur.lt = setTimeout(lockTick, 20000);
 }
 function paintSum() {
   const d = state(), s = box()?.querySelector('[data-dp-sum]'), f = box()?.querySelector('[data-dp-foot]');
@@ -25458,7 +25493,7 @@ function wire() {
     const t = e.target.closest('button'); if (!t || !cur) return;
     if (t.dataset.dpTab) { cur.view = t.dataset.dpTab; cur.sure = false; return paint(); }
     if (t.dataset.dpAmt) {
-      if (t.dataset.dpAmt === 'custom') { cur.custom = true; paint(); const i = box()?.querySelector('[data-dp-in]'); i?.focus(); i?.select?.(); return; }
+      if (t.dataset.dpAmt === 'custom') { cur.custom = true; cur.amt = Math.max(DEP.min, Math.min(capOf(), cur.amt)); paint(); const i = box()?.querySelector('[data-dp-in]'); i?.focus(); i?.select?.(); return; }
       cur.custom = false; cur.amt = +t.dataset.dpAmt; return paint();
     }
     if (t.dataset.dpStep) return setAmt(cur.amt + (+t.dataset.dpStep) * DEP.step, true);
@@ -25468,7 +25503,7 @@ function wire() {
       if (!cur.sure) { cur.sure = true; return paint(); }
       cur.sure = false; save((d) => { d.pend = null; }); toast('Dépôt annulé', 'warn'); return paint();
     }
-    if ('dpAgain' in t.dataset) { cur.view = 'dep'; cur.rec = null; return paint(); }
+    if ('dpAgain' in t.dataset) { Object.assign(cur, pickAmt(0)); cur.view = 'dep'; cur.rec = null; return paint(); }
   });
   el.addEventListener('input', (e) => {
     if (!e.target.matches('[data-dp-in]')) return;
@@ -25481,10 +25516,11 @@ function wire() {
 }
 
 function start() {
-  const d = state(), a = cur.amt;
+  const d = state(), a = cur.amt, custom = cur.custom;
   if (d.pend) return run();
   if (!(a >= DEP.min) || a > capOf(d)) return toast(`Choisis un montant entre ${fmt(DEP.min)} et ${fmt(capOf(d))}`, 'warn');
-  save((x) => { x.pend = { id: newId(), a, need: adsFor(a), done: 0, t: Date.now() }; });
+  if (isCheap(a, custom) && lockLeft(d)) return toast(`Offre en pause encore ${mins(lockLeft(d))} min : choisis un autre montant`, 'warn');
+  save((x) => { x.pend = { id: newId(), a, need: adsFor(a, custom), done: 0, t: Date.now(), ck: isCheap(a, custom) ? 1 : 0 }; });
   run();
 }
 
@@ -25524,6 +25560,7 @@ function finish() {
     rec = { id: p.id, t: Date.now(), a: p.a, b, n: p.need };
     d.sum += p.a;
     if (!d.first) d.first = rec.t;
+    if (p.ck) { const n = (d.ck?.n || 0) + 1; d.ck = n >= LOCK.uses ? { n: 0, until: rec.t + LOCK.min * 60000 } : { n, until: d.ck?.until || 0 }; }
     d.hist = [rec, ...(d.hist || [])].slice(0, 12);
     d.pend = null;
   });
@@ -25536,7 +25573,7 @@ function finish() {
   paint();
   sfx.bigWin?.();
   fx.confetti?.(90);
-  fx.coins?.(Math.min(70, 20 + adsFor(rec.a) * 4), box()?.querySelector('.dp-ok h3'));
+  fx.coins?.(Math.min(70, 20 + rec.n * 2), box()?.querySelector('.dp-ok h3'));
   dispatchEvent(new CustomEvent('sb:deposit', { detail: { amount: rec.a, bonus: rec.b } }));
 }
 
@@ -25553,14 +25590,14 @@ function heroHTML() {
   const d = state();
   return `<section class="panel dp-hero">
     <div class="dp-ht"><small>CAISSE</small><h1>Déposer des KE</h1>
-      <p class="muted">Choisis ton montant et paie en regardant des pubs vidéo : ton solde monte tout de suite. Plus tu déposes, plus il y a de pubs (1 pub par tranche de ${fmt(DEP.per)}).</p>
+      <p class="muted">Choisis ton montant et paie en regardant des pubs vidéo : ton solde monte tout de suite. Plus tu déposes, plus il y a de pubs : de 1 pub pour ${fmt(20000)} à 60 pubs pour ${fmt(500000)}.</p>
       ${d.first ? '' : `<span class="dp-hb">🎁 +${WELCOME.pct} % sur ton 1er dépôt, jusqu’à ${fmt(WELCOME.max)}</span>`}</div>
-    <div class="dp-hero-amts">${PRESETS.map((a) => `<button data-deposit="${a}"><b>${fmt(a)}</b><small>${pubs(adsFor(a))}</small></button>`).join('')}</div>
+    <div class="dp-hero-amts">${PRESETS.map((a) => { const locked = lockLeft(d) && CHEAP.includes(a); return `<button data-deposit="${a}" ${locked ? 'disabled' : ''}><b>${fmt(a)}</b><small>${locked ? `🔒 ${mins(lockLeft(d))} min` : pubs(PACKS[a])}</small></button>`; }).join('')}</div>
     <button class="btn primary lg dp-hgo" data-deposit>${d.pend ? `▶ Reprendre mon dépôt de ${fmt(d.pend.a)}` : '💳 Déposer'}</button>
   </section>`;
 }
 
-return { openDeposit, heroHTML, DEP, PRESETS, WELCOME, adsFor };
+return { openDeposit, heroHTML, DEP, PACKS, PRESETS, CHEAP, LOCK, CUSTOM_PER, WELCOME, adsFor };
 })();
 
 // ---- shorts.js ----

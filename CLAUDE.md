@@ -842,8 +842,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   solde (`.top-refill`, `data-deposit` ; sur ordinateur une pilule rose « DÉPOSER », `.tr-lbl`) ouvre la caisse (`depot.js`,
   `openDeposit()`, fenêtre `.dp-modal`, en bas de l'écran sur téléphone) : moyen de paiement « Pub vidéo », montants `PRESETS`
   (20 000 · 50 000 · 100 000 · 250 000 · 500 000) ou montant libre (par 5 000), récapitulatif (dépôt, bonus, frais 0, pubs, « tu
-  reçois »), bouton collé en bas (`.dp-foot`). **1 pub par tranche de 25 000** (`adsFor`, `DEP.per`) : 20 000 = 1 pub, 50 000 = 2,
-  100 000 = 4, 500 000 = 20. Limites : `DEP.max` 500 000 par dépôt, `DEP.day` 1 000 000 par jour. **Bonus de bienvenue** +50 % sur le
+  reçois »), bouton collé en bas (`.dp-foot`). **Prix en pubs voulus par le propriétaire** (`PACKS`) : 20 000 = 1 pub, 50 000 = 2,
+  100 000 = 10, 250 000 = 30, 500 000 = 60 ; les 2 petites offres (`CHEAP`) : 2 dépôts puis **30 min de pause** pour les deux (`LOCK`,
+  `profile.dep.ck = { n, until }`, cadenas et minutes sur les tuiles) ; **montant libre** à tout moment, toujours plus cher que l'offre
+  à 500 000 : 1 pub par tranche de 7 500 (`CUSTOM_PER` : 100 000 = 14 pubs, 500 000 = 67). Limites : `DEP.max` 500 000 par dépôt, `DEP.day` 1 000 000 par jour. **Bonus de bienvenue** +50 % sur le
   1er dépôt, jusqu'à 25 000 (`WELCOME`). Pubs à la suite (`ads.one(id, step, of)` d'`ads.js`, « Publicité 1 / 4 »), comptées pour le
   coffre des pubs ; une pub fermée = dépôt **en attente** (`profile.dep.pend`, « Continuer · pub 3 / 4 » ou « Annuler ») ; reçu avec
   n° de transaction `DEP-…`, onglet « Mes dépôts » (`profile.dep.hist`, 12 derniers). Invités : total du jour et bonus aussi gardés
