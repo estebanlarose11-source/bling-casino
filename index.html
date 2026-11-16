@@ -9014,6 +9014,73 @@ a.tb-hero[href]:hover { border-color: rgba(255, 61, 154, .5); }
 @media (max-width: 1100px) { .tb-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } .tb-heroes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 700px) { .tb-kpis, .tb-heroes, .tb-grid { grid-template-columns: 1fr 1fr; } .tb-heroes, .tb-grid { grid-template-columns: 1fr; } .tb-kpis b { font-size: 20px; } }
 
+/* ============ Offre spéciale parrainage (demande du propriétaire du 16 novembre 2026 : 250 000 KE + 100 tours à 1 000 KE sur 3
+   machines au choix, quand l'ami atteint le niveau 5 et qu'on a ajouté le Snap du site ; « une case plus voyante ») ============ */
+/* the banner of the home page, right under the categories */
+.rf-promo { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 18px; margin: 0 0 22px; padding: 20px 24px; border-radius: 18px; overflow: hidden; isolation: isolate; color: #fff; text-decoration: none;
+  background: radial-gradient(120% 140% at 0% 0%, rgba(255, 196, 0, .32), transparent 55%), radial-gradient(100% 120% at 100% 100%, rgba(255, 61, 154, .45), transparent 60%), linear-gradient(120deg, #2a0f2e, #3b0b2b 45%, #4a1a08);
+  box-shadow: inset 0 0 0 2px rgba(255, 207, 92, .85), 0 0 0 1px rgba(255, 61, 154, .5), 0 14px 40px rgba(255, 61, 154, .3), 0 0 60px rgba(255, 196, 0, .18); }
+.rf-promo::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, .22) 48%, transparent 60%); transform: translateX(-100%); animation: rfShine 3.2s ease-in-out infinite; }
+@keyframes rfShine { 55%, 100% { transform: translateX(100%); } }
+.rf-p-ico { font-size: 54px; line-height: 1; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); animation: rfBob 2.4s ease-in-out infinite; }
+@keyframes rfBob { 50% { transform: translateY(-5px) rotate(-6deg); } }
+.rf-p-txt { display: grid; gap: 4px; min-width: 0; }
+.rf-p-tag { justify-self: start; padding: 4px 10px; border-radius: 999px; font: 800 11.5px Inter, sans-serif; letter-spacing: 1.6px; color: #1b0610; background: linear-gradient(90deg, #ffd34d, #ff8a3d); box-shadow: 0 0 14px rgba(255, 196, 0, .55); }
+.rf-p-amt { font: 900 clamp(30px, 4.4vw, 46px)/1 KeCoin, Inter, sans-serif; letter-spacing: -.01em; background: linear-gradient(180deg, #fff6c2, #ffd34d 45%, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 0 rgba(120, 40, 0, .6)); }
+.rf-p-amt small { font-size: .5em; -webkit-text-fill-color: #fff; color: #fff; }
+.rf-p-sub { font: 600 14.5px/1.35 Inter, KeCoin, sans-serif; color: #f6e7f0; }
+.rf-p-sub b { color: #ffd34d; }
+.rf-p-go { padding: 14px 22px; border-radius: 12px; font: 800 15px Inter, sans-serif; letter-spacing: .5px; white-space: nowrap; color: #fff; background: linear-gradient(180deg, #ff4fae, #f0237f); box-shadow: 0 10px 24px rgba(255, 46, 150, .45); animation: rfPulse 1.6s ease-in-out infinite; }
+@keyframes rfPulse { 50% { transform: scale(1.06); } }
+.rf-promo:hover { box-shadow: inset 0 0 0 2px #ffe08a, 0 0 0 1px rgba(255, 61, 154, .7), 0 18px 46px rgba(255, 61, 154, .4), 0 0 70px rgba(255, 196, 0, .25); }
+@media (max-width: 760px) {
+  .rf-promo { grid-template-columns: minmax(0, 1fr) auto; gap: 10px 12px; padding: 16px 16px 16px 18px; margin-bottom: 16px; }
+  .rf-p-ico { grid-row: 1; grid-column: 2; align-self: start; font-size: 40px; }
+  .rf-p-txt { grid-row: 1; grid-column: 1; }
+  .rf-p-go { grid-column: 1 / -1; justify-self: stretch; text-align: center; padding: 12px; }
+  .rf-p-sub { font-size: 13.5px; }
+}
+@media (prefers-reduced-motion: reduce) { .rf-promo::before, .rf-p-ico, .rf-p-go { animation: none; } }
+/* the side menu: a badge on Parrainage */
+.side-new.rf-hot { color: #1b0610 !important; background: linear-gradient(90deg, #ffd34d, #ff8a3d) !important; box-shadow: 0 0 10px rgba(255, 196, 0, .5) !important; }
+/* the page */
+.rf-hero { position: relative; margin: 0 0 18px; padding: 22px 22px 20px; border-radius: 16px; overflow: hidden; text-align: left;
+  background: radial-gradient(90% 120% at 0% 0%, rgba(255, 196, 0, .28), transparent 60%), radial-gradient(90% 120% at 100% 100%, rgba(255, 61, 154, .4), transparent 60%), linear-gradient(120deg, #2a0f2e, #3b0b2b 50%, #4a1a08);
+  box-shadow: inset 0 0 0 2px rgba(255, 207, 92, .8), 0 12px 34px rgba(255, 61, 154, .25); }
+.rf-hero .rf-tag { display: inline-block; margin-bottom: 10px; padding: 5px 12px; border-radius: 999px; font: 800 12px Inter, sans-serif; letter-spacing: 1.6px; color: #1b0610; background: linear-gradient(90deg, #ffd34d, #ff8a3d); }
+.rf-hero h1 { margin: 0; font: 900 clamp(26px, 4.6vw, 42px)/1.1 Inter, KeCoin, sans-serif !important; }
+.rf-hero h1 b { display: block; font-family: KeCoin, Inter, sans-serif; background: linear-gradient(180deg, #fff6c2, #ffd34d 45%, #f59e0b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.rf-hero .rf-plus { margin: 10px 0 0; font: 700 16px/1.35 Inter, KeCoin, sans-serif; color: #fff; }
+.rf-hero .rf-plus b { color: #ffd34d; }
+.rf-hero .rf-friend { margin: 10px 0 0; font: 500 14px Inter, KeCoin, sans-serif; color: #f1dcea; }
+.rf-steps { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 10px; }
+.rf-step { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; padding: 14px; border-radius: 14px; background: var(--mq-card, #15121b); border: 1px solid var(--mq-line, rgba(255, 255, 255, .08)); }
+.rf-step > i { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font: 900 18px Inter, sans-serif; font-style: normal; color: #fff; background: linear-gradient(180deg, #ff4fae, #c0156a); box-shadow: 0 0 14px rgba(255, 61, 154, .45); }
+.rf-step.done > i { background: linear-gradient(180deg, #4ade80, #15803d); box-shadow: 0 0 14px rgba(74, 222, 128, .45); }
+.rf-step.done { border-color: rgba(74, 222, 128, .35); }
+.rf-st { display: grid; gap: 4px; min-width: 0; }
+.rf-st > b { font: 800 16px Inter, sans-serif; }
+.rf-st > small { font: 500 13.5px/1.4 Inter, KeCoin, sans-serif; color: var(--mq-muted, #a9a3b5); }
+.rf-st > small b { color: #ffd34d; }
+.rf-st .ref-box { margin: 8px 0 0; }
+.rf-snap { justify-self: start; margin-top: 8px; padding: 11px 18px !important; border-radius: 12px !important; font: 800 15px Inter, sans-serif !important; color: #111 !important; background: #fffc00 !important; box-shadow: 0 8px 20px rgba(255, 252, 0, .25) !important; }
+.ref-w { align-items: center; gap: 10px; margin-top: 6px; }
+.rf-bar { flex: 1; height: 6px; border-radius: 6px; background: rgba(255, 255, 255, .1); overflow: hidden; }
+.rf-bar b { display: block; height: 100%; border-radius: 6px; background: linear-gradient(90deg, #ff3d9a, #ffd34d); }
+.rf-h { display: flex; align-items: baseline; gap: 10px; margin: 18px 0 10px; }
+.rf-h small { font: 700 13px Inter, sans-serif; color: var(--mq-pink, #ff3d9a); }
+.rf-games { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.rf-g { position: relative; display: grid; align-content: end; aspect-ratio: 1; padding: 0; border-radius: 12px; overflow: hidden; cursor: pointer; border: 2px solid transparent; background: linear-gradient(160deg, var(--c1), var(--c2)); color: #fff; text-align: left; }
+.rf-g img, .rf-g .rf-svg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; padding: 0; background: none; }
+.rf-g .rf-svg svg { width: 100%; height: 100%; display: block; }
+.rf-g span:not(.rf-svg) { position: relative; padding: 18px 8px 7px; font: 700 12.5px/1.2 Inter, sans-serif; background: linear-gradient(transparent, rgba(0, 0, 0, .85)); }
+.rf-g em { position: absolute; left: 6px; top: 6px; padding: 2px 7px; border-radius: 99px; font: 800 11px Inter, sans-serif; font-style: normal; background: #16a34a; }
+.rf-g > i { position: absolute; right: 6px; top: 6px; display: none; place-items: center; width: 26px; height: 26px; border-radius: 50%; font: 900 15px Inter, sans-serif; font-style: normal; background: var(--mq-pink, #ff3d9a); box-shadow: 0 0 10px rgba(255, 61, 154, .7); }
+.rf-g.on { border-color: var(--mq-pink, #ff3d9a); box-shadow: 0 0 18px rgba(255, 61, 154, .45); }
+.rf-g.on > i { display: grid; }
+.rf-page .ref-stats > div { max-width: none; }
+@media (max-width: 760px) { .rf-games { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; } .rf-g span:not(.rf-svg) { font-size: 11px; padding: 14px 6px 6px; } }
+
 /* ============ Plein écran des décors (fullFit de core/videobg.js, demande du propriétaire du 16 novembre 2026 : le décor prend tout
    l'écran du téléphone) : là où l'image ne peut pas aller sans couper la grille ou la barre (téléphone très allongé), ses bords
    continuent en dégradé (.vf), jamais flou ni masque sur le décor (les rouleaux restent fluides) ============ */
@@ -9356,7 +9423,7 @@ a.tb-hero[href]:hover { border-color: rgba(255, 61, 154, .5); }
     </nav>
     <div class="side-label">Plus</div>
     <nav class="side-nav side-more">
-      <a href="#parrainage" data-nav="ref"><span><svg class="ico"><use href="#ui-ref"/></svg></span>Parrainage</a>
+      <a href="#parrainage" data-nav="ref"><span><svg class="ico"><use href="#ui-ref"/></svg></span>Parrainage<span class="side-new rf-hot">250K</span></a>
       <a href="https://www.tiktok.com/@spinbet_casino" data-tiktok-link target="_blank" rel="noopener"><span><svg class="ico"><use href="#ui-tiktok"/></svg></span>Notre TikTok<b class="side-new">+10K</b></a>
       <a href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><span><svg class="ico"><use href="#ui-ghost"/></svg></span>Notre Snap · code du jour</a>
       <a href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><span><svg class="ico"><use href="#ui-support"/></svg></span>Service client (Snap)</a>
@@ -11297,6 +11364,14 @@ const gifts = {
     profiles.update('freeRounds', (me) => { me.freeRounds = { ...me.freeRounds, [game]: me.freeRounds[game] - 1 }; });
     return true;
   },
+  // Free spins at BIG_BET (1 000 KE, core/base.js) on one game: the referral offer (social.js), profile.bigRounds = { gameId: count }
+  big: (game) => profiles.current?.bigRounds?.[game] || 0,
+  addBig(game, n) { if (n > 0) profiles.update('bigRounds', (me) => { me.bigRounds = { ...(me.bigRounds || {}), [game]: (me.bigRounds?.[game] || 0) + n }; }); },
+  useBig(game) {
+    if (!gifts.big(game)) return false;
+    profiles.update('bigRounds', (me) => { me.bigRounds = { ...me.bigRounds, [game]: me.bigRounds[game] - 1 }; });
+    return true;
+  },
 };
 
 // The spin is drawn and saved at once (one spin a day), but the reward is only paid once the wheel has stopped
@@ -11571,9 +11646,10 @@ return { renderMissions, missionStatus: status };
 __mods['social.js'] = (() => {
 // Referral (#parrainage) and the weekly challenge (#defi), both on Firestore (see firebase/firestore.rules).
 // Referral: a link ?ref=<uid>; a new account opened from it gets REF_KE (10 000 KE: the hook of every shared link)
-// and writes referrals/{newUid} = { by };
-// once that friend reaches level REF_LEVEL (read from their public leaderboard entry), the referrer collects
-// REF_PARRAIN KE + REF_SPINS free spins on Huff la Puff, from the parrainage page or at login.
+// and writes referrals/{newUid} = { by }. Special offer of the owner (16 November 2026): the referrer gets REF_PARRAIN
+// (250 000 KE) + REF_SPINS (100) free spins at REF_BET (1 000 KE, BIG_BET of core/base.js) on REF_PICK (3) slot machines
+// of his choice, once (1) he added the site's Snapchat (SNAP: a step he confirms on the page, profile.refSnap) and (2) the
+// friend reached level REF_LEVEL (5, read from their public leaderboard entry); paid from the page or at login.
 // Challenge: one imposed game per week; the score is the biggest win in × the stake on that game (so every bet
 // size is on an equal footing), saved in challenges/{week}/scores/{uid}. The leader is shown live everywhere a
 // [data-leader] element is on screen; last week's n°1 collects CHAMP_KE and the Champion badge.
@@ -11585,7 +11661,8 @@ const { toast } = __mods['ui.js'];
 const { fx } = __mods['fx.js'];
 const { sfx } = __mods['audio.js'];
 
-const REF_KE = 10000, REF_PARRAIN = 50000, REF_SPINS = 50, REF_GAME = 'huff', REF_LEVEL = 2, REF_MAX = 50, REF_KEY = 'spinbet_ref';
+const REF_KE = 10000, REF_PARRAIN = 250000, REF_SPINS = 100, REF_BET = 1000, REF_PICK = 3, REF_LEVEL = 5, REF_MAX = 50, REF_KEY = 'spinbet_ref';
+const SNAP = 'spinbetcazino', SNAP_URL = `https://www.snapchat.com/add/${SNAP}`;
 // The site's official address: every referral and share link points there, wherever the player opened the site.
 const SITE = 'https://www.spinbetcaz.com/';
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -11598,8 +11675,23 @@ const uid = () => (profiles.mode === 'cloud' ? profiles.store.current : null);
 })();
 const pendingRef = () => { try { return localStorage.getItem(REF_KEY); } catch { return null; } };
 const refLink = () => (uid() ? `${SITE}?ref=${uid()}` : null);
+const giftsMod = () => __mods['wheel.js'].gifts;
+// the slot machines the free spins can go to (the ones of the main engine, open to everyone)
+const refChoices = () => (__mods['games/index.js'].SLOTS || []).filter((g) => g.original && !g.wip);
+const refGames = () => { const ok = new Set(refChoices().map((g) => g.id)); return (profiles.current?.refGames || []).filter((id) => ok.has(id)).slice(0, REF_PICK); };
+const snapDone = () => !!profiles.current?.refSnap;
+// n free spins at REF_BET: shared out over the 3 chosen machines, or kept (profile.refPend) until they are chosen
+function giveSpins(n) {
+  const gs = refGames();
+  if (n <= 0) return true;
+  if (gs.length < REF_PICK) { profiles.update('refPend', (p) => { p.refPend = (p.refPend || 0) + n; }); return false; }
+  const per = Math.floor(n / gs.length), extra = n - per * gs.length;
+  gs.forEach((g, i) => giftsMod().addBig(g, per + (i < extra ? 1 : 0)));
+  return true;
+}
 
-// Referrer side: pays every friend who reached level REF_LEVEL and was not paid yet. Returns { paid, waiting }.
+// Referrer side: pays every friend who reached level REF_LEVEL and was not paid yet (only once the Snap step is done).
+// Returns { paid, waiting }.
 async function collectReferrals() {
   const me = uid();
   if (!me) return { paid: 0, waiting: [] };
@@ -11607,17 +11699,16 @@ async function collectReferrals() {
   const paid = new Set(profiles.current?.refPaid || []);
   const todo = list.filter((r) => !paid.has(r.uid));
   const boards = await Promise.all(todo.map((r) => cloud.boardOf(r.uid).catch(() => null)));
-  const ok = [], waiting = [];
-  todo.forEach((r, k) => { const lv = boards[k]?.level || 1; if (lv >= REF_LEVEL && paid.size + ok.length < REF_MAX) ok.push(r); else waiting.push({ ...r, level: lv }); });
+  const ok = [], waiting = [], snap = snapDone();
+  todo.forEach((r, k) => { const lv = boards[k]?.level || 1; if (snap && lv >= REF_LEVEL && paid.size + ok.length < REF_MAX) ok.push(r); else waiting.push({ ...r, level: lv }); });
   if (ok.length) {
     profiles.update('refPaid', (p) => { p.refPaid = [...paid, ...ok.map((r) => r.uid)]; });
     wallet.grant(REF_PARRAIN * ok.length);
-    giftsMod().addRounds(REF_GAME, REF_SPINS * ok.length);
-    toast(`🤝 ${ok.length > 1 ? `${ok.length} filleuls ont atteint` : `${esc(ok[0].name || 'Ton filleul')} a atteint`} le niveau ${REF_LEVEL} : +${fmt(REF_PARRAIN * ok.length)} et ${REF_SPINS * ok.length} tours offerts sur Le Loup 2.0 !`, 'ok');
+    const placed = giveSpins(REF_SPINS * ok.length);
+    toast(`🤝 ${ok.length > 1 ? `${ok.length} filleuls ont atteint` : `${esc(ok[0].name || 'Ton filleul')} a atteint`} le niveau ${REF_LEVEL} : +${fmt(REF_PARRAIN * ok.length)} et ${REF_SPINS * ok.length} tours offerts à ${fmt(REF_BET)}${placed ? ' !' : ' : choisis tes 3 machines sur la page Parrainage !'}`, 'ok');
   }
   return { paid: ok.length, waiting };
 }
-const giftsMod = () => __mods['wheel.js'].gifts;
 
 profiles.addEventListener('change', async (e) => {
   const me = uid();
@@ -11635,40 +11726,73 @@ profiles.addEventListener('change', async (e) => {
 });
 
 async function renderReferral(root) {
-  const link = refLink(), paid = profiles.current?.refPaid?.length || 0;
+  const link = refLink(), paid = profiles.current?.refPaid?.length || 0, snap = snapDone(), chosen = refGames();
+  const pend = profiles.current?.refPend || 0, gifts = giftsMod();
+  const left = chosen.reduce((t, g) => t + gifts.big(g), 0);
+  const step = (n, done, title, sub, extra = '') => `<li class="rf-step${done ? ' done' : ''}"><i>${done ? '✓' : n}</i><div class="rf-st"><b>${title}</b><small>${sub}</small>${extra}</div></li>`;
+  const tile = (g) => {
+    const on = chosen.includes(g.id), C = __mods['covers.js'], ph = C.coverPhoto(g.id), n = gifts.big(g.id);
+    const art = ph?.src ? `<img src="${ph.src}" alt="" loading="lazy" decoding="async">` : `<span class="rf-svg">${C.coverSVG(g, { square: true })}</span>`;
+    return `<button type="button" class="rf-g${on ? ' on' : ''}" data-pick="${g.id}" style="--c1:${g.colors[0]};--c2:${g.colors[1] || '#111'}">${art}<span>${esc(g.name)}</span>${n ? `<em>🎁 ${n}</em>` : ''}<i>✓</i></button>`;
+  };
   root.innerHTML = `
-    <section class="panel social-page ref-page">
-      <span class="eyebrow">🤝 Parrainage</span>
-      <h1>Invite tes amis</h1>
-      <div class="ref-offer">
-        <div class="ref-card you"><small>Pour toi</small><b>${fmt(REF_PARRAIN)}</b><span>+ ${REF_SPINS} tours offerts sur Le Loup 2.0</span></div>
-        <div class="ref-card friend"><small>Pour ton ami</small><b>+${fmt(REF_KE)}</b><span>en plus de son solde de départ</span></div>
+    <section class="panel social-page ref-page rf-page">
+      <div class="rf-hero">
+        <span class="rf-tag">🔥 OFFRE SPÉCIALE PARRAINAGE</span>
+        <h1>Gagne <b>${fmt(REF_PARRAIN)}</b> pour chaque ami</h1>
+        <p class="rf-plus">+ <b>${REF_SPINS} tours offerts à ${fmt(REF_BET)}</b> sur ${REF_PICK} machines à sous au choix</p>
+        <p class="rf-friend">🎁 Ton ami reçoit <b>+${fmt(REF_KE)}</b> dès qu’il crée son compte</p>
       </div>
-      <p class="muted">Ta récompense arrive quand ton ami atteint le <b>niveau ${REF_LEVEL}</b> (jusqu’à ${REF_MAX} amis).</p>
-      ${link ? `<div class="ref-box"><input readonly value="${link}" aria-label="Ton lien de parrainage"><button class="btn primary" data-copy>Copier</button>${navigator.share ? '<button class="btn ghost" data-share>Partager</button>' : ''}</div>
-        <div class="ref-stats"><div><b>${paid}</b><small>filleul${paid > 1 ? 's' : ''} validé${paid > 1 ? 's' : ''}</small></div><div><b>${fmt(paid * REF_PARRAIN)}</b><small>gagnés</small></div></div>
-        <div class="ref-wait" data-wait></div>
-        <button class="btn ghost" data-check>🔄 Vérifier mes filleuls</button>`
-      : '<p class="ref-need">Le parrainage demande un <b>compte</b> (e-mail et mot de passe). Crée le tien : tu gardes ce que tu as gagné en invité.</p><button class="btn primary" data-signup="💾 Crée ton compte">Créer mon compte</button>'}
-      <h4>Comment ça marche ?</h4>
-      <ol class="app-list"><li>Copie ton lien et envoie-le (WhatsApp, Snap, Discord…).</li><li>Ton ami ouvre le lien et crée son compte : il reçoit <b>${fmt(REF_KE)} de plus</b> tout de suite.</li><li>Dès qu’il atteint le niveau ${REF_LEVEL}, tu reçois <b>${fmt(REF_PARRAIN)}</b> et <b>${REF_SPINS} tours offerts</b> sur Le Loup 2.0 (à ${fmt(1)} la mise), ici ou à ta prochaine connexion.</li></ol>
+      <ol class="rf-steps">
+        ${step(1, snap, 'Ajoute notre Snap', `<b>${SNAP}</b> : on y met aussi un code cadeau chaque jour`, snap ? '' : `<a class="btn rf-snap" href="${SNAP_URL}" target="_blank" rel="noopener" data-snap>👻 Ajouter ${SNAP}</a>`)}
+        ${step(2, paid > 0, 'Invite un ami avec ton lien', 'Il ouvre ton lien et crée son compte', link ? `<div class="ref-box"><input readonly value="${link}" aria-label="Ton lien de parrainage"><button class="btn primary" data-copy>Copier</button>${navigator.share ? '<button class="btn ghost" data-share>Partager</button>' : ''}</div>` : '<p class="ref-need">Le parrainage demande un <b>compte</b> (e-mail et mot de passe). Crée le tien : tu gardes ce que tu as gagné en invité.</p><button class="btn primary" data-signup="💾 Crée ton compte">Créer mon compte</button>')}
+        ${step(3, paid > 0, `Ton ami atteint le niveau ${REF_LEVEL}`, `Tu reçois <b>${fmt(REF_PARRAIN)}</b> + <b>${REF_SPINS} tours à ${fmt(REF_BET)}</b>, ici ou à ta prochaine connexion`, '<div class="ref-wait" data-wait></div>')}
+      </ol>
+      ${link ? `<div class="ref-stats"><div><b>${paid}</b><small>ami${paid > 1 ? 's' : ''} validé${paid > 1 ? 's' : ''}</small></div><div><b>${fmt(paid * REF_PARRAIN)}</b><small>gagnés</small></div><div><b>${left + pend}</b><small>tours à ${fmt(REF_BET)}</small></div></div>
+        <button class="btn ghost" data-check>🔄 Vérifier mes amis</button>` : ''}
+      <h4 class="rf-h">🎰 Tes ${REF_PICK} machines pour les tours offerts <small data-picked>${chosen.length} / ${REF_PICK}</small></h4>
+      ${pend ? `<p class="ref-need">Tu as <b>${pend} tours offerts</b> qui t’attendent : choisis tes ${REF_PICK} machines !</p>` : ''}
+      <div class="rf-games">${refChoices().map(tile).join('')}</div>
+      <p class="muted small">Les tours offerts se jouent à ${fmt(REF_BET)} de mise : ouvre la machine, la mise est déjà réglée, appuie sur Lancer (le nombre de tours est sur le bouton). Tu peux changer de machines : les tours déjà donnés restent sur leur machine. Jusqu’à ${REF_MAX} amis.</p>
     </section>`;
   const input = root.querySelector('.ref-box input');
   root.querySelector('[data-copy]')?.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(link); } catch { input.select(); document.execCommand?.('copy'); }
     toast('Lien copié ✅', 'ok');
   });
-  root.querySelector('[data-share]')?.addEventListener('click', () => navigator.share({ title: 'SpinBet Casino', text: `Rejoins-moi sur SpinBet Casino : ${fmt(REF_KE).replace('\uE1E0', 'KE')} offerts à l’inscription 🎰`, url: link }).catch(() => {}));
+  root.querySelector('[data-share]')?.addEventListener('click', () => navigator.share({ title: 'SpinBet Casino', text: `Rejoins-moi sur SpinBet Casino : ${fmt(REF_KE).replace('', 'KE')} offerts à l’inscription 🎰`, url: link }).catch(() => {}));
+  // the Snap step: the page opens the site's Snapchat and counts the step as done
+  root.querySelector('[data-snap]')?.addEventListener('click', () => {
+    profiles.update('refSnap', (p) => { p.refSnap = Date.now(); });
+    setTimeout(() => { toast('👻 Merci ! Étape 1 validée', 'ok'); collectReferrals().finally(() => { if (root.isConnected) renderReferral(root); }); }, 400);
+  });
+  // the 3 machines (a 4th tap replaces the oldest); the spins kept waiting go to them once 3 are chosen
+  root.querySelectorAll('[data-pick]').forEach((b) => b.addEventListener('click', () => {
+    const id = b.dataset.pick;
+    let list = refGames();
+    list = list.includes(id) ? list.filter((x) => x !== id) : [...list, id].slice(-REF_PICK);
+    profiles.update('refGames', (p) => { p.refGames = list; });
+    sfx.click?.();
+    const wait = profiles.current?.refPend || 0;
+    if (wait && list.length === REF_PICK) {
+      profiles.update('refPend', (p) => { p.refPend = 0; });
+      giveSpins(wait);
+      toast(`🎁 ${wait} tours offerts à ${fmt(REF_BET)} répartis sur tes ${REF_PICK} machines !`, 'ok');
+    }
+    renderReferral(root);
+  }));
   const showWaiting = (w) => {
     const box = root.querySelector('[data-wait]');
-    if (box) box.innerHTML = w.length ? `<h4>En attente du niveau ${REF_LEVEL}</h4>${w.map((r) => `<div class="ref-w"><b>${esc(r.name || 'Ami')}</b><span>Niveau ${r.level} / ${REF_LEVEL}</span></div>`).join('')}` : '';
+    const s2 = root.querySelectorAll('.rf-step')[1];
+    if (w.length && s2) { s2.classList.add('done'); s2.querySelector('i').textContent = '✓'; }
+    if (box) box.innerHTML = w.length ? w.map((r) => `<div class="ref-w"><b>${esc(r.name || 'Ami')}</b><i class="rf-bar"><b style="width:${Math.min(100, (r.level / REF_LEVEL) * 100)}%"></b></i><span>Niveau ${r.level} / ${REF_LEVEL}${r.level >= REF_LEVEL && !snapDone() ? ' · ajoute notre Snap !' : ''}</span></div>`).join('') : '';
   };
   if (link) collectReferrals().then((r) => { if (root.isConnected) { showWaiting(r.waiting); if (r.paid) renderReferral(root); } });
   root.querySelector('[data-check]')?.addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     btn.disabled = true;
     const r = await collectReferrals();
-    if (!r.paid) toast(r.waiting.length ? `Tes filleuls n’ont pas encore atteint le niveau ${REF_LEVEL}` : 'Pas de nouveau filleul pour l’instant');
+    if (!r.paid) toast(!snapDone() ? `Étape 1 : ajoute d’abord notre Snap ${SNAP}` : r.waiting.length ? `Tes amis n’ont pas encore atteint le niveau ${REF_LEVEL}` : 'Pas de nouvel ami pour l’instant');
     else { sfx.unlock(); sfx.bigWin(); fx.coins(60); fx.confetti(90); }
     if (root.isConnected) { if (r.paid) renderReferral(root); else { showWaiting(r.waiting); btn.disabled = false; } }
   });
@@ -11885,7 +12009,7 @@ document.addEventListener('click', (e) => {
   shareSite(b.dataset.shareSite ? { id: b.dataset.shareSite, name: b.dataset.shareName } : null);
 });
 
-return { renderReferral, renderChallenge, challengeGame, challengeOf, gameOf, CHALLENGES: CATS, shareSite, REF_KE, REF_PARRAIN };
+return { renderReferral, renderChallenge, challengeGame, challengeOf, gameOf, CHALLENGES: CATS, shareSite, REF_KE, REF_PARRAIN, REF_SPINS, REF_BET, REF_PICK, REF_LEVEL, SNAP };
 })();
 
 // ---- brand.js ----
@@ -14803,6 +14927,18 @@ function vitrineHTML() {
   </nav>`;
 }
 
+// The referral offer, big and bright on the home page (owner's request: « que la case soit plus voyante »), under the categories.
+function refPromoHTML() {
+  const S = __mods['social.js'];
+  if (!S?.REF_PARRAIN) return '';
+  return `<a class="rf-promo" href="#parrainage" aria-label="Offre spéciale parrainage">
+    <span class="rf-p-ico" aria-hidden="true">🤝</span>
+    <span class="rf-p-txt"><span class="rf-p-tag">OFFRE SPÉCIALE PARRAINAGE</span><b class="rf-p-amt">${fmt(S.REF_PARRAIN)} <small>par ami</small></b>
+      <span class="rf-p-sub">+ <b>${S.REF_SPINS} tours offerts à ${fmt(S.REF_BET)}</b> sur ${S.REF_PICK} machines au choix · quand ton ami atteint le niveau ${S.REF_LEVEL}</span></span>
+    <span class="rf-p-go">J’invite un ami ›</span>
+  </a>`;
+}
+
 const VOL =['', 'Très basse', 'Basse', 'Moyenne', 'Haute', 'Très haute'];
 const volLabel = (g) => (g.original ? VOL[g.vol] : g.volatility);
 
@@ -14931,7 +15067,7 @@ function renderLobby(root, params = {}) {
       </div>
     </section>` : '';
 
-  root.innerHTML = `${filter === 'all' ? vitrineHTML() + dailyHomeHTML() : ''}
+  root.innerHTML = `${filter === 'all' ? vitrineHTML() + refPromoHTML() + dailyHomeHTML() : ''}
     ${filter === 'all' ? '' : hero || `<section class="hero">
       <div class="hero-main theme-wolf has-bg">${bgArt(wolf, 'upd-bg')}
         <div class="hero-copy">
@@ -16766,7 +16902,8 @@ const wpick = (l) => {
 // as the balance grows.
 const BETS = [100, 200, 300, 500, 1000, 2000, 2500, 5000, 10000, 20000, 25000, 50000, 100000, 200000, 500000, 1000000];
 const GIFT_MAX_BET = 100; // free bonus rounds from the daily wheel are played at up to 1\u00a0\uE1E0
-const FREE_BET = 100; // free spins (referral reward) are played at 1\u00a0\uE1E0
+const FREE_BET = 100; // free spins (ads, older referral rewards) are played at 1\u00a0\uE1E0
+const BIG_BET = 100000; // free spins of the referral offer are played at 1 000\u00a0\uE1E0 (gifts.big, social.js)
 
 const TIERS = [
   { x: 150, label: 'Grand Souffle WIN', cls: 'legend' },
@@ -16843,8 +16980,11 @@ class BaseGame {
       toast('⚡ Turbo coupé pour profiter du bonus · tu peux le remettre dans « Bonus & menu »', 'info');
     };
     addEventListener('sb:feature', this.onFeatCalm);
-    const fr = gifts.rounds(game.id);
-    if (fr && this.cfg.bets.includes(FREE_BET)) {
+    const fr = gifts.rounds(game.id), big = gifts.big(game.id);
+    if (big && this.cfg.bets.includes(BIG_BET)) {
+      this.bi = this.cfg.bets.indexOf(BIG_BET); this.updateMeters();
+      setTimeout(() => toast(`🎁 Tu as ${big} tours offerts à ${fmtC(BIG_BET)} (parrainage) : appuie sur Lancer !`, 'ok'), 600);
+    } else if (fr && this.cfg.bets.includes(FREE_BET)) {
       this.bi = this.cfg.bets.indexOf(FREE_BET); this.updateMeters();
       setTimeout(() => toast(`🎁 Tu as ${fr} tours offerts à ${fmtC(FREE_BET)} : appuie sur Lancer !`, 'ok'), 600);
     }
@@ -16861,13 +17001,25 @@ class BaseGame {
   /* ---------- money (cents) ---------- */
   get bet() { return this.cfg.bets[this.bi]; }
   balC() { wallet.fresh(); return wallet.cents; }
-  // A main-button stake of FREE_BET is free while the player has free rounds on this game (referral reward).
+  // A main-button stake of FREE_BET (1 KE) or BIG_BET (1 000 KE, the referral offer) is free while the player has free
+  // rounds of that kind on this game.
   pay(c) {
+    if (!this.buying && c === BIG_BET && this.bet === BIG_BET && gifts.useBig(this.game.id)) {
+      this.updateMeters();
+      return true;
+    }
     if (!this.buying && c === FREE_BET && this.bet === FREE_BET && gifts.useRound(this.game.id)) {
       this.updateMeters();
       return true;
     }
-    if (!wallet.debit(c / 100)) { toast('Solde insuffisant : rechargez votre argent fictif', 'warn'); this.stopAuto(true); return false; }
+    if (!wallet.debit(c / 100)) {
+      if (this.bet === BIG_BET && !gifts.big(this.game.id) && this.bi > 0) { // the free spins at 1 000 are over: back to a stake the balance allows
+        while (this.bi > 0 && this.cfg.bets[this.bi] > this.balC()) this.bi--;
+        this.saveKey(this.betKey, this.bi); this.updateMeters();
+        toast(`Tes tours offerts à ${fmtC(BIG_BET)} sont finis : mise remise à ${fmtC(this.bet)}`, 'info');
+      } else toast('Solde insuffisant : rechargez votre argent fictif', 'warn');
+      this.stopAuto(true); return false;
+    }
     return true;
   }
   // Max win of a slot machine for this round, in cents (0 = no cap): maxX × the stake, bonus included.
@@ -16997,8 +17149,8 @@ class BaseGame {
     this.q('.bal').textContent = fmtC(this.balC());
     this.q('.bet-val').textContent = fmtC(this.stakeLabel ? this.stakeLabel() : this.bet);
     this.q('.auto-count').textContent = this.auto ? this.auto : '';
-    const fr = gifts.rounds(this.game.id), frb = this.q('.fr-badge');
-    if (frb) { frb.hidden = !fr; frb.textContent = `🎁 ${fr}`; frb.classList.toggle('off', this.bet !== FREE_BET); frb.title = `${fr} tours offerts à ${fmtC(FREE_BET)} de mise`; }
+    const big = gifts.big(this.game.id), fr = big || gifts.rounds(this.game.id), fb = big ? BIG_BET : FREE_BET, frb = this.q('.fr-badge');
+    if (frb) { frb.hidden = !fr; frb.textContent = `🎁 ${fr}`; frb.classList.toggle('off', this.bet !== fb); frb.title = `${fr} tours offerts à ${fmtC(fb)} de mise`; }
     this.slotEl.classList.toggle('auto-on', !!this.auto);
     this.q('[data-act="bet-"]')?.toggleAttribute('disabled', this.busy || this.bi === 0);
     this.q('[data-act="bet+"]')?.toggleAttribute('disabled', this.busy || this.bi === this.cfg.bets.length - 1);
@@ -17019,6 +17171,11 @@ class BaseGame {
 
   changeBet(d) {
     if (this.busy) return;
+    // free spins at 1 000 KE left (referral offer): + goes back to that stake, whatever the balance
+    if (d > 0 && this.bet < BIG_BET && !this.canRaise() && gifts.big(this.game.id) && this.cfg.bets.includes(BIG_BET)) {
+      this.bi = this.cfg.bets.indexOf(BIG_BET); sfx.click(); this.updateMeters(); this.onBetChange?.();
+      return;
+    }
     if (d > 0 && this.cfg.bets[this.bi + 1] !== undefined && !this.canRaise()) {
       toast(`Mise max avec ton solde : ${fmtC(this.bet)}. Gagne plus pour débloquer ${fmtC(this.cfg.bets[this.bi + 1])} !`, 'info');
       return;
@@ -24368,7 +24525,7 @@ E.addHome((t) => agendaHTML(t), { top: true });
 E.addHome(() => {
   const S = __mods['social.js'];
   if (!S?.REF_KE || !profiles.current) return '';
-  return `<a class="ev-card ev-invite" href="#parrainage"><span class="ev-ico">🤝</span><div><small>INVITE TES AMIS</small><b>+${fmt(S.REF_KE)} pour eux, +${fmt(S.REF_PARRAIN)} pour toi</b><em>${profiles.online ? 'Envoie ton lien sur WhatsApp, Snap ou Discord' : 'Crée ton compte gratuit pour avoir ton lien'}</em></div><span class="ev-go">Inviter ›</span></a>`;
+  return `<a class="ev-card ev-invite" href="#parrainage"><span class="ev-ico">🤝</span><div><small>OFFRE SPÉCIALE PARRAINAGE</small><b>+${fmt(S.REF_PARRAIN)} par ami + ${S.REF_SPINS} tours à ${fmt(S.REF_BET)}</b><em>${profiles.online ? `Quand ton ami atteint le niveau ${S.REF_LEVEL} · lui reçoit +${fmt(S.REF_KE)}` : 'Crée ton compte gratuit pour avoir ton lien'}</em></div><span class="ev-go">Inviter ›</span></a>`;
 });
 
 /* ---------- 2. le cadeau « Bon retour » ---------- */

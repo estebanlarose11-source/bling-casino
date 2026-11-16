@@ -795,9 +795,17 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   parties, `NUDGE`), par la puce du joueur en haut (« 💾 Sauvegarder ») et par tout bouton `[data-signup]`. Un compte
   créé depuis le mode invité garde le solde et la progression de l'invité (`openAccount` dans `profile.js`).
   Un visiteur venu d'un lien de parrainage voit directement l'écran « Créer un compte ».
-- **Parrainage** (`social.js`, page `#parrainage`) : l'ami reçoit `REF_KE` = **10 000 KE** à l'inscription (c'est
-  l'accroche de chaque lien partagé), le parrain `REF_PARRAIN` 50 000 KE + 50 tours quand l'ami atteint le niveau 2
-  (50 filleuls au plus). Encart « 🤝 Invite tes amis » sur l'accueil (`retour.js`).
+- **Parrainage = offre spéciale** (`social.js`, page `#parrainage`, demande du propriétaire du 16 novembre 2026) : l'ami reçoit
+  `REF_KE` = **10 000 KE** à l'inscription (l'accroche de chaque lien partagé) ; le parrain reçoit `REF_PARRAIN` = **250 000 KE** +
+  `REF_SPINS` = **100 tours offerts à `REF_BET` = 1 000 KE** sur `REF_PICK` = **3 machines à sous au choix**, quand **(1)** il a ajouté le
+  Snap du site (`SNAP` = spinbetcazino : le bouton ouvre snapchat.com/add/… et valide l'étape, `profile.refSnap` ; impossible de vérifier
+  vraiment un ajout Snap) et **(2)** l'ami atteint le **niveau 5** (`REF_LEVEL`, lu dans son `leaderboard`) ; 50 amis au plus. Page en
+  3 étapes (`.rf-step`) + choix des 3 machines (`.rf-games`, machines du moteur `core/base.js` seulement : `refChoices`) ; tours répartis
+  34 / 33 / 33 (`giveSpins`), gardés dans `profile.refPend` tant que les 3 machines ne sont pas choisies. **Tours à 1 000 KE** :
+  `gifts.big` / `addBig` / `useBig` (`profile.bigRounds`) et `BIG_BET` de `core/base.js` (la machine s'ouvre à 1 000 KE de mise même
+  avec un petit solde, tour gratuit si la mise = `BIG_BET`, retour à une mise possible quand ils sont finis). Grande case dorée sur
+  l'accueil sous les catégories (`refPromoHTML()` de `pages/lobby.js`, `.rf-promo`), encart des événements (`retour.js`), étiquette
+  « 250K » sur Parrainage dans le menu (`.side-new.rf-hot`).
 - **Image de gros gain** (`bigwin.js`) : après un gain ≥ ×50 la mise (bonus achetés exclus), et par les boutons 📸 de
   « Mes gains récents » sous chaque jeu (dès ×10) : image 1080×1920 (couverture du jeu, ×, montant, pseudo, logo,
   adresse du site et lien de parrainage des comptes) à partager ou télécharger.
