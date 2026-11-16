@@ -399,6 +399,11 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `.nx-cats`, puis cadeau du jour, Nouveautés, Populaires, Machines à sous, événements, encarts. Sur téléphone : dessin
   en haut, texte centré dessous. **Ordinateur (≥ 1180 px)** : menu horizontal dans la barre du haut (`.nx-nav`,
   menus déroulants Événements / Récompenses), le menu de gauche devient un tiroir ouvert par ☰ (`--side: 0`).
+- **Catégorie « En ligne »** (demande du propriétaire du 16 novembre 2026 : « rassembler tous les jeux online, pour que ce soit plus
+  simple ») : filtre `online` de `FILTERS` (`pages/lobby.js`, page `#lobby-online`) = `isOnline(g)` : les tables multijoueurs (`tag:
+  'En ligne'`) + les duels en direct `ONLINE_DUELS` (Le Derby, Le Ring). Ils ne sont plus dans Roues & tables ni Jeux rapides (leur `cat`
+  ne change pas). Liens : menu de gauche, menu du haut (`.nx-nav`), tuile de l'accueil (`.nx-cats` : 7 tuiles, sur téléphone 4 puis 3),
+  rangée « 🟢 En ligne » de l'accueil avec « Tout voir ». Nouveau jeu en ligne : `tag: 'En ligne'` suffit.
 - **Barre de mise « pierre gravée » partout** (demande du propriétaire du 11 novembre 2026 : la barre du Valhalla dans toutes
   les machines et tous les jeux, dans leurs couleurs) : classe `pro-ctl` sur `.controls` des deux moteurs (`core/base.js`
   et `slot/machine.js`, qui reçoit aussi `--accent` / `--accent2`), boutons `pb-max` (MISE MAX, `maxBet()`, si la mise

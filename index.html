@@ -8325,7 +8325,7 @@ html.light .side-nav a.on { background: linear-gradient(90deg, rgba(236, 47, 142
 .nx-btn.ghost { background: rgba(255, 255, 255, .04); box-shadow: inset 0 0 0 1.5px rgba(255, 140, 220, .55); }
 
 /* the categories under the vitrine: one tidy row */
-.nx-cats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; }
+.nx-cats { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; }
 .nx-cats a { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 10px; align-items: center; padding: 12px 14px; border-radius: 14px; background: linear-gradient(180deg, rgba(40, 20, 62, .9), rgba(20, 10, 34, .9)) padding-box, var(--fin-edge) border-box; border: 1px solid transparent; transition: transform .2s, box-shadow .2s; min-width: 0; }
 .nx-cats a:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(255, 46, 150, .22); }
 .nx-cats i { grid-row: 1 / 3; font-style: normal; font-size: 26px; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: radial-gradient(circle at 35% 30%, rgba(255, 95, 200, .35), rgba(139, 61, 255, .18)); }
@@ -8334,7 +8334,7 @@ html.light .side-nav a.on { background: linear-gradient(90deg, rgba(236, 47, 142
 html.light .nx-cats a { background: linear-gradient(180deg, #fff, #f7f0ff) padding-box, var(--fin-edge) border-box; }
 html.light .nx-cats small { color: #6b5a86; }
 
-@media (max-width: 1100px) { .nx-cats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 1100px) { .nx-cats { grid-template-columns: repeat(12, minmax(0, 1fr)); } .nx-cats a { grid-column: span 3; } .nx-cats a:nth-child(n+5) { grid-column: span 4; } } /* 4 categories, then 3 */
 /* phone: the picture on top, the text under it, centred */
 @media (max-width: 760px) {
   .nx-hero { grid-template-columns: 1fr; min-height: 0; padding: 6px 18px 22px; gap: 0; text-align: center; border-radius: 18px; }
@@ -8369,6 +8369,8 @@ html.light .nx-cats small { color: #6b5a86; }
   .nx-nav > a, .nx-dd > button { display: inline-flex; align-items: center; gap: 4px; height: 38px; padding: 0 12px; border-radius: 999px; font: 700 12.5px Inter, sans-serif; letter-spacing: .8px; text-transform: uppercase; color: #e4d4f7; white-space: nowrap; transition: color .15s, background .15s; }
   .nx-nav > a:hover, .nx-dd > button:hover, .nx-dd:focus-within > button { color: #fff; background: rgba(255, 95, 200, .1); }
   .nx-nav > a.on { color: #ff6fc0; }
+  @media (max-width: 1560px) { .nx-nav > a, .nx-dd > button { padding: 0 8px; font-size: 11.5px; letter-spacing: .4px; } } /* 5 categories + 2 menus (En ligne added) */
+  @media (max-width: 1320px) { .nx-nav > a, .nx-dd > button { padding: 0 6px; font-size: 10.5px; letter-spacing: .2px; } }
   .nx-dd { position: relative; }
   .nx-dd > button i { font-style: normal; font-size: 10px; opacity: .7; }
   .nx-menu { position: absolute; top: calc(100% + 6px); left: 0; min-width: 230px; padding: 6px; border-radius: 14px; display: grid; gap: 2px; background: linear-gradient(180deg, #1f1233, #120a1f) padding-box, var(--fin-edge) border-box; border: 1px solid transparent; box-shadow: 0 20px 50px rgba(0, 0, 0, .55); opacity: 0; visibility: hidden; transform: translateY(-4px); transition: opacity .15s, transform .15s, visibility 0s .15s; z-index: 50; }
@@ -8633,6 +8635,7 @@ html.light .gd > div { background: #f7f0ff; border-color: #d9c8f5; } html.light 
       <a href="#lobby-slot" data-nav="slots"><span><svg class="ico"><use href="#ui-slots"/></svg></span>Machines à sous</a>
       <a href="#lobby-table" data-nav="tables"><span><svg class="ico"><use href="#ui-tables"/></svg></span>Roues & tables</a>
       <a href="#lobby-quick" data-nav="quick"><span><svg class="ico"><use href="#ui-quick"/></svg></span>Jeux rapides</a>
+      <a href="#lobby-online" data-nav="online"><span>🟢</span>En ligne</a>
       <a href="#jcc" data-nav="jcc"><span>🃏</span>Cartes à collectionner (JCC)<b class="side-badge" data-jc-badge hidden></b><b class="side-new">NEW</b></a>
     </nav>
     <div class="side-label">Défi spécial</div>
@@ -8690,6 +8693,7 @@ html.light .gd > div { background: #f7f0ff; border-color: #d9c8f5; } html.light 
       <a href="#lobby-slot" data-nav="slots">Machines à sous</a>
       <a href="#lobby-table" data-nav="tables">Roues &amp; tables</a>
       <a href="#lobby-quick" data-nav="quick">Jeux rapides</a>
+      <a href="#lobby-online" data-nav="online">En ligne</a>
       <div class="nx-dd"><button type="button" aria-haspopup="true">Événements <i>▾</i></button><div class="nx-menu">
         <a href="#special" data-nav="special">🏆 Défi spécial</a>
         <a href="#tournois" data-nav="tournois">🏁 Tournois</a>
@@ -14055,6 +14059,7 @@ function vitrineHTML() {
     <a href="#lobby-slot"><i>🎰</i><b>Machines<span class="nx-l"> à sous</span></b><small>${ALL_GAMES.filter((g) => !g.wip && FILTERS[1].test(g)).length} jeux</small></a>
     <a href="#lobby-table"><i>🎡</i><b>Roues &amp; tables</b><small>Roulette, 21, poker</small></a>
     <a href="#lobby-quick"><i>⚡</i><b>Jeux rapides</b><small>Mines, Pilote…</small></a>
+    <a href="#lobby-online"><i>🟢</i><b>En ligne</b><small>${ALL_GAMES.filter((g) => !g.wip && isOnline(g)).length} jeux à plusieurs</small></a>
     <a href="#tournois"><i>🏁</i><b>Tournois</b><small>Chaque soir</small></a>
     <a href="#jackpot"><i>💎</i><b>Jackpot</b><small data-jackpot="short">…</small></a>
     <a href="#lobby-fav"><i>❤️</i><b>Mes favoris</b><small>Tes jeux</small></a>
@@ -14105,12 +14110,17 @@ function gameCard(g) {
   </a>`;
 }
 
+// « En ligne » (owner's request of 16 November 2026: every online game in one category): the multiplayer tables
+// (tag « En ligne ») and the live duels between friends (Le Derby, Le Ring); they leave Roues & tables and Jeux rapides
+const ONLINE_DUELS = ['foot', 'boxe'];
+const isOnline = (g) => !!g && (g.tag === 'En ligne' || ONLINE_DUELS.includes(g.id));
 const FILTERS = [
   { id: 'all', label: 'Tous les jeux', icon: '🎰', test: () => true },
   { id: 'slot', label: 'Machines à sous', icon: '🍒', test: (g) => !g.original || g.cat === 'slot' },
   { id: 'hold', label: 'Hold & Spin', icon: '🪙', test: (g) => !!g.holdSpin || g.id === 'huff' },
-  { id: 'table', label: 'Roues & tables', icon: '🎡', test: (g) => g.cat === 'table' },
-  { id: 'quick', label: 'Jeux rapides', icon: '⚡', test: (g) => g.cat === 'quick' },
+  { id: 'table', label: 'Roues & tables', icon: '🎡', test: (g) => g.cat === 'table' && !isOnline(g) },
+  { id: 'quick', label: 'Jeux rapides', icon: '⚡', test: (g) => g.cat === 'quick' && !isOnline(g) },
+  { id: 'online', label: 'En ligne', icon: '🟢', test: (g) => isOnline(g) },
   { id: 'fav', label: 'Mes favoris', icon: '❤️', test: (g) => isLiked(g.id) },
 ];
 
@@ -14144,7 +14154,7 @@ function renderLobby(root, params = {}) {
       + '<div data-ev-home></div>' + `<a class="sp-banner" href="#special"><span>🏆</span><div><b>DÉFI SPÉCIAL · ${fmt(__mods['special.js'].specialStatus().prize)}</b><small>Débloque tous les bonus du casino en jouant : ${__mods['special.js'].specialStatus().have} / ${__mods['special.js'].specialStatus().total}</small></div><em>Voir le défi ›</em></a>`
       + '<a class="snap-box" href="https://www.snapchat.com/add/spinbetcazino" target="_blank" rel="noopener"><svg class="snap-ghost" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c2.9 0 5.2 2.2 5.2 5.3v2.3c.5.2 1.1.1 1.5-.1.6-.2 1.2.3 1 .9-.2.5-1 .8-1.7 1-.4.1-.6.5-.4.9.9 1.8 2.4 3.1 4 3.5.4.1.5.6.2.8-.6.4-1.5.6-2.4.8-.2.3-.2.9-.5 1.1-.5.2-1.3-.1-2.2 0-1.3.2-2 1.6-4.7 1.6s-3.4-1.4-4.7-1.6c-.9-.1-1.7.2-2.2 0-.3-.2-.3-.8-.5-1.1-.9-.2-1.8-.4-2.4-.8-.3-.2-.2-.7.2-.8 1.6-.4 3.1-1.7 4-3.5.2-.4 0-.8-.4-.9-.7-.2-1.5-.5-1.7-1-.2-.6.4-1.1 1-.9.4.2 1 .3 1.5.1V7.5c0-3.1 2.3-5.3 5.2-5.3z" fill="#fff" stroke="#000" stroke-width="1.2"/></svg><div><b>Code cadeau du jour en story Snap</b><small>Ajoute <strong>spinbetcazino</strong> : chaque jour un code qui rapporte des KE (à entrer dans Recharger)</small></div><em>Ajouter ›</em></a>'
       + '<section class="panel live-now" data-live-now></section>'
-      + row('🟢 En ligne · joue avec les autres', ['storm-online', 'bj-online', 'holdem-online', 'madwheel-online', 'plateau-online', 'peche-online', 'roueor-online', 'robots-online'].map(getGame))
+      + row('🟢 En ligne · joue avec les autres', ALL_GAMES.filter((g) => !g.wip && isOnline(g)), 'online')
       + '<div class="hta-slot" data-hta=""></div>'
       + row('Roues & tables', ORIGINALS.filter(FILTERS[3].test), 'table')
       + row('Jeux rapides', ORIGINALS.filter(FILTERS[4].test), 'quick')
@@ -14156,7 +14166,7 @@ function renderLobby(root, params = {}) {
   // Category pages lead with their latest game update; the home page with the newest game (NOUVEAU for 14 days),
   // and the Big Bad Wolf hero when no game is new.
   const isFresh = (u) => (Date.now() - Date.parse(`${u.date}T12:00:00`)) / 864e5 <= 14;
-  const ups = ['slot', 'table', 'quick'].includes(filter) ? latestFor(f.test)
+  const ups = ['slot', 'table', 'quick', 'online'].includes(filter) ? latestFor(f.test)
     : UPDATES.filter((u) => u.isNew && isFresh(u) && getGame(u.game));
   const upd = ups[0], ug = upd && getGame(upd.game);
   const updTile = (u, k) => {
@@ -23585,7 +23595,7 @@ const view = document.getElementById('view');
 
 const routes = [
   { re: /^(accueil)?$/, page: (r) => renderLobby(r), nav: 'home' },
-  { re: /^lobby-(\w+)$/, page: (r, m) => renderLobby(r, { filter: m[1] }), nav: (m) => ({ table: 'tables', quick: 'quick' }[m[1]] || 'slots') },
+  { re: /^lobby-(\w+)$/, page: (r, m) => renderLobby(r, { filter: m[1] }), nav: (m) => ({ table: 'tables', quick: 'quick', online: 'online' }[m[1]] || 'slots') },
   { re: /^succes$/, page: (r) => renderAchievements(r), nav: 'ach' },
   { re: /^game-([\w-]+)$/, page: (r, m) => renderGame(r, { id: m[1] }), nav: 'slots' },
   { re: /^(profil|vip)$/, page: (r) => renderProfile(r), nav: 'vip' },
