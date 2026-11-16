@@ -467,6 +467,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série
   à zéro, gardée dans `spinbet_bataille_serie`) ; mise annexe ÉGALITÉ 12 pour 1. Simulation `node tools/sim/bataille.js` :
   mise principale ≈ 96 % (dont 3,5 points de série, bonus 1 main sur 86), Égalité ≈ 96 %.
+  **Table filmée depuis le 16 novembre 2026** (demande du propriétaire) : `BjVideoGame` comme Le 21 (même vidéo, même croupière) ;
+  à chaque main, clip `p1` (ta carte) puis `d1` (la sienne, posée cachée puis retournée). Cercle ÉGALITÉ à droite du cercle de mise
+  (`vx` / `vy` / `vr` de `SIDES`), résultat sous la carte (`.btl .bjx .bjv-hand .bjv-res`). Règles et gains inchangés.
 - **Paliers de prestige** (`achievements.js`, `PR_TIERS`) : Bronze 1, Argent 5, Or 10, Platine 25, Diamant 50, Légende 100
   prestiges en tout, en médailles sur le profil (`tiersHTML`) ; le total `pres` est publié dans `leaderboard` et le
   profil public (`#@pseudo`) montre le palier. **Règles Firestore à recoller** (champ `pres` ajouté) : en attendant, le

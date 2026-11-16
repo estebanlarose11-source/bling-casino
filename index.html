@@ -7389,6 +7389,7 @@ polygon.rlx-cell.rl-no { animation: rlNo .45s; }
 @keyframes btlHot { to { box-shadow: 0 0 24px rgba(253, 224, 71, .55), 0 8px 20px rgba(0, 0, 0, .45); } }
 .btl .bjv-msg { top: 112px; }
 .btl .bjv-hand .bjv-res { left: -250px; top: 70px; }
+.btl .bjx .bjv-hand .bjv-res { left: 0; top: 116px; }
 @media (max-width: 700px) { .btl-serie { top: 52px; gap: 6px; padding: 5px 8px; } .btl-pips i { width: 24px; height: 24px; font-size: 10px; } .btl-pips i:last-child { width: 32px; } .btl-serie em { display: none; } .btl .bjv-msg { top: 96px; } }
 </style>
 <style id="finition">
@@ -14630,6 +14631,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'bataille', date: '2026-11-16', title: 'La croupière en vidéo', items: ['La même croupière filmée que Le 21 : elle te donne ta carte, puis prend la sienne', 'Sa carte est retournée devant toi', 'Mêmes règles : la carte la plus haute gagne, série de 5 victoires = ×5, Égalité 12 pour 1'] },
   { game: 'poker', date: '2026-11-16', title: 'Nouvelle table de poker', items: ['Une vraie table de 9 joueurs : jusqu’à 8 adversaires', 'Grands boutons Coucher, Suivre et Relancer, montant à régler avec − et +, ½ pot, ⅔ pot, pot ou tapis', 'Sur ordinateur : curseur de mise, +25 % / +50 % du pot, ×2 ×3 ×4 et raccourcis clavier', 'Plein écran qui prend tout l’écran, téléphone tenu droit ou couché', 'Recave pour remettre ton tapis entre deux mains'] },
   { game: 'billets', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'Le décor prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
   { game: 'pirates', date: '2026-11-16', title: 'Plein écran plus beau et plus fluide', items: ['Plus d’écran noir quand on lance un tour en plein écran', 'Le décor prend tout l’écran du téléphone, sans bande floue', 'Rouleaux plus fluides'] },
@@ -18188,7 +18190,7 @@ const FILES = {
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'da5341a3eb'],
   rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', '9ea2baa53f'],
   roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', '90d6df1d84'],
-  bataille: ['bataille', 'games/impl/bataille.js', 'BatailleGame', '39b70b1d30'],
+  bataille: ['bataille', 'games/impl/bataille.js', 'BatailleGame', '0a3e6edd5d'],
   poker: ['poker', 'games/impl/poker.js', 'PokerGame', '770f58216c'],
   mines: ['mines', 'games/impl/mines.js', 'MinesGame', '4f6ae0eba7'],
   avion: ['avion', 'games/impl/avion.js', 'AvionGame', 'c403583020'],
