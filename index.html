@@ -3242,6 +3242,12 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 /* « ⛶ Grand écran » on the wheel (phone): the site's full screen, where everything fits */
 .pe-big { display: none; position: absolute; right: 8px; top: 8px; z-index: 6; padding: 6px 11px; border: 1px solid rgba(186, 230, 253, .6); border-radius: 999px; font: 800 12px Archivo, sans-serif; color: #e0f2fe; background: rgba(2, 6, 23, .7); box-shadow: 0 0 12px rgba(56, 189, 248, .4); }
 @media (max-width: 600px) { .pe-big { display: block; } }
+/* La Pêche : le lac gelé du propriétaire derrière la roue (vidéo .pe-bg en boucle, fond-large / fond-haut), la roue détourée (roue-cut.webp) */
+.pe-view { overflow: hidden; isolation: isolate; background: #0b1626; }
+.pe-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; }
+.pe-view > .pe-zone, .pe-view > .pe-bonus { z-index: 1; }
+.pe-view .pe-zone { -webkit-mask-image: none; mask-image: none; }
+.pe-view .pe-scene { filter: drop-shadow(0 14px 26px rgba(2, 12, 30, .55)); }
 .game-host.is-full .pe-big { display: none !important; }
 /* Full screen (⛶): everything fits the screen; on a wide screen the table-game grid puts the wheel on the left */
 .game-host.is-full > .slot.g-peche .pe-zone { --ptz: max(200px, min(calc(100vw - 24px), 560px, calc((100dvh - 330px) / 1.12))); }
@@ -15281,6 +15287,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'peche', date: '2026-11-16', title: 'Le lac gelé', items: ['La roue en verre tourne maintenant devant un grand lac gelé, sous la neige, entre les montagnes', 'Le décor bouge en continu, sur ordinateur comme sur téléphone'] },
   { game: 'madwheel', date: '2026-11-16', title: 'Pile ou Face sur le plateau', items: ['Le bonus Pile ou Face se joue maintenant avec l’animateur : il lance le palet, qui retombe rouge ou bleu dans le bocal'] },
   { game: 'madwheel', date: '2026-11-16', title: 'Les bonus sur le plateau', items: ['Pachinko, Tir aux Cibles et Méga Folie se jouent maintenant sur le plateau de l’émission, avec l’animateur', 'Pachinko : la bille dorée rebondit sur les picots et tombe dans les multiplicateurs', 'Tir aux Cibles : un multiplicateur sur chacun des 132 canards, différent à chaque fois', 'Méga Folie : la grande roue à 3 flèches avec des multiplicateurs moyens et gros, DOUBLE et TRIPLE'] },
   { game: 'madwheel', date: '2026-11-16', title: 'Le jeu télé', items: ['Sur le plateau, l’animateur lance la roue quand tu appuies sur LANCER', 'Le son de l’émission (bouton 🔊 pour le couper)', 'La nouvelle roue dorée à ampoules, qui suit la caméra', 'Les 4 bonus peuvent s’acheter dans « Bonus & menu »'] },
@@ -18879,12 +18886,12 @@ const FILES = {
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '6e1081a69e'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', 'd17abb90c6'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '77467eded7'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
   'robots-online': ['robots', 'games/impl/robots.js', 'RobotsOnlineGame', '620d0b9f44'],
   'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', 'cb653c5cbc'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
-  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', 'd17abb90c6'],
+  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '77467eded7'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '234dd4780f'],
   totemx: ['totemx', 'games/impl/totemx.js', 'TotemXGame', '652d982842'],

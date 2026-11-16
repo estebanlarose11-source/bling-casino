@@ -334,6 +334,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`.pe-big`, `data-act="full"`) : en plein écran tout tient sur l'écran (titre caché, `--ptz` calculé sur `100dvh`),
   téléphone couché = roue à gauche, mises à droite. Les outils (Annuler … Tours auto) sont sur 2 lignes de 4 (grille), jamais en
   rangée qui défile (« en grand écran on n'a pas accès à tout ») ; vérifié jusqu'à un iPhone SE avec les barres de Safari (375 × 548).
+  **Décor du lac gelé** (demande du propriétaire du 16 novembre 2026) : **ses 2 vidéos** `tools/art/peche/fond-large.mp4` (736 × 400) et
+  `fond-haut.mp4` (400 × 736) → `python3 tools/art/peche/fond.py` : boucles sans coupure muettes `assets/games/peche/fond-*.mp4` +
+  `scene-*.webp` (`LOOP` = 217/24 s, `VideoBg`), vidéo `.pe-bg` derrière la roue (haute quand la vue est plus haute que large : `bgFit()`),
+  et la roue détourée `roue-cut.webp` (roue.webp avait son fond bleu nuit ; le masque haut / bas de `.pe-zone` est enlevé).
 - **The Hunt, nouveau décor** (`games/chasse.js`, id `chasse`, demande du propriétaire du 16 novembre 2026, comme La Sweety) : **ses 2
   images** `tools/art/chasse/decor-large.jpg` (1168 × 784, `.hu-l`) et `decor-haut.jpg` (784 × 1168, `.hu-p`) : cadre en bois dans la
   forêt (cerf, sanglier, faisans, lièvre, loup), plaques MINI / MAJOR / GRAND JACKPOT, barre BET / SPIN / MAX BET / BONUS MENU.

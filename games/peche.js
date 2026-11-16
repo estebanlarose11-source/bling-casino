@@ -71,6 +71,9 @@ function payout(O, bets) {
 const IMG_V = 2;
 const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file version: images and videos are inlined
 const src = (n) => asset(`assets/games/peche/${n}.webp`);
+// the frozen lake behind the wheel (owner's videos of 16 November 2026, tools/art/peche/fond.py): wide, or tall when the view
+// is taller than wide (phone held upright); a seamless loop of LOOP seconds (core/videobg.js)
+const LOOP = 217 / 24;
 const vidSrc = (k, n) => asset(`assets/games/peche/${k}-${n}.mp4`);
 const fishImg = (k, cls = 'pe-ico') => `<img class="${cls}" src="${src(k)}" alt="" draggable="false">`;
 const COL = { w: '#dbeafe', s: '#1e3a8a', fb: '#2563eb', fo: '#f97316', fr: '#dc2626' };
@@ -122,8 +125,8 @@ class PecheGame extends BaseGame {
       head: '<div class="hist pt-hist pe-hist"></div>',
       // the fishing of each colour, bought at the chip chosen on the table (get bet)
       buys: ov?.online ? [] : ['fb', 'fo', 'fr'].map((k) => ({ id: k, icon: '🎣', label: `Pêche au ${NAME[k].toLowerCase()} · ${PRICE[k].toLocaleString('fr-FR')} × ton jeton`, desc: `Petit, moyen ou gros poisson au hasard : ${RANGE[k]}, gros poisson jusqu’au MAX WIN`, cost: (b) => Math.round(b * PRICE[k]) })),
-      stage: `<div class="pe-view">${ov?.online ? '' : '<button class="pe-big" type="button" data-act="full">⛶ <span>Grand écran</span></button>'}
-          <div class="pe-zone"><img class="pe-scene" src="${src('roue')}" alt="" draggable="false">
+      stage: `<div class="pe-view"><video class="pe-bg" muted loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>${ov?.online ? '' : '<button class="pe-big" type="button" data-act="full">⛶ <span>Grand écran</span></button>'}
+          <div class="pe-zone"><img class="pe-scene" src="${src('roue-cut')}" alt="" draggable="false">
             <div class="pe-disc">${wheelSVG()}<div class="pe-flash"></div></div>
             <img class="pe-top" src="${src('roue-top')}" alt="" draggable="false"><i class="pe-ptr"></i><div class="pe-hub"></div></div>
           <div class="pe-bonus" hidden>
@@ -143,11 +146,21 @@ class PecheGame extends BaseGame {
     this.wheel = this.q('.pe-wheel');
     this.q('.pe-buy')?.addEventListener('click', () => { if (!this.busy) this.openMenu(); });
     ['fb', 'fo', 'fr', 'roue-disc', 'roue-top'].forEach((n) => { new Image().src = src(n); });
+    const { VideoBg } = __mods['core/videobg.js'];
+    this.vbg = new VideoBg(this.q('.pe-bg'), { loop: LOOP, root: this.root });
+    this.view = this.q('.pe-view');
+    this.ro = new ResizeObserver(() => this.bgFit()); this.ro.observe(this.view);
+    this.bgFit();
+  }
+  bgFit() {
+    if (this.dead || !this.view.clientWidth) return;
+    const name = this.view.clientHeight > this.view.clientWidth * 1.05 ? 'haut' : 'large';
+    this.vbg.set(asset(`assets/games/peche/fond-${name}.mp4`), asset(`assets/games/peche/scene-${name}.webp`));
   }
 
   // a bought fishing costs PRICE × the chip chosen on the table
   get bet() { return this.board?.chip || 100; }
-  destroy() { const v = this.q('.pe-vid'); if (v) { v.pause(); v.removeAttribute('src'); v.load(); } super.destroy(); }
+  destroy() { const v = this.q('.pe-vid'); if (v) { v.pause(); v.removeAttribute('src'); v.load(); } this.ro?.disconnect(); this.vbg?.destroy(); super.destroy(); }
   stakeLabel() { return this.board ? this.board.total() : 0; }
   chipSound() { sfx.click(); }
   onMeters() { if (this.mainBtn) this.mainBtn.disabled = !this.auto && (this.busy || !this.board?.total()); }
