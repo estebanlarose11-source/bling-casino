@@ -486,8 +486,12 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (bleue, violette `.v`), Défi spécial en carte avec anneau de progression (`data-sp-ring`, `--p`), **toujours ouvert sur
   ordinateur** (≥ 1180 px : plus de menu en haut `.nx-nav`, caché). **Barre du haut** : ordinateur = SOLDE + portefeuille (Recharger)
   collé au NIVEAU (barre d'XP, `.me-chip` rempli par `renderChip` : `.lv-shield`, `.me-lv`, `.me-bar`), cadeau `.top-gift` (point rose =
-  cadeau du jour prêt, lien Récompenses), cloche `.top-bell` (`#appli`), avatar rond `.top-av` ; téléphone = avatar · solde + « + » ·
-  écusson NIVEAU · cloche · ☰ à droite (`.burger-r`). **Barre du bas** : Accueil · Promotions (`#recompenses`) · Tournois · Caisse
+  cadeau du jour prêt, lien Récompenses), cloche `.top-bell` (`#appli`), avatar rond `.top-av` ; **téléphone** (demande du propriétaire
+  du 16 novembre 2026) = ☰ **à gauche** (`.burger-r`, `order: -1` ; plus d'avatar) · solde **toujours en entier** (`fitBalance()` réduit
+  un peu les chiffres s'ils ne tiennent pas ; avant : « 500… » pour 500 000) + « + » · « NIV 25 » (`.lv-s`, « Niveau » `.lv-w` sur
+  ordinateur) · cloche (cachée ≤ 430 px) · **logo S à droite** (`.logo.mobile`). **Menu de côté** : ne défile que de haut en bas
+  (`overflow-x: hidden`, `touch-action: pan-y`, `overscroll-behavior: contain`, page derrière bloquée `body.side-open`) : avant, il
+  glissait parfois sur le côté et la page derrière bougeait en bout de liste. **Barre du bas** : Accueil · Promotions (`#recompenses`) · Tournois · Caisse
   (`#recharger`) · Plus (ouvre le menu, `[data-toggle-side]` peut être sur plusieurs boutons). **Accueil** : vitrine `vitrineHTML()`
   (texte à gauche « BIENVENUE CHEZ / SPINBET CASINO », cadeau du jour, JOUER MAINTENANT / CRÉER UN COMPTE ou RECHARGER, roulette et
   2 cartes `NX_WHEEL` à droite ; téléphone : roue derrière le texte, à droite), « Catégories de jeux » en tuiles à icône rose (4 sur

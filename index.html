@@ -8736,7 +8736,12 @@ html:not(.light) body::after {
 
 /* ---- menu de gauche ---- */
 html:not(.light) .side { background: #0e0c13 !important; border-right: 1px solid rgba(255, 255, 255, .06) !important; }
-.side { padding: 18px 14px 14px; gap: 2px; }
+/* it only scrolls up and down (owner's request of 16 November 2026: on a phone it also slid sideways, and the page behind
+   moved at the end of the list) */
+.side { padding: 18px 14px 14px; gap: 2px; overflow-x: hidden !important; overscroll-behavior: contain; touch-action: pan-y; }
+.side > * { max-width: 100%; min-width: 0; }
+@media (hover: none) { .side-nav a:hover { transform: none !important; } }
+@media (max-width: 1179px) { body.side-open { overflow: hidden; } .side-scrim { touch-action: none; overscroll-behavior: contain; } }
 .side .logo { padding: 4px 8px 18px; margin: 0 0 6px; border-bottom: 1px solid var(--mq-line); position: relative; }
 .side .logo::after { content: ''; position: absolute; left: 30%; right: 30%; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 61, 154, .7), transparent); }
 .side-label { margin: 12px 4px 4px; padding: 14px 8px 4px; border-top: 1px solid var(--mq-line); background: none !important; -webkit-background-clip: initial !important; background-clip: initial !important; color: var(--mq-pink) !important; -webkit-text-fill-color: currentColor; font: 700 11.5px Inter, sans-serif !important; letter-spacing: 2.6px !important; }
@@ -8863,26 +8868,32 @@ html:not(.light) .bottom-nav { background: #0e0c13 !important; border-top: 1px s
 @media (max-width: 900px) {
   :root { --top: 66px; }
   .top { padding: 0 12px !important; gap: 8px; }
-  .burger-r { display: grid !important; order: 5; flex: none; width: 40px; height: 40px; place-items: center; padding: 0; background: none !important; border: 0 !important; color: #fff !important; }
+  /* owner's request of 16 November 2026: ☰ on the left (no more profile photo there), the S logo on the right, the whole
+     balance (it showed « 500… » for 500 000) and a small level « NIV 25 » */
+  .burger-r { display: grid !important; order: -1; flex: none; width: 40px; height: 40px; margin-left: -4px; place-items: center; padding: 0; background: none !important; border: 0 !important; color: #fff !important; }
   .burger-r .ico { width: 28px; height: 28px; }
-  .top-av { order: 0; width: 44px; height: 44px; margin: 0; }
-  .top-wallet { order: 1; margin: 0 !important; height: 46px; padding: 0 5px 0 14px !important; gap: 8px; border-radius: 999px !important; border-right: 1px solid var(--mq-line) !important; min-width: 0; }
+  .top-av { display: none !important; }
+  .top .logo.mobile.mobile { display: grid !important; order: 6; flex: none; width: 40px; height: 40px; margin: 0 -2px 0 0; padding: 0; place-items: center; border: 0; }
+  .top .logo.mobile .logo-mark { width: 34px; height: 34px; }
+  .top-wallet { order: 1; flex: 0 1 auto; margin: 0 !important; height: 46px; padding: 0 5px 0 14px !important; gap: 8px; border-radius: 999px !important; border-right: 1px solid var(--mq-line) !important; min-width: 0; }
+  .top-wallet .balance { min-width: 0; }
   .top-wallet .balance small { display: none; }
-  .top-wallet .balance b { font-size: 16.5px; overflow: hidden; text-overflow: ellipsis; }
+  .top-wallet .balance b { font-size: 16.5px; overflow: hidden; text-overflow: clip; letter-spacing: -.01em; }
   .top-wallet .top-refill { width: 34px; height: 34px; border-radius: 50% !important; background: linear-gradient(180deg, #ff4fae, #e6227f) !important; color: #fff !important; }
   .top-wallet .top-refill .ico { display: none; }
   .top-wallet .top-refill b { display: block !important; font-size: 22px; line-height: 1; }
-  .me-chip { order: 2; margin-left: 0; height: 46px; padding: 0 12px 0 8px !important; border-radius: 999px !important; flex: none; }
-  .me-chip::before, .me-bar, .me-lv em { display: none; }
-  .lv-shield { display: block; }
-  .me-lv small { font-size: 11.5px; letter-spacing: 1px; color: #d8d2e2; }
+  .me-chip { order: 2; margin-left: 0; height: 46px; padding: 0 13px !important; border-radius: 999px !important; flex: none; }
+  .me-chip::before, .me-bar, .me-lv em, .lv-shield, .lv-w { display: none !important; }
+  .me-lv .lv-s { display: inline; }
+  .me-lv small { font-size: 12px; letter-spacing: .8px; color: #fff; }
   .top-right { order: 3; margin-left: auto; gap: 0; }
   .top-gift { display: none !important; }
   .top-ic { width: 40px !important; height: 40px !important; }
   .top-ic .ico { width: 26px; height: 26px; }
 }
+.lv-s { display: none; }
 @media (max-width: 430px) { .top-bell { display: none !important; } .top-right { margin-left: auto; } .me-lv small b { display: none; } }
-@media (max-width: 370px) { .me-lv small { display: none; } .me-chip { padding: 0 8px !important; } }
+@media (max-width: 370px) { .top { gap: 6px !important; padding: 0 8px !important; } .me-chip { padding: 0 9px !important; } .me-lv small { font-size: 11px; letter-spacing: .4px; } .top-wallet { padding-left: 11px !important; } }
 @media (max-width: 760px) {
   .nx-hero { display: block; position: relative; padding: 34px 18px 22px !important; text-align: left !important; border-radius: 16px; overflow: hidden; }
   .nx-stage { position: absolute; z-index: 0; top: 18px; right: -150px; width: 400px; margin: 0; pointer-events: none; }
@@ -12136,7 +12147,7 @@ function renderChip() {
     if (profiles.guest && cloud.enabled) chip.dataset.signup = '💾 Sauvegarde ta partie'; else delete chip.dataset.signup;
     const look = __mods['shop.js']?.publicLook?.(me), S = __mods['shop.js'];
     const lv = p.level, pct = (p.pct * 100).toFixed(1), save = profiles.guest && cloud.enabled;
-    chip.innerHTML = `<i class="lv-shield"><b>${lv}</b></i><span class="me-lv"><small>Niveau ${lv}${p.boosted ? ' · ⚡ XP ×2' : ''}</small><i class="me-bar"><b style="width:${pct}%"></b></i><em>${save ? '💾 Sauvegarder' : profiles.guest ? 'Non sauvegardé' : lv >= 50 ? 'Niveau maximum' : `${Math.floor(p.xp).toLocaleString('fr-FR')} / ${p.need.toLocaleString('fr-FR')} XP`}</em></span>`;
+    chip.innerHTML = `<i class="lv-shield"><b>${lv}</b></i><span class="me-lv"><small><span class="lv-w">Niveau</span><span class="lv-s">Niv</span> ${lv}${p.boosted ? '<b> · ⚡ XP ×2</b>' : ''}</small><i class="me-bar"><b style="width:${pct}%"></b></i><em>${save ? '💾 Sauvegarder' : profiles.guest ? 'Non sauvegardé' : lv >= 50 ? 'Niveau maximum' : `${Math.floor(p.xp).toLocaleString('fr-FR')} / ${p.need.toLocaleString('fr-FR')} XP`}</em></span>`;
     chip.title = `${me.name} · ${p.rank.name} · niveau ${lv}`;
     const av = document.querySelector('.top-av');
     if (av) { const lk = S?.lookHTML?.(look, 'sm'); av.innerHTML = lk || '<svg class="ico"><use href="#ui-user"/></svg>'; av.classList.toggle('has-look', !!lk); }
@@ -24969,13 +24980,25 @@ function updateWallet() {
     const step = (t) => {
       const k = Math.min(1, (t - t0) / T), e = 1 - Math.pow(1 - k, 3), v = from + (to - from) * e;
       nodes.forEach((n) => { n.textContent = fmt(k < 1 ? Math.round(v * 100) / 100 : to); });
-      if (k < 1) balRaf = requestAnimationFrame(step);
+      if (k < 1) balRaf = requestAnimationFrame(step); else fitBalance();
     };
     balRaf = requestAnimationFrame(step);
     return;
   }
   nodes.forEach((n) => { n.textContent = fmt(to); });
+  fitBalance();
 }
+// The whole balance always shows in the top bar of a phone (it was cut: « 500… » for 500 000): the figures get a bit
+// smaller when the number does not fit.
+function fitBalance() {
+  const b = document.querySelector('.top-wallet [data-balance]');
+  if (!b || !b.isConnected) return;
+  b.style.fontSize = '';
+  const sw = b.scrollWidth, cw = b.clientWidth;
+  if (cw > 0 && sw > cw + 0.5) b.style.fontSize = `${Math.max(10.5, (parseFloat(getComputedStyle(b).fontSize) * cw) / sw - 0.2).toFixed(1)}px`;
+}
+addEventListener('resize', () => requestAnimationFrame(fitBalance));
+document.fonts?.ready?.then(() => fitBalance());
 
 // Premium touches shared by every page: ripples on buttons.
 function mountPro() {
