@@ -14,6 +14,63 @@ const { SymbolGrid } = __mods['core/grid.js'];
 const { DEFS, MAP } = __mods['art/pharaon.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
+const { Scene, sceneHTML } = __mods['core/videobg.js'];
+// The owner's 2 animated decors of 16 November 2026 (tools/art/totemx/clean.py): the temple and its loading bar. The
+// video is not a loop: it is the bar. Its first frames fill the bar (gold, then red) up to FULL, then it catches fire
+// from FIRE. The game plays it forward to the frame of the totem's height (the bar grows at each connection) and plays
+// the fire on a FULL SCREEN (owner's wish), then goes back to the start for the next spin.
+const SCENE = { id: 'tz', dir: 'totemx', ver: 1, video: { large: 0, haut: 0 }, manual: true, size: { large: [672, 448], haut: [448, 672] }, key: { large: [10, 10, 662, 445], haut: [0, 0, 448, 672] } };
+const BAR = { haut: { full: 100, fire: 136 }, large: { full: 132, fire: 136 } }, NF = 193, FPS = 24;
+class BarVideo {
+  constructor(v) {
+    this.v = v; v.muted = true; v.loop = false;
+    this.frac = 0; this.stopAt = null; this.burn = false;
+    const tick = () => {
+      if (this.dead) return;
+      const t = v.currentTime;
+      if (this.stopAt !== null && t >= this.stopAt) { v.pause(); this.stopAt = null; }
+      if (this.burn && t >= (NF - 3) / FPS) v.currentTime = (this.bar.fire + 20) / FPS; // the flames go on
+      this.raf = requestAnimationFrame(tick);
+    };
+    this.raf = requestAnimationFrame(tick);
+    this.onVis = () => { if (document.hidden) v.pause(); else if (this.burn || this.stopAt !== null) this.play(); };
+    document.addEventListener('visibilitychange', this.onVis);
+  }
+  calmPlay() { return matchMedia('(prefers-reduced-motion: reduce)').matches; }
+  play() { if (!this.dead && !this.calmPlay()) this.v.play().catch(() => {}); }
+  // the whole file in memory (a jump to any frame works at once), then back to the bar's height
+  async load(url, poster, name) {
+    this.bar = BAR[name]; this.v.poster = poster;
+    const n = ++this.n || (this.n = 1);
+    let src = url;
+    try { const r = await fetch(url); if (r.ok) src = URL.createObjectURL(await r.blob()); } catch { /* the plain file */ }
+    if (this.dead || n !== this.n) return;
+    if (this.blob) URL.revokeObjectURL(this.blob);
+    this.blob = src.startsWith('blob:') ? src : null;
+    this.v.src = src;
+    this.v.addEventListener('loadeddata', () => this.go(this.frac, true), { once: true });
+  }
+  // the bar at frac (0..1): played forward (it grows), or put there at once (back to the start)
+  go(frac, jump) {
+    this.frac = frac; this.burn = false;
+    if (!this.bar || !this.v.src) return;
+    const t = (frac * this.bar.full) / FPS;
+    if (jump || t < this.v.currentTime - 0.02 || this.calmPlay()) { this.v.pause(); this.stopAt = null; this.v.currentTime = t; return; }
+    this.stopAt = t; this.play();
+  }
+  fire() {
+    if (!this.bar || !this.v.src) return;
+    this.burn = true; this.stopAt = null;
+    if (this.v.currentTime < this.bar.full / FPS) this.v.currentTime = this.bar.full / FPS;
+    this.play();
+  }
+  destroy() {
+    this.dead = true; cancelAnimationFrame(this.raf);
+    document.removeEventListener('visibilitychange', this.onVis);
+    this.v.pause(); this.v.removeAttribute('src'); this.v.load();
+    if (this.blob) URL.revokeObjectURL(this.blob);
+  }
+}
 
 /* ===ENGINE */
 const SYM = [['👑', 8, 10], ['🦅', 6, 10], ['☥', 4, 10], ['🐍', 3, 10], ['🪲', 2, 10], ['🏺', 1, 10]];
@@ -54,48 +111,17 @@ const symArt = (v) => (IMG[v] ? `<img class="ph-img" src="${asset(`assets/games/
 const NAMES = { '👑': 'Masque du pharaon', '🦅': 'Faucon d’Horus', '☥': 'Ankh', '🐍': 'Cobra', '🪲': 'Scarabée', '🏺': 'Amphore', '☀️': 'Soleil (scatter)' };
 const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Embers rising in the temple (transform only, cheap on phones).
-const embers = Array.from({ length: 12 }, (_, i) => `<i class="tx-ember tw-absolute tw-bottom-0 tw-block tw-rounded-full tw-animate-tx-rise" style="left:${4 + i * 8}%;width:${3 + (i % 3)}px;height:${3 + (i % 3)}px;animation-delay:${-(i * 0.55).toFixed(2)}s;animation-duration:${4 + (i % 5) * 0.7}s"></i>`).join('');
-const TORCH = (d = 0) => `<span class="tx-torch tw-relative tw-mt-6 tw-shrink-0" aria-hidden="true"><i class="tw-animate-tx-flicker" style="animation-delay:${d}s"></i></span>`;
-
-const HEAD = `<div class="tw-flex tw-items-end tw-gap-4 max-md:tw-hidden">${TORCH()}<div class="tx-plaque tw-flex tw-items-center tw-gap-3 tw-px-5 tw-py-1.5 tw-rounded-full tw-border tw-border-orange-500/60 tw-bg-gradient-to-b tw-from-[#3a0d02]/95 tw-to-[#140301]/95 tw-shadow-[0_0_28px_rgba(249,115,22,.35)]">
-    <span class="tw-text-xl tw-leading-none">🔥</span>
-    <span class="tw-font-cinzel tw-font-black tw-tracking-[.22em] tw-text-transparent tw-bg-clip-text tw-bg-gradient-to-b tw-from-yellow-100 tw-via-orange-400 tw-to-red-600 tw-text-lg">TOTEM EXTRÊME</span>
-    <span class="tw-text-[11px] tw-font-semibold tw-uppercase tw-tracking-widest tw-text-orange-200/70">jusqu’à ×100 · full screen</span>
-  </div>${TORCH(-0.35)}</div>`;
-
-const STAGE = `<div class="tx tw-relative tw-flex tw-items-stretch tw-justify-center tw-gap-3 max-md:tw-flex-col max-md:tw-gap-2">
-    <aside class="tx-totem tw-relative tw-flex tw-flex-col tw-shrink-0 tw-w-[92px] tw-rounded-xl tw-overflow-hidden tw-border tw-border-orange-500/50 tw-bg-gradient-to-b tw-from-[#2a0802]/90 tw-via-[#0c0201]/95 tw-to-[#2a0802]/90 tw-shadow-[0_0_30px_rgba(249,115,22,.3),inset_0_0_18px_rgba(0,0,0,.75)] max-md:tw-w-full max-md:tw-flex-row max-md:tw-h-[56px]" aria-label="Totem des multiplicateurs">
-      <div class="tw-z-10 tw-flex tw-items-center tw-justify-center tw-py-1.5 tw-bg-gradient-to-b tw-from-yellow-200 tw-via-orange-500 tw-to-red-700 tw-text-[#1a0401] tw-font-black tw-text-[10px] tw-tracking-[.18em] tw-shadow-[0_2px_8px_rgba(0,0,0,.5)] max-md:tw-px-2.5 max-md:tw-py-0 max-md:tw-flex-col max-md:tw-leading-tight">
-        <span class="max-md:tw-hidden">EXTRÊME</span><span class="md:tw-hidden tw-text-[9px] tw-tracking-[.12em]">TOTEM</span><b class="tx-cur md:tw-hidden tw-font-num tw-text-lg tw-tracking-normal">×1</b>
-      </div>
-      <div class="tx-lad tw-relative tw-flex-1 tw-overflow-hidden">
-        <div class="tx-steps tw-absolute tw-left-0 tw-top-0 tw-flex tw-flex-col-reverse tw-items-center tw-gap-2 tw-w-full tw-py-3 tw-transition-transform tw-duration-500 max-md:tw-w-auto max-md:tw-h-full max-md:tw-flex-row max-md:tw-px-3 max-md:tw-py-0">${LAD.map((v, i) => `<div class="tx-step${i >= HOT ? ' fire' : ''}${i === LAD.length - 1 ? ' top' : ''}" data-i="${i}"><span>×${v}</span></div>`).join('')}</div>
-        <div class="tw-pointer-events-none tw-absolute tw-inset-0 tw-bg-[linear-gradient(180deg,#0c0201_0%,transparent_20%,transparent_80%,#0c0201_100%)] max-md:tw-bg-[linear-gradient(90deg,#0c0201_0%,transparent_14%,transparent_86%,#0c0201_100%)]"></div>
-      </div>
-    </aside>
-    <div class="tx-board tw-relative tw-flex-initial tw-min-w-0">
-      <div class="tx-rays tw-pointer-events-none tw-absolute tw-left-1/2 tw-top-1/2 tw-w-[150%] tw-aspect-square tw--translate-x-1/2 tw--translate-y-1/2 tw-opacity-40 tw-animate-tx-rays" aria-hidden="true"></div>
-      <div class="tx-embers tw-pointer-events-none tw-absolute tw-inset-0 tw-overflow-hidden" aria-hidden="true">${embers}</div>
-      <div class="tx-frame tw-relative tw-w-fit tw-max-w-full tw-mx-auto tw-rounded-2xl tw-p-2 tw-border-2 tw-border-orange-500/80 tw-bg-gradient-to-b tw-from-[#2a0802]/75 tw-to-[#0c0201]/85 tw-shadow-[0_0_0_4px_rgba(12,2,1,.9),0_0_0_6px_rgba(249,115,22,.45),0_18px_50px_rgba(0,0,0,.6),inset_0_0_40px_rgba(0,0,0,.65)] max-md:tw-p-1.5">
-        <i class="tx-gem tw-absolute tw--top-2 tw-left-1/2 tw--translate-x-1/2 tw-w-5 tw-h-5 tw-rotate-45 tw-rounded-sm tw-bg-gradient-to-br tw-from-yellow-200 tw-to-red-600 tw-shadow-[0_0_16px_rgba(249,115,22,.9)] tw-border-2 tw-border-yellow-300"></i>
-        <div class="tx-heat tw-pointer-events-none tw-absolute tw-inset-0 tw-rounded-2xl tw-opacity-0 tw-transition-opacity tw-duration-700" aria-hidden="true"></div>
-        <div class="grid-host"></div>
-        <div class="tx-pop tw-pointer-events-none tw-absolute tw-left-1/2 tw-top-1/2 tw-z-20 tw-whitespace-nowrap tw-text-center tw-opacity-0" aria-live="polite"></div>
-      </div>
-      <div class="tx-hud tw-relative tw-z-10 tw-flex tw-justify-center tw-gap-2 max-md:tw-gap-1 tw-mt-2 tw-flex-wrap tw-text-[12px] max-md:tw-text-[10.5px] tw-font-bold tw-text-orange-50">
-        <span class="tx-fullchip tw-flex tw-items-center tw-gap-1.5 tw-px-3 tw-py-1 max-md:tw-px-2 max-md:tw-gap-1 tw-rounded-full tw-bg-black/60 tw-border tw-border-orange-500/40">🔒 Full screen <b class="tx-locked tw-font-num tw-text-orange-400">0</b><small class="tw-opacity-60">/ 30</small></span>
-        <span class="tw-flex tw-items-center tw-gap-1.5 tw-px-3 tw-py-1 max-md:tw-px-2 max-md:tw-gap-1 tw-rounded-full tw-bg-black/60 tw-border tw-border-orange-500/40">⛓️ Connexions <b class="tx-chain tw-font-num tw-text-orange-400">0</b><small class="tw-opacity-60">/ ${MAX_ROUNDS}</small></span>
-        <span class="tx-sunchip tw-flex tw-items-center tw-gap-1.5 tw-px-3 tw-py-1 max-md:tw-px-2 max-md:tw-gap-1 tw-rounded-full tw-bg-black/60 tw-border tw-border-orange-500/40 tw-transition-all">☀️ Soleils <b class="tx-suns tw-font-num tw-text-orange-400">0</b><small class="tw-opacity-60">/ 3</small></span>
-      </div>
-    </div>
-  </div>`;
+const STAGE = sceneHTML('tz', {
+  host: 'grid-host',
+  inWin: '<div class="tx-pop tw-pointer-events-none tw-absolute tw-left-1/2 tw-top-1/2 tw-z-20 tw-whitespace-nowrap tw-text-center tw-opacity-0" aria-live="polite"></div>',
+  plates: '<div class="sx-pl sx-bal"><small>SOLDE</small><b></b></div><div class="sx-pl sx-totem"><small>TOTEM</small><b class="tx-cur">×1</b></div><div class="sx-pl sx-gain"><small>GAIN</small><b>0</b></div>',
+  inArt: '<div class="sx-pl sx-full-n"><small>FULL SCREEN</small><b><i class="tx-locked">0</i> / 30</b></div><div hidden><i class="tx-chain"></i><i class="tx-suns"></i><i class="tx-sunchip"></i><i class="tx-fullchip"></i></div>',
+});
 
 class TotemXGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       defs: DEFS, music: MUSIC, cls: 'tx-game',
-      head: HEAD,
       stage: STAGE,
       buys: [
         { id: 'n', icon: '🔥', label: 'Bonus de feu · 3 soleils', desc: '8 tours gratuits, le totem part de ×3 et ne redescend pas', cost: (b) => b * BUYN },
@@ -103,10 +129,8 @@ class TotemXGame extends BaseGame {
       ],
       hello: 'Relie 5 symboles : le totem monte… et au-dessus de ×5, il brûle',
     });
-    this.steps = this.q('.tx-steps');
-    this.lad = this.q('.tx-lad');
     this.popEl = this.q('.tx-pop');
-    this.frame = this.q('.tx-frame');
+    this.frame = this.q('.sx-win');
     this.lv = 0;
     Object.values(IMG).forEach((n) => { new Image().src = asset(`assets/games/pharaon/${n}.webp`); });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
@@ -115,41 +139,30 @@ class TotemXGame extends BaseGame {
       cls: (v) => (v === SC ? 'scatter' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => SYM[Math.floor(Math.random() * SYM.length)][0]));
-    this.onResize = () => this.placeLadder();
-    addEventListener('resize', this.onResize);
+    this.bar = new BarVideo(this.q('.sx-vid'));
+    this.sx = new Scene(this, { ...SCENE, onOrient: (name) => this.bar.load(asset(`assets/games/totemx/fond-${name}.mp4`), asset(`assets/games/totemx/scene-${name}.webp`), name) });
     this.setLevel(0);
     this.hud(0, 0, 0);
   }
 
-  destroy() { removeEventListener('resize', this.onResize); super.destroy(); }
+  destroy() { this.bar?.destroy(); this.sx?.destroy(); super.destroy(); }
+  onMeters() { this.sx?.meters(); }
 
   // Overlays (bonus intro, big wins) burn too.
   overlay(html, cls = '') { return super.overlay(html, `${cls} tx-ov`); }
 
   /* ---------- the extreme totem ---------- */
-  placeLadder() {
-    const on = this.steps.querySelector('.tx-step.on');
-    if (!on) return;
-    const row = getComputedStyle(this.steps).flexDirection.startsWith('row');
-    this.steps.style.transform = row
-      ? `translateX(${Math.round(this.lad.clientWidth / 2 - (on.offsetLeft + on.offsetWidth / 2))}px)`
-      : `translateY(${Math.round(this.lad.clientHeight / 2 - (on.offsetTop + on.offsetHeight / 2))}px)`;
-  }
+  // the totem's height = the loading bar of the temple (the video goes forward to it; back to the start for a new spin)
   setLevel(lv, bump) {
     const was = this.lv;
     this.lv = lv;
-    this.steps.querySelectorAll('.tx-step').forEach((s) => {
-      const i = +s.dataset.i;
-      s.classList.toggle('on', i === lv);
-      s.classList.toggle('done', i < lv);
-    });
     this.q('.tx-cur').textContent = `×${LAD[lv]}`;
+    this.bar?.go(lv / (LAD.length - 1), lv < was || !bump);
     // the temple heats up with the totem: hot from ×8, inferno from ×30
     this.slotEl.classList.toggle('tx-hot', lv >= HOT);
     this.slotEl.classList.toggle('tx-inferno', lv >= 9);
-    this.placeLadder();
     if (!bump) return;
-    const on = this.steps.querySelector('.tx-step.on');
+    const on = this.q('.sx-totem');
     on?.classList.remove('tx-bump'); void on?.offsetWidth; on?.classList.add('tx-bump');
     this.frame.classList.remove('tx-flash'); void this.frame.offsetWidth; this.frame.classList.add('tx-flash');
     const hot = lv >= HOT;
@@ -278,6 +291,7 @@ class TotemXGame extends BaseGame {
   // The whole grid is sealed: the temple bursts into flames.
   async fullScreen(prize, m) {
     this.slotEl.classList.add('tx-full');
+    this.bar?.fire(); // the bar of the temple catches fire
     sfx.bigWin?.();
     fx.confetti?.(120);
     fx.coins?.(50);

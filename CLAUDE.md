@@ -83,7 +83,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   SEO. Pour l'ouvrir : retirer `"wip": true` puis `python3 tools/build.py`. Le propriétaire essaie un jeu en travaux
   avec `?essai` dans l'adresse (`renderGame` dans `pages/game.js`).
 - **Jeux retirés** (demande du propriétaire du 16 novembre 2026 : La Pizza Yo-Yo `taco`, Le Totem `pharaon`, Le Labo `labo`, Le
-  Coffre aux Pirates `pirates`, Le Filon `filon`, Le Plateau `plateau`, puis Le Plateau Online `plateau-online`) : `"wip": true, "retired": true` dans
+  Le Filon `filon`, Le Plateau `plateau`, puis Le Plateau Online `plateau-online` ; Le Coffre aux Pirates `pirates`, retiré
+  le même jour, **remis en ligne** avec son nouveau décor, sans revenir dans les listes des tournois et événements) : `"wip": true, "retired": true` dans
   leur ligne d'`ORIGINALS`. Ils sortent de `ALL_GAMES` (accueil, catégories, `SLOTS`, Défi spécial, pages SEO, affiches `UPDATES` : `LIVE`),
   mais `getGame()` les trouve encore (`RETIRED` du catalogue) : records, historique, profils. Page du jeu = « 🚫 Machine retirée » (sauf
   `?essai`). **Succès gardés** : `mySlots()` d'`achievements.js` ajoute une machine retirée si le joueur y a quelque chose, avec
@@ -256,6 +257,24 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `jpEl(k)` pour les faire clignoter), SOLDE · GAIN à gauche du cadre (large) ou de chaque côté du SPIN (haut) (`.dg-info`),
   compteur des tours gratuits à leur place (large) ou sur la rangée BET / BONUS MENU / MAX BET (haut), barre cliquable ; plus
   de `frameCls: 'dg-frame'` (ses anciennes règles gênaient le plein écran). Plein écran comme L'Olympe. Gains inchangés.
+- **Décors des 5 machines du 16 novembre 2026** (demande du propriétaire : Le Coffre-Fort `billets`, Le Coffre aux Pirates `pirates`, La
+  Tournée du Père Noël `noel`, Le Totem Extrême `totemx`, La Tour Bling `bling`) : **un seul cadre commun**, `Scene` / `sceneHTML` de
+  `core/videobg.js` : image ou vidéo « large » (ordinateur) et « haute » (téléphone tenu droit), rouleaux sur la fenêtre peinte (`.sx-win`),
+  barre peinte rendue cliquable (`.sx-bm` / `.sx-bet` / `.sx-bp` / `.sx-menu` / `.sx-menu2` / `.sx-spin` / `.sx-max`), plaques `.sx-pl`
+  (`.sx-bal`, `.sx-gain`, `.sx-tbet`), jackpots `.sx-jp-*`, compteur du bonus à la place des plaques, plein écran qui couvre l'écran
+  (`coverFit`, zone gardée `key`, `.sx.sx-fullsc` en `position: fixed`). Chaque jeu : `stage: sceneHTML(id, { host, inWin, inArt, plates })`,
+  puis `this.sx = new Scene(this, SCENE)` ; `onMeters()` → `this.sx.meters()`. Positions en % (bloc CSS « Décors des 5 machines », fabriqué
+  par un petit script à partir des boîtes en pixels de chaque image : `.sx-<id>.sx-l` / `.sx-p`). **Piège** : la classe de plaque est
+  `.sx-pl` (`.sx-p` = image haute) ; un texte dimensionné en `cqh` doit être dans un enfant de la boîte `container-type: size`.
+  Fichiers : `tools/art/<jeu>/clean.py` → `assets/games/<jeu>/scene-*.webp` (+ `fond-*.mp4`). Coffre-Fort : 2 images (fenêtre vidée, mise
+  et BALANCE / TOTAL BET / WIN effacés). Pirates : image large (5 colonnes au lieu de 3 rangées, roue SPIN et ancre gardées devant) + vidéo
+  haute ; « x1 » effacé (`.sx-mult` = ×1, puis le multiplicateur du Crabe pendant les tours gratuits), jackpots sur la poutre (`.ap-jps`).
+  Noël : 2 vidéos (5 rangées peintes effacées, le jeu a 7 rangées ; montants des jackpots effacés ; MINI / MAXI / GRAND `data-jx`).
+  La Tour Bling : 2 vidéos (sa grille 6 × 7 est celle du jeu ; seule la mise est effacée). **Le Totem Extrême** : sa vidéo **n'est pas une
+  boucle, c'est la barre de chargement** (`BarVideo` dans `games/totemx.js`, fichier chargé entier en mémoire, une image-clé toutes les
+  4 images) : `setLevel` la fait avancer jusqu'à la hauteur du totem (lv / 11 de `BAR.full` : image 100 sur la haute, 132 sur la large),
+  elle revient au début à chaque nouveau tour, et au **FULL SCREEN elle prend feu** (`fire()` : images 136 → fin, flammes en boucle),
+  voulu par le propriétaire ; plaques du temple = SOLDE · TOTEM ×N · GAIN, « FULL SCREEN n / 30 » sous la grille. Gains inchangés.
 - **Décors animés, outils communs** : `tools/art/videobg.py` (lecture, effaçage, boucle sans coupure, ×2, affiche) pour les
   `tools/art/<jeu>/clean.py`, et module `core/videobg.js` d'`index.html` : `VideoBg` (lecture muette, retour d'une boucle `loop`,
   pause page cachée, rien avec « animations réduites », décodeur libéré à `destroy()`), `screenBox` (écran moins les zones sûres),

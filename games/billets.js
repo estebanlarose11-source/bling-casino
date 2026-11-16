@@ -12,6 +12,10 @@ const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, sleep, center } = __mods['fx.js'];
 const { el } = __mods['ui.js'];
+const { Scene, sceneHTML } = __mods['core/videobg.js'];
+// The owner's decor of 16 November 2026 (tools/art/billets/clean.py): neon frame, MINOR / MAJOR / JACKPOT plates, bills
+// flying; the reels in its window, its bar made clickable (core/videobg.js: Scene).
+const SCENE = { id: 'cf', dir: 'billets', ver: 1, video: false, size: { large: [1168, 784], haut: [784, 1168] }, key: { large: [130, 90, 1040, 720], haut: [20, 150, 770, 1150] } };
 
 /* ===ENGINE */
 // 5×3, 243 ways. Bills 5 to 500 KE pay by ways; WILD safe on reels 2-4. Cash bills carry a value (× the bet) or a
@@ -102,10 +106,11 @@ class BilletsGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.billets,
-      frameCls: 'bv-frame',
-      stage: `<div class="bv-vault"><i class="bv-boxes l"></i><i class="bv-boxes r"></i><i class="bv-gold l"></i><i class="bv-gold r"></i><i class="bv-shine"></i></div>
-        <div class="bv-top"><div class="bv-jp mini"><small>MINI</small><b data-jp="mini"></b></div><div class="bv-grand"><small>JACKPOT</small><b data-jp="grand"></b></div><div class="bv-jp major"><small>MAJEUR</small><b data-jp="major"></b></div></div>
-        <div class="reels-host"></div><div class="bv-word"></div>`,
+      stage: sceneHTML('cf', {
+        inWin: '<div class="bv-word"></div>',
+        inArt: ['mini', 'major', 'grand'].map((k) => `<div class="sx-jp sx-jp-${k}"><b data-jp="${k}"></b></div>`).join(''),
+        plates: '<div class="sx-pl sx-bal"><small>SOLDE</small><b></b></div><div class="sx-pl sx-tbet"><small>MISE</small><b></b></div><div class="sx-pl sx-gain"><small>GAIN</small><b>0</b></div>',
+      }),
       buys: [
         { id: 'case', icon: '💼', label: 'Mallette garantie', desc: 'Un tour avec une mallette de collecte sur le rouleau 5', cost: (b) => Math.round(b * BUY_CASE) },
         { id: 'fs', icon: '💵', label: `Free spins · ${FS_SPINS} tours`, desc: 'Mallettes sur tous les rouleaux et billets cash plus fréquents', cost: (b) => b * BUY_FS },
@@ -119,8 +124,12 @@ class BilletsGame extends BaseGame {
       cls: (v) => (v === CASH ? 'cash' : v === CASE ? 'case' : v === FSB ? 'fsb' : v === WILD ? 'wild' : `n${v}`),
     });
     this.reels.setAll(Array.from({ length: N }, (_, i) => cell(Math.floor(i / ROWS), false)));
+    this.sx = new Scene(this, SCENE);
     this.onBetChange();
   }
+
+  onMeters() { this.sx?.meters(); }
+  destroy() { this.sx?.destroy(); super.destroy(); }
 
   // A cash bill shows its value (or its jackpot note); the reel filler draws random values.
   cellArt(v, i) {

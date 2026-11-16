@@ -59,11 +59,11 @@ def loop(fr):
     return body, np.concatenate([body, body[:TAIL]])
 
 
-def write(frames, video, poster, crf=25):
+def write(frames, video, poster, crf=25, gop=24):
     n, h, w, _ = frames.shape
     p = subprocess.Popen(['ffmpeg', '-v', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{w}x{h}', '-r', str(FPS), '-i', '-',
                           '-vf', f'scale={w * UP}:{h * UP}:flags=lanczos,unsharp=5:5:0.45:5:5:0', '-c:v', 'libx264', '-preset', 'veryslow',
-                          '-crf', str(crf), '-pix_fmt', 'yuv420p', '-g', '24', '-profile:v', 'high', '-movflags', '+faststart', '-an', video],
+                          '-crf', str(crf), '-pix_fmt', 'yuv420p', '-g', str(gop), '-profile:v', 'high', '-movflags', '+faststart', '-an', video],
                          stdin=subprocess.PIPE)
     p.communicate(frames.tobytes())
     Image.fromarray(frames[0]).resize((w * UP, h * UP), Image.LANCZOS).save(poster, quality=82, method=6)

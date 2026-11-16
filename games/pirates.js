@@ -3,7 +3,7 @@
 __mods['games/impl/pirates.js'] = (() => {
 // Le Coffre aux Pirates (owner's request, 12 November 2026: his specification « Apex Predators », then a pirates'
 // treasure with his video and his board of 25 symbols, all used). 5 reels × 4 rows, 1 024 ways, very high volatility,
-// max ×50 000. The owner's video (assets/games/pirates/bg.mp4: a pirate ship at sea, silent, seamless loop) plays behind
+// max ×50 000. The owner's decor of 16 November 2026 (SCENE below: his picture and video) replaces the old ship video behind
 // the whole machine; the music is an original pirate jig (EXTRA_THEMES.pirates). Jackpots MINI / MINOR / MAJOR / GRAND shown at the top (.ap-jps).
 // Base game: small frequent wins, GOLD COINS carry a value (or a LUCKY STARFISH with MINI / MINOR), the CRAB of reel 5
 // collects every coin. 3 WHIRLPOOLS = LA CHASSE AU TRÉSOR: Hold & Win on 5 × 6 (2 rows locked), 3 lives; coins,
@@ -16,6 +16,11 @@ const { Reels } = __mods['core/reels.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx, audioContext, isMuted, duck } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
+const { Scene, sceneHTML } = __mods['core/videobg.js'];
+// The owner's decor of 16 November 2026 (tools/art/pirates/clean.py): his picture for computers (the captain, the storm,
+// MULTIPLICATEUR, the ship's wheel SPIN) and his video for phones (the little pirate on the rail, the lantern): the reels in
+// the 5 columns, his bar made clickable, the jackpots on the beam above the reels (core/videobg.js: Scene).
+const SCENE = { id: 'pi', dir: 'pirates', ver: 1, video: { haut: 121 / 24 }, size: { large: [1168, 784], haut: [448, 672] }, key: { large: [30, 0, 1100, 760], haut: [0, 0, 448, 672] } };
 
 /* ===ENGINE */
 // All the owner's 25 symbols (owner's wish, 12 November 2026). Symbols 0-3: heart, spade, club, diamond (low);
@@ -314,15 +319,10 @@ class PiratesGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.pirates, cls: 'ap-slot',
-      stage: `<div class="ap-stage">
-        <div class="ap-logo" aria-label="Le Coffre aux Pirates"><small>LE COFFRE AUX</small><b>PIRATES</b></div>
-        <div class="ap-jps">${['grand', 'major', 'minor', 'mini'].map((k) => `<span class="ap-jp ${k}">${pic(k === 'grand' ? 'crown' : 'star', 'ap-jpi')}<span class="ap-jpt"><i>${JP_NAME[k]}</i><b data-jp="${k}"></b></span></span>`).join('')}</div>
-        <div class="ap-board"><div class="ap-shake">
-          <div class="ap-reels"></div>
-          <div class="ap-heist" hidden></div>
-        </div></div>
-        <div class="ap-word"></div>
-      </div>`,
+      stage: sceneHTML('pi', {
+        host: 'ap-reels', inWin: '<div class="ap-heist" hidden></div>',
+        inArt: `<div class="ap-jps">${['grand', 'major', 'minor', 'mini'].map((k) => `<span class="ap-jp ${k}"><span class="ap-jpt"><i>${JP_NAME[k]}</i><b data-jp="${k}"></b></span></span>`).join('')}</div><div class="sx-mult"><b>×1</b></div><div class="ap-word"></div>`,
+      }),
       buys: [
         { id: 'heist', icon: '🌀', label: 'LA CHASSE AU TRÉSOR', desc: '5 pièces d’or, 3 vies, Tonneaux, Crabe, Ancres, jackpots MINI à GRAND, full screen ×500', cost: (b) => b * E.BUY.heist },
         { id: 'fs', icon: '🧰', label: 'LES TOURS GRATUITS', desc: `${E.P.fs.n} tours gratuits, plus de pièces, le Crabe sur tous les rouleaux avec un multiplicateur qui monte`, cost: (b) => b * E.BUY.fs },
@@ -330,18 +330,6 @@ class PiratesGame extends BaseGame {
       hello: `${E.HEIST_AT} tourbillons = LA CHASSE AU TRÉSOR · ${E.FS_AT} coffres = LES TOURS GRATUITS · le Crabe ramasse toutes les pièces`,
     });
     this.tension = new Tension();
-    const bg = this.q('.slot-bg');
-    bg.innerHTML = `<video class="ap-video" src="${asset('assets/games/pirates/bg.mp4')}" poster="${asset('assets/games/pirates/bg.webp')}" muted autoplay loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video><div class="ap-shade"></div>`;
-    this.video = bg.querySelector('video');
-    this.video.muted = true;
-    // a seamless loop, like a gif (owner's wish): the file's end fades into its start, and we go back to the start a
-    // little before the end so that the browser never stops on the last frame
-    const v = this.video, rewind = () => { if (v.duration && v.currentTime > v.duration - 0.3) v.currentTime = 0.04; };
-    v.addEventListener('timeupdate', rewind);
-    v.addEventListener('ended', () => { v.currentTime = 0; v.play().catch(() => {}); });
-    const play = () => { if (!this.dead && !matchMedia('(prefers-reduced-motion: reduce)').matches) this.video.play().catch(() => {}); };
-    play();
-    this.root.addEventListener('pointerdown', play, { once: true }); // a phone in power-saving mode waits for a touch
     this.vals = {};
     this.reels = new Reels(this.q('.ap-reels'), {
       cols: E.COLS, rows: E.ROWS, game: this, random: (c) => this.filler(c),
@@ -350,13 +338,15 @@ class PiratesGame extends BaseGame {
     });
     this.reels.el.classList.add('ap-rs');
     this.reels.setAll(this.idle());
+    this.sx = new Scene(this, SCENE);
     this.paintJps();
-    this.onVis = () => { if (document.hidden) { this.tension.stop(); this.video.pause(); } else play(); };
+    this.onVis = () => { if (document.hidden) this.tension.stop(); };
     document.addEventListener('visibilitychange', this.onVis);
   }
 
   onBetChange() { this.paintJps(); }
-  onMeters() { this.paintJps(); }
+  onMeters() { this.paintJps(); this.sx?.meters(); }
+  mult(m) { const n = this.q('.sx-mult b'); if (n) n.textContent = `×${m}`; }
   paintJps() { if (this.dead) return; this.qa('[data-jp]').forEach((n) => { n.innerHTML = `${kfmt(E.JPX[n.dataset.jp] * this.bet)}${KE}`; }); }
   // a jackpot is won: its plate at the top lights up, and the big word
   async jackpot(k, b) {
@@ -368,7 +358,7 @@ class PiratesGame extends BaseGame {
     await this.wait(k === 'grand' ? 2200 : k === 'major' ? 1200 : 700);
   }
 
-  destroy() { document.removeEventListener('visibilitychange', this.onVis); this.tension.stop(); this.video.pause(); this.video.muted = true; super.destroy(); }
+  destroy() { document.removeEventListener('visibilitychange', this.onVis); this.tension.stop(); this.sx?.destroy(); super.destroy(); }
 
   idle() { const { g, vals } = E.screen(Math.random); for (let i = 0; i < E.N; i++) if (g[i] === E.SCAT || g[i] === E.FSC || g[i] === E.COLL) g[i] = E.symbol(Math.floor(i / E.ROWS), Math.random); this.vals = vals; return g; }
   filler(c) {
@@ -716,7 +706,7 @@ class PiratesGame extends BaseGame {
     this.inFs = true;
     this.slotEl.classList.add('ap-fs');
     let tot = 0, left = E.P.fs.n, m = 1;
-    const banner = () => this.setBanner(`<b>TOURS GRATUITS</b><span class="pill">${left} restant${left > 1 ? 's' : ''}</span><span class="pill ap-cm">🦀 ×${m}</span><span class="pill gold">${fmtC(Math.round(Math.min(tot, capLeft)))}</span>`);
+    const banner = () => this.mult(m) || this.setBanner(`<b>TOURS GRATUITS</b><span class="pill">${left} restant${left > 1 ? 's' : ''}</span><span class="pill ap-cm">🦀 ×${m}</span><span class="pill gold">${fmtC(Math.round(Math.min(tot, capLeft)))}</span>`);
     banner();
     for (const sp of run.spins) {
       if (this.dead || tot >= capLeft) break;
@@ -751,7 +741,7 @@ class PiratesGame extends BaseGame {
     }
     const won = Math.min(Math.round(tot), capLeft);
     await this.celebrate(won, { summary: 'LES TOURS GRATUITS', stake: b });
-    this.setBanner('');
+    this.setBanner(''); this.mult(1);
     this.inFs = false;
     this.slotEl.classList.remove('ap-fs');
     this.msg(`Les Tours gratuits : ${fmtC(won)}`);

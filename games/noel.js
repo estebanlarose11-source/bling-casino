@@ -12,6 +12,10 @@ const { Reels } = __mods['core/reels.js'];
 const { EXTRA_THEMES } = __mods['core/music.js'];
 const { sfx } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
+const { Scene, sceneHTML } = __mods['core/videobg.js'];
+// The owner's 2 animated decors of 16 November 2026 (tools/art/noel/clean.py): the snowy arch, the Santas, MINI / MAJOR /
+// GRAND JACKPOT plates (our MINI / MAXI / GRAND in KE), the reels on his white grid, his bar made clickable (core/videobg.js).
+const SCENE = { id: 'nl', dir: 'noel', ver: 1, video: { large: 169 / 24, haut: 169 / 24 }, size: { large: [672, 448], haut: [448, 672] }, key: { large: [30, 20, 640, 445], haut: [0, 0, 448, 672] } };
 
 /* ===ENGINE */
 // 5 reels × 7 rows, 16 807 ways (a symbol pays on 3+ reels side by side from the left, at any height).
@@ -184,7 +188,7 @@ class NoelGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.noel, cls: 'nl-slot',
-      stage: `<div class="nl-reels"><div class="nl-cap" aria-hidden="true"></div><div class="reels-host"></div></div><div class="nl-word"></div>`,
+      stage: sceneHTML('nl', { inArt: `${['mini', 'maxi', 'grand'].map((k) => `<div class="sx-jp sx-jp-${k}"><b data-jx="${k}"></b></div>`).join('')}<div class="nl-word"></div>` }),
       buys: [
         { id: 'fs', icon: '🛷', label: 'La Tournée · 10 tours gratuits', desc: 'Le traîneau WILD monte dans sa colonne : ×2 à ×8, et les multiplicateurs se multiplient', cost: (b) => b * BUY_FS },
         { id: 'hold', icon: '❄️', label: 'Boules de neige · 6 boules', desc: '6 boules de neige qui restent, 3 relances · lutin ×2, Père Noël qui ramasse tout, MINI, MAXI et GRAND', cost: (b) => b * BUY_HOLD },
@@ -192,18 +196,6 @@ class NoelGame extends BaseGame {
       hello: ' ',
     });
     // the moving snowy plain behind the whole machine, a snowfall and the northern lights of the bonus
-    const bg = this.q('.slot-bg');
-    bg.innerHTML = `<video class="nl-video" src="${asset('assets/games/noel/bg.mp4')}" poster="${src('bg')}" muted autoplay loop playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
-      <div class="nl-aurora" aria-hidden="true"><i></i><i></i><i></i></div><div class="nl-shade"></div>
-      <div class="nl-snow" aria-hidden="true">${Array.from({ length: 36 }, (_, k) => `<i style="left:${(k * 37) % 100}%;--s:${2 + (k % 4)}px;--d:${7 + (k % 6) * 1.6}s;--x:${((k * 23) % 50) - 25}px;animation-delay:-${(k * 1.7) % 12}s"></i>`).join('')}</div>`;
-    this.video = bg.querySelector('video');
-    this.video.muted = true;
-    const play = () => { if (!this.dead && !matchMedia('(prefers-reduced-motion: reduce)').matches) this.video.play().catch(() => {}); };
-    play();
-    this.onVis = () => { if (document.hidden) this.video.pause(); else play(); };
-    document.addEventListener('visibilitychange', this.onVis);
-    this.root.addEventListener('pointerdown', play, { once: true }); // a phone in power-saving mode waits for a touch
-
     this.gvals = {}; this.gkind = {}; this.under = new Set(); this.cols = {};
     this.reels = new Reels(this.q('.reels-host'), {
       cols: COLS, rows: ROWS, game: this, random: (c) => this.filler(c),
@@ -213,9 +205,14 @@ class NoelGame extends BaseGame {
     this.reels.el.classList.add('nl-rs');
     this.reels.setAll(screen(Math.random, false).g);
     ['wild', 'scat', 'globe', 's7', 's8'].forEach((n) => { new Image().src = src(n); });
+    this.sx = new Scene(this, SCENE);
+    this.onBetChange();
   }
 
-  destroy() { document.removeEventListener('visibilitychange', this.onVis); this.video?.pause(); super.destroy(); }
+  onMeters() { this.sx?.meters(); }
+  onBetChange() { this.qa('[data-jx]').forEach((n) => { n.textContent = shortC(JPX[n.dataset.jx] * this.bet); }); }
+
+  destroy() { this.sx?.destroy(); super.destroy(); }
 
   filler(c) { const r = Math.random(); return r < 0.03 ? GLOBE : r < 0.045 ? SCAT : symbol(c, Math.random, !this.inFree); }
 
@@ -298,7 +295,7 @@ class NoelGame extends BaseGame {
   night(on) {
     this.slotEl.classList.toggle('nl-night', on);
     this.inFree = on;
-    try { this.video.playbackRate = on ? 1.7 : 1; } catch { /* ignore */ }
+    try { this.q('.sx-vid').playbackRate = on ? 1.4 : 1; } catch { /* ignore */ }
   }
 
   async freeSpins(count, b, capLeft) {

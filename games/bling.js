@@ -8,6 +8,10 @@ const { SymbolGrid } = __mods['core/grid.js'];
 const { DEFS, MAP } = __mods['art/bling.js'];
 const { sfx } = __mods['audio.js'];
 const { fx } = __mods['fx.js'];
+const { Scene, sceneHTML } = __mods['core/videobg.js'];
+// The owner's 2 animated decors of 16 November 2026 (tools/art/bling/clean.py): BLING TOWER, the city at night, coins
+// falling, a gold frame with the 6 × 7 grid, MENU / BONUS / MISE / SPIN made clickable (core/videobg.js: Scene).
+const SCENE = { id: 'bt', dir: 'bling', ver: 1, video: { large: 121 / 24, haut: 121 / 24 }, size: { large: [736, 400], haut: [400, 736] }, key: { large: [10, 0, 726, 400], haut: [0, 0, 400, 736] } };
 
 /* ===ENGINE (original) */
 const SYM = [['💎', 40, 2], ['👑', 20, 3], ['💰', 10, 4], ['💵', 5, 6], ['🪙', 3, 8], ['🍾', 2, 9], ['💸', 1.5, 9]];
@@ -46,7 +50,7 @@ class BlingGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       defs: DEFS, music: MUSIC,
-      stage: '<div class="bt-bg"><i class="bt-photo"></i><i class="bt-beam b1"></i><i class="bt-beam b2"></i><i class="bt-city"></i><i class="bt-glitter"></i></div><div class="grid-host"></div><div class="bt-word"></div><div class="bt-combo"></div>',
+      stage: sceneHTML('bt', { host: 'grid-host', inWin: '<div class="bt-word"></div><div class="bt-combo"></div>' }),
       buys: [
         { id: 'normal', icon: '💲', label: 'Bonus 3 scatters · ×2', desc: '10 tours gratuits, toutes les cases démarrent à ×2', cost: (b) => b * BUYN },
         { id: 'bounty', icon: '💎', label: 'Bonus 4 scatters · ×5', desc: '15 tours gratuits, toutes les cases démarrent à ×5', cost: (b) => b * BUYB },
@@ -56,15 +60,18 @@ class BlingGame extends BaseGame {
     this.mm = new Array(N).fill(0);
     this.startM = 0;
     // load the painted coins and the city right away, so the first spin shows no empty cell
-    this.q('.bt-photo').style.backgroundImage = `url("${asset('assets/games/bling/bg.webp')}")`;
-    [...Object.values(IMG), 'bg'].forEach((n) => { new Image().src = asset(`assets/games/bling/${n}.webp`); });
+    Object.values(IMG).forEach((n) => { new Image().src = asset(`assets/games/bling/${n}.webp`); });
     this.grid = new SymbolGrid(this.q('.grid-host'), {
       cols: COLS, rows: ROWS, game: this,
       art: symArt,
       cls: (v) => (v === SC ? 'scatter' : ''),
     });
     this.grid.setAll(Array.from({ length: N }, () => SYM[Math.floor(Math.random() * SYM.length)][0]));
+    this.sx = new Scene(this, SCENE);
   }
+
+  onMeters() { this.sx?.meters(); }
+  destroy() { this.sx?.destroy(); super.destroy(); }
 
   word(k, text) {
     const w = this.q('.bt-word');
