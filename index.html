@@ -5447,6 +5447,82 @@ html.light .slot small { color: inherit; }
 .ch-pay .ch-img { width: 100%; height: 100%; }
 .ch-pay .ch-card { width: 50px; height: 50px; } .ch-pay .ch-shell { width: 45%; height: 100%; } .ch-pay .ch-wild { font-size: 9px; padding: 0 5px; }
 @media (max-width: 600px) { .ch-corner { width: 18px; height: 18px; } .ch-corner::after { inset: 6px; } .g-chasse .rs { gap: 3px; } .ch-reels { border-radius: 12px; } .g-chasse .rs-cell::before { border-radius: 7px; } }
+/* ============ The Hunt, nouveau décor (games/chasse.js): the owner's 2 pictures of 16 November 2026, scene-large.webp
+   (1168 × 784: computer, wide screens, .hu-l) and scene-haut.webp (784 × 1168: phone held upright, .hu-p). Reels in the
+   wooden frame, his bar clickable, his 3 plaques = SOLDE · GAIN · GAIN MAX; full screen = the picture covering the screen.
+   The hunt (bonus) is unchanged: .ht-field takes the place of the picture ============ */
+.g-chasse.ch-slot .slot-head, .g-chasse.ch-slot > .feature-banner:empty { display: none !important; }
+.slot.g-chasse.ch-slot > .slot-bg { background: url(assets/games/chasse/scene-large.webp?v=3) center / cover no-repeat !important; filter: blur(14px) brightness(.6) !important; transform: scale(1.1); }
+.g-chasse.ch-slot { padding-top: 0; }
+.game-host:not(.is-full):has(> .g-chasse.ch-slot) { max-width: max(420px, min(1250px, calc((100svh - 220px) * 1.49 + 40px))) !important; }
+.hu-scene[hidden] { display: none !important; }
+.hu-scene { position: relative; margin: 0 auto; overflow: hidden; border-radius: 6px; box-shadow: 0 10px 40px rgba(0, 0, 0, .5); }
+.hu-scene.hu-l { width: min(100%, max(300px, calc((100svh - 220px) * 1.49))); aspect-ratio: 1168 / 784; }
+.hu-scene.hu-p { width: min(100%, max(260px, calc((100svh - 140px) * .671))); aspect-ratio: 784 / 1168; }
+.hu-art { position: absolute; inset: 0; container-type: size; background: url(assets/games/chasse/scene-large.webp?v=3) center / 100% 100% no-repeat; }
+.hu-p .hu-art { background-image: url(assets/games/chasse/scene-haut.webp?v=3); }
+.hu-safe { position: absolute; visibility: hidden; pointer-events: none; padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.hu-win, .hu-hot, .hu-bet, .hu-plq { position: absolute; }
+.hu-l .hu-win { left: 17.89%; top: 22.58%; width: 64.47%; height: 51.79%; }
+.hu-l .hu-p1 { left: 16.52%; top: 9.95%; width: 11.73%; height: 7.14%; }
+.hu-l .hu-p2 { left: 42.21%; top: 11.22%; width: 15.84%; height: 8.8%; }
+.hu-l .hu-p3 { left: 71.06%; top: 9.95%; width: 11.99%; height: 7.4%; }
+.hu-l .hu-bm { left: 10.1%; top: 85.84%; width: 4.11%; height: 6.12%; }
+.hu-l .hu-bp { left: 27.05%; top: 85.84%; width: 4.11%; height: 6.12%; }
+.hu-l .hu-bet { left: 14.21%; top: 85.46%; width: 12.84%; height: 6.63%; }
+.hu-l .hu-spin { left: 42.38%; top: 72.96%; width: 15.41%; height: 19.13%; }
+.hu-l .hu-menu { left: 36.82%; top: 92.47%; width: 26.54%; height: 5.74%; }
+.hu-l .hu-max { left: 71.06%; top: 82.91%; width: 16.27%; height: 9.57%; }
+.hu-p .hu-win { left: 17.86%; top: 21.92%; width: 66.07%; height: 51.71%; }
+.hu-p .hu-p1 { left: 17.6%; top: 11.39%; width: 18.62%; height: 7.19%; }
+.hu-p .hu-p2 { left: 40.82%; top: 10.96%; width: 19.39%; height: 7.36%; }
+.hu-p .hu-p3 { left: 65.05%; top: 11.39%; width: 18.75%; height: 7.19%; }
+.hu-p .hu-bm { left: 4.46%; top: 86.73%; width: 6.89%; height: 4.62%; }
+.hu-p .hu-bp { left: 26.4%; top: 86.73%; width: 6.89%; height: 4.62%; }
+.hu-p .hu-bet { left: 11.35%; top: 86.82%; width: 15.05%; height: 4.45%; }
+.hu-p .hu-spin { left: 36.61%; top: 80.05%; width: 26.79%; height: 17.98%; }
+.hu-p .hu-menu { left: 36.99%; top: 74.66%; width: 26.4%; height: 5.65%; }
+.hu-p .hu-max { left: 69.9%; top: 84.76%; width: 23.47%; height: 7.02%; }
+/* the reels in the frame: no wooden box of ours any more, the tiles sit on the painted window */
+.hu-win { z-index: 2; }
+.hu-win .ch-reels { position: absolute; inset: 0; padding: .5% .6%; border-radius: 0; background: none; box-shadow: none; }
+.hu-win .reels-host { position: absolute; inset: 0; }
+.g-chasse .hu-win .rs { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; min-width: 0; margin: 0; gap: .8%; padding: .6% .8%; box-sizing: border-box; }
+.g-chasse .hu-win .rs-reel { border-radius: 4px; background: linear-gradient(180deg, rgba(8, 14, 6, .55), rgba(16, 24, 10, .25) 50%, rgba(8, 14, 6, .55)); box-shadow: inset 0 0 0 1px rgba(214, 170, 90, .28), inset 0 0 14px rgba(0, 0, 0, .5); }
+.hu-p .hu-win .ch-img { width: 96%; height: 70%; } .hu-p .hu-win .ch-card { width: 86%; height: 60%; } .hu-p .hu-win .ch-shell { width: 50%; height: 70%; }
+.g-chasse .hu-win .ch-word { font-size: 6cqw; } .hu-p .hu-win .ch-word { font-size: 10cqw; }
+/* his 3 plaques */
+.hu-plq { z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .35cqh; pointer-events: none; text-align: center; overflow: hidden; }
+.hu-plq small { font: 900 1.25cqw/1 Cinzel, Georgia, serif; letter-spacing: .14em; color: #e9c77a; text-shadow: 0 1px 0 #2a1606; }
+.hu-plq b { max-width: 96%; font: 900 2cqw/1 KeCoin, Cinzel, Georgia, serif; white-space: nowrap; color: #fff1c9; text-shadow: 0 2px 0 #2a1606, 0 0 8px rgba(0, 0, 0, .6); }
+.hu-p2 small { font-size: 1.45cqw; } .hu-p2 b { font-size: 2.5cqw; }
+.hu-plq.won b { color: #fde047; text-shadow: 0 2px 0 #3b1d05, 0 0 12px rgba(253, 224, 71, .8); }
+.hu-p .hu-plq small { font-size: 2.3cqw; } .hu-p .hu-plq b { font-size: 3.5cqw; } .hu-p .hu-p2 b { font-size: 3.8cqw; }
+/* his bar, clickable */
+.hu-hot { z-index: 5; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: box-shadow .15s, background .15s; }
+.hu-hot:hover:not([disabled]) { background: rgba(255, 230, 160, .12); box-shadow: 0 0 14px rgba(253, 200, 90, .7); }
+.hu-hot:active:not([disabled]) { background: rgba(255, 230, 160, .26); }
+.hu-hot[disabled] { cursor: default; background: rgba(0, 0, 0, .3); }
+.hu-max, .hu-menu { border-radius: 10px; }
+.g-chasse.busy .hu-spin { box-shadow: 0 0 22px rgba(253, 200, 90, .85), inset 0 0 18px rgba(255, 240, 200, .35); animation: ftHot .5s ease-in-out infinite alternate; }
+.g-chasse.auto-on .hu-spin { box-shadow: 0 0 0 3px #fff1c9, 0 0 18px #f59e0b; }
+.hu-spin .auto-count { position: absolute; left: 50%; bottom: 8%; transform: translateX(-50%); font: 900 2.2cqw 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 0 8px #92400e, 0 2px 0 #3b1d05; }
+.hu-p .hu-spin .auto-count { font-size: 5.5cqw; }
+.hu-spin .fr-badge { position: absolute; left: 50%; top: -8%; transform: translateX(-50%); padding: .1em .4em; border-radius: 99px; background: #16a34a; color: #fff; font: 800 1.1cqw Archivo, sans-serif; white-space: nowrap; }
+.hu-p .hu-spin .fr-badge { font-size: 2.8cqw; }
+.hu-bet { z-index: 4; display: flex; align-items: center; justify-content: center; white-space: nowrap; pointer-events: none; font: 900 2.6cqw/1 KeCoin, Cinzel, Georgia, serif; color: #f6d77a; text-shadow: 0 2px 0 #2a1606, 0 0 8px rgba(0, 0, 0, .6); }
+.hu-p .hu-bet { font-size: 4.4cqw; }
+.hu-full { z-index: 8; position: absolute; right: 1.2%; top: 1.6%; width: clamp(28px, 3.4%, 44px); height: auto; aspect-ratio: 1; border-radius: 8px; background: rgba(42, 24, 8, .7); color: #fff1c9; font: 700 clamp(14px, 2.2vmin, 22px)/1 sans-serif; box-shadow: inset 0 0 0 1px rgba(233, 199, 122, .6); }
+.hu-p .hu-full { width: clamp(28px, 6%, 40px); }
+/* full screen */
+.game-host.is-full:has(> .slot.g-chasse) { background: #12180c; }
+.game-host.ml-busy > .slot.g-chasse .slot-frame, .game-host.ml-busy > .slot.g-chasse .reels { animation: none !important; }
+.hu-scene.hu-fullsc { position: absolute; inset: 0; z-index: 1; width: auto !important; height: auto; aspect-ratio: auto !important; margin: 0; border-radius: 0; box-shadow: none; background: url(assets/games/chasse/scene-large.webp?v=3) center / cover no-repeat #12180c; }
+.hu-scene.hu-fullsc.hu-p { background-image: url(assets/games/chasse/scene-haut.webp?v=3); }
+.hu-fullsc.hu-l .hu-art { -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); mask-image: linear-gradient(90deg, transparent, #000 2.5%, #000 97.5%, transparent); }
+.hu-band .hu-art { -webkit-mask-image: linear-gradient(180deg, transparent, #000 7%); mask-image: linear-gradient(180deg, transparent, #000 7%); }
+.hu-scene.hu-band::before { content: ''; position: absolute; inset: -20px; background: url(assets/games/chasse/scene-haut.webp?v=3) center top / 100% auto no-repeat #12180c; filter: blur(14px) brightness(.8); }
+.hu-fullsc .hu-full { right: auto; left: max(10px, env(safe-area-inset-left, 0px)); top: max(10px, env(safe-area-inset-top, 0px)); width: 40px; height: 40px; }
 /* ============ Le Valhalla (5×4, 25 lignes, WILD collés ; symboles du propriétaire, machine en pierre dessinée par nous) ============ */
 .g-viking { --slot-bg: #0b2a3a; --vk-st: linear-gradient(180deg, #5d6874 0%, #39424d 38%, #232a33 100%); --vk-edge: inset 0 2px 0 rgba(170, 182, 196, .55), inset 0 -3px 0 rgba(0, 0, 0, .55), 0 0 0 2px #0b0f14; }
 .slot.g-viking > .slot-bg { background: #0b2a3a !important; overflow: hidden; filter: none !important; border-radius: inherit; }
@@ -13429,6 +13505,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'chasse', date: '2026-11-16', title: 'Nouveau décor de chasse', items: ['La machine dans un grand cadre en bois au cœur de la forêt, avec cerf, sanglier, faisans et lièvre', 'Tous les boutons du décor marchent : mise − / +, SPIN, MAX BET et BONUS MENU', 'Solde, gain et gain max sur les plaques du haut', 'Plein écran sur tout l’écran, téléphone et ordinateur', 'La chasse (le bonus) ne change pas'] },
   { game: 'peche', date: '2026-11-16', title: 'Adaptée au téléphone', items: ['Sur téléphone, la roue, les mises et le bouton LANCER tiennent ensemble', 'Nouveau bouton « ⛶ Grand écran » sur la roue : tout le jeu sur un seul écran, sans rien faire défiler', 'Téléphone couché : la roue à gauche, les mises à droite', 'En grand écran, tous les boutons sont visibles : Annuler, Effacer, Rejouer, Doubler, Remise auto et Tours auto sur 2 lignes'] },
   { game: 'peche', date: '2026-11-15', title: 'Roue en verre et pêche sur la glace', items: ['Nouvelle roue en verre qui s’arrête au hasard sur n’importe quelle case', 'La pêche se joue en vidéo sur un lac gelé : petit poisson à la canne, poisson moyen à la grue, gros poisson à l’hélicoptère', 'Plus le poisson est gros, plus le multiplicateur est gros : le gros poisson peut donner le MAX WIN', 'Nouveau : « 🎣 Acheter une pêche » bleue, orange ou rouge'] },
   { game: 'peche-online', date: '2026-11-15', title: 'Roue en verre et pêche sur la glace', items: ['La nouvelle roue en verre et les vidéos de pêche (canne, grue, hélicoptère) pour tout le salon'] },
@@ -16672,7 +16749,7 @@ const FILES = {
   taco: ['taco', 'games/impl/taco.js', 'PizzaGame', '9621261bab'],
   robots: ['robots', 'games/impl/robots.js', 'RobotsGame', '620d0b9f44'],
   pileface: ['pileface', 'games/impl/pileface.js', 'PileFaceGame', 'b3c63b68ca'],
-  chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', '14b7bec1aa'],
+  chasse: ['chasse', 'games/impl/chasse.js', 'ChasseGame', 'db3570edfb'],
   poulet: ['poulet', 'games/impl/poulet.js', 'PouletGame', 'e3a4bec1eb'],
   gratteciel: ['gratteciel', 'games/impl/gratteciel.js', 'GratteCielGame', 'a7fe064c42'],
   pilote: ['pilote', 'games/impl/pilote.js', 'PiloteGame', '759a2adc83'],

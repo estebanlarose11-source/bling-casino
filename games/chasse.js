@@ -121,15 +121,27 @@ class ChasseGame extends BaseGame {
   constructor(root, game) {
     super(root, game, {
       music: EXTRA_THEMES.chasse, cls: 'ch-slot',
-      // decor: ducks flying over the reels, a deer and the golden deer running under them
-      stage: `<div class="ch-sky" aria-hidden="true"><img class="ch-duck d1" src="${src('duck')}" alt="" draggable="false"><img class="ch-duck d2" src="${src('duck')}" alt="" draggable="false"><img class="ch-duck d3" src="${src('duck')}" alt="" draggable="false"></div>
-        <div class="ch-reels"><i class="ch-corner tl"></i><i class="ch-corner tr"></i><i class="ch-corner bl"></i><i class="ch-corner br"></i><div class="reels-host"></div></div>
-        <div class="ch-ground" aria-hidden="true"><img class="ch-deer" src="${src('deer2')}" alt="" draggable="false"><img class="ch-golden" src="${src('gold')}" alt="" draggable="false"></div>
+      // the owner's 2 pictures of 16 November 2026: scene-large.webp (computer, wide screens) and scene-haut.webp (phone
+      // held upright). The 5 × 3 reels sit in the wooden frame, his bar is clickable (BET − / +, BONUS MENU, SPIN, MAX BET),
+      // his 3 plaques show SOLDE · GAIN · GAIN MAX. sceneFit() picks the picture and fits it (full screen: covers the screen).
+      // The hunt (bonus) is unchanged: its field takes the place of the picture.
+      stage: `<div class="hu-scene hu-l"><i class="hu-safe"></i><div class="hu-art">
+          <div class="hu-plq hu-p1"><small>SOLDE</small><b class="hu-bal"></b></div>
+          <div class="hu-plq hu-p2"><small>GAIN</small><b class="hu-gain">0</b></div>
+          <div class="hu-plq hu-p3"><small>GAIN MAX</small><b>×${CAPX.toLocaleString('fr-FR')}</b></div>
+          <div class="hu-win"><div class="ch-reels"><div class="reels-host"></div></div><div class="ch-word"></div></div>
+          <button class="hu-hot hu-bm" type="button" data-act="bet-" aria-label="Diminuer la mise"></button>
+          <b class="hu-bet"></b>
+          <button class="hu-hot hu-bp" type="button" data-act="bet+" aria-label="Augmenter la mise"></button>
+          <button class="hu-hot hu-menu" type="button" data-act="menu" aria-label="Bonus, tours auto et réglages"></button>
+          <button class="hu-hot hu-spin" type="button" data-act="main" aria-label="Lancer"><span class="auto-count"></span><span class="fr-badge" hidden></span></button>
+          <button class="hu-hot hu-max" type="button" data-act="max" aria-label="Mise maximum"></button>
+        </div><button class="hu-hot hu-full" type="button" data-act="full" aria-label="Plein écran">⛶<span hidden>Plein écran</span></button></div>
         <div class="ht-field" hidden>
           <div class="ht-hud"><span class="ht-shells"></span><span class="ht-time">20<small> s</small></span><span class="ht-sum">×0</span></div>
           <div class="ht-layer"></div><div class="ht-scope">${SCOPE}</div><div class="ht-banner"></div>
           <div class="ht-rotate"><b>↻</b><span>Tourne ton téléphone pour chasser en grand</span></div>
-        </div><div class="ch-word"></div>`,
+        </div>`,
       buys: [
         { id: 'h3', icon: '🎯', label: 'La Chasse · 3 cartouches', desc: '3 tirs, chaque animal touché paie ×2 à ×250 la mise', cost: (b) => b * BUY3 },
         { id: 'h5', icon: '🦌', label: 'La Grande Chasse · 5 cartouches', desc: '5 tirs, et le cerf doré peut passer (×500)', cost: (b) => b * BUY5 },
@@ -141,15 +153,61 @@ class ChasseGame extends BaseGame {
       art: (v) => symArt(v), cls: (v) => (v === SCAT ? 'scat' : v === WILD ? 'wild' : v >= 5 ? `an a${v}` : `card c${v}`),
     });
     this.reels.setAll(Array.from({ length: N }, (_, i) => sym(Math.floor(i / ROWS))));
+    for (const sel of ['.controls', '.slot > .win-bar']) this.q(sel)?.style.setProperty('display', 'none', 'important');
+    this.gainObs = new MutationObserver(() => this.paintGain());
+    this.gainObs.observe(this.winAmt, { childList: true, characterData: true, subtree: true });
+    this.ro = new ResizeObserver(() => this.sceneFit());
+    this.ro.observe(this.q('.hu-scene'));
+    this.onRs = () => requestAnimationFrame(() => this.sceneFit());
+    addEventListener('resize', this.onRs);
     this.field = this.q('.ht-field'); this.layer = this.q('.ht-layer'); this.scope = this.q('.ht-scope');
     this.playing = false; this.animals = []; this.obst = [];
     this.field.addEventListener('pointerdown', (e) => this.shoot(e));
     this.field.addEventListener('pointermove', (e) => this.aim(e));
     this.field.addEventListener('pointerleave', () => this.scope.classList.remove('on'));
     [...ANIMALS, 'gold'].forEach((n) => { new Image().src = src(n); });
+    this.onMeters(); this.paintGain(); this.sceneFit();
   }
 
-  destroy() { cancelAnimationFrame(this.raf); clearTimeout(this.goldT); this.huntDone?.(0); super.destroy(); }
+  destroy() { cancelAnimationFrame(this.raf); clearTimeout(this.goldT); this.huntDone?.(0); this.gainObs?.disconnect(); this.ro?.disconnect(); removeEventListener('resize', this.onRs); super.destroy(); }
+
+  /* ---------- the owner's pictures: bar, plaques, full screen ---------- */
+  onMeters() {
+    const set = (c, t) => { const n = this.q(c); if (n && n.textContent !== t) n.textContent = t; };
+    set('.hu-bet', fmtC(this.bet)); set('.hu-bal', fmtC(this.balC()));
+  }
+  paintGain() {
+    const n = this.q('.hu-gain'); if (!n) return;
+    const w = this.winAmt.textContent.trim().replace(/^[-−]\s*/, '');
+    n.textContent = w || fmtC(0);
+    n.parentElement.classList.toggle('won', !!w);
+  }
+  // Wide picture on a computer, tall picture on a phone held upright. Full screen: the picture that fits the screen's
+  // shape covers the whole screen, cropped on its edges but never cutting the plaques, the frame or the bar (KEY, in its pixels).
+  sceneFit() {
+    if (this.dead) return;
+    const sc = this.q('.hu-scene'), art = this.q('.hu-art');
+    const full = !!this.slotEl.closest('.is-full');
+    sc.classList.toggle('hu-fullsc', full);
+    if (!full) {
+      sc.classList.remove('hu-band');
+      const port = innerWidth < 700 && innerHeight > innerWidth;
+      sc.classList.toggle('hu-p', port); sc.classList.toggle('hu-l', !port);
+      art.style.cssText = ''; return;
+    }
+    const cs = getComputedStyle(this.q('.hu-safe')), sp = (k) => parseFloat(cs[k]) || 0;
+    const top = sp('paddingTop'), bot = sp('paddingBottom'), lft = sp('paddingLeft'), rgt = sp('paddingRight');
+    const W = sc.clientWidth - lft - rgt, H = sc.clientHeight - top - bot;
+    if (!W || !H) return;
+    const port = W / H < 1, iw = port ? 784 : 1168, ih = port ? 1168 : 784;
+    sc.classList.toggle('hu-p', port); sc.classList.toggle('hu-l', !port);
+    const [kx0, ky0, kx1, ky1] = port ? [12, 112, 772, 1150] : [105, 58, 1060, 778];
+    const k = Math.min(Math.max(W / iw, H / ih), W / (kx1 - kx0), H / (ky1 - ky0)), w = iw * k, h = ih * k;
+    const fit = (S, len, a0, a1) => { let v = (S - len) / 2; v = Math.min(0, Math.max(S - len, v)); return Math.min(S - a1 * k, Math.max(-a0 * k, v)); };
+    const x = fit(W, w, kx0, kx1), y = h < H ? H - h : fit(H, h, ky0, ky1); // thinner than the bar: the picture at the bottom
+    art.style.cssText = `width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;left:${(lft + x).toFixed(1)}px;top:${(top + y).toFixed(1)}px`;
+    sc.classList.toggle('hu-band', y > 0.5); // the band left at the top shows the forest, blurred
+  }
 
   word(t, cls = '') {
     const w = this.q('.ch-word');
@@ -202,7 +260,7 @@ class ChasseGame extends BaseGame {
     const big = shots === 5;
     await this.featureIntro(big ? 'LA GRANDE CHASSE' : 'LA CHASSE', `${shots} cartouches · ${HUNT_S[shots]} secondes · chaque animal touché paie ×2 à ×250 la mise${big ? ' · le cerf doré vaut ×500 !' : ''}`, SHELL);
     if (this.dead) return 0;
-    this.qa('.ch-reels, .ch-sky, .ch-ground').forEach((n) => { n.hidden = true; }); this.field.hidden = false;
+    this.q('.hu-scene').hidden = true; this.field.hidden = false;
     this.slotEl.classList.add('in-free', 'ht-on');
     this.focusStage?.();
     this.setTod(Math.floor(Math.random() * 3));
@@ -222,7 +280,7 @@ class ChasseGame extends BaseGame {
     const won = Math.min(Math.round(sum * b), capLeft);
     await this.wait(2400);
     cancelAnimationFrame(this.raf);
-    this.field.hidden = true; this.qa('.ch-reels, .ch-sky, .ch-ground').forEach((n) => { n.hidden = false; });
+    this.field.hidden = true; this.q('.hu-scene').hidden = false; this.setBanner(''); this.sceneFit();
     this.slotEl.classList.remove('in-free', 'ht-on');
     if (won > 0) { this.win(won, big ? 'Grande chasse' : 'Chasse'); this.setLast(won); }
     await this.celebrate(won, { summary: big ? 'GRANDE CHASSE' : 'LA CHASSE', stake: b });
