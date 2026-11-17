@@ -64,7 +64,7 @@ KW = {
     'taco': 'machine à sous gratuite pizza', 'billets': 'machine à sous gratuite à jackpots',
     'dragons': 'machine à sous gratuite de dragons', 'labo': 'machine à sous gratuite à 3 bonus',
     'fortune': 'machine à sous gratuite chinoise Hold & Spin',
-    'madwheel': 'jeu de roue gratuit à 4 bonus', 'storm': 'roulette gratuite à multiplicateurs',
+    'madwheel': 'jeu de roue gratuit à 4 bonus', 'plateaulive': 'jeu de roue et plateau aux dés gratuit', 'storm': 'roulette gratuite à multiplicateurs',
     'doublespin': 'roulette gratuite à deux billes', 'plateau': 'jeu de roue et de dés gratuit',
     'peche': 'jeu de roue gratuit, pêche aux multiplicateurs', 'roueor': 'roue de la fortune gratuite',
     'roulette': 'roulette européenne gratuite en 3D', 'bataille': 'jeu de bataille gratuit en ligne',

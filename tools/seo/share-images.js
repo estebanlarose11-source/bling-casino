@@ -33,7 +33,7 @@ const bebas = fs.readFileSync(path.join(__dirname, 'bebas.woff2')).toString('bas
     #share .logo{display:flex;align-items:center;gap:12px;font:900 30px 'Inter Display',sans-serif;letter-spacing:.5px}
     #share .logo i{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;font-style:normal;font-size:26px;background:radial-gradient(circle at 35% 30%,#bae6fd,#3b82f6 60%,#1e3a8a)}
     #share .logo em{font-style:normal;color:#93c5fd}
-    #share h1{margin:4px 0 0;font:400 104px/.92 'SB Bebas',Impact,sans-serif;letter-spacing:1px;text-shadow:0 6px 30px rgba(0,0,0,.6)}
+    #share h1{margin:4px 0 0;color:#fff;font:400 104px/.92 'SB Bebas',Impact,sans-serif;letter-spacing:1px;text-shadow:0 6px 30px rgba(0,0,0,.6)}
     #share .kind{font:800 28px 'Inter Display',sans-serif;color:var(--ac)}
     #share .cta{align-self:flex-start;margin-top:10px;padding:16px 30px;border-radius:999px;font:900 34px 'Inter Display',sans-serif;
       background:linear-gradient(180deg,#7dd3fc,#2563eb);box-shadow:0 10px 30px rgba(37,99,235,.55)}

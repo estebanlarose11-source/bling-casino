@@ -500,6 +500,26 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   bleu image par image** : rouge très saturé partout, rouge pâle seulement hors de l'animateur détouré, pour garder sa peau), 720 × 1280.
   `bonusCF` joue la version du côté tiré (`openShow('pf', …, src)`, écran 9 : 16 `.mwb-pf`), plaques ROUGE ×a / BLEU ×b en haut
   (`.mwb-pf-v`), résultat à 10,2 s de la vidéo. Gains inchangés.
+- **Le Plateau Live** (`games/plateaulive.js`, id `plateaulive`, Roues & tables, demande du propriétaire du 17 novembre 2026 : « reprends
+  Le Plateau » avec ses vidéos ; il l'appelait « MNOP » : nom gardé à nous, pas de nom ni de dessin d'un jeu existant). **La roue** = celle
+  de l'ancien Plateau (78 cases : 1 ×33, 2 ×22, 5 ×11, 10 ×6, 2 LANCERS ×4, 4 LANCERS ×1, CHANCE ×1 = la roue repart, ce tour paie ×10 ;
+  sans CHANCE, 1 / 2 / 5 / 10 ne peuvent pas rendre tous ≈ 95 %). **Sa vidéo de l'émission** `tools/art/plateaulive/roue.mp4` (une
+  présentatrice lance une roue à ampoules ; sa version « téléphone » est la même image avec des bandes noires : non utilisée) →
+  `python3 tools/art/plateaulive/roue.py` (`--fast` = sans réencoder) : bandes noires enlevées, `assets/games/plateaulive/roue.mp4`
+  (1280 × 694, avec le son, bouton 🔊 `spinbet_plateaulive_snd`), **suivi image par image** du bord doré et du moyeu (le moyeu ne tourne
+  pas) → homographie disque unité → image (`TRACK`, 8 nombres par image, posée en `matrix3d` sur `.plx-wb`), présentatrice détourée
+  (rembg) dans le repère du disque (`roue-mask.png`). NOTRE roue (`discSVG`) et NOTRE moyeu (`HUB`) couvrent les cases et le moyeu de sa
+  vidéo (écrits d'un autre jeu). Elle lance à 2,75 s (`TH`), notre roue s'arrête à 8,1 s (`ST`). Téléphone tenu droit : la partie droite
+  de la vidéo (`.plx-p`). **Les bonus sur sa vidéo du plateau** `tools/art/plateaulive/plateau.mp4` (3 dés lancés dans un bocal) →
+  `python3 tools/art/plateaulive/plateau.py` : stabilisée, rognée sur le plateau, 4 textes du centre effacés, points des dés effacés
+  une fois posés (image 112) → `plateau.mp4` + géométrie `BOARD_GEO` (bord du plateau, faces des dés). Nos 40 cases (`cellHTML`, carré de
+  1000 px en `matrix3d` sur le bord du plateau, bandes `RING`) recouvrent ses cases (noms d'un jeu existant), nos plaques LANCERS / TOTAL
+  / PLATEAU / DÉS au centre, notre pion (`PAWN`), nos points sur ses dés (`.plb-face`). Règles du plateau (`VAL`, `KIND`, `CARDS`) :
+  3 dés, chaque case ajoute son multiplicateur ; DÉPART repassé = tout le plateau ×2 ; coin ×2 = total ×2 ; +1 LANCER ; SUPER CASE
+  ×50 ; 3 CHANCE (+×5 … +×50, total ×2, +1 lancer) ; 3 dés pareils = +1 lancer. Achats ×19 / ×75 le jeton. Simulation
+  `node tools/sim/plateaulive.js` : chaque case ≈ 95,5 %, 2 LANCERS 1 tour sur 19 (≈ ×15,5), 4 LANCERS 1 sur 77 (≈ ×64,7), achats
+  ≈ 87 %, max ×10 000. Plein écran : téléphone droit = tout tient (titre caché, mises qui défilent si besoin), couché / ordinateur =
+  l'émission à gauche, mises et barre sur 2 rangées à droite. **Le Plateau** et **Le Plateau Online** restent retirés.
 - **Le Super Keno** (`games/keno.js`, id `keno`, catégorie Jeux rapides, tag Loterie, demande du propriétaire du 16 novembre 2026 : « le
   Keno, en mode big loto ») : **ses 2 vidéos** d'un animateur qui fait tomber 20 boules dans un tube, colonne lumineuse derrière lui
   (`tools/art/keno/keno-large.mp4` 736 × 400 ; `keno-haut.mp4` 1080 × 1920, même plateau de plus près) → `python3 tools/art/keno/build.py` :
