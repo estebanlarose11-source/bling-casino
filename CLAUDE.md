@@ -448,6 +448,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   show-<l|p>.mp4` (+ `.webp`). Cases cliquables sur le tapis de chaque vidéo (`XGEO`, `xFelt()`), la vidéo entière toujours visible.
   Sa voix (`INTRO`, images 0 → 48) à la 1re mise de la partie (puis après 90 s), le lancer de `SPIN` à la fin au LANCER ; on ne voit pas
   où la bille tombe : le numéro tiré au hasard est annoncé par-dessus (`.rlx-ann`). Bouton 🔊 (`spinbet_roulette_snd`). Gains inchangés.
+  **Notre bille sur sa roue** (voulu par le propriétaire : ses vidéos n'en ont pas, exprès) : `.rlx-ball`, lancée quand sa main quitte la
+  roue (`B0`), elle tourne sur la piste extérieure à l'envers de la roue, ralentit, tombe (`BD`), rebondit entre les cases et se fait prendre
+  (`BS`), puis tourne avec la roue (`ROTOR`, vitesse mesurée sur la case verte) ; ellipses de chaque vidéo dans `BALL` (piste, cases,
+  tourelle qui la cache derrière). Sons faits maison (`ballNoise` : roulement sur le bois, `ballClack` : clics des rebonds, « toc » final).
 - **Le Valhalla, décor animé** (`games/viking.js`, demande du propriétaire du 16 novembre 2026) : **sa vidéo** `tools/art/viking/fond-haut.mp4`
   (448 × 672 seulement : cadre de pierre dans les flammes bleues, médaillon du Jarl et sa barre en haut à gauche, médaillon de la valkyrie
   et sa barre à droite) → `tools/art/viking/clean.py` : grille peinte remplacée par une pierre propre fixe, remplissage bleu des 2 barres

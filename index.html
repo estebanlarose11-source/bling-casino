@@ -7478,6 +7478,8 @@ body.derby-on .toasts, body.derby-on .live-tick, body.derby-on .ad-pop, body.der
 .rlx-film .rlx-tapis, .rlx-talk .rlx-tapis { opacity: 0; transition-delay: .12s; }
 .rlx-snd { position: absolute; right: 8px; top: 8px; z-index: 5; width: 30px; height: 30px; border-radius: 50%; border: 1px solid rgba(231, 199, 102, .6); background: rgba(10, 6, 4, .6); font-size: 15px; line-height: 1; cursor: pointer; }
 .rlx .rl-turn { display: none !important; }
+.rlx-ball { position: absolute; left: -5px; top: -5px; z-index: 2; width: 10px; height: 10px; border-radius: 50%; pointer-events: none; background: radial-gradient(circle at 34% 30%, #fff 0, #f4f4f2 28%, #bdbdbb 66%, #6d6d6b 100%); box-shadow: 0 1.2px 1.6px rgba(0, 0, 0, .65), 0 0 3px rgba(255, 255, 255, .35); transition: opacity .06s; }
+.rlx-ball[hidden] { display: none; }
 .rlx-p .rlx-snd { width: 34px; height: 34px; top: 296px; right: 8px; }
 .rlx-ann { position: absolute; left: 50%; top: 50%; z-index: 6; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 34px 16px; border-radius: 18px; transform: translate(-50%, -50%) scale(.4); opacity: 0; transition: transform .45s cubic-bezier(.3, 1.6, .5, 1), opacity .3s; background: radial-gradient(circle at 50% 30%, rgba(40, 24, 10, .92), rgba(10, 6, 2, .95)); border: 2px solid #e7c766; box-shadow: 0 0 40px rgba(231, 199, 102, .5), 0 14px 40px rgba(0, 0, 0, .7); pointer-events: none; }
 .rlx-ann.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
@@ -15566,7 +15568,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
-  { game: 'roulette', date: '2026-11-17', title: 'La croupière en direct', items: ['Une nouvelle croupière, assise à côté de la roue : elle te parle, lance la roue et la bille, avec le son', 'Tu mises directement sur le tapis de la vidéo, sur ordinateur comme sur téléphone (chaque écran a sa propre vidéo)', 'Sur téléphone, les colonnes ont leurs propres cases sur le tapis'] },
+  { game: 'roulette', date: '2026-11-17', title: 'La croupière en direct', items: ['Une nouvelle croupière, assise à côté de la roue : elle te parle, lance la roue et la bille, avec le son', 'Tu mises directement sur le tapis de la vidéo, sur ordinateur comme sur téléphone (chaque écran a sa propre vidéo)', 'Sur téléphone, les colonnes ont leurs propres cases sur le tapis', 'Une vraie bille tourne sur sa roue, rebondit entre les cases et tombe avec son bruit'] },
   { game: 'blackjack', date: '2026-11-17', title: 'La table Platinum VIP', items: ['Une nouvelle croupière filmée à la table Platinum VIP, avec le son de la salle', 'Tes vraies cartes glissent sous sa main quand elle les distribue', 'Une vidéo pour l’ordinateur et une pour le téléphone tenu droit'] },
   { game: 'lightningbj', date: '2026-11-17', title: 'La table Platinum VIP', items: ['Une nouvelle croupière filmée, avec le son', 'Tes vraies cartes glissent sous sa main', 'Paires et 21+3 sur les places de la table, Bust It à côté d’elle'] },
   { game: 'bataille', date: '2026-11-17', title: 'La table Platinum VIP', items: ['Une nouvelle croupière filmée, avec le son', 'Ta carte et la sienne glissent sous sa main'] },
@@ -19119,7 +19121,7 @@ const FILES = {
   bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', 'b010cfef71'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '0bef82d927'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'da5341a3eb'],
-  rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', '5d908aeb6f'],
+  rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', 'a572058d79'],
   roulette: ['roulette', 'games/impl/roulette.js', 'RouletteGame', '90d6df1d84'],
   echecs: ['echecs', 'games/impl/echecs.js', 'EchecsGame', '01b135d461'],
   bataille: ['bataille', 'games/impl/bataille.js', 'BatailleGame', '0a3e6edd5d'],

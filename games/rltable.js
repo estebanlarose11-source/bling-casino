@@ -17,7 +17,7 @@ __mods['games/impl/rltable.js'] = (() => {
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { ORDER, colr, buildDefs, ballTick, thunder } = __mods['core/roulette.js'];
 const { CHIPS, chipSVG } = __mods['games/impl/bjtable.js'];
-const { sfx, isMuted } = __mods['audio.js'];
+const { sfx, isMuted, audioContext } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
 const { modal } = __mods['ui.js'];
 
@@ -661,6 +661,46 @@ function xFelt(m) {
   return { ...g, C, A, src: `show-${m === 'p' ? 'p' : 'l'}` };
 }
 const XGEO = { l: xFelt('l'), p: xFelt('p') };
+// Our ball on her wheel (the owner's videos have none, on purpose): thrown when her hand leaves the wheel (B0), it runs on the
+// outer track against the wheel, slows down, drops (BD), bounces between the pockets and is caught (BS), then turns with the
+// wheel. Ellipses of each video (centre, track, pockets: rx, ry in video pixels), the turret that hides it behind (x0, x1, y0, y1).
+const BALL = {
+  l: { c: [206, 201], track: [170, 66], pocket: [121, 45], r: 4.4, turret: [180, 238, 88, 196] },
+  p: { c: [104, 148], track: [124, 51], pocket: [86, 34], r: 3.7, turret: [83, 123, 66, 148] },
+};
+const B0 = 122, BD = 222, BS = 244, WHEEL0 = 96; // frames: thrown, drops, caught; her wheel starts to turn
+const ROTOR = (f) => (f < WHEEL0 ? 0 : 7.2 - (3.4 * (f - WHEEL0)) / 192); // the wheel's speed (° per frame, clockwise on screen)
+const smooth = (x) => x * x * (3 - 2 * x);
+function ballPath(seed) {
+  const th = [], rad = [], n = 320;
+  let a = seed, v = 0;
+  for (let f = 0; f < n; f++) {
+    if (f < B0) { th.push(a); rad.push(1); continue; }
+    if (f < BD) v = -(17 - (12 * (f - B0)) / (BD - B0));
+    else if (f < BS) { const k = smooth((f - BD) / (BS - BD)); v = -5 * (1 - k) + ROTOR(f) * k; } else v = ROTOR(f);
+    a += v; th.push(a);
+    if (f < BD) rad.push(1 + 0.012 * Math.sin(f * 0.9));
+    else if (f < BS) { const k = (f - BD) / (BS - BD); rad.push(Math.max(0, 1 - smooth(k)) + 0.32 * Math.abs(Math.sin(k * Math.PI * 3.2)) * (1 - k) ** 1.4); } else rad.push(0);
+  }
+  return { th, rad };
+}
+// the sounds of the ball: rolling on the wooden track, then the clicks of the bounces between the pockets
+function ballNoise(ac) {
+  const len = ac.sampleRate * 1.2, buf = ac.createBuffer(1, len, ac.sampleRate), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (0.6 + 0.4 * Math.sin(i / 37));
+  const src = ac.createBufferSource(); src.buffer = buf; src.loop = true;
+  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 1400; bp.Q.value = 0.9;
+  const g = ac.createGain(); g.gain.value = 0;
+  src.connect(bp).connect(g).connect(ac.destination); src.start();
+  return { set(spd) { const t = ac.currentTime; g.gain.setTargetAtTime(0.05 * spd, t, 0.05); bp.frequency.setTargetAtTime(700 + 1300 * spd, t, 0.05); }, stop() { const t = ac.currentTime; g.gain.setTargetAtTime(0, t, 0.04); setTimeout(() => { try { src.stop(); } catch { /* ignore */ } }, 300); } };
+}
+function ballClack(ac, vol = 1, low = false) {
+  const t = ac.currentTime, o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
+  o.type = 'square'; o.frequency.setValueAtTime(low ? 900 : 2300 + Math.random() * 700, t); o.frequency.exponentialRampToValueAtTime(low ? 380 : 1200, t + 0.05);
+  f.type = 'highpass'; f.frequency.value = low ? 250 : 900;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16 * vol, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + (low ? 0.12 : 0.06));
+  o.connect(f).connect(g).connect(ac.destination); o.start(t); o.stop(t + 0.15);
+}
 const modeOf = () => (innerHeight > innerWidth ? 'p' : 'l');
 const pts = (P) => P.map((p) => p.map((x) => x.toFixed(1)).join(',')).join(' ');
 const xFeltSVG = (g) => `<g class="rl-hl"></g>
@@ -676,6 +716,7 @@ function videoScene() {
     <div class="rlx-vp" style="width:${g.W}px;height:${g.H}px">
       <video class="rlx-v" playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
       <img class="rlx-img rlx-tapis" src="${xsrc(g.src + '.webp')}" alt="" draggable="false">
+      <i class="rlx-ball" hidden></i>
       <div class="rlx-ann" hidden><small>RIEN NE VA PLUS</small><b></b><em></em></div>
       <svg class="rlx-felt" viewBox="0 0 ${g.W} ${g.H}" width="${g.W}" height="${g.H}">
         <defs><radialGradient id="bjvChipShade" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs>
@@ -747,7 +788,7 @@ class RlVideoGame extends RlTableGame {
     this.load(); this.paintAll();
   }
   paintSnd() { const b = this.q('.rlx-snd'); if (b) { b.textContent = this.sndOn ? '🔊' : '🔇'; b.title = this.sndOn ? 'Couper la voix de la croupière' : 'Remettre la voix de la croupière'; } }
-  destroy() { document.removeEventListener('visibilitychange', this.onVis); removeEventListener('resize', this.onRs); try { this.vid.pause(); this.vid.removeAttribute('src'); this.vid.load(); } catch { /* ignore */ } if (this.vurl) URL.revokeObjectURL(this.vurl); super.destroy(); }
+  destroy() { this.ballSnd?.stop(); document.removeEventListener('visibilitychange', this.onVis); removeEventListener('resize', this.onRs); try { this.vid.pause(); this.vid.removeAttribute('src'); this.vid.load(); } catch { /* ignore */ } if (this.vurl) URL.revokeObjectURL(this.vurl); super.destroy(); }
 
   // the whole video, as big as the screen allows between the top bar and the buttons
   applyCam(name = this.view?.dataset.cam || 'bet', animate = false) {
@@ -833,6 +874,32 @@ class RlVideoGame extends RlTableGame {
     if (ret > 0) wins.forEach((g) => { const k = g.dataset.c, b = g.getBoundingClientRect(); fx.floatText(b.left + b.width / 2, b.top, `+${fmtC(this.payOf(k, placed[k], res, extra))}`, '#fde047', 18); fx.burst(b.left + b.width / 2, b.top + b.height / 2, 14, ['#fde047', '#fff', '#4ade80'], 6); });
     return ret;
   }
+  // our ball: a new throw (its own path), its sounds
+  ballStart() {
+    this.bp = ballPath(-60 - Math.random() * 200); this.bstep = 0;
+    const ac = !isMuted() && audioContext?.();
+    this.ballSnd?.stop(); this.ballSnd = ac ? ballNoise(ac) : null;
+  }
+  ballAt(f) {
+    const e = this.q('.rlx-ball'), b = BALL[this.mode], p = this.bp; if (!e || !p) return;
+    if (f < B0) { e.hidden = true; return; }
+    const i = Math.min(p.th.length - 2, Math.floor(f)), k = f - i;
+    const a = (p.th[i] + (p.th[i + 1] - p.th[i]) * k) * Math.PI / 180, r = p.rad[i] + (p.rad[i + 1] - p.rad[i]) * k;
+    const rx = b.pocket[0] + (b.track[0] - b.pocket[0]) * r, ry = b.pocket[1] + (b.track[1] - b.pocket[1]) * r;
+    const x = b.c[0] + rx * Math.cos(a), y = b.c[1] + ry * Math.sin(a);
+    const back = Math.sin(a) < 0, hid = back && x > b.turret[0] && x < b.turret[1] && y > b.turret[2] && y < b.turret[3];
+    const sc = 0.8 + 0.25 * (Math.sin(a) + 1) / 2;
+    e.hidden = false; e.style.opacity = hid ? '0' : '1';
+    e.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) scale(${(sc * b.r / 5).toFixed(3)})`;
+    // sounds: rolling while it runs, a click at each bounce, a deeper « tock » when it is caught
+    if (this.ballSnd) this.ballSnd.set(f < BD ? Math.max(0.2, 1 - (f - B0) / (BD - B0) * 0.6) : f < BS ? 0.25 * (1 - (f - BD) / (BS - BD)) : 0);
+    const ac = !isMuted() && audioContext?.();
+    const hits = [BD + 2, BD + 7, BD + 11, BD + 15, BD + 18, BS - 1];
+    while (this.bstep < hits.length && f >= hits[this.bstep]) {
+      if (ac) ballClack(ac, 1 - this.bstep * 0.12, this.bstep === hits.length - 1);
+      this.bstep++;
+    }
+  }
   // her throw (from SPIN, with the sound of the wheel) to the end of the video, then the drawn number announced over it
   async film(r) {
     const v = this.vid, ann = this.q('.rlx-ann');
@@ -849,17 +916,18 @@ class RlVideoGame extends RlTableGame {
       this.view.classList.add('rlx-film'); // the felt picture fades, the video shows
       await new Promise((res) => {
         const g = setTimeout(res, ((end - SPIN) / 24 / v.playbackRate) * 1000 + 3000);
-        let lastTick = 0;
+        this.ballStart();
         const tick = () => {
           if (this.dead) { clearTimeout(g); return res(); }
           const f = v.currentTime * 24;
-          if (f > 130 && v.muted && performance.now() - lastTick > 70 + (f - 130) * 1.6) { lastTick = performance.now(); ballTick(0.05 + Math.max(0, end - f) / 900); }
+          this.ballAt(f);
           if (f >= end - 1 || v.ended) { clearTimeout(g); return res(); }
           requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
       });
     } else await this.wait0(1200);
+    this.ballSnd?.stop(); this.ballSnd = null;
     if (this.dead) return;
     v.pause();
     // the number, its colour
@@ -875,6 +943,7 @@ class RlVideoGame extends RlTableGame {
   async back() {
     const ann = this.q('.rlx-ann');
     this.view.classList.remove('rlx-film', 'rlx-talk');
+    this.q('.rlx-ball').hidden = true;
     ann.classList.remove('on');
     await this.setCam('bet');
     this.swapMode();
