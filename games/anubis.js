@@ -592,8 +592,8 @@ class AnubisGame extends BaseGame {
       if (b.dataset.v !== t) { b.dataset.v = t; b.innerHTML = `<i>×</i>${t}`; d.classList.remove('hit'); void d.offsetWidth; d.classList.add('hit'); }
       d.classList.toggle('mod', x.mod); d.classList.toggle('lit', x.n > 0 || x.mod);
     });
-    // the 3 bars of the bonus hall = the relaunches: one goes out as each relaunch starts, all 3 come back when something
-    // lands (owner's request of 16 November 2026); `shown` = bars lit
+    // the 3 bars of the bonus hall = the relaunches (still images over his video): one goes out after a relaunch where
+    // nothing landed, all 3 come back as soon as something lands (owner's request of 17 November 2026); `shown` = bars lit
     let shown = 3;
     const bars = (n) => {
       this.qa('.jbars i').forEach((bar, k) => {
@@ -690,7 +690,6 @@ class AnubisGame extends BaseGame {
     await this.wait(400); info();
     while (respins > 0 && !capHit && rounds < 120 && !this.dead) {
       rounds++;
-      bars(respins - 1); // this relaunch uses a bar
       this.msg(`Relance… (${respins - 1 ? `encore ${respins - 1} après celle-ci` : 'dernière relance'})`);
       // a cascade of black cubes runs through the empty cells of every column, then the columns stop one by one
       const strips = cols.map((x, c) => this.startStrip(c, x.n));

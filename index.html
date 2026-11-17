@@ -6548,19 +6548,24 @@ html.light .slot small { color: inherit; }
 .g-anubis .an-top .mrow > div.hot { color: #fff; box-shadow: inset 0 0 0 2px #5eead4, 0 0 14px rgba(94, 234, 212, .6); }
 .g-anubis .an-top .jrow > div.mod { box-shadow: inset 0 0 0 2px #a855f7, 0 0 14px rgba(168, 85, 247, .55); }
 .g-anubis .an-top .jrow .lbl { font-size: 3.4cqh; text-shadow: 0 2px 0 #000, 0 0 8px #000; }
-/* the respins of the Judgment: his 3 purple bars, darkened when a respin is spent */
-.g-anubis .an-art .jbars { position: absolute; z-index: 3; display: none; grid-template-columns: repeat(3, 1fr); width: auto; min-width: 0; margin: 0; padding: 0; }
+/* the respins of the Judgment: his 3 purple bars. His video lights and kills them on its own in a loop: they are covered
+   by a still image (tools/art/anubis/bars.py: top = lit, bottom = out); a relaunch with nothing = one bar goes out
+   (flash, then out), something lands = the 3 come back (owner's request of 17 November 2026) */
+.g-anubis .an-art .jbars { position: absolute; z-index: 3; display: none; grid-template-columns: repeat(3, 1fr); min-width: 0; margin: 0; padding: 0; --bw: 320.5%; }
 .g-anubis.judge .an-art .jbars { display: grid; }
 .an-l .jbars { left: 17.56%; top: 82.14%; width: 64.58%; height: 4.91%; column-gap: 3.2%; }
 .an-p .jbars { left: 8.93%; top: 87.20%; width: 82.14%; height: 3.57%; column-gap: 2.2%; }
-.g-anubis .an-art .jbars i { height: auto; border-radius: 4px; background: rgba(10, 6, 16, .82); box-shadow: inset 0 0 0 1px rgba(120, 90, 50, .6); transition: background .3s, box-shadow .3s; }
-.g-anubis .an-art .jbars i.on { background: transparent; box-shadow: 0 0 12px rgba(192, 132, 252, .55); }
-/* a relaunch used: the painted bar goes out (flash, then dark); something landed: the 3 bars come back with a glow */
-.g-anubis .an-art .jbars i:not(.on) { background: #07040c; box-shadow: inset 0 0 0 1px rgba(120, 90, 50, .5); }
-.g-anubis .an-art .jbars i.lose { animation: anBarLose .55s ease-in forwards; }
-@keyframes anBarLose { 0% { background: rgba(233, 213, 255, .9); box-shadow: 0 0 22px #c084fc; transform: scaleY(1.3); } 100% { background: #07040c; transform: none; } }
-.g-anubis .an-art .jbars i.gain { animation: anBarGain .6s ease-out; }
-@keyframes anBarGain { 0% { background: rgba(233, 213, 255, .95); box-shadow: 0 0 30px #e9d5ff; transform: scaleY(1.5); } 100% { background: transparent; transform: none; } }
+.g-anubis .an-p .jbars { --bw: 313.8%; }
+.g-anubis .an-art .jbars i { position: relative; height: auto; border-radius: 0; box-shadow: none; background: url(assets/games/anubis/bars-large.webp?v=1) 0 100% / var(--bw) 200% no-repeat #07040c; }
+.g-anubis .an-p .jbars i { background-image: url(assets/games/anubis/bars-haut.webp?v=1); }
+.g-anubis .an-art .jbars i:nth-child(2) { background-position-x: 50%; }
+.g-anubis .an-art .jbars i:nth-child(3) { background-position-x: 100%; }
+.g-anubis .an-art .jbars i.on { background-position-y: 0; }
+.g-anubis .an-art .jbars i::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; border-radius: 4px; }
+.g-anubis .an-art .jbars i.lose::after { animation: anBarLose .6s ease-out; }
+@keyframes anBarLose { 0% { opacity: 1; background: rgba(233, 213, 255, .85); box-shadow: 0 0 22px #c084fc; } 40% { opacity: .8; background: rgba(168, 85, 247, .6); box-shadow: 0 0 14px #a855f7; } 100% { opacity: 0; } }
+.g-anubis .an-art .jbars i.gain::after { animation: anBarGain .6s ease-out; }
+@keyframes anBarGain { 0% { opacity: 1; background: rgba(243, 232, 255, .95); box-shadow: 0 0 30px #e9d5ff; } 100% { opacity: 0; } }
 .an-relx { position: absolute; z-index: 3; display: none; place-items: center; pointer-events: none; font: 400 3cqh/1 'Bebas Neue', Impact, sans-serif; letter-spacing: .3em; color: #d6b46a; text-shadow: 0 1px 0 #000; }
 .an-b .an-relx { display: grid; }
 .an-l .an-relx { left: 38.99%; top: 87.05%; width: 16.37%; height: 4.46%; }
@@ -15926,6 +15931,7 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'anubis', date: '2026-11-17', title: 'Les vies du Jugement', items: ['Les 3 barres violettes ne clignotent plus toutes seules : elles restent allumées', 'Une relance sans rien qui tombe éteint une barre, un cube ou un crâne les rallume toutes les 3'] },
   { game: 'plateaulive', date: '2026-11-17', title: 'Nouveau : Le Plateau Live', isNew: true, items: ['La présentatrice lance la grande roue à ampoules, avec le son de l’émission', 'Mise sur 1, 2, 5, 10 ou sur les bonus 2 LANCERS et 4 LANCERS', 'Bonus : 3 dés tombent dans le bocal et ton pion avance sur un plateau de 40 cases, jusqu’à ×100 par case', 'Cartes CHANCE, case ×2, tour complet qui double tout le plateau', 'CHANCE sur la roue : elle repart et ce tour paie ×10', 'Les 2 bonus peuvent s’acheter'] },
   { game: 'roulette', date: '2026-11-17', title: 'La croupière en direct', items: ['Une nouvelle croupière, assise à côté de la roue : elle te parle, lance la roue et la bille, avec le son', 'Tu mises directement sur le tapis de la vidéo, sur ordinateur comme sur téléphone (chaque écran a sa propre vidéo)', 'Sur téléphone, les colonnes ont leurs propres cases sur le tapis', 'Une vraie bille tourne sur sa roue, rebondit entre les cases et tombe avec son bruit'] },
   { game: 'blackjack', date: '2026-11-17', title: 'La table Platinum VIP', items: ['Une nouvelle croupière filmée à la table Platinum VIP, avec le son de la salle', 'Tes vraies cartes glissent sous sa main quand elle les distribue', 'Une vidéo pour l’ordinateur et une pour le téléphone tenu droit'] },
@@ -19472,7 +19478,7 @@ const FILES = {
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', '943b46c1ce'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '68f3a18915'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f84807ddeb'],
-  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', 'f6f4cf77cd'],
+  anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '65c706dfae'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '58092f9458'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'c757c58318'],
   madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', 'cb653c5cbc'],
