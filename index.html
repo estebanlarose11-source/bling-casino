@@ -6916,20 +6916,11 @@ html.light .slot small { color: inherit; }
 .nl-pay .nl-img, .nl-pay .nl-card { width: 100%; height: 100%; }
 @media (max-width: 600px) { .g-noel .rs.nl-rs { gap: 2px; } .g-noel .rs-reel { border-radius: 7px; } .nl-reels { border-radius: 12px; padding: 5px; } .nl-cap { height: 18px; top: -10px; } }
 /* friends */
-.fr-add { display: flex; gap: 8px; margin-bottom: 10px; }
-.fr-add input { flex: 1; min-width: 0; height: 38px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-2); color: var(--text); font: inherit; }
-.fr-add .btn { height: 38px; border-radius: 999px; padding: 0 14px; }
-.fr-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: var(--panel-2); margin-bottom: 6px; }
-.fr-row.req { justify-content: space-between; border: 1px solid rgba(124, 200, 255, .45); }
-.fr-row.req span { display: flex; gap: 6px; } .fr-row.req .btn { height: 30px; padding: 0 10px; font-size: 12px; border-radius: 999px; }
-.fr-dot { width: 9px; height: 9px; border-radius: 50%; background: #52525b; flex: none; }
-.fr-row.on .fr-dot { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
-.fr-n { display: flex; flex-direction: column; min-width: 0; } .fr-n small { color: var(--muted); font-size: 12px; } .fr-n small a { color: #bfe6ff; font-weight: 700; }
 .fr-badge { min-width: 16px; padding: 0 4px; border-radius: 999px; background: #7cc8ff; color: #fff; font-size: 10px; }
 .fr-badge[hidden] { display: none; }
-.ln-p.friend { border-color: rgba(34, 197, 94, .5); }
-.ln-fr { font-style: normal; font-size: 11px; }
-.ct-tabs button { font-size: 12.5px; padding-left: 8px; padding-right: 8px; }
+/* demandes d'ami reçues, sur l'onglet Amis du chat (pas .fr-badge : c'est la pastille des tours offerts du bouton tourner) */
+.ct-frb { min-width: 17px; height: 17px; padding: 0 5px; border-radius: 999px; background: #ef4444; color: #fff !important; font: 800 10px/17px Inter, sans-serif; }
+.ct-frb[hidden] { display: none; }
 /* prestiges & trophies */
 .ac-pr { font-style: normal; font-size: 11px; padding: 1px 7px; margin-left: 4px; border-radius: 999px; background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #1a1205; vertical-align: middle; }
 .ac-prestige { border-top: 1px dashed rgba(251, 191, 36, .35); }
@@ -7015,15 +7006,88 @@ html.light .slot small { color: inherit; }
 .live-dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 0 rgba(34, 197, 94, .6); animation: liveDot 1.6s infinite; display: inline-block; }
 @keyframes liveDot { 70% { box-shadow: 0 0 0 7px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
 .live-now { margin-bottom: 18px; }
-.ln-head, .lt-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-.ln-head small, .lt-head small { color: var(--muted); }
-.ln-list { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-.ln-p { flex: none; display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; background: var(--panel-2); border: 1px solid var(--line); }
-.ln-p > span { display: flex; flex-direction: column; line-height: 1.2; }
-.ln-p b { font-size: 13px; } .ln-p small { font-size: 11.5px; color: var(--muted); } .ln-p small a { color: #bfe6ff; font-weight: 700; }
-.ct-online { padding: 12px; overflow-y: auto; height: 100%; }
-.ct-online .ln-list { flex-direction: column; overflow: visible; }
-.ct-tabs b[data-online-count] { color: #22c55e; }
+.lt-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.lt-head small { color: var(--muted); }
+/* Joueurs en ligne et amis (live.js, friends.js ; demande du propriétaire du 17 novembre 2026 : « il faut améliorer ça ») : une carte par
+   joueur (avatar + point vert, pseudo, AMI / TOI, niveau aux couleurs du rang, ce que joue un ami, Rejoindre), sections Tes amis /
+   Dans le casino, onglet Amis en sections En ligne / Hors ligne. Couleurs en variables --ol-* (nuit ici, lavande dans la couche finition). */
+:root { --ol-bg: rgba(255, 255, 255, .045); --ol-bg2: rgba(255, 255, 255, .07); --ol-bd: rgba(255, 255, 255, .1); --ol-ink: #f5f2ff; --ol-mut: #a39bbb;
+  --ol-acc: #e61e7d; --ol-acc2: #ff4fa3; --ol-on: #22c55e; --ol-fr: rgba(34, 197, 94, .5); --ol-frbg: rgba(34, 197, 94, .09); --ol-ring: #15121b; --ol-win: #fbbf24; --ol-sh: 0 2px 10px rgba(0, 0, 0, .25); }
+.ln-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.ln-count { flex: none; display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 13px 0 12px; border-radius: 999px; background: rgba(34, 197, 94, .13); border: 1px solid rgba(34, 197, 94, .4); }
+.ln-count b { font: 800 17px/1 Archivo, Inter, sans-serif; color: var(--ol-on); }
+.ln-ht { display: flex; flex-direction: column; gap: 2px; min-width: 0; line-height: 1.2; }
+.ln-ht b { font: 800 15px Inter, sans-serif; color: var(--ol-ink); }
+.ln-ht small { font-size: 12px; color: var(--ol-mut); }
+.ln-empty { margin: 4px 0 0; font-size: 13px; color: var(--ol-mut); }
+.ln-list { display: flex; gap: 10px; overflow-x: auto; padding: 2px 2px 6px; scroll-snap-type: x proximity; scrollbar-width: thin; }
+.ln-p { flex: none; width: 280px; scroll-snap-align: start; display: flex; align-items: center; gap: 8px; padding: 8px 10px 8px 8px; border-radius: 16px;
+  background: var(--ol-bg); border: 1px solid var(--ol-bd); box-shadow: var(--ol-sh); transition: transform .15s, border-color .15s; }
+.ln-p.friend, .fr-row.on { border-color: var(--ol-fr); background: linear-gradient(180deg, var(--ol-frbg), transparent 85%), var(--ol-bg); }
+.ln-who, .fr-who { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 12px; outline-offset: 3px; }
+.ln-av { position: relative; flex: none; display: grid; place-items: center; width: 42px; height: 42px; }
+.ln-av > .lk-av { width: 42px; height: 42px; font-size: 23px; margin: 0; }
+.ln-av > .lk-none .rank-badge { width: 40px; height: 40px; }
+.ln-on { position: absolute; right: -1px; bottom: 0; width: 13px; height: 13px; border-radius: 50%; background: var(--ol-on); border: 2.5px solid var(--ol-ring); box-sizing: border-box; }
+.fr-row:not(.on) .ln-on { background: #a1a1aa; }
+.ln-txt, .fr-n { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; line-height: 1.2; }
+.ln-top { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.ln-p .pname, .fr-n .pname { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 800 14.5px Inter, sans-serif; color: var(--ol-ink); }
+.ln-tag { flex: none; padding: 3px 7px; border-radius: 999px; font: 800 9.5px/1 Inter, sans-serif; letter-spacing: .06em; font-style: normal; background: rgba(34, 197, 94, .16); color: #4ade80; }
+.ln-tag.me { background: rgba(255, 79, 163, .16); color: var(--ol-acc2); }
+.ln-st, .fr-n small { display: flex; align-items: center; gap: 6px; min-width: 0; white-space: nowrap; font: 500 12px Inter, sans-serif; color: var(--ol-mut); }
+.ln-st > span, .fr-n small > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ln-st b, .fr-n small b { font-weight: 800; color: var(--ol-ink); }
+.ln-lv { flex: none; padding: 3px 6px; border-radius: 6px; font: 800 10px/1 Inter, sans-serif; font-style: normal; color: #fff; background: var(--rk); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25); }
+.ln-gm { flex: none; width: 14px; height: 14px; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .3); }
+.ln-win { align-self: flex-start; padding: 2px 8px; border-radius: 999px; font: 800 11.5px/1.3 KeCoin, Inter, sans-serif; font-style: normal; white-space: nowrap; color: var(--ol-win); background: rgba(251, 191, 36, .12); border: 1px solid rgba(251, 191, 36, .35); }
+.ln-chev { flex: none; margin-left: auto; font: 400 22px/1 Inter, sans-serif; font-style: normal; color: var(--ol-mut); opacity: .55; }
+.ln-go { flex: none; display: inline-flex; align-items: center; height: 32px; padding: 0 13px; border-radius: 999px; background: linear-gradient(180deg, var(--ol-acc2), var(--ol-acc));
+  color: #fff !important; font: 800 12.5px Inter, sans-serif; text-decoration: none !important; box-shadow: 0 4px 12px rgba(230, 30, 125, .3); white-space: nowrap; }
+.ln-go.ic { width: 34px; height: 34px; padding: 0; justify-content: center; border-radius: 50%; }
+.ln-go.ic svg { width: 16px; height: 16px; margin-left: 2px; }
+.ln-go:active, .fr-ok:active, .fr-addb:active { transform: scale(.96); }
+@media (hover: hover) { .ln-p:hover, .fr-row:hover { transform: translateY(-1px); border-color: var(--ol-acc2); } .ln-go:hover { filter: brightness(1.08); } }
+/* dans l'onglet « En ligne » du chat et l'onglet « Amis » : une colonne */
+.ct-online { padding: 14px; overflow-y: auto; height: 100%; }
+.ct-online .ln-list { flex-direction: column; overflow: visible; gap: 8px; padding: 0; }
+.ct-online .ln-p { width: auto; }
+.ln-sec { display: flex; align-items: center; gap: 8px; margin: 16px 2px 8px; font: 800 11px Inter, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--ol-mut); }
+.ln-sec b { padding: 2px 7px; border-radius: 999px; font: 800 10.5px/1.3 Inter, sans-serif; letter-spacing: 0; background: var(--ol-bg2); border: 1px solid var(--ol-bd); color: var(--ol-ink); }
+.ln-sec::after { content: ''; flex: 1; height: 1px; background: var(--ol-bd); }
+.ln-hint { width: 100%; display: flex; align-items: center; gap: 12px; margin-top: 4px; padding: 12px; border-radius: 16px; border: 1px dashed var(--ol-bd); background: var(--ol-bg2); color: var(--ol-ink); text-align: left; font: inherit; cursor: pointer; }
+.ln-hint > i:first-child { flex: none; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; font-size: 21px; font-style: normal; background: var(--ol-bg); border: 1px solid var(--ol-bd); }
+.ln-hint > span { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ln-hint b { font: 800 14px Inter, sans-serif; color: var(--ol-ink); } .ln-hint small { font-size: 12px; line-height: 1.35; color: var(--ol-mut); }
+/* onglet Amis */
+.fr-add { display: flex; gap: 8px; margin-bottom: 2px; }
+.fr-in { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px; border-radius: 999px; background: var(--ol-bg); border: 1px solid var(--ol-bd); cursor: text; }
+.fr-in svg { flex: none; width: 17px; height: 17px; color: var(--ol-mut); }
+.fr-in input { flex: 1; min-width: 0; height: 100%; padding: 0; border: 0; outline: 0; background: none; color: var(--ol-ink); font: 600 14.5px Inter, sans-serif; }
+.fr-in input::placeholder { color: var(--ol-mut); opacity: .8; }
+.fr-in:focus-within { border-color: var(--ol-acc2); box-shadow: 0 0 0 3px rgba(255, 79, 163, .18); }
+.fr-addb, .fr-ok { flex: none; border: 0; border-radius: 999px; background: linear-gradient(180deg, var(--ol-acc2), var(--ol-acc)); color: #fff; font: 800 13px Inter, sans-serif; cursor: pointer; box-shadow: 0 4px 12px rgba(230, 30, 125, .28); }
+.fr-addb { height: 44px; padding: 0 18px; }
+.fr-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; padding: 8px 10px 8px 8px; border-radius: 16px; background: var(--ol-bg); border: 1px solid var(--ol-bd); box-shadow: var(--ol-sh); transition: transform .15s, border-color .15s; }
+.fr-row:not(.on):not(.req) .pname { opacity: .75; }
+.fr-row.req { border-color: rgba(255, 79, 163, .45); }
+.fr-row.out { background: transparent; border-style: dashed; box-shadow: none; }
+.fr-row.req .ln-on, .fr-row.out .ln-on { display: none; }
+.fr-ini { color: #fff; font: 800 18px Inter, sans-serif; background: linear-gradient(135deg, hsl(var(--h) 72% 60%), hsl(var(--h) 62% 36%)) !important; box-shadow: none; }
+.fr-act { flex: none; display: flex; align-items: center; gap: 6px; }
+.fr-ok { height: 32px; padding: 0 13px; font-size: 12.5px; }
+.fr-no { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--ol-bd); background: var(--ol-bg2); color: var(--ol-mut); font-size: 13px; cursor: pointer; }
+.fr-wait { flex: none; padding: 4px 9px; border-radius: 999px; font: 700 11px Inter, sans-serif; font-style: normal; background: var(--ol-bg2); color: var(--ol-mut); }
+.fr-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; margin-top: 14px; padding: 26px 18px; border-radius: 18px; border: 1px dashed var(--ol-bd); background: var(--ol-bg2); text-align: center; }
+.fr-empty > i { font-size: 34px; font-style: normal; }
+.fr-empty b { font: 800 15px Inter, sans-serif; color: var(--ol-ink); } .fr-empty small { max-width: 300px; font-size: 13px; line-height: 1.45; color: var(--ol-mut); }
+.fo-addfr .ln-sec, .fo-addfr .fr-empty { display: none; }
+/* onglets du chat : sur une ligne */
+.ct-tabs { gap: 4px; min-width: 0; }
+.ct-tabs button { flex: 1 1 auto; display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 8px 7px; font-size: 12.5px; white-space: nowrap; }
+.ct-live { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, .2); }
+.ct-tabs b[data-online-count] { min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: rgba(34, 197, 94, .18); color: #4ade80; font: 800 11px/18px Inter, sans-serif; }
+@media (max-width: 380px) { .ct-tabs button { padding: 8px 5px; font-size: 12px; gap: 4px; } }
 .live-tick { position: fixed; left: 16px; bottom: 16px; z-index: 70; display: flex; align-items: center; gap: 10px; max-width: min(420px, calc(100vw - 100px)); padding: 10px 14px; border-radius: 999px;
   background: rgba(17, 14, 16, .96); border: 1px solid rgba(34, 197, 94, .45); box-shadow: 0 10px 28px rgba(0, 0, 0, .5); font-size: 13.5px; opacity: 0; transform: translateY(12px); transition: opacity .3s, transform .3s; }
 .live-tick.show { opacity: 1; transform: none; }
@@ -10568,8 +10632,6 @@ html.light .ct-tabs button { color: var(--lv-ink2); border-radius: 999px; font-w
 html.light .ct-tabs button:hover { background: rgba(90, 43, 199, .07); }
 html.light .ct-tabs button.on { background: var(--fin-blue); color: #fff; box-shadow: 0 6px 14px rgba(90, 43, 199, .28); }
 html.light .ct-tabs button.on b { color: #fff; }
-html.light .ct-tabs b[data-online-count] { color: #15803d; }
-html.light .ct-tabs button.on b[data-online-count] { color: #bbf7d0; }
 html.light .ct-x { background: #efe8fd; color: var(--lv-ink); border-radius: 50%; }
 html.light .ct-x:hover { background: #e3d9f7; }
 html.light .ct-msg { background: #fff; border: 1px solid #ebe3fb; border-radius: 14px 14px 14px 4px; box-shadow: 0 2px 6px rgba(60, 30, 140, .06); }
@@ -10593,16 +10655,22 @@ html.light .ct-hist > div { border-bottom-color: #ebe3fb; }
 html.light .ct-panel .ct-hist .in b { color: #15803d; } html.light .ct-panel .ct-hist .out b { color: #dc2626; }
 html.light .ct-msg.win { background: linear-gradient(135deg, #fff7dc, #ffe9c2); border-color: #f5c56b; }
 html.light .ct-panel .ct-win b { color: #b45309; } html.light .ct-panel .ct-win a { color: var(--lv-p); }
-/* joueurs en ligne (chat, accueil, sous les jeux) : pastilles blanches, pseudo lisible, ce qu'il fait en violet */
-html.light .ln-p { background: #fff; border: 1px solid #e3d9f7; box-shadow: 0 3px 10px rgba(60, 30, 140, .07); }
-html.light .ln-p.friend { border-color: #86d9a4; background: linear-gradient(180deg, #fff, #f0fbf4); }
-html.light .ln-p .pname, html.light .ct-panel .ln-p .pname { color: var(--lv-ink); cursor: pointer; }
-html.light .ln-p .pname:hover { color: var(--lv-p); text-decoration: underline; }
-html.light .ln-p small, html.light .ct-panel .ln-p small { color: var(--lv-muted); }
-html.light .ln-p small a { color: var(--lv-p); }
-html.light .ct-panel .ln-head b { color: var(--lv-ink); }
-html.light .ct-panel .ln-head small { color: var(--lv-muted); }
-html.light .ct-online .ln-p { border-radius: 16px; padding: 8px 12px 8px 8px; }
+/* joueurs en ligne et amis (chat, accueil, sous les jeux) : cartes blanches, encre violet nuit, violet profond pour les boutons */
+html.light { --ol-bg: #fff; --ol-bg2: #f7f3ff; --ol-bd: #e6ddf8; --ol-ink: var(--lv-ink); --ol-mut: var(--lv-muted); --ol-acc: var(--lv-pd); --ol-acc2: var(--lv-p2);
+  --ol-on: #16a34a; --ol-fr: #9adbb2; --ol-frbg: #eefaf2; --ol-ring: #fff; --ol-win: #b45309; --ol-sh: 0 3px 12px rgba(60, 30, 140, .07); }
+html.light .ln-count { background: #e9f9ef; border-color: #b6e7c6; }
+html.light .ln-count b { color: #15803d; }
+html.light .ln-tag { background: #dcfce7; color: #15803d; }
+html.light .ln-tag.me { background: #efe7fe; color: var(--lv-p); }
+html.light .ln-go, html.light .fr-addb, html.light .fr-ok { box-shadow: 0 5px 14px rgba(90, 43, 199, .28); }
+html.light .fr-in:focus-within { box-shadow: 0 0 0 3px rgba(90, 43, 199, .16); }
+html.light .fr-row.req { border-color: #cdb9f5; background: linear-gradient(180deg, #f6f0ff, #fff); }
+html.light .ct-online .ln-st b, html.light .ct-online .fr-n small b { color: var(--lv-ink); }
+html.light .ct-panel .ln-head small, html.light .ct-panel .ln-st, html.light .ct-panel .fr-n small { color: var(--lv-muted); }
+html.light .ln-win, html.light .ct-panel .ln-win { color: #b45309; background: #fff6e0; border-color: #f5d28a; }
+html.light .ct-panel .fr-empty small, html.light .ct-panel .ln-hint small { color: var(--lv-muted); }
+html.light .ct-tabs b[data-online-count] { background: #dcfce7; color: #15803d; }
+html.light .ct-tabs button.on b[data-online-count] { background: rgba(255, 255, 255, .22); color: #fff; }
 html.light .lt-seat .pname { color: var(--lv-ink); }
 html.light .lt-seat.me { border-color: var(--lv-p); box-shadow: 0 0 0 2px rgba(90, 43, 199, .18); }
 /* la fiche d'un joueur */
@@ -21072,7 +21140,7 @@ function mountChat() {
   const fab = el('button', 'ct-fab', '<svg class="ico"><use href="#ui-chat"/></svg><b class="ct-badge" hidden></b>');
   fab.setAttribute('aria-label', 'Chat');
   root = el('div', 'ct-panel', `
-    <div class="ct-head"><div class="ct-tabs"><button data-tab="chat" class="on">💬 Chat</button><button data-tab="friends">👥 Amis <b class="fr-badge" data-fr-count hidden>0</b></button><button data-tab="online">🟢 En ligne <b data-online-count>0</b></button><button data-tab="send">💸 KE</button></div><button class="ct-x" aria-label="Fermer">✕</button></div>
+    <div class="ct-head"><div class="ct-tabs"><button data-tab="chat" class="on">💬 Chat</button><button data-tab="friends">👥 Amis <b class="ct-frb" data-fr-count hidden>0</b></button><button data-tab="online"><i class="ct-live"></i>En ligne <b data-online-count>0</b></button><button data-tab="send">💸 KE</button></div><button class="ct-x" aria-label="Fermer">✕</button></div>
     <div class="ct-body chat"><div class="ct-list"></div>
       <form class="ct-form"><input maxlength="${MAX}" placeholder="Écris un message…" autocomplete="off"><button>Envoyer</button></form></div>
     <div class="ct-body friends" hidden><div class="ct-online" data-friends></div></div>
@@ -21083,6 +21151,7 @@ function mountChat() {
   fab.addEventListener('click', () => toggle(!open));
   root.querySelector('.ct-x').addEventListener('click', () => toggle(false));
   root.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  root.addEventListener('click', (e) => { const b = e.target.closest('[data-goto-tab]'); if (b) setTab(b.dataset.gotoTab); }); // « Joue avec tes amis » of the En ligne tab
   root.querySelector('.ct-form').addEventListener('submit', (e) => { e.preventDefault(); send(); });
   list.addEventListener('click', (e) => { const n = e.target.closest('[data-uid]'); if (n) openPlayer(n.dataset.uid, n.dataset.name, { msgId: n.dataset.id }); });
   profiles.addEventListener('change', () => setTimeout(onUser, 300));
@@ -21765,21 +21834,34 @@ async function addByName(name) {
 }
 
 /* ---------- the « Amis » tab of the chat panel ([data-friends]) ---------- */
+// owner's request of 17 November 2026 (« il faut améliorer ça »): search field, requests with Accepter / ✕, friends split
+// into « En ligne » (avatar, green dot, what they play, Rejoindre) and « Hors ligne », sent requests at the end
+const hue = (t) => { let h = 7; for (const c of String(t)) h = (h * 31 + c.charCodeAt(0)) % 360; return h; };
+const initial = (name) => `<span class="lk-av lk-md fr-ini" style="--h:${hue(name)}">${esc(String(name).trim().charAt(0).toUpperCase() || '?')}</span>`;
+const frSec = (t, n) => `<div class="ln-sec"><span>${t}</span><b>${n}</b></div>`;
+const SEARCH = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 function panelHTML() {
   const m = me();
-  if (!m) return '<p class="ct-empty"><a href="#" class="signup-link" data-signup>Crée un compte</a> (ou connecte-toi) pour ajouter des amis et voir à quoi ils jouent.</p>';
-  const online = __mods['live.js']?.online?.() || [];
+  if (!m) return '<div class="fr-empty"><i>👥</i><b>Joue avec tes amis</b><small><a href="#" class="signup-link" data-signup>Crée un compte</a> (ou connecte-toi) pour ajouter des amis, voir à quoi ils jouent et les rejoindre.</small></div>';
+  const live = __mods['live.js'], online = live?.online?.() || [];
   const game = (id) => __mods['games/index.js'].getGame(id);
   const ins = incoming.filter((r) => r.status === 'pending');
   const outs = outgoing.filter((r) => r.status === 'pending');
   const fr = Object.entries(list).map(([uid, name]) => ({ uid, name, p: online.find((x) => x.uid === uid) })).sort((a, b) => (!!b.p - !!a.p) || a.name.localeCompare(b.name));
-  return `<form class="fr-add"><input maxlength="16" placeholder="Pseudo d’un joueur" autocomplete="off"><button class="btn primary">➕ Ajouter</button></form>
-    ${ins.length ? `<h4 class="ct-h">Demandes reçues</h4>${ins.map((r) => `<div class="fr-row req"><b>${esc(r.fromName)}</b><span><button class="btn primary" data-acc="${esc(r.id)}">Accepter</button><button class="btn" data-ref="${esc(r.id)}">Refuser</button></span></div>`).join('')}` : ''}
-    <h4 class="ct-h">Mes amis (${fr.length})</h4>
-    ${fr.length ? fr.map(({ uid, name, p }) => `<div class="fr-row${p ? ' on' : ''}"><span class="fr-dot"></span><span class="fr-n"><b class="pname" data-player="${esc(uid)}" data-pname="${esc(name)}" role="button" tabindex="0">${esc(name)}</b>
-      <small>${p ? (p.game && game(p.game) ? `joue à <a href="#game-${p.game}">${esc(game(p.game).name)}</a>` : 'en ligne, dans le lobby') : 'hors ligne'}</small></span></div>`).join('')
-      : '<p class="ct-empty">Pas encore d’amis. Ajoute un joueur avec son pseudo, ou touche son pseudo dans le chat.</p>'}
-    ${outs.length ? `<h4 class="ct-h">Demandes envoyées</h4>${outs.map((r) => `<div class="fr-row"><b>${esc(r.toName)}</b><small>en attente…</small></div>`).join('')}` : ''}`;
+  const on = fr.filter((f) => f.p), off = fr.filter((f) => !f.p);
+  const row = ({ uid, name, p }) => {
+    const g = p?.game && game(p.game);
+    const st = g ? `<i class="ln-gm" style="background:linear-gradient(135deg, ${g.colors[0]}, ${g.colors[1] || g.colors[0]})"></i><span>Joue à <b>${esc(g.name)}</b></span>` : `<span>${p ? 'En ligne · dans le lobby' : 'Hors ligne'}</span>`;
+    return `<div class="fr-row${p ? ' on' : ''}"><span class="fr-who" data-player="${esc(uid)}" data-pname="${esc(name)}" role="button" tabindex="0">
+      <span class="ln-av">${(p && live?.avatar?.(p, 'md')) || initial(name)}<i class="ln-on"></i></span>
+      <span class="fr-n"><span class="ln-top"><b class="pname">${esc(name)}</b>${(p && live?.lvChip?.(p)) || ''}</span><small>${st}</small></span>${g ? '' : '<i class="ln-chev" aria-hidden="true">›</i>'}</span>${g ? `<a class="ln-go" href="#game-${p.game}">Rejoindre</a>` : ''}</div>`;
+  };
+  return `<form class="fr-add"><label class="fr-in">${SEARCH}<input maxlength="16" placeholder="Pseudo d’un joueur" autocomplete="off" aria-label="Pseudo d’un joueur à ajouter"></label><button class="fr-addb">Ajouter</button></form>
+    ${ins.length ? frSec('Demandes reçues', ins.length) + ins.map((r) => `<div class="fr-row req"><span class="ln-av">${initial(r.fromName)}</span><span class="fr-n"><b class="pname">${esc(r.fromName)}</b><small><span>veut être ton ami</span></small></span>
+      <span class="fr-act"><button class="fr-ok" data-acc="${esc(r.id)}">Accepter</button><button class="fr-no" data-ref="${esc(r.id)}" aria-label="Refuser">✕</button></span></div>`).join('') : ''}
+    ${fr.length ? (on.length ? frSec('En ligne', on.length) + on.map(row).join('') : '') + (off.length ? frSec('Hors ligne', off.length) + off.map(row).join('') : '')
+      : '<div class="fr-empty"><i>👥</i><b>Pas encore d’amis</b><small>Ajoute un joueur avec son pseudo, ou touche son pseudo dans le chat ou dans « En ligne ».</small></div>'}
+    ${outs.length ? frSec('Demandes envoyées', outs.length) + outs.map((r) => `<div class="fr-row out"><span class="ln-av">${initial(r.toName)}</span><span class="fr-n"><b class="pname">${esc(r.toName)}</b><small><span>Demande envoyée</span></small></span><i class="fr-wait">en attente…</i></div>`).join('') : ''}`;
 }
 function paint() {
   document.querySelectorAll('[data-friends]').forEach((box) => {
@@ -22207,13 +22289,38 @@ function nextTick() {
 const avatar = (p, size = 'sm') => shop()?.lookHTML?.(p.look, size) || `<span class="lk-av lk-${size} lk-none">${rankBadge(rankOf(p.level || 1), size === 'md' ? 34 : 24)}</span>`;
 const pname = (p) => `<b class="pname" data-player="${esc(p.uid)}" data-pname="${esc(p.name)}" role="button" tabindex="0" ${shop()?.nameStyle?.(p.look) || ''}>${esc(p.name)}</b>${p.maison ? __mods['maison.js'].tag : shop()?.badgeIcon?.(p.look) || ''}`;
 
-function nowHTML() {
-  const list = players.slice().sort((a, b) => isFriend(b.uid) - isFriend(a.uid)).slice(0, 20);
-  const fr = players.filter((p) => p.uid !== uid() && isFriend(p.uid)).length;
-  const what = (p) => (!isFriend(p.uid) ? 'en ligne' : p.game && game(p.game) ? `joue à <a href="#game-${p.game}">${esc(game(p.game).name)}</a>` : 'dans le lobby');
-  return `<div class="ln-head"><span class="live-dot"></span><b>${players.length} joueur${players.length > 1 ? 's' : ''} en ligne</b><small>${fr ? `dont ${fr} ami${fr > 1 ? 's' : ''}` : 'ajoute des amis pour voir à quoi ils jouent'}</small></div>
-    <div class="ln-list">${list.length ? list.map((p) => `<div class="ln-p${isFriend(p.uid) && p.uid !== uid() ? ' friend' : ''}">${avatar(p)}<span>${pname(p)}${isFriend(p.uid) && p.uid !== uid() ? ' <i class="ln-fr">👥</i>' : ''}<small>${what(p)}</small></span></div>`).join('')
-      : `<p class="muted small">${cloud.enabled ? 'Personne d’autre pour l’instant : invite tes amis !' : 'Le direct s’active avec les comptes en ligne.'}</p>`}</div>`;
+// one player (owner's request of 17 November 2026, « il faut améliorer ça »): avatar with the green « online » dot, pseudo,
+// AMI / TOI tag, level chip in the rank colours, what a friend plays (with the game's colours) and his last win, and
+// « Rejoindre » to open the same game. Only friends (and me) show their game; the others are just « En ligne ».
+// The card opens the player's sheet ([data-player] on .ln-who, the Rejoindre link stays outside it).
+const lvChip = (p) => { const r = rankOf(p.level || 1); return `<i class="ln-lv" style="--rk:${r.dark}">Niv.&nbsp;${p.level || 1}</i>`; };
+const gameChip = (g) => `<i class="ln-gm" style="background:linear-gradient(135deg, ${g.colors[0]}, ${g.colors[1] || g.colors[0]})"></i>`;
+function pRow(p, o = {}) {
+  const mine = p.uid === uid(), fr = !mine && isFriend(p.uid), g = (mine || fr) && p.game && game(p.game), win = (mine || fr) && winTxt(p);
+  const st = o.here ? (win ? '' : '<span>En train de jouer</span>') : g ? `${gameChip(g)}<span>Joue à <b>${esc(g.name)}</b></span>` : `<span>${mine || fr ? 'Dans le lobby' : 'En ligne'}</span>`;
+  // a column (chat) has room for « Rejoindre »; a card of the home row gets a round ▶
+  const go = fr && g && !o.here ? (o.col ? `<a class="ln-go" href="#game-${g.id}">Rejoindre</a>` : `<a class="ln-go ic" href="#game-${g.id}" title="Rejoindre" aria-label="Rejoindre ${esc(p.name)} sur ${esc(g.name)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg></a>`) : '';
+  return `<div class="ln-p${fr ? ' friend' : ''}${mine ? ' me' : ''}"><span class="ln-who" data-player="${esc(p.uid)}" data-pname="${esc(p.name)}" role="button" tabindex="0">
+    <span class="ln-av">${avatar(p, 'md')}<i class="ln-on"></i></span>
+    <span class="ln-txt"><span class="ln-top"><b class="pname" ${shop()?.nameStyle?.(p.look) || ''}>${esc(p.name)}</b>${p.maison ? __mods['maison.js'].tag : shop()?.badgeIcon?.(p.look) || ''}${mine ? '<i class="ln-tag me">TOI</i>' : fr ? '<i class="ln-tag">AMI</i>' : ''}${lvChip(p)}</span>
+      ${st ? `<small class="ln-st">${st}</small>` : ''}${win ? `<em class="ln-win">${win}</em>` : ''}</span>${o.col && !go ? '<i class="ln-chev" aria-hidden="true">›</i>' : ''}</span>${go}</div>`;
+}
+const lnSec = (t, n) => `<div class="ln-sec"><span>${t}</span><b>${n}</b></div>`;
+
+// col = the « En ligne » tab of the chat (a column, friends then the others); otherwise a row of cards (home page)
+function nowHTML(col) {
+  const me = uid(), plays = (p) => !!(p.game && game(p.game));
+  const frs = players.filter((p) => p.uid !== me && isFriend(p.uid)).sort((a, b) => plays(b) - plays(a) || a.name.localeCompare(b.name));
+  const self = players.filter((p) => p.uid === me), others = players.filter((p) => p.uid !== me && !isFriend(p.uid));
+  const n = players.length, f = frs.length, busy = frs.filter(plays).length;
+  const head = `<div class="ln-head"><span class="ln-count"><span class="live-dot"></span><b>${n}</b></span><span class="ln-ht"><b>joueur${n > 1 ? 's' : ''} en ligne</b><small>${f ? `dont ${f} ami${f > 1 ? 's' : ''}${busy ? ` · ${busy} en train de jouer` : ''}` : 'ajoute des amis pour voir à quoi ils jouent'}</small></span></div>`;
+  if (!n) return `${head}<p class="ln-empty">${cloud.enabled ? 'Personne d’autre pour l’instant : invite tes amis !' : 'Le direct s’active avec les comptes en ligne.'}</p>`;
+  if (!col) return `${head}<div class="ln-list">${[...frs, ...self, ...others].slice(0, 20).map((p) => pRow(p)).join('')}</div>`;
+  const hint = me ? '<button class="ln-hint" type="button" data-goto-tab="friends"><i>👥</i><span><b>Joue avec tes amis</b><small>Ajoute-les pour voir à quoi ils jouent et les rejoindre</small></span><i class="ln-chev">›</i></button>'
+    : '<button class="ln-hint" type="button" data-signup><i>👥</i><span><b>Joue avec tes amis</b><small>Crée un compte pour ajouter des amis et voir à quoi ils jouent</small></span><i class="ln-chev">›</i></button>';
+  const rest = [...self, ...others].slice(0, 40);
+  return head + (f ? lnSec('Tes amis', f) + `<div class="ln-list">${frs.map((p) => pRow(p, { col: 1 })).join('')}</div>` : hint)
+    + (rest.length ? lnSec('Dans le casino', self.length + others.length) + `<div class="ln-list">${rest.map((p) => pRow(p, { col: 1 })).join('')}</div>` : '');
 }
 
 function tableHTML(id) {
@@ -22224,7 +22331,7 @@ function tableHTML(id) {
     const fr = others.filter((p) => isFriend(p.uid));
     if (!fr.length) return '<i class="lg-none" hidden></i>'; // nobody to show: the box is hidden (CSS), not left empty
     return `<div class="lt-head"><span class="live-dot"></span><b>${fr.length ? `${fr.length} ami${fr.length > 1 ? 's' : ''} sur ${esc(g.name)} en ce moment` : `Aucun ami sur ${esc(g.name)} pour l’instant`}</b></div>
-      ${fr.length ? `<div class="ln-list">${fr.slice(0, 10).map((p) => `<div class="ln-p friend">${avatar(p)}<span>${pname(p)}<small>${winTxt(p) || 'en train de jouer'}</small></span></div>`).join('')}</div>` : ''}`;
+      ${fr.length ? `<div class="ln-list">${fr.slice(0, 10).map((p) => pRow(p, { here: 1 })).join('')}</div>` : ''}`;
   }
   const seats = [mine || (me ? { uid: me, name: profiles.current?.name, level: progress.info().level, look: shop()?.publicLook?.(), self: true } : null), ...others].filter(Boolean).slice(0, SEATS);
   while (seats.length < SEATS) seats.push(null);
@@ -22246,7 +22353,7 @@ function paint() {
   document.querySelectorAll('[data-live-now]').forEach((n) => { n.innerHTML = nowHTML(); });
   document.querySelectorAll('[data-live-game]').forEach((n) => { n.innerHTML = tableHTML(n.dataset.liveGame); });
   document.querySelectorAll('[data-online-count]').forEach((n) => { n.textContent = players.length; });
-  document.querySelectorAll('[data-online-list]').forEach((n) => { n.innerHTML = nowHTML(); });
+  document.querySelectorAll('[data-online-list]').forEach((n) => { n.innerHTML = nowHTML(true); });
 }
 function paintWins() { document.querySelectorAll('[data-gw]').forEach((n) => { n.innerHTML = gameWinsHTML(n.dataset.gw); }); }
 
@@ -22288,7 +22395,7 @@ function mountLive() {
   __mods['friends.js']?.bus.addEventListener('change', paint);
 }
 
-return { mountLive, TABLE_GAMES, online: () => players };
+return { mountLive, TABLE_GAMES, online: () => players, avatar, lvChip };
 })();
 
 // ---- hta.js ----

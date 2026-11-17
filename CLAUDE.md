@@ -613,6 +613,14 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   foncé `--lv-gold` (Tendances, Défi, Paris, Jackpot, Loto, Missions, Cashback, Battle, Parrainage, Succès, Boutique, rangs du profil, JCC,
   pastille des affiches). Trouvés par un contrôle automatique du contraste de toutes les pages (texte / fond < 2,6) : à refaire après un
   gros changement de couleurs.
+- **Joueurs en ligne et amis, nouvelles cartes** (demande du propriétaire du 17 novembre 2026 : « il faut améliorer ça ») : une carte par joueur
+  (`pRow` de `live.js` : avatar + point vert `.ln-on`, pseudo, AMI / TOI, niveau aux couleurs du rang `lvChip`, « Joue à <jeu> » avec ses couleurs,
+  dernier gain `.ln-win`, **Rejoindre** `.ln-go` = ouvre le même jeu ; seuls les amis montrent leur jeu). Onglet « En ligne » du chat
+  (`nowHTML(true)`) : sections « Tes amis » puis « Dans le casino », carte « Joue avec tes amis » (`data-goto-tab="friends"`) sans ami ;
+  accueil : rangée de cartes (Rejoindre en ▶). Onglet Amis (`panelHTML` de `friends.js`) : recherche, demandes reçues (Accepter / ✕), En ligne,
+  Hors ligne (initiale colorée `fr-ini`), demandes envoyées. Toucher la carte = la fiche du joueur (`data-player` sur `.ln-who` / `.fr-who`, le
+  lien Rejoindre reste dehors). Couleurs en variables `--ol-*` (nuit, puis lavande dans `html.light`). Onglets du chat sur une ligne. **Piège** :
+  `.fr-badge` = la pastille des tours offerts du bouton tourner des machines ; la pastille des demandes d'ami du chat est `.ct-frb`.
 - **Les plus belles machines en tête de l'accueil** (demande du propriétaire du 16 novembre 2026 : « quand t'arrives, c'est directement les
   plus belles ») : rang « ⭐ Les plus belles machines » juste sous la vitrine (`bestHTML()` de `pages/lobby.js`, liste `BEST` : les machines à
   décor animé, L'Olympe, La Fortune, L'Hydre, REDK… ; machines en travaux ou retirées sautées), grandes affiches (`.nx-best`, fin de la
