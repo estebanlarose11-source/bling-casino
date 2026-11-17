@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8">
-  <script>try { if (localStorage.getItem('spinbet_theme') === 'light') document.documentElement.classList.add('light'); } catch (e) { /* ignore */ }</script>
+  <script>/* lavender theme (html.light) by default since 16 November 2026, owner's mock-up; « Mode sombre » in the menu is kept on this device */ try { if (localStorage.getItem('spinbet_theme_v2') !== 'dark') document.documentElement.classList.add('light'); } catch (e) { document.documentElement.classList.add('light'); }</script>
   <meta name="519481923e1d7435699124242fa8ae91548e7602" content="519481923e1d7435699124242fa8ae91548e7602" />
   <meta name="referrer" content="no-referrer-when-downgrade" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -16,7 +16,7 @@
     {"@type":"WebSite","@id":"https://www.spinbetcaz.com/#site","name":"SpinBet Casino","alternateName":"SpinBet","url":"https://www.spinbetcaz.com/","inLanguage":"fr","description":"Casino gratuit en argent fictif : machines à sous, roulettes, roues, blackjack, poker, tables multijoueurs et jeux rapides."},
     {"@type":"Organization","@id":"https://www.spinbetcaz.com/#org","name":"SpinBet Casino","url":"https://www.spinbetcaz.com/","logo":"https://www.spinbetcaz.com/assets/icon-512.png","sameAs":["https://www.tiktok.com/@spinbet_casino"]},
     {"@type":"WebApplication","name":"SpinBet Casino","url":"https://www.spinbetcaz.com/","applicationCategory":"GameApplication","operatingSystem":"Web, Android, iOS","isAccessibleForFree":true,"inLanguage":"fr","offers":{"@type":"Offer","price":0,"priceCurrency":"EUR"},"publisher":{"@id":"https://www.spinbetcaz.com/#org"}}]}</script>
-  <meta name="theme-color" content="#0b0f17">
+  <meta name="theme-color" content="#ece5fb">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="SpinBet Casino">
   <meta property="og:title" content="SpinBet Casino · Casino gratuit en argent fictif">
@@ -10096,6 +10096,246 @@ html .modal.pw-modal { width: min(380px, 100%); padding: 24px 22px 18px !importa
 section.nx-row.nx-best .game-row { grid-auto-columns: minmax(220px, 250px); }
 section.nx-row.nx-best .sec-head h2 { background: linear-gradient(90deg, #fff, #ffd23f); -webkit-background-clip: text; background-clip: text; color: transparent; }
 @media (max-width: 900px) { section.nx-row.nx-best .game-row { grid-auto-columns: 46vw; } }
+
+/* ============ Thème lavande (maquette du propriétaire du 16 novembre 2026 : « exactement 100 % pareil ») : fond lavande clair,
+   encre violet nuit, violet profond pour ce qui est actif, cartes blanches givrées à grands coins, boutons en pilule violette,
+   logo couronne + SPINBET, vitrine « LE FRISSON SANS RISQUE », catégories 3 × 2, « JEUX EN VEDETTE », barre du bas
+   Accueil · Promotions · Tournois · VIP · Menu. C'est le thème par défaut (html.light, « Mode sombre » reste dans le menu).
+   Dernier bloc de la finition : il passe après tout. Les écrans des jeux gardent leurs couleurs. ============ */
+.lv-brand { display: none; }
+html.light {
+  --lv-ink: #1c1145; --lv-ink2: #2c2160; --lv-muted: #6b5f92; --lv-p: #5a2bc7; --lv-p2: #7b4be0; --lv-pd: #3d1a9a;
+  --lv-card: rgba(255, 255, 255, .7); --lv-edge: rgba(255, 255, 255, .95); --lv-line: #e3d9f7; --lv-shadow: 0 12px 34px rgba(88, 56, 170, .13);
+  --bg: #ede6fb; --bg-2: #e6ddf9; --panel: #fbf9ff; --panel-2: #f4effd; --panel-3: #ebe3fb; --line: #e3d9f7; --text: #1c1145; --muted: #6b5f92;
+  --green: #5a2bc7; --green-d: #3d1a9a; --cyan: #7b4be0; --purple: #5a2bc7; --pink: #9b6cf0; --glass: rgba(255, 255, 255, .85);
+  --mq-pink: #5a2bc7; --mq-pink2: #6a35d6; --mq-bg: #ede6fb; --mq-card: rgba(255, 255, 255, .72); --mq-card2: #f6f1fe; --mq-line: #e3d9f7; --mq-muted: #6b5f92;
+  --fin-blue: linear-gradient(180deg, #7a46e6 0%, #5a2bc7 55%, #45199f 100%);
+  --fin-panel: linear-gradient(180deg, rgba(255, 255, 255, .86), rgba(250, 247, 255, .78));
+  --fin-edge: linear-gradient(135deg, rgba(255, 255, 255, .95), rgba(225, 214, 250, .8));
+  color-scheme: light;
+}
+html.light body { background: #ede6fb !important; color: var(--lv-ink); }
+html.light body::after {
+  background:
+    radial-gradient(520px 420px at 92% 6%, rgba(255, 255, 255, .75), transparent 70%),
+    radial-gradient(700px 600px at 100% 30%, rgba(196, 170, 250, .45), transparent 70%),
+    radial-gradient(600px 500px at 0% 70%, rgba(214, 196, 252, .55), transparent 70%),
+    linear-gradient(180deg, #ebe3fb 0%, #f1ebfd 45%, #ece4fb 100%) !important;
+}
+html.light :is(h1, h2, h3, h4) { color: var(--lv-ink); }
+html.light .muted { color: var(--lv-muted); }
+html.light a { color: inherit; }
+
+/* ---- logo : couronne + SPINBET ---- */
+html.light .logo > :not(.lv-brand) { display: none !important; }
+html.light .lv-brand { display: inline-grid; justify-items: center; gap: 1px; color: var(--lv-ink); line-height: 1; }
+html.light .lv-brand svg { width: 34px; height: 21px; color: #4a24a8; display: block; }
+html.light .lv-brand b { font: 700 26px/1 Cinzel, Georgia, 'Times New Roman', serif; letter-spacing: .5px; color: var(--lv-ink); }
+html.light .side .logo { justify-content: flex-start; padding: 6px 10px 16px; }
+html.light .side .logo::after { background: linear-gradient(90deg, transparent, rgba(90, 43, 199, .5), transparent); }
+
+/* ---- barre du haut ---- */
+html.light .top { background: rgba(237, 230, 251, .94) !important; border-bottom: 1px solid rgba(255, 255, 255, .7) !important; box-shadow: none !important; }
+html.light .top-wallet, html.light .me-chip { background: rgba(255, 255, 255, .78) !important; border: 1px solid var(--lv-edge) !important; box-shadow: 0 6px 18px rgba(88, 56, 170, .1) !important; }
+html.light .me-chip::before { background: var(--lv-line); }
+html.light .top-wallet .balance small, html.light .me-lv em { color: var(--lv-muted); }
+html.light .top-wallet .balance b, html.light .me-lv small { color: var(--lv-ink) !important; }
+html.light .top-wallet .top-refill { color: var(--lv-p) !important; }
+html.light .me-bar { background: #e6defa; } html.light .me-bar b { background: linear-gradient(90deg, #5a2bc7, #9b6cf0); box-shadow: none; }
+html.light .lv-shield { background: linear-gradient(160deg, #9b6cf0, #4a24a8); } html.light .lv-shield::before { background: linear-gradient(180deg, #fff, #efe8fd); } html.light .lv-shield b { color: var(--lv-pd); }
+html.light .top-ic, html.light .top-av, html.light .burger-r { color: var(--lv-ink) !important; }
+html.light .top-ic:hover { background: rgba(90, 43, 199, .08) !important; }
+html.light .top-gift.dot::after { background: var(--lv-p); box-shadow: 0 0 0 2px #ede6fb; }
+html.light .top-av { background: none !important; box-shadow: none !important; }
+html.light .top-av .ico { width: 30px; height: 30px; stroke-width: 1.5; }
+@media (max-width: 900px) {
+  html.light .top { padding: 0 14px !important; gap: 6px; }
+  html.light .top .logo.mobile.mobile { display: grid !important; order: 0; width: auto; height: auto; margin: 0 auto 0 0; }
+  html.light .top .logo.mobile .lv-brand svg { width: 28px; height: 17px; }
+  html.light .top .logo.mobile .lv-brand b { font-size: 21px; }
+  html.light .top-wallet { order: 5; margin: 0 !important; height: 40px; padding: 0 4px 0 12px !important; }
+  html.light .top-wallet .balance b { font-size: 15px; }
+  html.light .top .top-wallet .btn.top-refill, html.light body:not(.ml-off) .top .top-wallet .btn.top-refill { width: 30px; height: 30px; background: var(--fin-blue) !important; color: #fff !important; }
+  html.light .top-wallet .top-refill b { font-size: 20px; }
+  html.light .me-chip, html.light .top-right { display: none !important; }
+  html.light .top-av { display: grid !important; order: 8; width: 40px; height: 40px; margin: 0; }
+  html.light .burger-r { order: 9 !important; margin: 0 -6px 0 0 !important; width: 42px; }
+  html.light .burger-r .ico { width: 32px; height: 32px; stroke-width: 1.5; }
+}
+@media (max-width: 360px) { html.light .top .logo.mobile .lv-brand b { font-size: 18px; } html.light .top-av { display: none !important; } }
+
+/* ---- menu de gauche ---- */
+html.light .side { background: rgba(247, 243, 254, .98) !important; border-right: 1px solid var(--lv-line) !important; }
+html.light .side-label { color: var(--lv-p) !important; border-top-color: var(--lv-line); }
+html.light .side-nav a { color: var(--lv-ink) !important; }
+html.light .side-nav a > span:first-child { color: #4a3c78; }
+html.light .side-nav a:hover { background: rgba(90, 43, 199, .06) !important; }
+html.light .side-nav a.on, html.light .side-nav a.on > span:first-child { color: var(--lv-pd) !important; }
+html.light .side-nav a.on { background: linear-gradient(90deg, rgba(90, 43, 199, .14), rgba(90, 43, 199, .04)) !important; box-shadow: inset 0 0 0 1px rgba(90, 43, 199, .18), inset 3px 0 0 var(--lv-p) !important; }
+html.light .side-nav a.side-special { background: rgba(255, 255, 255, .8) !important; box-shadow: inset 0 0 0 1px rgba(90, 43, 199, .2), 0 6px 16px rgba(88, 56, 170, .08) !important; }
+html.light .sp-ring { background: conic-gradient(var(--lv-p) var(--p), rgba(90, 43, 199, .12) 0); filter: none; }
+html.light .side-special .sp-ico { filter: none; }
+html.light .side-new { color: #3d55c4 !important; background: rgba(80, 110, 230, .1) !important; box-shadow: inset 0 0 0 1px rgba(80, 110, 230, .35) !important; }
+html.light .side-new.v { color: var(--lv-pd) !important; background: rgba(90, 43, 199, .1) !important; box-shadow: inset 0 0 0 1px rgba(90, 43, 199, .35) !important; }
+html.light .side-badge { background: var(--lv-p) !important; }
+html.light .side-vip { background: rgba(255, 255, 255, .7) !important; border: 1px solid var(--lv-line) !important; }
+html.light .side-foot { color: var(--lv-muted); }
+
+/* ---- boutons ---- */
+html.light .btn.primary, html.light body:not(.ml-off) .btn.primary, html.light .btn.primary:not(.slot .btn) {
+  background: var(--fin-blue) !important; color: #fff !important; border-color: transparent !important; border-radius: 999px !important;
+  box-shadow: 0 10px 24px rgba(90, 43, 199, .3), inset 0 1px 0 rgba(255, 255, 255, .35) !important; text-shadow: none !important; }
+html.light .btn.primary:hover:not(:disabled) { box-shadow: 0 12px 28px rgba(90, 43, 199, .42), inset 0 1px 0 rgba(255, 255, 255, .4) !important; }
+html.light .btn:not(.primary):not(.slot .btn) { background: rgba(255, 255, 255, .85) !important; color: var(--lv-ink) !important; border: 1px solid var(--lv-line) !important; border-radius: 999px !important; box-shadow: 0 4px 12px rgba(88, 56, 170, .07) !important; }
+html.light .slot .btn, html.light .slot .btn.primary { border-radius: revert-layer; }
+html.light .chips .chip { background: rgba(255, 255, 255, .8) !important; color: var(--lv-ink2) !important; border-color: var(--lv-line) !important; border-radius: 999px; }
+html.light .chips .chip.on { background: var(--fin-blue) !important; color: #fff !important; border-color: transparent !important; }
+html.light .ct-fab { background: var(--fin-blue) !important; color: #fff; box-shadow: 0 10px 24px rgba(90, 43, 199, .38), 0 0 0 2px rgba(255, 255, 255, .7) !important; }
+html.light input, html.light select, html.light textarea { background: #fff; color: var(--lv-ink); border-color: var(--lv-line); }
+html.light input:focus, html.light select:focus, html.light textarea:focus { border-color: var(--lv-p2); box-shadow: 0 0 0 3px rgba(123, 75, 224, .18); outline: 0; }
+
+/* ---- cases et panneaux : blanc givré, grands coins ---- */
+html.light body :where(.panel, .modal, .app-promo:not(.ms-promo):not(.defi-promo):not(.wheel-promo), .sp-rules > div, .sp-game, .nx-catbox) {
+  background: var(--lv-card) !important; border: 1px solid var(--lv-edge) !important; box-shadow: var(--lv-shadow) !important; color: var(--lv-ink); }
+html.light .panel { border-radius: 22px !important; }
+html.light .modal { background: #fbf9ff !important; border-radius: 24px !important; }
+html.light .bottom-nav ~ * .modal, html.light .modal h2, html.light .modal h3 { color: var(--lv-ink); }
+
+/* ---- barre du bas : Accueil · Promotions · Tournois · VIP · Menu ---- */
+html.light .bottom-nav { background: rgba(255, 255, 255, .9) !important; border-top: 1px solid rgba(255, 255, 255, .95) !important; border-radius: 26px 26px 0 0; box-shadow: 0 -10px 30px rgba(88, 56, 170, .14) !important; }
+html.light .bottom-nav a { color: #3b3358 !important; font: 500 12.5px Inter, sans-serif !important; letter-spacing: 0; }
+html.light .bottom-nav a .ico { width: 27px !important; height: 27px !important; stroke-width: 1.5; }
+html.light .bottom-nav a.on { color: #2e1585 !important; font-weight: 700 !important; }
+html.light .bottom-nav a.on > span { filter: none; }
+html.light .bottom-nav a.on .ico { fill: currentColor; stroke-width: 1.4; }
+html.light .bottom-nav .nav-badge { background: var(--lv-p) !important; color: #fff !important; }
+
+/* ---- vitrine ---- */
+html.light .nx-hero.nx-lav, .nx-hero.nx-lav { position: relative; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); align-items: center; min-height: 420px; padding: 40px 10px 30px 44px; border-radius: 28px; overflow: hidden; background: none !important; box-shadow: none !important; text-align: left; }
+html.light .nx-lav { background: radial-gradient(70% 90% at 80% 30%, rgba(255, 255, 255, .55), transparent 70%) !important; }
+.nx-lav .nx-stage { order: 2; margin: -20px -10px -30px 0; display: grid; place-items: center; pointer-events: none; }
+.nx-lav-art { width: 100%; max-width: 470px; height: auto; display: block; }
+.nx-lav .nx-pearl { animation: lvFloat 6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.nx-lav .nx-pearl.b { animation-duration: 7.5s; animation-delay: -2s; } .nx-lav .nx-pearl.c { animation-duration: 9s; animation-delay: -4s; }
+@keyframes lvFloat { 50% { transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .nx-lav .nx-pearl { animation: none; } }
+.nx-lav .nx-copy { order: 1; position: relative; z-index: 1; }
+.nx-lav .nx-kick { display: block; margin: 0 0 10px; font: 600 clamp(15px, 1.4vw, 19px) Inter, sans-serif; letter-spacing: .4px; text-transform: uppercase; }
+.nx-lav h1 { margin: 0; font: 900 clamp(60px, 7vw, 104px)/.95 Inter, Archivo, sans-serif !important; letter-spacing: -.02em !important; white-space: nowrap; }
+.nx-lav .nx-short { display: block !important; max-width: 470px; margin: 22px 0 34px !important; font: 600 clamp(16px, 1.45vw, 21px)/1.35 Inter, sans-serif !important; text-transform: uppercase !important; letter-spacing: .1px !important; }
+.nx-lav .nx-cta { display: flex; margin: 0; }
+.nx-lav .nx-btn { height: 60px; padding: 0 32px; gap: 14px; border-radius: 999px !important; font: 700 16px Inter, sans-serif !important; letter-spacing: .3px !important; }
+.nx-lav .nx-btn .ico { display: block !important; width: 22px; height: 22px; }
+html.light .nx-lav .nx-kick, html.light .nx-lav .nx-short { color: var(--lv-ink2) !important; text-shadow: none !important; }
+html.light .nx-lav h1 { color: var(--lv-ink) !important; text-shadow: none !important; }
+html.light .nx-lav .nx-btn { color: #fff !important; background: linear-gradient(180deg, #6b37dc, #4a1fb2) !important; box-shadow: 0 14px 30px rgba(74, 31, 178, .35), inset 0 1px 0 rgba(255, 255, 255, .3) !important; }
+html:not(.light) .nx-lav { background: radial-gradient(60% 85% at 78% 35%, rgba(150, 40, 255, .3), transparent 68%), linear-gradient(135deg, #130e1b, #170a20) !important; }
+html:not(.light) .nx-lav .nx-kick { color: var(--mq-pink); }
+html:not(.light) .nx-lav .nx-short { color: #cfc8da !important; }
+
+/* ---- catégories de jeux : une carte blanche, 3 × 2 sur téléphone ---- */
+.nx-catbox { margin: 0 0 26px; padding: 22px 22px 18px; border-radius: 28px; }
+html:not(.light) .nx-catbox { background: var(--mq-card); border: 1px solid var(--mq-line); }
+.nx-catbox h2 { margin: 0 0 14px 6px; font: 800 18px Inter, sans-serif; letter-spacing: .3px; text-transform: uppercase; }
+.nx-catbox .nx-cats { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)) !important; gap: 4px 6px !important; margin: 0 !important; }
+.nx-catbox .nx-cats a { position: relative; display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center; text-align: center !important; gap: 10px !important; min-height: 0 !important; padding: 18px 4px 14px !important; border-radius: 50% / 46% !important; background: none !important; border: 0 !important; box-shadow: none !important; }
+.nx-catbox .nx-cats a::before { content: ''; position: absolute; inset: 0 6%; z-index: -1; border-radius: 50%; background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, .9), rgba(255, 255, 255, 0) 70%); opacity: .8; }
+.nx-catbox .nx-cats a:hover { transform: translateY(-2px); }
+.nx-catbox .nx-cats a > i { margin: 0 !important; filter: none !important; }
+.nx-catbox .nx-cats a > i .ico { width: 48px !important; height: 48px !important; stroke-width: 1.45 !important; }
+.nx-catbox .nx-cats b { font: 700 14px/1.2 Inter, sans-serif !important; letter-spacing: .1px; text-transform: uppercase; white-space: nowrap !important; overflow: visible !important; }
+.nx-catbox .nx-cats a:nth-child(n+5) { display: flex !important; }
+html.light .nx-catbox { background: rgba(255, 255, 255, .62) !important; isolation: isolate; }
+html.light .nx-catbox h2, html.light .nx-catbox .nx-cats b { color: var(--lv-ink) !important; }
+html.light .nx-catbox .nx-cats a > i { color: #4520a6 !important; }
+html:not(.light) .nx-catbox .nx-cats a > i { color: var(--mq-pink); }
+html:not(.light) .nx-catbox .nx-cats a::before { display: none; }
+@media (max-width: 1400px) and (min-width: 761px) { .nx-catbox .nx-cats { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; } }
+
+/* ---- rangées de jeux : titres en capitales, TOUT VOIR →, vignettes à grands coins ---- */
+html.light .nx-row { background: rgba(255, 255, 255, .5) !important; border: 1px solid rgba(255, 255, 255, .85) !important; border-radius: 26px !important; box-shadow: 0 10px 30px rgba(88, 56, 170, .08) !important; }
+html.light .nx-row .sec-head h2, html.light section.nx-row.nx-best .sec-head h2 { font: 800 18px Inter, sans-serif !important; letter-spacing: .3px !important; color: var(--lv-ink) !important; background: none !important; -webkit-text-fill-color: currentColor; }
+html.light .nx-row .more { color: var(--lv-ink2) !important; font: 700 14px Inter, sans-serif !important; letter-spacing: .3px; }
+html.light .nx-row .more svg { width: 18px; height: 18px; }
+html.light .game-row .card, html.light .game-row > a { border-radius: 18px; }
+html.light section.nx-row.nx-best { background: none !important; border: 0 !important; box-shadow: none !important; padding-left: 4px; padding-right: 0; }
+html.light .card .cover, html.light .game-row .cover { border-radius: 18px; }
+html.light .sec-head h2::before { display: none !important; }
+
+/* ---- téléphone ---- */
+@media (max-width: 760px) {
+  .nx-hero.nx-lav, html.light .nx-hero.nx-lav { display: block !important; min-height: 0; margin: -6px -2px 18px; padding: 26px 12px 26px 16px !important; border-radius: 0; overflow: visible; }
+  html.light .nx-lav { background: none !important; }
+  .nx-lav .nx-stage { position: absolute; z-index: 0; top: -22px; right: -46px; width: 64%; max-width: 290px; margin: 0; }
+  .nx-lav .nx-kick { font-size: 14.5px; margin-bottom: 14px; }
+  .nx-lav h1 { font-size: clamp(50px, 16.4vw, 72px) !important; }
+  .nx-lav .nx-short { max-width: 76%; margin: 22px 0 32px !important; font-size: 15.5px !important; }
+  .nx-lav .nx-cta { display: flex !important; }
+  .nx-lav .nx-btn { height: 56px; padding: 0 26px; font-size: 15px !important; }
+  .nx-catbox { margin: 0 2px 22px; padding: 20px 10px 12px; border-radius: 26px; }
+  .nx-catbox h2 { font-size: 16.5px; margin: 0 0 6px 14px; }
+  .nx-catbox .nx-cats { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0 !important; }
+  .nx-catbox .nx-cats a { padding: 16px 2px 12px !important; gap: 10px !important; }
+  .nx-catbox .nx-cats a:nth-child(n+7) { display: none !important; }
+  .nx-catbox .nx-cats a > i .ico { width: 44px !important; height: 44px !important; }
+  .nx-catbox .nx-cats b { font-size: 12.5px !important; letter-spacing: 0; }
+  html.light .nx-row { padding: 6px 0 10px 2px !important; background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; }
+  html.light .nx-row .sec-head { padding: 0 6px 0 4px; }
+  html.light .nx-row .sec-head h2 { font-size: 16.5px !important; }
+  html.light .nx-row .more { font-size: 12.5px !important; }
+  html.light section.nx-row.nx-best .game-row { grid-auto-columns: 31.5vw !important; gap: 10px; }
+}
+@media (max-width: 360px) { .nx-catbox .nx-cats b { font-size: 11px !important; } .nx-lav .nx-btn { padding: 0 20px; } }
+.nx-lav .nx-btn { width: auto !important; flex: none; }
+html.light .bottom-nav a, html.light .bottom-nav a.on { background: none !important; box-shadow: none !important; border: 0 !important; outline: 0; }
+/* featured row: clean square covers like the mock-up (no tags, no counters) */
+html.light section.nx-row.nx-best .upd-tag, html.light section.nx-row.nx-best .like, html.light section.nx-row.nx-best .play { display: none !important; }
+html.light .game-card .thumb { border-radius: 18px; box-shadow: 0 10px 22px rgba(60, 30, 140, .18); }
+html.light .game-card { border-radius: 18px; }
+/* referral offer and daily gift, in lavender */
+html.light .rf-promo { color: #fff; background: radial-gradient(110% 140% at 100% 0%, rgba(190, 150, 255, .55), transparent 60%), linear-gradient(120deg, #3b1696, #5a2bc7 55%, #7b4be0) !important; box-shadow: 0 16px 36px rgba(74, 31, 178, .3), inset 0 0 0 1px rgba(255, 255, 255, .25) !important; border-radius: 24px; }
+html.light .rf-p-tag { color: #3b1696; background: #fff; box-shadow: none; }
+html.light .rf-p-amt { background: none; -webkit-text-fill-color: #fff; color: #fff; filter: none; }
+html.light .rf-p-sub { color: #ece4ff; } html.light .rf-p-sub b { color: #fff; }
+html.light .rf-p-go { color: #3b1696; background: #fff; border-radius: 999px; box-shadow: 0 8px 20px rgba(30, 10, 80, .25); }
+html.light .dh-card, html.light .dh-card:not(.ready) { background: rgba(255, 255, 255, .7) !important; border: 1px solid #fff !important; border-radius: 22px; box-shadow: 0 10px 30px rgba(88, 56, 170, .1); }
+@media (min-width: 901px) { html.light body .top .top-wallet a.btn.top-refill.top-refill { background: var(--fin-blue) !important; box-shadow: 0 6px 18px rgba(90, 43, 199, .3) !important; } }
+@media (max-width: 760px) { html.light .nx-row .game-row { scrollbar-width: none; } html.light .nx-row .game-row::-webkit-scrollbar { display: none; } }
+/* tabs in a white pill, the chosen one in purple */
+html.light .lb-tabs { border-radius: 999px !important; padding: 5px !important; gap: 4px !important; background: rgba(255, 255, 255, .78) !important; border: 1px solid #fff !important; box-shadow: 0 6px 18px rgba(88, 56, 170, .1) !important; }
+html.light .lb-tabs button { border-radius: 999px !important; color: var(--lv-muted) !important; }
+html.light .lb-tabs button.on { background: var(--fin-blue) !important; color: #fff !important; box-shadow: 0 6px 14px rgba(90, 43, 199, .3) !important; }
+@media (max-width: 520px) { html.light .lb-tabs { border-radius: 20px !important; } html.light .lb-tabs button { border-radius: 16px !important; } }
+/* cards drawn dark on purpose (special challenge, promos): their small titles stay readable */
+html.light :is(.hero, .sp-hero, .sp-banner, .ms-promo, .defi-promo, .wheel-promo, .gate) :is(.eyebrow, small.eyebrow, .sp-eye) { color: #f5d77a !important; }
+/* the cashier: deep purple card, white amounts */
+html.light .panel.dp-hero { background: radial-gradient(110% 140% at 100% 0%, rgba(190, 150, 255, .5), transparent 60%), linear-gradient(135deg, #3b1696, #5a2bc7 60%, #7b4be0) !important; border: 0 !important; border-radius: 24px !important; box-shadow: 0 16px 36px rgba(74, 31, 178, .3) !important; }
+html.light .dp-hero .muted, html.light .dp-ht small { color: #e6dcff !important; }
+html.light .dp-hero-amts button { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .3); border-radius: 16px; }
+html.light .dp-hero-amts small { color: #ddd2ff; }
+html.light .dp-hero .dp-hgo { background: #fff !important; color: #3b1696 !important; border-radius: 999px !important; }
+html.light .dp-hb { color: #fff; background: rgba(255, 255, 255, .16); border-color: rgba(255, 255, 255, .4); }
+html.light .bottom-nav { background: rgba(255, 255, 255, .97) !important; }
+/* the cashier window: deep night purple with lavender lights (same family as the mock-up) */
+html.light .dp-modal { --mq-pink: #9b6cf0; }
+html.light .modal.dp-modal { background: linear-gradient(180deg, #24135a, #150a3a) !important; border: 1px solid rgba(190, 160, 255, .35) !important; border-radius: 24px !important; box-shadow: 0 30px 90px rgba(40, 15, 110, .5) !important; }
+html.light .dp-head { background: radial-gradient(120% 160% at 0% 0%, rgba(155, 108, 240, .45), transparent 62%), linear-gradient(180deg, #2c1868, #24135a) !important; }
+html.light .dp-head > small { color: #cbb6ff; }
+html.light .dp-head h2, html.light .dp-modal :is(h2, h3) { color: #fff !important; }
+html.light .dp-foot b { color: #cbb6ff; }
+html.light .dp-tabs { background: #24135a; }
+html.light .dp-tabs button.on { background: linear-gradient(180deg, #7a46e6, #5a2bc7); border-color: transparent; }
+html.light .dp-welcome { background: linear-gradient(100deg, rgba(251, 191, 36, .18), rgba(155, 108, 240, .25)); }
+html.light .dp-method { background: rgba(155, 108, 240, .12); }
+html.light .dp-mi { background: linear-gradient(180deg, #8d5cf0, #5a2bc7); }
+html.light .dp-amt, html.light .dp-custom > button { background: #2c1a66; border-color: rgba(255, 255, 255, .1); }
+html.light .dp-amt:hover:not(:disabled) { border-color: rgba(155, 108, 240, .6); }
+html.light .dp-amt.on { background: linear-gradient(180deg, rgba(155, 108, 240, .38), rgba(155, 108, 240, .14)); box-shadow: 0 0 0 3px rgba(155, 108, 240, .2), 0 8px 20px rgba(90, 43, 199, .3); }
+html.light .dp-amt.on small { color: #e0d2ff; }
+html.light .dp-custom label { background: #1a0d44; }
+html.light .dp-foot { background: #150a3a; }
+html.light .dp-ring circle.pg { filter: drop-shadow(0 0 6px rgba(155, 108, 240, .6)); }
+html.light .dp :is(.btn.primary, .dp-go) { border-radius: 999px !important; }
 </style>
 </head>
 <body>
@@ -10125,9 +10365,9 @@ section.nx-row.nx-best .sec-head h2 { background: linear-gradient(90deg, #fff, #
 <symbol id="c-huff" viewBox="0 0 120 160"><path d="M4 68 Q28 60 50 68 M8 84 Q32 76 56 84 M4 100 Q28 92 50 100" stroke="#fff" stroke-opacity=".65" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="92" y="62" width="7" height="14" fill="#8a2a22" stroke="#fff" stroke-width="1.5"/><path d="M70 98 L92 74 L114 98 Z" fill="#8a2a22" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><rect x="75" y="98" width="34" height="34" fill="#d9573f" stroke="#fff" stroke-width="2"/><path d="M75 106 H109 M75 114 H109 M75 122 H109 M84 98 V106 M100 106 V114 M88 114 V122" stroke="#ffd0c0" stroke-opacity=".6" stroke-width="1.3" fill="none"/><rect x="86" y="112" width="10" height="20" rx="1.5" fill="#5a2f14" stroke="#fff" stroke-width="1.2"/><path d="M14 22 L26 44 L52 44 L64 22 L68 60 Q68 82 40 84 Q12 82 12 60 Z" fill="#cfd8e0" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><ellipse cx="40" cy="68" rx="14" ry="10" fill="#fff"/><ellipse cx="40" cy="62" rx="4.6" ry="3.4" fill="#111"/><path d="M26 54 Q32 48 38 55 Q32 58 26 54Z M54 54 Q48 48 42 55 Q48 58 54 54Z" fill="#ffd23f" stroke="#111" stroke-width="1.5"/><path d="M26 47 L38 51 M54 47 L42 51" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M32 72 Q40 78 48 72" fill="#7a1220" stroke="#111" stroke-width="1.4"/><g fill="#d9573f" stroke="#fff" stroke-width="1.8"><rect x="12" y="116" width="26" height="14" rx="3"/><rect x="30" y="134" width="26" height="14" rx="3"/></g><g font-family="KeCoin,Georgia,serif" font-weight="900" font-size="9" fill="#fff" text-anchor="middle"><text x="25" y="126">×5</text><text x="43" y="144">×12</text></g><rect x="6" y="148" width="108" height="3" fill="none"/></symbol>
 <symbol id="c-avion" viewBox="0 0 120 160"><path d="M10 142 H112 M10 142 V22" stroke="#fff" stroke-opacity=".5" stroke-width="2" fill="none"/><path d="M12 138 C40 134 70 112 98 42" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="1 7" stroke-linecap="round"/><g transform="translate(98 40) rotate(-35)"><path d="M-14 6 L16 -4 L-4 16 L-6 8 Z M-6 8 L16 -4" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/></g><rect x="6" y="6" width="70" height="28" rx="14" fill="#fff" fill-opacity=".92"/><text x="41" y="26" text-anchor="middle" font-family="KeCoin,Georgia,serif" font-weight="900" font-size="17" fill="#c4132f">×12,4</text></symbol>
 </svg>
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ui-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 10.5 12 3.8l8.5 6.7"/><path d="M5.5 9.2V20h4.6v-5.6h3.8V20h4.6V9.2"/></symbol><symbol id="ui-slots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="6.5" width="14.5" height="14" rx="2.5"/><rect x="5.6" y="9.6" width="9.3" height="5.8" rx="1"/><path d="M8.7 9.6v5.8M11.8 9.6v5.8M7 18h6.5M6.5 6.5V4.5h7.5v2"/><path d="M17.5 12.5h1.6a.9.9 0 0 0 .9-.9V8"/><circle cx="20" cy="6.6" r="1.4"/></symbol><symbol id="ui-tables" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.3"/><circle cx="12" cy="12" r="1.5"/><path d="M12 3v3.7M12 17.3V21M3 12h3.7M17.3 12H21M5.6 5.6l2.6 2.6M15.8 15.8l2.6 2.6M18.4 5.6l-2.6 2.6M8.2 15.8l-2.6 2.6"/></symbol><symbol id="ui-quick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M13.5 2.5 5 13.5h6l-1 8 8.5-11h-6z"/></symbol><symbol id="ui-online" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8" r="3.1"/><path d="M6.6 19.5c0-3 2.4-5.2 5.4-5.2s5.4 2.2 5.4 5.2"/><circle cx="5.4" cy="10.2" r="2.2"/><path d="M1.9 18.3c0-2.1 1.4-3.7 3.5-4"/><circle cx="18.6" cy="10.2" r="2.2"/><path d="M22.1 18.3c0-2.1-1.4-3.7-3.5-4"/></symbol><symbol id="ui-cards" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 9.8h18M6.5 14.6h4.5"/></symbol><symbol id="ui-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M7.8 4h8.4v5a4.2 4.2 0 0 1-8.4 0z"/><path d="M7.8 5.8H5.2A2.6 2.6 0 0 0 8 9.6M16.2 5.8h2.6A2.6 2.6 0 0 1 16 9.6M12 13.2v3.3M8.5 20.5h7M9.6 20.5l.6-4h3.6l.6 4"/></symbol><symbol id="ui-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="9" cy="6.5" rx="5.5" ry="2.5"/><path d="M3.5 6.5v4c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-4M3.5 10.5v4c0 1.4 2.5 2.5 5.5 2.5"/><ellipse cx="15" cy="14.5" rx="5.5" ry="2.5"/><path d="M9.5 14.5v3c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-3"/></symbol><symbol id="ui-swords" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 3.5h3l10 10M3.5 3.5v3l10 10M20.5 3.5h-3l-5 5M20.5 3.5v3l-5 5M12.5 17.5l5-5M18.5 18.5l-3-3M11.5 17.5l-5-5M5.5 18.5l3-3M17 20l3-3M7 20l-3-3"/></symbol><symbol id="ui-cashback" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M19.6 13.5a7.8 7.8 0 0 1-14.1 3.2M4.4 10.5a7.8 7.8 0 0 1 14.1-3.2"/><path d="M18.8 3.6v3.9h-3.9M5.2 20.4v-3.9h3.9"/><path d="M13.8 9.6c-.4-.6-1-.9-1.8-.9-1 0-1.8.6-1.8 1.4 0 1.9 3.8 1 3.8 2.9 0 .8-.8 1.4-1.9 1.4-.8 0-1.6-.4-2-1M12 7.7v1M12 14.4v1"/></symbol><symbol id="ui-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8-7.5 9.5-4.3-1.5-7.5-5-7.5-9.5V6z"/><path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6"/></symbol><symbol id="ui-ball" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l4 2.9-1.5 4.7h-5L8 10.5z"/><path d="M12 3v4.6M20.6 9.3l-4.6 1.2M17.3 19.3l-2.8-4.1M6.7 19.3l2.8-4.1M3.4 9.3 8 10.5"/></symbol><symbol id="ui-loto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.4"/><path d="M11.2 10.6l1.1-.8v4.6"/></symbol><symbol id="ui-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8.5h14V12M12 8v12.5"/><path d="M12 8C10.6 4.6 6.5 4 6.5 6.5 6.5 8 9.5 8 12 8zM12 8c1.4-3.4 5.5-4 5.5-1.5C17.5 8 14.5 8 12 8z"/></symbol><symbol id="ui-tv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M8.5 21h7M10.5 9.3v5.4l4.6-2.7z"/></symbol><symbol id="ui-ghost" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.2c2.9 0 4.8 2.1 4.8 4.9v2.4l1.9.7-1.3 1.4c.6 1.5 1.7 2.6 3.2 3.1-.8.8-2 1-2.8 1.1l-.5 1.4c-1.1-.2-2.1.1-3 .7-.7.5-1.4.8-2.3.8s-1.6-.3-2.3-.8c-.9-.6-1.9-.9-3-.7l-.5-1.4c-.8-.1-2-.3-2.8-1.1 1.5-.5 2.6-1.6 3.2-3.1l-1.3-1.4 1.9-.7V8.1c0-2.8 1.9-4.9 4.8-4.9z"/></symbol><symbol id="ui-support" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.6"/><rect x="17" y="13" width="4" height="6" rx="1.6"/><path d="M19 19c0 1.6-2.2 2.5-5.5 2.5"/></symbol><symbol id="ui-music" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M9 18V5.5l11-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></symbol><symbol id="ui-vibe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8M1.8 10.2v3.6M19.5 8v8M22.2 10.2v3.6"/></symbol><symbol id="ui-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/></symbol><symbol id="ui-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.1H4.4z"/><path d="M10 21a2.1 2.1 0 0 0 4 0"/></symbol><symbol id="ui-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7.5V18a2 2 0 0 0 2 2h14V9.5H6a2 2 0 0 1-2-2zm0 0a2 2 0 0 1 2-2h11v4"/><circle cx="16.4" cy="14.8" r="1.2"/></symbol><symbol id="ui-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></symbol><symbol id="ui-dots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></symbol><symbol id="ui-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13.2v4.2M9.9 15.3h4.2"/></symbol><symbol id="ui-ach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="14.5" r="5.8"/><path d="M8.6 9.8 6 3.5h4l2 4.4 2-4.4h4l-2.6 6.3"/><path d="m12 11.9 1 1.9 2.1.3-1.5 1.5.4 2.1-2-1-1.9 1 .4-2.1-1.5-1.5 2.1-.3z"/></symbol><symbol id="ui-missions" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/></symbol><symbol id="ui-wheel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="13" r="8.3"/><circle cx="12" cy="13" r="1.6"/><path d="M12 4.7v6.7M12 14.6v6.7M3.7 13h6.7M13.6 13h6.7M6.1 7.1l4.8 4.8M13.1 14.1l4.8 4.8M17.9 7.1l-4.8 4.8M10.9 14.1l-4.8 4.8"/><path d="M10.3 1.8h3.4L12 4.4z"/></symbol><symbol id="ui-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M5 21V3.8M5 4.3h12.5L15 8.3l2.5 4H5"/></symbol><symbol id="ui-vip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></symbol><symbol id="ui-top" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 20.5h17M5 20.5v-6h4.5v6M9.5 20.5V8.5h5v12M14.5 20.5V12H19v8.5"/></symbol><symbol id="ui-refill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7.5V18a2 2 0 0 0 2 2h14V9.5H6a2 2 0 0 1-2-2zm0 0a2 2 0 0 1 2-2h11v4"/><path d="M14.2 14.8h4.4M16.4 12.6V17"/></symbol><symbol id="ui-ref" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="9.5" cy="8.5" r="3.8"/><path d="M2.5 20c0-3.6 3-6 7-6 1.6 0 3 .4 4.1 1M18.5 13.2v6M15.5 16.2h6"/></symbol><symbol id="ui-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/></symbol><symbol id="ui-app" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M12 7v6.5M9.5 11l2.5 2.5 2.5-2.5M10.5 18.5h3"/></symbol><symbol id="ui-resp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8-7.5 9.5-4.3-1.5-7.5-5-7.5-9.5V6z"/><path d="m8.8 12 2.2 2.2 4.2-4.4"/></symbol><symbol id="ui-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol><symbol id="ui-shop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M5 8h14l-1 12.5H6z"/><path d="M9 10.5V7a3 3 0 0 1 6 0v3.5"/></symbol><symbol id="ui-tiktok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 2.6 2.4 4.4 5 4.6"/></symbol><symbol id="ui-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 4.5h16a1 1 0 0 1 1 1v10.5a1 1 0 0 1-1 1H9l-5 4v-4H4a1 1 0 0 1-1-1V5.5a1 1 0 0 1 1-1z"/><path d="M7.5 9h9M7.5 12.5h6"/></symbol><symbol id="ui-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 20s-7.8-4.7-7.8-10.4A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.8 2.4C19.8 15.3 12 20 12 20z"/></symbol><symbol id="ui-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 20.5h17M6.5 20.5v-6M11 20.5V9M15.5 20.5v-8M20 20.5V4.5"/></symbol><symbol id="ui-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol></svg>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ui-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="m12 3.2 2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 17l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/></symbol><symbol id="ui-roulette" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.2 2.2M16.2 16.2l2.2 2.2M18.4 5.6l-2.2 2.2M7.8 16.2l-2.2 2.2"/><path d="m12 7.6.9 1.6-.9.6-.9-.6z" fill="currentColor"/></symbol><symbol id="ui-bj" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3.2" y="5" width="9.5" height="14" rx="1.6" transform="rotate(-12 8 12)"/><rect x="10.5" y="4" width="9.5" height="14" rx="1.6" transform="rotate(10 15 11)"/><path d="m14.4 8.6 1.8 5.3M13.3 12.5l3.5-.6"/><path d="M6.2 9.6 7 8.3"/></symbol><symbol id="ui-poker" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5.5" width="9.5" height="14" rx="1.6" transform="rotate(-10 8 12)"/><rect x="10" y="4.5" width="9.5" height="14" rx="1.6" transform="rotate(8 15 11)"/><circle cx="14.6" cy="11.8" r="2.6"/><path d="M14.6 9.2v1.1M14.6 13.3v1.1M12 11.8h1.1M16.1 11.8h1.1"/></symbol><symbol id="ui-promo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="m12 2.8 2 1.9 2.7-.4.9 2.6 2.5 1.2-.6 2.7 1.4 2.4-2 1.9.2 2.7-2.7.6-1.3 2.4-2.6-.9-2.5 1.1-1.6-2.2-2.7-.4.1-2.7-1.9-2 1.4-2.3-.5-2.7 2.5-1.1 1-2.5 2.7.5z"/><circle cx="12" cy="12" r="3.6"/><path d="m12 9.6.7 1.4 1.5.2-1.1 1 .3 1.5-1.4-.7-1.4.7.3-1.5-1.1-1 1.5-.2z" fill="currentColor"/></symbol><symbol id="ui-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 10.5 12 3.8l8.5 6.7"/><path d="M5.5 9.2V20h4.6v-5.6h3.8V20h4.6V9.2"/></symbol><symbol id="ui-slots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="6.5" width="14.5" height="14" rx="2.5"/><rect x="5.6" y="9.6" width="9.3" height="5.8" rx="1"/><path d="M8.7 9.6v5.8M11.8 9.6v5.8M7 18h6.5M6.5 6.5V4.5h7.5v2"/><path d="M17.5 12.5h1.6a.9.9 0 0 0 .9-.9V8"/><circle cx="20" cy="6.6" r="1.4"/></symbol><symbol id="ui-tables" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.3"/><circle cx="12" cy="12" r="1.5"/><path d="M12 3v3.7M12 17.3V21M3 12h3.7M17.3 12H21M5.6 5.6l2.6 2.6M15.8 15.8l2.6 2.6M18.4 5.6l-2.6 2.6M8.2 15.8l-2.6 2.6"/></symbol><symbol id="ui-quick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M13.5 2.5 5 13.5h6l-1 8 8.5-11h-6z"/></symbol><symbol id="ui-online" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8" r="3.1"/><path d="M6.6 19.5c0-3 2.4-5.2 5.4-5.2s5.4 2.2 5.4 5.2"/><circle cx="5.4" cy="10.2" r="2.2"/><path d="M1.9 18.3c0-2.1 1.4-3.7 3.5-4"/><circle cx="18.6" cy="10.2" r="2.2"/><path d="M22.1 18.3c0-2.1-1.4-3.7-3.5-4"/></symbol><symbol id="ui-cards" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 9.8h18M6.5 14.6h4.5"/></symbol><symbol id="ui-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M7.8 4h8.4v5a4.2 4.2 0 0 1-8.4 0z"/><path d="M7.8 5.8H5.2A2.6 2.6 0 0 0 8 9.6M16.2 5.8h2.6A2.6 2.6 0 0 1 16 9.6M12 13.2v3.3M8.5 20.5h7M9.6 20.5l.6-4h3.6l.6 4"/></symbol><symbol id="ui-coins" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><ellipse cx="9" cy="6.5" rx="5.5" ry="2.5"/><path d="M3.5 6.5v4c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-4M3.5 10.5v4c0 1.4 2.5 2.5 5.5 2.5"/><ellipse cx="15" cy="14.5" rx="5.5" ry="2.5"/><path d="M9.5 14.5v3c0 1.4 2.5 2.5 5.5 2.5s5.5-1.1 5.5-2.5v-3"/></symbol><symbol id="ui-swords" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 3.5h3l10 10M3.5 3.5v3l10 10M20.5 3.5h-3l-5 5M20.5 3.5v3l-5 5M12.5 17.5l5-5M18.5 18.5l-3-3M11.5 17.5l-5-5M5.5 18.5l3-3M17 20l3-3M7 20l-3-3"/></symbol><symbol id="ui-cashback" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M19.6 13.5a7.8 7.8 0 0 1-14.1 3.2M4.4 10.5a7.8 7.8 0 0 1 14.1-3.2"/><path d="M18.8 3.6v3.9h-3.9M5.2 20.4v-3.9h3.9"/><path d="M13.8 9.6c-.4-.6-1-.9-1.8-.9-1 0-1.8.6-1.8 1.4 0 1.9 3.8 1 3.8 2.9 0 .8-.8 1.4-1.9 1.4-.8 0-1.6-.4-2-1M12 7.7v1M12 14.4v1"/></symbol><symbol id="ui-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8-7.5 9.5-4.3-1.5-7.5-5-7.5-9.5V6z"/><path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6"/></symbol><symbol id="ui-ball" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.6l4 2.9-1.5 4.7h-5L8 10.5z"/><path d="M12 3v4.6M20.6 9.3l-4.6 1.2M17.3 19.3l-2.8-4.1M6.7 19.3l2.8-4.1M3.4 9.3 8 10.5"/></symbol><symbol id="ui-loto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.4"/><path d="M11.2 10.6l1.1-.8v4.6"/></symbol><symbol id="ui-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v8.5h14V12M12 8v12.5"/><path d="M12 8C10.6 4.6 6.5 4 6.5 6.5 6.5 8 9.5 8 12 8zM12 8c1.4-3.4 5.5-4 5.5-1.5C17.5 8 14.5 8 12 8z"/></symbol><symbol id="ui-tv" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M8.5 21h7M10.5 9.3v5.4l4.6-2.7z"/></symbol><symbol id="ui-ghost" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.2c2.9 0 4.8 2.1 4.8 4.9v2.4l1.9.7-1.3 1.4c.6 1.5 1.7 2.6 3.2 3.1-.8.8-2 1-2.8 1.1l-.5 1.4c-1.1-.2-2.1.1-3 .7-.7.5-1.4.8-2.3.8s-1.6-.3-2.3-.8c-.9-.6-1.9-.9-3-.7l-.5-1.4c-.8-.1-2-.3-2.8-1.1 1.5-.5 2.6-1.6 3.2-3.1l-1.3-1.4 1.9-.7V8.1c0-2.8 1.9-4.9 4.8-4.9z"/></symbol><symbol id="ui-support" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="13" width="4" height="6" rx="1.6"/><rect x="17" y="13" width="4" height="6" rx="1.6"/><path d="M19 19c0 1.6-2.2 2.5-5.5 2.5"/></symbol><symbol id="ui-music" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M9 18V5.5l11-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></symbol><symbol id="ui-vibe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="8" y="3.5" width="8" height="17" rx="2"/><path d="M4.5 8v8M1.8 10.2v3.6M19.5 8v8M22.2 10.2v3.6"/></symbol><symbol id="ui-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M20 14.6A8.2 8.2 0 1 1 9.4 4a6.6 6.6 0 0 0 10.6 10.6z"/></symbol><symbol id="ui-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.6 2.1H4.4z"/><path d="M10 21a2.1 2.1 0 0 0 4 0"/></symbol><symbol id="ui-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7.5V18a2 2 0 0 0 2 2h14V9.5H6a2 2 0 0 1-2-2zm0 0a2 2 0 0 1 2-2h11v4"/><circle cx="16.4" cy="14.8" r="1.2"/></symbol><symbol id="ui-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></symbol><symbol id="ui-dots" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></symbol><symbol id="ui-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M12 13.2v4.2M9.9 15.3h4.2"/></symbol><symbol id="ui-ach" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="14.5" r="5.8"/><path d="M8.6 9.8 6 3.5h4l2 4.4 2-4.4h4l-2.6 6.3"/><path d="m12 11.9 1 1.9 2.1.3-1.5 1.5.4 2.1-2-1-1.9 1 .4-2.1-1.5-1.5 2.1-.3z"/></symbol><symbol id="ui-missions" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/></symbol><symbol id="ui-wheel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="13" r="8.3"/><circle cx="12" cy="13" r="1.6"/><path d="M12 4.7v6.7M12 14.6v6.7M3.7 13h6.7M13.6 13h6.7M6.1 7.1l4.8 4.8M13.1 14.1l4.8 4.8M17.9 7.1l-4.8 4.8M10.9 14.1l-4.8 4.8"/><path d="M10.3 1.8h3.4L12 4.4z"/></symbol><symbol id="ui-defi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M5 21V3.8M5 4.3h12.5L15 8.3l2.5 4H5"/></symbol><symbol id="ui-vip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c0-4 3.4-6.5 7.5-6.5s7.5 2.5 7.5 6.5"/></symbol><symbol id="ui-top" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 20.5h17M5 20.5v-6h4.5v6M9.5 20.5V8.5h5v12M14.5 20.5V12H19v8.5"/></symbol><symbol id="ui-refill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7.5V18a2 2 0 0 0 2 2h14V9.5H6a2 2 0 0 1-2-2zm0 0a2 2 0 0 1 2-2h11v4"/><path d="M14.2 14.8h4.4M16.4 12.6V17"/></symbol><symbol id="ui-ref" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="9.5" cy="8.5" r="3.8"/><path d="M2.5 20c0-3.6 3-6 7-6 1.6 0 3 .4 4.1 1M18.5 13.2v6M15.5 16.2h6"/></symbol><symbol id="ui-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/></symbol><symbol id="ui-app" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M12 7v6.5M9.5 11l2.5 2.5 2.5-2.5M10.5 18.5h3"/></symbol><symbol id="ui-resp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l7.5 3v5.5c0 4.5-3.2 8-7.5 9.5-4.3-1.5-7.5-5-7.5-9.5V6z"/><path d="m8.8 12 2.2 2.2 4.2-4.4"/></symbol><symbol id="ui-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol><symbol id="ui-shop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M5 8h14l-1 12.5H6z"/><path d="M9 10.5V7a3 3 0 0 1 6 0v3.5"/></symbol><symbol id="ui-tiktok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 2.6 2.4 4.4 5 4.6"/></symbol><symbol id="ui-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M4 4.5h16a1 1 0 0 1 1 1v10.5a1 1 0 0 1-1 1H9l-5 4v-4H4a1 1 0 0 1-1-1V5.5a1 1 0 0 1 1-1z"/><path d="M7.5 9h9M7.5 12.5h6"/></symbol><symbol id="ui-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M12 20s-7.8-4.7-7.8-10.4A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 7.8 2.4C19.8 15.3 12 20 12 20z"/></symbol><symbol id="ui-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M3.5 20.5h17M6.5 20.5v-6M11 20.5V9M15.5 20.5v-8M20 20.5V4.5"/></symbol><symbol id="ui-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol></svg>
   <aside class="side">
-    <a class="logo" href="#accueil"><span class="logo-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lgS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4fae"/><stop offset="1" stop-color="#8b3dff"/></linearGradient></defs><path d="M9 4.5h16.5l-4 6H5z" fill="url(#lgS)"/><path d="M6.5 13h16.2l3 4.3-6.4 10.2H4l4-6h9.4l-1.2-2H10.3z" fill="url(#lgS)"/></svg></span><span>SPINBET<em>CASINO</em></span></a>
+    <a class="logo" href="#accueil"><span class="lv-brand"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M8 34 4 12l14 10 14-18 14 18 14-10-4 22z" fill="currentColor"/><circle cx="4" cy="11" r="3.4" fill="currentColor"/><circle cx="32" cy="4" r="3.6" fill="currentColor"/><circle cx="60" cy="11" r="3.4" fill="currentColor"/><rect x="8" y="35.5" width="48" height="4" rx="1.5" fill="currentColor"/></svg><b>SPINBET</b></span><span class="logo-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lgS" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4fae"/><stop offset="1" stop-color="#8b3dff"/></linearGradient></defs><path d="M9 4.5h16.5l-4 6H5z" fill="url(#lgS)"/><path d="M6.5 13h16.2l3 4.3-6.4 10.2H4l4-6h9.4l-1.2-2H10.3z" fill="url(#lgS)"/></svg></span><span>SPINBET<em>CASINO</em></span></a>
     <div class="side-label">Jouer</div>
     <nav class="side-nav">
       <a href="#accueil" data-nav="home"><span><svg class="ico"><use href="#ui-home"/></svg></span>Accueil</a>
@@ -10189,7 +10429,7 @@ section.nx-row.nx-best .sec-head h2 { background: linear-gradient(90deg, #fff, #
 
   <header class="top">
     <button class="icon-btn burger" data-toggle-side aria-label="Menu"><svg class="ico"><use href="#ui-menu"/></svg></button>
-    <a class="logo mobile" href="#accueil"><span class="logo-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lgS2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4fae"/><stop offset="1" stop-color="#8b3dff"/></linearGradient></defs><path d="M9 4.5h16.5l-4 6H5z" fill="url(#lgS2)"/><path d="M6.5 13h16.2l3 4.3-6.4 10.2H4l4-6h9.4l-1.2-2H10.3z" fill="url(#lgS2)"/></svg></span></a>
+    <a class="logo mobile" href="#accueil"><span class="lv-brand"><svg viewBox="0 0 64 40" aria-hidden="true"><path d="M8 34 4 12l14 10 14-18 14 18 14-10-4 22z" fill="currentColor"/><circle cx="4" cy="11" r="3.4" fill="currentColor"/><circle cx="32" cy="4" r="3.6" fill="currentColor"/><circle cx="60" cy="11" r="3.4" fill="currentColor"/><rect x="8" y="35.5" width="48" height="4" rx="1.5" fill="currentColor"/></svg><b>SPINBET</b></span><span class="logo-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lgS2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4fae"/><stop offset="1" stop-color="#8b3dff"/></linearGradient></defs><path d="M9 4.5h16.5l-4 6H5z" fill="url(#lgS2)"/><path d="M6.5 13h16.2l3 4.3-6.4 10.2H4l4-6h9.4l-1.2-2H10.3z" fill="url(#lgS2)"/></svg></span></a>
     <a class="logo nx-logo" href="#accueil"><span class="logo-mark"><svg viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="lgS3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4fae"/><stop offset="1" stop-color="#8b3dff"/></linearGradient></defs><path d="M9 4.5h16.5l-4 6H5z" fill="url(#lgS3)"/><path d="M6.5 13h16.2l3 4.3-6.4 10.2H4l4-6h9.4l-1.2-2H10.3z" fill="url(#lgS3)"/></svg></span><span>SPINBET<em>CASINO</em></span></a>
     <nav class="nx-nav" aria-label="Menu principal">
       <a href="#lobby-slot" data-nav="slots">Machines à sous</a>
@@ -10236,10 +10476,9 @@ section.nx-row.nx-best .sec-head h2 { background: linear-gradient(90deg, #fff, #
   <nav class="bottom-nav">
     <a href="#accueil" data-nav="home"><span><svg class="ico"><use href="#ui-home"/></svg></span>Accueil</a>
     <a href="#recompenses" data-nav="rewards"><span><svg class="ico"><use href="#ui-gift"/></svg></span>Promotions<b class="side-badge nav-badge" data-rw-badge hidden style="display:none"></b></a>
-    <a href="#classement" data-nav="top"><span><svg class="ico"><use href="#ui-top"/></svg></span>Classement</a>
     <a href="#tournois" data-nav="tournois"><span><svg class="ico"><use href="#ui-trophy"/></svg></span>Tournois</a>
-    <a href="#recharger" data-nav="refill"><span><svg class="ico"><use href="#ui-wallet"/></svg></span>Caisse</a>
-    <a href="#" data-toggle-side role="button"><span><svg class="ico"><use href="#ui-dots"/></svg></span>Plus<b class="side-badge nav-badge" data-ach-badge hidden></b></a>
+    <a href="#profil" data-nav="vip"><span><svg class="ico"><use href="#ui-star"/></svg></span>VIP</a>
+    <a href="#" data-toggle-side role="button"><span><svg class="ico"><use href="#ui-menu"/></svg></span>Menu<b class="side-badge nav-badge" data-ach-badge hidden></b></a>
   </nav>
 
   <script>
@@ -15710,63 +15949,69 @@ const { challengeGame } = __mods['social.js'];
    right). Drawn here in SVG (our own drawing), a single picture: no filter per frame, only the chips float. */
 // The home showcase (owner's mock-ups of 16 November 2026): text on the left (title, short line, a pink rule, the daily
 // gift, two buttons), a roulette wheel and two cards on the right; then the category tiles with thin pink icons.
-const NX_WHEEL = (() => {
-  const N = 37, R1 = 150, R0 = 112, pk = [];
-  for (let i = 0; i < N; i++) {
-    const a0 = (i / N) * Math.PI * 2 - Math.PI / 2, a1 = ((i + 1) / N) * Math.PI * 2 - Math.PI / 2;
-    const P = (r, a) => `${(r * Math.cos(a)).toFixed(1)} ${(r * Math.sin(a)).toFixed(1)}`;
-    pk.push(`<path d="M${P(R0, a0)} L${P(R1, a0)} A${R1} ${R1} 0 0 1 ${P(R1, a1)} L${P(R0, a1)} A${R0} ${R0} 0 0 0 ${P(R0, a0)}Z" fill="${i === 0 ? '#0f8a4c' : i % 2 ? '#b3122e' : '#120a14'}"/>`);
-  }
-  const card = (x, y, rot, r, suit, col) => `<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="-62" y="-88" width="124" height="176" rx="12" fill="url(#nwCard)" stroke="#5a2a7a" stroke-width="2"/><rect x="-62" y="-88" width="124" height="176" rx="12" fill="none" stroke="#ff8fd0" stroke-opacity=".18" stroke-width="6"/><text x="-46" y="-56" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="30" fill="${col}">${r}</text><text x="-44" y="-30" font-size="22" fill="${col}">${suit}</text><text x="6" y="46" text-anchor="middle" font-size="78" fill="${col}">${suit}</text></g>`;
-  return `<svg class="nx-art" viewBox="0 0 560 460" role="img" aria-label="Roulette et cartes">
+
+// The lavender showcase (owner's mock-up of 16 November 2026, « exactement pareil ») : « LE FRISSON SANS RISQUE », the big
+// SPINBET, the short line, one purple pill button, a 3D dice, three fanned aces and glossy purple pearls on a soft cloud.
+const NX_LAV = `<svg class="nx-lav-art" viewBox="0 0 420 440" role="img" aria-label="Dé, cartes et perles">
   <defs>
-    <radialGradient id="nwGlow" cx="55%" cy="40%" r="55%"><stop offset="0" stop-color="#b03cff" stop-opacity=".45"/><stop offset=".6" stop-color="#ff2f93" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity="0"/></radialGradient>
-    <linearGradient id="nwRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a3058"/><stop offset=".5" stop-color="#1c1222"/><stop offset="1" stop-color="#0a060c"/></linearGradient>
-    <radialGradient id="nwCone" cx="45%" cy="35%" r="70%"><stop offset="0" stop-color="#6a4a3a"/><stop offset=".6" stop-color="#2a1a14"/><stop offset="1" stop-color="#120a08"/></radialGradient>
-    <linearGradient id="nwGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe7a6"/><stop offset=".5" stop-color="#c8902c"/><stop offset="1" stop-color="#6e4610"/></linearGradient>
-    <linearGradient id="nwCard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c1840"/><stop offset="1" stop-color="#120a1c"/></linearGradient>
+    <radialGradient id="lvCloud" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ddd0fb"/></radialGradient>
+    <radialGradient id="lvBlob" cx="40%" cy="35%" r="65%"><stop offset="0" stop-color="#f6f2fe"/><stop offset=".7" stop-color="#ddd0fb"/><stop offset="1" stop-color="#ddd0fb" stop-opacity="0"/></radialGradient>
+    <radialGradient id="lvPearl" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#e6d6ff"/><stop offset=".45" stop-color="#9a6cf0"/><stop offset="1" stop-color="#4b1fb0"/></radialGradient>
+    <radialGradient id="lvPearlL" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset=".55" stop-color="#d8c6fb"/><stop offset="1" stop-color="#a98ae9"/></radialGradient>
+    <linearGradient id="lvDieTop" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#ece6fa"/></linearGradient>
+    <linearGradient id="lvDieL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f0fd"/><stop offset="1" stop-color="#cfc2ef"/></linearGradient>
+    <linearGradient id="lvDieR" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e3dbf7"/><stop offset="1" stop-color="#b9a9e6"/></linearGradient>
+    <linearGradient id="lvCard" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e9e1fb"/></linearGradient>
+    <filter id="lvSoft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6"/></filter>
   </defs>
-  <ellipse cx="330" cy="200" rx="250" ry="210" fill="url(#nwGlow)"/>
-  <g transform="translate(340 190) scale(1 .78)">
-    <circle r="196" fill="#08050a" transform="translate(0 26)"/>
-    <circle r="192" fill="url(#nwRim)" stroke="#6b4a7a" stroke-width="2"/>
-    <circle r="168" fill="#0d0810" stroke="#c48b2c" stroke-width="3"/>
-    <g class="nx-rotor">${pk.join('')}<circle r="${R1}" fill="none" stroke="#d9b56a" stroke-width="1.5"/><circle r="${R0}" fill="none" stroke="#d9b56a" stroke-width="1.5"/></g>
-    <circle r="110" fill="url(#nwCone)"/>
-    <circle r="70" fill="none" stroke="#c48b2c" stroke-opacity=".5" stroke-width="2"/>
-    <g class="nx-rotor"><path d="M0-78 V78 M-78 0 H78" stroke="url(#nwGold)" stroke-width="7" stroke-linecap="round"/></g>
-    <circle r="22" fill="url(#nwGold)"/><circle r="9" fill="#fff2c8"/>
-    <circle cx="120" cy="-104" r="8" fill="#fff"/>
+  <circle cx="290" cy="130" r="130" fill="url(#lvBlob)" opacity=".8"/>
+  <circle cx="250" cy="300" r="40" fill="#fff" opacity=".35" filter="url(#lvSoft)"/>
+  <g transform="translate(215 262)">
+    ${[[-22, 'A', '♠', '#b9a3ef', 0.85], [-6, 'A', '♦', '#d6439a', 0.95], [10, 'A', '♠', '#211452', 1]].map(([r, v, su, c, o], i) => `<g transform="translate(${i * 40} ${-i * 18}) rotate(${r})" opacity="${o}"><rect x="-58" y="-86" width="116" height="172" rx="13" fill="url(#lvCard)" stroke="#d7cbf3" stroke-width="2"/><text x="-40" y="-48" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="34" fill="${c}">${v}</text><text x="-38" y="-18" font-size="26" fill="${c}">${su}</text>${i === 2 ? `<text x="18" y="62" text-anchor="middle" font-size="96" fill="${c}">${su}</text>` : ''}</g>`).join('')}
   </g>
-  ${card(170, 300, -12, 'A', '♠', '#c9a3ff')}${card(300, 318, 9, 'K', '♥', '#ff4fa8')}
+  <g transform="translate(250 105) rotate(-14)">
+    <path d="M-62 -34 L0 -66 L62 -34 L0 -2 Z" fill="url(#lvDieTop)"/>
+    <path d="M-62 -34 L0 -2 L0 72 L-62 40 Z" fill="url(#lvDieL)"/>
+    <path d="M62 -34 L0 -2 L0 72 L62 40 Z" fill="url(#lvDieR)"/>
+    <path d="M-62 -34 L0 -66 L62 -34 L62 40 L0 72 L-62 40 Z" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="2" stroke-linejoin="round"/>
+    <g fill="#1d1340"><ellipse cx="0" cy="-34" rx="9" ry="5"/><ellipse cx="-30" cy="-34" rx="7" ry="4"/><ellipse cx="30" cy="-34" rx="7" ry="4"/></g>
+    <g fill="#1d1340"><ellipse cx="-46" cy="-10" rx="5.5" ry="7.5" transform="rotate(-25 -46 -10)"/><ellipse cx="-16" cy="44" rx="5.5" ry="7.5" transform="rotate(-25 -16 44)"/><ellipse cx="-31" cy="17" rx="5.5" ry="7.5" transform="rotate(-25 -31 17)"/></g>
+    <g fill="#1d1340"><ellipse cx="16" cy="6" rx="5.5" ry="7.5" transform="rotate(25 16 6)"/><ellipse cx="46" cy="-10" rx="5.5" ry="7.5" transform="rotate(25 46 -10)"/><ellipse cx="16" cy="44" rx="5.5" ry="7.5" transform="rotate(25 16 44)"/><ellipse cx="46" cy="28" rx="5.5" ry="7.5" transform="rotate(25 46 28)"/></g>
+  </g>
+  <path d="M20 440 C 60 400, 120 366, 170 374 C 200 334, 280 324, 320 352 C 360 334, 405 350, 418 392 C 420 410, 420 425, 420 440 Z" fill="url(#lvCloud)"/>
+  <circle class="nx-pearl" cx="370" cy="70" r="20" fill="url(#lvPearl)"/>
+  <circle class="nx-pearl b" cx="95" cy="200" r="24" fill="url(#lvPearlL)"/>
+  <circle class="nx-pearl c" cx="125" cy="345" r="30" fill="url(#lvPearlL)" opacity=".9"/><circle cx="125" cy="345" r="16" fill="url(#lvPearl)"/>
+  <circle class="nx-pearl" cx="330" cy="208" r="9" fill="url(#lvPearl)"/>
+  <circle cx="160" cy="62" r="11" fill="url(#lvPearlL)" opacity=".8"/>
 </svg>`;
-})();
 
 function vitrineHTML() {
-  const playable = ALL_GAMES.filter((g) => !g.wip).length;
-  const guest = __mods['profile.js'].profiles.guest;
   const ic = (n) => `<i><svg class="ico"><use href="#ui-${n}"/></svg></i>`;
-  return `<section class="nx-hero">
-    <div class="nx-stage">${NX_WHEEL}</div>
+  const has = (id) => { const g = getGame(id); return g && !g.wip && !g.retired; };
+  const cat = (href, icon, label) => `<a href="${href}">${ic(icon)}<b>${label}</b></a>`;
+  return `<section class="nx-hero nx-lav">
+    <div class="nx-stage">${NX_LAV}</div>
     <div class="nx-copy">
-      <small class="nx-kick">Bienvenue chez</small>
-      <h1>SPINBET <em>CASINO</em></h1>
-      <p class="nx-short">${playable} jeux gratuits <b>•</b> aucun dépôt <b>•</b> aucun vrai pari</p>
-      <i class="nx-rule" aria-hidden="true"><b>✦</b></i>
-      <a class="nx-bonus" href="#profil"><i><svg class="ico"><use href="#ui-gift"/></svg></i><span><small>Cadeau du jour</small><b>JUSQU’À ${fmt(10000)}</b></span></a>
-      <div class="nx-cta"><a class="nx-btn" href="#lobby-slot">JOUER MAINTENANT</a>${guest ? '<a class="nx-btn ghost" href="#" data-signup>CRÉER UN COMPTE</a>' : `<a class="nx-btn ghost" href="#depot" data-deposit><svg class="ico"><use href="#ui-wallet"/></svg>DÉPOSER</a>`}</div>
+      <small class="nx-kick">Le frisson sans risque</small>
+      <h1>SPINBET</h1>
+      <p class="nx-short">100% jeux virtuels &amp; gratuits - aucun dépôt requis</p>
+      <div class="nx-cta"><a class="nx-btn" href="#lobby-slot">JOUER MAINTENANT <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
     </div>
   </section>
-  <div class="nx-cats-h"><h2>Catégories de jeux</h2></div>
-  <nav class="nx-cats" aria-label="Catégories">
-    <a href="#lobby-slot">${ic('slots')}<b>Machines à sous</b><small>${ALL_GAMES.filter((g) => !g.wip && FILTERS[1].test(g)).length} machines</small></a>
-    <a href="#lobby-table">${ic('tables')}<b>Roues &amp; tables</b><small>Roulette, 21, poker</small></a>
-    <a href="#lobby-quick">${ic('quick')}<b>Jeux rapides</b><small>Mines, Pilote…</small></a>
-    <a href="#lobby-online">${ic('online')}<b>En ligne</b><small>${ALL_GAMES.filter((g) => !g.wip && isOnline(g)).length} jeux à plusieurs</small></a>
-    <a href="#tournois">${ic('trophy')}<b>Tournois</b><small>Chaque soir</small></a>
-    <a href="#jackpot">${ic('coins')}<b>Jackpot</b><small data-jackpot="short">…</small></a>
-    <a href="#lobby-fav">${ic('heart')}<b>Mes favoris</b><small>Tes jeux</small></a>
-  </nav>`;
+  <section class="nx-catbox">
+    <h2>Catégories de jeux</h2>
+    <nav class="nx-cats" aria-label="Catégories">
+      ${cat('#lobby-slot', 'slots', 'Slots')}
+      ${cat(has('roulette') ? '#game-roulette' : '#lobby-table', 'roulette', 'Roulette')}
+      ${cat(has('blackjack') ? '#game-blackjack' : '#lobby-table', 'bj', 'Blackjack')}
+      ${cat(has('poker') ? '#game-poker' : '#lobby-table', 'poker', 'Poker')}
+      ${cat('#lobby-quick', 'quick', 'Jeux rapides')}
+      ${cat('#recompenses', 'promo', 'Promotions')}
+      ${cat('#lobby-online', 'online', 'En ligne')}
+      ${cat('#tournois', 'trophy', 'Tournois')}
+    </nav>
+  </section>`;
 }
 
 // The referral offer, big and bright on the home page (owner's request: « que la case soit plus voyante »), under the categories.
@@ -15848,11 +16093,11 @@ const BEST = ['zeus', 'fortune', 'dragons', 'redk', 'huff', 'anubis', 'cosmic', 
 const PRETTY = [...BEST, 'madwheel', 'keno', 'roulette', 'blackjack', 'lightningbj', 'peche', 'bataille', 'echecs', 'poker', 'pilote', 'madwheel-online', 'peche-online'];
 const rank = (g) => { const i = PRETTY.indexOf(g?.id); return i < 0 ? PRETTY.length : i; };
 const pretty = (list) => list.map((g, i) => [g, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map((x) => x[0]);
-const bestHTML = () => row('⭐ Les plus belles machines', BEST.map(getGame).filter((g) => g && !g.wip && !g.retired && FILTERS[1].test(g)), 'slot').replace('class="nx-row"', 'class="nx-row nx-best"');
+const bestHTML = () => row('Jeux en vedette', BEST.map(getGame).filter((g) => g && !g.wip && !g.retired && FILTERS[1].test(g)), 'slot').replace('class="nx-row"', 'class="nx-row nx-best"');
 const mysCard = () => __mods['mystere.js']?.cardHTML?.() || '';
 const row = (title, list, more) => `
   <section class="nx-row">
-    <div class="sec-head"><h2>${title}</h2>${more && more !== 'new' ? `<a class="more" href="#lobby-${more}">Voir tout <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : ''}</div>
+    <div class="sec-head"><h2>${title}</h2>${more && more !== 'new' ? `<a class="more" href="#lobby-${more}">Tout voir <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : ''}</div>
     <div class="game-row">${more === 'slot' ? mysCard() : ''}${(more === 'new' ? list : pretty(list)).map(gameCard).join('')}</div>
   </section>`;
 
@@ -27443,10 +27688,10 @@ document.addEventListener('click', (e) => {
   if (!b) return;
   e.preventDefault();
   const light = document.documentElement.classList.toggle('light');
-  try { localStorage.setItem('spinbet_theme', light ? 'light' : 'dark'); } catch (err) { /* ignore */ }
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', light ? '#f3f7fb' : '#0b0f17');
+  try { localStorage.setItem('spinbet_theme_v2', light ? 'light' : 'dark'); } catch (err) { /* ignore */ }
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', light ? '#ece5fb' : '#0b0f17');
 });
-if (document.documentElement.classList.contains('light')) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#f3f7fb');
+if (!document.documentElement.classList.contains('light')) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#0b0f17');
 </script>
 </body>
 </html>

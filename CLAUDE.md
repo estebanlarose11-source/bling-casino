@@ -567,6 +567,17 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (texte à gauche « BIENVENUE CHEZ / SPINBET CASINO », cadeau du jour, JOUER MAINTENANT / CRÉER UN COMPTE ou RECHARGER, roulette et
   2 cartes `NX_WHEEL` à droite ; téléphone : roue derrière le texte, à droite), « Catégories de jeux » en tuiles à icône rose (4 sur
   téléphone), rangées de jeux dans des cartes `.nx-row` (titre en capitales, « VOIR TOUT › » rose). Jeux, tables et règles inchangés.
+- **Thème lavande = thème par défaut** (maquette du propriétaire du 16 novembre 2026, « exactement 100 % pareil ») : fond lavande clair,
+  encre violet nuit `--lv-ink`, violet profond `--lv-p` pour ce qui est actif, cartes blanches givrées à grands coins, boutons en pilule
+  violette (`--fin-blue` redéfini). C'est `html.light` (allumé par défaut : localStorage `spinbet_theme_v2` = `dark` seulement si le joueur
+  choisit « Mode sombre » dans le menu) ; **dernier bloc de la couche `finition`** (« Thème lavande »), il passe après tout. Logo = couronne
+  + SPINBET en Cinzel (`.lv-brand` dans les logos, montré seulement en lavande). Téléphone : logo à gauche, solde + « + », 👤 profil, ☰ à
+  droite (niveau et cloche cachés). Accueil : vitrine `NX_LAV` (« LE FRISSON SANS RISQUE », SPINBET, « 100% JEUX VIRTUELS & GRATUITS -
+  AUCUN DÉPÔT REQUIS », JOUER MAINTENANT →, dé, 3 as et perles en SVG), carte « Catégories de jeux » `.nx-catbox` (téléphone 3 × 2 :
+  Slots, Roulette, Blackjack, Poker, Jeux rapides, Promotions ; ordinateur + En ligne, Tournois ; icônes `ui-roulette`, `ui-bj`,
+  `ui-poker`, `ui-promo`), rang « Jeux en vedette » (`bestHTML`, vignettes nettes) avec « TOUT VOIR → ». **Barre du bas = Accueil ·
+  Promotions · Tournois · VIP (`#profil`, `ui-star`) · Menu** (Classement et Caisse restent dans le menu et le « + » du solde). Caisse et
+  offre de parrainage en violet profond. Les écrans des jeux gardent leurs couleurs.
 - **Les plus belles machines en tête de l'accueil** (demande du propriétaire du 16 novembre 2026 : « quand t'arrives, c'est directement les
   plus belles ») : rang « ⭐ Les plus belles machines » juste sous la vitrine (`bestHTML()` de `pages/lobby.js`, liste `BEST` : les machines à
   décor animé, L'Olympe, La Fortune, L'Hydre, REDK… ; machines en travaux ou retirées sautées), grandes affiches (`.nx-best`, fin de la
