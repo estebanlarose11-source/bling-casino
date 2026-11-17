@@ -465,7 +465,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
 - **La Roue Folle = le jeu télé** (`games/madwheel.js`, ids `madwheel` et `madwheel-online`, demande du propriétaire du 16 novembre 2026 :
   « une dinguerie ») : **ses 2 vidéos** d'un animateur qui lance une grande roue sur un plateau télé (`tools/art/madwheel/show-large.mp4`
   736 × 400 : ordinateur ; `show-haut.mp4` 400 × 736 : téléphone tenu droit, roue vue de biais et coupée à droite) **jouées avec leur son**
-  (voix, roue, public ; bouton 🔊 sur la scène, `spinbet_madwheel_snd`, coupé aussi par « Effets sonores », musique du jeu baissée par
+  (voix, roue, public ; bouton SON sur la scène, coupé à chaque arrivée (voir « L'attente »), coupé aussi par « Effets sonores », musique du jeu baissée par
   `duck`), et **sa roue** (`roue.jpg` : cadre doré à ampoules → `rim.webp`, moyeu au tourbillon → `hub.webp`). **Notre roue** (les 54 cases
   du jeu, `discSVG()` : tranches arc-en-ciel `PAL`, valeurs dans des carrés noirs, bonus en carré de couleur avec un signe blanc `GLYPH`)
   est **posée sur la roue de la vidéo** et tourne elle-même jusqu'au résultat tiré : `tools/art/madwheel/build.py` (opencv, rembg, ffmpeg)
@@ -506,7 +506,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   sans CHANCE, 1 / 2 / 5 / 10 ne peuvent pas rendre tous ≈ 95 %). **Sa vidéo de l'émission** `tools/art/plateaulive/roue.mp4` (une
   présentatrice lance une roue à ampoules ; sa version « téléphone » est la même image avec des bandes noires : non utilisée) →
   `python3 tools/art/plateaulive/roue.py` (`--fast` = sans réencoder) : bandes noires enlevées, `assets/games/plateaulive/roue.mp4`
-  (1280 × 694, avec le son, bouton 🔊 `spinbet_plateaulive_snd`), **suivi image par image** du bord doré et du moyeu (le moyeu ne tourne
+  (1280 × 694, avec le son, bouton SON coupé à chaque arrivée), **suivi image par image** du bord doré et du moyeu (le moyeu ne tourne
   pas) → homographie disque unité → image (`TRACK`, 8 nombres par image, posée en `matrix3d` sur `.plx-wb`), présentatrice détourée
   (rembg) dans le repère du disque (`roue-mask.png`). NOTRE roue (`discSVG`) et NOTRE moyeu (`HUB` : « SPIN BET » en doré, voulu par le propriétaire) couvrent les cases et le moyeu de sa
   vidéo (écrits d'un autre jeu). Elle lance à 2,75 s (`TH`), notre roue s'arrête à 8,1 s (`ST`). Téléphone tenu droit : la partie droite
@@ -520,6 +520,26 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `node tools/sim/plateaulive.js` : chaque case ≈ 95,5 %, 2 LANCERS 1 tour sur 19 (≈ ×15,5), 4 LANCERS 1 sur 77 (≈ ×64,7), achats
   ≈ 87 %, max ×10 000. Plein écran : téléphone droit = tout tient (titre caché, mises qui défilent si besoin), couché / ordinateur =
   l'émission à gauche, mises et barre sur 2 rangées à droite. **Le Plateau** et **Le Plateau Online** restent retirés.
+- **L'attente du Plateau Live et de La Roue Folle** (demande du propriétaire du 17 novembre 2026 : « dès qu'on arrive on voit la vidéo
+  tourner déjà, elle tourne en boucle, et quand on veut jouer on active la roue avec nos mises », et le son OFF en arrivant) : une 2e
+  `<video>` au-dessus de l'émission (`.plx-idle` / `.mwx-idle`), muette, qui tourne en boucle dès l'arrivée (retour d'une boucle `IDLE.loop`
+  comme `VideoBg`), notre roue posée dessus (`frame(k, 'idle')` / `idleSrc`). **Son de l'émission coupé à chaque arrivée** (`sndOn = false`,
+  plus de `spinbet_*_snd`) : bouton « 🔇 SON OFF » / « 🔊 SON ON » (`paintSnd`, rond sur le téléphone de La Roue Folle, à gauche sur celui du
+  Plateau Live), musique baissée tant que l'attente parle (`duckIdle`), et tout toucher redonne le son à l'attente (iPhone). LANCER
+  (`startShow`, dans le toucher) : l'émission part et, dès sa 1re image (`fromIdle`, `requestVideoFrameCallback`), elle remplace l'attente ;
+  quand elle finit (`ended`, ou `handAt` = `IDLE.from` pour La Roue Folle) : `toIdle()`. Attente en pause pendant les bonus, reprise après.
+  **Plateau Live** : **sa vidéo** `tools/art/plateaulive/attente.mp4` (la présentatrice parle à côté de la roue, caméra fixe ; son montage
+  continuait par `roue.mp4`, coupé à l'image 538) → `python3 tools/art/plateaulive/attente.py` (`--fast`) : boucle images 41 → 532 (deux
+  silences de sa voix), fin fondue dans le début (1 s, image et son) → `assets/games/plateaulive/attente.mp4` (1280 × 694, avec sa voix) +
+  `attente.webp`, présentatrice détourée `attente-mask.png`, `IDLE` dans `games/plateaulive.js` (une seule homographie `h` : la roue ne bouge
+  pas, case du masque par image `m`). LANCER part de `GO` = 1,6 s de `roue.mp4` (elle lance à 2,75 s) avec un fondu de 0,35 s (même caméra).
+  **La Roue Folle** : pas de vidéo d'attente : `python3 tools/art/madwheel/attente.py` fait un aller-retour de la fin de `show-*.mp4`
+  (l'animateur montre la roue arrêtée : images 222 → 240 large, 214 → 230 haut) + l'ambiance du public → `attente-large.mp4` /
+  `attente-haut.mp4` (+ `.webp`) ; `IDLE[large|haut].f` = l'image de l'émission montrée par chaque image de l'attente (`TRACK` et masques
+  réutilisés), `from` = l'image où l'émission lui rend la main sans saut. LANCER = coupe franche vers l'image 0 (autre cadrage), il lance 1 s
+  plus tard. Si le propriétaire envoie une vraie vidéo d'attente de l'animateur, la mettre à la place comme pour Le Plateau Live.
+  **Essais en local** : `python3 -m http.server` ne répond pas aux requêtes « Range » : une vidéo ne peut pas y avancer (`currentTime`
+  revient à 0, l'émission repart du début) ; Vercel les gère.
 - **Le Super Keno** (`games/keno.js`, id `keno`, catégorie Jeux rapides, tag Loterie, demande du propriétaire du 16 novembre 2026 : « le
   Keno, en mode big loto ») : **ses 2 vidéos** d'un animateur qui fait tomber 20 boules dans un tube, colonne lumineuse derrière lui
   (`tools/art/keno/keno-large.mp4` 736 × 400 ; `keno-haut.mp4` 1080 × 1920, même plateau de plus près) → `python3 tools/art/keno/build.py` :

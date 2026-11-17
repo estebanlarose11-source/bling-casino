@@ -1575,7 +1575,10 @@ body.gated { overflow: hidden; }
 .mwx.mwx-p { aspect-ratio: 400 / 580; max-width: max(260px, calc((100svh - 300px) * .69)); }
 .mwx-art { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 .mwx-p .mwx-art { top: calc(-70 / 580 * 100%); height: calc(736 / 580 * 100%); }
-.mwx-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; background: #0b0418; }
+.mwx-vid, .mwx-idle { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; background: #0b0418; }
+/* l'attente (demande du propriétaire du 17 novembre 2026) : la fin de l'émission en boucle dès qu'on arrive (l'animateur montre la roue),
+   au-dessus de l'émission ; LANCER passe d'un coup au lancer, et l'émission rend la main à l'attente sur la même image */
+.mwx-idle.off { opacity: 0; }
 .mwx-wb { position: absolute; z-index: 2; pointer-events: none; left: calc((var(--cx) - var(--rx) * 1.05) * 1%); top: calc((var(--cy) - var(--ry) * 1.16) * 1%); width: calc(var(--rx) * 2.1%); height: calc(var(--ry) * 2.21%); }
 .mwx-wb.mk { -webkit-mask-image: var(--mk); mask-image: var(--mk); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); -webkit-mask-position: var(--mx) var(--my); mask-position: var(--mx) var(--my); }
 .mwx-wh { position: absolute; left: 50%; top: calc(1.16 / 2.21 * 100%); height: calc(2 / 2.21 * 100%); aspect-ratio: 1; transform: translate(-50%, -50%) scaleX(var(--sx, 1)); }
@@ -1609,8 +1612,10 @@ body.gated { overflow: hidden; }
 .mwx-res b.n { font-size: clamp(30px, 6cqw, 56px); line-height: 1; }
 .mwx-p .mwx-res { bottom: calc(86 / 736 * 100% + 4%); }
 .mwx-p .mwx-res b { font-size: clamp(18px, 6cqw, 30px); } .mwx-p .mwx-res b.n { font-size: clamp(30px, 11cqw, 52px); }
-.mwx-snd { position: absolute; z-index: 6; right: 10px; top: 10px; width: 38px; height: 38px; border-radius: 50%; font-size: 18px; background: rgba(0, 0, 0, .5); box-shadow: inset 0 0 0 1px rgba(255, 210, 63, .5); }
+.mwx-snd { position: absolute; z-index: 6; right: 10px; top: 10px; height: 36px; padding: 0 12px 0 9px; border-radius: 18px; display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, .55); box-shadow: inset 0 0 0 1px rgba(255, 210, 63, .55); color: #fff; }
 .mwx-p .mwx-snd { top: calc(70 / 736 * 100% + 10px); }
+/* téléphone : le bouton du son en rond (la plaque du Boost est juste à côté) */
+.mwx-p .mwx-snd { width: 38px; height: 38px; padding: 0; justify-content: center; } .mwx-p .mwx-snd b { display: none; }
 @media (prefers-reduced-motion: reduce) { .mwx-glow { animation: none; } }
 .mw-felt { margin-top: 10px; }
 /* full screen: the show as big as possible (computer and phone held sideways: the show on the left, larger than for the other
@@ -1676,7 +1681,7 @@ body.gated { overflow: hidden; }
 .mwb-box { position: absolute; z-index: 2; pointer-events: none; }
 .mwb-box.mk { -webkit-mask-image: var(--mk); mask-image: var(--mk); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); -webkit-mask-position: var(--mx) var(--my); mask-position: var(--mx) var(--my); }
 .mwb-full { position: absolute; }
-.mwb .mwb-snd { z-index: 6; width: 34px; height: 34px; font-size: 16px; right: 8px; top: 8px; }
+.mwb .mwb-snd { z-index: 6; height: 32px; padding: 0 10px 0 8px; right: 8px; top: 8px; }
 .mwb-big { position: absolute; z-index: 5; left: 37.5%; top: 45%; translate: -50% -50%; padding: .6cqw 2.6cqw; border-radius: 1.4cqw; pointer-events: none; opacity: 0; transform: scale(.5);
   font: 900 7.5cqw/1 KeCoin, Archivo, sans-serif; color: #fff; background: linear-gradient(180deg, rgba(60, 14, 100, .92), rgba(16, 4, 30, .92)); box-shadow: 0 0 0 .35cqw #ffd23f, 0 0 3cqw rgba(255, 210, 63, .6), 0 1cqw 3cqw rgba(0, 0, 0, .6);
   text-shadow: 0 .3cqw 0 rgba(0, 0, 0, .5), 0 0 2cqw #ffd23f; transition: opacity .25s, transform .45s cubic-bezier(.3, 1.7, .5, 1); }
@@ -1732,7 +1737,11 @@ body.gated { overflow: hidden; }
 .plx.plx-p { aspect-ratio: 1024 / 694; }
 .plx-art { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
 .plx-p .plx-art { left: -25%; width: 125%; }
-.plx-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; background: #0b0418; }
+.plx-vid, .plx-idle { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; background: #0b0418; }
+/* l'attente (demande du propriétaire du 17 novembre 2026) : sa vidéo de la présentatrice qui parle, en boucle dès qu'on arrive, au-dessus
+   de l'émission ; LANCER la fait fondre dans le lancer de la roue (même caméra), elle revient d'un coup à la fin */
+.plx-idle { transition: opacity .35s ease; }
+.plx-idle.off { opacity: 0; } .plx-idle.cut { transition: none; }
 .plx-wb { position: absolute; z-index: 2; left: 0; top: 0; width: 1000px; height: 1000px; transform-origin: 0 0; pointer-events: none; }
 .plx-wb.mk { -webkit-mask-image: var(--mk); mask-image: var(--mk); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); -webkit-mask-position: var(--mx) var(--my); mask-position: var(--mx) var(--my); }
 .plx-rot { position: absolute; left: 3.5%; top: 3.5%; width: 93%; height: 93%; will-change: transform; }
@@ -1758,7 +1767,12 @@ body.gated { overflow: hidden; }
 .plx-chance.on { opacity: 1; transform: none; }
 .plx-chance b { font: 900 clamp(28px, 8cqw, 76px)/1 KeCoin, Archivo, sans-serif; color: #fff; letter-spacing: .06em; text-shadow: 0 .5cqw 0 #6a0420; }
 .plx-chance small { font: 800 clamp(11px, 2.2cqw, 20px) Archivo, sans-serif; color: #ffe4ea; }
-.plx-snd { position: absolute; z-index: 6; right: 10px; top: 10px; width: 38px; height: 38px; border-radius: 50%; font-size: 18px; background: rgba(0, 0, 0, .5); box-shadow: inset 0 0 0 1px rgba(255, 210, 63, .5); }
+.plx-snd { position: absolute; z-index: 6; right: 10px; top: 10px; height: 36px; padding: 0 12px 0 9px; border-radius: 18px; display: inline-flex; align-items: center; gap: 6px; background: rgba(0, 0, 0, .55); box-shadow: inset 0 0 0 1px rgba(255, 210, 63, .55); color: #fff; }
+/* son de l'émission : coupé quand on arrive (demande du propriétaire), le bouton le dit (SON OFF) */
+.plx-p .plx-snd { right: auto; left: 10px; }
+.plx-snd i, .mwx-snd i { font-style: normal; font-size: 17px; line-height: 1; }
+.plx-snd b, .mwx-snd b { font: 900 12px/1 Archivo, sans-serif; letter-spacing: .06em; white-space: nowrap; color: #ffd23f; }
+.plx-snd.on b, .mwx-snd.on b { color: #fff; }
 @media (prefers-reduced-motion: reduce) { .plx-bulb { animation: none; } }
 .pl-felt { margin-top: 10px; background: linear-gradient(180deg, #1d0b44, #0d0426); border-color: rgba(139, 92, 246, .35); }
 .pl-spots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
@@ -1896,7 +1910,7 @@ body.gated { overflow: hidden; }
   opacity: 0; transform: scale(.4); transition: opacity .25s, transform .45s cubic-bezier(.3, 1.7, .5, 1); white-space: nowrap; }
 .plb-big small { font: 900 2.8cqw/1.2 Archivo, sans-serif; text-shadow: none; color: #3a1a00; margin-top: .6cqw; letter-spacing: .05em; }
 .plb-big.on { opacity: 1; transform: none; }
-.plb .plb-snd { position: absolute; z-index: 9; width: 34px; height: 34px; font-size: 16px; right: 8px; top: 8px; }
+.plb .plb-snd { position: absolute; z-index: 9; height: 32px; padding: 0 10px 0 8px; right: 8px; top: 8px; }
 @media (max-height: 560px) { .pl-ov h2 { display: none; } .plb { width: min(96vw, calc((100dvh - 60px) * 864 / 832)); } .pl-ov .msgov { font-size: 13px; } }
 
 /* ============ Super Keno (games/keno.js, demande du propriétaire du 16 novembre 2026) ============
@@ -15931,8 +15945,9 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'madwheel', date: '2026-11-17', title: 'L’émission en direct', items: ['Dès que tu arrives, l’animateur est déjà en direct sur le plateau, à côté de la roue', 'Le son est coupé en arrivant : touche SON OFF pour l’entendre', 'LANCER : il lance la roue tout de suite, puis l’émission continue en attendant ta prochaine mise'] },
   { game: 'anubis', date: '2026-11-17', title: 'Les vies du Jugement', items: ['Les 3 barres violettes ne clignotent plus toutes seules : elles restent allumées', 'Une relance sans rien qui tombe éteint une barre, un cube ou un crâne les rallume toutes les 3'] },
-  { game: 'plateaulive', date: '2026-11-17', title: 'Nouveau : Le Plateau Live', isNew: true, items: ['La présentatrice lance la grande roue à ampoules, avec le son de l’émission', 'Mise sur 1, 2, 5, 10 ou sur les bonus 2 LANCERS et 4 LANCERS', 'Bonus : 3 dés tombent dans le bocal et ton pion avance sur un plateau de 40 cases, jusqu’à ×100 par case', 'Cartes CHANCE, case ×2, tour complet qui double tout le plateau', 'CHANCE sur la roue : elle repart et ce tour paie ×10', 'Les 2 bonus peuvent s’acheter'] },
+  { game: 'plateaulive', date: '2026-11-17', title: 'Nouveau : Le Plateau Live', isNew: true, items: ['Dès que tu arrives, la présentatrice est déjà en direct à côté de la roue (son coupé : touche SON OFF pour l’entendre)', 'LANCER : elle lance la grande roue à ampoules tout de suite', 'Mise sur 1, 2, 5, 10 ou sur les bonus 2 LANCERS et 4 LANCERS', 'Bonus : 3 dés tombent dans le bocal et ton pion avance sur un plateau de 40 cases, jusqu’à ×100 par case', 'Cartes CHANCE, case ×2, tour complet qui double tout le plateau', 'CHANCE sur la roue : elle repart et ce tour paie ×10', 'Les 2 bonus peuvent s’acheter'] },
   { game: 'roulette', date: '2026-11-17', title: 'La croupière en direct', items: ['Une nouvelle croupière, assise à côté de la roue : elle te parle, lance la roue et la bille, avec le son', 'Tu mises directement sur le tapis de la vidéo, sur ordinateur comme sur téléphone (chaque écran a sa propre vidéo)', 'Sur téléphone, les colonnes ont leurs propres cases sur le tapis', 'Une vraie bille tourne sur sa roue, rebondit entre les cases et tombe avec son bruit'] },
   { game: 'blackjack', date: '2026-11-17', title: 'La table Platinum VIP', items: ['Une nouvelle croupière filmée à la table Platinum VIP, avec le son de la salle', 'Tes vraies cartes glissent sous sa main quand elle les distribue', 'Une vidéo pour l’ordinateur et une pour le téléphone tenu droit'] },
   { game: 'lightningbj', date: '2026-11-17', title: 'La table Platinum VIP', items: ['Une nouvelle croupière filmée, avec le son', 'Tes vraies cartes glissent sous sa main', 'Paires et 21+3 sur les places de la table, Bust It à côté d’elle'] },
@@ -19481,8 +19496,8 @@ const FILES = {
   anubis: ['anubis', 'games/impl/anubis.js', 'AnubisGame', '65c706dfae'],
   bling: ['bling', 'games/impl/bling.js', 'BlingGame', '58092f9458'],
   pharaon: ['pharaon', 'games/impl/pharaon.js', 'PharaonGame', 'c757c58318'],
-  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', 'cb653c5cbc'],
-  plateaulive: ['plateaulive', 'games/impl/plateaulive.js', 'PlateauLiveGame', '51c799eb5c'],
+  madwheel: ['madwheel', 'games/impl/madwheel.js', 'MadWheelGame', 'f0a13417d8'],
+  plateaulive: ['plateaulive', 'games/impl/plateaulive.js', 'PlateauLiveGame', '622d99ff44'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '209ac1dbd4'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', 'a2079e2117'],
   bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', 'b010cfef71'],
@@ -19516,7 +19531,7 @@ const FILES = {
   peche: ['peche', 'games/impl/peche.js', 'PecheGame', '77467eded7'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
   'robots-online': ['robots', 'games/impl/robots.js', 'RobotsOnlineGame', '620d0b9f44'],
-  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', 'cb653c5cbc'],
+  'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', 'f0a13417d8'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
   'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '77467eded7'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
