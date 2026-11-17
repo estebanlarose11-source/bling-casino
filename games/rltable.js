@@ -17,7 +17,7 @@ __mods['games/impl/rltable.js'] = (() => {
 const { BaseGame, fmtC } = __mods['core/base.js'];
 const { ORDER, colr, buildDefs, ballTick, thunder } = __mods['core/roulette.js'];
 const { CHIPS, chipSVG } = __mods['games/impl/bjtable.js'];
-const { sfx } = __mods['audio.js'];
+const { sfx, isMuted } = __mods['audio.js'];
 const { fx, center } = __mods['fx.js'];
 const { modal } = __mods['ui.js'];
 
@@ -621,55 +621,68 @@ class RlTableGame extends BaseGame {
   }
 }
 
-/* ===================== La Roulette filmée (demande du propriétaire du 16 novembre 2026) =====================
-   Sa vidéo (tools/art/roulette/lancer.mp4, 672 × 448, nettoyée par tools/art/roulette/clean.py) : on mise sur son tapis
-   (1re image, tapis.webp : les cases sont des zones cliquables posées dessus, en coordonnées de la vidéo), la vidéo se
-   lance au LANCER (la caméra descend vers la roue, la croupière lance la bille, gros plan sur la bille qui roule : on ne
-   voit pas où elle tombe), puis le numéro tiré au hasard (draw()) est annoncé par-dessus avec sa couleur (.rlx-ann). */
-const XW = 672, XH = 448, XEND = 238; // end of the video (the ball still rolling: the drawn number is announced over it)
-const xsrc = (n) => window.__assets?.[`assets/games/roulette/${n}`] || `assets/games/roulette/${n}?v=2`;
-// the felt of the video: the 12 × 3 numbers grid (bilinear from its 4 corners), u = column (0 = 1-2-3), v = row (0 = top: 3, 6…)
-const XG = { tl: [91.7, 264.3], tr: [550, 265], bl: [61.7, 343.3], br: [570, 346] };
-const XP = (u, v) => {
+/* ===================== La Roulette filmée (demande du propriétaire, vidéos du 17 novembre 2026) =====================
+   Ses 2 vidéos (tools/art/roulette/show-large.mp4 672 × 448 pour l'ordinateur, show-haut.mp4 448 × 672 pour le téléphone
+   tenu droit, nettoyées par tools/art/roulette/show.py, avec le son de sa voix) : la croupière à côté de la roue parle
+   (0 → 2 s, joué à la 1re mise de la partie : INTRO), lance la roue et la bille (LANCER : de SPIN à la fin), la roue tourne
+   jusqu'au bout ; on ne voit pas où la bille tombe : le numéro tiré au hasard (draw()) est annoncé par-dessus (.rlx-ann).
+   Le tapis est dans l'image (caméra fixe) : nos cases cliquables sont posées dessus (XGEO, en pixels de chaque vidéo). */
+const INTRO = 48, SPIN = 48; // frames (24 / s): her words before she reaches for the wheel, then the throw to the end
+const xsrc = (n) => window.__assets?.[`assets/games/roulette/${n}`] || `assets/games/roulette/${n}?v=3`;
+const bilin = (G) => (u, v) => {
   const a = u / 12, b = v / 3;
-  const t = [XG.tl[0] + (XG.tr[0] - XG.tl[0]) * a, XG.tl[1] + (XG.tr[1] - XG.tl[1]) * a];
-  const d = [XG.bl[0] + (XG.br[0] - XG.bl[0]) * a, XG.bl[1] + (XG.br[1] - XG.bl[1]) * a];
+  const t = [G.tl[0] + (G.tr[0] - G.tl[0]) * a, G.tl[1] + (G.tr[1] - G.tl[1]) * a];
+  const d = [G.bl[0] + (G.br[0] - G.bl[0]) * a, G.bl[1] + (G.br[1] - G.bl[1]) * a];
   return [t[0] + (d[0] - t[0]) * b, t[1] + (d[1] - t[1]) * b];
 };
-const quad = (u0, v0, u1, v1) => [XP(u0, v0), XP(u1, v0), XP(u1, v1), XP(u0, v1)];
-const XCELLS = {}; // key -> polygon on the video
-XCELLS.n0 = [XP(-0.72, 0), XP(0, 0), XP(0, 3), [26, 343.5], [33, 300]];
-for (let c = 0; c < 12; c++) for (let r = 0; r < 3; r++) XCELLS['n' + (3 * (c + 1) - r)] = quad(c, r, c + 1, r + 1);
-[3, 2, 1].forEach((k, r) => { XCELLS['k' + k] = quad(12, r, 13.18, r + 1); });
-Object.assign(XCELLS, {
-  d1: [[54, 346], [208, 346], [204, 376], [47, 376]], d2: [[208, 346], [405, 346], [406, 376], [204, 376]], d3: [[405, 346], [573, 346], [580, 376], [406, 376]],
-  low: [[47, 376], [122, 376], [112, 413], [35, 413]], even: [[122, 376], [205, 376], [200, 413], [112, 413]], red: [[205, 376], [272, 376], [270, 413], [200, 413]],
-  black: [[272, 376], [340, 376], [339, 413], [270, 413]], odd: [[340, 376], [405, 376], [407, 413], [339, 413]], high: [[520, 376], [576, 376], [592, 413], [525, 413]],
-});
-const XANCH = {};
-for (const k in XCELLS) { const P = XCELLS[k]; XANCH[k] = [P.reduce((a, p) => a + p[0], 0) / P.length, P.reduce((a, p) => a + p[1], 0) / P.length]; }
-XANCH.n0 = XP(-0.38, 1.5);
-L.HOTS.forEach((h) => { const u = (h.x - 36) / 38; let v = h.y / 46; if (v > 2.7) v = 3; XANCH[h.key] = XP(u, v); });
-const XCAM = { bet: [8, 150, 664, 424], spin: [0, 0, XW, XH] }; // what each view shows (video px)
+// a row of cells between 2 lines: xs at its top (y0) and at its bottom (y1)
+const rowCells = (keys, top, bot, y0, y1) => Object.fromEntries(keys.map((k, i) => [k, [[top[i], y0], [top[i + 1], y0], [bot[i + 1], y1], [bot[i], y1]]]));
+function xFelt(m) {
+  const g = m === 'p'
+    ? { W: 448, H: 672, G: { tl: [59, 345], tr: [425, 350], bl: [27.5, 459], br: [446, 466] }, ku: 12,
+      zero: [[37.5, 345], [59, 345], [27.5, 459], [2, 458], [9, 392]],
+      rows: [[['d1', 'd2', 'd3'], [12, 161, 302.5, 448], [5, 156, 304, 448], 461, 500], [['k1', 'k2', 'k3'], [5, 156, 304, 448], [1, 150, 303.5, 448], 502, 542],
+        [['low', 'even', 'black', 'red', 'odd', 'high'], [1, 72, 147, 216, 303, 383, 448], [1, 62, 144, 216, 304, 388, 448], 545, 597]],
+      led: [8, 292] }
+    : { W: 672, H: 448, G: { tl: [107.5, 312.5], tr: [590, 312.5], bl: [62, 372.5], br: [611, 372.5] }, ku: 12.62,
+      zero: [[50, 313.5], [107.5, 312.5], [62, 372.5], [25, 372.5], [31, 337.5]],
+      rows: [[['d1', 'd2', 'd3'], [54, 242.5, 440, 631], [35, 239, 444, 645], 373.5, 410],
+        [['low', 'even', 'red', 'black', 'odd', 'high'], [35, 131, 235, 336, 445, 541, 645], [21, 122, 231, 336, 449, 550, 659], 410.5, 441]],
+      led: [16, 10] };
+  const XP = bilin(g.G), quad = (u0, v0, u1, v1) => [XP(u0, v0), XP(u1, v0), XP(u1, v1), XP(u0, v1)];
+  const C = { n0: g.zero };
+  for (let c = 0; c < 12; c++) for (let r = 0; r < 3; r++) C['n' + (3 * (c + 1) - r)] = quad(c, r, c + 1, r + 1);
+  if (m !== 'p') [3, 2, 1].forEach((k, r) => { C['k' + k] = quad(12, r, g.ku, r + 1); }); // the columns: on the right (computer), in a row (phone)
+  g.rows.forEach((r) => Object.assign(C, rowCells(...r)));
+  const A = {};
+  for (const k in C) { const P = C[k]; A[k] = [P.reduce((a, p) => a + p[0], 0) / P.length, P.reduce((a, p) => a + p[1], 0) / P.length]; }
+  A.n0 = XP(-0.42, 1.5);
+  L.HOTS.forEach((h) => { const u = (h.x - 36) / 38; let v = h.y / 46; if (v > 2.7) v = 3; A[h.key] = XP(u, v); });
+  return { ...g, C, A, src: `show-${m === 'p' ? 'p' : 'l'}` };
+}
+const XGEO = { l: xFelt('l'), p: xFelt('p') };
+const modeOf = () => (innerHeight > innerWidth ? 'p' : 'l');
 const pts = (P) => P.map((p) => p.map((x) => x.toFixed(1)).join(',')).join(' ');
+const xFeltSVG = (g) => `<g class="rl-hl"></g>
+        ${Object.entries(g.C).map(([k, P]) => `<polygon class="rl-cell rlx-cell" data-k="${k}" points="${pts(P)}"/>`).join('')}
+        <g class="rl-hots">${L.HOTS.map((h) => { const [x, y] = g.A[h.key]; return `<circle class="rl-hot rlx-hot" data-k="${h.key}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5"/>`; }).join('')}</g>
+        <g class="rl-chips"></g>
+        <g class="rl-lk"></g>`;
 
 function videoScene() {
-  return `<div class="rl rlx" data-cam="bet">
-    <div class="rlx-bg" style="background-image:url('${xsrc('tapis.webp')}')"></div>
-    <div class="rlx-vp">
-      <video class="rlx-v" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
-      <img class="rlx-img rlx-tapis" src="${xsrc('tapis.webp')}" alt="" draggable="false">
+  const g = XGEO[modeOf()];
+  return `<div class="rl rlx rlx-${g.src.slice(-1)}" data-cam="bet">
+    <div class="rlx-bg" style="background-image:url('${xsrc(g.src + '.webp')}')"></div>
+    <div class="rlx-vp" style="width:${g.W}px;height:${g.H}px">
+      <video class="rlx-v" playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+      <img class="rlx-img rlx-tapis" src="${xsrc(g.src + '.webp')}" alt="" draggable="false">
       <div class="rlx-ann" hidden><small>RIEN NE VA PLUS</small><b></b><em></em></div>
-      <svg class="rlx-felt" viewBox="0 0 ${XW} ${XH}" width="${XW}" height="${XH}">
+      <svg class="rlx-felt" viewBox="0 0 ${g.W} ${g.H}" width="${g.W}" height="${g.H}">
         <defs><radialGradient id="bjvChipShade" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs>
-        <polygon class="rlx-pad" points="405,377 520,377 525,412 407,412"/>
-        <g class="rl-hl"></g>
-        ${Object.entries(XCELLS).map(([k, P]) => `<polygon class="rl-cell rlx-cell" data-k="${k}" points="${pts(P)}"/>`).join('')}
-        <g class="rl-hots">${L.HOTS.map((h) => { const [x, y] = XANCH[h.key]; return `<circle class="rl-hot rlx-hot" data-k="${h.key}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="5.5"/>`; }).join('')}</g>
-        <g class="rl-chips"></g>
-        <g class="rl-lk"></g>
+        <g class="rlx-cells">${xFeltSVG(g)}</g>
       </svg>
-      <div class="rlx-led" data-led="1" aria-label="Derniers numéros et statistiques"></div>
+      <div class="rlx-led" data-led="1" aria-label="Derniers numéros et statistiques" style="left:${g.led[0]}px;top:${g.led[1]}px"></div>
+      <button class="rlx-snd" type="button" aria-label="Son de la croupière"></button>
     </div>
     <div class="rl-top">
       <button class="rl-sq" data-act="menu" aria-label="Menu et règles"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
@@ -697,53 +710,101 @@ class RlVideoGame extends RlTableGame {
     super(root, game, cfg, { ...o, video: true });
     this.vp = this.q('.rlx-vp'); this.vid = this.q('.rlx-v');
     this.vok = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.sndOn = (() => { try { return localStorage.getItem('spinbet_roulette_snd') !== '0'; } catch { return true; } })();
     const v = this.vid; v.muted = true; v.playsInline = true;
     v.addEventListener('error', () => { this.vok = false; });
-    // the whole file in memory (≈ 2,4 Mo): it always starts at once from its first image
-    this.vready = !this.vok ? Promise.resolve() : fetch(xsrc('lancer.mp4')).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
-      .then((b) => { if (this.dead) return; this.vurl = URL.createObjectURL(b); v.src = this.vurl; v.load(); })
-      .catch(() => { if (!this.dead) v.src = xsrc('lancer.mp4'); });
+    this.mode = this.view.classList.contains('rlx-p') ? 'p' : 'l';
+    this.load();
     this.onVis = () => { if (document.hidden) v.pause(); };
     document.addEventListener('visibilitychange', this.onVis);
-    addEventListener('resize', this.onRs = () => requestAnimationFrame(() => this.applyCam()));
+    addEventListener('resize', this.onRs = () => requestAnimationFrame(() => { this.swapMode(); this.applyCam(); }));
+    this.q('.rlx-snd').addEventListener('click', (e) => { e.stopPropagation(); this.sndOn = !this.sndOn; try { localStorage.setItem('spinbet_roulette_snd', this.sndOn ? '1' : '0'); } catch { /* ignore */ } this.paintSnd(); this.vid.muted = !this.sndOn || isMuted(); });
+    this.paintSnd();
     this.applyCam('bet');
   }
+  get g() { return XGEO[this.mode || 'l']; }
+  // the whole file in memory (≈ 2,8 Mo): it always starts at once from any image
+  load() {
+    const v = this.vid, src = xsrc(`${this.g.src}.mp4`), tok = this.ltok = (this.ltok || 0) + 1;
+    if (this.vurl) { URL.revokeObjectURL(this.vurl); this.vurl = null; }
+    this.vready = !this.vok ? Promise.resolve() : fetch(src).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+      .then((b) => { if (this.dead || tok !== this.ltok) return; this.vurl = URL.createObjectURL(b); v.src = this.vurl; v.load(); })
+      .catch(() => { if (!this.dead && tok === this.ltok) v.src = src; });
+  }
+  // computer (wide) or phone held upright: its own video and felt; the bets stay
+  swapMode() {
+    const m = modeOf();
+    if (m === this.mode || this.phase !== 'bet' || this.busy || this.dead) return;
+    this.mode = m; const g = this.g;
+    this.view.classList.toggle('rlx-p', m === 'p'); this.view.classList.toggle('rlx-l', m !== 'p');
+    this.vp.style.width = `${g.W}px`; this.vp.style.height = `${g.H}px`;
+    const svg = this.q('.rlx-felt'); svg.setAttribute('viewBox', `0 0 ${g.W} ${g.H}`); svg.setAttribute('width', g.W); svg.setAttribute('height', g.H);
+    this.q('.rlx-cells').innerHTML = xFeltSVG(g);
+    this.chipsG = this.q('.rl-chips');
+    this.q('.rlx-tapis').src = xsrc(`${g.src}.webp`); this.q('.rlx-bg').style.backgroundImage = `url('${xsrc(`${g.src}.webp`)}')`;
+    const led = this.q('.rlx-led'); led.style.left = `${g.led[0]}px`; led.style.top = `${g.led[1]}px`;
+    this.vid.pause(); this.vid.removeAttribute('src'); this.view.classList.remove('rlx-film'); this.introAt = 0;
+    this.load(); this.paintAll();
+  }
+  paintSnd() { const b = this.q('.rlx-snd'); if (b) { b.textContent = this.sndOn ? '🔊' : '🔇'; b.title = this.sndOn ? 'Couper la voix de la croupière' : 'Remettre la voix de la croupière'; } }
   destroy() { document.removeEventListener('visibilitychange', this.onVis); removeEventListener('resize', this.onRs); try { this.vid.pause(); this.vid.removeAttribute('src'); this.vid.load(); } catch { /* ignore */ } if (this.vurl) URL.revokeObjectURL(this.vurl); super.destroy(); }
 
-  // the view: the felt (bet) or the whole video (spin), as big as the screen allows between the top bar and the buttons
+  // the whole video, as big as the screen allows between the top bar and the buttons
   applyCam(name = this.view?.dataset.cam || 'bet', animate = false) {
     const v = this.view; if (!v || this.dead || !this.vp) return 0;
     v.dataset.cam = name;
     const cw = v.clientWidth; if (!cw) return 0;
+    const { W, H } = this.g;
     const full = !!this.root.closest('.is-full');
-    const top = (this.q('.rl-top')?.offsetHeight || 46) + 10, hud = (this.q('.rl-hud')?.offsetHeight || 70) + 12;
+    const top = (this.q('.rl-top')?.offsetHeight || 46) + 8, hud = (this.q('.rl-hud')?.offsetHeight || 70) + 10;
     if (!full) {
       const port = innerHeight > innerWidth;
-      const want = port ? Math.round(top + hud + (XH * (cw - 8)) / XW) : Math.round(Math.max(420, Math.min(innerHeight * 0.86, cw * 0.66, 900)));
+      const want = Math.round(Math.max(port ? 480 : 440, Math.min(innerHeight - (port ? 150 : 130), top + hud + (H * (cw - 4)) / W, 980)));
       if (Math.abs(v.clientHeight - want) > 2) v.style.height = `${want}px`;
     } else if (v.style.height) v.style.height = '';
-    const ch = v.clientHeight, [x0, y0, x1, y1] = XCAM[name];
-    const k = Math.min((cw - 8) / (x1 - x0), (ch - top - hud) / (y1 - y0));
-    const tx = cw / 2 - ((x0 + x1) / 2) * k, ty = top + (ch - top - hud) / 2 - ((y0 + y1) / 2) * k;
-    const ms = animate ? (this.turbo ? 500 : 800) : 0;
-    this.vp.style.transition = ms ? `transform ${ms}ms cubic-bezier(.65,0,.35,1)` : 'none';
+    const ch = v.clientHeight;
+    const k = Math.min((cw - 4) / W, (ch - top - hud) / H);
+    const tx = (cw - W * k) / 2, ty = top + (ch - top - hud - H * k) / 2;
+    this.vp.style.transition = 'none';
     this.vp.style.transform = `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) scale(${k.toFixed(4)})`;
-    return ms;
+    return 0;
   }
-  setCam(name) { const ms = this.applyCam(name, true); return this.wait0(ms + 30); }
+  setCam(name) { this.applyCam(name); return Promise.resolve(); }
+
+  // her words, once at the start of the game (and again after a long pause), when the first chip is placed: the tap is
+  // a gesture of the player, so the sound is allowed (iPhone)
+  place(parts, node, label) {
+    const r = super.place(parts, node, label);
+    if (this.phase === 'bet' && this.vok && Date.now() - (this.introAt || 0) > 90000) this.intro();
+    return r;
+  }
+  intro() {
+    const v = this.vid; if (!v.src || this.dead) return;
+    this.introAt = Date.now();
+    try { v.currentTime = 0; } catch { /* ignore */ }
+    v.muted = !this.sndOn || isMuted(); v.playbackRate = 1;
+    const p = v.play(); p?.catch(() => { v.muted = true; v.play().catch(() => {}); });
+    this.view.classList.add('rlx-talk');
+    const stop = () => {
+      if (this.dead || !this.view.classList.contains('rlx-talk')) return;
+      if (v.currentTime * 24 >= INTRO || v.ended) { v.pause(); return; }
+      requestAnimationFrame(stop);
+    };
+    requestAnimationFrame(stop);
+  }
 
   // the chips on the video's felt
   paintBets(fresh = []) {
-    const out = [];
+    const out = [], A = this.g.A;
     for (const k in this.bets) {
-      const a = this.bets[k], p = XANCH[k]; if (!p || !a) continue;
+      const a = this.bets[k], p = A[k]; if (!p || !a) continue;
       const c = chipOf(a), n = Math.min(4, Math.max(1, Math.ceil(a / c[0])));
       const discs = Array.from({ length: n - 1 }, (_, i) => `<ellipse cx="0" cy="${(-i * 2.4 + 1.5).toFixed(1)}" rx="11" ry="11" fill="${c[2]}" stroke="${c[3]}" stroke-width="1.5" stroke-dasharray="3 2.5"/>`).join('');
       out.push(`<g class="rl-ch${fresh.includes(k) ? ' fresh' : ''}" data-c="${k}" transform="translate(${p[0].toFixed(1)} ${p[1].toFixed(1)})"><ellipse cx="1" cy="${(3 - (n - 1) * 1).toFixed(1)}" rx="12" ry="${11 + (n - 1) * 1.5}" fill="#000" opacity=".45"/>${discs}<g transform="translate(0 ${(-(n - 1) * 2.4).toFixed(1)})"><svg x="-11.5" y="-11.5" width="23" height="23" viewBox="0 0 100 100" overflow="visible">${chipSVG([c[0], fmtK(a), c[2], c[3], c[4]], 100)}</svg></g></g>`);
     }
     this.chipsG.innerHTML = out.join('');
   }
-  // the last numbers, on the right above the felt (touch: statistics)
+  // the last numbers (touch: statistics)
   paintLed() {
     const e = this.q('.rlx-led'); if (!e) return;
     e.innerHTML = this.hist.slice(0, 9).map((n, i) => `<i class="${colr(n)}${i === 0 ? ' last' : ''}">${n}</i>`).join('') || '<em>Derniers numéros</em>';
@@ -758,39 +819,42 @@ class RlVideoGame extends RlTableGame {
   }
   // the winning places of the felt, lit
   lightFelt(r) {
-    const hl = [];
-    for (const k in L.DEF) if (XCELLS[k] && L.DEF[k].n.includes(r)) hl.push(`<polygon points="${pts(XCELLS[k])}" class="rlx-win${k[0] === 'n' ? ' num' : ''}"/>`);
+    const hl = [], C = this.g.C;
+    for (const k in L.DEF) if (C[k] && L.DEF[k].n.includes(r)) hl.push(`<polygon points="${pts(C[k])}" class="rlx-win${k[0] === 'n' ? ' num' : ''}"/>`);
     this.q('.rl-hl').innerHTML = hl.join('');
   }
   async payAnim(placed, res, extra) {
     const ret = this.settle(placed, res, extra);
     const chips = this.qa('.rl-ch');
     const wins = chips.filter((g) => this.payOf(g.dataset.c, placed[g.dataset.c] || 0, res, extra) > 0), loses = chips.filter((g) => !wins.includes(g));
-    loses.forEach((g, i) => { const p = XANCH[g.dataset.c]; g.animate([{ opacity: 1, transform: `translate(${p[0]}px, ${p[1]}px)` }, { opacity: 0, transform: `translate(${p[0] + (340 - p[0]) * 0.4}px, ${p[1] - 60}px) scale(.6)` }], { duration: this.turbo ? 300 : 650, delay: i * 25, easing: 'ease-in', fill: 'forwards' }); });
+    loses.forEach((g, i) => { const p = this.g.A[g.dataset.c]; g.animate([{ opacity: 1, transform: `translate(${p[0]}px, ${p[1]}px)` }, { opacity: 0, transform: `translate(${p[0] + (340 - p[0]) * 0.4}px, ${p[1] - 60}px) scale(.6)` }], { duration: this.turbo ? 300 : 650, delay: i * 25, easing: 'ease-in', fill: 'forwards' }); });
     wins.forEach((g) => g.classList.add('win'));
     await this.wait(loses.length ? 650 : 200);
     if (ret > 0) wins.forEach((g) => { const k = g.dataset.c, b = g.getBoundingClientRect(); fx.floatText(b.left + b.width / 2, b.top, `+${fmtC(this.payOf(k, placed[k], res, extra))}`, '#fde047', 18); fx.burst(b.left + b.width / 2, b.top + b.height / 2, 14, ['#fde047', '#fff', '#4ade80'], 6); });
     return ret;
   }
-  // the video from its first image (the felt) to the close-up on the ball, then the drawn number announced over it
+  // her throw (from SPIN, with the sound of the wheel) to the end of the video, then the drawn number announced over it
   async film(r) {
     const v = this.vid, ann = this.q('.rlx-ann');
     ann.hidden = true; ann.classList.remove('on');
+    this.view.classList.remove('rlx-talk');
     if (this.vok) await Promise.race([this.vready, this.wait0(3000)]);
     const play = this.vok && v.src && !this.dead;
+    const end = v.duration ? v.duration * 24 - 1 : 287;
     if (play) {
-      try { v.currentTime = 0; } catch { /* ignore */ }
-      v.playbackRate = this.superT ? 3.2 : this.turbo ? 2.5 : 1.6;
-      await v.play().catch(() => {});
-      this.view.classList.add('rlx-film'); // the felt image fades, the video shows
+      if (v.paused || v.currentTime * 24 < SPIN - 2 || v.currentTime * 24 > SPIN + 30) { try { v.currentTime = SPIN / 24; } catch { /* ignore */ } }
+      v.playbackRate = this.superT ? 3.2 : this.turbo ? 2.4 : 1.45;
+      v.muted = !this.sndOn || isMuted();
+      await v.play().catch(() => { v.muted = true; return v.play().catch(() => {}); });
+      this.view.classList.add('rlx-film'); // the felt picture fades, the video shows
       await new Promise((res) => {
-        const g = setTimeout(res, (XEND / 24 / v.playbackRate) * 1000 + 3000);
+        const g = setTimeout(res, ((end - SPIN) / 24 / v.playbackRate) * 1000 + 3000);
         let lastTick = 0;
         const tick = () => {
           if (this.dead) { clearTimeout(g); return res(); }
           const f = v.currentTime * 24;
-          if (f > 150 && performance.now() - lastTick > 70 + (f - 150) * 2.5) { lastTick = performance.now(); ballTick(0.05 + Math.max(0, XEND - f) / 700); }
-          if (f >= XEND || v.ended) { clearTimeout(g); return res(); }
+          if (f > 130 && v.muted && performance.now() - lastTick > 70 + (f - 130) * 1.6) { lastTick = performance.now(); ballTick(0.05 + Math.max(0, end - f) / 900); }
+          if (f >= end - 1 || v.ended) { clearTimeout(g); return res(); }
           requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
@@ -810,9 +874,10 @@ class RlVideoGame extends RlTableGame {
   }
   async back() {
     const ann = this.q('.rlx-ann');
-    this.view.classList.remove('rlx-film');
+    this.view.classList.remove('rlx-film', 'rlx-talk');
     ann.classList.remove('on');
     await this.setCam('bet');
+    this.swapMode();
     ann.hidden = true;
   }
   onMain() {

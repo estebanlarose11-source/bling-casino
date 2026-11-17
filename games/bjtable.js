@@ -12,7 +12,7 @@ __mods['games/impl/bjtable.js'] = (() => {
 // sont des « panneaux » redressés face au joueur (.bjv-up). Les 3 jeux étendent BjTableGame.
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
-const { sfx } = __mods['audio.js'];
+const { sfx, isMuted } = __mods['audio.js'];
 
 let uid = 0;
 // Chips in cents: [value, label, colour, edge inserts, text colour]. 5 of them are on the felt, chosen from the balance.
@@ -459,42 +459,48 @@ class BjTableGame extends BaseGame {
   sideResult(t, k, text) { const e = this.q(`.bjv-spot[data-t="${t}"] .bjv-sres`); if (!e) return; e.hidden = !text; if (text) { e.className = `bjv-up bjv-sres ${k}`; e.innerHTML = text; } }
 }
 
-/* ===================== La table filmée (Le 21, Le 21 Électrique) =====================
-   Demande du propriétaire du 16 novembre 2026 : sa vidéo d'une croupière vue depuis la place du joueur
-   (tools/art/blackjack/donne.mp4, 448 × 672, nettoyée par tools/art/blackjack/clean.py : les cartes posées sont
-   effacées dès qu'elles touchent le tapis) distribue chaque carte. Le jeu en rejoue des morceaux (CLIPS, en images à
-   24 / s) : pour le joueur (1re carte : à gauche, les suivantes : à droite) et pour la croupière (1re carte : le grand
-   geste, les suivantes : la carte cachée). Quand la carte de la vidéo touche le tapis (`land`), notre carte apparaît
-   à cet endroit puis glisse à sa place. Tout est en coordonnées de la vidéo (448 × VH : la vidéo jusqu'à FELT, puis
-   une bande de tapis avec les cercles de mise et les 5 jetons), mis à l'échelle de l'écran par fit(). */
-const VW = 448, VH = 762, FELT = 560, VID = 'assets/games/blackjack/donne', VIDV = 1;
-const vsrc = (ext) => window.__assets?.[`${VID}.${ext}`] || `${VID}.${ext}?v=${VIDV}`;
-const CLIPS = {
-  d1: { a: 0, land: 41, b: 72, x: 311, y: 436 },      // her first card: the big gesture
-  p1: { a: 78, land: 120, b: 144, x: 179, y: 517 },   // the player's first card (left)
-  p2: { a: 144, land: 157, b: 186, x: 267, y: 514 },  // the player's next cards (right)
-  d2: { a: 186, land: 209, b: 216, x: 313, y: 432, rest: true }, // her next cards (the hidden one)
+/* ===================== La table filmée (Le 21, Le 21 Électrique, La Bataille) =====================
+   Demande du propriétaire, vidéos du 17 novembre 2026 : la croupière de la table « Platinum VIP » (tools/art/blackjack/
+   table-large.mp4 672 × 448 pour l'ordinateur et les écrans larges, table-haut.mp4 720 × 1280 pour le téléphone tenu droit,
+   nettoyées par tools/art/blackjack/table.py, avec leur son) prend une carte dans le sabot et la pousse vers sa droite
+   (CLIPS.p : les cartes du joueur), puis une autre devant elle (CLIPS.d : ses cartes). Le jeu rejoue ces gestes pour chaque
+   carte : les cartes de la vidéo sont effacées, et NOTRE carte (sa vraie valeur, ou son dos pour la carte cachée) suit sa
+   main image par image (BJTRACK, sous ses doigts : masque de ses mains HAND par image), puis va à sa place. Tout est en
+   pixels de la vidéo (BGEO[mode] : W × VH, la vidéo puis, sur l'ordinateur, une bande de tapis pour les jetons). */
+/* BJTRACK */ const BJTRACK = {"l":{"p":{"s":43,"f":[[172.9,284.4,48.7,-17.8],[177.3,286.8,52.2,-14.2],[182.6,288.6,55.6,-17.8],[192.7,292.8,55.6,-17.8],[204.3,295.7,55.6,-18.4],[217.5,297.8,55.6,-19.1],[231.6,299.7,55.6,-20.3],[246.3,301.4,55.6,-20.6],[261.5,303.0,55.6,-20.6],[278.4,303.7,54.7,-21.8],[293.8,304.0,52.9,-21.8],[308.9,303.9,48.0,-13.0],[323.3,303.6,46.5,0.0],[337.4,302.7,46.0,0.0],[349.6,302.4,46.0,0.0],[362.6,302.0,41.0,0.0],[375.1,301.5,38.0,0.0],[387.1,300.7,38.0,0.0],[393.1,300.4,38.0,0.0]]},"d":{"s":150,"f":[[235.2,245.8,34.0,0.0],[242.1,246.7,35.1,0.0],[248.7,247.8,36.3,0.0],[261.6,250.3,37.5,-11.3],[273.3,252.5,37.5,-11.9],[283.9,254.5,36.3,-11.9],[293.3,256.6,33.2,-11.9],[301.8,258.3,31.9,-11.9],[309.5,259.5,30.2,-11.9],[316.7,260.1,30.2,-11.8],[320.5,260.4,29.9,-11.1],[324.1,260.7,29.5,-13.0]]},"hand":{"box":[150,230,600,400],"cols":8,"rows":25,"w":225,"h":85,"idx":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192]}},"p":{"p":{"s":46,"f":[[30.0,831.5,83.3,-26.6],[40.1,836.9,99.5,-23.5],[52.7,842.1,115.8,-20.3],[79.0,850.3,136.8,-21.7],[111.9,857.8,136.8,-20.3],[149.7,862.7,136.8,-20.3],[194.4,865.3,136.8,0.0],[237.5,866.1,136.8,0.0],[279.8,866.0,136.8,0.0],[320.8,866.1,134.0,0.0],[361.8,865.8,130.6,0.0],[398.0,865.0,130.6,0.0],[436.4,863.6,119.0,0.0],[472.5,861.8,111.0,0.0],[507.3,859.6,111.0,0.0],[524.3,858.5,111.0,0.0]]},"d":{"s":151,"f":[[115.6,719.4,100.4,0.0],[134.2,721.9,100.2,-6.1],[151.3,724.4,100.1,-12.0],[183.8,729.3,100.1,-12.0],[213.3,733.3,97.4,-12.0],[239.5,737.3,96.8,-8.7],[263.3,740.7,95.1,-8.7],[285.4,743.0,87.2,-8.7],[305.8,744.1,87.2,-8.3],[316.8,744.6,86.2,-10.2],[326.9,745.2,85.1,-12.1]]},"hand":{"box":[0,700,720,1160],"cols":8,"rows":25,"w":180,"h":115,"idx":[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192]}}}; /* /BJTRACK */
+const BJV = 'assets/games/blackjack/', BJVV = 2;
+const bsrc = (n) => window.__assets?.[`${BJV}${n}`] || `${BJV}${n}?v=${BJVV}`;
+const BGEO = {
+  // computer / wide screen: the video (672 × 448) and a band of felt under it for the chips and the rules
+  l: { W: 672, H: 448, VH: 516, u: 0.78, deal: { x: 314, y: 246 }, hand: { x: 440, y: 286 }, spot: { x: 332, y: 358, r: 22 },
+    picks: { y: 482, dx: 60 }, txt: 506, sides: { pp: [228, 347, 19], t3: [437, 347, 19], tie: [437, 347, 21], bust: [480, 266, 19] }, fsP: 0.74, fsD: 0.62 },
+  // phone held upright: the video only (720 × 1280); the chips on the rail, the rules above it
+  p: { W: 720, H: 1280, VH: 1280, u: 1.62, deal: { x: 300, y: 732 }, hand: { x: 520, y: 862 }, spot: { x: 346, y: 1012, r: 50 },
+    picks: { y: 1222, dx: 116 }, txt: 1138, sides: { pp: [64, 988, 44], t3: [654, 988, 44], tie: [654, 988, 46], bust: [606, 784, 42] }, fsP: 0.74, fsD: 0.62 },
 };
-const VDEAL = { x: 311, y: 400 }, VHAND = { x: 224, y: 474 }, VSPOT = { x: 224, y: 644, r: 40 };
-const VPICK = [-2, -1, 0, 1, 2].map((k) => ({ x: 224 + k * 64, y: 716 }));
-const VCW = 108 * 0.56, VDW = 108 * 0.52; // cards on the video (base card 108 × 152, scaled)
+// her 2 gestures (frames at 24 / s): a = start, land = the card touches its place, b = her hand is back (then: rest)
+const CLIPS = { p: { a: 10, land: 61, b: 100 }, d: { a: 100, land: 161, b: 192 } };
+const bmode = () => (innerHeight > innerWidth && innerWidth < 900 ? 'p' : 'l');
 
-const vSpotHTML = (t, x, y, r, label, sub) => `<button class="bjv-spot bjx-spot${t === 'main' ? ' main' : ' bjv-sb'}" data-t="${t}" style="left:${x}px;top:${y}px;--d:${r * 2}px" aria-label="Poser le jeton choisi sur ${label}"><em class="bjx-lab">${label}${sub ? `<small>${sub}</small>` : ''}</em><span class="bjv-stack"></span><b class="bjv-up bjv-amt" hidden></b><b class="bjv-up bjv-sres" hidden></b></button>`;
+const vSpotHTML = (t, label, sub) => `<button class="bjv-spot bjx-spot${t === 'main' ? ' main' : ' bjv-sb'}" data-t="${t}" aria-label="Poser le jeton choisi sur ${label}"><em class="bjx-lab">${label}${sub ? `<small>${sub}</small>` : ''}</em><span class="bjv-stack"></span><b class="bjv-up bjv-amt" hidden></b><b class="bjv-up bjv-sres" hidden></b></button>`;
 
 function videoHTML(o = {}) {
-  const sides = o.sides || [];
-  return `<div class="bjv bjx" data-cam="bet" data-phase="bet" style="--tilt:0deg">
-    <div class="bjx-bg" style="background-image:url('${vsrc('webp')}')"></div>
-    <div class="bjx-vp">
-      <video class="bjx-v" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
-      <video class="bjx-v off" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+  const sides = o.sides || [], m = bmode(), g = BGEO[m];
+  return `<div class="bjv bjx bjx-${m}" data-cam="bet" data-phase="bet" style="--tilt:0deg">
+    <div class="bjx-bg" style="background-image:url('${bsrc(`table-${m}.webp`)}')"></div>
+    <div class="bjx-vp" style="width:${g.W}px;height:${g.VH}px;--u:${g.u}">
+      <video class="bjx-v" playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+      <video class="bjx-v off" playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
       <div class="bjx-felt"><i class="bjx-t">${o.t2 || 'LE BLACKJACK PAIE 6 POUR 5 · LA CROUPIÈRE TIRE À 16 ET RESTE À 17'}</i></div>
       ${CHIP_SHADE}
-      <div class="bjv-dcards" style="left:${VDEAL.x}px;top:${VDEAL.y}px"><div class="bjv-up bjv-bub d" hidden></div></div>
-      <div class="bjv-hands"></div>
-      ${vSpotHTML('main', VSPOT.x, VSPOT.y, VSPOT.r, 'MISE')}
-      ${sides.map((s) => vSpotHTML(s.id, s.vx, s.vy, s.vr, s.name, s.sub)).join('')}
-      ${VPICK.map((p, i) => `<button class="bjv-pick" data-pick="${i}" style="left:${p.x}px;top:${p.y}px"></button>`).join('')}
+      <div class="bjx-occ">
+        <div class="bjv-dcards"><div class="bjv-up bjv-bub d" hidden></div></div>
+        <div class="bjv-hands"></div>
+      </div>
+      ${vSpotHTML('main', 'MISE')}
+      ${sides.map((s) => vSpotHTML(s.id, s.name, s.sub)).join('')}
+      ${[0, 1, 2, 3, 4].map((i) => `<button class="bjv-pick" data-pick="${i}"></button>`).join('')}
+      <button class="bjx-snd" type="button" aria-label="Son de la table"></button>
     </div>
     <div class="bjv-top">
       <button class="bjv-sq" data-act="menu" aria-label="Menu et règles"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
@@ -513,20 +519,33 @@ function videoHTML(o = {}) {
 }
 
 // The croupière's video: 2 <video> of the same file, a clip plays on one while the other waits (cross-fade between
-// clips, so the start of a clip never shows a jump). play() resolves when the card touches the felt.
+// clips). play() calls back every frame (onFrame: our card follows her hand, the mask of her hands follows the video)
+// and resolves when the card touches the felt.
 class Donne {
-  constructor(vids) {
-    this.v = vids; this.cur = 0; this.tok = 0;
+  constructor(vids, file, onFrame) {
+    this.v = vids; this.cur = 0; this.tok = 0; this.onFrame = onFrame; this.sound = false;
     this.ok = !matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // the whole file in memory once (≈ 1,4 Mo): both <video> share it and can jump to any clip at once (a server
-    // without « Range » requests, or a file still loading, would refuse to seek far)
-    vids.forEach((v) => { v.muted = true; v.playsInline = true; v.poster = vsrc('webp'); v.addEventListener('error', () => { this.ok = false; }); });
-    this.ready = !this.ok ? Promise.resolve() : fetch(vsrc('mp4')).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
-      .then((b) => { if (this.dead) return; this.url = URL.createObjectURL(b); vids.forEach((v) => { v.src = this.url; v.load(); }); })
-      .catch(() => { if (!this.dead) vids.forEach((v) => { v.src = vsrc('mp4'); }); });
-    this.loaded = false; this.ready.then(() => { this.loaded = true; });
+    vids.forEach((v) => { v.muted = true; v.playsInline = true; v.addEventListener('error', () => { this.ok = false; }); });
+    this.open(file);
     this.onVis = () => { if (document.hidden) this.v.forEach((v) => v.pause()); };
     document.addEventListener('visibilitychange', this.onVis);
+  }
+  // the whole file in memory once: both <video> share it and can jump to any clip at once
+  open(file) {
+    const tok = this.ftok = (this.ftok || 0) + 1, vids = this.v, src = bsrc(`${file}.mp4`);
+    this.v.forEach((v) => { v.pause(); v.poster = bsrc(`${file}.webp`); });
+    if (this.url) { URL.revokeObjectURL(this.url); this.url = null; }
+    this.loaded = false;
+    this.ready = !this.ok ? Promise.resolve() : fetch(src).then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+      .then((b) => { if (this.dead || tok !== this.ftok) return; this.url = URL.createObjectURL(b); vids.forEach((v) => { v.src = this.url; v.load(); }); })
+      .catch(() => { if (!this.dead && tok === this.ftok) vids.forEach((v) => { v.src = src; }); });
+    this.ready.then(() => { if (tok === this.ftok) this.loaded = true; });
+  }
+  // inside a tap of the player: both <video> may now play with their sound (iPhone)
+  unlock() {
+    if (this.unlocked || !this.sound || !this.loaded) return;
+    this.unlocked = true;
+    this.v.forEach((v) => { if (!v.paused) return; const t = v.currentTime; v.muted = false; const p = v.play(); p?.then(() => { v.pause(); try { v.currentTime = t; } catch { /* ignore */ } }).catch(() => { v.muted = true; }); });
   }
   seek(v, t) {
     return new Promise((res) => {
@@ -538,31 +557,34 @@ class Donne {
     });
   }
   swap(nv) { const old = this.v[this.cur]; this.cur = this.v.indexOf(nv); nv.classList.remove('off'); old.classList.add('off'); setTimeout(() => { if (this.v[this.cur] !== old) old.pause(); }, 220); }
-  // back to her first frame (hands on the shoe), still
+  frame() { return Math.round((this.v[this.cur]?.currentTime || 0) * 24); }
+  // back to her first frame (hands resting), still
   async rest() {
     const tok = ++this.tok, nv = this.v[this.cur ^ 1];
     nv.pause(); await this.seek(nv, 0.001);
-    if (tok === this.tok && !this.dead) this.swap(nv);
+    if (tok === this.tok && !this.dead) { this.swap(nv); this.onFrame?.(0, null); }
   }
-  async play(c, rate) {
+  async play(c, rate, follow) {
     if (!this.loaded) await Promise.race([this.ready, new Promise((r) => setTimeout(r, 2500))]);
     if (!this.loaded || this.dead) return;
     const tok = ++this.tok, nv = this.v[this.cur ^ 1];
     return new Promise((res) => {
       let landed = false;
       const land = () => { if (!landed) { landed = true; clearTimeout(guard); res(); } };
-      const guard = setTimeout(land, ((c.land - c.a) / 24 / rate) * 1000 + 1600);
+      const guard = setTimeout(land, ((c.land - c.a) / 24 / rate) * 1000 + 1800);
       nv.pause();
       this.seek(nv, c.a / 24 + 0.001).then(() => {
         if (tok !== this.tok || this.dead) return land();
         nv.playbackRate = rate;
-        nv.play().catch(() => land());
+        nv.muted = !this.sound;
+        nv.play().catch(() => { nv.muted = true; return nv.play(); }).catch(() => land());
         this.swap(nv);
         const tick = () => {
           if (tok !== this.tok || this.dead) return land();
           const f = nv.currentTime * 24;
+          this.onFrame?.(Math.round(f), landed ? null : follow);
           if (f >= c.land) land();
-          if (f >= c.b) { nv.pause(); if (c.rest) this.rest(); return; }
+          if (f >= c.b) { nv.pause(); this.rest(); return; }
           requestAnimationFrame(tick);
         };
         requestAnimationFrame(tick);
@@ -575,101 +597,178 @@ class Donne {
 class BjVideoGame extends BjTableGame {
   constructor(root, game, cfg, o = {}) {
     super(root, game, cfg, { ...o, video: true });
-    this.vp = this.q('.bjx-vp');
-    this.donne = new Donne(this.qa('.bjx-v'));
+    this.vp = this.q('.bjx-vp'); this.occ = this.q('.bjx-occ');
+    this.mode = this.view.classList.contains('bjx-p') ? 'p' : 'l';
+    this.donne = new Donne(this.qa('.bjx-v'), `table-${this.mode}`, (f, follow) => this.onFrame(f, follow));
+    this.sndOn = (() => { try { return localStorage.getItem('spinbet_bj_snd') !== '0'; } catch { return true; } })();
+    this.donne.sound = this.sndOn && !isMuted();
+    this.q('.bjx-snd').addEventListener('click', (e) => { e.stopPropagation(); this.sndOn = !this.sndOn; try { localStorage.setItem('spinbet_bj_snd', this.sndOn ? '1' : '0'); } catch { /* ignore */ } this.paintSnd(); });
+    this.paintSnd();
     const board = this.q('.lbv-board'); if (board) this.vp.appendChild(board); // Le 21 Électrique: its board on the wall, left of her
     this.nd = 0; this.np = 0;
-    addEventListener('resize', this.onRs = () => requestAnimationFrame(() => this.fit()));
+    this.geo();
+    this.onFrame(0, null);
+    addEventListener('resize', this.onRs = () => requestAnimationFrame(() => { this.swapMode(); this.fit(); }));
     requestAnimationFrame(() => this.fit());
   }
+  get g() { return BGEO[this.mode]; }
   destroy() { this.donne?.destroy(); removeEventListener('resize', this.onRs); super.destroy(); }
+  wake() { super.wake(); this.donne.sound = this.sndOn && !isMuted(); this.donne.unlock(); }
+  paintSnd() { const b = this.q('.bjx-snd'); if (b) { b.textContent = this.sndOn ? '🔊' : '🔇'; b.title = this.sndOn ? 'Couper le son de la table' : 'Remettre le son de la table'; } if (this.donne) this.donne.sound = this.sndOn && !isMuted(); }
   measure() {}
   camera() { this.fit(); }
   dealerDo() {}
-  // the scene (448 × VH video units) as big as the screen allows, above the buttons; around it the video, blurred
+  // the places of the mode: circles, chips, rows of cards
+  geo() {
+    const g = this.g, vp = this.vp;
+    vp.style.width = `${g.W}px`; vp.style.height = `${g.VH}px`; vp.style.setProperty('--u', g.u);
+    this.qa('.bjx-v').forEach((v) => { v.style.width = `${g.W}px`; v.style.height = `${g.H}px`; });
+    const put = (el, x, y, r) => { if (!el) return; el.style.left = `${x}px`; el.style.top = `${y}px`; if (r) el.style.setProperty('--d', `${r * 2}px`); };
+    put(this.q('.bjv-spot.main'), g.spot.x, g.spot.y, g.spot.r);
+    for (const s of this.o.sides || []) { const p = g.sides[s.id] || g.sides.t3; put(this.q(`.bjv-spot[data-t="${s.id}"]`), p[0], p[1], p[2]); }
+    this.qa('.bjv-pick').forEach((b, i) => put(b, g.W / 2 + (i - 2) * g.picks.dx, g.picks.y));
+    put(this.q('.bjv-dcards'), g.deal.x, g.deal.y);
+    const t = this.q('.bjx-felt'); // computer: the band under the video; phone: just the words, above the rail
+    if (this.mode === 'p') { t.style.top = `${g.txt - 14}px`; t.style.bottom = 'auto'; t.style.height = '26px'; } else { t.style.top = `${g.H - 6}px`; t.style.bottom = '0'; t.style.height = ''; }
+    const hm = BJTRACK[this.mode]?.hand;
+    if (hm) {
+      const [x0, y0, x1, y1] = hm.box, cw = x1 - x0, chh = y1 - y0;
+      this.occ.style.maskImage = this.occ.style.webkitMaskImage = `url('${bsrc(`hand-${this.mode}.png`)}')`;
+      this.occ.style.maskSize = this.occ.style.webkitMaskSize = `${hm.cols * cw}px ${hm.rows * chh}px`;
+      this.hm = { ...hm, cw, chh, x0, y0 };
+    } else { this.occ.style.maskImage = this.occ.style.webkitMaskImage = 'none'; this.hm = null; }
+    this.hmLast = -1;
+    this.placeHands(this.q('.bjv-hands').children.length || 1);
+    this.layout(this.dealerRow());
+  }
+  // phone turned: the other video, the other places (only between two hands)
+  swapMode() {
+    const m = bmode();
+    if (m === this.mode || this.dead || !this.betting() || this.busyHand) return;
+    this.mode = m;
+    this.view.classList.toggle('bjx-p', m === 'p'); this.view.classList.toggle('bjx-l', m !== 'p');
+    this.q('.bjx-bg').style.backgroundImage = `url('${bsrc(`table-${m}.webp`)}')`;
+    this.donne.open(`table-${m}`); this.donne.cur = 0; this.qa('.bjx-v').forEach((v, i) => v.classList.toggle('off', i > 0));
+    this.geo(); this.onFrame(0, null);
+  }
+  // every frame of her video: the mask of her hands over our cards, and the card she pushes
+  onFrame(f, follow) {
+    const h = this.hm;
+    if (h) {
+      const i = h.idx[Math.max(0, Math.min(h.idx.length - 1, f))];
+      if (i !== this.hmLast) {
+        this.hmLast = i;
+        const px = h.x0 - (i % h.cols) * h.cw, py = h.y0 - Math.floor(i / h.cols) * h.chh;
+        this.occ.style.maskPosition = this.occ.style.webkitMaskPosition = `${px}px ${py}px`;
+      }
+    }
+    if (follow) follow(f);
+  }
+  // the scene (W × VH video pixels) as big as the screen allows, above the buttons; around it the video, blurred
   fit() {
     const v = this.view, vp = this.vp; if (!v || !vp || this.dead) return;
+    const { W: VW, VH } = this.g;
     const cw = v.clientWidth; if (!cw) return;
     const full = !!this.root.closest('.is-full');
     let ch = v.clientHeight;
-    const wideScreen = cw > 700 && innerWidth > innerHeight;
+    const wideScreen = this.mode === 'l' && cw > 700;
     if (!full) {
-      const want = wideScreen ? Math.round(Math.max(560, Math.min(innerHeight - 110, 960))) : 0;
-      if (want && Math.abs(ch - want) > 2) { v.style.height = `${want}px`; ch = want; }
+      const want = wideScreen ? Math.round(Math.max(520, Math.min(innerHeight - 170, (VH * Math.min(cw, 1300)) / VW + 20, 980))) : Math.round(Math.max(480, innerHeight - 150));
+      if (Math.abs(ch - want) > 2) { v.style.height = `${want}px`; ch = want; }
     } else if (v.style.height) { v.style.height = ''; ch = v.clientHeight; }
     // wide screen: the 4 buttons go each side of the scene (2 left, 2 right) and the scene takes the whole height
     let wide = false;
-    if (wideScreen) { const s1 = (ch - 16) / VH; wide = cw - VW * s1 >= 500; }
+    if (wideScreen) { const s1 = (ch - 16) / VH; wide = cw - VW * s1 >= 460; }
     v.classList.toggle('bjx-wide', wide);
-    const top = wide ? 8 : (this.q('.bjv-top')?.offsetHeight || 44) + 12, hud = wide ? 8 : (this.q('.bjv-hud')?.offsetHeight || 64) + 6;
-    if (!full && !wideScreen) { // a phone, not in full screen: the whole table on the screen (the ⛶ button makes it big)
-      const want = Math.round(Math.min(top + hud + (VH * Math.min(cw, 560)) / VW, Math.max(480, innerHeight - 150)));
-      if (Math.abs(ch - want) > 2) { v.style.height = `${want}px`; ch = want; }
-    }
+    const top = wide ? 8 : (this.q('.bjv-top')?.offsetHeight || 44) + 10, hud = wide ? 8 : (this.q('.bjv-hud')?.offsetHeight || 64) + 6;
     const sc = Math.min(cw / VW, (ch - top - hud) / VH);
-    vp.style.transform = `translate(${((cw - VW * sc) / 2).toFixed(1)}px, ${top.toFixed(1)}px) scale(${sc.toFixed(4)})`;
+    vp.style.transform = `translate(${((cw - VW * sc) / 2).toFixed(1)}px, ${(top + (ch - top - hud - VH * sc) / 2).toFixed(1)}px) scale(${sc.toFixed(4)})`;
     v.style.setProperty('--sc', sc.toFixed(4));
   }
   paintMe() { super.paintMe(); const b = this.q('.bjx-bal'); if (b) b.textContent = fmtC(this.balC()); }
   clearTable() { super.clearTable(); this.nd = 0; this.np = 0; }
-  // the chip slides from the tray to the circle
+  // the chip slides from its place to the circle
   placeChip(t = 'main') {
     if (!this.betting() || !(t in this.bets)) return;
-    const v = +this.q(`[data-pick="${this.pickI}"]`).dataset.v;
+    const pk = this.q(`[data-pick="${this.pickI}"]`), v = +pk.dataset.v;
     if (this.phase === 'end') this.clearForBet();
     const next = { ...this.bets, [t]: this.bets[t] + v };
     const spot = this.q(`.bjv-spot[data-t="${t}"]`);
     if (next[t] > this.maxFor(t)) { this.msg(`Mise maximum ici : ${fmtC(this.maxFor(t))}`); this.shake(spot); return; }
     if (this.costOf(next) > this.balC()) { this.msg('Solde insuffisant pour ce jeton : choisis-en un plus petit'); this.shake(spot); return; }
-    const p = VPICK[this.pickI], fly = document.createElement('i');
+    const px = parseFloat(pk.style.left), py = parseFloat(pk.style.top), fly = document.createElement('i');
     fly.className = 'bjv-flychip bjx-fly'; fly.innerHTML = chipSVG(CHIPS.find((c) => c[0] === v), 100);
-    fly.style.left = `${p.x}px`; fly.style.top = `${p.y}px`;
+    fly.style.left = `${px}px`; fly.style.top = `${py}px`;
     this.vp.appendChild(fly);
-    const dx = parseFloat(spot.style.left) - p.x, dy = parseFloat(spot.style.top) - p.y;
-    fly.animate([{ transform: 'translate(-50%,-50%)' }, { transform: `translate(calc(-50% + ${dx / 2}px), calc(-50% + ${dy / 2 - 30}px)) scale(1.15)`, offset: 0.5 }, { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))` }],
+    const dx = parseFloat(spot.style.left) - px, dy = parseFloat(spot.style.top) - py, u = this.g.u;
+    fly.animate([{ transform: 'translate(-50%,-50%)' }, { transform: `translate(calc(-50% + ${dx / 2}px), calc(-50% + ${dy / 2 - 30 * u}px)) scale(1.15)`, offset: 0.5 }, { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))` }],
       { duration: this.turbo ? 220 : 340, easing: 'cubic-bezier(.3,.7,.4,1)' }).finished.then(() => fly.remove());
     sfx.click();
     this.bets = next;
     if (t === 'main') this.saveStake();
     setTimeout(() => { sfx.coin?.(); this.betsChanged(); }, this.turbo ? 200 : 320);
   }
-  // card i of n in a row, in video units: [left, top, visual width]
+  cw(dealer) { return 108 * (dealer ? 0.52 : 0.56) * this.g.u; }
+  // card i of n in a row, in video pixels: [left, top, visual width]
   slot(i, n, row) {
+    const u = this.g.u;
     if (row.classList.contains('bjv-dcards')) {
-      const sp = n > 4 ? 26 : 34, shift = Math.max(0, n - 2) * 20; // fans out to the left too: her bubble stays on the screen
-      return [i * sp - VDW / 2 - shift, 0, VDW];
+      const w = this.cw(true), sp = (n > 4 ? 26 : 34) * u, shift = Math.max(0, n - 2) * 20 * u; // fans out to the left too: her bubble stays on the screen
+      return [i * sp - w / 2 - shift, 0, w];
     }
-    const split = this.q('.bjv-hands').children.length > 1;
-    const sp = split ? (n > 3 ? 20 : 28) : n <= 2 ? 66 : n === 3 ? 50 : n === 4 ? 40 : 32;
-    return [i * sp - ((n - 1) * sp) / 2 - VCW / 2, 0, VCW];
+    const w = this.cw(false), split = this.q('.bjv-hands').children.length > 1;
+    const sp = (split ? (n > 3 ? 20 : 28) : n <= 2 ? 62 : n === 3 ? 48 : n === 4 ? 38 : 30) * u;
+    return [i * sp - ((n - 1) * sp) / 2 - w / 2, 0, w];
   }
   layout(row) {
+    if (!row) return;
     const cards = [...row.querySelectorAll(':scope > .bjv-card')];
     cards.forEach((c, i) => { const [x, y] = this.slot(i, cards.length, row); c.style.left = `${x}px`; c.style.top = `${y}px`; c.style.zIndex = i + 1; });
     const bub = row.querySelector(':scope > .bjv-bub');
-    if (bub && cards.length) { const [x, , w] = this.slot(cards.length - 1, cards.length, row); bub.style.left = `${x + w + 18}px`; }
+    if (bub && cards.length) { const [x, , w] = this.slot(cards.length - 1, cards.length, row); bub.style.left = `${x + w + 14 * this.g.u}px`; }
   }
   placeHands(n) {
-    [...this.q('.bjv-hands').children].forEach((el, i) => { el.style.left = `${VHAND.x + (n === 2 ? (i ? 92 : -92) : 0)}px`; el.style.top = `${VHAND.y}px`; this.layout(el); });
+    const g = this.g;
+    [...this.q('.bjv-hands').children].forEach((el, i) => { el.style.left = `${g.hand.x + (n === 2 ? (i ? 88 : -88) * g.u : 0)}px`; el.style.top = `${g.hand.y}px`; this.layout(el); });
   }
-  // the croupière deals card c: her clip plays, and when her card touches the felt ours takes its place
+  // the croupière deals card c: her gesture plays, our card follows her hand from the moment it shows on the felt
+  // (under her fingers), then goes to its place
   async deal(row, c, down = false, to = 'p') {
     const node = this.cardEl(c);
     row.appendChild(node);
     this.layout(row);
-    const clip = to === 'd' ? (this.nd++ ? CLIPS.d2 : CLIPS.d1) : (this.np++ ? CLIPS.p2 : CLIPS.p1);
+    const who = to === 'd' ? 'd' : 'p', clip = CLIPS[who];
+    if (to === 'd') this.nd++; else this.np++;
     const rate = this.superT ? 3.2 : this.turbo ? 2.4 : 1.5;
+    const tr = BJTRACK[this.mode]?.[who], g = this.g;
+    const rx = parseFloat(row.style.left) || 0, ry = parseFloat(row.style.top) || 0;
+    const ox = rx + parseFloat(node.style.left), oy = ry + parseFloat(node.style.top);
+    const S = (who === 'd' ? 0.52 : 0.56) * g.u, land = (who === 'd' ? 0.52 : 0.56);
+    let pose = null;
+    const at = (p) => {
+      const [cx, cy, w, a] = p, fs = who === 'd' ? g.fsD : g.fsP;
+      return who === 'd'
+        ? `translate(${(cx - ox).toFixed(1)}px, ${(cy - oy).toFixed(1)}px) rotate(${a}deg) scale(1, ${fs}) scale(${(w / 108).toFixed(3)}) translate(-54px, -76px)`
+        : `translate(${(cx - ox).toFixed(1)}px, ${(cy - oy).toFixed(1)}px) rotate(${a}deg) scale(1, ${fs}) rotate(90deg) scale(${(w / 152).toFixed(3)}) translate(-54px, -76px)`;
+    };
     node.style.visibility = 'hidden';
     const vid = this.donne.ok;
-    if (vid) await this.donne.play(clip, rate);
+    if (vid) {
+      await this.donne.play(clip, rate, tr ? (f) => {
+        const i = f - tr.s; if (i < 0 || i >= tr.f.length) return;
+        pose = at(tr.f[i]);
+        node.style.scale = '1'; node.style.transform = pose; node.style.visibility = '';
+        if (!down) node.classList.remove('down');
+      } : null);
+    }
     if (this.dead) return node;
-    const rx = parseFloat(row.style.left) || 0, ry = parseFloat(row.style.top) || 0;
-    const w = to === 'd' ? VDW : VCW, h = w * 152 / 108;
-    const cx = rx + parseFloat(node.style.left) + w / 2, cy = ry + parseFloat(node.style.top) + h / 2;
-    const real = vid && this.donne.loaded, from = real ? { x: clip.x, y: clip.y } : { x: 70, y: 400 };
+    const real = vid && this.donne.loaded;
+    if (!pose) pose = real && tr ? at(tr.f[tr.f.length - 1]) : `translate(${70 - ox}px, ${g.deal.y - oy}px) scale(${S})`;
     node.style.visibility = '';
-    const t = this.turbo ? 180 : 300;
-    node.animate([{ transform: `translate(${from.x - cx}px, ${from.y - cy}px) scale(.9)`, opacity: real ? 1 : 0.4 }, { transform: 'none', opacity: 1 }], { duration: t, easing: 'cubic-bezier(.25,.75,.3,1)' });
+    const t = this.turbo ? 200 : 340;
+    node.style.transform = ''; node.style.scale = '';
+    node.animate([{ transform: pose, scale: '1', opacity: real ? 1 : 0.4 }, { transform: 'none', scale: String(S), opacity: 1 }], { duration: t, easing: 'cubic-bezier(.25,.75,.3,1)' });
+    void land;
     sfx.click();
     if (!down) setTimeout(() => node.classList.remove('down'), t * 0.4);
     await this.wait(t + 40);

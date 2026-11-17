@@ -424,27 +424,30 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `frame()` calcule le cadrage) ; le plateau de la roue (`.rl-rotor`) et les billes (`.rl-bw` / `.rl-ballv`) sont des calques
   à part tournés par `transform` ; jetons, éclairs et cases gagnantes dans leurs propres SVG (`.rl-chipsvg`, `.rl-lksvg`,
   `.rl-hlsvg`) ; aucun filtre SVG ni `filter` CSS sur le tapis ou la roue. Ne pas les remettre.
-- **Le 21 et Le 21 Électrique : la table filmée** (demande du propriétaire du 16 novembre 2026) : **sa vidéo** d'une croupière vue
-  depuis la place du joueur (`tools/art/blackjack/donne.mp4`, 448 × 672, 10 s, 4 cartes blanches distribuées) → `tools/art/blackjack/clean.py`
-  efface chaque carte posée dès qu'elle touche le tapis (pixels blancs seulement, ses doigts restent ; `CARDS` = rectangle + image de
-  départ) → `assets/games/blackjack/donne.mp4` (×1,5, une image-clé toutes les 6 images) + `donne.webp`. `BjVideoGame` (`games/bjtable.js`,
-  utilisée par `blackjack.js` et `lightningbj.js` ; Le 21 Online et La Bataille gardent la table 3D) : `videoHTML()` (`.bjv.bjx`), mêmes
-  classes que la table 3D pour les cartes, cercles et boutons. Le jeu rejoue des morceaux de la vidéo (`CLIPS`, en images à 24 / s) :
-  `p1` 1re carte du joueur, `p2` les suivantes (tirer, doubler, séparer), `d1` 1re carte de la croupière, `d2` les suivantes (carte cachée,
-  ses tirages) ; quand sa carte touche le tapis (`land`), la nôtre apparaît là puis glisse à sa place. 2 `<video>` (`Donne`) avec fondu
-  entre deux morceaux ; le fichier est chargé **entier en mémoire** (`fetch` → blob) sinon le saut vers un morceau échoue. Vitesse ×1,5,
-  Turbo ×2,4, Super turbo ×3,2. Tout est en unités de la vidéo dans `.bjx-vp` (448 × `VH` 762 : la vidéo puis une bande de tapis avec
-  les cercles de mise `VSPOT` et les 5 jetons `VPICK`), mis à l'échelle par `fit()` ; écran large : 2 boutons de chaque côté de la
-  scène (`.bjx-wide`), téléphone : une rangée de 4 boutons et le solde en haut. Le 21 Électrique : mises annexes `vx` / `vy` / `vr` de
-  `SIDES` (Paires à gauche, 21+3 à droite du cercle, Bust It à droite de la croupière), panneau des multiplicateurs au mur. Gains inchangés.
-- **La Roulette : la table filmée** (`games/roulette.js` → `RlVideoGame` de `games/rltable.js`, demande du propriétaire du 16 novembre
-  2026 ; L'Éclair, La Double Bille et L'Éclair Online gardent la table 3D) : **sa 2e vidéo** `tools/art/roulette/lancer.mp4` (672 × 448, 10 s :
-  le tapis, la caméra descend sur la roue, la croupière lance la bille, gros plan sur la bille **qui roule encore** : on ne voit pas où
-  elle tombe, voulu par le propriétaire) → `tools/art/roulette/clean.py` : `lancer.mp4` (×1,5) + `tapis.webp` (1re image : on mise dessus ;
-  2 « 2 to 1 » en trop et la ligne illisible sous ROULETTE effacés). **Le numéro est tiré au hasard** (`draw()`) et annoncé en grand avec sa
-  couleur à la fin de la vidéo (`.rlx-ann`, image `XEND`). Cases cliquables posées sur le tapis (`XCELLS`, grille bilinéaire `XG`, chevaux /
-  carrés `XANCH` des `HOTS`), case vide `.rlx-pad` sur les 2 cases en trop. Derniers numéros `.rlx-led` (toucher = statistiques). Pas de
-  cylindre (Tiers, Orphelins…) sur ce tapis. Gains inchangés (plein 35).
+- **Le 21, Le 21 Électrique et La Bataille : la table filmée « Platinum VIP »** (vidéos du propriétaire du 17 novembre 2026, remplacent
+  celle du 16) : **ses 2 vidéos** d'une croupière (`tools/art/blackjack/table-large.mp4` 672 × 448 : ordinateur et écrans larges ;
+  `table-haut.mp4` 720 × 1280 : téléphone tenu droit ; 8 s, **avec le son**) qui prend une carte au sabot et la pousse vers sa droite
+  (images 10 → 61), puis une autre devant elle (100 → 161). `python3 tools/art/blackjack/table.py` (opencv) : **toutes les cartes de la
+  vidéo effacées** sur le tapis (le tapis propre de la 1re image, ses doigts restent), « BLACK JACK PAYS 3 TO 2 / Dealer must stand on 17 »
+  effacé (nos jeux ne paient pas tous 3 pour 2) sauf sous sa main, **la carte qu'elle pousse suivie image par image** et **le masque de
+  ses mains** sur le tapis par image (`hand-<l|p>.png`, planche) → `assets/games/blackjack/table-<l|p>.mp4` (+ `.webp`), et il écrit
+  `BJTRACK` dans `games/bjtable.js` (`--inject` = seulement réécrire `BJTRACK` depuis `table.json`). `BjVideoGame` : `CLIPS.p` (cartes du
+  joueur) et `CLIPS.d` (ses cartes, la carte cachée aussi) rejoués pour chaque carte ; **notre carte (sa vraie valeur, ou son dos)
+  suit sa main** sous ses doigts (`.bjx-occ` masqué par `hand-*.png`, `onFrame`), puis va à sa place (joueur à sa droite, croupière
+  devant elle). Places en pixels de chaque vidéo : `BGEO` (`l` : vidéo + bande de tapis pour les 5 jetons et la phrase des règles ;
+  `p` : jetons sur le rail ; cercle MISE sur la place du milieu « S'ASSEOIR ICI », Paires / 21+3 / Égalité sur les places voisines,
+  Bust It à côté d'elle ; les `vx` / `vy` des jeux ne servent plus). Tailles du CSS `.bjx` en `calc(… * var(--u))`. Mode choisi par la
+  forme de l'écran (`bmode`, changé entre deux mains). Son : bouton 🔊 (`spinbet_bj_snd`, aussi coupé par « Effets sonores »),
+  `Donne.unlock()` dans le 1er toucher (iPhone). Gains inchangés.
+- **La Roulette : la croupière filmée** (`games/roulette.js` → `RlVideoGame` de `games/rltable.js`, vidéos du propriétaire du 17 novembre
+  2026, remplacent celle du 16 ; L'Éclair, La Double Bille et L'Éclair Online gardent la table 3D) : **ses 2 vidéos** (`tools/art/roulette/
+  show-large.mp4` 672 × 448 ; `show-haut.mp4` 448 × 672 ; 12 s, **avec sa voix**) : la croupière à côté de la roue parle, lance la roue et
+  la bille, la roue tourne jusqu'au bout, **caméra fixe avec le tapis dans l'image**. `python3 tools/art/roulette/show.py` : ordinateur =
+  les mots de la rangée « 2 to 1 » en trop effacés (les douzaines prennent la rangée, les colonnes sont à droite) ; téléphone = la rangée
+  « 2 to 1 » devient « 1re / 2e / 3e colonne », le losange « 0 » devient le losange noir, le rouge perd ses mots → `assets/games/roulette/
+  show-<l|p>.mp4` (+ `.webp`). Cases cliquables sur le tapis de chaque vidéo (`XGEO`, `xFelt()`), la vidéo entière toujours visible.
+  Sa voix (`INTRO`, images 0 → 48) à la 1re mise de la partie (puis après 90 s), le lancer de `SPIN` à la fin au LANCER ; on ne voit pas
+  où la bille tombe : le numéro tiré au hasard est annoncé par-dessus (`.rlx-ann`). Bouton 🔊 (`spinbet_roulette_snd`). Gains inchangés.
 - **Le Valhalla, décor animé** (`games/viking.js`, demande du propriétaire du 16 novembre 2026) : **sa vidéo** `tools/art/viking/fond-haut.mp4`
   (448 × 672 seulement : cadre de pierre dans les flammes bleues, médaillon du Jarl et sa barre en haut à gauche, médaillon de la valkyrie
   et sa barre à droite) → `tools/art/viking/clean.py` : grille peinte remplacée par une pierre propre fixe, remplissage bleu des 2 barres
@@ -523,9 +526,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   gagne ; **série** : 5 victoires d'affilée avec la même mise = la 5e main paie ×5 la mise (changer de mise remet la série
   à zéro, gardée dans `spinbet_bataille_serie`) ; mise annexe ÉGALITÉ 12 pour 1. Simulation `node tools/sim/bataille.js` :
   mise principale ≈ 96 % (dont 3,5 points de série, bonus 1 main sur 86), Égalité ≈ 96 %.
-  **Table filmée depuis le 16 novembre 2026** (demande du propriétaire) : `BjVideoGame` comme Le 21 (même vidéo, même croupière) ;
-  à chaque main, clip `p1` (ta carte) puis `d1` (la sienne, posée cachée puis retournée). Cercle ÉGALITÉ à droite du cercle de mise
-  (`vx` / `vy` / `vr` de `SIDES`), résultat sous la carte (`.btl .bjx .bjv-hand .bjv-res`). Règles et gains inchangés.
+  **Table filmée** (demande du propriétaire) : `BjVideoGame` comme Le 21 (même croupière « Platinum VIP » depuis le 17 novembre 2026) ;
+  à chaque main, ta carte puis la sienne. Cercle ÉGALITÉ sur la place à droite du cercle de mise (`BGEO.sides.tie`). Règles et gains inchangés.
 - **Paliers de prestige** (`achievements.js`, `PR_TIERS`) : Bronze 1, Argent 5, Or 10, Platine 25, Diamant 50, Légende 100
   prestiges en tout, en médailles sur le profil (`tiersHTML`) ; le total `pres` est publié dans `leaderboard` et le
   profil public (`#@pseudo`) montre le palier. **Règles Firestore à recoller** (champ `pres` ajouté) : en attendant, le
