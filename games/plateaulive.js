@@ -158,18 +158,17 @@ function blurDisc(img) {
     return c;
   } catch { return null; }
 }
-// our hub (it covers the hub of his wheel): gold rim with bulbs, night-blue centre, a die and SPINBET
+// our hub (it covers the hub of his wheel, written « CRAZY TIME »): gold rim with bulbs, night-blue centre, SPIN BET in gold (owner's request)
 const HUB = (() => {
   let b = '';
   for (let i = 0; i < 16; i++) { const p = pt(i * 22.5, 86, 100, 100); b += `<circle class="plx-bulb" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="5.2" fill="url(#hbB)" style="animation-delay:${i % 2 ? '.45' : '0'}s"/>`; }
   return `<svg class="plx-hub" viewBox="0 0 200 200" aria-hidden="true"><defs><radialGradient id="hbG" cx=".4" cy=".3"><stop offset="0" stop-color="#fff3b0"/><stop offset=".45" stop-color="#e8b23a"/><stop offset="1" stop-color="#7a4a08"/></radialGradient>
     <radialGradient id="hbB" cx=".4" cy=".35"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#fff2b0"/><stop offset="1" stop-color="#f5a623"/></radialGradient>
-    <radialGradient id="hbC" cx=".5" cy=".35"><stop offset="0" stop-color="#5b21b6"/><stop offset="1" stop-color="#160733"/></radialGradient></defs>
+    <linearGradient id="hbT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff8d6"/><stop offset=".55" stop-color="#ffd23f"/><stop offset="1" stop-color="#e8961a"/></linearGradient><radialGradient id="hbC" cx=".5" cy=".35"><stop offset="0" stop-color="#5b21b6"/><stop offset="1" stop-color="#160733"/></radialGradient></defs>
     <circle cx="100" cy="100" r="99" fill="url(#hbG)"/><circle cx="100" cy="100" r="99" fill="none" stroke="#5a3a08" stroke-width="2"/>${b}
     <circle cx="100" cy="100" r="72" fill="url(#hbC)" stroke="#ffd76a" stroke-width="4"/>
-    <g transform="translate(100 78) rotate(-12)"><rect x="-19" y="-19" width="38" height="38" rx="8" fill="#fff" stroke="#c9a227" stroke-width="2.5"/><circle cx="-9" cy="-9" r="4" fill="#e11d48"/><circle r="4" fill="#e11d48"/><circle cx="9" cy="9" r="4" fill="#e11d48"/></g>
-    <text x="100" y="128" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="19" fill="#ffe08a" letter-spacing="1">SPINBET</text>
-    <text x="100" y="149" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="13" fill="#fff" letter-spacing="2">LIVE</text></svg>`;
+    <text x="100" y="98" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="40" fill="url(#hbT)" stroke="#5a3a08" stroke-width="1.5" paint-order="stroke" letter-spacing="1">SPIN</text>
+    <text x="100" y="138" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="40" fill="url(#hbT)" stroke="#5a3a08" stroke-width="1.5" paint-order="stroke" letter-spacing="1">BET</text></svg>`;
 })();
 const POINTER = '<svg class="plx-ptr" viewBox="0 0 60 84" aria-hidden="true"><defs><linearGradient id="plxG" x1="0" x2="1"><stop offset="0" stop-color="#8a5a12"/><stop offset=".45" stop-color="#ffe9a6"/><stop offset="1" stop-color="#8a5a12"/></linearGradient><radialGradient id="plxR" cx=".4" cy=".3"><stop offset="0" stop-color="#ffb3b3"/><stop offset=".45" stop-color="#e01b2b"/><stop offset="1" stop-color="#5c0610"/></radialGradient></defs><path d="M6 6 Q30 -4 54 6 L48 40 L30 80 L12 40 Z" fill="url(#plxG)" stroke="#5a3a08" stroke-width="2"/><path d="M15 14 Q30 8 45 14 L40 40 L30 66 L20 40 Z" fill="url(#plxR)" stroke="#3a0408" stroke-width="1.5"/><path d="M22 18 Q28 15 33 17 L27 38 Z" fill="#fff" opacity=".55"/></svg>';
 const PAWN = '<svg viewBox="0 0 60 92" aria-hidden="true"><defs><radialGradient id="pwG" cx=".35" cy=".3"><stop offset="0" stop-color="#ffd0d6"/><stop offset=".4" stop-color="#ff2d55"/><stop offset="1" stop-color="#7a0620"/></radialGradient><linearGradient id="pwB" x1="0" x2="1"><stop offset="0" stop-color="#7a0620"/><stop offset=".45" stop-color="#ff4d6d"/><stop offset="1" stop-color="#6a0418"/></linearGradient></defs><ellipse cx="30" cy="86" rx="26" ry="6" fill="#000" opacity=".35"/><path d="M8 84 Q8 74 18 72 L22 46 Q14 42 18 36 L42 36 Q46 42 38 46 L42 72 Q52 74 52 84 Z" fill="url(#pwB)" stroke="#3a0210" stroke-width="2"/><circle cx="30" cy="22" r="18" fill="url(#pwG)" stroke="#3a0210" stroke-width="2"/><ellipse cx="24" cy="15" rx="6" ry="4" fill="#fff" opacity=".6"/><path d="M30 76 l3 6 h-6 Z" fill="#ffd76a"/></svg>';

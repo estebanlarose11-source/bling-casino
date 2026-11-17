@@ -508,7 +508,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `python3 tools/art/plateaulive/roue.py` (`--fast` = sans réencoder) : bandes noires enlevées, `assets/games/plateaulive/roue.mp4`
   (1280 × 694, avec le son, bouton 🔊 `spinbet_plateaulive_snd`), **suivi image par image** du bord doré et du moyeu (le moyeu ne tourne
   pas) → homographie disque unité → image (`TRACK`, 8 nombres par image, posée en `matrix3d` sur `.plx-wb`), présentatrice détourée
-  (rembg) dans le repère du disque (`roue-mask.png`). NOTRE roue (`discSVG`) et NOTRE moyeu (`HUB`) couvrent les cases et le moyeu de sa
+  (rembg) dans le repère du disque (`roue-mask.png`). NOTRE roue (`discSVG`) et NOTRE moyeu (`HUB` : « SPIN BET » en doré, voulu par le propriétaire) couvrent les cases et le moyeu de sa
   vidéo (écrits d'un autre jeu). Elle lance à 2,75 s (`TH`), notre roue s'arrête à 8,1 s (`ST`). Téléphone tenu droit : la partie droite
   de la vidéo (`.plx-p`). **Les bonus sur sa vidéo du plateau** `tools/art/plateaulive/plateau.mp4` (3 dés lancés dans un bocal) →
   `python3 tools/art/plateaulive/plateau.py` : stabilisée, rognée sur le plateau, 4 textes du centre effacés, points des dés effacés
