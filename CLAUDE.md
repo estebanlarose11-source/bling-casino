@@ -658,6 +658,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   `python3 -m http.server 8123` puis `node tools/verif/robot.js`. À relancer après une grosse modification.
 - **Couvertures** (`covers.js`, `poster()`) : un seul gabarit pour tous les jeux (plaque de titre, Bebas Neue, marque).
   Une image avec un titre peint dedans se déclare dans `CROP` (partie gardée, au-dessus du titre).
+- **Miniatures = une image du vrai jeu** (demande du propriétaire du 17 novembre 2026 : « le blackjack, une photo avec la croupière et le
+  tapis, comme Le Plateau Live… avec tous les jeux, hormis les machines à sous ») : tables et jeux rapides ont pour `cover.webp` une capture
+  du jeu en pleine partie, faite par `tools/covers/shots.js` (réglages par jeu dans `tools/covers/games.js` : téléphone ou ordinateur, étapes
+  jouées (mise, cartes posées au bout du sabot, `Math.random` poussé pour un long vol…), cadre `fit` / `col` / `box`), 600 × 800 sans
+  titre peint (le haut carré = la vignette). Jeux filmés : la croupière, l'animateur, la roue ; les autres : l'écran du jeu. Refaire une
+  miniature : `python3 -m http.server 8123` puis `node tools/covers/shots.js <id>`, puis `node tools/seo/share-images.js <id>` et changer
+  `CACHE` dans `sw.js`. Les machines à sous gardent leurs affiches.
 - **Dessins par code en 3D** (`tools/render3d/`, Three.js) : couvertures des jeux sans image peinte et pièces des
   jeux rapides (`SPRITES`). `cd tools/render3d && npm i three@0.160.0 && node render.js` (couvertures) ou
   `node render.js --pieces` → `assets/games/<id>/…webp` (puis changer `CACHE` dans `sw.js`).

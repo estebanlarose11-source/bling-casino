@@ -15438,6 +15438,7 @@ const SPECS = {
       <text x="150" y="98" text-anchor="middle" font-family="KeCoin,${FONTS.orb}" font-weight="900" font-size="34" fill="url(#tit${u})" stroke="#3b2a00" stroke-width="1.5" paint-order="stroke" filter="url(#glow${u})">×100 000</text>`,
   },
   roulette: {
+    photo: 'assets/games/roulette/cover.webp',
     bg: ['#0f3d66', '#02070f'], light: '#9fd4ff', title: ['LA ROULETTE'], font: 'cinzel', metal: ['#fff', '#fde68a', '#a16207'], tag: '35 POUR 1',
     art: (u) => `
       <ellipse cx="150" cy="300" rx="210" ry="120" fill="#1d5b85" stroke="#7a3d12" stroke-width="12"/>
@@ -15453,6 +15454,7 @@ const SPECS = {
       <text x="150" y="235" text-anchor="middle" font-size="120" fill="#f5e6c8" stroke="#3b2a00" stroke-width="2">♚</text>`,
   },
   bataille: {
+    photo: 'assets/games/bataille/cover.webp',
     bg: ['#5a1020', '#0a0204'], light: '#fde68a', title: ['LA BATAILLE'], font: 'cinzel', metal: ['#fff', '#fde68a', '#a16207'], tag: 'SÉRIE ×5',
     art: (u) => `
       <ellipse cx="150" cy="300" rx="190" ry="110" fill="#0e6b43" stroke="#fde68a" stroke-opacity=".35" stroke-width="3"/>
@@ -15659,6 +15661,7 @@ const SPECS = {
       <path d="M232 196 l4 -11 l4 11 l11 4 l-11 4 l-4 11 l-4 -11 l-11 -4Z M64 236 l3 -8 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3Z M150 96 l3 -8 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3Z" fill="#fff" filter="url(#glow${u})"/>`,
   },
   boxe: {
+    photo: 'assets/games/boxe/cover.webp',
     bg: ['#450a0a', '#05060d'], light: '#fca5a5', title: ['LE RING'], font: 'bebas', metal: ['#fff', '#fecaca', '#dc2626'], tag: 'ENTRE AMIS',
     art: (u) => `
       <radialGradient id="bxs${u}" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="#fff7e0" stop-opacity=".55"/><stop offset="1" stop-color="#fff7e0" stop-opacity="0"/></radialGradient>
@@ -15825,10 +15828,10 @@ const CARD = {
 // finish everywhere — vignette, top gloss, a dark title plate in the card colour, the title in Bebas Neue with a
 // light metal fill, a thin accent line, the studio wordmark and a lit rim. Pictures with a title painted in them
 // (CROP) are cut above that title, so only one style of title is ever shown.
+// Since 17 November 2026 the covers of the tables and quick games are pictures of the game itself (tools/covers/shots.js:
+// 600 × 800, the square top is what the tiles show), so only these two still need a cut.
 const CROP = { // [top, bottom] of the picture that is kept (fractions of its height)
-  'assets/games/madwheel/cover.webp': [0, 0.5], 'assets/games/storm/cover.webp': [0.04, 0.72], 'assets/games/doublespin/cover.webp': [0.02, 0.62],
-  'assets/games/blackjack/cover.webp': [0.17, 0.67], 'assets/games/lightningbj/cover.webp': [0.2, 0.66], 'assets/games/poker/cover.webp': [0.2, 0.62],
-  'assets/games/plateau/cover.webp': [0.04, 0.84], 'assets/games/plateaulive/cover.webp': [0, 0.75], 'assets/games/peche/cover.webp': [0, 0.76],
+  'assets/games/plateau/cover.webp': [0.04, 0.84], 'assets/games/plateaulive/cover.webp': [0, 0.75],
 };
 function photoArt(sp, H) {
   const c = CROP[sp.photo];
