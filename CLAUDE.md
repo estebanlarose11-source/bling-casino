@@ -606,6 +606,13 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Promotions · Classement · VIP (`#profil`, `ui-star`) · Menu** (Classement à la place de Tournois, voulu par le propriétaire le 17 novembre
   2026 ; Tournois et Caisse restent dans le menu et le « + » du solde). Caisse et
   offre de parrainage en violet profond. Les écrans des jeux gardent leurs couleurs.
+- **Lisibilité du thème lavande** (demande du propriétaire du 17 novembre 2026 : « on voit mal s'ils jouent… pas les bonnes couleurs ») :
+  2 blocs à la fin de la couche `finition` (après « Thème lavande ») : **le chat, les joueurs en ligne et la fiche d'un joueur** (`.ct-panel`
+  en carte blanche givrée, onglet actif violet, bulles claires, pastilles `.ln-p` blanches avec le pseudo en encre, `.pc-mz` violet) et
+  **« Lisibilité en thème lavande »** : textes faits pour la nuit (blanc, jaune pâle, bleu pâle) repassés en encre, montants dorés en ambre
+  foncé `--lv-gold` (Tendances, Défi, Paris, Jackpot, Loto, Missions, Cashback, Battle, Parrainage, Succès, Boutique, rangs du profil, JCC,
+  pastille des affiches). Trouvés par un contrôle automatique du contraste de toutes les pages (texte / fond < 2,6) : à refaire après un
+  gros changement de couleurs.
 - **Les plus belles machines en tête de l'accueil** (demande du propriétaire du 16 novembre 2026 : « quand t'arrives, c'est directement les
   plus belles ») : rang « ⭐ Les plus belles machines » juste sous la vitrine (`bestHTML()` de `pages/lobby.js`, liste `BEST` : les machines à
   décor animé, L'Olympe, La Fortune, L'Hydre, REDK… ; machines en travaux ou retirées sautées), grandes affiches (`.nx-best`, fin de la

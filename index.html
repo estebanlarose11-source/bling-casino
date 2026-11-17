@@ -10557,6 +10557,109 @@ html.light .dp-custom label { background: #1a0d44; }
 html.light .dp-foot { background: #150a3a; }
 html.light .dp-ring circle.pg { filter: drop-shadow(0 0 6px rgba(155, 108, 240, .6)); }
 html.light .dp :is(.btn.primary, .dp-go) { border-radius: 999px !important; }
+/* Le chat, les joueurs en ligne et la fiche d'un joueur en thème lavande (demande du propriétaire du 17 novembre 2026 : « on voit mal
+   s'ils jouent… pas les bonnes couleurs ») : carte blanche givrée, encre violet nuit, violet profond pour ce qui est actif. */
+html.light .ct-panel { background: linear-gradient(180deg, #fdfbff, #f3edfe); border: 1px solid #e3d9f7; border-radius: 22px; box-shadow: 0 24px 60px rgba(60, 30, 140, .28), 0 0 0 1px rgba(255, 255, 255, .9) inset; color: var(--lv-ink); }
+@media (max-width: 640px) { html.light .ct-panel { border-radius: 22px 22px 0 0; } }
+html.light .ct-panel :is(p, small, .muted) { color: var(--lv-muted); }
+html.light .ct-panel :is(h1, h2, h3, h4, b) { color: var(--lv-ink); }
+html.light .ct-head { border-bottom-color: #e3d9f7; background: rgba(255, 255, 255, .6); }
+html.light .ct-tabs button { color: var(--lv-ink2); border-radius: 999px; font-weight: 800; }
+html.light .ct-tabs button:hover { background: rgba(90, 43, 199, .07); }
+html.light .ct-tabs button.on { background: var(--fin-blue); color: #fff; box-shadow: 0 6px 14px rgba(90, 43, 199, .28); }
+html.light .ct-tabs button.on b { color: #fff; }
+html.light .ct-tabs b[data-online-count] { color: #15803d; }
+html.light .ct-tabs button.on b[data-online-count] { color: #bbf7d0; }
+html.light .ct-x { background: #efe8fd; color: var(--lv-ink); border-radius: 50%; }
+html.light .ct-x:hover { background: #e3d9f7; }
+html.light .ct-msg { background: #fff; border: 1px solid #ebe3fb; border-radius: 14px 14px 14px 4px; box-shadow: 0 2px 6px rgba(60, 30, 140, .06); }
+html.light .ct-msg.mine { background: linear-gradient(180deg, #ede4ff, #e2d5fd); border-color: #d6c6fa; border-radius: 14px 14px 4px 14px; }
+html.light .ct-panel .ct-msg p { color: var(--lv-ink); }
+html.light .ct-panel .ct-name, html.light .ct-panel .ct-msg.mine .ct-name { color: var(--lv-p); }
+html.light .ct-time { color: #9a8fbd; }
+html.light .ct-panel .ct-empty { color: var(--lv-muted); }
+html.light .ct-panel .ct-empty a, html.light .ct-panel .signup-link { color: var(--lv-p); font-weight: 800; }
+html.light .ct-form { border-top-color: #e3d9f7; background: rgba(255, 255, 255, .7); }
+html.light .ct-form input, html.light .ct-gift input { background: #fff; color: var(--lv-ink); border: 1px solid #d9ccf6; border-radius: 999px; }
+html.light .ct-gift input { border-radius: 12px; }
+html.light .ct-form input::placeholder, html.light .ct-gift input::placeholder { color: #9a8fbd; }
+html.light .ct-form input:focus, html.light .ct-gift input:focus { outline: 2px solid rgba(90, 43, 199, .35); border-color: var(--lv-p); }
+html.light .ct-form button { background: var(--fin-blue); border-radius: 999px; }
+html.light .ct-gift label { color: var(--lv-ink2); }
+html.light .ct-quick button { background: #f4effd; border-color: #d9ccf6; color: var(--lv-p); border-radius: 999px; }
+html.light .ct-panel .ct-info b { color: var(--lv-p); }
+html.light .ct-panel .ct-note { color: #9a8fbd; }
+html.light .ct-hist > div { border-bottom-color: #ebe3fb; }
+html.light .ct-panel .ct-hist .in b { color: #15803d; } html.light .ct-panel .ct-hist .out b { color: #dc2626; }
+html.light .ct-msg.win { background: linear-gradient(135deg, #fff7dc, #ffe9c2); border-color: #f5c56b; }
+html.light .ct-panel .ct-win b { color: #b45309; } html.light .ct-panel .ct-win a { color: var(--lv-p); }
+/* joueurs en ligne (chat, accueil, sous les jeux) : pastilles blanches, pseudo lisible, ce qu'il fait en violet */
+html.light .ln-p { background: #fff; border: 1px solid #e3d9f7; box-shadow: 0 3px 10px rgba(60, 30, 140, .07); }
+html.light .ln-p.friend { border-color: #86d9a4; background: linear-gradient(180deg, #fff, #f0fbf4); }
+html.light .ln-p .pname, html.light .ct-panel .ln-p .pname { color: var(--lv-ink); cursor: pointer; }
+html.light .ln-p .pname:hover { color: var(--lv-p); text-decoration: underline; }
+html.light .ln-p small, html.light .ct-panel .ln-p small { color: var(--lv-muted); }
+html.light .ln-p small a { color: var(--lv-p); }
+html.light .ct-panel .ln-head b { color: var(--lv-ink); }
+html.light .ct-panel .ln-head small { color: var(--lv-muted); }
+html.light .ct-online .ln-p { border-radius: 16px; padding: 8px 12px 8px 8px; }
+html.light .lt-seat .pname { color: var(--lv-ink); }
+html.light .lt-seat.me { border-color: var(--lv-p); box-shadow: 0 0 0 2px rgba(90, 43, 199, .18); }
+/* la fiche d'un joueur */
+html.light .pc-mz { color: var(--lv-p); background: #f1eafe; border: 1px solid #e3d9f7; border-radius: 999px; padding: 6px 12px; }
+html.light .pc-stats > div { background: #faf7ff; border-color: #e3d9f7; }
+html.light .pc-stats b { color: var(--lv-ink); }
+html.light .pc-stats b small { color: var(--lv-muted); }
+/* Lisibilité en thème lavande (demande du propriétaire du 17 novembre 2026 : « vérifie chaque case… qu'on voie bien ») : textes faits
+   pour le fond de nuit (blanc, jaune pâle, bleu pâle) repassés en encre violette, montants dorés en ambre foncé ; cartes sombres :
+   texte clair. Trouvés par un contrôle du contraste de toutes les pages (ordinateur et téléphone). */
+html.light { --lv-gold: #b45309; }
+html.light .side-vip .side-me b { color: #b45309; }
+/* Paris : les cotes */
+html.light .pr-odd b { color: var(--lv-p); }
+html.light .pr-odd.on b, html.light .pr-odd[aria-pressed="true"] b { color: #fff; }
+/* montants et gains dorés sur les cartes claires */
+html.light :is(.jp-row em, .ref-stats b, .lo-prizes li span, .lo-prizes li em, .ms-rew, .defi-prize b, .jc-goal b, .daily-card .sd.now b, .dh-d.now b, .br-pot b, .ac-stats b, .sh-bal b, .jp-amt, .lo-when b, .rf-st small b) { color: var(--lv-gold) !important; -webkit-text-fill-color: currentColor; text-shadow: none; }
+html.light .jp-amt { background: none !important; }
+html.light .br-status, html.light .br-status span { color: var(--lv-ink2); }
+html.light .br-status span { color: var(--lv-gold); font-weight: 800; }
+html.light .cb-claim b, html.light .rw-h small { color: #15803d !important; }
+html.light .jc-ends { color: #be185d; } html.light .jc-ends b { color: #9d174d; }
+/* rangs du profil : noms et récompenses lisibles */
+html.light .rank-card li { color: var(--lv-muted); }
+html.light .rank-card > b { -webkit-text-fill-color: currentColor; text-shadow: none; filter: saturate(1.4) brightness(.62); }
+/* missions : la barre et son texte */
+html.light .ms-bar { background: #ebe3fb; }
+html.light .ms-bar small { color: var(--lv-ink); text-shadow: 0 1px 0 rgba(255, 255, 255, .6); }
+/* Tendances (#stats) : chiffres, onglets, classements */
+html.light .tb-pub :is(.tb-kpis b, .tb-heroes b, .tb-bars strong) { color: var(--lv-ink) !important; }
+html.light .tb-pub .tb-bars span { color: var(--lv-ink2) !important; }
+html.light .tb-pub .tb-tabs button { color: var(--lv-ink2); background: #fff; border-color: #e3d9f7; }
+html.light .tb-pub .tb-tabs button.on { color: #fff; background: var(--fin-blue); border-color: transparent; }
+/* Défi de la semaine, parrainage : le haut de la page en clair */
+html.light .defi-top :is(h1, h2, h3) { color: var(--lv-ink); }
+html.light .defi-top :is(p, .muted, small, .defi-live, .defi-prize) { color: var(--lv-ink2); }
+html.light .defi-top b { color: var(--lv-ink); }
+html.light .defi-top .defi-prize b { color: var(--lv-gold); }
+html.light .defi-top .signup-link { color: var(--lv-p); font-weight: 800; }
+html.light .ref-stats small { color: var(--lv-muted); }
+/* parrainage : la grande carte reste sombre, son texte clair */
+html.light .rf-hero :is(h1, h2, h3) { color: #fff; }
+html.light .rf-hero .rf-plus { color: #fff; } html.light .rf-hero .rf-friend { color: #ffe4f2; }
+/* calendrier de l'Avent : carte sombre */
+html.light .av-hero :is(h1, h2) { color: #fff; }
+/* cartes à collectionner */
+html.light .jc-pick .chip { color: var(--lv-ink2); background: #fff; border-color: #e3d9f7; }
+html.light .jc-pick .chip.on { color: #fff; background: var(--fin-blue); border-color: transparent; }
+html.light .jc-tabs button.on { color: #fff; background: var(--fin-blue); }
+html.light .jc-shop-btn b { color: var(--lv-ink); text-shadow: 0 1px 0 rgba(255, 255, 255, .6); }
+html.light .jc-shop-btn em { color: #7c2d12 !important; text-shadow: 0 1px 0 rgba(255, 255, 255, .6); font-weight: 900; }
+html.light .jc-album-bar span { color: var(--lv-ink); }
+/* affiches des nouveautés : la date sur sa pastille */
+html.light .hero .upd-eye { color: #1c1145 !important; text-shadow: none !important; }
+html.light .tb-pub .tb-play { color: #fff !important; }
+/* bouton Google Play (noir) */
+html.light .store-soon b, html.light .store-soon span { color: #fff; }
 </style>
 </head>
 <body>
