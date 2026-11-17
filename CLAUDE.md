@@ -571,9 +571,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   encre violet nuit `--lv-ink`, violet profond `--lv-p` pour ce qui est actif, cartes blanches givrées à grands coins, boutons en pilule
   violette (`--fin-blue` redéfini). C'est `html.light` (allumé par défaut : localStorage `spinbet_theme_v2` = `dark` seulement si le joueur
   choisit « Mode sombre » dans le menu) ; **dernier bloc de la couche `finition`** (« Thème lavande »), il passe après tout. Logo = couronne
-  + SPINBET en Cinzel (`.lv-brand` dans les logos, montré seulement en lavande). Téléphone : logo à gauche, solde + « + », 👤 profil, ☰ à
+  + SPINBET en Cinzel (`.lv-brand` dans les logos, montré seulement en lavande). Téléphone : logo à gauche, solde dans un rectangle blanc net (« SOLDE » + montant en gros, voulu par le propriétaire) + « + », 👤 profil, ☰ à
   droite (niveau et cloche cachés). Accueil : vitrine `NX_LAV` (« LE FRISSON SANS RISQUE », SPINBET, « 100% JEUX VIRTUELS & GRATUITS -
-  AUCUN DÉPÔT REQUIS », JOUER MAINTENANT →, dé, 3 as et perles en SVG), carte « Catégories de jeux » `.nx-catbox` (téléphone 3 × 2 :
+  AUCUN DÉPÔT REQUIS », JOUER MAINTENANT →, dé, 3 as et perles = `assets/home/hero-art.webp`, découpés dans la maquette même du propriétaire,
+  fondus dans la page par un masque fixe), carte « Catégories de jeux » `.nx-catbox` (téléphone 3 × 2 :
   Slots, Roulette, Blackjack, Poker, Jeux rapides, Promotions ; ordinateur + En ligne, Tournois ; icônes `ui-roulette`, `ui-bj`,
   `ui-poker`, `ui-promo`), rang « Jeux en vedette » (`bestHTML`, vignettes nettes) avec « TOUT VOIR → ». **Barre du bas = Accueil ·
   Promotions · Tournois · VIP (`#profil`, `ui-star`) · Menu** (Classement et Caisse restent dans le menu et le « + » du solde). Caisse et
