@@ -577,7 +577,8 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   fondus dans la page par un masque fixe), carte « Catégories de jeux » `.nx-catbox` (téléphone 3 × 2 :
   Slots, Roulette, Blackjack, Poker, Jeux rapides, Promotions ; ordinateur + En ligne, Tournois ; icônes `ui-roulette`, `ui-bj`,
   `ui-poker`, `ui-promo`), rang « Jeux en vedette » (`bestHTML`, vignettes nettes) avec « TOUT VOIR → ». **Barre du bas = Accueil ·
-  Promotions · Tournois · VIP (`#profil`, `ui-star`) · Menu** (Classement et Caisse restent dans le menu et le « + » du solde). Caisse et
+  Promotions · Classement · VIP (`#profil`, `ui-star`) · Menu** (Classement à la place de Tournois, voulu par le propriétaire le 17 novembre
+  2026 ; Tournois et Caisse restent dans le menu et le « + » du solde). Caisse et
   offre de parrainage en violet profond. Les écrans des jeux gardent leurs couleurs.
 - **Les plus belles machines en tête de l'accueil** (demande du propriétaire du 16 novembre 2026 : « quand t'arrives, c'est directement les
   plus belles ») : rang « ⭐ Les plus belles machines » juste sous la vitrine (`bestHTML()` de `pages/lobby.js`, liste `BEST` : les machines à
