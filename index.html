@@ -3305,29 +3305,43 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .plateau .pt-say .dbl { color: #c81d25; }
 
 /* ============ La Pêche ============ */
-/* the owner's glass wheel (15 November 2026): roue.webp = scene, .pe-disc = the turning glass disc (roue-disc.webp + the
-   cases in SVG, games/peche.js), roue-top.webp = crystal pointer and glass hub above it. Positions = tools/art/peche/clean.py */
+/* la présentatrice (vidéo du propriétaire du 18 novembre 2026, tools/art/peche/presentatrice.py) : sa vidéo muette en boucle (.pex-vid),
+   NOTRE roue de 54 cases posée sur sa roue de glace par une homographie par image (.pex-wb, SHOW, en matrix3d), sa main gardée devant
+   (.pex-mk, planche show-mask.png), son moyeu (hub.webp) et son cristal-pointeur (ptr.webp) au-dessus ; téléphone tenu droit : la
+   partie droite de la vidéo (.pex-p). La boîte .pex-wb fait 1000 px pour [-1,08 ; 1,08]² du disque : tailles en px de cette boîte.
+   Le cristal (.pe-top) est un peu tassé et remonté : sa pointe s'arrête au bord des cases, on lit la case gagnante dessous. */
 .g-peche { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(125, 211, 252, .25), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(37, 99, 235, .25), transparent 70%), linear-gradient(180deg, #071a2e 0%, #05070b 100%); }
 .slot.g-peche > .slot-bg { background: radial-gradient(ellipse at 50% 40%, #0c2d6b 0%, #051637 45%, #020818 100%) !important; filter: none; }
 .g-peche > .slot-bg::after { display: none; }
 .pe-hist span { position: relative; }
 .pe-hist em { position: absolute; right: -4px; top: -7px; font: 900 8px KeCoin, Archivo, sans-serif; font-style: normal; color: #713f12; background: #fde047; border-radius: 3px; padding: 0 2px; }
-.pe-view { position: relative; border-radius: 8px; background: linear-gradient(180deg, #020622 0%, #01061f 55%, #000c2a 100%); }
-.pe-zone { --ptz: min(500px, calc(100vw - 32px), calc((100vh - 290px) * .794)); position: relative; width: var(--ptz); min-width: 240px; aspect-ratio: 896 / 1129; margin: 6px auto 4px;
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 3%, #000 88%, transparent); mask-image: linear-gradient(180deg, transparent, #000 3%, #000 88%, transparent); }
-.pe-zone[hidden], .pe-bonus[hidden] { display: none !important; }
-.pe-scene, .pe-top { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
-.pe-top { z-index: 3; }
-.pe-disc { position: absolute; left: 5.8%; top: 16.1%; width: 88.39%; aspect-ratio: 1; z-index: 1; }
+.pe-view { position: relative; }
+.pex { position: relative; width: 100%; margin: 6px auto 4px; overflow: hidden; border-radius: 10px; background: #061633;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, .55), inset 0 0 0 1px rgba(125, 211, 252, .3); }
+.pex[hidden], .pe-bonus[hidden] { display: none !important; }
+.pex.pex-l { aspect-ratio: 1280 / 720; max-width: max(320px, calc((100svh - 330px) * 1.778)); }
+.pex.pex-p { aspect-ratio: 1024 / 720; }
+.pex-art { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.pex-p .pex-art { left: -25%; width: 125%; }
+.pex-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; background: #061633; }
+.pex-wb { position: absolute; z-index: 2; left: 0; top: 0; width: 1000px; height: 1000px; transform-origin: 0 0; pointer-events: none; }
+.pex-mk { position: absolute; inset: 0; }
+.pex-mk.mk { -webkit-mask-image: var(--mk); mask-image: var(--mk); -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); mask-size: calc(var(--cols) * 100%) calc(var(--rows) * 100%); -webkit-mask-position: var(--mx) var(--my); mask-position: var(--mx) var(--my); }
+.pex-wb .pe-disc, .pex-gloss { position: absolute; left: 2.083%; top: 2.083%; width: 95.833%; height: 95.833%; border-radius: 50%; }
+.pe-rot { position: absolute; inset: 0; will-change: transform; }
 .pe-svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .pe-wheel { transform-origin: 150px 150px; }
 .pe-disc .pt-hl { fill-opacity: .3; animation: peHl .45s ease-in-out infinite alternate; }
 @keyframes peHl { to { fill-opacity: .6; } }
-.pe-ptr { position: absolute; left: 50%; top: 13.5%; z-index: 4; width: 7%; aspect-ratio: 1; translate: -50% 0; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, #fff, rgba(186, 230, 253, .6) 40%, transparent 70%); }
-.pe-hub { position: absolute; left: 50%; top: calc(16.1% + 70.15% / 2); z-index: 4; width: 14.8%; aspect-ratio: 1; transform: translate(-50%, -50%); display: grid; place-items: center; text-align: center; border-radius: 50%; font: 900 clamp(16px, 4vw, 26px)/1 KeCoin, 'Bebas Neue', Archivo, sans-serif; color: #fde047; text-shadow: 0 2px 4px #000, 0 0 8px #000; pointer-events: none; }
-.pe-hub .big { font: 900 clamp(20px, 5vw, 32px) 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 2px 4px #000, 0 0 10px #38bdf8; }
-.pe-hubfish { width: 120%; max-width: none; height: auto; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .7)); animation: ptPulse .6s ease-in-out infinite alternate; }
-.pe-lx { position: absolute; bottom: -12px; font: 900 13px KeCoin, Archivo, sans-serif; font-style: normal; color: #713f12; background: #fde047; border-radius: 3px; padding: 1px 6px; }
+/* the light stays where it is while the disc turns, and the edge goes into her glass ring */
+.pex-gloss { pointer-events: none; background: radial-gradient(ellipse 58% 42% at 34% 24%, rgba(255, 255, 255, .2), transparent 70%), radial-gradient(circle, transparent 80%, rgba(2, 14, 46, .3) 96%, rgba(2, 14, 46, 0) 100%); }
+.pex-cap { position: absolute; left: 39.583%; top: 39.583%; width: 20.833%; height: 20.833%; pointer-events: none; user-select: none; filter: drop-shadow(0 6px 10px rgba(0, 10, 40, .5)); }
+.pex-wb .pe-top { position: absolute; z-index: 3; left: 36.5%; top: -12.963%; width: 27%; height: 21.52%; pointer-events: none; user-select: none; filter: drop-shadow(0 8px 8px rgba(0, 10, 40, .45)); }
+.pe-ptr { position: absolute; z-index: 4; left: 50%; top: 7.4%; width: 7%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, #fff, rgba(186, 230, 253, .6) 40%, transparent 70%); }
+.pe-hub { position: absolute; left: 50%; top: 50%; z-index: 4; width: 17%; height: 17%; transform: translate(-50%, -50%); display: grid; place-items: center; text-align: center; border-radius: 50%; font: 900 72px/1 KeCoin, 'Bebas Neue', Archivo, sans-serif; color: #fde047; text-shadow: 0 4px 8px #000, 0 0 16px #000; pointer-events: none; }
+.pe-hub .big { font: 900 96px 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 4px 8px #000, 0 0 20px #38bdf8; }
+.pe-hubfish { width: 125%; max-width: none; height: auto; filter: drop-shadow(0 6px 8px rgba(0, 0, 0, .7)); animation: ptPulse .6s ease-in-out infinite alternate; }
+.pe-lx { position: absolute; bottom: -40px; font: 900 40px KeCoin, Archivo, sans-serif; font-style: normal; color: #713f12; background: #fde047; border-radius: 8px; padding: 2px 14px; }
 .pe-flash { position: absolute; inset: -4%; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(255, 255, 255, .9), rgba(253, 224, 71, .4) 40%, transparent 70%); }
 .pe-flash.on { animation: peFlash .4s ease-out; }
 @keyframes peFlash { 10% { opacity: 1; } to { opacity: 0; } }
@@ -3362,12 +3376,29 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 .pe-plate.done b { color: #fde047; text-shadow: 0 2px 0 #92400e, 0 0 18px #f59e0b; }
 .pe-plate.max { background: linear-gradient(180deg, #78350f, #1c0a02); box-shadow: 0 0 0 3px #fde047, 0 0 40px #f59e0b; }
 .pe-plate.max b { font-size: clamp(26px, 7vw, 40px); animation: ptPulse .5s ease-in-out infinite alternate; }
-/* Phone (owner's request, 16 November 2026: « on peut pas bouger pour miser »): the wheel, the 5 betting spots, the chips
-   and LANCER on one screen. The scene loses its empty top and reflection (negative margins), the spots go on one row,
-   chips and tools on one line each (sliding sideways if needed), the lightning note goes (it is in the rules). */
+/* the fishing: one of the owner's 9 videos (small fish = rod, medium = crane, big = helicopter) */
+.pe-bonus { position: relative; margin: 6px auto 4px; height: min(calc(100vh - 230px), 760px); min-height: 340px; max-width: calc(100vw - 24px); aspect-ratio: 448 / 672; border-radius: 10px; overflow: hidden; background: #0b1626;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, .6), 0 0 0 3px color-mix(in srgb, var(--fc, #38bdf8) 80%, #fff), 0 0 30px color-mix(in srgb, var(--fc, #38bdf8) 50%, transparent); }
+.pe-vid { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.pe-btop { position: absolute; left: 0; right: 0; top: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 8px 26px; background: linear-gradient(180deg, rgba(2, 8, 23, .75), transparent); pointer-events: none; }
+.pe-title { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px; margin: 0; max-width: 100%; font: 900 clamp(18px, 5vw, 30px)/1 'Bebas Neue', Impact, sans-serif; letter-spacing: 1.2px; color: #fff; text-shadow: 0 2px 0 rgba(0, 0, 0, .6), 0 0 12px rgba(0, 0, 0, .7); }
+.pe-title em { font: 900 .8em KeCoin, Archivo, sans-serif; font-style: normal; color: #713f12; background: #fde047; border-radius: 4px; padding: 1px 6px; text-shadow: none; }
+.pe-tico { width: 38px; height: 22px; object-fit: contain; }
+.pe-size { padding: 4px 12px; border-radius: 999px; font: 900 12px/1.2 Archivo, sans-serif; letter-spacing: .5px; color: #fff; background: color-mix(in srgb, var(--fc, #38bdf8) 70%, #0f172a); box-shadow: 0 0 0 2px rgba(255, 255, 255, .5); animation: peSize .5s cubic-bezier(.3, 1.6, .5, 1) both; }
+.pe-size small { font-weight: 700; opacity: .85; }
+.pe-size.z3 { font-size: 15px; background: linear-gradient(90deg, #f59e0b, #dc2626); box-shadow: 0 0 0 2px #fde047, 0 0 20px #f59e0b; }
+@keyframes peSize { from { transform: scale(.4); opacity: 0; } }
+.pe-say { position: absolute; left: 50%; bottom: 96px; z-index: 2; translate: -50% 0; max-width: 90%; padding: 5px 12px; border-radius: 6px; background: rgba(8, 47, 73, .8); font-weight: 800; font-size: 13px; text-align: center; color: #e0f2fe; }
+.pe-plate { position: absolute; left: 50%; bottom: 14px; z-index: 2; translate: -50% 0; min-width: 52%; display: flex; flex-direction: column; align-items: center; padding: 6px 18px 8px; border-radius: 12px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, .9), rgba(2, 6, 23, .92)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--fc, #38bdf8) 80%, #fff), 0 8px 20px rgba(0, 0, 0, .5); }
+.pe-plate small { font: 800 10px Archivo, sans-serif; letter-spacing: 2px; color: #93c5fd; }
+.pe-plate b { white-space: nowrap; font: 900 clamp(30px, 8vw, 46px)/1 KeCoin, 'Bebas Neue', Impact, sans-serif; color: #fff; text-shadow: 0 0 12px var(--fc, #38bdf8); font-variant-numeric: tabular-nums; }
+.pe-plate.done b { color: #fde047; text-shadow: 0 2px 0 #92400e, 0 0 18px #f59e0b; }
+.pe-plate.max { background: linear-gradient(180deg, #78350f, #1c0a02); box-shadow: 0 0 0 3px #fde047, 0 0 40px #f59e0b; }
+.pe-plate.max b { font-size: clamp(26px, 7vw, 40px); animation: ptPulse .5s ease-in-out infinite alternate; }
+/* Phone (owner's request, 16 November 2026: « on peut pas bouger pour miser »): the show, the 5 betting spots, the chips and
+   LANCER on one screen: the spots on one row, chips and tools on one line each, the lightning note goes (it is in the rules). */
 @media (max-width: 600px) {
-  .g-peche .pe-zone { --ptz: max(200px, min(calc(100vw - 24px), calc((100dvh - 400px) / 1.12))); min-width: 0; margin: calc(var(--ptz) * -.035) auto calc(var(--ptz) * -.1); }
-  .g-peche .pe-view { overflow: hidden; }
   .pe-bonus { height: min(calc(100dvh - 190px), calc((100vw - 24px) * 1.5)); min-height: 300px; }
   .pe-say { font-size: 11px; bottom: 84px; }
 }
@@ -3389,21 +3420,32 @@ body.fs-on .view { animation: none !important; transform: none !important; }
   .g-peche .rt-tools .pe-buy { order: -1; grid-column: span 2; }
   .g-peche .rt-autopick { margin-top: 4px; }
 }
-/* « ⛶ Grand écran » on the wheel (phone): the site's full screen, where everything fits */
+/* « ⛶ Grand écran » on the show (phone): the site's full screen, where everything fits */
 .pe-big { display: none; position: absolute; right: 8px; top: 8px; z-index: 6; padding: 6px 11px; border: 1px solid rgba(186, 230, 253, .6); border-radius: 999px; font: 800 12px Archivo, sans-serif; color: #e0f2fe; background: rgba(2, 6, 23, .7); box-shadow: 0 0 12px rgba(56, 189, 248, .4); }
 @media (max-width: 600px) { .pe-big { display: block; } }
-/* La Pêche : le lac gelé du propriétaire derrière la roue (vidéo .pe-bg en boucle, fond-large / fond-haut), la roue détourée (roue-cut.webp) */
-.pe-view { overflow: hidden; isolation: isolate; background: #0b1626; }
-.pe-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; }
-.pe-view > .pe-zone, .pe-view > .pe-bonus { z-index: 1; }
-.pe-view .pe-zone { -webkit-mask-image: none; mask-image: none; }
-.pe-view .pe-scene { filter: drop-shadow(0 14px 26px rgba(2, 12, 30, .55)); }
 .game-host.is-full .pe-big { display: none !important; }
-/* Full screen (⛶): everything fits the screen; on a wide screen the table-game grid puts the wheel on the left */
-.game-host.is-full > .slot.g-peche .pe-zone { --ptz: max(200px, min(calc(100vw - 24px), 560px, calc((100dvh - 330px) / 1.12))); }
-@media (orientation: landscape) and (min-aspect-ratio: 4/3) { .game-host.is-full > .slot.g-peche .pe-zone { --ptz: min(100%, calc((100dvh - 40px) * .794)); } .game-host.is-full > .slot.g-peche .pe-bonus { height: calc(100dvh - 60px); min-height: 0; } .game-host.is-full > .slot.g-peche .slot-title { display: none; } }
-@media (max-width: 600px) { .game-host.is-full > .slot.g-peche .slot-title { display: none; } .game-host.is-full > .slot.g-peche { padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); } .game-host.is-full > .slot.g-peche .slot-head { min-height: 0; margin-bottom: 4px; } .game-host.is-full > .slot.g-peche .win-bar { min-height: 0; padding-top: 2px; padding-bottom: 2px; font-size: 12px; }
-  .game-host.is-full > .slot.g-peche .pe-zone { --ptz: max(130px, min(calc(100vw - 16px), calc((100dvh - 395px) / 1.12))); } .game-host.is-full > .slot.g-peche .pe-bonus { height: min(calc(100dvh - 150px), calc((100vw - 16px) * 1.5)); } }
+/* Full screen (⛶): computer and phone held sideways = the show on the left as big as possible, the bets on the right; phone held
+   upright = the show on top, the bets and LANCER below (only the bets scroll if there is not enough room) */
+@media (orientation: landscape) and (min-aspect-ratio: 4/3) {
+  .game-host.is-full > .slot.table-game:has(.pex) { grid-template-columns: minmax(0, 1fr) minmax(270px, 32%); align-content: center; min-height: 100%; box-sizing: border-box; }
+  .game-host.is-full .pex.pex-l { max-width: none; width: min(100%, calc((100dvh - 24px) * 1.778)); }
+  .game-host.is-full > .slot.g-peche .pe-bonus { height: calc(100dvh - 60px); min-height: 0; }
+  .game-host.is-full > .slot.g-peche .slot-title { display: none; }
+  .game-host.is-full > .slot.g-peche > .slot-bg { grid-column: 1 / -1; }
+  .game-host.is-full > .slot.g-peche.table-game:not(.online-game) .controls.pro-ctl.no-step { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) auto !important; grid-template-areas: "win win spin bal bal" "bet bet spin max opts" !important; align-items: center; row-gap: 6px !important; column-gap: 6px !important; padding: 6px 8px !important; }
+  .game-host.is-full > .slot.g-peche.table-game:not(.online-game) .pro-ctl.no-step .pb-auto { display: none !important; }
+  .game-host.is-full > .slot.g-peche.table-game:not(.online-game) .pro-ctl.no-step .spin-btn.wide { min-width: 0 !important; max-width: 140px; }
+}
+.game-host.is-full .pex.pex-p { width: 100%; max-width: none; }
+@media (orientation: portrait) {
+  .game-host.is-full > .slot.g-peche:not(.online-game) { display: flex; flex-direction: column; justify-content: center; height: 100%; overflow: hidden; padding-bottom: max(6px, env(safe-area-inset-bottom, 0px)); }
+  .game-host.is-full > .slot.g-peche:not(.online-game) > * { flex: none; }
+  .game-host.is-full > .slot.g-peche:not(.online-game) > .slot-head { min-height: 0; margin-bottom: 4px; }
+  .game-host.is-full > .slot.g-peche:not(.online-game) .slot-title { display: none; }
+  .game-host.is-full > .slot.g-peche:not(.online-game) > .pe-felt { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin-top: 6px; }
+  .game-host.is-full > .slot.g-peche:not(.online-game) > .win-bar { min-height: 0; margin-top: 4px; padding-top: 2px; padding-bottom: 2px; font-size: 12px; }
+  .game-host.is-full > .slot.g-peche .pe-bonus { height: min(calc(100dvh - 150px), calc((100vw - 16px) * 1.5)); }
+}
 
 /* ============ La Roue d’Or ============ */
 .g-roueor { --slot-bg: radial-gradient(700px 360px at 50% -10%, rgba(251, 191, 36, .25), transparent 70%), radial-gradient(600px 320px at 90% 100%, rgba(75, 85, 99, .35), transparent 70%), linear-gradient(180deg, #14110a 0%, #06070b 100%); }
@@ -15134,7 +15176,7 @@ const ORIGINALS = [
   {"id": "roueor-online", "name": "La Roue d’Or Online", "cat": "table", "tag": "En ligne", "sub": "Une roue pour tout le salon, chacun son niveau", "colors": ["#fbbf24", "#14110a"], "description": "La Roue d’Or en multijoueur : chacun choisit son niveau et sa mise puis appuie sur PRÊT, la roue part dès que tout le salon est prêt (tout de suite si tu es seul). La même roue tombe dans l’or pour certains niveaux : ces joueurs jouent leur bonus des 24 cubes. Tu vois les mises et les gains des autres joueurs, et le salon a son propre chat.", "features": ["Multijoueur en direct", "Départ quand tout le monde est prêt", "3 niveaux", "Bonus des 24 cubes jusqu’à ×5 000", "Chat du salon"], "rtp": "≈ 95 %", "vol": 5, "max": "×5 000"},
   {"id": "doublespin", "name": "La Double Bille", "cat": "table", "tag": "Roulette", "sub": "Deux billes, multiplicateur jusqu’à ×100 000", "colors": ["#e89a00", "#1a2a8a"], "description": "Une roulette à deux billes : la blanche paie les mises normalement, si les deux billes tombent sur ton plein, la jaune ajoute un multiplicateur de ×10 à ×100 000.", "features": ["2 billes", "Multiplicateur ×10 à ×100 000", "Tapis complet"], "rtp": "≈ 95 % (pleins)", "vol": 5, "max": "×100 000"},
   {"id": "plateau", "wip": true, "retired": true, "name": "Le Plateau", "cat": "table", "tag": "Jeu de roue", "sub": "Roue, dés et plateau de multiplicateurs", "colors": ["#22c55e", "#0c1a14"], "description": "Une grande roue de 78 cases : mise sur 1, 2, 5, 10 ou sur les bonus 2 lancers et 4 lancers. Dans les bonus, lance 2 dés et fais avancer ton pion sur un plateau de 28 cases jusqu’à ×200. Et si la roue tombe sur Chance, elle repart et ce tour paie ×10 !", "features": ["Cases 1, 2, 5 et 10", "Bonus 2 lancers et 4 lancers", "Plateau jusqu’à ×200 par case", "Double = lancer en plus", "Case Chance ×10"], "rtp": "≈ 95 %", "vol": 4, "max": "×10 000"},
-  {"id": "peche", "name": "La Pêche", "cat": "table", "tag": "Jeu de roue", "sub": "Roue en verre à éclairs et pêche sur la glace", "colors": ["#38bdf8", "#071a2e"], "description": "Une roue en verre de 54 cases : ×2 glace, ×2 nuit et trois poissons. À chaque lancer, des éclairs multiplient des cases. Sur un poisson, direction le trou dans la glace : petit poisson pêché à la canne, poisson moyen sorti par la grue ou gros poisson sorti par l’hélicoptère, avec un multiplicateur à la mesure du poisson, jusqu’au MAX WIN. Les pêches s’achètent aussi !", "features": ["Roue en verre à 54 cases", "4 éclairs à chaque lancer", "Petit poisson à la canne, moyen à la grue", "Gros poisson à l’hélicoptère jusqu’au MAX WIN", "Pêches bleue, orange et rouge à acheter"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
+  {"id": "peche", "name": "La Pêche", "cat": "table", "tag": "Jeu de roue", "sub": "La présentatrice, la roue de glace et la pêche sur la glace", "colors": ["#38bdf8", "#071a2e"], "description": "Une présentatrice en direct à côté d’une grande roue de glace de 54 cases : ×2 glace, ×2 nuit et trois poissons. À chaque lancer, des éclairs multiplient des cases. Sur un poisson, direction le trou dans la glace : petit poisson pêché à la canne, poisson moyen sorti par la grue ou gros poisson sorti par l’hélicoptère, avec un multiplicateur à la mesure du poisson, jusqu’au MAX WIN. Les pêches s’achètent aussi !", "features": ["Présentatrice et roue de glace en direct", "4 éclairs à chaque lancer", "Petit poisson à la canne, moyen à la grue", "Gros poisson à l’hélicoptère jusqu’au MAX WIN", "Pêches bleue, orange et rouge à acheter"], "rtp": "≈ 95 %", "vol": 5, "max": "×25 000"},
   {"id": "roueor", "name": "La Roue d’Or", "cat": "table", "tag": "Jeu de roue", "sub": "Simple, Moyen ou Compliqué : 24 cubes à ouvrir", "colors": ["#fbbf24", "#14110a"], "description": "Une roue noire et métal avec une part en or. Choisis ton niveau : Simple (beaucoup d’or, petits cubes), Moyen ou Compliqué (peu d’or, cubes jusqu’à ×5 000). Sur l’or, place au bonus des 24 cubes : regarde les multiplicateurs, ils se cachent et se mélangent, choisis le tien et décide à chaque étape si tu encaisses ou continues !", "features": ["3 niveaux : Simple, Moyen, Compliqué", "24 cubes montrés puis mélangés", "Encaisse l’offre ou continue", "Jusqu’à ×5 000", "Tours automatiques"], "rtp": "≈ 95 %", "vol": 5, "max": "×5 000"},
   {"id": "blackjack", "name": "Le 21", "cat": "table", "tag": "Cartes", "sub": "Blackjack payé 6 pour 5", "colors": ["#11a05f", "#06301f"], "description": "Blackjack classique à 6 jeux : tirer, rester, doubler, séparer. Le blackjack naturel paie 6 pour 5.", "features": ["Doubler", "Séparer une paire", "Blackjack 6 pour 5", "Animations de cartes"], "rtp": "≈ 98 %", "vol": 1, "max": "×2,2"},
   {"id": "lightningbj", "name": "Le 21 Électrique", "cat": "table", "tag": "Cartes", "sub": "Multiplicateurs éclair jusqu’à ×1000", "colors": ["#3b82f6", "#0b0f3a"], "description": "Le blackjack frappé par la foudre : avant chaque distribution, les scores 17, 18, 19, 20 et 21 reçoivent un multiplicateur de ×1 à ×1000. Gagne ta main sur ce score et ton gain est multiplié tout de suite. Side bets Paires Parfaites, 21+3 et Bust It.", "features": ["Multiplicateurs ×1 à ×1000", "Gain multiplié dans la manche", "Paires Parfaites", "21+3", "Bust It", "Doubler et séparer"], "rtp": "≈ 97,5 %", "vol": 4, "max": "×1 500"},
@@ -15902,6 +15944,8 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'peche', date: '2026-11-18', title: 'La présentatrice et sa roue de glace', items: ['Une présentatrice en robe rouge présente la roue sur un plateau de glace, en continu', 'Ta roue de 54 cases est posée sur sa grande roue de glace, avec son cristal-pointeur', 'La roue s’arrête au hasard sur n’importe quelle case, à chaque lancer', 'Quand elle montre la roue, sa main passe vraiment devant'] },
+  { game: 'peche-online', date: '2026-11-18', title: 'La présentatrice et sa roue de glace', items: ['Une présentatrice en robe rouge présente la roue pour tout le salon', 'Ta roue de 54 cases est posée sur sa grande roue de glace'] },
   { game: 'madwheel', date: '2026-11-18', title: 'La présentatrice du Plateau Live', items: ['La même émission que Le Plateau Live : la présentatrice en robe rouge lance ta grande roue de 54 cases', 'Ta roue arc-en-ciel est posée sur sa roue à ampoules, avec le moyeu SPIN BET', 'Les bonus aussi : c’est elle qui présente le Pachinko, le Tir aux Cibles, la Méga Folie et Pile ou Face, avec sa voix', 'Plus de pièces ni de médaille en 3D par-dessus l’émission'] },
   { game: 'madwheel-online', date: '2026-11-18', title: 'La présentatrice du Plateau Live', items: ['La présentatrice en robe rouge lance la roue pour tout le salon', 'Elle présente aussi les 4 bonus', 'Plus d’effets en 3D par-dessus l’émission'] },
   { game: 'plateaulive', date: '2026-11-18', title: 'L’émission sans effets 3D', items: ['Plus de pluie de pièces ni de médaille en 3D par-dessus l’émission : on voit mieux la présentatrice, la roue et le plateau'] },
@@ -19488,12 +19532,12 @@ const FILES = {
   penalty: ['penalty', 'games/impl/penalty.js', 'PenaltyGame', '6e1081a69e'],
   ticket: ['ticket', 'games/impl/ticket.js', 'TicketGame', 'be1f8e5485'],
   plateau: ['plateau', 'games/impl/plateau.js', 'PlateauGame', 'c218089532'],
-  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '77467eded7'],
+  peche: ['peche', 'games/impl/peche.js', 'PecheGame', '06a665cdde'],
   roueor: ['roueor', 'games/impl/roueor.js', 'RoueOrGame', '8bdbe54829'],
   'robots-online': ['robots', 'games/impl/robots.js', 'RobotsOnlineGame', '620d0b9f44'],
   'madwheel-online': ['madwheel', 'games/impl/madwheel.js', 'MadWheelOnlineGame', 'e6eed29dff'],
   'plateau-online': ['plateau', 'games/impl/plateau.js', 'PlateauOnlineGame', 'c218089532'],
-  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '77467eded7'],
+  'peche-online': ['peche', 'games/impl/peche.js', 'PecheOnlineGame', '06a665cdde'],
   'roueor-online': ['roueor', 'games/impl/roueor.js', 'RoueOrOnlineGame', '8bdbe54829'],
   billes: ['billes', 'games/impl/billes.js', 'BillesGame', '234dd4780f'],
   totemx: ['totemx', 'games/impl/totemx.js', 'TotemXGame', '652d982842'],

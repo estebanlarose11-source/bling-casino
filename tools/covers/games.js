@@ -37,10 +37,11 @@ module.exports = (G) => ({
     mode: 'pc', dpr: 3, rect: '.kn-art', fit: [0.585, 0.5], hide: '.kn-snd{display:none!important}',
     steps: [{ click: '[data-k="f1"]' }, { wait: 400 }, { eval: `${G}.onMain()` }, { wait: 15000 }],
   },
-  // La Pêche : la roue en verre sur le lac gelé
+  // La Pêche : la présentatrice, la main sur sa roue de glace (9,3 s de sa vidéo), et les éclairs sur notre roue
+  // (serveur qui répond aux requêtes « Range » pour que la vidéo puisse avancer : SHOTS_URL=…)
   peche: {
-    mode: 'pc', rect: '.pe-zone', box: [0.02, 0, 0.96], hide: '.pe-big{display:none!important}',
-    steps: [{ click: '.fs-btn' }, { wait: 600 }, { click: '.pe-spot.fr' }, { click: '.pe-spot.w' }, { click: '.spin-btn' }, { wait: 5000 }],
+    mode: 'pc', dpr: 3, rect: '.pex', fit: [0.36, 0.5], hide: '.pe-big{display:none!important}',
+    steps: [{ click: '.pe-spot.fr' }, { click: '.pe-spot.w' }, { eval: `(() => { const v = document.querySelector('.pex-vid'); v.pause(); v.currentTime = 9.3; })()` }, { wait: 900 }, { eval: `${G}.onMain()` }, { wait: 1650 }],
   },
   // ---- jeux rapides : l'écran du jeu en pleine action, comme sur un téléphone ----
   // Le Champ de Mines : les compteurs et 8 gemmes déjà retournées

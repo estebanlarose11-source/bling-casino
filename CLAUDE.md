@@ -316,30 +316,39 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`bg.webp` supprimé). Grille 6×5 dans le cadre (`.sk-win`), barre cliquable : BET − / +, BONUS MENU, SPIN, MAX BET ; plaque SOLDE ·
   GAIN (· TOURS) (`.sk-info`) ; Bal de la Reine annoncé et fini dans le cadre (`panel`). Plein écran : l'image couvre l'écran
   (`layout()` → `fullFit`, zone gardée). Gains inchangés.
-- **La Pêche, roue en verre et pêche en vidéo** (`games/peche.js`, id `peche` et `peche-online`, demande du propriétaire du
-  15 novembre 2026) : **ses 10 vidéos** dans `tools/art/peche/` : `roue.mp4` (roue en verre qui s'arrête toujours au même
-  endroit) et 9 pêches sur un lac gelé `<bleu|orange|rouge>-<canne|grue|helico>.mp4`. `tools/art/peche/clean.py` : la roue est
-  **refaite pour tourner au hasard** (voulu par le propriétaire : « que ça tombe pas toujours sur la même case ») :
-  `roue.webp` (décor, roue rendue ronde ×2), `roue-disc.webp` (disque qui tourne, refait avec les 54 cases de `SEGS` à partir des
-  parts de verre sans poisson de la vidéo : clair = ×2 glace `w`, foncé = ×2 nuit `s`, moyen = poissons), `roue-top.webp`
-  (pointeur de cristal et moyeu, au-dessus) ; **si `SEGS` change, relancer `python3 tools/art/peche/clean.py --roue`**. Les
-  pêches → `assets/games/peche/<fb|fo|fr>-<1|2|3>.mp4` (+ affiche `.webp`, taille d'origine, ≈ 0,4 à 1 Mo). **Bonus** : la taille
+- **La Pêche, la présentatrice et sa roue de glace** (`games/peche.js`, id `peche` et `peche-online`, demande du propriétaire du
+  18 novembre 2026 : « tu remplaces la roue par la roue de la vidéo… comme le style du Plateau et de La Roue Folle », à la place de la
+  roue en verre et du lac gelé) : **sa vidéo** `tools/art/peche/presentatrice.mp4` (copie muette de son .mov : le son est enlevé,
+  voulu par le propriétaire ; 1280 × 720, 30 images/s, 15,6 s) : une présentatrice en robe rouge à côté d'une roue de glace (12 parts
+  à poissons, anneau de verre fixe à boulons, cristal-pointeur en haut) ; 2 plans : plan large où la caméra avance (images 0 → 238),
+  coupe, plan rapproché presque fixe (239 → 468). `python3 tools/art/peche/presentatrice.py` (`--fast` = sans réencoder ; opencv,
+  rembg) : **suivi image par image** de l'anneau fixe (points SIFT de proche en proche dans chaque plan, lissés) → homographie disque
+  unité (bord de ses parts) → % de la vidéo, présentatrice détourée (sa main passe devant la roue vers 9 s : planche
+  `show-mask.png`, une case par image), écrits dans `SHOW` de `games/peche.js` ; `show.mp4` (muette, boucle `loop` : la fin → le
+  début = une coupe de caméra) + `show.webp` ; `disc.webp` = **notre disque de 54 cases** dans le style de sa roue (verre givré ×2
+  glace `w`, bleu roi ×2 nuit `s`, turquoise / ambre / rubis à liseré d'or pour les 3 poissons, rayons de verre, boulons ; dessiné
+  par le script dans l'ordre de `SEGS` : **si `SEGS` change, relancer le script**) ; `hub.webp` (son moyeu de verre, fixe au-dessus
+  du disque) ; `ptr.webp` (son cristal-pointeur redressé, recentré ; en CSS un peu tassé et remonté pour que sa pointe s'arrête au
+  bord des cases : on lit la case gagnante). Dans le jeu (comme Le Plateau Live) : `.pex` (`.pex-l` = toute la vidéo ; téléphone
+  tenu droit `.pex-p` = sa partie droite), `.pex-wb` (boîte de 1000 px pour [-1,08 ; 1,08]² du disque, `matrix3d` par image,
+  `frame()` / `follow()` avec `requestVideoFrameCallback`), `.pex-mk` (masque de sa main, seulement une fois la planche chargée),
+  `.pe-rot` tourne (`spin()`), éclairs et case gagnante dans le SVG (`wheelSVG`) ; vidéo en pause pendant la pêche et page cachée.
+  Miniature : elle, la main sur la roue (`tools/covers/games.js`, serveur qui gère « Range » pour que la vidéo avance). Pêches,
+  gains et achats inchangés. Ses vidéos d'avant (`roue.mp4`, `fond-*.mp4`) restent dans `tools/art/peche/` ; `fond.py` et
+  `roue*.webp`, `fond-*.mp4`, `scene-*.webp` des assets sont supprimés.
+  **Les pêches** (vidéos du 15 novembre 2026) : 9 pêches sur un lac gelé `tools/art/peche/<bleu|orange|rouge>-<canne|grue|helico>.mp4`
+  → `python3 tools/art/peche/clean.py` → `assets/games/peche/<fb|fo|fr>-<1|2|3>.mp4` (+ affiche `.webp`, taille d'origine, ≈ 0,4 à 1 Mo). **Bonus** : la taille
   du poisson est tirée au hasard (`fishDraw`, 62 / 30 / 8 %) : 1 canne = petit multiplicateur, 2 grue = moyen, 3 hélicoptère =
   le plus gros, avec le **MAX WIN** (×25 000, `CAPX`) dans les gros poissons (`FISH` : [poids de la taille, [[×, poids]…]]) ;
   multiplicateur qui défile pendant la vidéo puis s'arrête (`fishing`). **Achats** (voulu par le propriétaire) : pêche bleue /
   orange / rouge à 8,75 / 17,4 / 52 × le jeton choisi (`PRICE`, `get bet()` = jeton ; bouton « 🎣 Acheter une pêche » et
   « Bonus & menu », pas dans le salon en ligne), taille au hasard, sans éclair. Simulation `node tools/sim/peche.js` (lit le
   moteur, 20 M lancers) : ≈ 95 % sur chaque case (comme avant), achats ≈ 88 %, hélicoptère 1 poisson sur 12,5.
-  **Téléphone** (demande du 16 novembre 2026 : « on peut pas bouger pour miser ») : bloc « Phone » à la fin du CSS de La Pêche :
-  roue plus petite (le haut vide et le reflet de l'image coupés par des marges négatives), 5 cases de mise sur une ligne, jetons et
-  outils sur une ligne chacun (« Acheter une pêche » en tête), note des éclairs cachée ; bouton « ⛶ Grand écran » sur la roue
-  (`.pe-big`, `data-act="full"`) : en plein écran tout tient sur l'écran (titre caché, `--ptz` calculé sur `100dvh`),
-  téléphone couché = roue à gauche, mises à droite. Les outils (Annuler … Tours auto) sont sur 2 lignes de 4 (grille), jamais en
-  rangée qui défile (« en grand écran on n'a pas accès à tout ») ; vérifié jusqu'à un iPhone SE avec les barres de Safari (375 × 548).
-  **Décor du lac gelé** (demande du propriétaire du 16 novembre 2026) : **ses 2 vidéos** `tools/art/peche/fond-large.mp4` (736 × 400) et
-  `fond-haut.mp4` (400 × 736) → `python3 tools/art/peche/fond.py` : boucles sans coupure muettes `assets/games/peche/fond-*.mp4` +
-  `scene-*.webp` (`LOOP` = 217/24 s, `VideoBg`), vidéo `.pe-bg` derrière la roue (haute quand la vue est plus haute que large : `bgFit()`),
-  et la roue détourée `roue-cut.webp` (roue.webp avait son fond bleu nuit ; le masque haut / bas de `.pe-zone` est enlevé).
+  **Téléphone** (demande du 16 novembre 2026 : « on peut pas bouger pour miser ») : 5 cases de mise sur une ligne, jetons et
+  outils sur une ligne chacun (« Acheter une pêche » en tête), note des éclairs cachée ; bouton « ⛶ Grand écran » sur l'émission
+  (`.pe-big`, `data-act="full"`) : en plein écran, téléphone tenu droit = l'émission en haut, mises et LANCER dessous (seules les
+  mises défilent s'il manque de la place), téléphone couché et ordinateur = l'émission à gauche, mises à droite. Les outils
+  (Annuler … Tours auto) sont sur 2 lignes de 4 (grille), jamais en rangée qui défile (« en grand écran on n'a pas accès à tout »).
 - **The Hunt, nouveau décor** (`games/chasse.js`, id `chasse`, demande du propriétaire du 16 novembre 2026, comme La Sweety) : **ses 2
   images** `tools/art/chasse/decor-large.jpg` (1168 × 784, `.hu-l`) et `decor-haut.jpg` (784 × 1168, `.hu-p`) : cadre en bois dans la
   forêt (cerf, sanglier, faisans, lièvre, loup), plaques MINI / MAJOR / GRAND JACKPOT, barre BET / SPIN / MAX BET / BONUS MENU.
