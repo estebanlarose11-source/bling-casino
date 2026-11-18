@@ -10808,6 +10808,36 @@ html.light .hero .upd-eye { color: #1c1145 !important; text-shadow: none !import
 html.light .tb-pub .tb-play { color: #fff !important; }
 /* bouton Google Play (noir) */
 html.light .store-soon b, html.light .store-soon span { color: #fff; }
+
+/* ===== Lisibilité du menu « Bonus & menu » et des joueurs des tables en ligne (demande du propriétaire du 18 novembre 2026) =====
+   Le menu des jeux est une feuille claire en thème lavande : ses cases (bonus, mise, réglages) étaient restées sombres avec
+   un texte encre (illisible). Elles passent en clair. La liste des joueurs et le chat des salons en ligne étaient sur un voile
+   noir transparent (gris sur le fond lavande) avec un texte gris : panneau sombre plein et texte clair. */
+html.light .gm-back { --panel-2: #f4effe; --panel-3: #b9acdf; --line: #ddd2f6; --text: #1c1145; --muted: #5d5185; --green: #5a2bc7; --gold: #b45309; color: #1c1145; color-scheme: light; }
+html.light .modal.gm, html.light .modal.gm h3 { color: #1c1145; }
+html.light .modal.gm .gm-sec h4 { color: #5d5185; }
+html.light .modal.gm .buy-item { background: #fff; border: 1.5px solid #ddd2f6; box-shadow: 0 3px 10px rgba(60, 30, 140, .08); color: #1c1145; }
+html.light .modal.gm .buy-item:hover:not(:disabled) { border-color: #5a2bc7; box-shadow: 0 6px 18px rgba(90, 43, 199, .18); }
+html.light .modal.gm .buy-item.gift { border-color: #16a34a; }
+html.light .modal.gm .bi-txt b { color: #1c1145; font-weight: 800; }
+html.light .modal.gm .bi-txt small { color: #5d5185; }
+html.light .modal.gm .bi-price { color: #fff; background: linear-gradient(180deg, #7b4be0, #4a1fb0); padding: 6px 10px; border-radius: 999px; }
+html.light .modal.gm .gm-stake { background: #f4effe; }
+html.light .modal.gm .gm-stake b { color: #1c1145; }
+html.light .modal.gm .gm-stake .round-btn { background: #fff; color: #1c1145; border: 1.5px solid #ddd2f6; }
+html.light .modal.gm .gm-stake .round-btn:disabled { opacity: .4; }
+html.light .modal.gm .gm-tog { background: #fff; color: #1c1145; border: 1.5px solid #ddd2f6; }
+html.light .modal.gm .gm-tog.on { border-color: #5a2bc7; background: #f4effe; }
+html.light .modal.gm .gm-tog .sw { background: #c9bfe6; }
+html.light .modal.gm .gm-tog.on .sw { background: #5a2bc7; }
+html.light .modal.gm .modal-x { background: #f4effe; color: #1c1145; border: 1px solid #ddd2f6; }
+.on-players, .on-chat { background: linear-gradient(180deg, #1d1638, #120d26); border-color: rgba(190, 160, 255, .28); color: #f4f1ff; }
+.on-p { background: rgba(255, 255, 255, .08); color: #fff; }
+.on-p > b { color: #fff; }
+.on-p > span { color: #cfc7ee; }
+.on-p em { color: #e9e4ff; } .on-p em.w { color: #5ef08f; } .on-p em.l { color: #ff8a8a; }
+.on-msg { color: #f1eefc; }
+.on-chat .muted, .on-players .muted { color: #bdb4e0 !important; }
 </style>
 </head>
 <body>

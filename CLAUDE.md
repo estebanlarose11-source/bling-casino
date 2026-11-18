@@ -642,7 +642,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   en carte blanche givrée, onglet actif violet, bulles claires, pastilles `.ln-p` blanches avec le pseudo en encre, `.pc-mz` violet) et
   **« Lisibilité en thème lavande »** : textes faits pour la nuit (blanc, jaune pâle, bleu pâle) repassés en encre, montants dorés en ambre
   foncé `--lv-gold` (Tendances, Défi, Paris, Jackpot, Loto, Missions, Cashback, Battle, Parrainage, Succès, Boutique, rangs du profil, JCC,
-  pastille des affiches). Trouvés par un contrôle automatique du contraste de toutes les pages (texte / fond < 2,6) : à refaire après un
+  pastille des affiches) ; **« Bonus & menu » des jeux** (`html.light .modal.gm` : cases des bonus, de la mise et des réglages en blanc, texte encre, prix en pilule violette ; avant, cases sombres et texte encre, 18 novembre 2026) et **joueurs + chat des salons en ligne** (`.on-players` / `.on-chat` : panneau violet nuit plein, pseudo blanc, gains vert vif). Trouvés par un contrôle automatique du contraste de toutes les pages (texte / fond < 2,6) : à refaire après un
   gros changement de couleurs.
 - **Joueurs en ligne et amis, nouvelles cartes** (demande du propriétaire du 17 novembre 2026 : « il faut améliorer ça ») : une carte par joueur
   (`pRow` de `live.js` : avatar + point vert `.ln-on`, pseudo, AMI / TOI, niveau aux couleurs du rang `lvChip`, « Joue à <jeu> » avec ses couleurs,
