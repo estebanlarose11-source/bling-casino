@@ -548,20 +548,23 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   même émission que Le Plateau Live »).
   **Essais en local** : `python3 -m http.server` ne répond pas aux requêtes « Range » : une vidéo ne peut pas y avancer (`currentTime`
   revient à 0, l'émission repart du début) ; Vercel les gère.
-- **Le Super Keno** (`games/keno.js`, id `keno`, catégorie Jeux rapides, tag Loterie, demande du propriétaire du 16 novembre 2026 : « le
-  Keno, en mode big loto ») : **ses 2 vidéos** d'un animateur qui fait tomber 20 boules dans un tube, colonne lumineuse derrière lui
-  (`tools/art/keno/keno-large.mp4` 736 × 400 ; `keno-haut.mp4` 1080 × 1920, même plateau de plus près) → `python3 tools/art/keno/build.py` :
-  `assets/games/keno/show-large.mp4` (×2) / `show-haut.mp4` (lignes 300 à 1720, téléphone tenu droit), avec le son (bouton 🔊,
-  `spinbet_keno_snd`), + affiches et `cover.webp`. Les 2 vidéos ont **le même rythme** : une boule entre dans la boîte du tube aux instants
-  `BALLS` (la 20e à 18,8 s) ; à chaque instant, **notre numéro** (tiré au hasard parmi 1 à 70) s'affiche en grand (`.kn-now`), dans la
-  rangée des 20 boules (`.kn-drawn`) et sur le tableau 1 à 70 (`.kn-board`) ; à la fin, le numéro de la dernière boule est posé sur elle
-  dans la boîte (`.kn-lastb`). **La colonne lumineuse** (vidéo large ; plaque en haut à droite sur la haute) montre le **multiplicateur de
-  la dernière boule** tiré à chaque tirage (`MULT` : ×2 60 %, ×3 22 %, ×5 12 %, ×10 5 %, ×25 0,8 %, ×50 0,2 %) : une grille gagnante qui
-  contient la dernière boule est multipliée. **Grilles** : autant qu'on veut (`MAXG` = 50), 1 à 10 numéros chacune, à la mise par grille
-  (TIRAGE = mise × grilles) : ＋ Grille (numéros touchés sur le tableau, Compléter / Vider / Valider) ou 🎲 Flash ×1 / ×5 / ×10 (grilles au
-  hasard du nombre de numéros choisi) ; gardées sur l'appareil (`spinbet_keno_grids`). Gains `PAY` (× la mise d'une grille, jusqu'à
-  ×10 000 pour 10 bons sur 10, plafond `CAPX` ×100 000). Simulation `node tools/sim/keno.js` (5 M tirages, lit le moteur) : retour 93,5 à
-  96,8 % selon le nombre de numéros (moyenne ≈ 95 %), une grille de 6 gagne 1 fois sur 4,5. **Pas dans les nouveautés** (voulu par le propriétaire le 16 novembre 2026 : pas d'entrée `UPDATES`, donc ni rang « Nouveautés », ni étiquette NOUVEAU, ni affiche).
+- **Le Speedball** (`games/speedball.js`, id `speedball`, catégorie **Roues & tables** (`cat: 'table'`, voulu par le propriétaire), demande
+  du 18 novembre 2026 : **remplace le Super Keno**, supprimé avec ses fichiers) : **sa vidéo** `tools/art/speedball/speedball.mp4` (832 × 480,
+  15,1 s : présentatrice, sphère de boules blanches et dorées, tube en spirale, tableau en arc ; plan large images 0 → 188, caméra fixe, puis
+  gros plan sur le tube) → `python3 tools/art/speedball/build.py` : `assets/games/speedball/attente.mp4` (plan large en boucle sans coupure,
+  muette, `LOOP` = 165/24 s) et `tirage.mp4` (de 3 s à la fin, avec le son ; `CUT` = 4,875 s = gros plan) + affiches. Rien n'est effacé :
+  notre tableau en arc (20 boules), le compteur BOULE n / 20 et la plaque SPEEDBALL couvrent les siens (SVG `HUD` en pixels de sa vidéo,
+  cercle `CX` / `CY`), la boule qui sort en grand `.sbx-now`. Téléphone tenu droit : le milieu de la vidéo (`.sbx-p`, x 140 → 740). Attente
+  comme Le Plateau Live (son OFF à l'arrivée, LANCER = le tirage). **Jeu** (bloc `===ENGINE`) : grilles 5 × 5 (colonne c = 5 numéros parmi
+  10c+1 … 10c+10), boutons **+1 / +5 / +10 / +50** (cumulables, `MAXG` = 200, gardées pour le tirage suivant : `spinbet_speedball_grids`,
+  🔄 Changer, 🗑), mise par grille ; **pas de liste des grilles sous le jeu** (voulu par le propriétaire) : elles tombent en pile les unes
+  sur les autres (`dealAnim`, 14 au plus à l'écran), la **grille la plus avancée** est toujours en haut de la pile (`cardState().score` :
+  lignes, puis meilleure ligne k / 5, le numéro qui manque clignote `.ms`) ; à la fin, la fenêtre « Mes grilles » (`showAll`, `modal`,
+  meilleures d'abord, croix = on rejoue ; pas en tours auto). 20 boules (1 à 50, `BT`), puis la boule dorée SPEEDBALL (`GOLD_T`) avec son
+  multiplicateur annoncé au départ (`MULT` ×2 … ×200). Gains `PAY` par nombre de lignes complètes (12 par grille : ×2, ×12, ×80, ×300,
+  ×1 000…), × le multiplicateur si le SPEEDBALL est dans une ligne complète, plafond ×50 000 la mise d'une grille. Simulation
+  `node tools/sim/speedball.js` : retour ≈ 95,5 %, une grille gagne 1 fois sur 9. Plein écran : couché / ordinateur = l'émission à gauche,
+  la pile et les boutons à droite (bloc CSS « Le Speedball »).
 - **Le Texas, nouvelle table** (`games/poker.js`, id `poker`, demande du propriétaire du 16 novembre 2026, d'après ses 2 maquettes :
   téléphone = 1re, ordinateur = 2e) : table de **9 places** (`SLOTS`, 1 à 8 adversaires, 3 nouveaux bots Le Prof, Mimi, Rocky), places
   libres affichées. Un seul HTML `.pkx`, `data-m` = `phone` (table ovale, sièges ronds sur le bord, bandeau blindes / table / tapis,
@@ -653,7 +656,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   plus belles ») : rang « ⭐ Les plus belles machines » juste sous la vitrine (`bestHTML()` de `pages/lobby.js`, liste `BEST` : les machines à
   décor animé, L'Olympe, La Fortune, L'Hydre, REDK… ; machines en travaux ou retirées sautées), grandes affiches (`.nx-best`, fin de la
   couche `finition`). **Partout, les plus beaux jeux d'abord** (« tout le temps en avant ») : `pretty()` trie chaque rangée de l'accueil et
-  chaque page de catégorie selon `PRETTY` (les machines de `BEST`, puis les jeux filmés : La Roue Folle, Super Keno, La Roulette, Le 21,
+  chaque page de catégorie selon `PRETTY` (les machines de `BEST`, puis les jeux filmés : La Roue Folle, Le Speedball, La Roulette, Le 21,
   La Pêche…), les autres gardent leur ordre ; seul le rang « Nouveautés » garde l'ordre des mises à jour. Nouvelle belle machine : l'ajouter à `BEST`.
 - **Catégorie « En ligne »** (demande du propriétaire du 16 novembre 2026 : « rassembler tous les jeux online, pour que ce soit plus
   simple ») : filtre `online` de `FILTERS` (`pages/lobby.js`, page `#lobby-online`) = `isOnline(g)` : les tables multijoueurs (`tag:

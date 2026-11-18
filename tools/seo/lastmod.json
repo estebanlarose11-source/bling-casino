@@ -12,11 +12,11 @@
 "d": "2026-11-05"
 },
 "articles/jeux-crash-mines-plinko-gratuits.html": {
-"h": "dd1dd584f7f15a38",
-"d": "2026-11-17"
+"h": "04691eb98a5ddab7",
+"d": "2026-11-18"
 },
 "articles/jeux-de-casino-gratuits-sans-telechargement.html": {
-"h": "0104a8b3e09a83b8",
+"h": "382b915c8d5c33c3",
 "d": "2026-11-18"
 },
 "articles/martingale-roulette.html": {
@@ -36,7 +36,7 @@
 "d": "2026-11-05"
 },
 "index.html": {
-"h": "0560a87ad04382db",
+"h": "55e0ab3d43134e1b",
 "d": "2026-11-18"
 },
 "jeux/anubis.html": {
@@ -136,7 +136,7 @@
 "d": "2026-11-16"
 },
 "jeux/index.html": {
-"h": "08cb75cb76fa4776",
+"h": "e5ed689a13db1778",
 "d": "2026-11-18"
 },
 "jeux/keno.html": {
@@ -241,6 +241,10 @@
 },
 "jeux/roulette.html": {
 "h": "344cb5aea041e73a",
+"d": "2026-11-18"
+},
+"jeux/speedball.html": {
+"h": "a1ed6db6dd5ebf7f",
 "d": "2026-11-18"
 },
 "jeux/storm-online.html": {

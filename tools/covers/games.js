@@ -32,10 +32,10 @@ module.exports = (G) => ({
     mode: 'pc', dpr: 3, rect: '.mwb', fit: [0.64, 0.5], hide: '.mwb-snd{display:none!important}',
     steps: [{ eval: `(() => { const g = ${G}; g.board.chip = 10; g.round(async () => { await g.onBuy('ch'); }); })()` }, { wait: 10600 }],
   },
-  // Super Keno : l'animateur, le tube plein de boules, la boule tirée et le multiplicateur de la dernière boule
-  keno: {
-    mode: 'pc', dpr: 3, rect: '.kn-art', fit: [0.585, 0.5], hide: '.kn-snd{display:none!important}',
-    steps: [{ click: '[data-k="f1"]' }, { wait: 400 }, { eval: `${G}.onMain()` }, { wait: 15000 }],
+  // Le Speedball : la présentatrice, la sphère, le tableau en arc qui se remplit et le SPEEDBALL
+  speedball: {
+    mode: 'pc', dpr: 3, rect: '.sbx-art', fit: [0.42, 0.5], hide: '.sbx-snd{display:none!important}',
+    steps: [{ click: '.sb-buy [data-n="5"]' }, { wait: 1600 }, { eval: `${G}.onMain()` }, { wait: 3900 }],
   },
   // La Pêche : la présentatrice, la main sur sa roue de glace (9,3 s de sa vidéo), et les éclairs sur notre roue
   // (serveur qui répond aux requêtes « Range » pour que la vidéo puisse avancer : SHOTS_URL=…)
