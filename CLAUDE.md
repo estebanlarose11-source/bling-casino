@@ -34,7 +34,9 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   seule toile (pluie de pièces `#tl-win`, effets de bonus `#tl-fx`, cachées entre deux usages) et, pour une toile
   jetée, appeler `forceContextLoss()`. Les rouleaux Pixi repassent en HTML tout seuls si leur contexte est perdu.
 - **Pas d'effets 3D dans les machines à sous** (choix du propriétaire, `inSlot()` dans la couche d'animations) : ni
-  pluie de pièces et gemmes 3D sur les gains, ni médaillon 3D sur les bonus. Les roues et tables gardent les leurs ;
+  pluie de pièces et gemmes 3D sur les gains, ni médaillon 3D sur les bonus. Les roues et tables gardent les leurs, **sauf
+  Le Plateau Live et La Roue Folle** (et leurs versions Online / retirées : `NO3D`, demande du propriétaire du 18 novembre 2026 :
+  rien en 3D par-dessus la vidéo de la présentatrice ; l'écouteur `sb:bonus` passe aussi par `inSlot()`) ;
   le grand titre « GROS GAIN ! » reste partout.
 - **Tailwind (Le Totem et Le Totem Extrême)** : `games/pharaon.js` et `games/totemx.js` sont écrits avec des classes
   Tailwind préfixées `tw-` (sans remise à zéro de la page). Après une modification de leurs classes ou de
@@ -462,44 +464,45 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Plus de crête, pilier ni ciel dessinés (`CREST`, `PILLAR`, `SKY` ne sont plus utilisés). **Plein écran** : la scène prend la largeur
   (avant, téléphone couché = on ne voyait que le ciel) ; téléphone couché : la scène sur toute la hauteur, la barre de pierre en colonne
   à droite (bloc CSS après `.vkx`). Gains inchangés.
-- **La Roue Folle = le jeu télé** (`games/madwheel.js`, ids `madwheel` et `madwheel-online`, demande du propriétaire du 16 novembre 2026 :
-  « une dinguerie ») : **ses 2 vidéos** d'un animateur qui lance une grande roue sur un plateau télé (`tools/art/madwheel/show-large.mp4`
-  736 × 400 : ordinateur ; `show-haut.mp4` 400 × 736 : téléphone tenu droit, roue vue de biais et coupée à droite) **jouées avec leur son**
-  (voix, roue, public ; bouton SON sur la scène, coupé à chaque arrivée (voir « L'attente »), coupé aussi par « Effets sonores », musique du jeu baissée par
-  `duck`), et **sa roue** (`roue.jpg` : cadre doré à ampoules → `rim.webp`, moyeu au tourbillon → `hub.webp`). **Notre roue** (les 54 cases
-  du jeu, `discSVG()` : tranches arc-en-ciel `PAL`, valeurs dans des carrés noirs, bonus en carré de couleur avec un signe blanc `GLYPH`)
-  est **posée sur la roue de la vidéo** et tourne elle-même jusqu'au résultat tiré : `tools/art/madwheel/build.py` (opencv, rembg, ffmpeg)
-  suit la roue **image par image** (ellipse du bord doré, `CAM` = suivi par la caméra quand l'animateur la cache) et **détoure l'animateur**
-  (rembg `u2net_human_seg`) → `TRACK` dans `games/madwheel.js` (par image : centre, rayons en % de la vidéo, case du masque) + planches
-  `mask-large.png` / `mask-haut.png` (masque CSS `.mwx-wb.mk` : l'animateur reste **devant** notre roue). La vidéo démarre dans le toucher
-  de LANCER (`startShow`, sinon pas de son sur iPhone) ; Boost pendant que l'animateur se prépare ; la roue part à son lancer (`VID.throw`)
-  et s'arrête quand il réagit (`VID.stop`), suivie par `requestVideoFrameCallback` ; flou de rotation = 2e disque flouté (`blurDisc`) dont
-  l'opacité suit la vitesse. Téléphone : lignes 70 à 650 de la vidéo haute (`VID.haut.crop`, `.mwx-p`). **Bonus à acheter** (« Bonus &
-  menu », solo seulement, au jeton choisi : `get bet()` = `board.chip`) : Pile ou Face ×18, Pachinko ×17, Tir aux Cibles ×34, Méga Folie
-  ×38 (valeur moyenne par simulation ×15 / ×13,9 / ×28,8 / ×32,1 + la mise → ≈ 88 %) ; la roue s'arrête sur le bonus acheté, sans Boost,
-  pas compté au Défi spécial. Les gains de la roue n'ont pas changé ; les bonus Pachinko, Tir aux Cibles et Méga Folie se jouent sur ses
-  vidéos de bonus (voir « La Roue Folle, les bonus sur ses vidéos »). Refaire les fichiers : `python3 tools/art/madwheel/build.py`
-  (`--fast` = sans réencoder les vidéos), puis `python3 tools/build.py` et changer `CACHE` dans `sw.js`.
-- **La Roue Folle, les bonus sur ses vidéos** (`games/madwheel.js`, demande du propriétaire du 16 novembre 2026) : **ses 3 vidéos**
-  (672 × 448, 6 s, avec le son) `tools/art/madwheel/bonus-pachinko.mp4` (plateau de Plinko), `bonus-canards.mp4` (mur de 12 × 11 canards
-  qui se mélangent puis tombent), `bonus-roue.mp4` (grande roue à 3 flèches rouge / jaune / bleue) → `python3 tools/art/madwheel/bonus.py`
-  (`--fast` = sans réencoder) : vidéos recalées sur la 1re image (la caméra zoome), bille dorée de la vidéo effacée et reflet des cases sur
-  le sol flouté (Plinko), écritures de la roue floutées et panneau « THE BIG SPIN » effacé (roue), boucle sans coupure au meilleur
-  endroit (`seam`, Plinko et roue : `at` / `loop`), **le son de la vidéo gardé pendant tout le bonus, boucles comprises** (voulu par le propriétaire ; bouton 🔊 sur la vidéo), animateur détouré → `assets/games/madwheel/b-<pa|ch|ct>.mp4` + `.webp` +
-  `bmask-*.png`, suivi `BTRACK` (zone, place des 132 canards, case du masque par image) écrit dans `games/madwheel.js`. Écran du bonus
-  `openShow()` : l'élément vidéo de l'émission y est **déplacé** (déjà autorisé à jouer avec le son par le toucher de LANCER, iPhone) puis
-  rendu par `closeShow()` ; nos éléments en % de la vidéo dans `.mwb-full` ; téléphone tenu droit : seule la partie `BCROP` de la vidéo.
-  **Pachinko** : nos 16 cases sur ses cases peintes, notre bille qui rebondit sur ses picots (moteur inchangé). **Tir aux Cibles** :
-  132 canards, chacun avec un multiplicateur **tiré au hasard à chaque bonus** (`chBoard` : mêmes chances que les 108 cibles d'avant,
-  moyenne ×28,8 inchangée) ; la vidéo s'arrête après le mélange (3,4 s), le joueur touche un canard, puis ils tombent. **Méga Folie** :
-  notre roue de **32 cases** (`CTC` : ×10 à ×200, 1 DOUBLE, 1 TRIPLE) sur la sienne, ses 3 flèches redessinées droites à leur place
-  (`CTTIP`, angles `CTARR` = −27°, 2°, 32°) ; moyenne ×32,25 (×32,21 avant), achat ×38 ≈ 87,5 % comme avant. Pile ou Face n'a pas de vidéo.
-- **La Roue Folle, Pile ou Face sur sa vidéo** (demande du propriétaire du 16 novembre 2026) : **sa vidéo** `tools/art/madwheel/bonus-pileface.mp4`
-  (1080 × 1920, 12 s, avec le son : l'animateur lance un palet rouge qui retombe dans un bocal, toujours rouge) →
-  `python3 tools/art/madwheel/pileface.py` : `assets/games/madwheel/b-pf-r.mp4` (rouge) et **`b-pf-b.mp4` (le rouge du palet passé en
-  bleu image par image** : rouge très saturé partout, rouge pâle seulement hors de l'animateur détouré, pour garder sa peau), 720 × 1280.
-  `bonusCF` joue la version du côté tiré (`openShow('pf', …, src)`, écran 9 : 16 `.mwb-pf`), plaques ROUGE ×a / BLEU ×b en haut
-  (`.mwb-pf-v`), résultat à 10,2 s de la vidéo. Gains inchangés.
+- **La Roue Folle = la même émission que Le Plateau Live** (`games/madwheel.js`, ids `madwheel` et `madwheel-online`, demande du
+  propriétaire du 18 novembre 2026 : « la même vidéo et la même animatrice pour la roue folle et le plateau », à la place de l'animateur
+  du 16 novembre) : **les vidéos du Plateau Live** (`assets/games/plateaulive/roue.mp4` + `attente.mp4`, la présentatrice en robe rouge)
+  et leur suivi (`TRACK`, `IDLE`, `GO`, moyeu `HUB` « SPIN BET », `POINTER`, `mul`, `css3d` : exportés par `games/plateaulive.js` dans
+  `SHOW`, chargé avant La Roue Folle par `DEPS` de `games/impl/index.js` ; lus au lancement, `PLX()`). **Notre roue de 54 cases**
+  (`discSVG()` : tranches arc-en-ciel `PAL`, valeurs dans des carrés noirs, bonus en carré de couleur `GLYPH`, jusqu'au bord comme celle
+  du Plateau Live) posée sur sa roue par homographie (`.plx-wb`, mêmes classes `.plx` et même CSS que Le Plateau Live, `.mw-live`) ;
+  attente, LANCER, son coupé à l'arrivée, téléphone tenu droit = partie droite : tout comme Le Plateau Live (`frame`, `toIdle`,
+  `fromIdle`, `startShow`) ; elle lance à 2,75 s, la roue s'arrête à 8,1 s ; le Boost tourne pendant qu'elle se prépare (plaque `.mw-top`,
+  en bas à gauche sur téléphone). Plein écran : règles du Plateau Live étendues à `.slot.mwlive`. Les anciennes vidéos de l'animateur
+  (`show-*`, `attente-*`, `mask-*`, `rim.webp`) et `tools/art/madwheel/build.py` / `attente.py` sont supprimés (ses vidéos d'origine restent
+  dans `tools/art/madwheel/`). **Bonus à acheter** (« Bonus & menu », solo seulement, au jeton choisi : `get bet()` = `board.chip`) :
+  Pile ou Face ×18, Pachinko ×17, Tir aux Cibles ×34, Méga Folie ×38 (valeur moyenne par simulation ×15 / ×13,9 / ×28,8 / ×32,1 + la
+  mise → ≈ 88 %) ; la roue s'arrête sur le bonus acheté, sans Boost, pas compté au Défi spécial. Gains de la roue inchangés.
+  Miniature : la présentatrice devant le mur de canards (`tools/covers/games.js`).
+- **La Roue Folle, les bonus sur ses vidéos** (`games/madwheel.js`, demande du propriétaire du 16 novembre 2026 ; **depuis le 18 novembre
+  2026 avec la présentatrice du Plateau Live à la place de l'animateur, et SA voix**) : **ses 3 vidéos** (672 × 448, 6 s)
+  `tools/art/madwheel/bonus-pachinko.mp4` (plateau de Plinko), `bonus-canards.mp4` (mur de 12 × 11 canards qui se mélangent puis tombent),
+  `bonus-roue.mp4` (grande roue à 3 flèches). Fabrication en 3 temps (`MW_WORK` = dossier de travail) :
+  1. `python3 tools/art/madwheel/sansanimateur.py` : vidéos recalées (`bonus.py` : `stabilize`, bille dorée et panneau effacés), **l'animateur
+     effacé** (rembg `u2net_human_seg` élargi + ce qui diffère du décor près de lui ; chaque pixel pris dans l'image la plus proche où il ne le
+     cache pas ; canards : sa main repérée par la couleur de peau, jamais de mélange entre avant / pendant / après le mélange des canards,
+     canards jamais vus recopiés 5 colonnes plus à gauche, cellule entière) → `WORK/<k>-clean.npy` ;
+  2. la présentatrice détourée dans `tools/art/plateaulive/attente.mp4` (rembg `isnet-general-use` : net autour du micro), RGBA dans `MW_FEMME` ;
+  3. `python3 tools/art/madwheel/femme.py` : elle est posée à la place de l'animateur (`PLACE` : haut de la tête, centre ; coupée par le bas de
+     l'image comme dans sa vidéo), en 1344 × 896, sa voix du même passage (lèvres synchrones) ; Pachinko et roue : boucle sans coupure
+     (`seam` sur le décor, et un passage d'elle qui revient à la même pose, `her_loop`) ; sa planche de masques `bmask-*.png` et `BTRACK`.
+  Écran du bonus `openShow()` (élément vidéo de l'émission déplacé), nos éléments en % de la vidéo dans `.mwb-full` ; téléphone tenu droit :
+  seule la partie `BCROP` (élargie pour qu'on voie son visage). **Pachinko** : nos 16 cases sur ses cases peintes, notre bille. **Tir aux
+  Cibles** : 132 canards, multiplicateur tiré au hasard à chaque bonus (`chBoard`, moyenne ×28,8) ; la vidéo s'arrête après le mélange (3,4 s),
+  le joueur touche un canard, puis ils tombent. **Méga Folie** : notre roue de 32 cases (`CTC`) sur la sienne, ses 3 flèches (`CTTIP`, `CTARR`).
+- **La Roue Folle, Pile ou Face** (`b-pf-r.mp4` rouge / `b-pf-b.mp4` bleu, 720 × 1280 ; refait le 18 novembre 2026 avec la présentatrice :
+  `python3 tools/art/madwheel/pileface-femme.py`, d'abord `--masks`) : sa vidéo `bonus-pileface.mp4` est un gros plan où la caméra bouge et où
+  l'animateur lance le palet : l'effacer laissait des traces. C'est donc **un montage** : 2,5 s de plan fixe du décor (images 0 à 57 sans
+  lui ni le palet, `plate()`), **elle derrière la table** qui annonce (cachée sous le bord de la table `EDGE`, léger reflet), puis coupe sur
+  la caméra qui suit le palet (images 96 → fin, cadre `CAM` sur la partie droite, sa main au bord effacée), le palet tombe dans le bocal,
+  gros plan. Sa voix tout du long. Le palet est vu dans le bocal à `PF_AT` = 8,8 s (`bonusCF`). Version bleue : le rouge du palet passé en
+  bleu (`pileface.py` `blue()`), jamais sur elle (sa robe reste rouge). Plaques ROUGE ×a / BLEU ×b en haut (`.mwb-pf-v`), bouton du son en
+  bas. Gains inchangés.
 - **Le Plateau Live** (`games/plateaulive.js`, id `plateaulive`, Roues & tables, demande du propriétaire du 17 novembre 2026 : « reprends
   Le Plateau » avec ses vidéos ; il l'appelait « MNOP » : nom gardé à nous, pas de nom ni de dessin d'un jeu existant). **La roue** = celle
   de l'ancien Plateau (78 cases : 1 ×33, 2 ×22, 5 ×11, 10 ×6, 2 LANCERS ×4, 4 LANCERS ×1, CHANCE ×1 = la roue repart, ce tour paie ×10 ;
@@ -524,20 +527,16 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   tourner déjà, elle tourne en boucle, et quand on veut jouer on active la roue avec nos mises », et le son OFF en arrivant) : une 2e
   `<video>` au-dessus de l'émission (`.plx-idle` / `.mwx-idle`), muette, qui tourne en boucle dès l'arrivée (retour d'une boucle `IDLE.loop`
   comme `VideoBg`), notre roue posée dessus (`frame(k, 'idle')` / `idleSrc`). **Son de l'émission coupé à chaque arrivée** (`sndOn = false`,
-  plus de `spinbet_*_snd`) : bouton « 🔇 SON OFF » / « 🔊 SON ON » (`paintSnd`, rond sur le téléphone de La Roue Folle, à gauche sur celui du
-  Plateau Live), musique baissée tant que l'attente parle (`duckIdle`), et tout toucher redonne le son à l'attente (iPhone). LANCER
+  plus de `spinbet_*_snd`) : bouton « 🔇 SON OFF » / « 🔊 SON ON » (`paintSnd`, à gauche sur le téléphone), musique baissée tant que l'attente parle (`duckIdle`), et tout toucher redonne le son à l'attente (iPhone). LANCER
   (`startShow`, dans le toucher) : l'émission part et, dès sa 1re image (`fromIdle`, `requestVideoFrameCallback`), elle remplace l'attente ;
-  quand elle finit (`ended`, ou `handAt` = `IDLE.from` pour La Roue Folle) : `toIdle()`. Attente en pause pendant les bonus, reprise après.
+  quand elle finit (`ended`) : `toIdle()`. Attente en pause pendant les bonus, reprise après.
   **Plateau Live** : **sa vidéo** `tools/art/plateaulive/attente.mp4` (la présentatrice parle à côté de la roue, caméra fixe ; son montage
   continuait par `roue.mp4`, coupé à l'image 538) → `python3 tools/art/plateaulive/attente.py` (`--fast`) : boucle images 41 → 532 (deux
   silences de sa voix), fin fondue dans le début (1 s, image et son) → `assets/games/plateaulive/attente.mp4` (1280 × 694, avec sa voix) +
   `attente.webp`, présentatrice détourée `attente-mask.png`, `IDLE` dans `games/plateaulive.js` (une seule homographie `h` : la roue ne bouge
   pas, case du masque par image `m`). LANCER part de `GO` = 1,6 s de `roue.mp4` (elle lance à 2,75 s) avec un fondu de 0,35 s (même caméra).
-  **La Roue Folle** : pas de vidéo d'attente : `python3 tools/art/madwheel/attente.py` fait un aller-retour de la fin de `show-*.mp4`
-  (l'animateur montre la roue arrêtée : images 222 → 240 large, 214 → 230 haut) + l'ambiance du public → `attente-large.mp4` /
-  `attente-haut.mp4` (+ `.webp`) ; `IDLE[large|haut].f` = l'image de l'émission montrée par chaque image de l'attente (`TRACK` et masques
-  réutilisés), `from` = l'image où l'émission lui rend la main sans saut. LANCER = coupe franche vers l'image 0 (autre cadrage), il lance 1 s
-  plus tard. Si le propriétaire envoie une vraie vidéo d'attente de l'animateur, la mettre à la place comme pour Le Plateau Live.
+  **La Roue Folle** : depuis le 18 novembre 2026, exactement la même attente que Le Plateau Live (ses vidéos, voir « La Roue Folle = la
+  même émission que Le Plateau Live »).
   **Essais en local** : `python3 -m http.server` ne répond pas aux requêtes « Range » : une vidéo ne peut pas y avancer (`currentTime`
   revient à 0, l'émission repart du début) ; Vercel les gère.
 - **Le Super Keno** (`games/keno.js`, id `keno`, catégorie Jeux rapides, tag Loterie, demande du propriétaire du 16 novembre 2026 : « le

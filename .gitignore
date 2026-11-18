@@ -7,3 +7,4 @@ android/.gradle/
 tools/shorts/out/
 ios/SpinBet.xcodeproj/
 ios/SpinBet/Info.plist
+__pycache__/

@@ -27,10 +27,10 @@ module.exports = (G) => ({
     mode: 'phone', rect: '.rlx-v', box: [0, 0, 1], hide: '.rl-tip,.rlx-snd,.rlx-led{display:none!important}',
     steps: [{ eval: `["n17", "n23", "n8", "n32", "n0"].forEach((k) => document.querySelector('.rlx-cell[data-k=' + k + ']')?.dispatchEvent(new MouseEvent('click', { bubbles: true })))` }, { wait: 300 }, { eval: `${G}.onMain()` }, { wait: 3200 }],
   },
-  // La Roue Folle : l'animateur qui rit devant sa grande roue (vidéo du téléphone)
+  // La Roue Folle : la présentatrice du Plateau Live devant le mur de canards du Tir aux Cibles (multiplicateurs affichés)
   madwheel: {
-    mode: 'phone', rect: '.mwx', fit: [0.5, 0.45], hide: '.mwx-snd,.mw-top,.mwx-res{display:none!important}',
-    steps: [{ click: '.mw-spot[data-k="10"]' }, { click: '.spin-btn' }, { wait: 8800 }],
+    mode: 'pc', dpr: 3, rect: '.mwb', fit: [0.64, 0.5], hide: '.mwb-snd{display:none!important}',
+    steps: [{ eval: `(() => { const g = ${G}; g.board.chip = 10; g.round(async () => { await g.onBuy('ch'); }); })()` }, { wait: 10600 }],
   },
   // Super Keno : l'animateur, le tube plein de boules, la boule tirée et le multiplicateur de la dernière boule
   keno: {

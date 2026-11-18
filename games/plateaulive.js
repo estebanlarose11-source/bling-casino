@@ -716,5 +716,6 @@ class PlateauLiveGame extends BaseGame {
   }
 }
 
-return { PlateauLiveGame, outcome, boardRun, SEGS };
+// the show (her videos, the tracking of her wheel, our hub and pointer) is also La Roue Folle's (owner's request of 18 November 2026)
+return { PlateauLiveGame, outcome, boardRun, SEGS, SHOW: { TRACK, IDLE, GO, HUB, POINTER, mul, css3d } };
 })();
