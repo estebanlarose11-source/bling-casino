@@ -450,6 +450,21 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Bust It à côté d'elle ; les `vx` / `vy` des jeux ne servent plus). Tailles du CSS `.bjx` en `calc(… * var(--u))`. Mode choisi par la
   forme de l'écran (`bmode`, changé entre deux mains). Son : bouton 🔊 (`spinbet_bj_snd`, aussi coupé par « Effets sonores »),
   `Donne.unlock()` dans le 1er toucher (iPhone). Gains inchangés.
+- **La croupière en direct : ouverture et gros plan** (Le 21, Le 21 Électrique, La Bataille, `BjVideoGame` ; vidéo du propriétaire du
+  19 novembre 2026, 1080 × 1920, 15 s, copiée dans `tools/art/blackjack/ouverture.mp4`) : c'est un montage de 4 plans : images 0 → 38 = fin de
+  l'ouverture « Bonsoir, la table est ouverte. » (étiquette « la table est ouverte », sous-titres), 39 → 251 = la table large où elle
+  distribue (non utilisé : le jeu garde `table-<l|p>.mp4`), 252 → 267 = début de la même ouverture, 268 → 453 = gros plan d'elle, vivante,
+  caméra qui avance. `python3 tools/art/blackjack/attente.py` (`ouverture` / `idle` = une seule des deux) → `assets/games/blackjack/`
+  **`ouverture.mp4`** (252 → 267 puis 0 → 38 = toute la phrase, 1,8 s, avec sa voix) et **`attente.mp4`** (le gros plan en aller-retour,
+  demi-tours adoucis `EASE`, muet, boucle `IDLE_LOOP` = 370 / 30 s puis 15 images répétées ; « BLACK JACK PAYS 3 TO 2 / Dealer must stand
+  on 17 » effacé : tapis suivi image par image (SIFT, homographie depuis l'image 268), bande `BAND` remplacée par un tapis lisse).
+  Dans le jeu (voulu par le propriétaire : « quand on joue pas… la croupière animée à l'infini ; quand on mise, la vidéo où elle sert les
+  cartes ») : **à chaque arrivée** sur la table, l'ouverture par-dessus tout le jeu (`.bjx-open`, après l'écran d'accueil du jeu `.gi-back`,
+  un toucher la passe, sautée avec `?nointro`, ajustée à la partie visible au-dessus de la barre du bas du téléphone `fitOpen()`), puis
+  **le gros plan** (`.bjx-idle`, classe `.bjx-idle-on` : tapis, cercles, cartes, jetons, tableau du 21 Électrique s'effacent, « ● EN DIRECT »
+  et « Touche la table pour miser » ; ordinateur = son visage en `object-fit: cover`). Tout toucher (ou touche du clavier) ramène la table
+  (`touchTable`) ; le gros plan revient après `IDLE_AFTER` (9 s sans toucher en choisissant sa mise, 6 s après la fin d'une main), jamais
+  pendant une main. Le nom `act` est déjà pris par Le 21 (main en cours). Gains inchangés.
 - **La Roulette : la croupière filmée** (`games/roulette.js` → `RlVideoGame` de `games/rltable.js`, vidéos du propriétaire du 17 novembre
   2026, remplacent celle du 16 ; L'Éclair, La Double Bille et L'Éclair Online gardent la table 3D) : **ses 2 vidéos** (`tools/art/roulette/
   show-large.mp4` 672 × 448 ; `show-haut.mp4` 448 × 672 ; 12 s, **avec sa voix**) : la croupière à côté de la roue parle, lance la roue et

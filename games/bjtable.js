@@ -12,7 +12,7 @@ __mods['games/impl/bjtable.js'] = (() => {
 // sont des « panneaux » redressés face au joueur (.bjv-up). Les 3 jeux étendent BjTableGame.
 
 const { BaseGame, fmtC } = __mods['core/base.js'];
-const { sfx, isMuted } = __mods['audio.js'];
+const { sfx, isMuted, duck } = __mods['audio.js'];
 
 let uid = 0;
 // Chips in cents: [value, label, colour, edge inserts, text colour]. 5 of them are on the felt, chosen from the balance.
@@ -480,6 +480,12 @@ const BGEO = {
 };
 // her 2 gestures (frames at 24 / s): a = start, land = the card touches its place, b = her hand is back (then: rest)
 const CLIPS = { p: { a: 10, land: 61, b: 100 }, d: { a: 100, land: 161, b: 192 } };
+// Her video of 19 November 2026 (tools/art/blackjack/attente.py, owner's wish: « ça donne une impression de live »):
+// ouverture.mp4 = « Bonsoir, la table est ouverte. » (1.8 s, her voice) once when the player comes to the table; attente.mp4 =
+// a close-up of her, alive, looped while nobody plays (IDLE_LOOP: the loop, then its first frames again: we jump back by one
+// loop like core/videobg.js). Bets and deals go back to the table video above. IDLE_AFTER: ms without a touch before the
+// close-up comes back (bet = choosing the bet, end = the result of the last hand stays on the felt).
+const IDLE_LOOP = 370 / 30, IDLE_AFTER = { bet: 9000, end: 6000 };
 const bmode = () => (innerHeight > innerWidth && innerWidth < 900 ? 'p' : 'l');
 
 const vSpotHTML = (t, label, sub) => `<button class="bjv-spot bjx-spot${t === 'main' ? ' main' : ' bjv-sb'}" data-t="${t}" aria-label="Poser le jeton choisi sur ${label}"><em class="bjx-lab">${label}${sub ? `<small>${sub}</small>` : ''}</em><span class="bjv-stack"></span><b class="bjv-up bjv-amt" hidden></b><b class="bjv-up bjv-sres" hidden></b></button>`;
@@ -491,6 +497,9 @@ function videoHTML(o = {}) {
     <div class="bjx-vp" style="width:${g.W}px;height:${g.VH}px;--u:${g.u}">
       <video class="bjx-v" playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
       <video class="bjx-v off" playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+      <video class="bjx-idle" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+      <i class="bjx-live" aria-hidden="true"><b></b>EN DIRECT</i>
+      <b class="bjx-tap" aria-hidden="true">Touche la table pour miser</b>
       <div class="bjx-felt"><i class="bjx-t">${o.t2 || 'LE BLACKJACK PAIE 6 POUR 5 · LA CROUPIÈRE TIRE À 16 ET RESTE À 17'}</i></div>
       ${CHIP_SHADE}
       <div class="bjx-occ">
@@ -515,6 +524,7 @@ function videoHTML(o = {}) {
       <div class="bjv-me"><span class="bjv-av"></span><b class="bjv-name"></b><em class="bjv-bal"></em></div>
       <button class="bjv-b" data-b="2"></button><button class="bjv-b" data-b="3"></button>
     </div>
+    <div class="bjx-open" hidden><i class="bjx-open-bg"></i><video class="bjx-open-v" playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video></div>
   </div>`;
 }
 
@@ -610,9 +620,106 @@ class BjVideoGame extends BjTableGame {
     this.onFrame(0, null);
     addEventListener('resize', this.onRs = () => requestAnimationFrame(() => { this.swapMode(); this.fit(); }));
     requestAnimationFrame(() => this.fit());
+    // her close-up while nobody plays, her opening when the player comes
+    this.iv = this.q('.bjx-idle'); this.idle = false; this.lastAct = performance.now();
+    if (this.donne.ok) {
+      const iv = this.iv;
+      iv.poster = bsrc('attente.webp'); iv.src = bsrc('attente.mp4');
+      iv.addEventListener('timeupdate', () => { if (iv.currentTime >= IDLE_LOOP) iv.currentTime -= IDLE_LOOP; });
+      iv.addEventListener('ended', () => { iv.currentTime = 0; if (this.idle) iv.play().catch(() => {}); });
+    }
+    this.view.addEventListener('pointerdown', this.onAct = (e) => this.touchTable(e), true);
+    addEventListener('keydown', this.onKeyAct = (e) => { if (!e.repeat && !e.target?.closest?.('input, textarea, [contenteditable]')) this.touchTable(e); }, true);
+    document.addEventListener('visibilitychange', this.onIdleVis = () => { if (document.hidden) this.iv.pause(); else if (this.idle) this.iv.play().catch(() => {}); });
+    this.idleTick = setInterval(() => this.idleCheck(), 400);
+    this.openTable();
   }
   get g() { return BGEO[this.mode]; }
-  destroy() { this.donne?.destroy(); removeEventListener('resize', this.onRs); super.destroy(); }
+  destroy() {
+    this.donne?.destroy(); removeEventListener('resize', this.onRs);
+    clearInterval(this.idleTick); clearTimeout(this.openT); clearTimeout(this.ivT); this.offUnlock?.();
+    this.view?.removeEventListener('pointerdown', this.onAct, true); removeEventListener('keydown', this.onKeyAct, true);
+    document.removeEventListener('visibilitychange', this.onIdleVis);
+    [this.iv, this.q('.bjx-open-v')].forEach((v) => { if (!v) return; v.pause(); v.removeAttribute('src'); v.load(); });
+    super.destroy();
+  }
+  // « Bonsoir, la table est ouverte. »: over the whole table, once, when the player comes (after the game's welcome screen),
+  // then her close-up. A tap skips it (to the table: the player wants to play).
+  openTable() {
+    const box = this.q('.bjx-open'), v = box?.querySelector('video');
+    if (!box || !this.donne.ok || new URLSearchParams(location.search).has('nointro')) return;
+    this.opening = true; box.hidden = false;
+    box.querySelector('.bjx-open-bg').style.backgroundImage = `url('${bsrc('ouverture.webp')}')`;
+    v.muted = true; v.poster = bsrc('ouverture.webp'); v.src = bsrc('ouverture.mp4');
+    const snd = () => this.sndOn && !isMuted();
+    // the first touch (JOUER of the welcome screen…): she may then speak (iPhone wants a touch for a video with sound)
+    const unlock = () => {
+      this.offUnlock?.();
+      if (this.openGo || !snd()) return;
+      v.muted = false;
+      v.play()?.then(() => { if (!this.openGo) { v.pause(); try { v.currentTime = 0; } catch { /* ignore */ } } }).catch(() => { v.muted = true; });
+    };
+    document.addEventListener('pointerdown', unlock, true);
+    this.offUnlock = () => document.removeEventListener('pointerdown', unlock, true);
+    let since = 0;
+    const wait = () => {
+      if (this.dead || !this.opening) return;
+      if (document.querySelector('.gi-back:not(.out)') || document.hidden) { since = 0; this.openT = setTimeout(wait, 100); return; }
+      since = since || performance.now();
+      if (v.readyState < 3 && performance.now() - since < 3000) { this.openT = setTimeout(wait, 100); return; }
+      if (v.readyState < 2) return this.endOpening(false); // too slow to come: straight to her close-up
+      this.openGo = true; this.offUnlock(); this.fitOpen();
+      try { v.currentTime = 0; } catch { /* ignore */ }
+      v.muted = !snd();
+      v.play().catch(() => { v.muted = true; return v.play(); }).catch(() => this.endOpening(false));
+      if (!v.muted) duck(0.35, 2.4);
+      v.addEventListener('ended', () => this.endOpening(false), { once: true });
+      this.openT = setTimeout(() => this.endOpening(false), 4500);
+    };
+    wait();
+  }
+  // the opening inside the part of the table that the screen shows (on a phone, the bottom of the table is under the site's
+  // bottom bar until the player scrolls or goes full screen): her words at the bottom of the video stay readable
+  fitOpen() {
+    const box = this.q('.bjx-open'), r = this.view.getBoundingClientRect();
+    const nav = document.querySelector('.bottom-nav'), nr = nav && getComputedStyle(nav).display !== 'none' ? nav.getBoundingClientRect() : null;
+    const bot = Math.min(innerHeight, nr && nr.height ? nr.top : innerHeight), top = Math.max(0, document.querySelector('.top')?.getBoundingClientRect().bottom || 0);
+    const cb = Math.max(0, Math.min(r.height * 0.4, r.bottom - bot)), ct = Math.max(0, Math.min(r.height * 0.3, top - r.top));
+    box.style.inset = `${Math.round(ct)}px 0 ${Math.round(cb)}px 0`;
+  }
+  endOpening(skip) {
+    if (!this.opening) return;
+    this.opening = false; clearTimeout(this.openT); this.offUnlock?.();
+    const box = this.q('.bjx-open'), v = box.querySelector('video');
+    this.lastAct = performance.now();
+    if (!skip) this.goIdle();
+    box.classList.add('out');
+    setTimeout(() => { if (this.dead) return; box.hidden = true; v.pause(); v.removeAttribute('src'); v.load(); }, 520);
+  }
+  // her close-up over the table (bets, cards and circles fade out); any touch brings the table back
+  goIdle() {
+    if (this.idle || this.dead || this.opening || !this.donne.ok || !this.betting()) return;
+    this.idle = true; this.view.classList.add('bjx-idle-on');
+    clearTimeout(this.ivT); this.iv.play().catch(() => {});
+  }
+  leaveIdle() {
+    if (!this.idle) return;
+    this.idle = false; this.view.classList.remove('bjx-idle-on');
+    clearTimeout(this.ivT); this.ivT = setTimeout(() => { if (!this.idle) this.iv.pause(); }, 600);
+  }
+  touchTable(e) {
+    this.lastAct = performance.now();
+    if (this.opening) { if (e?.type === 'pointerdown') this.endOpening(true); return; }
+    if (e?.target?.closest?.('.bjx-snd')) return; // the sound button: her close-up stays
+    this.leaveIdle();
+  }
+  idleCheck() {
+    if (this.dead || this.opening) return;
+    const ph = this.betting() ? this.phase : 'play';
+    if (ph !== this.idlePh) { this.idlePh = ph; this.lastAct = performance.now(); }
+    if (ph === 'play') { this.leaveIdle(); return; }
+    if (!this.idle && !document.hidden && performance.now() - this.lastAct > (IDLE_AFTER[ph] || IDLE_AFTER.bet)) this.goIdle();
+  }
   wake() { super.wake(); this.donne.sound = this.sndOn && !isMuted(); this.donne.unlock(); }
   paintSnd() { const b = this.q('.bjx-snd'); if (b) { b.textContent = this.sndOn ? '🔊' : '🔇'; b.title = this.sndOn ? 'Couper le son de la table' : 'Remettre le son de la table'; } if (this.donne) this.donne.sound = this.sndOn && !isMuted(); }
   measure() {}
@@ -623,6 +730,7 @@ class BjVideoGame extends BjTableGame {
     const g = this.g, vp = this.vp;
     vp.style.width = `${g.W}px`; vp.style.height = `${g.VH}px`; vp.style.setProperty('--u', g.u);
     this.qa('.bjx-v').forEach((v) => { v.style.width = `${g.W}px`; v.style.height = `${g.H}px`; });
+    const iv = this.q('.bjx-idle'); if (iv) { iv.style.width = `${g.W}px`; iv.style.height = `${this.mode === 'p' ? g.H : g.VH}px`; } // computer: her face over the whole scene
     const put = (el, x, y, r) => { if (!el) return; el.style.left = `${x}px`; el.style.top = `${y}px`; if (r) el.style.setProperty('--d', `${r * 2}px`); };
     put(this.q('.bjv-spot.main'), g.spot.x, g.spot.y, g.spot.r);
     for (const s of this.o.sides || []) { const p = g.sides[s.id] || g.sides.t3; put(this.q(`.bjv-spot[data-t="${s.id}"]`), p[0], p[1], p[2]); }

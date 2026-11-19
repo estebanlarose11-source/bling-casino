@@ -8699,6 +8699,30 @@ html.light .snowfall i { background: radial-gradient(circle, #cbd5e1 0%, rgba(14
   .bjx .bjv-top .bjv-meter { flex: 1 1 0; min-width: 0; text-align: center; } .bjx .bjv-meter b { font-size: 12.5px; }
   .lbj .bjx .bjv-msg { top: 54px; }
 }
+/* Le 21, Le 21 Électrique, La Bataille : la croupière en gros plan tant que personne ne joue (.bjx-idle, attente.mp4 en boucle,
+   classe .bjx-idle-on sur .bjx : tapis, cartes et cercles s'effacent, un toucher ramène la table) et l'ouverture « Bonsoir, la table
+   est ouverte. » à l'arrivée (.bjx-open, ouverture.mp4), vidéo du propriétaire du 19 novembre 2026 (tools/art/blackjack/attente.py). */
+.bjx-idle { position: absolute; left: 0; top: 0; z-index: 1; width: 720px; height: 1280px; object-fit: cover; object-position: 50% 4%; pointer-events: none; opacity: 0; transition: opacity .45s ease; background: #0b120e; }
+.bjx-l .bjx-idle { border-radius: 0 0 18px 18px; }
+.bjx .bjx-felt, .bjx .bjx-occ, .bjx .bjx-spot, .bjx .lbv-board { transition: opacity .45s ease; }
+.bjx-idle-on .bjx-idle { opacity: 1; }
+.bjx.bjx-idle-on .bjx-felt, .bjx.bjx-idle-on .bjx-occ, .bjx.bjx-idle-on .bjx-spot, .bjx.bjx-idle-on .lbv-board, .bjx.bjx-idle-on .bjx-fly,
+.bjx.bjx-idle-on .bjv-pick, .bjx.bjx-idle-on[data-phase="end"] .bjv-pick { opacity: 0; pointer-events: none; }
+.bjx-live { position: absolute; left: calc(12px * var(--u)); top: calc(12px * var(--u)); z-index: 5; display: flex; align-items: center; gap: calc(5px * var(--u)); padding: calc(4px * var(--u)) calc(9px * var(--u)) calc(4px * var(--u)) calc(7px * var(--u)); border-radius: 99px; background: rgba(8, 6, 6, .55); border: 1px solid rgba(255, 255, 255, .22); font: 800 calc(10px * var(--u))/1 Archivo, sans-serif; font-style: normal; letter-spacing: calc(1.4px * var(--u)); color: #fff; pointer-events: none; opacity: 0; transition: opacity .45s ease; }
+.bjx-live b { width: calc(7px * var(--u)); height: calc(7px * var(--u)); border-radius: 50%; background: #ff3b3b; box-shadow: 0 0 calc(6px * var(--u)) #ff3b3b; animation: bjxLive 1.4s ease-in-out infinite; }
+.bjx-tap { position: absolute; left: 50%; bottom: calc(14px * var(--u)); z-index: 5; transform: translateX(-50%); padding: calc(7px * var(--u)) calc(16px * var(--u)); border-radius: 99px; background: rgba(8, 6, 6, .6); border: 1px solid rgba(240, 210, 122, .55); font: 800 calc(12px * var(--u))/1 Archivo, sans-serif; letter-spacing: calc(1px * var(--u)); color: #fde68a; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .45s ease; }
+.bjx-p .bjx-tap { bottom: 40px; font-size: calc(13px * var(--u)); }
+.bjx-idle-on .bjx-live { opacity: 1; }
+.bjx-idle-on .bjx-tap { opacity: 1; animation: bjxTap 2.6s ease-in-out .6s infinite; }
+.btl .bjx-live { display: none; } /* La Bataille : sa barre SÉRIE est à cette place */
+@keyframes bjxLive { 50% { opacity: .35; } }
+@keyframes bjxTap { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
+.bjx-open { position: absolute; inset: 0; z-index: 40; overflow: hidden; background: #050607; cursor: pointer; transition: opacity .5s ease; }
+.bjx-open[hidden] { display: none; }
+.bjx-open.out { opacity: 0; pointer-events: none; }
+.bjx-open-bg { position: absolute; inset: -40px; background: center / cover no-repeat; filter: blur(26px) brightness(.42) saturate(1.1); pointer-events: none; }
+.bjx-open-v { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .bjx-live b, .bjx-idle-on .bjx-tap { animation: none; } }
 /* ============ Néon violet et rose (demande du propriétaire du 11 novembre 2026, d'après une bannière de casino :
    nuit violette, lumières roses, boutons en pilule rose, menu en haut sur ordinateur, vitrine sur l'accueil).
    Après tout le reste de la finition : c'est ici qu'on retouche l'allure générale. ============ */
@@ -16036,6 +16060,9 @@ __mods['updates.js'] = (() => {
 const { getGame } = __mods['games/index.js'];
 
 const UPDATES = [
+  { game: 'blackjack', date: '2026-11-19', title: 'La croupière en direct', items: ['En arrivant à la table, la croupière t’accueille : « Bonsoir, la table est ouverte. »', 'Quand tu ne joues pas, la caméra passe en gros plan sur elle : elle sourit, baisse les yeux, s’installe, en continu', 'Touche la table pour miser : la caméra revient sur le tapis et elle te sert tes cartes', 'Le texte « BLACK JACK PAYS 3 TO 2 » du tapis a aussi disparu du gros plan'] },
+  { game: 'lightningbj', date: '2026-11-19', title: 'La croupière en direct', items: ['En arrivant à la table, la croupière t’accueille : « Bonsoir, la table est ouverte. »', 'Quand tu ne joues pas, la caméra passe en gros plan sur elle, en continu', 'Touche la table pour miser : la caméra revient sur le tapis et elle te sert tes cartes'] },
+  { game: 'bataille', date: '2026-11-19', title: 'La croupière en direct', items: ['En arrivant à la table, la croupière t’accueille : « Bonsoir, la table est ouverte. »', 'Quand tu ne joues pas, la caméra passe en gros plan sur elle, en continu', 'Touche la table pour miser : la caméra revient sur le tapis'] },
   { game: 'speedball', date: '2026-11-18', isNew: true, title: 'Le Speedball', items: ['Le tirage en direct avec la présentatrice : 20 boules, puis la boule dorée du SPEEDBALL', 'Achète tes grilles par 1, 5, 10 ou 50 d’un coup : elles tombent en pile', 'Ta grille la plus avancée passe toujours en haut de la pile, le numéro qui lui manque clignote', 'À la fin, la fenêtre « Mes grilles » les montre toutes, les meilleures d’abord', 'Le SPEEDBALL multiplie jusqu’à ×200 les grilles qui l’ont dans une ligne'] },
   { game: 'peche', date: '2026-11-18', title: 'La présentatrice et sa roue de glace', items: ['Une présentatrice en robe rouge présente la roue sur un plateau de glace, en continu', 'Ta roue de 54 cases est posée sur sa grande roue de glace, avec son cristal-pointeur', 'La roue s’arrête au hasard sur n’importe quelle case, à chaque lancer', 'Quand elle montre la roue, sa main passe vraiment devant'] },
   { game: 'peche-online', date: '2026-11-18', title: 'La présentatrice et sa roue de glace', items: ['Une présentatrice en robe rouge présente la roue pour tout le salon', 'Ta roue de 54 cases est posée sur sa grande roue de glace'] },
@@ -19597,7 +19624,7 @@ const FILES = {
   plateaulive: ['plateaulive', 'games/impl/plateaulive.js', 'PlateauLiveGame', '6ffe0b361e'],
   storm: ['storm', 'games/impl/storm.js', 'StormGame', '209ac1dbd4'],
   doublespin: ['doublespin', 'games/impl/doublespin.js', 'DoubleSpinGame', 'a2079e2117'],
-  bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', 'b010cfef71'],
+  bjtable: ['bjtable', 'games/impl/bjtable.js', 'BjTableGame', '33e359aa0d'],
   blackjack: ['blackjack', 'games/impl/blackjack.js', 'BlackjackGame', '0bef82d927'],
   lightningbj: ['lightningbj', 'games/impl/lightningbj.js', 'LightningBJGame', 'da5341a3eb'],
   rltable: ['rltable', 'games/impl/rltable.js', 'RlTableGame', 'a572058d79'],
