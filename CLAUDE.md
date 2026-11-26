@@ -241,7 +241,7 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   (`--pack` = sans refaire le rendu) → `assets/games/zeus/3d/s0…s4.webp` (gemme au repos, 320 px) + `s0…s4-win.webp` (24 images de
   224 px côte à côte : tour complet sur elle-même avec flou de mouvement, ≈ 250 Ko). `games/zeus.js` : **seulement avec `?3d` dans
   l'adresse** (gardé sur l'appareil, `?3d=0` pour revenir) : les gemmes de la grille sont les rendus 3D et une gemme gagnante tourne
-  (`.z3d`, `steps(23)` en 0,7 s = le temps du gain, cellules `.g3d`). `tools/bundle.py` prend aussi `assets/games/*/3d/*`.
+  (`.z3d`, `steps(24, jump-none)` en 0,7 s : 24 positions = les 24 images = le temps du gain, cellules `.g3d`). `tools/bundle.py` prend aussi `assets/games/*/3d/*`.
   **Le film** (vertical 9:16, Snap / TikTok) : `trailer.py` (rendu des images 540 × 960 dans `BL_TMP`, `BL_QUICK=1` = aperçu) : éclair de
   Zeus, les 5 gemmes jaillissent et tournent en anneau autour d'une boule de plasma (`plasma()`), 2e éclair, titre L'OLYMPE en or qui se
   tourne vers nous, lumière qui balaie les lettres ; puis `film.py` : ciel d'orage dessiné, poussière d'or, bloom, adresse du site à la

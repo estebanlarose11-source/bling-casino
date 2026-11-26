@@ -2577,7 +2577,7 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 /* L'Olympe, les 5 gemmes en 3D (essai avec ?3d, Blender : tools/blender/olympe) : la gemme gagnante fait un tour complet sur
    elle-même (24 images côte à côte, 0,7 s, le temps du gain) */
 .g-zeus .z3d { position: absolute; left: 50%; top: 50%; width: min(100cqw, 100cqh); aspect-ratio: 1; translate: -50% -50%; background: 0 0 / 2400% 100% no-repeat; opacity: 0; pointer-events: none; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .5)); }
-.g-zeus .sg-cell.g3d.win .z3d { opacity: 1; animation: z3dSpin .7s steps(23, jump-none) both; }
+.g-zeus .sg-cell.g3d.win .z3d { opacity: 1; animation: z3dSpin .7s steps(24, jump-none) both; }
 .g-zeus .sg-cell.g3d.win .z-img { opacity: 0; animation: none; }
 @keyframes z3dSpin { from { background-position: 0 0; } to { background-position: 100% 0; } }
 .intro-glyph .z-img { width: 140px; height: 140px; }
