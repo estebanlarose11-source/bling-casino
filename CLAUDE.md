@@ -230,6 +230,22 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   tour), éclairs depuis `.zo-gem`, annonce et bilan des tours gratuits dans le cadre (`panel`). Plein écran (`layout()`, comme
   La Sweety) : la vidéo qui va avec la forme de l'écran le couvre, rognée sans couper médaillon, grille ni barre (zone gardée
   `[kx0, ky0, kx1, ky1]`) ; écran d'une autre forme : `fullFit` (étirée un peu, puis ses bords continuent). Positions en % de chaque vidéo dans le bloc CSS « L'Olympe ». Gains inchangés.
+- **L'Olympe en 3D avec Blender (essai)** (demande du propriétaire du 26 novembre 2026 : « pousse Blender à fond, comme un studio
+  professionnel », essai sur L'Olympe) : Blender 5.3 tourne ici sans carte graphique (`pip install bpy`, rendu Cycles sur le processeur,
+  débruitage OpenImageDenoise), piloté par les scripts de `tools/blender/olympe/` : `gems.py` = les 5 gemmes du jeu **modélisées pour de
+  vrai** (`GEMS` : saphir taille brillant 58 facettes, émeraude taille à degrés, topaze / améthyste / rubis taille coussin ; enveloppe
+  convexe des points des facettes = facettes vraiment planes), verre avec réfraction et **dispersion** (le « feu » arc-en-ciel), couleur
+  par absorption dans l'épaisseur (`ShaderNodeVolumeAbsorption`), sertis en or poli (`setting`), studio de joaillier (`studio` : HDRI de
+  Blender pour les reflets, fond noir ; `strips` : bandes de lumière), rendu `Filmic` / `High Contrast` (`VIEW`). `post.py` : étoiles de
+  brillance (`glints`, seulement dans la pierre, pas sur l'or), bloom, étalonnage. **Dans le jeu** : `python3 tools/blender/olympe/sprites.py`
+  (`--pack` = sans refaire le rendu) → `assets/games/zeus/3d/s0…s4.webp` (gemme au repos, 320 px) + `s0…s4-win.webp` (24 images de
+  224 px côte à côte : tour complet sur elle-même avec flou de mouvement, ≈ 250 Ko). `games/zeus.js` : **seulement avec `?3d` dans
+  l'adresse** (gardé sur l'appareil, `?3d=0` pour revenir) : les gemmes de la grille sont les rendus 3D et une gemme gagnante tourne
+  (`.z3d`, `steps(23)` en 0,7 s = le temps du gain, cellules `.g3d`). `tools/bundle.py` prend aussi `assets/games/*/3d/*`.
+  **Le film** (vertical 9:16, Snap / TikTok) : `trailer.py` (rendu des images 540 × 960 dans `BL_TMP`, `BL_QUICK=1` = aperçu) : éclair de
+  Zeus, les 5 gemmes jaillissent et tournent en anneau autour d'une boule de plasma (`plasma()`), 2e éclair, titre L'OLYMPE en or qui se
+  tourne vers nous, lumière qui balaie les lettres ; puis `film.py` : ciel d'orage dessiné, poussière d'or, bloom, adresse du site à la
+  fin, **son fabriqué** (tonnerre, tintements, souffle, boum du titre) → `tools/blender/olympe/out/olympe-3d.mp4` (1080 × 1920, non versionné).
 - **Le Loup 2.0, décor animé** (`games/huff.js`, demande du propriétaire du 15 novembre 2026, comme L'Olympe) : **ses 2 vidéos**
   `tools/art/huff/fond-large.mp4` (672 × 448, `.hf-l`) et `fond-haut.mp4` (448 × 672, `.hf-p`) : la maison en briques des cochons,
   plaques MINI / MAJOR / GRAND JACKPOT, fenêtre étoilée, le loup. Nettoyées par `tools/art/huff/clean.py` (« $1.00 » effacé, quadrillage

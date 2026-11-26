@@ -2574,6 +2574,12 @@ body.fs-on .view { animation: none !important; transform: none !important; }
 @container (min-width: 600px) { .g-zeus .controls { grid-template-columns: auto auto auto 1fr !important; } }
 .z-img { width: 90%; height: 90%; object-fit: contain; display: block; pointer-events: none; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .5)); }
 .g-zeus .sg-cell.win .z-img { animation: winBounce 1s ease-in-out infinite; }
+/* L'Olympe, les 5 gemmes en 3D (essai avec ?3d, Blender : tools/blender/olympe) : la gemme gagnante fait un tour complet sur
+   elle-même (24 images côte à côte, 0,7 s, le temps du gain) */
+.g-zeus .z3d { position: absolute; left: 50%; top: 50%; width: min(100cqw, 100cqh); aspect-ratio: 1; translate: -50% -50%; background: 0 0 / 2400% 100% no-repeat; opacity: 0; pointer-events: none; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .5)); }
+.g-zeus .sg-cell.g3d.win .z3d { opacity: 1; animation: z3dSpin .7s steps(23, jump-none) both; }
+.g-zeus .sg-cell.g3d.win .z-img { opacity: 0; animation: none; }
+@keyframes z3dSpin { from { background-position: 0 0; } to { background-position: 100% 0; } }
 .intro-glyph .z-img { width: 140px; height: 140px; }
 .pay-sym .z-img { width: 44px; height: 44px; }
 @keyframes zBreath { 50% { transform: scale(1.012) translateY(-2px); } }
@@ -19613,7 +19619,7 @@ const FILES = {
   'storm-online': ['storm-online', 'games/impl/storm-online.js', 'StormOnlineGame', '0a69ae2268'],
   'bj-online': ['bj-online', 'games/impl/bj-online.js', 'BjOnlineGame', '88301951af'],
   'holdem-online': ['holdem-online', 'games/impl/holdem-online.js', 'HoldemOnlineGame', '8de5400ee2'],
-  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '1f5dc4c5e4'],
+  zeus: ['zeus', 'games/impl/zeus.js', 'ZeusGame', '3890622eee'],
   huff: ['huff', 'games/impl/huff.js', 'HuffGame', '943b46c1ce'],
   candy: ['candy', 'games/impl/candy.js', 'CandyGame', '68f3a18915'],
   cosmic: ['cosmic', 'games/impl/cosmic.js', 'CosmicGame', 'f84807ddeb'],

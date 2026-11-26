@@ -126,10 +126,16 @@ const asset = (p) => window.__assets?.[p] || `${p}?v=${IMG_V}`; // single-file v
 const PAINT = { z0: 's0', z1: 's1', z2: 's2', z3: 's3', z4: 's4', z5: 's5', z6: 's6', z7: 's7', z8: 's8', zsc: 'scatter', zorb: 'orb' };
 const svgArt = art;
 art = (id) => (PAINT[id] ? `<img class="z-img" src="${asset(`assets/games/zeus/${PAINT[id]}.webp`)}" alt="" draggable="false" decoding="async">` : svgArt(id));
+// The 5 gems in 3D (Blender, tools/blender/olympe, trial of 26 November 2026), with ?3d in the address (kept on this device,
+// ?3d=0 to go back): the gems of the grid are the 3D renders (assets/games/zeus/3d/s0…s4.webp) and a winning gem spins on
+// itself (s0…s4-win.webp: 24 images side by side, played during the 0.7 s of the win, .z3d).
+const G3D = (() => { try { const q = new URLSearchParams(location.search); if (q.has('3d')) localStorage.setItem('spinbet_zeus3d', q.get('3d') === '0' ? '0' : '1'); return localStorage.getItem('spinbet_zeus3d') === '1'; } catch { return false; } })();
+if (G3D) for (let i = 0; i < 5; i++) PAINT[`z${i}`] = `3d/s${i}`;
+const spin3d = (s) => (G3D && s < 5 ? `<i class="z3d" style="background-image:url('${asset(`assets/games/zeus/3d/s${s}-win.webp`)}')"></i>` : '');
 const NAMES = ['Saphir', 'Émeraude', 'Topaze', 'Améthyste', 'Rubis', 'Calice', 'Anneau', 'Sablier', 'Couronne'];
 const lab = (t) => `<b class="sg-lab">${t}</b>`;
-const cellArt = (c) => (c.s === ORB ? art('zorb') + lab('×' + c.m) : c.s === SC ? art('zsc') + '<i class="lbl zl">SCATTER</i>' : art(IDS[c.s]));
-const cellCls = (c) => (c.s === ORB ? 'orb' : c.s === SC ? 'scatter' : c.s >= 5 ? 'hi' : '');
+const cellArt = (c) => (c.s === ORB ? art('zorb') + lab('×' + c.m) : c.s === SC ? art('zsc') + '<i class="lbl zl">SCATTER</i>' : art(IDS[c.s]) + spin3d(c.s));
+const cellCls = (c) => (c.s === ORB ? 'orb' : c.s === SC ? 'scatter' : c.s >= 5 ? 'hi' : G3D ? 'g3d' : '');
 
 // The videos: a 121-frame loop (24 images/s), then its first 12 frames again (core/videobg.js, tools/art/zeus/clean.py).
 const LOOP = 121 / 24;

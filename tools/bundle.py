@@ -46,7 +46,7 @@ for icon in ['apple-touch-icon.png', 'icon-192.png', 'icon-512.png', 'icon-maska
 amap = {}
 MIME = {'.webp': 'image/webp', '.mp4': 'video/mp4'}  # videos: the moving backgrounds (La Tournée du Père Noël)
 G = root / 'assets' / 'games'  # + the card pictures of each JCC series (assets/games/jcc/<serie>/*.webp)
-for img in sorted(p for p in [*G.glob('*/*'), *G.glob('jcc/*/*')] if p.suffix in MIME):
+for img in sorted(p for p in [*G.glob('*/*'), *G.glob('jcc/*/*'), *G.glob('*/3d/*')] if p.suffix in MIME):
     rel = img.relative_to(root).as_posix()
     data = f'data:{MIME[img.suffix]};base64,' + base64.b64encode(img.read_bytes()).decode()
     amap[rel] = data
