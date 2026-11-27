@@ -485,7 +485,7 @@ const CLIPS = { p: { a: 10, land: 61, b: 100 }, d: { a: 100, land: 161, b: 192 }
 // a close-up of her, alive, looped while nobody plays (IDLE_LOOP: the loop, then its first frames again: we jump back by one
 // loop like core/videobg.js). Bets and deals go back to the table video above. IDLE_AFTER: ms without a touch before the
 // close-up comes back (bet = choosing the bet, end = the result of the last hand stays on the felt).
-const IDLE_LOOP = 370 / 30, IDLE_AFTER = { bet: 9000, end: 6000 };
+const IDLE_LOOP = 370 / 30, IDLE_AFTER = { bet: 6000, end: 4000 };
 const bmode = () => (innerHeight > innerWidth && innerWidth < 900 ? 'p' : 'l');
 
 const vSpotHTML = (t, label, sub) => `<button class="bjv-spot bjx-spot${t === 'main' ? ' main' : ' bjv-sb'}" data-t="${t}" aria-label="Poser le jeton choisi sur ${label}"><em class="bjx-lab">${label}${sub ? `<small>${sub}</small>` : ''}</em><span class="bjv-stack"></span><b class="bjv-up bjv-amt" hidden></b><b class="bjv-up bjv-sres" hidden></b></button>`;
@@ -644,7 +644,8 @@ class BjVideoGame extends BjTableGame {
     super.destroy();
   }
   // « Bonsoir, la table est ouverte. »: over the whole table, once, when the player comes (after the game's welcome screen),
-  // then her close-up. A tap skips it (to the table: the player wants to play).
+  // then her close-up. A tap does not skip it (owner's wish of 27 November 2026: « faut bien laisser l'animation »): it is
+  // 1.8 s, and her close-up always follows it.
   openTable() {
     const box = this.q('.bjx-open'), v = box?.querySelector('video');
     if (!box || !this.donne.ok || new URLSearchParams(location.search).has('nointro')) return;
@@ -667,14 +668,14 @@ class BjVideoGame extends BjTableGame {
       if (document.querySelector('.gi-back:not(.out)') || document.hidden) { since = 0; this.openT = setTimeout(wait, 100); return; }
       since = since || performance.now();
       if (v.readyState < 3 && performance.now() - since < 3000) { this.openT = setTimeout(wait, 100); return; }
-      if (v.readyState < 2) return this.endOpening(false); // too slow to come: straight to her close-up
+      if (v.readyState < 2) return this.endOpening(); // too slow to come: straight to her close-up
       this.openGo = true; this.offUnlock(); this.fitOpen();
       try { v.currentTime = 0; } catch { /* ignore */ }
       v.muted = !snd();
-      v.play().catch(() => { v.muted = true; return v.play(); }).catch(() => this.endOpening(false));
+      v.play().catch(() => { v.muted = true; return v.play(); }).catch(() => this.endOpening());
       if (!v.muted) duck(0.35, 2.4);
-      v.addEventListener('ended', () => this.endOpening(false), { once: true });
-      this.openT = setTimeout(() => this.endOpening(false), 4500);
+      v.addEventListener('ended', () => this.endOpening(), { once: true });
+      this.openT = setTimeout(() => this.endOpening(), 4500);
     };
     wait();
   }
@@ -687,12 +688,12 @@ class BjVideoGame extends BjTableGame {
     const cb = Math.max(0, Math.min(r.height * 0.4, r.bottom - bot)), ct = Math.max(0, Math.min(r.height * 0.3, top - r.top));
     box.style.inset = `${Math.round(ct)}px 0 ${Math.round(cb)}px 0`;
   }
-  endOpening(skip) {
+  endOpening() {
     if (!this.opening) return;
     this.opening = false; clearTimeout(this.openT); this.offUnlock?.();
     const box = this.q('.bjx-open'), v = box.querySelector('video');
     this.lastAct = performance.now();
-    if (!skip) this.goIdle();
+    this.goIdle();
     box.classList.add('out');
     setTimeout(() => { if (this.dead) return; box.hidden = true; v.pause(); v.removeAttribute('src'); v.load(); }, 520);
   }
@@ -709,7 +710,7 @@ class BjVideoGame extends BjTableGame {
   }
   touchTable(e) {
     this.lastAct = performance.now();
-    if (this.opening) { if (e?.type === 'pointerdown') this.endOpening(true); return; }
+    if (this.opening) return; // her opening plays to the end, then her close-up
     if (e?.target?.closest?.('.bjx-snd')) return; // the sound button: her close-up stays
     this.leaveIdle();
   }

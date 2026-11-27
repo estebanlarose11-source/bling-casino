@@ -476,10 +476,10 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   on 17 » effacé : tapis suivi image par image (SIFT, homographie depuis l'image 268), bande `BAND` remplacée par un tapis lisse).
   Dans le jeu (voulu par le propriétaire : « quand on joue pas… la croupière animée à l'infini ; quand on mise, la vidéo où elle sert les
   cartes ») : **à chaque arrivée** sur la table, l'ouverture par-dessus tout le jeu (`.bjx-open`, après l'écran d'accueil du jeu `.gi-back`,
-  un toucher la passe, sautée avec `?nointro`, ajustée à la partie visible au-dessus de la barre du bas du téléphone `fitOpen()`), puis
+  un toucher ne la passe pas : elle va jusqu'au bout puis le gros plan, voulu par le propriétaire le 27 novembre 2026 ; sautée avec `?nointro`, ajustée à la partie visible au-dessus de la barre du bas du téléphone `fitOpen()`), puis
   **le gros plan** (`.bjx-idle`, classe `.bjx-idle-on` : tapis, cercles, cartes, jetons, tableau du 21 Électrique s'effacent, « ● EN DIRECT »
   et « Touche la table pour miser » ; ordinateur = son visage en `object-fit: cover`). Tout toucher (ou touche du clavier) ramène la table
-  (`touchTable`) ; le gros plan revient après `IDLE_AFTER` (9 s sans toucher en choisissant sa mise, 6 s après la fin d'une main), jamais
+  (`touchTable`) ; le gros plan revient après `IDLE_AFTER` (6 s sans toucher en choisissant sa mise, 4 s après la fin d'une main), jamais
   pendant une main. Le nom `act` est déjà pris par Le 21 (main en cours). Gains inchangés.
 - **La Roulette : la croupière filmée** (`games/roulette.js` → `RlVideoGame` de `games/rltable.js`, vidéos du propriétaire du 17 novembre
   2026, remplacent celle du 16 ; L'Éclair, La Double Bille et L'Éclair Online gardent la table 3D) : **ses 2 vidéos** (`tools/art/roulette/
