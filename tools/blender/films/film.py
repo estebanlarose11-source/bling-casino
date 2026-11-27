@@ -194,7 +194,9 @@ class FX:
                     s = 0.45 + 0.75 * z
                     sp_ = cv2.resize(spr, (max(2, int(spr.shape[1] * s)), max(2, int(spr.shape[0] * s))), interpolation=cv2.INTER_AREA)
                     if near: sp_ = cv2.GaussianBlur(sp_, (0, 0), 2.5)
-                    paste(img, sp_, x, y, ang * 0.5, flip, 0.95)
+                    # at the end, the big ones in front stay off the title and the site's address
+                    al = 0.95 * (1 - smooth((f - 140) / 20) * (y > 0.58 * H)) if near else 0.95
+                    if al > 0.02: paste(img, sp_, x, y, ang * 0.5, flip, al)
                 else:
                     L = (14 if k == 'confetti' else 26 if k == 'leaves' else 30) * (0.5 + 0.8 * z) * (1.5 if near else 1)
                     Wd = (8 if k == 'confetti' else 12 if k == 'leaves' else 2.5) * (0.5 + 0.8 * z) * max(0.15, abs(flip)) * (1.5 if near else 1)
