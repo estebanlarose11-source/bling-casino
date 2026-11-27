@@ -25,6 +25,9 @@ TITLE_IN, SWEEP = (126, 156), (160, 200)
 HERO_TURNS = [(58, 92), (166, 200)]
 
 
+def tz(lines): return -1.12 if lines else -1.25
+
+
 def tmp(mid): return os.path.join(os.environ.get('BL_TMP', '/tmp/films3d'), mid)
 def smooth(t): t = min(1, max(0, t)); return t * t * (3 - 2 * t)
 def back(t, s=1.7): t = min(1, max(0, t)) - 1; return 1 + t * t * ((s + 1) * t + s)
@@ -94,10 +97,10 @@ def build(mid):
     title = bpy.data.objects.new('title', tc); sc.collection.objects.link(title)
     title.data.materials.append(gems.gold_material())
     bpy.context.view_layer.update()
-    k = min(3.7 / title.dimensions.x, (1.5 if '\n' in cfg['title'] else 0.95) / title.dimensions.y)
-    title.scale = (k, k, k)
     lines = cfg['title'].count('\n')
-    TZ = -1.25 - 0.22 * lines
+    k = min(3.7 / title.dimensions.x, (1.25 if lines else 0.95) / title.dimensions.y)
+    title.scale = (k, k, k)
+    TZ = tz(lines)                     # its bottom stays above the site's address of the end
     tpiv = bpy.data.objects.new('tpiv', None); sc.collection.objects.link(tpiv); tpiv.location = (0, -1.0, TZ)
     title.parent = tpiv; title.rotation_euler = (math.radians(90), 0, 0)
     tkey = gems.area('tkey', (1.6, -4.5, TZ + 1.8), (0, -1.0, TZ), (2.4, 0.6), 0, (1.0, 0.95, 0.85))

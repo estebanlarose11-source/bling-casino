@@ -51,7 +51,7 @@ def hero_xy(f):
     return project(f, (0, 0.15, 1.45 + 0.35 * rise))
 
 
-def title_xy(f, lines): return project(f, (0, -1.0, -1.25 - 0.22 * lines))
+def title_xy(f, lines): return project(f, (0, -1.0, -1.12 if lines else -1.25))   # tz() of trailer.py
 
 
 # ---------------- the decor ----------------
