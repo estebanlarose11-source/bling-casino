@@ -113,4 +113,5 @@ def token(path, name, depth=0.07, bevel=0.022, rim=GOLD):
         sp.use_cyclic_u = True
     cu.materials.append(_mat_token(f'm-{name}', png, w, h, rim))
     ob = bpy.data.objects.new(name, cu); bpy.context.scene.collection.objects.link(ob)
+    ob['aspect'] = w / h
     return ob

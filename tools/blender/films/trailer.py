@@ -78,7 +78,9 @@ def build(mid):
         holder = bpy.data.objects.new(f'h-{name}', None); sc.collection.objects.link(holder)
         spin = bpy.data.objects.new(f's-{name}', None); sc.collection.objects.link(spin); spin.parent = holder
         o = tokens.token(src(path), name, rim=rim)
-        o.parent = spin; o.rotation_euler = (math.radians(90), 0, 0); o.scale = (scale,) * 3
+        # a long shape (a running deer, a banknote, a wooden plaque) is 1 wide but thin: a little bigger
+        grow = min(1.25 if name == 'hero' else 1.45, max(1.0, o['aspect']) ** 0.35)
+        o.parent = spin; o.rotation_euler = (math.radians(90), 0, 0); o.scale = (scale * grow,) * 3
         return holder, spin
 
     G = [(*piece(p, f'r{k}', 0.92), 2 * math.pi * k / 5 + math.pi / 2) for k, p in enumerate(cfg['ring'])]
