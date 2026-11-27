@@ -246,6 +246,19 @@ Le site est publié depuis `main` ; adresse officielle : https://www.spinbetcaz.
   Zeus, les 5 gemmes jaillissent et tournent en anneau autour d'une boule de plasma (`plasma()`), 2e éclair, titre L'OLYMPE en or qui se
   tourne vers nous, lumière qui balaie les lettres ; puis `film.py` : ciel d'orage dessiné, poussière d'or, bloom, adresse du site à la
   fin, **son fabriqué** (tonnerre, tintements, souffle, boum du titre) → `tools/blender/olympe/out/olympe-3d.mp4` (1080 × 1920, non versionné).
+- **Les films 3D de toutes les machines à sous** (demande du propriétaire du 27 novembre 2026, après le film de L'Olympe : « fais ça sur
+  toutes les machines… c'est génial ») : `tools/blender/films/`. `machines.py` = une ligne par machine (`M` : titre en or, symbole vedette
+  `hero`, les 5 qui tournent autour `ring`, décor `bg` = sa vidéo ou son image, particules `fx` : embers, blue_embers, snow, sparkles, dust,
+  stars, confetti, straw, fireflies, leaves, coins, notes ; couleur `accent`, son `sound` : boom, roar, gong, shot, chime, bells, wind ;
+  métal `rim`) et les lots `BATCHES`. `tokens.py` : **chaque symbole peint devient une vraie pièce 3D** (sa silhouette tracée par OpenCV,
+  extrudée, biseau et dos en métal, le dessin laqué sur la face ; vue « Standard » et dessin surtout en émission : les couleurs du
+  propriétaire restent justes ; Le Totem Extrême = ses emoji). `trailer.py <id>` : la scène Blender (même minutage que L'Olympe : impact,
+  le symbole vedette jaillit, les 5 autres en roue, il se retourne, 2e impact, le nom en or (police Bebas du site) qui se tourne vers nous,
+  lumière qui balaie les lettres ; `tkey` / `sweep` n'éclairent que le titre : `light_linking`) → images dans `BL_TMP/<id>/` (≈ 6 s
+  l'image sur 4 cœurs, ≈ 25 min par machine). `film.py <id>` (`--still N` = une image) : décor de la machine flouté et assombri en bas,
+  lumière de sa couleur derrière la vedette, rayons, onde de choc et étincelles des impacts, particules, son fabriqué →
+  `tools/blender/films/out/<id>.mp4` (1080 × 1920, ≈ 10 Mo, non versionné). Pièges : flou de mouvement à 0,28 (plus long, les pièces
+  qui tournent vite devenaient laiteuses : `NO_MB=1` / `NO_DOF=1` pour vérifier) ; pas de vue Filmic (elle délave les dessins).
 - **Le Loup 2.0, décor animé** (`games/huff.js`, demande du propriétaire du 15 novembre 2026, comme L'Olympe) : **ses 2 vidéos**
   `tools/art/huff/fond-large.mp4` (672 × 448, `.hf-l`) et `fond-haut.mp4` (448 × 672, `.hf-p`) : la maison en briques des cochons,
   plaques MINI / MAJOR / GRAND JACKPOT, fenêtre étoilée, le loup. Nettoyées par `tools/art/huff/clean.py` (« $1.00 » effacé, quadrillage
