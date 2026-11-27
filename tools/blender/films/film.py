@@ -242,10 +242,10 @@ def shock(img, f, centre, s0, acc):
         img += core[..., None] * (col * 1.6)
 
 
-def shafts(rgb, centre, strength):
+def shafts(rgb, centre, strength, thresh=0.55):
     """light shafts from the hero: the bright parts blurred outwards from its centre (zoom blur)"""
     if strength <= 0.01: return rgb
-    q = cv2.resize(np.clip(rgb - 0.55, 0, None), (W // 4, H // 4), interpolation=cv2.INTER_AREA)
+    q = cv2.resize(np.clip(rgb - thresh, 0, None), (W // 4, H // 4), interpolation=cv2.INTER_AREA)
     cx, cy = centre[0] / 4, centre[1] / 4
     acc = np.zeros_like(q)
     for i in range(10):
@@ -279,6 +279,8 @@ class Film:
         self.fx = FX(cfg)
         self.acc = np.array(cfg['accent'], np.float32)
         self.lines = cfg['title'].count('\n')
+        # light paintings (La Sweety's white tiles) must not glow white: a higher threshold, less glow
+        self.bloom, self.glow = cfg.get('bloom', 0.7), cfg.get('glow', 1.0)
 
     def compose(self, f):
         t = f / FPS; v = impact(f); acc = self.acc
@@ -296,12 +298,12 @@ class Film:
         fr = glints(fr, 4, 0.9, seed=f, thresh=0.8, scale=0.10, inner=0.004)
         a = fr[..., 3:4]
         out = bg * (1 - a) + fr[..., :3] * a
-        out = shafts(out, (hx, hy), 0.18 * on + 0.7 * v)
+        out = shafts(out, (hx, hy), (0.18 * on + 0.7 * v) * self.glow, self.bloom - 0.15)
         self.fx.draw(out, f, True)
         shock(out, f, (hx, hy), STRIKE1, acc); shock(out, f, (tx, ty), STRIKE2, acc)
         self.fx.sparks(out, f, (hx, hy), STRIKE1); self.fx.sparks(out, f, (tx, ty), STRIKE2)
         out += acc * v * 0.12
-        out = bloom(out, 0.7, 0.42 + 0.5 * v)
+        out = bloom(out, self.bloom, (0.42 + 0.5 * v) * self.glow)
         out = grade(out, sat=1.08, vignette=0.40, grain=0.008, seed=f)
         c = caption(f)
         if c is not None: out = out * (1 - c[..., 3:4]) + c[..., :3] * c[..., 3:4]

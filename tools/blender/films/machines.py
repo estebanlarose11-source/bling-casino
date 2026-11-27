@@ -1,6 +1,7 @@
 # One line per slot machine for its 3D film (tokens.py, trailer.py, film.py): the title written in gold, the hero symbol
 # (big, at the centre), the 5 symbols that turn around it, the owner's decor behind (video or image, blurred), the
-# particles of its world (fx), the colour of its light (accent), its impact sound, the metal of the pieces (rim).
+# particles of its world (fx), the colour of its light (accent), its impact sound, the metal of the pieces (rim); bloom /
+# glow = threshold and strength of the glow added in film.py (paintings on light backgrounds: higher, less).
 # Paths are relative to assets/games/. 'emoji:🦅' = an emoji drawn as a painting (Le Totem Extrême has no images).
 GOLD, SILVER, BRONZE, ROSE = (1.0, 0.62, 0.20), (0.86, 0.88, 0.92), (0.80, 0.45, 0.20), (1.0, 0.55, 0.55)
 
@@ -22,9 +23,10 @@ M = {
     'cosmic': dict(title='LE COSMIQUE', hero='cosmic/nova', ring=['cosmic/s0', 'cosmic/s1', 'cosmic/s2', 'cosmic/s3', 'cosmic/s8'],
                    bg='cosmic/scene-haut.webp', fx='stars', accent=(0.30, 0.85, 1.0), sound='boom', rim=SILVER),
     'candy': dict(title='LA SWEETY', hero='candy/heart', ring=['candy/s4', 'candy/s6', 'candy/s8', 'candy/s0', 'candy/s9'],
-                  bg='candy/scene-haut.webp', fx='confetti', accent=(1.0, 0.35, 0.75), sound='chime', rim=ROSE),
+                  bg='candy/scene-haut.webp', fx='confetti', accent=(1.0, 0.35, 0.75), sound='chime', rim=ROSE,
+                  bloom=0.93, glow=0.35),
     'noel': dict(title='LA TOURNÉE\nDU PÈRE NOËL', hero='noel/wild', ring=['noel/s8', 'noel/globe', 'noel/s1', 'noel/s5', 'noel/s4'],
-                 bg='noel/fond-haut.mp4', fx='snow', accent=(1.0, 0.25, 0.22), sound='bells'),
+                 bg='noel/fond-haut.mp4', fx='snow', accent=(1.0, 0.25, 0.22), sound='bells', bloom=0.82, glow=0.7),
     'huff': dict(title='LE LOUP 2.0', hero='huff/wolf', ring=['huff/pig', 'huff/straw', 'huff/wood', 'huff/brick', 'huff/scatter'],
                  bg='huff/fond-haut.mp4', fx='straw', accent=(1.0, 0.78, 0.30), sound='wind'),
     'big-bad-wolf': dict(title='LE LOUP', hero='huff/wolfplain', ring=['huff/pig', 'huff/straw', 'huff/wood', 'huff/brick', 'wolf/coin'],
@@ -34,7 +36,7 @@ M = {
     'bling': dict(title='LA TOUR BLING', hero='bling/s0', ring=['bling/s1', 'bling/s2', 'bling/s3', 'bling/s5', 'bling/sc'],
                   bg='bling/fond-haut.mp4', fx='sparkles', accent=(0.85, 0.35, 1.0), sound='chime'),
     'billets': dict(title='LE COFFRE-FORT', hero='billets/jackpot', ring=['billets/b5', 'billets/b4', 'billets/case', 'billets/fs', 'billets/b3'],
-                    bg='billets/scene-haut.webp', fx='notes', accent=(1.0, 0.80, 0.30), sound='boom'),
+                    bg='billets/scene-haut.webp', fx='notes', accent=(1.0, 0.80, 0.30), sound='boom', bloom=0.85, glow=0.6),
     'totemx': dict(title='LE TOTEM\nEXTRÊME', hero='emoji:☀️', ring=['emoji:👑', 'emoji:🦅', 'emoji:🐍', 'emoji:🪲', 'emoji:🏺'],
                    bg='totemx/fond-haut.mp4', fx='embers', accent=(1.0, 0.42, 0.08), sound='roar'),
 }
